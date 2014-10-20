@@ -55,290 +55,295 @@ import com.inmobi.casthrift.DemandSourceType;
 @PrepareForTest({InspectorStats.class, CasConfigUtil.class, BaseServlet.class})
 public class ServletIXFillTest {
 
-  @Test
-  public void testHandleRequestDroppedInRequestFilters() throws Exception {
-    /**
-     * Branches/Conditions followed: Is dropped in request filters
-     */
-    mockStatic(InspectorStats.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-    final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-    final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-    final CasInternalRequestParameters mockCasInternalRequestParameters =
-        createMock(CasInternalRequestParameters.class);
-    final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-    final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
-    final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+	@Test
+	public void testHandleRequestDroppedInRequestFilters() throws Exception {
+		/**
+		 * Branches/Conditions followed: Is dropped in request filters
+		 */
+		mockStatic(InspectorStats.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+		final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+		final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+		final CasInternalRequestParameters mockCasInternalRequestParameters =
+				createMock(CasInternalRequestParameters.class);
+		final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+		final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+		final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
 
-    expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
-    expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
-    expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-    expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-    expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-    expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
-    mockCasInternalRequestParameters.setTraceEnabled(true);
-    expectLastCall();
-    InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-    expectLastCall().times(1);
-    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-    expectLastCall().times(1);
-    mockResponseSender.sendNoAdResponse(null);
-    expectLastCall().times(1);
+		expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
+		expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+		expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
+		expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
+		expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
+		mockCasInternalRequestParameters.setTraceEnabled(true);
+		expectLastCall();
+		InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
+		expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
+		expectLastCall().times(1);
+		mockResponseSender.sendNoAdResponse(null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
-    mockResponseSender.sasParams = null;
-    mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
+		mockResponseSender.sasParams = null;
+		mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-    final ServletIXFill tested =
-        new ServletIXFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
-    tested.handleRequest(mockHttpRequestHandler, null, null);
+		final ServletIXFill tested =
+				new ServletIXFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
+		tested.handleRequest(mockHttpRequestHandler, null, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testHandleRequestNoMatchedSegmentDetails() throws Exception {
-    /**
-     * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false DemandSourceType
-     * is IX ResponseFormat is XHTML MatchedSegmentDetails is empty
-     */
-    mockStatic(InspectorStats.class);
-    mockStatic(CasConfigUtil.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-    final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-    final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-    final CasInternalRequestParameters mockCasInternalRequestParameters =
-        createMock(CasInternalRequestParameters.class);
-    final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-    final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
-    final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
-    final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-    final Configuration mockConfig = createMock(Configuration.class);
-    final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+	@Test
+	public void testHandleRequestNoMatchedSegmentDetails() throws Exception {
+		/**
+		 * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false
+		 * DemandSourceType is IX ResponseFormat is XHTML MatchedSegmentDetails is empty
+		 */
+		mockStatic(InspectorStats.class);
+		mockStatic(CasConfigUtil.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+		final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+		final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+		final CasInternalRequestParameters mockCasInternalRequestParameters =
+				createMock(CasInternalRequestParameters.class);
+		final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+		final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+		final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+		final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+		final Configuration mockConfig = createMock(Configuration.class);
+		final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
 
-    expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
-    expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
-    expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-    expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-    expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-    expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
-    expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
-    expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
-    expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
-    expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
-    expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
-        new ArrayList<AdvertiserMatchedSegmentDetail>());
-    expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
-    mockCasInternalRequestParameters.setTraceEnabled(true);
-    expectLastCall();
+		expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
+		expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+		expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
+		expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
+		expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
+		expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
+		expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
+		expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
+		expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
+		expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
+				new ArrayList<AdvertiserMatchedSegmentDetail>());
+		expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
+		mockCasInternalRequestParameters.setTraceEnabled(true);
+		expectLastCall();
 
-    mockSASRequestParameters.setResponseOnlyFromDcp(false);
-    expectLastCall().times(1);
-    mockSASRequestParameters.setImaiBaseUrl(null);
-    expectLastCall().times(1);
+		mockSASRequestParameters.setResponseOnlyFromDcp(false);
+		expectLastCall().times(1);
+		mockSASRequestParameters.setImaiBaseUrl(null);
+		expectLastCall().times(1);
 
-    InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-    expectLastCall().times(1);
-    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
+		expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
+		expectLastCall().times(1);
 
-    mockResponseSender.sendNoAdResponse(null);
-    expectLastCall().times(1);
+		mockResponseSender.sendNoAdResponse(null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
-    mockResponseSender.sasParams = mockSASRequestParameters;
-    mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
+		mockResponseSender.sasParams = mockSASRequestParameters;
+		mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-    final ServletIXFill tested =
-        new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, null, null, null, null);
-    tested.handleRequest(mockHttpRequestHandler, null, null);
+		final ServletIXFill tested =
+				new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, null, null,
+						null, null);
+		tested.handleRequest(mockHttpRequestHandler, null, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testHandleRequestNullFilteredSegments() throws Exception {
-    /**
-     * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false DemandSourceType
-     * is IX ResponseFormat is XHTML MatchedSegmentDetails is not empty siteMetaDataEntity is null filteredSegments are
-     * null
-     */
-    mockStatic(InspectorStats.class);
-    mockStatic(CasConfigUtil.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-    final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-    final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-    final CasInternalRequestParameters mockCasInternalRequestParameters =
-        createMock(CasInternalRequestParameters.class);
-    final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-    final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
-    final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
-    final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-    final Configuration mockConfig = createMock(Configuration.class);
-    final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
-    final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-    final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier = createMock(ChannelSegmentFilterApplier.class);
-    final CasContext mockCasContext = createMock(CasContext.class);
+	@Test
+	public void testHandleRequestNullFilteredSegments() throws Exception {
+		/**
+		 * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false
+		 * DemandSourceType is IX ResponseFormat is XHTML MatchedSegmentDetails is not empty siteMetaDataEntity is null
+		 * filteredSegments are null
+		 */
+		mockStatic(InspectorStats.class);
+		mockStatic(CasConfigUtil.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+		final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+		final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+		final CasInternalRequestParameters mockCasInternalRequestParameters =
+				createMock(CasInternalRequestParameters.class);
+		final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+		final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+		final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+		final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+		final Configuration mockConfig = createMock(Configuration.class);
+		final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+		final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+		final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
+				createMock(ChannelSegmentFilterApplier.class);
+		final CasContext mockCasContext = createMock(CasContext.class);
 
-    final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
+		final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
 
-    expectNew(CasContext.class).andReturn(mockCasContext).times(1);
+		expectNew(CasContext.class).andReturn(mockCasContext).times(1);
 
-    expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
-    expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
-    expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-    expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-    expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-    expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
-    expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
-    expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
-    expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
-    expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
-    expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
-    expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
-    expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
-    expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
-    expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(1);
-    expect(
-        mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null,
-            null)).andReturn(null).times(1);
-    mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
-    expectLastCall();
-    mockCasInternalRequestParameters.setTraceEnabled(true);
-    expectLastCall();
+		expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
+		expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+		expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
+		expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
+		expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
+		expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
+		expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
+		expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
+		expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
+		expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
+		expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
+		expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
+		expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
+		expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
+				1);
+		expect(
+				mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
+						null, null)).andReturn(null).times(1);
+		mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
+		expectLastCall();
+		mockCasInternalRequestParameters.setTraceEnabled(true);
+		expectLastCall();
 
-    mockSASRequestParameters.setResponseOnlyFromDcp(false);
-    expectLastCall().times(1);
-    mockSASRequestParameters.setImaiBaseUrl(null);
-    expectLastCall().times(1);
+		mockSASRequestParameters.setResponseOnlyFromDcp(false);
+		expectLastCall().times(1);
+		mockSASRequestParameters.setImaiBaseUrl(null);
+		expectLastCall().times(1);
 
-    InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-    expectLastCall().times(1);
-    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
+		expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
+		expectLastCall().times(1);
 
-    mockResponseSender.sendNoAdResponse(null);
-    expectLastCall().times(1);
+		mockResponseSender.sendNoAdResponse(null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
-    mockResponseSender.sasParams = mockSASRequestParameters;
-    mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
+		mockResponseSender.sasParams = mockSASRequestParameters;
+		mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-    final ServletIXFill tested =
-        new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
-            mockChannelSegmentFilterApplier, null, null, null, null);
-    tested.handleRequest(mockHttpRequestHandler, null, null);
+		final ServletIXFill tested =
+				new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
+						mockChannelSegmentFilterApplier, null, null, null, null);
+		tested.handleRequest(mockHttpRequestHandler, null, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testHandleRequestRankListIsEmpty() throws Exception {
-    /**
-     * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false DemandSourceType
-     * is IX ResponseFormat is XHTML MatchedSegmentDetails is not empty siteMetaDataEntity is null filteredSegments are
-     * not empty rankList is empty
-     */
-    mockStatic(InspectorStats.class);
-    mockStatic(CasConfigUtil.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-    final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-    final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-    final CasInternalRequestParameters mockCasInternalRequestParameters =
-        createMock(CasInternalRequestParameters.class);
-    final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-    final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
-    final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
-    final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-    final Configuration mockConfig = createMock(Configuration.class);
-    final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
-    final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-    final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier = createMock(ChannelSegmentFilterApplier.class);
-    final CasContext mockCasContext = createMock(CasContext.class);
-    final CasUtils mockCasUtils = createMock(CasUtils.class);
-    final AsyncRequestMaker mockAsyncRequestMaker = createNiceMock(AsyncRequestMaker.class);
+	@Test
+	public void testHandleRequestRankListIsEmpty() throws Exception {
+		/**
+		 * Branches/Conditions followed: Is not dropped in request filters IsResponseOnlyFromDcp is false
+		 * DemandSourceType is IX ResponseFormat is XHTML MatchedSegmentDetails is not empty siteMetaDataEntity is null
+		 * filteredSegments are not empty rankList is empty
+		 */
+		mockStatic(InspectorStats.class);
+		mockStatic(CasConfigUtil.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+		final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+		final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+		final CasInternalRequestParameters mockCasInternalRequestParameters =
+				createMock(CasInternalRequestParameters.class);
+		final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+		final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+		final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+		final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+		final Configuration mockConfig = createMock(Configuration.class);
+		final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+		final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+		final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
+				createMock(ChannelSegmentFilterApplier.class);
+		final CasContext mockCasContext = createMock(CasContext.class);
+		final CasUtils mockCasUtils = createMock(CasUtils.class);
+		final AsyncRequestMaker mockAsyncRequestMaker = createNiceMock(AsyncRequestMaker.class);
 
-    final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
-    final List<ChannelSegment> mockChannelSegmentList =
-        Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
+		final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
+		final List<ChannelSegment> mockChannelSegmentList =
+				Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
 
-    expectNew(CasContext.class).andReturn(mockCasContext).times(1);
+		expectNew(CasContext.class).andReturn(mockCasContext).times(1);
 
-    expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
-    expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(2);
-    expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-    expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-    expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-    expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
-    expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
-    expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
-    expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
-    expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
-    expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
-    expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
-    expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
-    expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
-    expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(1);
-    expect(
-        mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null,
-            null)).andReturn(mockChannelSegmentList).times(1);
-    expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
-    expect(mockCasUtils.getRtbFloor(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
-    expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).times(1);
-    expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).times(1);
-    expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).times(1);
-    expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).times(1);
-    expect(mockSASRequestParameters.getUAdapters()).andReturn(null).times(1);
-    expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).times(1);
-    mockCasInternalRequestParameters.setTraceEnabled(true);
-    expectLastCall();
+		expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
+		expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(2);
+		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+		expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
+		expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
+		expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
+		expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
+		expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
+		expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
+		expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
+		expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
+		expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
+		expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
+		expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
+		expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
+				1);
+		expect(
+				mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
+						null, null)).andReturn(mockChannelSegmentList).times(1);
+		expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
+		expect(mockCasUtils.getRtbFloor(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
+		expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).times(1);
+		expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).times(1);
+		expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).times(1);
+		expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).times(1);
+		expect(mockSASRequestParameters.getUAdapters()).andReturn(null).times(1);
+		expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).times(1);
+		mockCasInternalRequestParameters.setTraceEnabled(true);
+		expectLastCall();
 
-    mockSASRequestParameters.setResponseOnlyFromDcp(false);
-    expectLastCall().times(1);
-    mockSASRequestParameters.setImaiBaseUrl(null);
-    expectLastCall().times(1);
+		mockSASRequestParameters.setResponseOnlyFromDcp(false);
+		expectLastCall().times(1);
+		mockSASRequestParameters.setImaiBaseUrl(null);
+		expectLastCall().times(1);
 
-    InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-    expectLastCall().times(1);
-    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
+		expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
+		expectLastCall().times(1);
 
-    mockResponseSender.sendNoAdResponse(null);
-    expectLastCall().times(1);
-    mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
-    expectLastCall();
+		mockResponseSender.sendNoAdResponse(null);
+		expectLastCall().times(1);
+		mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
+		expectLastCall();
 
-    suppress(method(BaseServlet.class, "enrichCasInternalRequestParameters"));
+		suppress(method(BaseServlet.class, "enrichCasInternalRequestParameters"));
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
-    mockResponseSender.sasParams = mockSASRequestParameters;
-    mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
+		mockResponseSender.sasParams = mockSASRequestParameters;
+		mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-    final ServletIXFill tested =
-        new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
-            mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
-    tested.handleRequest(mockHttpRequestHandler, null, null);
+		final ServletIXFill tested =
+				new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
+						mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
+		tested.handleRequest(mockHttpRequestHandler, null, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testGetName() throws Exception {
-    final ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
-    assertThat(tested.getName(), is(IsEqual.equalTo("ixFill")));
-  }
+	@Test
+	public void testGetName() throws Exception {
+		final ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
+		assertThat(tested.getName(), is(IsEqual.equalTo("ixFill")));
+	}
 
-  @Test
-  public void testGetLogger() throws Exception {
-    final ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
-    assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletIXFill.class))));
-  }
+	@Test
+	public void testGetLogger() throws Exception {
+		final ServletIXFill tested = new ServletIXFill(null, null, null, null, null, null, null, null);
+		assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletIXFill.class))));
+	}
 }

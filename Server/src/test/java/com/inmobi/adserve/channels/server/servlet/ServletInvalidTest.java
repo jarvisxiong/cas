@@ -28,32 +28,32 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest(ServletInvalid.class)
 public class ServletInvalidTest {
 
-  @Test
-  public void testHandleRequest() throws Exception {
-    final Channel mockChannel = createMock(Channel.class);
-    final ChannelFuture mockFuture = createMock(ChannelFuture.class);
+	@Test
+	public void testHandleRequest() throws Exception {
+		final Channel mockChannel = createMock(Channel.class);
+		final ChannelFuture mockFuture = createMock(ChannelFuture.class);
 
-    final HttpResponse response =
-        new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
-            "Page not Found", Charset.defaultCharset()), true);
+		final HttpResponse response =
+				new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
+						"Page not Found", Charset.defaultCharset()), true);
 
-    expectNew(DefaultFullHttpResponse.class, HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-        Unpooled.copiedBuffer("Page not Found", Charset.defaultCharset()), true).andReturn(
-        (DefaultFullHttpResponse) response).times(1);
-    expect(mockChannel.writeAndFlush(response)).andReturn(mockFuture).times(1);
-    expect(mockFuture.addListener(ChannelFutureListener.CLOSE)).andReturn(null).times(1);
+		expectNew(DefaultFullHttpResponse.class, HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
+				Unpooled.copiedBuffer("Page not Found", Charset.defaultCharset()), true).andReturn(
+				(DefaultFullHttpResponse) response).times(1);
+		expect(mockChannel.writeAndFlush(response)).andReturn(mockFuture).times(1);
+		expect(mockFuture.addListener(ChannelFutureListener.CLOSE)).andReturn(null).times(1);
 
-    replayAll();
+		replayAll();
 
-    final ServletInvalid tested = new ServletInvalid();
-    tested.handleRequest(null, null, mockChannel);
+		final ServletInvalid tested = new ServletInvalid();
+		tested.handleRequest(null, null, mockChannel);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testGetName() throws Exception {
-    final ServletInvalid tested = new ServletInvalid();
-    assertThat(tested.getName(), is(IsEqual.equalTo("Invalid Servlet")));
-  }
+	@Test
+	public void testGetName() throws Exception {
+		final ServletInvalid tested = new ServletInvalid();
+		assertThat(tested.getName(), is(IsEqual.equalTo("Invalid Servlet")));
+	}
 }

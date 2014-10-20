@@ -4,6 +4,6 @@ import com.inmobi.casthrift.rtb.Native;
 
 public interface NativeBuilder {
 
-  public Native build();
+	public Native build();
 
 }

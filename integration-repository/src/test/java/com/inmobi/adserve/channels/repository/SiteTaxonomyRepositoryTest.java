@@ -28,60 +28,60 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 @PrepareForTest({NullAsZeroResultSetRow.class, ResultSetRow.class, SiteTaxonomyRepository.class})
 public class SiteTaxonomyRepositoryTest {
 
-  @Test
-  public void testBuildObjectFromRow() throws Exception {
-    final int id = 10;
-    final String name = "name";
-    final int parentId = 13;
-    final Timestamp modifiedOn = new Timestamp(1000L);
-    final String expectedId = String.valueOf(id);
-    final String expectedParentId = String.valueOf(parentId);
+	@Test
+	public void testBuildObjectFromRow() throws Exception {
+		final int id = 10;
+		final String name = "name";
+		final int parentId = 13;
+		final Timestamp modifiedOn = new Timestamp(1000L);
+		final String expectedId = String.valueOf(id);
+		final String expectedParentId = String.valueOf(parentId);
 
-    final NullAsZeroResultSetRow mockNullAsZeroResultSetRow = createMock(NullAsZeroResultSetRow.class);
-    final Logger mockLogger = createMock(Logger.class);
+		final NullAsZeroResultSetRow mockNullAsZeroResultSetRow = createMock(NullAsZeroResultSetRow.class);
+		final Logger mockLogger = createMock(Logger.class);
 
-    expect(mockNullAsZeroResultSetRow.getInt("id")).andReturn(id).times(1);
-    expect(mockNullAsZeroResultSetRow.getString("name")).andReturn(name).times(1);
-    expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifiedOn).times(1);
-    expect(mockNullAsZeroResultSetRow.getInt("parent_id")).andReturn(parentId).times(1);
-    mockLogger.debug("Id for the loaded siteTaxonomyEntity is " + id);
-    expectLastCall().times(1);
+		expect(mockNullAsZeroResultSetRow.getInt("id")).andReturn(id).times(1);
+		expect(mockNullAsZeroResultSetRow.getString("name")).andReturn(name).times(1);
+		expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifiedOn).times(1);
+		expect(mockNullAsZeroResultSetRow.getInt("parent_id")).andReturn(parentId).times(1);
+		mockLogger.debug("Id for the loaded siteTaxonomyEntity is " + id);
+		expectLastCall().times(1);
 
-    expectNew(NullAsZeroResultSetRow.class, new Class[] {ResultSetRow.class}, null).andReturn(
-        mockNullAsZeroResultSetRow).times(1);
+		expectNew(NullAsZeroResultSetRow.class, new Class[] {ResultSetRow.class}, null).andReturn(
+				mockNullAsZeroResultSetRow).times(1);
 
-    replayAll();
+		replayAll();
 
-    final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
-    MemberMatcher.field(SiteTaxonomyRepository.class, "logger").set(tested, mockLogger);
+		final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
+		MemberMatcher.field(SiteTaxonomyRepository.class, "logger").set(tested, mockLogger);
 
-    final DBEntity<SiteTaxonomyEntity, String> entity = tested.buildObjectFromRow(null);
-    final SiteTaxonomyEntity output = entity.getObject();
-    final Timestamp outputModifiedOn = entity.getModifiedTime();
-    assertThat(outputModifiedOn, is(equalTo(modifiedOn)));
+		final DBEntity<SiteTaxonomyEntity, String> entity = tested.buildObjectFromRow(null);
+		final SiteTaxonomyEntity output = entity.getObject();
+		final Timestamp outputModifiedOn = entity.getModifiedTime();
+		assertThat(outputModifiedOn, is(equalTo(modifiedOn)));
 
-    assertThat(output.getId(), is(equalTo(expectedId)));
-    assertThat(output.getName(), is(equalTo(name)));
-    assertThat(output.getParentId(), is(equalTo(expectedParentId)));
+		assertThat(output.getId(), is(equalTo(expectedId)));
+		assertThat(output.getName(), is(equalTo(name)));
+		assertThat(output.getParentId(), is(equalTo(expectedParentId)));
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testIsObjectToBeDeleted() throws Exception {
-    final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
-    assertThat(tested.isObjectToBeDeleted(null), is(equalTo(false)));
-  }
+	@Test
+	public void testIsObjectToBeDeleted() throws Exception {
+		final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
+		assertThat(tested.isObjectToBeDeleted(null), is(equalTo(false)));
+	}
 
-  @Test
-  public void testGetHashIndexKeyBuilder() throws Exception {
-    final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
-    assertThat(tested.getHashIndexKeyBuilder(null), is(equalTo(null)));
-  }
+	@Test
+	public void testGetHashIndexKeyBuilder() throws Exception {
+		final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
+		assertThat(tested.getHashIndexKeyBuilder(null), is(equalTo(null)));
+	}
 
-  @Test
-  public void testQueryUniqueResult() throws Exception {
-    final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
-    assertThat(tested.queryUniqueResult(null), is(equalTo(null)));
-  }
+	@Test
+	public void testQueryUniqueResult() throws Exception {
+		final SiteTaxonomyRepository tested = new SiteTaxonomyRepository();
+		assertThat(tested.queryUniqueResult(null), is(equalTo(null)));
+	}
 }

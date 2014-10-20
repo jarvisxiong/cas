@@ -29,59 +29,59 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InspectorStats.class)
 public class ServletChangeRolloutTest {
-  private static HttpRequestHandler mockHttpRequestHandler;
-  private static QueryStringDecoder mockQueryStringDecoder;
+	private static HttpRequestHandler mockHttpRequestHandler;
+	private static QueryStringDecoder mockQueryStringDecoder;
 
-  private Map<String, List<String>> createMapFromString(final String rollout) {
-    final Map<String, List<String>> params = new HashMap<>();
-    params.put("percentRollout", Arrays.asList(rollout));
-    return params;
-  }
+	private Map<String, List<String>> createMapFromString(final String rollout) {
+		final Map<String, List<String>> params = new HashMap<>();
+		params.put("percentRollout", Arrays.asList(rollout));
+		return params;
+	}
 
-  @Test
-  public void testHandleRequestThrowsNumberFormatException() throws Exception {
-    mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+	@Test
+	public void testHandleRequestThrowsNumberFormatException() throws Exception {
+		mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-    expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString("dummy")).times(1);
-    mockResponseSender.sendResponse("INVALIDPERCENT", null);
-    expectLastCall().times(1);
+		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString("dummy")).times(1);
+		mockResponseSender.sendResponse("INVALIDPERCENT", null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
 
-    final ServletChangeRollout tested = new ServletChangeRollout();
-    tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+		final ServletChangeRollout tested = new ServletChangeRollout();
+		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testHandleRequestSuccessful() throws Exception {
-    mockStatic(InspectorStats.class);
-    mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+	@Test
+	public void testHandleRequestSuccessful() throws Exception {
+		mockStatic(InspectorStats.class);
+		mockQueryStringDecoder = createMock(QueryStringDecoder.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-    expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString("50")).times(1);
-    InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, 50L);
-    expectLastCall().times(1);
-    mockResponseSender.sendResponse("OK", null);
-    expectLastCall().times(1);
+		expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString("50")).times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.PERCENT_ROLL_OUT, 50L);
+		expectLastCall().times(1);
+		mockResponseSender.sendResponse("OK", null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
 
-    final ServletChangeRollout tested = new ServletChangeRollout();
-    tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
+		final ServletChangeRollout tested = new ServletChangeRollout();
+		tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testGetName() throws Exception {
-    final ServletChangeRollout tested = new ServletChangeRollout();
-    assertThat(tested.getName(), is(IsEqual.equalTo("changerollout")));
-  }
+	@Test
+	public void testGetName() throws Exception {
+		final ServletChangeRollout tested = new ServletChangeRollout();
+		assertThat(tested.getName(), is(IsEqual.equalTo("changerollout")));
+	}
 }

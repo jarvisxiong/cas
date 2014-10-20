@@ -16,19 +16,19 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionCurrencyFilter extends AbstractAuctionFilter {
 
-  @Inject
-  protected AuctionCurrencyFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER, serverConfiguration);
-    isApplicableRTBD = true;
-    isApplicableIX = false;
-  }
+	@Inject
+	protected AuctionCurrencyFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER, serverConfiguration);
+		isApplicableRTBD = true;
+		isApplicableIX = false;
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment rtbSegment,
-      final CasInternalRequestParameters casInternalRequestParameters) {
-    if (RtbAdNetwork.getCurrenciesSupported().contains(rtbSegment.getAdNetworkInterface().getCurrency())) {
-      return false;
-    }
-    return true;
-  }
+	@Override
+	protected boolean failedInFilter(final ChannelSegment rtbSegment,
+			final CasInternalRequestParameters casInternalRequestParameters) {
+		if (RtbAdNetwork.getCurrenciesSupported().contains(rtbSegment.getAdNetworkInterface().getCurrency())) {
+			return false;
+		}
+		return true;
+	}
 }

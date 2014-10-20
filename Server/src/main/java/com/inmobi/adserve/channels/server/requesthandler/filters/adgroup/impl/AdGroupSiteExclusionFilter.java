@@ -21,60 +21,61 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
-  private static final Logger LOG = LoggerFactory.getLogger(AdGroupSiteExclusionFilter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AdGroupSiteExclusionFilter.class);
 
-  /**
-   * @param traceMarkerProvider
-   */
-  @Inject
-  protected AdGroupSiteExclusionFilter(final Provider<Marker> traceMarkerProvider) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SITE_EXCLUSION_FILTER);
-  }
+	/**
+	 * @param traceMarkerProvider
+	 */
+	@Inject
+	protected AdGroupSiteExclusionFilter(final Provider<Marker> traceMarkerProvider) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SITE_EXCLUSION_FILTER);
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-      final CasContext casContext) {
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
+			final CasContext casContext) {
 
-    final boolean isFilterAtAdvertiserLevel = channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty();
+		final boolean isFilterAtAdvertiserLevel = channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty();
 
-    // applying site inclusion-exclusion at advertiser level
-    if (isFilterAtAdvertiserLevel) {
-      return isSiteExcludedAtAdvertiserLevel(channelSegment, sasParams);
-    }
+		// applying site inclusion-exclusion at advertiser level
+		if (isFilterAtAdvertiserLevel) {
+			return isSiteExcludedAtAdvertiserLevel(channelSegment, sasParams);
+		}
 
-    return isSiteExcludedAtAdGroupLevel(channelSegment, sasParams);
+		return isSiteExcludedAtAdGroupLevel(channelSegment, sasParams);
 
-  }
+	}
 
-  /**
-   * @param channelSegment
-   * @param sasParams
-   * @return
-   */
-  private boolean isSiteExcludedAtAdGroupLevel(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-    boolean result;
-    if (channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.getSiteId())) {
-      result = !channelSegment.getChannelSegmentEntity().isSiteInclusion();
-    } else {
-      result = channelSegment.getChannelSegmentEntity().isSiteInclusion();
-    }
-    return result;
-  }
+	/**
+	 * @param channelSegment
+	 * @param sasParams
+	 * @return
+	 */
+	private boolean isSiteExcludedAtAdGroupLevel(final ChannelSegment channelSegment,
+			final SASRequestParameters sasParams) {
+		boolean result;
+		if (channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.getSiteId())) {
+			result = !channelSegment.getChannelSegmentEntity().isSiteInclusion();
+		} else {
+			result = channelSegment.getChannelSegmentEntity().isSiteInclusion();
+		}
+		return result;
+	}
 
-  /**
-   * @param channelSegment
-   * @param sasParams
-   * @return
-   */
-  private boolean isSiteExcludedAtAdvertiserLevel(final ChannelSegment channelSegment,
-      final SASRequestParameters sasParams) {
-    boolean result;
-    if (channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
-      result = !channelSegment.getChannelEntity().isSiteInclusion();
-    } else {
-      result = channelSegment.getChannelEntity().isSiteInclusion();
-    }
-    return result;
-  }
+	/**
+	 * @param channelSegment
+	 * @param sasParams
+	 * @return
+	 */
+	private boolean isSiteExcludedAtAdvertiserLevel(final ChannelSegment channelSegment,
+			final SASRequestParameters sasParams) {
+		boolean result;
+		if (channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
+			result = !channelSegment.getChannelEntity().isSiteInclusion();
+		} else {
+			result = channelSegment.getChannelEntity().isSiteInclusion();
+		}
+		return result;
+	}
 
 }

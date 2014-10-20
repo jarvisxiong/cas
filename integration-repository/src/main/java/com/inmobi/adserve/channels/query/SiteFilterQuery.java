@@ -14,6 +14,6 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 @NoArgsConstructor
 public class SiteFilterQuery implements RepositoryQuery {
 
-  private String siteId;
-  private Integer ruleType;
+	private String siteId;
+	private Integer ruleType;
 }

@@ -19,47 +19,47 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 
 public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<SiteEcpmEntity, SiteEcpmQuery>
-    implements
-      Repository,
-      RepositoryManager {
+		implements
+			Repository,
+			RepositoryManager {
 
-  @Override
-  public DBEntity<SiteEcpmEntity, SiteEcpmQuery> buildObjectFromRow(final ResultSetRow resultSetRow)
-      throws RepositoryException {
-    final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-    final String siteId = row.getString("site_id");
-    final Integer countryId = row.getInt("country_id");
-    final Integer osId = row.getInt("os_id");
-    final double ecpm = row.getDouble("ecpm");
-    final double networkEcpm = row.getDouble("network_ecpm");
-    final Timestamp modified_on = row.getTimestamp("modified_on");
+	@Override
+	public DBEntity<SiteEcpmEntity, SiteEcpmQuery> buildObjectFromRow(final ResultSetRow resultSetRow)
+			throws RepositoryException {
+		final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
+		final String siteId = row.getString("site_id");
+		final Integer countryId = row.getInt("country_id");
+		final Integer osId = row.getInt("os_id");
+		final double ecpm = row.getDouble("ecpm");
+		final double networkEcpm = row.getDouble("network_ecpm");
+		final Timestamp modified_on = row.getTimestamp("modified_on");
 
-    final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
-    builder.setSiteId(siteId);
-    builder.setCountryId(countryId);
-    builder.setOsId(osId);
-    builder.setEcpm(ecpm);
-    builder.setNetworkEcpm(networkEcpm);
-    builder.setModifiedOn(modified_on);
-    final SiteEcpmEntity entity = builder.build();
-    return new DBEntity<SiteEcpmEntity, SiteEcpmQuery>(entity, modified_on);
-  }
+		final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+		builder.setSiteId(siteId);
+		builder.setCountryId(countryId);
+		builder.setOsId(osId);
+		builder.setEcpm(ecpm);
+		builder.setNetworkEcpm(networkEcpm);
+		builder.setModifiedOn(modified_on);
+		final SiteEcpmEntity entity = builder.build();
+		return new DBEntity<SiteEcpmEntity, SiteEcpmQuery>(entity, modified_on);
+	}
 
-  @Override
-  public boolean isObjectToBeDeleted(final SiteEcpmEntity siteEcpmEntity) {
-    if (DateUtils.addDays(siteEcpmEntity.getModifiedOn(), 3).before(new Date())) {
-      return true;
-    }
-    return false;
-  }
+	@Override
+	public boolean isObjectToBeDeleted(final SiteEcpmEntity siteEcpmEntity) {
+		if (DateUtils.addDays(siteEcpmEntity.getModifiedOn(), 3).before(new Date())) {
+			return true;
+		}
+		return false;
+	}
 
-  @Override
-  public HashIndexKeyBuilder<SiteEcpmEntity> getHashIndexKeyBuilder(final String className) {
-    return null;
-  }
+	@Override
+	public HashIndexKeyBuilder<SiteEcpmEntity> getHashIndexKeyBuilder(final String className) {
+		return null;
+	}
 
-  @Override
-  public SiteEcpmEntity queryUniqueResult(final RepositoryQuery repositoryQuery) throws RepositoryException {
-    return null;
-  }
+	@Override
+	public SiteEcpmEntity queryUniqueResult(final RepositoryQuery repositoryQuery) throws RepositoryException {
+		return null;
+	}
 }

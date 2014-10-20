@@ -14,35 +14,35 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 
 public class SiteTaxonomyRepository extends AbstractStatsMaintainingDBRepository<SiteTaxonomyEntity, String>
-    implements
-      RepositoryManager {
+		implements
+			RepositoryManager {
 
-  @Override
-  public DBEntity<SiteTaxonomyEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
-      throws RepositoryException {
-    final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-    final String id = String.valueOf(row.getInt("id"));
-    final String name = row.getString("name");
-    final String parentId = String.valueOf(row.getInt("parent_id"));
-    final Timestamp modifyTime = row.getTimestamp("modified_on");
-    final SiteTaxonomyEntity entity = new SiteTaxonomyEntity(id, name, parentId);
+	@Override
+	public DBEntity<SiteTaxonomyEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
+			throws RepositoryException {
+		final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
+		final String id = String.valueOf(row.getInt("id"));
+		final String name = row.getString("name");
+		final String parentId = String.valueOf(row.getInt("parent_id"));
+		final Timestamp modifyTime = row.getTimestamp("modified_on");
+		final SiteTaxonomyEntity entity = new SiteTaxonomyEntity(id, name, parentId);
 
-    logger.debug("Id for the loaded siteTaxonomyEntity is " + id);
-    return new DBEntity<SiteTaxonomyEntity, String>(entity, modifyTime);
-  }
+		logger.debug("Id for the loaded siteTaxonomyEntity is " + id);
+		return new DBEntity<SiteTaxonomyEntity, String>(entity, modifyTime);
+	}
 
-  @Override
-  public boolean isObjectToBeDeleted(final SiteTaxonomyEntity object) {
-    return false;
-  }
+	@Override
+	public boolean isObjectToBeDeleted(final SiteTaxonomyEntity object) {
+		return false;
+	}
 
-  @Override
-  public HashIndexKeyBuilder<SiteTaxonomyEntity> getHashIndexKeyBuilder(final String className) {
-    return null;
-  }
+	@Override
+	public HashIndexKeyBuilder<SiteTaxonomyEntity> getHashIndexKeyBuilder(final String className) {
+		return null;
+	}
 
-  @Override
-  public SiteTaxonomyEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
-    return null;
-  }
+	@Override
+	public SiteTaxonomyEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
+		return null;
+	}
 }

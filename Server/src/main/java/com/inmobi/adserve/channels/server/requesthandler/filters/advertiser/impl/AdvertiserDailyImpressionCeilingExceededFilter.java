@@ -19,15 +19,15 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDailyImpressionCeilingExceededFilter extends AbstractAdvertiserLevelFilter {
 
-  @Inject
-  public AdvertiserDailyImpressionCeilingExceededFilter(final Provider<Marker> traceMarkerProvider) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_IMPRESSION_FILTER);
-  }
+	@Inject
+	public AdvertiserDailyImpressionCeilingExceededFilter(final Provider<Marker> traceMarkerProvider) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_IMPRESSION_FILTER);
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-    return channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment.getChannelEntity()
-        .getImpressionCeil();
-  }
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
+		return channelSegment.getChannelFeedbackEntity().getTodayImpressions() > channelSegment.getChannelEntity()
+				.getImpressionCeil();
+	}
 
 }

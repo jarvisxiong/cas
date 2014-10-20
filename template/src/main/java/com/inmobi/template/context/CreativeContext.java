@@ -9,29 +9,29 @@ import com.inmobi.template.interfaces.Context;
 public class CreativeContext implements Context {
 
 
-  Map<String, Object> params = new HashMap<String, Object>();
+	Map<String, Object> params = new HashMap<String, Object>();
 
-  public CreativeContext() {
-    params.put("adGroupGuid", "1000");
+	public CreativeContext() {
+		params.put("adGroupGuid", "1000");
 
-  }
+	}
 
-  public String getNs() {
-    return "_namespace_1004";
-  }
+	public String getNs() {
+		return "_namespace_1004";
+	}
 
-  public boolean getRequireMraidJs() {
-    return true;
-  }
+	public boolean getRequireMraidJs() {
+		return true;
+	}
 
-  @Override
-  public Object get(final String key) {
+	@Override
+	public Object get(final String key) {
 
-    return null;
-  }
+		return null;
+	}
 
-  public boolean isLatencyOptimised() {
-    return true;
-  }
+	public boolean isLatencyOptimised() {
+		return true;
+	}
 
 }

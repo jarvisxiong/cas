@@ -10,5 +10,5 @@ import com.inmobi.adserve.channels.api.config.AdapterConfig;
  * 
  */
 public interface AdapterConfigFactory {
-  AdapterConfig create(final Configuration adapterConfig, final String adapterName);
+	AdapterConfig create(final Configuration adapterConfig, final String adapterName);
 }

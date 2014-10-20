@@ -20,69 +20,71 @@ import com.ning.http.client.AsyncHttpClientConfig;
  */
 public class AsyncHttpClientProvider {
 
-  private final ServerConfig serverConfig;
-  private final ExecutorService executorService;
-  private AsyncHttpClient dcpAsyncHttpClient;
-  private AsyncHttpClient rtbAsyncHttpClient;
+	private final ServerConfig serverConfig;
+	private final ExecutorService executorService;
+	private AsyncHttpClient dcpAsyncHttpClient;
+	private AsyncHttpClient rtbAsyncHttpClient;
 
-  @Inject
-  public AsyncHttpClientProvider(final ServerConfig serverConfig,
-      @WorkerExecutorService final ExecutorService executorService) {
-    this.serverConfig = serverConfig;
-    this.executorService = executorService;
-  }
+	@Inject
+	public AsyncHttpClientProvider(final ServerConfig serverConfig,
+			@WorkerExecutorService final ExecutorService executorService) {
+		this.serverConfig = serverConfig;
+		this.executorService = executorService;
+	}
 
-  @PostConstruct
-  public void setup() {
-    final AsyncHttpClientConfig.Builder cfRtbd =
-        new AsyncHttpClientConfig.Builder()
-            .setRequestTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
-            .setConnectionTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
-            .setMaximumConnectionsTotal(
-                serverConfig.getMaxRtbOutGoingConnections() * Runtime.getRuntime().availableProcessors())
-            .setFollowRedirects(false)
-            .setMaxRequestRetry(0)
-            .setAllowPoolingConnection(true)
-            .setExecutorService(
-                Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("outbound-rtbd-client-%d")
-                    .build()));
-    rtbAsyncHttpClient = new AsyncHttpClient(cfRtbd.build());
+	@PostConstruct
+	public void setup() {
+		final AsyncHttpClientConfig.Builder cfRtbd =
+				new AsyncHttpClientConfig.Builder()
+						.setRequestTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
+						.setConnectionTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
+						.setMaximumConnectionsTotal(
+								serverConfig.getMaxRtbOutGoingConnections()
+										* Runtime.getRuntime().availableProcessors())
+						.setFollowRedirects(false)
+						.setMaxRequestRetry(0)
+						.setAllowPoolingConnection(true)
+						.setExecutorService(
+								Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat(
+										"outbound-rtbd-client-%d").build()));
+		rtbAsyncHttpClient = new AsyncHttpClient(cfRtbd.build());
 
-    final AsyncHttpClientConfig.Builder cfDcp =
-        new AsyncHttpClientConfig.Builder()
-            .setRequestTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
-            .setConnectionTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
-            .setMaximumConnectionsTotal(
-                serverConfig.getMaxDcpOutGoingConnections() * Runtime.getRuntime().availableProcessors())
-            .setFollowRedirects(false)
-            .setMaxRequestRetry(0)
-            .setAllowPoolingConnection(true)
-            .setExecutorService(
-                Executors.newCachedThreadPool(new ThreadFactoryBuilder()
-                    .setNameFormat("outbound-dcpbackfill-client-%d").build()));
-    dcpAsyncHttpClient = new AsyncHttpClient(cfDcp.build());
+		final AsyncHttpClientConfig.Builder cfDcp =
+				new AsyncHttpClientConfig.Builder()
+						.setRequestTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
+						.setConnectionTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
+						.setMaximumConnectionsTotal(
+								serverConfig.getMaxDcpOutGoingConnections()
+										* Runtime.getRuntime().availableProcessors())
+						.setFollowRedirects(false)
+						.setMaxRequestRetry(0)
+						.setAllowPoolingConnection(true)
+						.setExecutorService(
+								Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat(
+										"outbound-dcpbackfill-client-%d").build()));
+		dcpAsyncHttpClient = new AsyncHttpClient(cfDcp.build());
 
 
-  }
+	}
 
-  /**
-   * @return the dcpAsyncHttpClient
-   */
-  public AsyncHttpClient getDcpAsyncHttpClient() {
-    return dcpAsyncHttpClient;
-  }
+	/**
+	 * @return the dcpAsyncHttpClient
+	 */
+	public AsyncHttpClient getDcpAsyncHttpClient() {
+		return dcpAsyncHttpClient;
+	}
 
-  /**
-   * @return the rtbAsyncHttpClient
-   */
-  public AsyncHttpClient getRtbAsyncHttpClient() {
-    return rtbAsyncHttpClient;
-  }
+	/**
+	 * @return the rtbAsyncHttpClient
+	 */
+	public AsyncHttpClient getRtbAsyncHttpClient() {
+		return rtbAsyncHttpClient;
+	}
 
-  @PreDestroy
-  public void tearDown() {
-    dcpAsyncHttpClient.close();
-    rtbAsyncHttpClient.close();
-  }
+	@PreDestroy
+	public void tearDown() {
+		dcpAsyncHttpClient.close();
+		rtbAsyncHttpClient.close();
+	}
 
 }

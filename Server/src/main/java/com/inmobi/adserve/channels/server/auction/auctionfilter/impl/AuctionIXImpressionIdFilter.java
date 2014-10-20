@@ -22,30 +22,30 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionIXImpressionIdFilter extends AbstractAuctionFilter {
 
-  @Inject
-  protected AuctionIXImpressionIdFilter(final Provider<Marker> traceMarkerProvider,
-      final ServerConfig serverConfiguration) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_AUCTION_IX_IMPRESSION_ID_FILTER, serverConfiguration);
-    isApplicableRTBD = false;
-    isApplicableIX = true;
-  }
+	@Inject
+	protected AuctionIXImpressionIdFilter(final Provider<Marker> traceMarkerProvider,
+			final ServerConfig serverConfiguration) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_AUCTION_IX_IMPRESSION_ID_FILTER, serverConfiguration);
+		isApplicableRTBD = false;
+		isApplicableIX = true;
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment rtbSegment,
-      final CasInternalRequestParameters casInternalRequestParameters) {
-    if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
-      final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
-      try {
-        final int responseImpressionId = Integer.parseInt(ixAdNetwork.getRtbImpressionId());
-        if (ixAdNetwork.getResponseBidObjCount() == 1 && responseImpressionId >= 1
-            && responseImpressionId <= ixAdNetwork.getImpressionObjCount()) {
-          return false;
-        }
-      } catch (final NumberFormatException e) {
-        return false;
-      }
+	@Override
+	protected boolean failedInFilter(final ChannelSegment rtbSegment,
+			final CasInternalRequestParameters casInternalRequestParameters) {
+		if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
+			final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
+			try {
+				final int responseImpressionId = Integer.parseInt(ixAdNetwork.getRtbImpressionId());
+				if (ixAdNetwork.getResponseBidObjCount() == 1 && responseImpressionId >= 1
+						&& responseImpressionId <= ixAdNetwork.getImpressionObjCount()) {
+					return false;
+				}
+			} catch (final NumberFormatException e) {
+				return false;
+			}
 
-    }
-    return true;
-  }
+		}
+		return true;
+	}
 }

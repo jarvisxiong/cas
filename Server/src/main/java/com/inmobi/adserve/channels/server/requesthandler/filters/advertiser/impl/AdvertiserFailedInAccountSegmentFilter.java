@@ -24,31 +24,32 @@ import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 @Singleton
 public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLevelFilter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AdvertiserFailedInAccountSegmentFilter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AdvertiserFailedInAccountSegmentFilter.class);
 
-  private final Map<String, String> advertiserIdNameMap;
+	private final Map<String, String> advertiserIdNameMap;
 
-  @Inject
-  public AdvertiserFailedInAccountSegmentFilter(final Provider<Marker> traceMarkerProvider,
-      @AdvertiserIdNameMap final Map<String, String> advertiserIdNameMap) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ACCOUNT_SEGMENT_FILTER);
-    this.advertiserIdNameMap = advertiserIdNameMap;
-  }
+	@Inject
+	public AdvertiserFailedInAccountSegmentFilter(final Provider<Marker> traceMarkerProvider,
+			@AdvertiserIdNameMap final Map<String, String> advertiserIdNameMap) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ACCOUNT_SEGMENT_FILTER);
+		this.advertiserIdNameMap = advertiserIdNameMap;
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
 
-    final int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
-    final String advertiserId = channelSegment.getChannelEntity().getAccountId();
+		final int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
+		final String advertiserId = channelSegment.getChannelEntity().getAccountId();
 
-    LOG.debug("AccountId from ChannelEntity: {} ", channelSegment.getChannelEntity().getAccountId());
-    LOG.debug("AdvertiserId from ChannelFeedbackEntity: {}", channelSegment.getChannelFeedbackEntity()
-        .getAdvertiserId());
-    LOG.debug("AdvertiserId from ChannelSegmentEntity: {}", channelSegment.getChannelSegmentEntity().getAdvertiserId());
+		LOG.debug("AccountId from ChannelEntity: {} ", channelSegment.getChannelEntity().getAccountId());
+		LOG.debug("AdvertiserId from ChannelFeedbackEntity: {}", channelSegment.getChannelFeedbackEntity()
+				.getAdvertiserId());
+		LOG.debug("AdvertiserId from ChannelSegmentEntity: {}", channelSegment.getChannelSegmentEntity()
+				.getAdvertiserId());
 
-    final String advertiserName = advertiserIdNameMap.get(advertiserId);
+		final String advertiserName = advertiserIdNameMap.get(advertiserId);
 
-    return advertiserName == null || sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
-        && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment);
-  }
+		return advertiserName == null || sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
+				&& !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment);
+	}
 }

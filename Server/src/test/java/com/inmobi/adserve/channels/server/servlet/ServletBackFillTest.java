@@ -33,58 +33,58 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @PrepareForTest({InspectorStats.class})
 public class ServletBackFillTest {
 
-  @Test
-  public void testHandleRequest() throws Exception {
-    mockStatic(InspectorStats.class);
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
-    final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-    final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-    final CasInternalRequestParameters mockCasInternalRequestParameters =
-        createMock(CasInternalRequestParameters.class);
-    final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-    final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
-    final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+	@Test
+	public void testHandleRequest() throws Exception {
+		mockStatic(InspectorStats.class);
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+		final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+		final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+		final CasInternalRequestParameters mockCasInternalRequestParameters =
+				createMock(CasInternalRequestParameters.class);
+		final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+		final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+		final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
 
-    expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
-    expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
-    expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
-    expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-    expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-    expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
-    mockCasInternalRequestParameters.setTraceEnabled(true);
-    expectLastCall();
+		expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
+		expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+		expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+		expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
+		expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
+		expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
+		mockCasInternalRequestParameters.setTraceEnabled(true);
+		expectLastCall();
 
-    InspectorStats.incrementStatCount(InspectorStrings.BACK_FILL_REQUESTS);
-    expectLastCall().times(1);
-    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-    expectLastCall().times(1);
-    mockResponseSender.sendNoAdResponse(null);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.BACK_FILL_REQUESTS);
+		expectLastCall().times(1);
+		InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
+		expectLastCall().times(1);
+		mockResponseSender.sendNoAdResponse(null);
+		expectLastCall().times(1);
 
-    // Powermock cannot currently suppress super methods
-    // PowerMock.suppress(method(BaseServlet.class, "handleRequest"));
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
-    mockResponseSender.sasParams = null;
-    mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
+		// Powermock cannot currently suppress super methods
+		// PowerMock.suppress(method(BaseServlet.class, "handleRequest"));
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
+		mockResponseSender.sasParams = null;
+		mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-    final ServletBackFill tested =
-        new ServletBackFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
-    tested.handleRequest(mockHttpRequestHandler, null, null);
+		final ServletBackFill tested =
+				new ServletBackFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
+		tested.handleRequest(mockHttpRequestHandler, null, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testGetName() throws Exception {
-    final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
-    assertThat(tested.getName(), is(IsEqual.equalTo("BackFill")));
-  }
+	@Test
+	public void testGetName() throws Exception {
+		final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
+		assertThat(tested.getName(), is(IsEqual.equalTo("BackFill")));
+	}
 
-  @Test
-  public void testGetLogger() throws Exception {
-    final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
-    assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletBackFill.class))));
-  }
+	@Test
+	public void testGetLogger() throws Exception {
+		final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
+		assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletBackFill.class))));
+	}
 }

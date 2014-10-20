@@ -8,24 +8,24 @@ import com.inmobi.casthrift.rtb.Native;
 
 public class NativeBuilderImpl implements NativeBuilder {
 
-  private final NativeAdTemplateEntity templateEntity;
-  private final Native nativeObj;
+	private final NativeAdTemplateEntity templateEntity;
+	private final Native nativeObj;
 
 
-  @Inject
-  public NativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
-    nativeObj = new Native();
-    this.templateEntity = templateEntity;
+	@Inject
+	public NativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
+		nativeObj = new Native();
+		this.templateEntity = templateEntity;
 
-  }
+	}
 
-  @Override
-  public Native build() {
-    nativeObj.setMandatory(NativeConstrains.getMandatoryList(templateEntity.getMandatoryKey()));
-    nativeObj.setImage(NativeConstrains.getImage(templateEntity.getImageKey()));
+	@Override
+	public Native build() {
+		nativeObj.setMandatory(NativeConstrains.getMandatoryList(templateEntity.getMandatoryKey()));
+		nativeObj.setImage(NativeConstrains.getImage(templateEntity.getImageKey()));
 
-    return nativeObj;
-  }
+		return nativeObj;
+	}
 
 
 

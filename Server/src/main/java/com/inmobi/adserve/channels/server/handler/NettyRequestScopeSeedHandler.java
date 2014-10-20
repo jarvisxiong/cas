@@ -31,46 +31,46 @@ import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
 @Slf4j
 public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
 
-  private final NettyRequestScope scope;
-  private final Map<String, Servlet> pathToServletMap;
-  private final ServletInvalid invalidServlet;
-  private final Provider<Marker> traceMarkerProvider;
+	private final NettyRequestScope scope;
+	private final Map<String, Servlet> pathToServletMap;
+	private final ServletInvalid invalidServlet;
+	private final Provider<Marker> traceMarkerProvider;
 
 
-  @Inject
-  public NettyRequestScopeSeedHandler(final NettyRequestScope scope, final Map<String, Servlet> pathToServletMap,
-      final ServletInvalid invalidServlet, final Provider<Marker> traceMarkerProvider) {
-    this.scope = scope;
-    this.pathToServletMap = pathToServletMap;
-    this.invalidServlet = invalidServlet;
-    this.traceMarkerProvider = traceMarkerProvider;
-  }
+	@Inject
+	public NettyRequestScopeSeedHandler(final NettyRequestScope scope, final Map<String, Servlet> pathToServletMap,
+			final ServletInvalid invalidServlet, final Provider<Marker> traceMarkerProvider) {
+		this.scope = scope;
+		this.pathToServletMap = pathToServletMap;
+		this.invalidServlet = invalidServlet;
+		this.traceMarkerProvider = traceMarkerProvider;
+	}
 
-  @Override
-  public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-    final HttpRequest httpRequest = (HttpRequest) msg;
-    final boolean isTracer = Boolean.valueOf(httpRequest.headers().get("x-mkhoj-tracer"));
-    final Marker traceMarker = isTracer ? NettyRequestScope.TRACE_MAKER : null;
-    scope.enter();
-    try {
-      scope.seed(Marker.class, traceMarker);
-      scope.seed(ResponseSender.class, new ResponseSender(traceMarkerProvider));
+	@Override
+	public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+		final HttpRequest httpRequest = (HttpRequest) msg;
+		final boolean isTracer = Boolean.valueOf(httpRequest.headers().get("x-mkhoj-tracer"));
+		final Marker traceMarker = isTracer ? NettyRequestScope.TRACE_MAKER : null;
+		scope.enter();
+		try {
+			scope.seed(Marker.class, traceMarker);
+			scope.seed(ResponseSender.class, new ResponseSender(traceMarkerProvider));
 
-      final QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
-      final String path = queryStringDecoder.path();
+			final QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
+			final String path = queryStringDecoder.path();
 
-      Servlet servlet = pathToServletMap.get(path);
-      if (servlet == null) {
-        servlet = invalidServlet;
-      }
+			Servlet servlet = pathToServletMap.get(path);
+			if (servlet == null) {
+				servlet = invalidServlet;
+			}
 
-      log.debug("Request servlet is {} for path {}", servlet, path);
-      scope.seed(Servlet.class, servlet);
+			log.debug("Request servlet is {} for path {}", servlet, path);
+			scope.seed(Servlet.class, servlet);
 
-      ctx.fireChannelRead(httpRequest);
-    } finally {
-      scope.exit();
-    }
-  }
+			ctx.fireChannelRead(httpRequest);
+		} finally {
+			scope.exit();
+		}
+	}
 
 }

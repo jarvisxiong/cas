@@ -6,18 +6,18 @@ import org.slf4j.LoggerFactory;
 
 public final class TemplateLogger {
 
-  private final static Logger LOG = LoggerFactory.getLogger(TemplateLogger.class);
-  private static TemplateLogger SINGLETON = new TemplateLogger();
+	private final static Logger LOG = LoggerFactory.getLogger(TemplateLogger.class);
+	private static TemplateLogger SINGLETON = new TemplateLogger();
 
-  private TemplateLogger() {}
+	private TemplateLogger() {}
 
 
-  public static TemplateLogger getInstance() {
-    return SINGLETON;
-  }
+	public static TemplateLogger getInstance() {
+		return SINGLETON;
+	}
 
-  public void logParameters(final Integer asyncType, final Integer asyncMethod) {
-    LOG.debug("AsyncType : " + asyncType + " | asyncMethod : " + asyncMethod);
-  }
+	public void logParameters(final Integer asyncType, final Integer asyncMethod) {
+		LOG.debug("AsyncType : " + asyncType + " | asyncMethod : " + asyncMethod);
+	}
 
 }

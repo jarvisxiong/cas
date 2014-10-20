@@ -31,34 +31,34 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 @Path("/rtbdFill")
 public class ServletRtbd extends BaseServlet {
-  private static final Logger LOG = LoggerFactory.getLogger(ServletRtbd.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ServletRtbd.class);
 
-  @Inject
-  public ServletRtbd(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
-      final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
-      final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker,
-      @DcpAndRtbdAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
-      @DcpAndRtbAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
-    super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters, asyncRequestMaker,
-        advertiserLevelFilters, adGroupLevelFilters);
-  }
+	@Inject
+	public ServletRtbd(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
+			final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,
+			final CasUtils casUtils, final AsyncRequestMaker asyncRequestMaker,
+			@DcpAndRtbdAdvertiserLevelFilters final List<AdvertiserLevelFilter> advertiserLevelFilters,
+			@DcpAndRtbAdGroupLevelFilters final List<AdGroupLevelFilter> adGroupLevelFilters) {
+		super(matchSegments, traceMarkerProvider, channelSegmentFilterApplier, casUtils, requestFilters,
+				asyncRequestMaker, advertiserLevelFilters, adGroupLevelFilters);
+	}
 
-  @Override
-  public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-      final Channel serverChannel) throws Exception {
-    final Marker traceMarker = traceMarkerProvider.get();
-    LOG.debug(traceMarker, "Inside RTBD servlet");
-    InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
-    super.handleRequest(hrh, queryStringDecoder, serverChannel);
-  }
+	@Override
+	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+			final Channel serverChannel) throws Exception {
+		final Marker traceMarker = traceMarkerProvider.get();
+		LOG.debug(traceMarker, "Inside RTBD servlet");
+		InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
+		super.handleRequest(hrh, queryStringDecoder, serverChannel);
+	}
 
-  @Override
-  public String getName() {
-    return "rtbdFill";
-  }
+	@Override
+	public String getName() {
+		return "rtbdFill";
+	}
 
-  @Override
-  protected Logger getLogger() {
-    return LOG;
-  }
+	@Override
+	protected Logger getLogger() {
+		return LOG;
+	}
 }

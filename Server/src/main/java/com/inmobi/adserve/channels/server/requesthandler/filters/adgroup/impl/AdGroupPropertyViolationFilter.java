@@ -22,56 +22,56 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
 
-  /**
-   * @param traceMarkerProvider
-   */
-  @Inject
-  protected AdGroupPropertyViolationFilter(final Provider<Marker> traceMarkerProvider) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PROPERTY_VIOLATION_FILTER);
-  }
+	/**
+	 * @param traceMarkerProvider
+	 */
+	@Inject
+	protected AdGroupPropertyViolationFilter(final Provider<Marker> traceMarkerProvider) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PROPERTY_VIOLATION_FILTER);
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-      final CasContext casContext) {
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
+			final CasContext casContext) {
 
-    final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
+		final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
 
-    if (channelSegmentEntity.isUdIdRequired()
-        && (StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
-        && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty())) {
-      channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_UDID_FILTER);
-      return true;
-    }
-    if (channelSegmentEntity.isZipCodeRequired() && sasParams.getPostalCode() == null) {
-      channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ZIPCODE_FILTER);
-      return true;
-    }
-    if (channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.getLatLong())) {
-      channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_LAT_LONG_FILTER);
-      return true;
-    }
-    if (channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia()) {
-      channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_RICH_MEDIA_FILTER);
-      return true;
-    }
+		if (channelSegmentEntity.isUdIdRequired()
+				&& (StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
+				&& (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty())) {
+			channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_UDID_FILTER);
+			return true;
+		}
+		if (channelSegmentEntity.isZipCodeRequired() && sasParams.getPostalCode() == null) {
+			channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ZIPCODE_FILTER);
+			return true;
+		}
+		if (channelSegmentEntity.isLatlongRequired() && StringUtils.isEmpty(sasParams.getLatLong())) {
+			channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_LAT_LONG_FILTER);
+			return true;
+		}
+		if (channelSegmentEntity.isRestrictedToRichMediaOnly() && !sasParams.isRichMedia()) {
+			channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_RICH_MEDIA_FILTER);
+			return true;
+		}
 
-    final String rqAdType = sasParams.getRqAdType();
+		final String rqAdType = sasParams.getRqAdType();
 
-    if (channelSegmentEntity.isInterstitialOnly() && (rqAdType == null || !"int".equals(rqAdType))) {
-      channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);
-      return true;
-    }
-    if (channelSegmentEntity.isNonInterstitialOnly() && rqAdType != null && "int".equals(rqAdType)) {
-      channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_NON_INTERSTITIAL_FILTER);
-      return true;
-    }
+		if (channelSegmentEntity.isInterstitialOnly() && (rqAdType == null || !"int".equals(rqAdType))) {
+			channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);
+			return true;
+		}
+		if (channelSegmentEntity.isNonInterstitialOnly() && rqAdType != null && "int".equals(rqAdType)) {
+			channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_NON_INTERSTITIAL_FILTER);
+			return true;
+		}
 
-    return false;
-  }
+		return false;
+	}
 
-  @Override
-  protected void incrementStats(final ChannelSegment channelSegment) {
-    // No-op
-  }
+	@Override
+	protected void incrementStats(final ChannelSegment channelSegment) {
+		// No-op
+	}
 
 }

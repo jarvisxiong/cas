@@ -24,23 +24,24 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupHandsetTargetingFilter extends AbstractAdGroupLevelFilter {
-  private static final Logger LOG = LoggerFactory.getLogger(AdGroupHandsetTargetingFilter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AdGroupHandsetTargetingFilter.class);
 
-  /**
-   * @param traceMarkerProvider
-   */
-  @Inject
-  protected AdGroupHandsetTargetingFilter(final Provider<Marker> traceMarkerProvider) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_HANDSET_TARGETING_FILTER);
-  }
+	/**
+	 * @param traceMarkerProvider
+	 */
+	@Inject
+	protected AdGroupHandsetTargetingFilter(final Provider<Marker> traceMarkerProvider) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_HANDSET_TARGETING_FILTER);
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-      final CasContext casContext) {
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
+			final CasContext casContext) {
 
-    final List<Integer> manufModelTargetingList = channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
-    return CollectionUtils.isNotEmpty(manufModelTargetingList)
-        && !manufModelTargetingList.contains(sasParams.getModelId());
-  }
+		final List<Integer> manufModelTargetingList =
+				channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
+		return CollectionUtils.isNotEmpty(manufModelTargetingList)
+				&& !manufModelTargetingList.contains(sasParams.getModelId());
+	}
 
 }

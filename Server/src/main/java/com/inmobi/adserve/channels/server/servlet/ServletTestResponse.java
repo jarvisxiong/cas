@@ -20,19 +20,19 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 @Singleton
 @Path("/testResponse")
 public class ServletTestResponse implements Servlet {
-  private static final Logger LOG = LoggerFactory.getLogger(ServletTestResponse.class);
-  private static final String FILE_NAME = "/opt/mkhoj/test/cas/testResponse.txt";
+	private static final Logger LOG = LoggerFactory.getLogger(ServletTestResponse.class);
+	private static final String FILE_NAME = "/opt/mkhoj/test/cas/testResponse.txt";
 
-  @Override
-  public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-      final Channel serverChannel) throws Exception {
-    LOG.debug("Inside testResponse servlet");
-    final String testResponse = Files.toString(new File(FILE_NAME), Charsets.UTF_8);
-    hrh.responseSender.sendResponse(testResponse, serverChannel);
-  }
+	@Override
+	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+			final Channel serverChannel) throws Exception {
+		LOG.debug("Inside testResponse servlet");
+		final String testResponse = Files.toString(new File(FILE_NAME), Charsets.UTF_8);
+		hrh.responseSender.sendResponse(testResponse, serverChannel);
+	}
 
-  @Override
-  public String getName() {
-    return "testResponse";
-  }
+	@Override
+	public String getName() {
+		return "testResponse";
+	}
 }

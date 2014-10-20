@@ -22,29 +22,29 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 @Path("/stat")
 @Slf4j
 public class ServletStat implements Servlet {
-  private final ConnectionLimitHandler connectionLimitHandler;
+	private final ConnectionLimitHandler connectionLimitHandler;
 
-  @Inject
-  public ServletStat(final ConnectionLimitHandler connectionLimitHandler) {
-    this.connectionLimitHandler = connectionLimitHandler;
-  }
+	@Inject
+	public ServletStat(final ConnectionLimitHandler connectionLimitHandler) {
+		this.connectionLimitHandler = connectionLimitHandler;
+	}
 
 
-  @Override
-  public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-      final Channel serverChannel) throws Exception {
-    log.debug("Inside stat servlet");
-    final JSONObject inspectorJson = InspectorStats.getStatsObj();
-    final JSONObject manifestJson = new JSONObject(JarVersionUtil.getManifestData());
-    inspectorJson.put("manifestData", manifestJson);
-    final JSONObject connectionJson = connectionLimitHandler.getConnectionJson();
-    inspectorJson.put("connectionData", connectionJson);
+	@Override
+	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+			final Channel serverChannel) throws Exception {
+		log.debug("Inside stat servlet");
+		final JSONObject inspectorJson = InspectorStats.getStatsObj();
+		final JSONObject manifestJson = new JSONObject(JarVersionUtil.getManifestData());
+		inspectorJson.put("manifestData", manifestJson);
+		final JSONObject connectionJson = connectionLimitHandler.getConnectionJson();
+		inspectorJson.put("connectionData", connectionJson);
 
-    hrh.responseSender.sendResponse(inspectorJson.toString(), serverChannel);
-  }
+		hrh.responseSender.sendResponse(inspectorJson.toString(), serverChannel);
+	}
 
-  @Override
-  public String getName() {
-    return "stat";
-  }
+	@Override
+	public String getName() {
+		return "stat";
+	}
 }

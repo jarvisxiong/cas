@@ -21,47 +21,47 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 @RunWith(PowerMockRunner.class)
 public class ServletDisableLbStatusTest {
 
-  @Test
-  public void testHandleRequestLocalHost() throws Exception {
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+	@Test
+	public void testHandleRequestLocalHost() throws Exception {
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-    expect(mockHttpRequestHandler.isRequestFromLocalHost()).andReturn(true).times(1);
-    mockResponseSender.sendResponse("OK", null);
-    expectLastCall().times(1);
+		expect(mockHttpRequestHandler.isRequestFromLocalHost()).andReturn(true).times(1);
+		mockResponseSender.sendResponse("OK", null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
 
-    final ServletDisableLbStatus tested = new ServletDisableLbStatus();
-    tested.handleRequest(mockHttpRequestHandler, null, null);
-    assertThat(ServerStatusInfo.statusCode, is(equalTo(404)));
-    assertThat(ServerStatusInfo.statusString, is(equalTo("NOT_OK")));
+		final ServletDisableLbStatus tested = new ServletDisableLbStatus();
+		tested.handleRequest(mockHttpRequestHandler, null, null);
+		assertThat(ServerStatusInfo.statusCode, is(equalTo(404)));
+		assertThat(ServerStatusInfo.statusString, is(equalTo("NOT_OK")));
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testHandleRequestNotFromLocalHost() throws Exception {
-    final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-    final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+	@Test
+	public void testHandleRequestNotFromLocalHost() throws Exception {
+		final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+		final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-    expect(mockHttpRequestHandler.isRequestFromLocalHost()).andReturn(false).times(1);
-    mockResponseSender.sendResponse("NOT AUTHORIZED", null);
-    expectLastCall().times(1);
+		expect(mockHttpRequestHandler.isRequestFromLocalHost()).andReturn(false).times(1);
+		mockResponseSender.sendResponse("NOT AUTHORIZED", null);
+		expectLastCall().times(1);
 
-    replayAll();
-    mockHttpRequestHandler.responseSender = mockResponseSender;
+		replayAll();
+		mockHttpRequestHandler.responseSender = mockResponseSender;
 
-    final ServletDisableLbStatus tested = new ServletDisableLbStatus();
-    tested.handleRequest(mockHttpRequestHandler, null, null);
+		final ServletDisableLbStatus tested = new ServletDisableLbStatus();
+		tested.handleRequest(mockHttpRequestHandler, null, null);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testGetName() throws Exception {
-    final ServletDisableLbStatus tested = new ServletDisableLbStatus();
-    assertThat(tested.getName(), is(IsEqual.equalTo("disablelbstatus")));
-  }
+	@Test
+	public void testGetName() throws Exception {
+		final ServletDisableLbStatus tested = new ServletDisableLbStatus();
+		assertThat(tested.getName(), is(IsEqual.equalTo("disablelbstatus")));
+	}
 }

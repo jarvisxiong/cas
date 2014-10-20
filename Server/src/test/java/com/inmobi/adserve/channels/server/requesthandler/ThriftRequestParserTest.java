@@ -40,136 +40,137 @@ import com.inmobi.types.SupplySource;
 
 public class ThriftRequestParserTest extends TestCase {
 
-  ThriftRequestParser thriftRequestParser;
+	ThriftRequestParser thriftRequestParser;
 
-  @Override
-  public void setUp() {
-    final Configuration mockConfig = createMock(Configuration.class);
-    expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-    expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
-    expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
-    replay(mockConfig);
-    thriftRequestParser = new ThriftRequestParser();
-  }
+	@Override
+	public void setUp() {
+		final Configuration mockConfig = createMock(Configuration.class);
+		expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
+		expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
+		expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
+		replay(mockConfig);
+		thriftRequestParser = new ThriftRequestParser();
+	}
 
-  @Test
-  public void testParseRequestParameters() {
-    final Site site = new Site();
-    site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);
-    site.setCpcFloor(1);
-    site.setEcpmFloor(3.2);
-    site.setInventoryType(InventoryType.APP);
-    site.setSiteId("siteId");
-    site.setSiteIncId(12345);
-    site.setPublisherId("publisherId");
-    site.setSiteUrl("siteUrl");
+	@Test
+	public void testParseRequestParameters() {
+		final Site site = new Site();
+		site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);
+		site.setCpcFloor(1);
+		site.setEcpmFloor(3.2);
+		site.setInventoryType(InventoryType.APP);
+		site.setSiteId("siteId");
+		site.setSiteIncId(12345);
+		site.setPublisherId("publisherId");
+		site.setSiteUrl("siteUrl");
 
-    final Device device = new Device();
-    device.setDeviceTypeDeprecated(DeviceType.SMARTPHONE);
-    device.setUserAgent("UserAgent");
-    device.setOsId(123);
-    device.setModelId(234);
-    device.setHandsetInternalId(456);
+		final Device device = new Device();
+		device.setDeviceTypeDeprecated(DeviceType.SMARTPHONE);
+		device.setUserAgent("UserAgent");
+		device.setOsId(123);
+		device.setModelId(234);
+		device.setHandsetInternalId(456);
 
-    final Carrier carrier = new Carrier();
-    carrier.setCarrierId(12345);
+		final Carrier carrier = new Carrier();
+		carrier.setCarrierId(12345);
 
-    final User user = new User();
-    user.setYearOfBirth((short) 1930);
-    user.setGender(Gender.MALE);
+		final User user = new User();
+		user.setYearOfBirth((short) 1930);
+		user.setGender(Gender.MALE);
 
-    final Geo geo = new Geo();
-    final Set<Integer> cities = new HashSet<Integer>();
-    cities.add(12);
-    geo.setCityIds(cities);
-    geo.setCountryCode("US");
-    geo.setCountryId(94);
-    geo.setLocationSource(LocationSource.LATLON);
-    geo.setLatLong(new LatLong(12d, 12d));
-    final Set<Integer> zipIds = new HashSet<Integer>();
-    zipIds.add(123);
-    geo.setZipIds(zipIds);
-    final Set<Integer> stateIds = new HashSet<Integer>();
-    stateIds.add(123);
-    geo.setStateIds(stateIds);
+		final Geo geo = new Geo();
+		final Set<Integer> cities = new HashSet<Integer>();
+		cities.add(12);
+		geo.setCityIds(cities);
+		geo.setCountryCode("US");
+		geo.setCountryId(94);
+		geo.setLocationSource(LocationSource.LATLON);
+		geo.setLatLong(new LatLong(12d, 12d));
+		final Set<Integer> zipIds = new HashSet<Integer>();
+		zipIds.add(123);
+		geo.setZipIds(zipIds);
+		final Set<Integer> stateIds = new HashSet<Integer>();
+		stateIds.add(123);
+		geo.setStateIds(stateIds);
 
-    final IntegrationDetails integrationDetails = new IntegrationDetails();
-    integrationDetails.setAdCodeType(AdCodeType.BASIC);
-    integrationDetails.setIFrameId("009");
-    integrationDetails.setIntegrationType(IntegrationType.IOS_SDK);
-    integrationDetails.setIntegrationVersion(231);
+		final IntegrationDetails integrationDetails = new IntegrationDetails();
+		integrationDetails.setAdCodeType(AdCodeType.BASIC);
+		integrationDetails.setIFrameId("009");
+		integrationDetails.setIntegrationType(IntegrationType.IOS_SDK);
+		integrationDetails.setIntegrationVersion(231);
 
-    final AdPoolRequest adPoolRequest = new AdPoolRequest();
-    adPoolRequest.setSite(site);
-    adPoolRequest.setDevice(device);
-    adPoolRequest.setCarrier(carrier);
-    adPoolRequest.setUser(user);
-    adPoolRequest.setGeo(geo);
-    adPoolRequest.setRequestedAdType(RequestedAdType.INTERSTITIAL);
-    final List<SupplyCapability> supplyCapabilities = new ArrayList<SupplyCapability>();
-    supplyCapabilities.add(SupplyCapability.TEXT);
-    adPoolRequest.setSupplyCapabilities(supplyCapabilities);
-    adPoolRequest.setRemoteHostIp("10.14.118.143");
-    adPoolRequest.setSegmentId(234);
-    final List<Short> selectedSlots = new ArrayList<Short>();
-    selectedSlots.add((short) 12);
-    adPoolRequest.setSelectedSlots(selectedSlots);
-    adPoolRequest.setRequestedAdCount((short) 1);
-    adPoolRequest.setTaskId("tid");
-    adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
-    adPoolRequest.setIntegrationDetails(integrationDetails);
-    adPoolRequest.setIpFileVersion(3456);
-    adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
-    adPoolRequest.setReferralUrl("refUrl");
+		final AdPoolRequest adPoolRequest = new AdPoolRequest();
+		adPoolRequest.setSite(site);
+		adPoolRequest.setDevice(device);
+		adPoolRequest.setCarrier(carrier);
+		adPoolRequest.setUser(user);
+		adPoolRequest.setGeo(geo);
+		adPoolRequest.setRequestedAdType(RequestedAdType.INTERSTITIAL);
+		final List<SupplyCapability> supplyCapabilities = new ArrayList<SupplyCapability>();
+		supplyCapabilities.add(SupplyCapability.TEXT);
+		adPoolRequest.setSupplyCapabilities(supplyCapabilities);
+		adPoolRequest.setRemoteHostIp("10.14.118.143");
+		adPoolRequest.setSegmentId(234);
+		final List<Short> selectedSlots = new ArrayList<Short>();
+		selectedSlots.add((short) 12);
+		adPoolRequest.setSelectedSlots(selectedSlots);
+		adPoolRequest.setRequestedAdCount((short) 1);
+		adPoolRequest.setTaskId("tid");
+		adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
+		adPoolRequest.setIntegrationDetails(integrationDetails);
+		adPoolRequest.setIpFileVersion(3456);
+		adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
+		adPoolRequest.setReferralUrl("refUrl");
 
-    final SASRequestParameters sasRequestParameters = new SASRequestParameters();
-    final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-    thriftRequestParser.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+		final SASRequestParameters sasRequestParameters = new SASRequestParameters();
+		final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+		thriftRequestParser
+				.parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
-    assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
-    assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");
-    assertEquals(sasRequestParameters.getSource(), "APP");
-    assertEquals(sasRequestParameters.getAge(), new Short("84"));
-    assertEquals(sasRequestParameters.getGender(), "M");
-    assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
-    assertEquals(sasRequestParameters.getPostalCode(), new Integer(123));
-    assertEquals(sasRequestParameters.getCountryCode(), "US");
-    assertEquals(sasRequestParameters.getCountryId(), new Long(94));
-    assertEquals(sasRequestParameters.getImpressionId(), null); // Internal, Populated in cas
-    assertEquals(sasRequestParameters.getClurl(), null); // Internal, Populated in cas
-    assertEquals(sasRequestParameters.getSiteId(), "siteId");
-    assertEquals(sasRequestParameters.getSlot(), new Short("12"));
-    assertEquals(sasRequestParameters.getSiteType(), "FAMILY_SAFE");
-    assertEquals(sasRequestParameters.getSdkVersion(), "i231");
-    assertEquals(sasRequestParameters.getSiteIncId(), 12345);
-    assertEquals(sasRequestParameters.getAdIncId(), 0); // Internal, Populated in cas
-    assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
-    assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
-    assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
-    assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
-    assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
-    assertEquals(sasRequestParameters.getUidParams(), null);
-    assertEquals(sasRequestParameters.getTUidParams(), null);
-    assertEquals(sasRequestParameters.getRqIframe(), "009");
-    assertEquals(sasRequestParameters.getRFormat(), "xhtml");
-    assertEquals(sasRequestParameters.getOsId(), 123);
-    assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
-    assertEquals(sasRequestParameters.getTid(), "tid");
-    assertEquals(sasRequestParameters.getHandsetInternalId(), 456);
-    assertEquals(sasRequestParameters.getCarrierId(), 12345);
-    assertEquals(sasRequestParameters.getCity(), new Integer(12));
-    assertEquals(sasRequestParameters.getState(), new Integer(123));
-    assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("12"));
-    assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456));
-    assertEquals(sasRequestParameters.isRichMedia(), false);
-    assertEquals(sasRequestParameters.getRqAdType(), "int");
-    assertEquals(sasRequestParameters.getImaiBaseUrl(), null); // Internal, Populated in cas
-    assertEquals(sasRequestParameters.getAppUrl(), "siteUrl");
-    assertEquals(sasRequestParameters.getModelId(), 234);
-    assertEquals(sasRequestParameters.getDst(), 6);
-    assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
-    assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
-    assertEquals(sasRequestParameters.getSst(), 100);
-    assertEquals(sasRequestParameters.getReferralUrl(), "refUrl");
-  }
+		assertEquals(sasRequestParameters.getRemoteHostIp(), "10.14.118.143");
+		assertEquals(sasRequestParameters.getUserAgent(), "UserAgent");
+		assertEquals(sasRequestParameters.getSource(), "APP");
+		assertEquals(sasRequestParameters.getAge(), new Short("84"));
+		assertEquals(sasRequestParameters.getGender(), "M");
+		assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
+		assertEquals(sasRequestParameters.getPostalCode(), new Integer(123));
+		assertEquals(sasRequestParameters.getCountryCode(), "US");
+		assertEquals(sasRequestParameters.getCountryId(), new Long(94));
+		assertEquals(sasRequestParameters.getImpressionId(), null); // Internal, Populated in cas
+		assertEquals(sasRequestParameters.getClurl(), null); // Internal, Populated in cas
+		assertEquals(sasRequestParameters.getSiteId(), "siteId");
+		assertEquals(sasRequestParameters.getSlot(), new Short("12"));
+		assertEquals(sasRequestParameters.getSiteType(), "FAMILY_SAFE");
+		assertEquals(sasRequestParameters.getSdkVersion(), "i231");
+		assertEquals(sasRequestParameters.getSiteIncId(), 12345);
+		assertEquals(sasRequestParameters.getAdIncId(), 0); // Internal, Populated in cas
+		assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
+		assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
+		assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
+		assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
+		assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
+		assertEquals(sasRequestParameters.getUidParams(), null);
+		assertEquals(sasRequestParameters.getTUidParams(), null);
+		assertEquals(sasRequestParameters.getRqIframe(), "009");
+		assertEquals(sasRequestParameters.getRFormat(), "xhtml");
+		assertEquals(sasRequestParameters.getOsId(), 123);
+		assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
+		assertEquals(sasRequestParameters.getTid(), "tid");
+		assertEquals(sasRequestParameters.getHandsetInternalId(), 456);
+		assertEquals(sasRequestParameters.getCarrierId(), 12345);
+		assertEquals(sasRequestParameters.getCity(), new Integer(12));
+		assertEquals(sasRequestParameters.getState(), new Integer(123));
+		assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("12"));
+		assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456));
+		assertEquals(sasRequestParameters.isRichMedia(), false);
+		assertEquals(sasRequestParameters.getRqAdType(), "int");
+		assertEquals(sasRequestParameters.getImaiBaseUrl(), null); // Internal, Populated in cas
+		assertEquals(sasRequestParameters.getAppUrl(), "siteUrl");
+		assertEquals(sasRequestParameters.getModelId(), 234);
+		assertEquals(sasRequestParameters.getDst(), 6);
+		assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
+		assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
+		assertEquals(sasRequestParameters.getSst(), 100);
+		assertEquals(sasRequestParameters.getReferralUrl(), "refUrl");
+	}
 }

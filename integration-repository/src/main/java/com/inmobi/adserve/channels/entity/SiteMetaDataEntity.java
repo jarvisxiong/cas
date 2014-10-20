@@ -13,56 +13,56 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Getter
 public class SiteMetaDataEntity implements IdentifiableEntity<String> {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  private final String siteId;
-  private final String pubId;
-  private final Boolean backFillEnabled;
-  private final AccountType accountTypesAllowed;
-  private final Timestamp modified_on;
-  private final Set<String> advertisersIncludedBySite;
-  private final Set<String> advertisersIncludedByPublisher;
+	private final String siteId;
+	private final String pubId;
+	private final Boolean backFillEnabled;
+	private final AccountType accountTypesAllowed;
+	private final Timestamp modified_on;
+	private final Set<String> advertisersIncludedBySite;
+	private final Set<String> advertisersIncludedByPublisher;
 
-  public SiteMetaDataEntity(final Builder builder) {
-    siteId = builder.siteId;
-    pubId = builder.pubId;
-    backFillEnabled = builder.backFillEnabled;
-    AccountType accountsAllowed = AccountType.MANAGED;
-    if (builder.selfServeAllowed) {
-      accountsAllowed = AccountType.SELF_SERVE;
-    }
-    accountTypesAllowed = accountsAllowed;
-    modified_on = builder.modified_on;
-    advertisersIncludedBySite = builder.advertisersIncludedBySite;
-    advertisersIncludedByPublisher = builder.advertisersIncludedByPublisher;
-  }
+	public SiteMetaDataEntity(final Builder builder) {
+		siteId = builder.siteId;
+		pubId = builder.pubId;
+		backFillEnabled = builder.backFillEnabled;
+		AccountType accountsAllowed = AccountType.MANAGED;
+		if (builder.selfServeAllowed) {
+			accountsAllowed = AccountType.SELF_SERVE;
+		}
+		accountTypesAllowed = accountsAllowed;
+		modified_on = builder.modified_on;
+		advertisersIncludedBySite = builder.advertisersIncludedBySite;
+		advertisersIncludedByPublisher = builder.advertisersIncludedByPublisher;
+	}
 
-  public static Builder newBuilder() {
-    return new Builder();
-  }
+	public static Builder newBuilder() {
+		return new Builder();
+	}
 
-  @Setter
-  public static class Builder {
-    private String siteId;
-    private String pubId;
-    private Boolean backFillEnabled;
-    private Boolean selfServeAllowed;
-    private Timestamp modified_on;
-    private Set<String> advertisersIncludedBySite;
-    private Set<String> advertisersIncludedByPublisher;
+	@Setter
+	public static class Builder {
+		private String siteId;
+		private String pubId;
+		private Boolean backFillEnabled;
+		private Boolean selfServeAllowed;
+		private Timestamp modified_on;
+		private Set<String> advertisersIncludedBySite;
+		private Set<String> advertisersIncludedByPublisher;
 
-    public SiteMetaDataEntity build() {
-      return new SiteMetaDataEntity(this);
-    }
-  }
+		public SiteMetaDataEntity build() {
+			return new SiteMetaDataEntity(this);
+		}
+	}
 
-  @Override
-  public String getId() {
-    return siteId;
-  }
+	@Override
+	public String getId() {
+		return siteId;
+	}
 
-  @Override
-  public String getJSON() {
-    return null;
-  }
+	@Override
+	public String getJSON() {
+		return null;
+	}
 }

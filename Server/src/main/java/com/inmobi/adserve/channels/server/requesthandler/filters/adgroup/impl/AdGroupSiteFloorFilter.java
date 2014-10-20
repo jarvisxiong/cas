@@ -19,23 +19,23 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.Abstrac
 @Singleton
 public class AdGroupSiteFloorFilter extends AbstractAdGroupLevelFilter {
 
-  /**
-   * @param traceMarkerProvider
-   */
-  @Inject
-  protected AdGroupSiteFloorFilter(final Provider<Marker> traceMarkerProvider) {
-    super(traceMarkerProvider, null);
-  }
+	/**
+	 * @param traceMarkerProvider
+	 */
+	@Inject
+	protected AdGroupSiteFloorFilter(final Provider<Marker> traceMarkerProvider) {
+		super(traceMarkerProvider, null);
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-      final CasContext casContext) {
-    return false;
-  }
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
+			final CasContext casContext) {
+		return false;
+	}
 
-  @Override
-  protected void incrementStats(final ChannelSegment channelSegment) {
-    // No-op
-  }
+	@Override
+	protected void incrementStats(final ChannelSegment channelSegment) {
+		// No-op
+	}
 
 }

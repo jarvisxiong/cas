@@ -15,7 +15,7 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 @AllArgsConstructor
 public class AdvertiserMatchedSegmentDetail {
 
-  @Getter
-  private final List<ChannelSegment> channelSegmentList;
+	@Getter
+	private final List<ChannelSegment> channelSegmentList;
 
 }

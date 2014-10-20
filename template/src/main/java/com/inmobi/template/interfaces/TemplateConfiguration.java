@@ -7,12 +7,12 @@ import com.inmobi.template.gson.GsonManager;
 
 public interface TemplateConfiguration {
 
-  public MathTool getMathTool();
+	public MathTool getMathTool();
 
-  public Tools getTool();
+	public Tools getTool();
 
-  public GsonManager getGsonManager();
+	public GsonManager getGsonManager();
 
-  public TemplateDecorator getTemplateDecorator();
+	public TemplateDecorator getTemplateDecorator();
 
 }

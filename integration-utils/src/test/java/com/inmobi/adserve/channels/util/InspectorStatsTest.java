@@ -23,102 +23,104 @@ import com.yammer.metrics.reporting.GraphiteReporter;
 @PrepareForTest({InspectorStats.class, GraphiteReporter.class})
 public class InspectorStatsTest {
 
-  @Test
-  public void testInitUnknownHostException() throws Exception {
-    final String expectedMetricProducer = "unknown-host";
-    final String graphiteServer = "graphiteServer";
-    final int graphitePort = 1234;
-    final int graphiteInterval = 100;
+	@Test
+	public void testInitUnknownHostException() throws Exception {
+		final String expectedMetricProducer = "unknown-host";
+		final String graphiteServer = "graphiteServer";
+		final int graphitePort = 1234;
+		final int graphiteInterval = 100;
 
-    mockStatic(InetAddress.class);
-    mockStatic(GraphiteReporter.class);
+		mockStatic(InetAddress.class);
+		mockStatic(GraphiteReporter.class);
 
-    expect(InetAddress.getLocalHost()).andThrow(new UnknownHostException()).times(1);
-    GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort, expectedMetricProducer);
-    expectLastCall().times(1);
+		expect(InetAddress.getLocalHost()).andThrow(new UnknownHostException()).times(1);
+		GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort,
+				expectedMetricProducer);
+		expectLastCall().times(1);
 
-    replayAll();
+		replayAll();
 
-    InspectorStats.init(graphiteServer, graphitePort, graphiteInterval);
+		InspectorStats.init(graphiteServer, graphitePort, graphiteInterval);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testInit() throws Exception {
-    final String hostName = "something.someThingElse.inmobi.com";
-    final String expectedMetricProducer = "somethingelse.something";
-    final String graphiteServer = "graphiteServer";
-    final int graphitePort = 1234;
-    final int graphiteInterval = 100;
+	@Test
+	public void testInit() throws Exception {
+		final String hostName = "something.someThingElse.inmobi.com";
+		final String expectedMetricProducer = "somethingelse.something";
+		final String graphiteServer = "graphiteServer";
+		final int graphitePort = 1234;
+		final int graphiteInterval = 100;
 
-    mockStatic(InetAddress.class);
-    mockStatic(GraphiteReporter.class);
-    final InetAddress mockInetAddress = createMock(InetAddress.class);
+		mockStatic(InetAddress.class);
+		mockStatic(GraphiteReporter.class);
+		final InetAddress mockInetAddress = createMock(InetAddress.class);
 
-    expect(mockInetAddress.getHostName()).andReturn(hostName).times(1);
-    expect(InetAddress.getLocalHost()).andReturn(mockInetAddress).times(1);
-    GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort, expectedMetricProducer);
-    expectLastCall().times(1);
+		expect(mockInetAddress.getHostName()).andReturn(hostName).times(1);
+		expect(InetAddress.getLocalHost()).andReturn(mockInetAddress).times(1);
+		GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort,
+				expectedMetricProducer);
+		expectLastCall().times(1);
 
-    replayAll();
+		replayAll();
 
-    InspectorStats.init(graphiteServer, graphitePort, graphiteInterval);
+		InspectorStats.init(graphiteServer, graphitePort, graphiteInterval);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testIncrementStatCountParameterOnly() throws Exception {
-    final String key = "WorkFlow";
-    final String parameter = "param";
-    final long value = 1L;
+	@Test
+	public void testIncrementStatCountParameterOnly() throws Exception {
+		final String key = "WorkFlow";
+		final String parameter = "param";
+		final long value = 1L;
 
-    mockStaticPartial(InspectorStats.class, "incrementStatCount", String.class, String.class, long.class);
+		mockStaticPartial(InspectorStats.class, "incrementStatCount", String.class, String.class, long.class);
 
-    InspectorStats.incrementStatCount(key, parameter, value);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(key, parameter, value);
+		expectLastCall().times(1);
 
-    replayAll();
+		replayAll();
 
-    InspectorStats.incrementStatCount(key, parameter);
+		InspectorStats.incrementStatCount(key, parameter);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testIncrementStatCountParameterAndValueOnly() throws Exception {
-    final String key = "WorkFlow";
-    final String parameter = "param";
-    final long value = 5L;
+	@Test
+	public void testIncrementStatCountParameterAndValueOnly() throws Exception {
+		final String key = "WorkFlow";
+		final String parameter = "param";
+		final long value = 5L;
 
-    mockStaticPartial(InspectorStats.class, "incrementStatCount", String.class, String.class, long.class);
+		mockStaticPartial(InspectorStats.class, "incrementStatCount", String.class, String.class, long.class);
 
-    InspectorStats.incrementStatCount(key, parameter, value);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(key, parameter, value);
+		expectLastCall().times(1);
 
-    replayAll();
+		replayAll();
 
-    InspectorStats.incrementStatCount(parameter, value);
+		InspectorStats.incrementStatCount(parameter, value);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 
-  @Test
-  public void testIncrementStatCountKeyAndParameterOnly() throws Exception {
-    final String key = "WorkFlow";
-    final String parameter = "param";
-    final long value = 5L;
+	@Test
+	public void testIncrementStatCountKeyAndParameterOnly() throws Exception {
+		final String key = "WorkFlow";
+		final String parameter = "param";
+		final long value = 5L;
 
-    mockStaticPartial(InspectorStats.class, "incrementStatCount", String.class, String.class, long.class);
+		mockStaticPartial(InspectorStats.class, "incrementStatCount", String.class, String.class, long.class);
 
-    InspectorStats.incrementStatCount(key, parameter, value);
-    expectLastCall().times(1);
+		InspectorStats.incrementStatCount(key, parameter, value);
+		expectLastCall().times(1);
 
-    replayAll();
+		replayAll();
 
-    InspectorStats.incrementStatCount(parameter, value);
+		InspectorStats.incrementStatCount(parameter, value);
 
-    verifyAll();
-  }
+		verifyAll();
+	}
 }

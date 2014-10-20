@@ -18,15 +18,16 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 @Path("/getServerConfig")
 public class ServletGetServerConfig implements Servlet {
 
-  @Override
-  public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-      final Channel serverChannel) throws Exception {
-    hrh.responseSender.sendResponse(
-        new JSONObject(ConfigurationConverter.getMap(CasConfigUtil.getServerConfig())).toString(), serverChannel);
-  }
+	@Override
+	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+			final Channel serverChannel) throws Exception {
+		hrh.responseSender.sendResponse(
+				new JSONObject(ConfigurationConverter.getMap(CasConfigUtil.getServerConfig())).toString(),
+				serverChannel);
+	}
 
-  @Override
-  public String getName() {
-    return "getServerConfig";
-  }
+	@Override
+	public String getName() {
+		return "getServerConfig";
+	}
 }

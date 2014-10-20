@@ -15,18 +15,18 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionAdvertiserDomainFilter extends AbstractAuctionFilter {
 
-  @Inject
-  protected AuctionAdvertiserDomainFilter(final Provider<Marker> traceMarkerProvider,
-      final ServerConfig serverConfiguration) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ADVERTISER_DOMAINS_MISSING_FILTER, serverConfiguration);
-    isApplicableRTBD = true;
-    isApplicableIX = false;
-  }
+	@Inject
+	protected AuctionAdvertiserDomainFilter(final Provider<Marker> traceMarkerProvider,
+			final ServerConfig serverConfiguration) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ADVERTISER_DOMAINS_MISSING_FILTER, serverConfiguration);
+		isApplicableRTBD = true;
+		isApplicableIX = false;
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment rtbSegment,
-      final CasInternalRequestParameters casInternalRequestParameters) {
-    return null == rtbSegment.getAdNetworkInterface().getADomain()
-        || rtbSegment.getAdNetworkInterface().getADomain().isEmpty();
-  }
+	@Override
+	protected boolean failedInFilter(final ChannelSegment rtbSegment,
+			final CasInternalRequestParameters casInternalRequestParameters) {
+		return null == rtbSegment.getAdNetworkInterface().getADomain()
+				|| rtbSegment.getAdNetworkInterface().getADomain().isEmpty();
+	}
 }

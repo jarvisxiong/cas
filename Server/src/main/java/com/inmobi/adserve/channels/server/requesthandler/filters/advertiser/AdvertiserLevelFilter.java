@@ -13,7 +13,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
  */
 public interface AdvertiserLevelFilter extends ChannelSegmentFilter {
 
-  public void filter(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
-      final SASRequestParameters sasParams);
+	public void filter(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
+			final SASRequestParameters sasParams);
 
 }

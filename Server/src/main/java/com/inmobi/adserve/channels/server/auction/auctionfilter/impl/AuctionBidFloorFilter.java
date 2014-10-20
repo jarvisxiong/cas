@@ -15,19 +15,19 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AuctionBidFloorFilter extends AbstractAuctionFilter {
 
-  @Inject
-  protected AuctionBidFloorFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_BID_FLOOR_FILTER, serverConfiguration);
-    isApplicableRTBD = true;
-    isApplicableIX = true;
-  }
+	@Inject
+	protected AuctionBidFloorFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_BID_FLOOR_FILTER, serverConfiguration);
+		isApplicableRTBD = true;
+		isApplicableIX = true;
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment rtbSegment,
-      final CasInternalRequestParameters casInternalRequestParameters) {
-    if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.getAuctionBidFloor()) {
-      return true;
-    }
-    return false;
-  }
+	@Override
+	protected boolean failedInFilter(final ChannelSegment rtbSegment,
+			final CasInternalRequestParameters casInternalRequestParameters) {
+		if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.getAuctionBidFloor()) {
+			return true;
+		}
+		return false;
+	}
 }

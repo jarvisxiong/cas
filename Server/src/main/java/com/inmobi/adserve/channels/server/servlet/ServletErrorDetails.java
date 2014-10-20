@@ -17,19 +17,19 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 @Singleton
 @Path("/errorDetails")
 public class ServletErrorDetails implements Servlet {
-  private static final Logger LOG = LoggerFactory.getLogger(ServletErrorDetails.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ServletErrorDetails.class);
 
-  @Override
-  public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
-      final Channel serverChannel) throws Exception {
-    LOG.debug("Inside errorDetails servlet");
-    hrh.responseSender.sendResponse(CasConfigUtil.repositoryHelper.getRepositoryStatsProvider().getErrorDetails(),
-        serverChannel);
-  }
+	@Override
+	public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
+			final Channel serverChannel) throws Exception {
+		LOG.debug("Inside errorDetails servlet");
+		hrh.responseSender.sendResponse(CasConfigUtil.repositoryHelper.getRepositoryStatsProvider().getErrorDetails(),
+				serverChannel);
+	}
 
-  @Override
-  public String getName() {
-    return "ErrorDetailstat";
-  }
+	@Override
+	public String getName() {
+		return "ErrorDetailstat";
+	}
 
 }

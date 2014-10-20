@@ -5,15 +5,15 @@ import java.util.List;
 
 public class SuggestedNativeAttributeType implements NativeAttributeType<List<Integer>> {
 
-  List<Integer> suggested = new ArrayList<>();
+	List<Integer> suggested = new ArrayList<>();
 
-  public SuggestedNativeAttributeType() {
-    suggested.add(0);
-  }
+	public SuggestedNativeAttributeType() {
+		suggested.add(0);
+	}
 
-  @Override
-  public List<Integer> getAttributes() {
-    return suggested;
-  }
+	@Override
+	public List<Integer> getAttributes() {
+		return suggested;
+	}
 
 }

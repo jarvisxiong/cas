@@ -19,16 +19,16 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDailyRequestCapExceededFilter extends AbstractAdvertiserLevelFilter {
 
-  @Inject
-  public AdvertiserDailyRequestCapExceededFilter(final Provider<Marker> traceMarkerProvider) {
-    super(traceMarkerProvider, InspectorStrings.DROPPED_IN_REQUEST_CAP_FILTER);
-  }
+	@Inject
+	public AdvertiserDailyRequestCapExceededFilter(final Provider<Marker> traceMarkerProvider) {
+		super(traceMarkerProvider, InspectorStrings.DROPPED_IN_REQUEST_CAP_FILTER);
+	}
 
-  @Override
-  protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
+	@Override
+	protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
 
-    return channelSegment.getChannelFeedbackEntity().getTodayRequests() > channelSegment.getChannelEntity()
-        .getRequestCap();
-  }
+		return channelSegment.getChannelFeedbackEntity().getTodayRequests() > channelSegment.getChannelEntity()
+				.getRequestCap();
+	}
 
 }
