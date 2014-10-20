@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
-import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,7 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -30,9 +30,9 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
-    private static final Logger              LOG = LoggerFactory.getLogger(AdGroupPartnerCountFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdGroupPartnerCountFilter.class);
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
-    private final Provider<Marker>           traceMarkerProvider;
+    private final Provider<Marker> traceMarkerProvider;
     private FilterOrder order;
 
     /**
@@ -49,29 +49,31 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
     public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        Map<String, List<ChannelSegment>> advertiserSegmentListMap = getAdvertiserSegmentListMap(channelSegments);
+        final Map<String, List<ChannelSegment>> advertiserSegmentListMap = getAdvertiserSegmentListMap(channelSegments);
 
-        for (Entry<String, List<ChannelSegment>> entry : advertiserSegmentListMap.entrySet()) {
-            List<ChannelSegment> segmentListForAdvertiser = entry.getValue();
-            String advertiserId = entry.getKey();
+        for (final Entry<String, List<ChannelSegment>> entry : advertiserSegmentListMap.entrySet()) {
+            final List<ChannelSegment> segmentListForAdvertiser = entry.getValue();
+            final String advertiserId = entry.getKey();
             Collections.sort(segmentListForAdvertiser, ChannelSegment.CHANNEL_SEGMENT_REVERSE_COMPARATOR);
 
-            List<ChannelSegment> selectedSegmentListForAdvertiser = Lists.newArrayList();
+            final List<ChannelSegment> selectedSegmentListForAdvertiser = Lists.newArrayList();
             advertiserSegmentListMap.put(advertiserId, selectedSegmentListForAdvertiser);
 
-            for (ChannelSegment channelSegment : segmentListForAdvertiser) {
+            for (final ChannelSegment channelSegment : segmentListForAdvertiser) {
 
-                AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
+                final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 
-                boolean result = failedInFilter(selectedSegmentListForAdvertiser.size(), adapterConfig);
+                final boolean result = failedInFilter(selectedSegmentListForAdvertiser.size(), adapterConfig);
 
                 if (result) {
                     LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
                             advertiserId);
 
-                    // We are interested in capturing stats for all the dropped segments, hence not breaking the loop on this condition.
+                    // We are interested in capturing stats for all the dropped segments, hence not breaking the loop on
+                    // this
+                    // condition.
                     incrementStats(channelSegment);
                 } else {
                     selectedSegmentListForAdvertiser.add(channelSegment);
@@ -83,7 +85,7 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
         }
 
         channelSegments.clear();
-        for (List<ChannelSegment> channelSegmentList : advertiserSegmentListMap.values()) {
+        for (final List<ChannelSegment> channelSegmentList : advertiserSegmentListMap.values()) {
             channelSegments.addAll(channelSegmentList);
         }
 
@@ -93,10 +95,10 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
      * @param channelSegments
      */
     private Map<String, List<ChannelSegment>> getAdvertiserSegmentListMap(final List<ChannelSegment> channelSegments) {
-        Map<String, List<ChannelSegment>> advertiserSegmentListMap = Maps.newHashMap();
+        final Map<String, List<ChannelSegment>> advertiserSegmentListMap = Maps.newHashMap();
 
-        for (ChannelSegment channelSegment : channelSegments) {
-            String advertiserId = channelSegment.getChannelEntity().getAccountId();
+        for (final ChannelSegment channelSegment : channelSegments) {
+            final String advertiserId = channelSegment.getChannelEntity().getAccountId();
 
             List<ChannelSegment> segmentListForAdvertiser = advertiserSegmentListMap.get(advertiserId);
             if (segmentListForAdvertiser == null) {

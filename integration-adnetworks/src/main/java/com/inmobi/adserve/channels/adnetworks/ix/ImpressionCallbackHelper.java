@@ -13,13 +13,13 @@ public class ImpressionCallbackHelper {
     private final static Logger LOG = LoggerFactory.getLogger(ImpressionCallbackHelper.class);
 
     public boolean writeResponse(final URI uriCallBack, final Request callBackRequest,
-                                 final AsyncHttpClient asyncHttpClient) {
+            final AsyncHttpClient asyncHttpClient) {
 
         LOG.debug("In Adapter {}", this.getClass().getSimpleName());
 
         try {
             asyncHttpClient.executeRequest(callBackRequest);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.debug("Exception in makeAsyncRequest : {}", e);
         }
 

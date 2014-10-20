@@ -10,9 +10,8 @@ public interface IABCitiesInterface {
     /**
      * Maps inmobi cities to IAB cities.
      * 
-     * @param City
-     *            .
+     * @param City .
      * @return IAB city.
      */
-    String getIABCity(String city);
+    String getIABCity(final String city);
 }

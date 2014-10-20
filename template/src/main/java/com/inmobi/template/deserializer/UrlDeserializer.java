@@ -10,17 +10,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 public class UrlDeserializer implements JsonDeserializer<String> {
-	
 
-	@Override
-	public String deserialize(JsonElement json, Type typeOf,
-			JsonDeserializationContext arg2) throws JsonParseException {
-		final JsonArray jsonArray = json.getAsJsonArray();
-		Iterator<JsonElement> jsonItr = jsonArray.iterator();
-		if(jsonItr.hasNext()){
-			return jsonItr.next().getAsString();
-		}
-		return null;
-	}
-	
+
+    @Override
+    public String deserialize(final JsonElement json, final Type typeOf, final JsonDeserializationContext arg2)
+            throws JsonParseException {
+        final JsonArray jsonArray = json.getAsJsonArray();
+        final Iterator<JsonElement> jsonItr = jsonArray.iterator();
+        if (jsonItr.hasNext()) {
+            return jsonItr.next().getAsString();
+        }
+        return null;
+    }
+
 }

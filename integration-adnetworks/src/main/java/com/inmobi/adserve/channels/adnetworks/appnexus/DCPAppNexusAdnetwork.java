@@ -28,31 +28,31 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG             = LoggerFactory.getLogger(DCPAppNexusAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAppNexusAdnetwork.class);
 
-    private String              latitude        = null;
-    private String              longitude       = null;
-    private int                 width;
-    private int                 height;
-    private static final String ID              = "id";
-    private static final String APP_ID          = "appid";
-    private static final String SIZE            = "size";
-    private static final String LOCATION        = "loc";
-    private static final String POSTAL_CODE     = "pcode";
-    private static final String IDFA            = "idfa";
+    private String latitude = null;
+    private String longitude = null;
+    private int width;
+    private int height;
+    private static final String ID = "id";
+    private static final String APP_ID = "appid";
+    private static final String SIZE = "size";
+    private static final String LOCATION = "loc";
+    private static final String POSTAL_CODE = "pcode";
+    private static final String IDFA = "idfa";
     private static final String ANDROID_ID_SHA1 = "sha1udid";
-    private static final String ANDROID_ID_MD5  = "md5udid";
-    private static final String ODIN1           = "sha1mac";
-    private static final String OPENUDID_SHA1   = "openudid";
-    private static final String ST           	= "st";
-    private static final String TRAFFIC_TYPE    = "mobile_web";
+    private static final String ANDROID_ID_MD5 = "md5udid";
+    private static final String ODIN1 = "sha1mac";
+    private static final String OPENUDID_SHA1 = "openudid";
+    private static final String ST = "st";
+    private static final String TRAFFIC_TYPE = "mobile_web";
     // private static final String CLICKURL = "pubclick";
 
-    private static final String SIZE_FORMAT     = "%dx%d";
+    private static final String SIZE_FORMAT = "%dx%d";
     private static final String LAT_LONG_FORMAT = "%s,%s";
-    
-    private String              name;
-    private boolean             isApp;
+
+    private String name;
+    private boolean isApp;
 
     /**
      * @param config
@@ -75,7 +75,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString(name + ".host");
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
@@ -85,13 +85,12 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (casInternalRequestParameters.getLatLong() != null
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
 
-        if (sasParams.getOsId() == HandSetOS.Android.getValue()
-                || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+        if (sasParams.getOsId() == HandSetOS.Android.getValue() || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             isApp = true;
         } else {
             isApp = false;
@@ -109,14 +108,14 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(host);
+            final StringBuilder url = new StringBuilder(host);
             appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
             appendQueryParam(url, ID, externalSiteId, false);
             if (isApp) {
                 appendQueryParam(url, APP_ID, blindedSiteId, false);
-            } else{
-            	appendQueryParam(url, ST, TRAFFIC_TYPE, false);
+            } else {
+                appendQueryParam(url, ST, TRAFFIC_TYPE, false);
             }
             appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
 
@@ -130,16 +129,17 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
-                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.getUidMd5(), format),
-                            false);
+                    appendQueryParam(url, ANDROID_ID_MD5,
+                            getURLEncode(casInternalRequestParameters.getUidMd5(), format), false);
                 } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
-                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.getUid(), format), false);
+                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.getUid(), format),
+                            false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
-                    appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.getUidO1(), format),
-                            false);
+                    appendQueryParam(url, ANDROID_ID_SHA1,
+                            getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
                 }
-                
+
 
             }
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
@@ -152,16 +152,16 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                     appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.getUidIFA(), format), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
-                    appendQueryParam(url, OPENUDID_SHA1, getURLEncode(casInternalRequestParameters.getUidIDUS1(), format),
-                            false);
+                    appendQueryParam(url, OPENUDID_SHA1,
+                            getURLEncode(casInternalRequestParameters.getUidIDUS1(), format), false);
                 }
             }
 
             // appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
             LOG.debug("{} url is {}", name, url);
 
-            return (new URI(url.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -181,22 +181,22 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             try {
-                JSONObject responseJson = new JSONObject(response);
-                JSONArray responseArray = responseJson.getJSONArray("ads");
+                final JSONObject responseJson = new JSONObject(response);
+                final JSONArray responseArray = responseJson.getJSONArray("ads");
                 if (responseArray.length() == 0) {
                     responseContent = "";
                     statusCode = 500;
                     adStatus = "NO_AD";
                     return;
                 }
-                JSONObject adsJson = responseArray.getJSONObject(0);
+                final JSONObject adsJson = responseArray.getJSONObject(0);
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adsJson.getString("content"));
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from {} {}", name, exception);
                 LOG.info("Response from {} {}", name, response);

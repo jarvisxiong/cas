@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -15,6 +14,7 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
@@ -28,11 +28,11 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
 
-    private static final Logger       LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
 
-    private final Provider<Marker>    traceMarkerProvider;
+    private final Provider<Marker> traceMarkerProvider;
 
-    private final ServerConfig        serverConfig;
+    private final ServerConfig serverConfig;
 
     private FilterOrder order;
 
@@ -46,9 +46,9 @@ public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
     public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        int maxSegmentSelectionCount = serverConfig.getMaxSegmentSelectionCount();
+        final int maxSegmentSelectionCount = serverConfig.getMaxSegmentSelectionCount();
 
         if (maxSegmentSelectionCount == -1) {
             return;
@@ -56,10 +56,10 @@ public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
 
         int selectedSegmentCount = 0;
 
-        for (Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
-            ChannelSegment channelSegment = iterator.next();
+        for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
+            final ChannelSegment channelSegment = iterator.next();
 
-            boolean result = failedInFilter(maxSegmentSelectionCount, selectedSegmentCount);
+            final boolean result = failedInFilter(maxSegmentSelectionCount, selectedSegmentCount);
 
             if (result) {
                 // TODO: we can optimize if we don't need these inspector stats , then we can shorten our iteration

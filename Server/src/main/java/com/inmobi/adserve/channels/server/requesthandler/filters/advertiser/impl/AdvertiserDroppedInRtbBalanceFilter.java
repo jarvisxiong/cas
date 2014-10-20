@@ -25,7 +25,7 @@ public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevel
 
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
-    private final ServerConfig        serverConfiguration;
+    private final ServerConfig serverConfiguration;
 
     @Inject
     public AdvertiserDroppedInRtbBalanceFilter(final Provider<Marker> traceMarkerProvider,
@@ -37,12 +37,13 @@ public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevel
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-        boolean isRtbPartner = advertiserIdConfigMap.get(advertiserId).isRtb();
+        final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+        final boolean isRtbPartner = advertiserIdConfigMap.get(advertiserId).isRtb();
         boolean result = false;
         if (isRtbPartner) {
-            result = channelSegment.getChannelFeedbackEntity().getBalance() < serverConfiguration
-                    .getRtbBalanceFilterAmount();
+            result =
+                    channelSegment.getChannelFeedbackEntity().getBalance() < serverConfiguration
+                            .getRtbBalanceFilterAmount();
         }
         return result;
     }

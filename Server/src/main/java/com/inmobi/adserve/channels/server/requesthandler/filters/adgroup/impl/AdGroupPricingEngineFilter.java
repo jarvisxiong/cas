@@ -1,5 +1,13 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
+import java.util.Date;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -9,12 +17,6 @@ import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import java.util.Date;
 
 
 /**
@@ -37,16 +39,16 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
+        final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
 
-        Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
+        final Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
 
         if (dcpFloor != null) {
             // applying the boost
-            Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
-            Date today = new Date();
+            final Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
+            final Date today = new Date();
             double ecpm = channelSegment.getChannelSegmentAerospikeFeedbackEntity().getECPM();
             if (null != eCPMBoostExpiryDate && eCPMBoostExpiryDate.compareTo(today) > 0) {
                 LOG.debug(traceMarker, "EcpmBoost is applied for {}", channelSegment.getChannelSegmentEntity()
@@ -59,7 +61,7 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
             // applying dcp floor
             int percentage;
             if (dcpFloor > 0.0) {
-                percentage = (int) ((ecpm / dcpFloor) * 100);
+                percentage = (int) (ecpm / dcpFloor * 100);
             } else {
                 percentage = 150;
             }

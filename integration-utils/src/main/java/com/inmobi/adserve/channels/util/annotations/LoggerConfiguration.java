@@ -17,7 +17,7 @@ import com.google.inject.BindingAnnotation;
  */
 @BindingAnnotation
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ FIELD, METHOD, PARAMETER })
+@Target({FIELD, METHOD, PARAMETER})
 public @interface LoggerConfiguration {
 
 }

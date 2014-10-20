@@ -1,13 +1,14 @@
 package com.inmobi.adserve.channels.util.Utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CryptoHashGenerator {
@@ -31,10 +32,10 @@ public class CryptoHashGenerator {
                 mac = Mac.getInstance("HmacMD5");
                 mac.init(sk);
                 return mac;
-            } catch (NoSuchAlgorithmException e) {
+            } catch (final NoSuchAlgorithmException e) {
                 LOG.debug("Exception raised in CryptoHashGenerator {}", e);
                 return null;
-            } catch (InvalidKeyException e) {
+            } catch (final InvalidKeyException e) {
                 LOG.debug("Exception raised CryptoHashGenerator {}", e);
                 return null;
             }
@@ -46,9 +47,9 @@ public class CryptoHashGenerator {
     }
 
     public String generateHash(final String url) {
-        CRC32 crc = new CRC32();
+        final CRC32 crc = new CRC32();
         crc.update(mac.get().doFinal(url.getBytes()));
-        String hash = Long.toHexString(crc.getValue());
+        final String hash = Long.toHexString(crc.getValue());
         LOG.debug("CryptoHash Generated is {}", hash);
         return hash;
     }

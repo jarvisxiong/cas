@@ -33,18 +33,18 @@ import com.ning.http.client.RequestBuilder;
 
 
 public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
-    private static final Logger          LOG         = LoggerFactory.getLogger(DCPPubmaticAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPPubmaticAdNetwork.class);
 
-    private transient String             pubId;
-    private String                       latlong     = null;
-    private int                          width;
-    private int                          height;
-    private String                       deviceId;
-    private String                       adId;
-    private static final String          DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static String                creativeTag = "creative_tag";
-    private static String                trackingUrl = "tracking_url";
-    private static String                pubMaticBid = "PubMatic_Bid";
+    private transient String pubId;
+    private String latlong = null;
+    private int width;
+    private int height;
+    private String deviceId;
+    private String adId;
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static String creativeTag = "creative_tag";
+    private static String trackingUrl = "tracking_url";
+    private static String pubMaticBid = "PubMatic_Bid";
     private static IABCountriesInterface iABCountries;
 
     static {
@@ -68,17 +68,18 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         pubId = config.getString("pubmatic.pubId");
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
             try {
-                JSONObject additionalParams = entity.getAdditionalParams();
+                final JSONObject additionalParams = entity.getAdditionalParams();
                 // ad id is configured as the additional param in the
                 // segment table
-                adId = additionalParams.getString((sasParams.getSlot()).toString());
+                adId = additionalParams.getString(sasParams.getSlot().toString());
 
-            } catch (Exception e) {
-                LOG.error("AdId is not configured for the segment:{}, exception raised {}", entity.getExternalSiteKey(), e);
+            } catch (final Exception e) {
+                LOG.error("AdId is not configured for the segment:{}, exception raised {}",
+                        entity.getExternalSiteKey(), e);
                 return false;
             }
         } else {
@@ -93,7 +94,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         if (casInternalRequestParameters.getLatLong() != null) {
-            String[] t = casInternalRequestParameters.getLatLong().split(",");
+            final String[] t = casInternalRequestParameters.getLatLong().split(",");
             if (t.length > 1) {
                 latlong = String.format("%s,%s", t[0], t[1]);
             }
@@ -109,8 +110,9 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     public String getRequestParams() {
-        StringBuilder params = new StringBuilder(
-                "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=");
+        final StringBuilder params =
+                new StringBuilder(
+                        "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=");
         params.append(pubId);
         params.append("&adId=").append(adId);
         params.append("&siteId=").append(externalSiteId);
@@ -138,7 +140,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         params.append("&kadwidth=").append(width).append("&kadheight=").append(height);
         params.append("&pageURL=").append(blindedSiteId);
         params.append("&keywords=").append(getURLEncode(getCategories(','), format));
-        SimpleDateFormat dfm = new SimpleDateFormat(DATE_FORMAT);
+        final SimpleDateFormat dfm = new SimpleDateFormat(DATE_FORMAT);
         params.append("&kltstamp=").append(getURLEncode(dfm.format(Calendar.getInstance().getTime()), format));
         params.append("&ranreq=").append(Math.random());
 
@@ -154,9 +156,10 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
+        final byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
 
-        return new RequestBuilder("POST").setUrl(uri.toString()).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+        return new RequestBuilder("POST").setUrl(uri.toString())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
@@ -190,30 +193,30 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adResponse = adResponse.getJSONObject(pubMaticBid);
                 htmlCode = adResponse.getString(creativeTag).trim();
                 partnerBeacon = adResponse.getString(trackingUrl);
-            } catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.debug("Error parsing response from pubmatic : {}", exception);
                 LOG.info("Response from pubmatic NO_AD: {}", response);
                 return;
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from pubmatic : {}", ex);
                 LOG.info("Response from pubmatic: {}", response);
                 try {
                     throw ex;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                     return;
                 }
             }
 
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerBeacon);
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlCode);
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from pubmatic : {}", exception);
                 LOG.info("Response from pubmatic: {}", response);

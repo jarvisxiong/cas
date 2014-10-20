@@ -11,36 +11,36 @@ import com.inmobi.adserve.channels.util.config.CasBaseConfiguration;
 
 public class ConfigurationLoader {
 
-    private static final Logger        LOG      = Logger.getLogger(ConfigurationLoader.class);
+    private static final Logger LOG = Logger.getLogger(ConfigurationLoader.class);
 
     private static ConfigurationLoader instance = null;
 
     @Getter
-    private final Configuration        configuration;
+    private final Configuration configuration;
     @Getter
-    private final Configuration        cacheConfiguration;
+    private final Configuration cacheConfiguration;
     @Getter
-    private final Configuration        repoConfiguration;
+    private final Configuration repoConfiguration;
     @Getter
-    private final Configuration        feedBackConfiguration;
+    private final Configuration feedBackConfiguration;
     @Getter
-    private final Configuration        segmentFeedBackConfiguration;
+    private final Configuration segmentFeedBackConfiguration;
     @Getter
-    private final Configuration        siteTaxonomyConfiguration;
+    private final Configuration siteTaxonomyConfiguration;
     @Getter
-    private final Configuration        siteMetaDataConfiguration;
+    private final Configuration siteMetaDataConfiguration;
     @Getter
-    private final Configuration        adapterConfiguration;
+    private final Configuration adapterConfiguration;
     @Getter
-    private final Configuration        databaseConfiguration;
+    private final Configuration databaseConfiguration;
     @Getter
-    private final Configuration        serverConfiguration;
+    private final Configuration serverConfiguration;
     @Getter
-    private final Configuration        loggerConfiguration;
+    private final Configuration loggerConfiguration;
     @Getter
-    private final Configuration        log4jConfiguration;
+    private final Configuration log4jConfiguration;
     @Getter
-    private final Configuration        rtbConfiguration;
+    private final Configuration rtbConfiguration;
 
     private ConfigurationLoader(final String configFile) {
 
@@ -48,13 +48,14 @@ public class ConfigurationLoader {
             if (configFile.startsWith("/")) {
                 configuration = new CasBaseConfiguration(configFile);
             } else {
-                configuration = new CasBaseConfiguration(ConfigurationLoader.class.getClassLoader().getResource(configFile));
+                configuration =
+                        new CasBaseConfiguration(ConfigurationLoader.class.getClassLoader().getResource(configFile));
             }
-        } catch (ConfigurationException e) {
+        } catch (final ConfigurationException e) {
             LOG.error("error loading config {}", e);
             throw new RuntimeException(e);
         }
-        
+
         cacheConfiguration = configuration.subset("Cache");
         repoConfiguration = configuration.subset("Cache.ChannelAdGroupRepository");
         feedBackConfiguration = configuration.subset("Cache.ChannelFeedbackRepository");

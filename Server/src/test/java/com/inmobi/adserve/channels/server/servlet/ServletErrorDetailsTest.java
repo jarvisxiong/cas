@@ -1,15 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.RepositoryStatsProvider;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import org.hamcrest.core.IsEqual;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,17 +9,28 @@ import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
+import org.hamcrest.core.IsEqual;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.RepositoryStatsProvider;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+
 @RunWith(PowerMockRunner.class)
 public class ServletErrorDetailsTest {
 
     @Test
     public void testHandleRequest() throws Exception {
-        String errorDetails = "errorDetails";
+        final String errorDetails = "errorDetails";
         mockStatic(CasConfigUtil.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        RepositoryStatsProvider mockRepositoryStatsProvider = createMock(RepositoryStatsProvider.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final RepositoryStatsProvider mockRepositoryStatsProvider = createMock(RepositoryStatsProvider.class);
 
         expect(mockRepositoryHelper.getRepositoryStatsProvider()).andReturn(mockRepositoryStatsProvider).times(1);
         expect(mockRepositoryStatsProvider.getErrorDetails()).andReturn(errorDetails).times(1);
@@ -40,7 +41,7 @@ public class ServletErrorDetailsTest {
         mockHttpRequestHandler.responseSender = mockResponseSender;
         CasConfigUtil.repositoryHelper = mockRepositoryHelper;
 
-        ServletErrorDetails tested = new ServletErrorDetails();
+        final ServletErrorDetails tested = new ServletErrorDetails();
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -48,7 +49,7 @@ public class ServletErrorDetailsTest {
 
     @Test
     public void testGetName() throws Exception {
-        ServletErrorDetails tested = new ServletErrorDetails();
+        final ServletErrorDetails tested = new ServletErrorDetails();
         assertThat(tested.getName(), is(IsEqual.equalTo("ErrorDetailstat")));
     }
 }

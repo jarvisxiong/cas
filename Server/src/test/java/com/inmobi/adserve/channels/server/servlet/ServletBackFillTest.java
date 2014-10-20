@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.google.inject.Provider;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.auction.AuctionEngine;
-import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import org.hamcrest.core.IsEqual;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -27,6 +9,25 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+
+import org.hamcrest.core.IsEqual;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import com.google.inject.Provider;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class})
@@ -35,14 +36,15 @@ public class ServletBackFillTest {
     @Test
     public void testHandleRequest() throws Exception {
         mockStatic(InspectorStats.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-        CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
-        HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        HttpHeaders mockHttpHeaders = createMock((HttpHeaders.class));
-        RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
+        final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
+        final CasInternalRequestParameters mockCasInternalRequestParameters =
+                createMock(CasInternalRequestParameters.class);
+        final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
+        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
+        final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
@@ -67,7 +69,8 @@ public class ServletBackFillTest {
         mockResponseSender.sasParams = null;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
-        ServletBackFill tested = new ServletBackFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
+        final ServletBackFill tested =
+                new ServletBackFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -75,13 +78,13 @@ public class ServletBackFillTest {
 
     @Test
     public void testGetName() throws Exception {
-        ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
+        final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
         assertThat(tested.getName(), is(IsEqual.equalTo("BackFill")));
     }
 
     @Test
     public void testGetLogger() throws Exception {
-        ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
+        final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
         assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletBackFill.class))));
     }
 }

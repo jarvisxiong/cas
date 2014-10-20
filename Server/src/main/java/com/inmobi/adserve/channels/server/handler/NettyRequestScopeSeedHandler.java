@@ -31,9 +31,9 @@ import com.inmobi.adserve.channels.server.servlet.ServletInvalid;
 @Slf4j
 public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
 
-    private final NettyRequestScope    scope;
+    private final NettyRequestScope scope;
     private final Map<String, Servlet> pathToServletMap;
-    private final ServletInvalid       invalidServlet;
+    private final ServletInvalid invalidServlet;
     private final Provider<Marker> traceMarkerProvider;
 
 
@@ -48,16 +48,16 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
-        HttpRequest httpRequest = (HttpRequest) msg;
-        boolean isTracer = Boolean.valueOf(httpRequest.headers().get("x-mkhoj-tracer"));
-        Marker traceMarker = isTracer ? NettyRequestScope.TRACE_MAKER : null;
+        final HttpRequest httpRequest = (HttpRequest) msg;
+        final boolean isTracer = Boolean.valueOf(httpRequest.headers().get("x-mkhoj-tracer"));
+        final Marker traceMarker = isTracer ? NettyRequestScope.TRACE_MAKER : null;
         scope.enter();
         try {
             scope.seed(Marker.class, traceMarker);
             scope.seed(ResponseSender.class, new ResponseSender(traceMarkerProvider));
 
-            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
-            String path = queryStringDecoder.path();
+            final QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
+            final String path = queryStringDecoder.path();
 
             Servlet servlet = pathToServletMap.get(path);
             if (servlet == null) {

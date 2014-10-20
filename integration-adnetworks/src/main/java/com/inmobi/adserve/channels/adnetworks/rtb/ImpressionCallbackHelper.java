@@ -19,7 +19,7 @@ public class ImpressionCallbackHelper {
 
         try {
             asyncHttpClient.executeRequest(callBackRequest);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.debug("Exception in makeAsyncRequest : {}", e);
         }
 

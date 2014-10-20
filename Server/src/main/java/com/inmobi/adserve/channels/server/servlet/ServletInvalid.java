@@ -12,9 +12,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.nio.charset.Charset;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
@@ -29,10 +26,11 @@ public class ServletInvalid implements Servlet {
             final Channel serverChannel) throws Exception {
         // invalid request
         // TODO: remove header validation
-        HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-                Unpooled.copiedBuffer("Page not Found", Charset.defaultCharset()), true);
+        final HttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
+                        "Page not Found", Charset.defaultCharset()), true);
 
-        ChannelFuture future = serverChannel.writeAndFlush(response);
+        final ChannelFuture future = serverChannel.writeAndFlush(response);
         future.addListener(ChannelFutureListener.CLOSE);
     }
 

@@ -24,11 +24,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class DocumentBuilderHelper {
 
-    private GenericObjectPoolConfig                  poolConfig          = getPoolConfig();
+    private GenericObjectPoolConfig poolConfig = getPoolConfig();
 
     private final GenericObjectPool<DocumentBuilder> documentBuilderPool = new GenericObjectPool<DocumentBuilder>(
-                                                                                 new DocumentBuilderFactoryPool(),
-                                                                                 poolConfig);
+            new DocumentBuilderFactoryPool(), poolConfig);
 
     public GenericObjectPoolConfig getPoolConfig() {
         poolConfig = new GenericObjectPoolConfig();
@@ -45,7 +44,7 @@ public class DocumentBuilderHelper {
         @Override
         public DocumentBuilder create() throws Exception {
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             return factory.newDocumentBuilder();
         }
 
@@ -65,13 +64,13 @@ public class DocumentBuilderHelper {
      */
     public Document parse(final String data) throws Exception {
 
-        DocumentBuilder documentBuilder = documentBuilderPool.borrowObject();
+        final DocumentBuilder documentBuilder = documentBuilderPool.borrowObject();
 
         try {
-            Document document = documentBuilder.parse(new InputSource(new StringReader(data)));
+            final Document document = documentBuilder.parse(new InputSource(new StringReader(data)));
             documentBuilderPool.returnObject(documentBuilder);
             return document;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             documentBuilderPool.invalidateObject(documentBuilder);
             throw new RuntimeException(e);
         }

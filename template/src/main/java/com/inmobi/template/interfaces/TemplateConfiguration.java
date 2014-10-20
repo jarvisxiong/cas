@@ -6,13 +6,13 @@ import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.gson.GsonManager;
 
 public interface TemplateConfiguration {
-	
-	public MathTool getMathTool();
-	
-	public Tools getTool();
-	
-	public GsonManager getGsonManager();
-	
-	public TemplateDecorator getTemplateDecorator();
+
+    public MathTool getMathTool();
+
+    public Tools getTool();
+
+    public GsonManager getGsonManager();
+
+    public TemplateDecorator getTemplateDecorator();
 
 }

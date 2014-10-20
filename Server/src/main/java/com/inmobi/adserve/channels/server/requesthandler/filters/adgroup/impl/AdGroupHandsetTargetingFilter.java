@@ -38,7 +38,8 @@ public class AdGroupHandsetTargetingFilter extends AbstractAdGroupLevelFilter {
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        List<Integer> manufModelTargetingList = channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
+        final List<Integer> manufModelTargetingList =
+                channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
         return CollectionUtils.isNotEmpty(manufModelTargetingList)
                 && !manufModelTargetingList.contains(sasParams.getModelId());
     }

@@ -1,14 +1,15 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
+import javax.inject.Inject;
+
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
 
 
 /**

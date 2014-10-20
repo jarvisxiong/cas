@@ -28,17 +28,15 @@ import com.google.inject.Singleton;
 @Singleton
 public class JaxbHelper {
 
-    private GenericKeyedObjectPoolConfig                        poolConfig           = getPoolConfig();
+    private GenericKeyedObjectPoolConfig poolConfig = getPoolConfig();
 
-    private final GenericKeyedObjectPool<PoolKey, Marshaller>   marshallerPool       = new GenericKeyedObjectPool<PoolKey, Marshaller>(
-                                                                                             new MarshallerFactory(),
-                                                                                             poolConfig);
-    private final GenericKeyedObjectPool<PoolKey, Unmarshaller> unmarshallerPool     = new GenericKeyedObjectPool<PoolKey, Unmarshaller>(
-                                                                                             new UnmarshallerFactory(),
-                                                                                             poolConfig);
-    private final Map<PoolKey, JAXBContext>                     poolKeyToJaxbContext = Maps.newHashMap();
+    private final GenericKeyedObjectPool<PoolKey, Marshaller> marshallerPool =
+            new GenericKeyedObjectPool<PoolKey, Marshaller>(new MarshallerFactory(), poolConfig);
+    private final GenericKeyedObjectPool<PoolKey, Unmarshaller> unmarshallerPool =
+            new GenericKeyedObjectPool<PoolKey, Unmarshaller>(new UnmarshallerFactory(), poolConfig);
+    private final Map<PoolKey, JAXBContext> poolKeyToJaxbContext = Maps.newHashMap();
 
-    private final Object                                        lock                 = new Object();
+    private final Object lock = new Object();
 
     public GenericKeyedObjectPoolConfig getPoolConfig() {
         poolConfig = new GenericKeyedObjectPoolConfig();
@@ -112,10 +110,10 @@ public class JaxbHelper {
     }
 
     public <T> String marshal(final T instance) throws Exception {
-        StringWriter result = new StringWriter();
+        final StringWriter result = new StringWriter();
 
-        PoolKey poolKey = new PoolKey(instance.getClass());
-        Marshaller marshaller = marshallerPool.borrowObject(poolKey);
+        final PoolKey poolKey = new PoolKey(instance.getClass());
+        final Marshaller marshaller = marshallerPool.borrowObject(poolKey);
 
         try {
             marshaller.marshal(instance, result);
@@ -123,7 +121,7 @@ public class JaxbHelper {
             marshallerPool.returnObject(poolKey, marshaller);
 
             return result.toString();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             marshallerPool.invalidateObject(poolKey, marshaller);
             throw new RuntimeException(e);
         }
@@ -141,8 +139,8 @@ public class JaxbHelper {
     public <T> T unmarshal(final String data, final Class<T> clazz) throws Exception {
         T result;
 
-        PoolKey poolKey = new PoolKey(clazz);
-        Unmarshaller unmarshaller = unmarshallerPool.borrowObject(poolKey);
+        final PoolKey poolKey = new PoolKey(clazz);
+        final Unmarshaller unmarshaller = unmarshallerPool.borrowObject(poolKey);
 
         try {
             // noinspection unchecked
@@ -151,7 +149,7 @@ public class JaxbHelper {
             unmarshallerPool.returnObject(poolKey, unmarshaller);
 
             return result;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             unmarshallerPool.invalidateObject(poolKey, unmarshaller);
             throw new RuntimeException(e);
         }

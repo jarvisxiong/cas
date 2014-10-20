@@ -13,5 +13,5 @@ public interface AuctionEngineInterface {
 
     boolean isAuctionResponseNull();
 
-    public void updateIXChannelSegment(ChannelSegmentEntity dspChannelSegmentEntity);
+    public void updateIXChannelSegment(final ChannelSegmentEntity dspChannelSegmentEntity);
 }

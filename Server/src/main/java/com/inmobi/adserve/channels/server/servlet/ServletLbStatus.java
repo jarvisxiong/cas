@@ -41,9 +41,10 @@ public class ServletLbStatus implements Servlet {
             return;
         }
         // TODO: remove header validation
-        HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-                Unpooled.copiedBuffer(ServerStatusInfo.statusString, Charset.defaultCharset()));
-        ChannelFuture future = serverChannel.writeAndFlush(response);
+        final HttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
+                        ServerStatusInfo.statusString, Charset.defaultCharset()));
+        final ChannelFuture future = serverChannel.writeAndFlush(response);
         future.addListener(ChannelFutureListener.CLOSE);
     }
 
