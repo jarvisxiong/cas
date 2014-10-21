@@ -1,5 +1,23 @@
 package com.inmobi.adserve.channels.server;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Marker;
+import org.testng.annotations.Test;
+
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -8,46 +26,29 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Marker;
-import org.testng.annotations.Test;
-
-import javax.inject.Inject;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
 
 
 public class ServerTest extends TestCase {
 
-    private ResponseSender             responseSender;
+    private ResponseSender responseSender;
 
-    private Configuration              mockConfig       = null;
+    private Configuration mockConfig = null;
     private static ConfigurationLoader config;
-    private final String               debug            = "debug";
-    private final String               key              = "2";
-    private final String               keyType          = "HmacSha1Crc";
-    private final String               keyValue         = "SystemManagerScottTiger";
-    private final int                  ipFileVersion    = 2;
-    private final String               clickURLPrefix   = "http://c2.w.inmobi.com/c.asm";
-    private final String               beaconURLPrefix  = "http://c3.w.inmobi.com/c.asm";
-    private final String               secretKeyVersion = "1";
-    private SASRequestParameters       sasParam;
-    private RequestParser              requestParser;
-    private static String              rrFile           = "";
-    private static String              channelFile      = "";
-    private static int                 count            = 0;
-    private static int                 percentRollout   = 100;
-    private static List<String>        siteType         = Arrays.asList("FAMILYSAFE", "PERFORMANCE", "MATURE");
+    private final String debug = "debug";
+    private final String key = "2";
+    private final String keyType = "HmacSha1Crc";
+    private final String keyValue = "SystemManagerScottTiger";
+    private final int ipFileVersion = 2;
+    private final String clickURLPrefix = "http://c2.w.inmobi.com/c.asm";
+    private final String beaconURLPrefix = "http://c3.w.inmobi.com/c.asm";
+    private final String secretKeyVersion = "1";
+    private SASRequestParameters sasParam;
+    private RequestParser requestParser;
+    private static String rrFile = "";
+    private static String channelFile = "";
+    private static int count = 0;
+    private static int percentRollout = 100;
+    private static List<String> siteType = Arrays.asList("FAMILYSAFE", "PERFORMANCE", "MATURE");
 
     @Override
     public void setUp() throws Exception {
@@ -61,7 +62,7 @@ public class ServerTest extends TestCase {
         CasConfigUtil.init(config, null);
         responseSender = new ResponseSender(null);
 
-        AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
+        final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig);
 
         requestParser = new RequestParser(new Provider<Marker>() {
@@ -73,8 +74,8 @@ public class ServerTest extends TestCase {
     }
 
     public void prepareLogging() throws Exception {
-        FileWriter fstream = new FileWriter("target/channel-server.properties");
-        BufferedWriter out = new BufferedWriter(fstream);
+        final FileWriter fstream = new FileWriter("target/channel-server.properties");
+        final BufferedWriter out = new BufferedWriter(fstream);
         out.write("log4j.logger.app = DEBUG, channel\n");
         out.write("log4j.additivity.app = false\n");
         out.write("log4j.appender.channel=org.apache.log4j.DailyRollingFileAppender\n");
@@ -123,15 +124,15 @@ public class ServerTest extends TestCase {
     }
 
     public JSONObject prepareParameters() throws Exception {
-        JSONObject args = new JSONObject();
+        final JSONObject args = new JSONObject();
         sasParam = new SASRequestParameters();
         sasParam.setAge((short) 35);
         sasParam.setGender("m");
         sasParam.setImpressionId("4f8d98e2-4bbd-40bc-8729-22da000900f9");
-        int myarr[] = { 1, 2 };
-        long category[] = { 1, 2 };
-        long site[] = { 334, 50 };
-        HashMap<String, String> userParams = new HashMap<String, String>();
+        final int myarr[] = {1, 2};
+        final long category[] = {1, 2};
+        final long site[] = {334, 50};
+        final HashMap<String, String> userParams = new HashMap<String, String>();
         userParams.put("u-gender", "m");
         userParams.put("u-age", "35");
         args.put("uparams", new JSONObject(userParams));
@@ -145,7 +146,7 @@ public class ServerTest extends TestCase {
 
     @Test
     public void testStringify() throws Exception {
-        JSONObject jsonObject = prepareParameters();
+        final JSONObject jsonObject = prepareParameters();
         assertEquals(requestParser.stringify(jsonObject, "remoteHostIp"), "10.14.110.100");
     }
 
@@ -156,13 +157,13 @@ public class ServerTest extends TestCase {
 
     @Test
     public void testParseArray() throws Exception {
-        JSONObject jsonObject = prepareParameters();
+        final JSONObject jsonObject = prepareParameters();
         assertEquals(requestParser.parseArray(jsonObject, "testarr", 1), "2");
     }
 
     @Test
     public void testGetUserParams() throws Exception {
-        JSONObject jsonObject = prepareParameters();
+        final JSONObject jsonObject = prepareParameters();
         SASRequestParameters params = new SASRequestParameters();
         params = requestParser.getUserParams(params, jsonObject);
         assertEquals(params.getAge().shortValue(), (short) 35);
@@ -174,8 +175,8 @@ public class ServerTest extends TestCase {
      */
     @Test
     public void testGetCategory() throws Exception {
-        JSONObject jsonObject = prepareParameters();
-        Long[] category = { 1l, 2l };
+        final JSONObject jsonObject = prepareParameters();
+        final Long[] category = {1l, 2l};
         assertTrue("Category are expected to be equal",
                 requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
     }

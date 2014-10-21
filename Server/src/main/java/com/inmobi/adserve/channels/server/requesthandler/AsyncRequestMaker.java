@@ -1,5 +1,16 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import io.netty.channel.Channel;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -9,26 +20,17 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.SegmentFactory;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.ADCreativeType;
-import io.netty.channel.Channel;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 
 @Singleton
 public class AsyncRequestMaker {
-    private static final Logger  LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncRequestMaker.class);
 
     private final SegmentFactory segmentFactory;
 
@@ -47,11 +49,11 @@ public class AsyncRequestMaker {
             final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
             final List<ChannelSegment> rtbSegments) throws Exception {
 
-        List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
+        final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
         LOG.debug("Total channels available for sending requests {}", rows.size());
-        boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-        int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
+        final boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
+        final int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
         LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
 
         /*
@@ -60,14 +62,15 @@ public class AsyncRequestMaker {
          At this point, the creative type is set to Banner for video supported requests. If the request gets fullfiled
          with a video ad, creative type will be chosen accordingly.
         */
-        ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
+        final ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
         LOG.debug("Creative type is : {}", creativeType);
 
-        for (ChannelSegment row : rows) {
-            ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
-            AdNetworkInterface network = segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row
-                    .getChannelSegmentEntity().getChannelId(), adapterConfig, null, null, base, channel, advertiserSet,
-                    isRtbEnabled, rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
+        for (final ChannelSegment row : rows) {
+            final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
+            final AdNetworkInterface network =
+                    segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row.getChannelSegmentEntity()
+                            .getChannelId(), adapterConfig, null, null, base, channel, advertiserSet, isRtbEnabled,
+                            rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;
@@ -79,17 +82,18 @@ public class AsyncRequestMaker {
                 continue;
             }
 
-            long incId = channelSegmentEntity.getIncId(creativeType);
+            final long incId = channelSegmentEntity.getIncId(creativeType);
             if (incId == -1) {
-                LOG.debug("Could not find incId for adGroup {} and creativeType {}", channelSegmentEntity.getAdgroupId());
+                LOG.debug("Could not find incId for adGroup {} and creativeType {}",
+                        channelSegmentEntity.getAdgroupId());
                 continue;
             }
 
             String clickUrl = null;
             String beaconUrl = null;
             sasParams.setImpressionId(ImpressionIdGenerator.getInstance().getImpressionId(incId));
-            CasInternalRequestParameters casInternalRequestParameters = getCasInternalRequestParameters(sasParams,
-                    casInternalRequestParameterGlobal, channelSegmentEntity);
+            final CasInternalRequestParameters casInternalRequestParameters =
+                    getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal, channelSegmentEntity);
 
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
             sasParams.setAdIncId(incId);
@@ -101,8 +105,8 @@ public class AsyncRequestMaker {
                         && "cpc".equalsIgnoreCase(channelSegmentEntity.getPricingModel())) {
                     isCpc = true;
                 }
-                ClickUrlMakerV6 clickUrlMakerV6 = setClickParams(isCpc, config, sasParams,
-                        channelSegmentEntity.getDst() - 1);
+                final ClickUrlMakerV6 clickUrlMakerV6 =
+                        setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst() - 1);
                 clickUrlMakerV6.createClickUrls();
                 clickUrl = clickUrlMakerV6.getClickUrl();
                 beaconUrl = clickUrlMakerV6.getBeaconUrl();
@@ -131,9 +135,10 @@ public class AsyncRequestMaker {
     private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternalRequestParameterGlobal,
             final ChannelSegmentEntity channelSegmentEntity) {
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setImpressionId(sasParams.getImpressionId());
-        casInternalRequestParameters.setBlockedIabCategories(casInternalRequestParameterGlobal.getBlockedIabCategories());
+        casInternalRequestParameters.setBlockedIabCategories(casInternalRequestParameterGlobal
+                .getBlockedIabCategories());
         casInternalRequestParameters.setBlockedAdvertisers(casInternalRequestParameterGlobal.getBlockedAdvertisers());
         casInternalRequestParameters.setHighestEcpm(casInternalRequestParameterGlobal.getHighestEcpm());
         casInternalRequestParameters.setAuctionBidFloor(casInternalRequestParameterGlobal.getAuctionBidFloor());
@@ -162,8 +167,8 @@ public class AsyncRequestMaker {
         return casInternalRequestParameters;
     }
 
-    private String getImpressionIdForVideo(final SASRequestParameters sasParams,
-                                           final Integer[] adFormatIds, final Long[] adIncIds) {
+    private String getImpressionIdForVideo(final SASRequestParameters sasParams, final Integer[] adFormatIds,
+            final Long[] adIncIds) {
 
         if (!sasParams.isBannerVideoSupported() || adFormatIds == null || adIncIds == null) {
             LOG.debug("In-banner video ad is not supported.");
@@ -171,9 +176,9 @@ public class AsyncRequestMaker {
         }
 
         for (int i = 0; i < adFormatIds.length; i++) {
-            //  Get impression id for video ad format.
+            // Get impression id for video ad format.
             if (adFormatIds[i] == AdFormatType.VIDEO.getValue()) {
-                String impressionId = ImpressionIdGenerator.getInstance().getImpressionId(adIncIds[i]);
+                final String impressionId = ImpressionIdGenerator.getInstance().getImpressionId(adIncIds[i]);
                 LOG.debug("impression id for in-banner video ad is {}.", impressionId);
                 return impressionId;
             }
@@ -209,9 +214,9 @@ public class AsyncRequestMaker {
 
     public List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final Channel channel,
             final List<ChannelSegment> rtbSegments) {
-        Iterator<ChannelSegment> itr = rankList.iterator();
+        final Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
-            ChannelSegment channelSegment = itr.next();
+            final ChannelSegment channelSegment = itr.next();
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
@@ -221,9 +226,9 @@ public class AsyncRequestMaker {
                 itr.remove();
             }
         }
-        Iterator<ChannelSegment> rtbItr = rtbSegments.iterator();
+        final Iterator<ChannelSegment> rtbItr = rtbSegments.iterator();
         while (rtbItr.hasNext()) {
-            ChannelSegment channelSegment = rtbItr.next();
+            final ChannelSegment channelSegment = rtbItr.next();
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
@@ -239,7 +244,7 @@ public class AsyncRequestMaker {
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
             final SASRequestParameters sasParams, final Integer dst) {
-        ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
+        final ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
         builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
@@ -270,7 +275,7 @@ public class AsyncRequestMaker {
         return new ClickUrlMakerV6(builder);
     }
 
-    private boolean isNativeRequest(final SASRequestParameters sasParams){
+    private boolean isNativeRequest(final SASRequestParameters sasParams) {
         return "native".equalsIgnoreCase(sasParams.getRFormat());
     }
 }

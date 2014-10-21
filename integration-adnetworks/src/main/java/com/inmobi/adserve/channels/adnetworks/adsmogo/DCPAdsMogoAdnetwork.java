@@ -28,8 +28,7 @@ import com.ning.http.client.RequestBuilder;
 
 public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(DCPAdsMogoAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAdsMogoAdnetwork.class);
 
     private transient String latitude;
     private transient String longitude;
@@ -60,13 +59,11 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_AGE = "AGE";
     private static final String INTERSTITIAL = "interstitial";
     private static final String BANNER = "banner";
-    
-	private boolean isApp;
 
-    public DCPAdsMogoAdnetwork(final Configuration config,
-            final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler,
-            final Channel serverChannel) {
+    private boolean isApp;
+
+    public DCPAdsMogoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         host = config.getString("adsmogo.host");
         authKey = config.getString("adsmogo.authkey");
@@ -75,42 +72,40 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public boolean configureParameters() {
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
-                || StringUtils.isBlank(sasParams.getUserAgent())
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for AdsMogo so exiting adapter");
             return false;
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
-                && StringUtils.countMatches(
-                        casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
 
-        if (null != sasParams.getSlot()
-                && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams
-                    .getSlot());
+        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandatory parameters missing for AdsMogo so exiting adapter");
             return false;
         }
-        isApp = (StringUtils.isBlank(sasParams.getSource()) || WAP
-				.equalsIgnoreCase(sasParams.getSource())) ? false : true;
+        isApp =
+                StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
+                        ? false
+                        : true;
 
-        Integer sasParamsOsId = sasParams.getOsId();
+        final Integer sasParamsOsId = sasParams.getOsId();
         if (sasParamsOsId > 0 && sasParamsOsId < 21) {
             os = HandSetOS.values()[sasParamsOsId - 1].toString();
         }
 
-		if (isApp && StringUtils.isEmpty(getUid())) {
-			LOG.debug("mandatory parameter udid is missing for APP traffic in AdsMogo so exiting adapter");
-			return false;
-		}
+        if (isApp && StringUtils.isEmpty(getUid())) {
+            LOG.debug("mandatory parameter udid is missing for APP traffic in AdsMogo so exiting adapter");
+            return false;
+        }
 
         return true;
     }
@@ -122,69 +117,58 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder url = new StringBuilder(host);
+        final StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, APPID, externalSiteId, false);
         appendQueryParam(url, IPADDRESS, sasParams.getRemoteHostIp(), false);
-        if(isInterstitial()) {
+        if (isInterstitial()) {
             appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);
         } else {
             appendQueryParam(url, ADSPACE_TYPE, BANNER, false);
         }
-        appendQueryParam(url, USER_AGENT,
-                getURLEncode(sasParams.getUserAgent(), format), false);
+        appendQueryParam(url, USER_AGENT, getURLEncode(sasParams.getUserAgent(), format), false);
         if (StringUtils.isNotEmpty(os)) {
             appendQueryParam(url, DEVICE_OS, os, false);
         }
 
         if (null != sasParams.getAge()) {
-            appendQueryParam(url, USER_AGE, sasParams.getAge().toString(),
-                    false);
+            appendQueryParam(url, USER_AGE, sasParams.getAge().toString(), false);
         }
 
-        if (StringUtils.isNotEmpty(latitude)
-                && StringUtils.isNotEmpty(longitude)) {
+        if (StringUtils.isNotEmpty(latitude) && StringUtils.isNotEmpty(longitude)) {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);
         }
 
         if (StringUtils.isNotEmpty(sasParams.getCountryCode())) {
-            appendQueryParam(url, COUNTRY, sasParams.getCountryCode()
-                    .toUpperCase(), false);
+            appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
         appendQueryParam(url, ADSPACE_WIDTH, width, false);
         appendQueryParam(url, ADSPACE_HEIGHT, height, false);
 
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                appendQueryParam(url, IDFA,
-                        casInternalRequestParameters.getUidIFA(), false);
+                appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
 
             }
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
-                appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.getUid(),
-                        false);
-            } else if (StringUtils
-                    .isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
-                appendQueryParam(url, IOS_ID,
-                        casInternalRequestParameters.getUidIDUS1(), false);
+                appendQueryParam(url, IOS_OPEN_UDID, casInternalRequestParameters.getUid(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                appendQueryParam(url, IOS_ID, casInternalRequestParameters.getUidIDUS1(), false);
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
-                appendQueryParam(url, IOS_ID,
-                        casInternalRequestParameters.getUidMd5(), false);
+                appendQueryParam(url, IOS_ID, casInternalRequestParameters.getUidMd5(), false);
             }
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
-                appendQueryParam(url, ANDROID_ID,
-                        casInternalRequestParameters.getUidMd5(), false);
+                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
-                appendQueryParam(url, ANDROID_ID,
-                        casInternalRequestParameters.getUid(), false);
+                appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUid(), false);
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
                 appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
             }
         }
-        String gen = sasParams.getGender();
+        final String gen = sasParams.getGender();
         if (StringUtils.isNotEmpty(gen)) {
             if (gen.toLowerCase().startsWith("f")) {
 
@@ -197,16 +181,15 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             }
         }
         LOG.debug("AdsMogo url is {}", url);
-        URI requestUrl = new URI(url.toString());
-        StringBuilder query = new StringBuilder(URLDecoder.decode(requestUrl.getQuery()))
-                .append(authSecret);
+        final URI requestUrl = new URI(url.toString());
+        final StringBuilder query = new StringBuilder(URLDecoder.decode(requestUrl.getQuery())).append(authSecret);
         authSignature = getHashedValue(query.toString(), "MD5");
 
         return requestUrl;
-    
+
     }
 
-   
+
     @Override
     public Request getNingRequest() throws Exception {
 
@@ -215,37 +198,28 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        return new RequestBuilder()
-                .setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.USER_AGENT,
-                        sasParams.getUserAgent())
+        return new RequestBuilder().setUrl(uri.toString())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING,
-                        HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(SIGNATURE_HEADER, authSignature)
-                .setHeader(AUTHKEY_HEADER, authKey)
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).setHeader(SIGNATURE_HEADER, authSignature)
+                .setHeader(AUTHKEY_HEADER, authKey).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
     }
 
     @Override
-    public void parseResponse(final String response,
-            final HttpResponseStatus status) {
-        if (StringUtils.isBlank(response) || status.code() != 200
-                ) {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
+        if (StringUtils.isBlank(response) || status.code() != 200) {
             statusCode = 500;
             responseContent = "";
             return;
         } else {
-            VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
-                    response.trim());
+            final VelocityContext context = new VelocityContext();
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
-                responseContent = Formatter.getResponseFromTemplate(
-                        TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
                 statusCode = 200;
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from AdsMogo : {}", exception);
                 LOG.info("Response from AdsMogo: {}", response);
@@ -258,15 +232,15 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     public String getId() {
         return config.getString("adsmogo.advertiserId");
     }
-    
+
     @Override
     protected String getUid() {
-    	if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
             return casInternalRequestParameters.getUidIFA();
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
             return casInternalRequestParameters.getUidMd5();
-        }        
+        }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
             return casInternalRequestParameters.getUidIDUS1();
         }

@@ -27,12 +27,12 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG        = LoggerFactory.getLogger(DCPHttPoolAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPHttPoolAdNetwork.class);
 
-    private transient String    latitude;
-    private transient String    longitude;
-    private String              slotFormat;
-    private boolean             acceptShop = false;
+    private transient String latitude;
+    private transient String longitude;
+    private String slotFormat;
+    private boolean acceptShop = false;
 
     /**
      * @param config
@@ -56,7 +56,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -66,7 +66,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             if (slotSize == 9L || slotSize == 24L) {
                 slotSize = 15L;
             }
-            Dimension dim = SlotSizeMapping.getDimension(slotSize);
+            final Dimension dim = SlotSizeMapping.getDimension(slotSize);
             acceptShop = dim.getWidth() > 299;
             slotFormat = String.format("%dx%d", (int) Math.ceil(dim.getWidth()), (int) Math.ceil(dim.getHeight()));
         }
@@ -88,7 +88,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(host);
+            final StringBuilder url = new StringBuilder(host);
 
             url.append("type=rich%2Ctpt");
             if (acceptShop) {
@@ -113,18 +113,18 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             if (null != slot) {
                 url.append("&format=").append(slotFormat);
             }
-            String category = getCategories(';');
+            final String category = getCategories(';');
             if (!StringUtils.isEmpty(category)) {
                 url.append("&ct=").append(getURLEncode(category, format));
             }
-            String gender = sasParams.getGender();
+            final String gender = sasParams.getGender();
             if (StringUtils.isNotBlank(gender)) {
                 url.append("&dd_gnd=").append("f".equalsIgnoreCase(gender) ? 2 : 1);
             }
             LOG.debug("httpool url is {}", url.toString());
 
-            return (new URI(url.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -146,7 +146,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("beacon url inside httpool is {}", beaconUrl);
 
             try {
-                JSONObject adResponse = new JSONObject(response);
+                final JSONObject adResponse = new JSONObject(response);
                 if (adResponse.getInt("status") == 0) {
                     statusCode = 500;
                     responseContent = "";
@@ -154,21 +154,21 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
                 statusCode = status.code();
                 TemplateType t;
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                 context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("impression_url"));
-                String adType = adResponse.getString("ad_type");
+                final String adType = adResponse.getString("ad_type");
                 if ("tpt".equalsIgnoreCase(adType)) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                     t = TemplateType.HTML;
                 } else {
-                    String landingUrl = adResponse.getString("click_url") + "&url="
-                            + adResponse.getString("redirect_url");
+                    final String landingUrl =
+                            adResponse.getString("click_url") + "&url=" + adResponse.getString("redirect_url");
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, landingUrl);
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("image_url"));
                     if ("shop".equalsIgnoreCase(adType)) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("content"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             LOG.info("No template found for the slot");
                             adStatus = "NO_AD";
@@ -183,17 +183,17 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from httpool : {}", exception);
                 LOG.info("Response from httpool: {}", response);
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from httpool : {}", exception);
                 LOG.info("Response from httpool: {}", response);
                 try {
                     throw exception;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }

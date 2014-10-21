@@ -28,14 +28,14 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG       = LoggerFactory.getLogger(DCPPayPalAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPPayPalAdNetwork.class);
 
-    private String              latitude  = null;
-    private String              longitude = null;
-    private int                 width;
-    private int                 height;
-    private String              deviceId;
-    private String              responseFormat;
+    private String latitude = null;
+    private String longitude = null;
+    private int width;
+    private int height;
+    private String deviceId;
+    private String responseFormat;
 
     public DCPPayPalAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -53,15 +53,14 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
         responseFormat = config.getString("paypal.format");
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandate parameters missing for paypal, so returning from adapter");
             return false;
         }
-        if (sasParams.getOsId() == HandSetOS.Android.getValue()
-                || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+        if (sasParams.getOsId() == HandSetOS.Android.getValue() || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             deviceId = getUid();
             if (StringUtils.isBlank(deviceId) || deviceId == null) {
                 LOG.debug("mandate parameters missing for paypal, so returning from adapter");
@@ -70,7 +69,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         if (casInternalRequestParameters.getLatLong() != null
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -86,7 +85,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(host);
+            final StringBuilder url = new StringBuilder(host);
             url.append("&format=").append(responseFormat);
             url.append("&ip=").append(sasParams.getRemoteHostIp());
             url.append("&pubid=").append(externalSiteId);
@@ -135,8 +134,8 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
             LOG.debug("paypal url is {}", url);
 
-            return (new URI(url.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -157,7 +156,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
         } else {
             statusCode = status.code();
             try {
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
                 TemplateType t;
 
                 if (responseFormat.equalsIgnoreCase(TemplateType.HTML.name())) {
@@ -165,18 +164,19 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
                 } else {
                     t = TemplateType.IMAGE;
-                    JSONObject adResponse = new JSONObject(response).getJSONObject("adresponse").getJSONObject("imp");
+                    final JSONObject adResponse =
+                            new JSONObject(response).getJSONObject("adresponse").getJSONObject("imp");
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("imgurl"));
                     context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from paypal : {}", exception);
                 LOG.info("Response from paypal: {}", response);
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from paypal : {}", exception);
                 LOG.info("Response from paypal: {}", response);

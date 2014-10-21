@@ -40,26 +40,25 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl
  */
 public class ChannelSegmentFilterModule extends AbstractModule {
 
-    private final Reflections                             reflections;
+    private final Reflections reflections;
 
     private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
-                                                                                @Override
-                                                                                public int compare(
-                                                                                        final ChannelSegmentFilter o1,
-                                                                                        final ChannelSegmentFilter o2) {
-                                                                                    return o1.getOrder().getValue()
-                                                                                            - o2.getOrder().getValue();
-                                                                                }
-                                                                            };
+        @Override
+        public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
+            return o1.getOrder().getValue() - o2.getOrder().getValue();
+        }
+    };
 
     public ChannelSegmentFilterModule() {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .filterInputsBy(
-                        new FilterBuilder().includePackage(
-                                "com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl")
-                                .includePackage(
-                                        "com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl"))
-                .setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner());
+        final ConfigurationBuilder configurationBuilder =
+                new ConfigurationBuilder()
+                        .filterInputsBy(
+                                new FilterBuilder()
+                                        .includePackage(
+                                                "com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl")
+                                        .includePackage(
+                                                "com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl"))
+                        .setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner());
 
         reflections = new Reflections(configurationBuilder);
     }
@@ -68,19 +67,20 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     protected void configure() {
 
     }
-    
-    
+
+
     @DcpAndRtbdAdvertiserLevelFilters
     @Singleton
     @Provides
     List<AdvertiserLevelFilter> provideDcpAndRtbdAdvertiserLevelFilters(final Injector injector) {
-        List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+        final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
 
-        Set<Class<? extends AdvertiserLevelFilter>> classes = reflections.getSubTypesOf(AdvertiserLevelFilter.class);
+        final Set<Class<? extends AdvertiserLevelFilter>> classes =
+                reflections.getSubTypesOf(AdvertiserLevelFilter.class);
         classes.addAll(reflections.getSubTypesOf(AbstractAdvertiserLevelFilter.class));
 
-        for (Class<? extends AdvertiserLevelFilter> class1 : classes) {
-            AdvertiserLevelFilter filter = injector.getInstance(class1);
+        for (final Class<? extends AdvertiserLevelFilter> class1 : classes) {
+            final AdvertiserLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdvertiserDetailsInvalidFilter) {
                 filter.setOrder(FilterOrder.FIRST);
             } else if (filter instanceof AdvertiserExcludedFilter) {
@@ -96,12 +96,12 @@ public class ChannelSegmentFilterModule extends AbstractModule {
 
         return advertiserLevelFilterList;
     }
-    
+
     @IxAdvertiserLevelFilters
     @Singleton
     @Provides
     List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
-        List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+        final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
         advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
         return advertiserLevelFilterList;
     }
@@ -110,13 +110,13 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Singleton
     @Provides
     List<AdGroupLevelFilter> provideDcpAndRtbAdGroupLevelFilters(final Injector injector) {
-        List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
+        final List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
 
-        Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
+        final Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
         classes.addAll(reflections.getSubTypesOf(AbstractAdGroupLevelFilter.class));
 
-        for (Class<? extends AdGroupLevelFilter> class1 : classes) {
-            AdGroupLevelFilter filter = injector.getInstance(class1);
+        for (final Class<? extends AdGroupLevelFilter> class1 : classes) {
+            final AdGroupLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
                 filter.setOrder(FilterOrder.FIRST);
             } else if (filter instanceof AdGroupMaxSegmentPerRequestFilter) {
@@ -134,8 +134,8 @@ public class ChannelSegmentFilterModule extends AbstractModule {
 
         return adGroupLevelFilterList;
     }
-    
-    
+
+
     @IXAdGroupLevelFilters
     @Singleton
     @Provides

@@ -24,19 +24,19 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG                = LoggerFactory.getLogger(DCPAjillionAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAjillionAdnetwork.class);
 
-    private static final String        FORMAT             = "format";
-    private static final String        KEYWORD            = "keyword";
-    private static final String        PUBID              = "pubid";
-    private static final String        CLIENT_IP          = "clientip";
-    private static final String        CLIENT_UA          = "clientua";
-    private static final String        AGE                = "age";
-    private static final String        IS_BEACON_RQD      = "use_beacon";
-    private static final String        SLOT_FORMAT        = "%s.slot_%s_%s";
-    private static final String        BEACON_REQUIRED_FLAG = "1";
-    private String              placementId        = null;
-    private String              name;
+    private static final String FORMAT = "format";
+    private static final String KEYWORD = "keyword";
+    private static final String PUBID = "pubid";
+    private static final String CLIENT_IP = "clientip";
+    private static final String CLIENT_UA = "clientua";
+    private static final String AGE = "age";
+    private static final String IS_BEACON_RQD = "use_beacon";
+    private static final String SLOT_FORMAT = "%s.slot_%s_%s";
+    private static final String BEACON_REQUIRED_FLAG = "1";
+    private String placementId = null;
+    private String name;
 
     /**
      * @param config
@@ -57,7 +57,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString(name + ".host");
-        String siteRating = (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) ? "p" : "fs";
+        final String siteRating = SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType()) ? "p" : "fs";
         placementId = config.getString(String.format(SLOT_FORMAT, name, sasParams.getSlot(), siteRating));
         if (StringUtils.isBlank(placementId)) {
             LOG.debug("Slot is not configured for {}", externalSiteId);
@@ -81,7 +81,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(String.format(host, placementId));
+            final StringBuilder url = new StringBuilder(String.format(host, placementId));
             appendQueryParam(url, FORMAT, "json", true);
             appendQueryParam(url, IS_BEACON_RQD, BEACON_REQUIRED_FLAG, false);
             appendQueryParam(url, KEYWORD, getURLEncode(getCategories(','), format), false);
@@ -95,8 +95,8 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
             }
             LOG.debug("{} url is {}", name, url);
-            return (new URI(url.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -115,7 +115,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             try {
-                JSONObject adResponse = new JSONObject(response);
+                final JSONObject adResponse = new JSONObject(response);
 
                 if (!"true".equals(adResponse.getString("success"))) {
                     adStatus = "NO_AD";
@@ -125,7 +125,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 statusCode = status.code();
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
 
                 TemplateType t = TemplateType.IMAGE;
                 if (adResponse.has("beacon_url")) {
@@ -145,7 +145,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from {}  {}", response, name, exception);
             }

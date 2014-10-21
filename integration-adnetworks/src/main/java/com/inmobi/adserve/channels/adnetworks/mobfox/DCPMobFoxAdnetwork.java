@@ -27,36 +27,36 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger   LOG          = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
 
-    private transient String      latitude;
-    private transient String      longitude;
-    private int                   width;
-    private int                   height;
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
 
-    private static final String   PUBID        = "s";
-    private static final String   UA           = "u";
-    private static final String   CLIENT_IP    = "i";
-    private static final String   TRAFFICTYPE  = "m";
-    private static final String   MRAIDSUPPORT = "c_mraid";
-    private static final String   SHA1UDID     = "o_mcsha1";
-    private static final String   MD5UDID      = "o_mcmd5";
-    private static final String   IFA          = "o_iosadvid";
-    private static final String   VERSION      = "v";
-    protected static final String LAT          = "latitude";
-    protected static final String LONG         = "longitude";
-    protected static final String GENDER       = "demo.gender";
-    protected static final String KEYWORDS     = "demo.keywords";
-    protected static final String AGE          = "demo.age";
-    private static final String   WIDTH        = "adspace.width";
-    private static final String   HEIGHT       = "adspace.height";
-    private static final String   B_SITE_ID    = "s_subid";
-    private static final String   REQUEST_TYPE = "rt";
+    private static final String PUBID = "s";
+    private static final String UA = "u";
+    private static final String CLIENT_IP = "i";
+    private static final String TRAFFICTYPE = "m";
+    private static final String MRAIDSUPPORT = "c_mraid";
+    private static final String SHA1UDID = "o_mcsha1";
+    private static final String MD5UDID = "o_mcmd5";
+    private static final String IFA = "o_iosadvid";
+    private static final String VERSION = "v";
+    protected static final String LAT = "latitude";
+    protected static final String LONG = "longitude";
+    protected static final String GENDER = "demo.gender";
+    protected static final String KEYWORDS = "demo.keywords";
+    protected static final String AGE = "demo.age";
+    private static final String WIDTH = "adspace.width";
+    private static final String HEIGHT = "adspace.height";
+    private static final String B_SITE_ID = "s_subid";
+    private static final String REQUEST_TYPE = "rt";
 
-    private static final String   TYPE         = "live";
-    private static final String   MRAID_TYPE   = "1";
-    private static final String   API_VERSION  = "2.0";
-    private static final String   REQUEST_TYPE_VALUE = "api";
+    private static final String TYPE = "live";
+    private static final String MRAID_TYPE = "1";
+    private static final String API_VERSION = "2.0";
+    private static final String REQUEST_TYPE_VALUE = "api";
 
     /**
      * @param config
@@ -80,12 +80,12 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("mobfox.host");
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -101,7 +101,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder url = new StringBuilder(host);
+        final StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, REQUEST_TYPE, REQUEST_TYPE_VALUE, true);
         appendQueryParam(url, PUBID, externalSiteId, false);
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
@@ -125,7 +125,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidIDUS1(), false);
         } else {
-            String gpid = getGPID();
+            final String gpid = getGPID();
             if (gpid != null) {
                 url.append("&o_andadvid=").append(gpid);
             }
@@ -167,10 +167,10 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             try {
-                Request request = jaxbHelper.unmarshal(response, Request.class);
-                String htmlContent = request.getHtmlString();
+                final Request request = jaxbHelper.unmarshal(response, Request.class);
+                final String htmlContent = request.getHtmlString();
                 if (StringUtils.isBlank(htmlContent)) {
                     adStatus = "NO_AD";
                     statusCode = 500;
@@ -181,7 +181,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Mobfox, Exception raised {}", exception);
                 LOG.info("Response from Mobfox {}", response);

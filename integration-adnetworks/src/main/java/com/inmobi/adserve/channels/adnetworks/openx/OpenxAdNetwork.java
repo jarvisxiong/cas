@@ -25,10 +25,10 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.i
-    private static final Logger LOG       = LoggerFactory.getLogger(OpenxAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpenxAdNetwork.class);
 
-    private String              latitude  = null;
-    private String              longitude = null;
+    private String latitude = null;
+    private String longitude = null;
 
     public OpenxAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -46,7 +46,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (casInternalRequestParameters.getLatLong() != null
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
@@ -67,7 +67,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     // get URI
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
+        final StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountryCode().toLowerCase())
                 .append("&dma=").append(sasParams.getState());
         finalUrl.append("&net=").append(sasParams.getLocSrc()).append("&age=").append(sasParams.getAge());
@@ -95,21 +95,21 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
 
         finalUrl.append("&did=").append(casInternalRequestParameters.getUid());
 
-        String[] urlParams = finalUrl.toString().split("&");
+        final String[] urlParams = finalUrl.toString().split("&");
         finalUrl.delete(0, finalUrl.length());
         finalUrl.append(urlParams[0]);
 
         // discarding parameters that have null values
         for (int i = 1; i < urlParams.length; i++) {
-            String[] paramValue = urlParams[i].split("=");
-            if ((paramValue.length == 2) && !("null".equals(paramValue[1])) && !(StringUtils.isEmpty(paramValue[1]))) {
+            final String[] paramValue = urlParams[i].split("=");
+            if (paramValue.length == 2 && !"null".equals(paramValue[1]) && !StringUtils.isEmpty(paramValue[1])) {
                 finalUrl.append('&').append(paramValue[0]).append('=').append(paramValue[1]);
             }
         }
         LOG.debug("url inside openx: {}", finalUrl);
         try {
-            return (new URI(finalUrl.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(finalUrl.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("Error Forming Url inside openx {}", exception);
         }
@@ -129,17 +129,17 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             return;
         } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from openx : {}", exception);
                 LOG.info("Response from openx: {}", response);
                 try {
                     throw exception;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }

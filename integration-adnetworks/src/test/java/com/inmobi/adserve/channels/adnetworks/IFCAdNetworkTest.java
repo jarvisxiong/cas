@@ -27,16 +27,16 @@ import com.inmobi.phoenix.logging.DebugLogger;
 
 
 public class IFCAdNetworkTest extends TestCase {
-    private IFCAdNetwork  ifcAdNetwork;
-    private Configuration mockConfig        = null;
-    private final String  ifcHostus         = "http://10.14.118.91:8083/IFCPlatform/";
-    private final String  ifcAdvertiserId   = "1234";
-    private final String  ifcResponseFormat = "json";
-    private final String  isTest            = "0";
-    private final String  filter            = "clean";
-    private final String  debug             = "debug";
-    private final String  loggerConf        = "/tmp/channel-server.properties";
-    private DebugLogger   logger;
+    private IFCAdNetwork ifcAdNetwork;
+    private Configuration mockConfig = null;
+    private final String ifcHostus = "http://10.14.118.91:8083/IFCPlatform/";
+    private final String ifcAdvertiserId = "1234";
+    private final String ifcResponseFormat = "json";
+    private final String isTest = "0";
+    private final String filter = "clean";
+    private final String debug = "debug";
+    private final String loggerConf = "/tmp/channel-server.properties";
+    private DebugLogger logger;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -59,8 +59,8 @@ public class IFCAdNetworkTest extends TestCase {
         if (!f.exists()) {
             f.createNewFile();
         }
-        Channel serverChannel = createMock(Channel.class);
-        HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
+        final Channel serverChannel = createMock(Channel.class);
+        final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         SlotSizeMapping.init();
         ifcAdNetwork = new IFCAdNetwork(mockConfig, null, base, serverChannel);
@@ -68,10 +68,10 @@ public class IFCAdNetworkTest extends TestCase {
 
     @Test
     public void testConfigureParameters() throws Exception {
-        SASRequestParameters sasParams = new SASRequestParameters();
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final JSONArray jsonArray = new JSONArray();
+        final JSONObject jsonObject = new JSONObject();
         jsonObject.put("tid", "123");
         jsonObject.put("handset", jsonArray);
         jsonObject.put("carrier", jsonArray);
@@ -88,20 +88,21 @@ public class IFCAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
-                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final String externalKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ifcAdvertiserId, null, null,
+                        null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+                        null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
     }
 
     @Test
     public void testConfigureParametersForSdkVersion() throws Exception {
-        SASRequestParameters sasParams = new SASRequestParameters();
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final JSONArray jsonArray = new JSONArray();
+        final JSONObject jsonObject = new JSONObject();
         jsonObject.put("tid", "123");
         jsonObject.put("handset", jsonArray);
         jsonObject.put("carrier", jsonArray);
@@ -119,20 +120,21 @@ public class IFCAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
-                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final String externalKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ifcAdvertiserId, null, null,
+                        null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+                        null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
     }
 
     @Test
     public void testConfigureParametersForSdkVersion300() throws Exception {
-        SASRequestParameters sasParams = new SASRequestParameters();
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final JSONArray jsonArray = new JSONArray();
+        final JSONObject jsonObject = new JSONObject();
         jsonObject.put("tid", "123");
         jsonObject.put("handset", jsonArray);
         jsonObject.put("carrier", jsonArray);
@@ -150,11 +152,12 @@ public class IFCAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
-                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final String externalKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ifcAdvertiserId, null, null,
+                        null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+                        null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), false);
     }
 
@@ -170,10 +173,10 @@ public class IFCAdNetworkTest extends TestCase {
 
     @Test
     public void testParseResponse() throws Exception {
-        SASRequestParameters sasParams = new SASRequestParameters();
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final JSONArray jsonArray = new JSONArray();
+        final JSONObject jsonObject = new JSONObject();
         jsonObject.put("tid", "123");
         jsonObject.put("handset", jsonArray);
         jsonObject.put("carrier", jsonArray);
@@ -192,18 +195,18 @@ public class IFCAdNetworkTest extends TestCase {
         sasParams.setImaiBaseUrl("abcd");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
-                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final String externalKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ifcAdvertiserId, null, null,
+                        null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+                        null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
         try {
             ifcAdNetwork.parseResponse("", HttpResponseStatus.OK);
             ifcAdNetwork.parseResponse(null, HttpResponseStatus.OK);
             ifcAdNetwork.parseResponse("fkjhsdfkjahfkjsa", HttpResponseStatus.OK);
-        }
-        catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             fail();
         }
@@ -211,10 +214,10 @@ public class IFCAdNetworkTest extends TestCase {
 
     @Test
     public void testGetRequestBody() throws JSONException {
-        SASRequestParameters sasParams = new SASRequestParameters();
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final JSONArray jsonArray = new JSONArray();
+        final JSONObject jsonObject = new JSONObject();
         jsonObject.put("tid", "123");
         jsonObject.put("handset", jsonArray);
         jsonObject.put("carrier", jsonArray);
@@ -231,11 +234,12 @@ public class IFCAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        String externalKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
-                ifcAdvertiserId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
-                null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final String externalKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ifcAdvertiserId, null, null,
+                        null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
+                        null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
     }
 }

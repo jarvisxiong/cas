@@ -1,17 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import org.hamcrest.core.IsEqual;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.File;
-
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,6 +10,19 @@ import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
+import java.io.File;
+
+import org.hamcrest.core.IsEqual;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ServletTestResponse.class, Files.class})
 public class ServletTestResponseTest {
@@ -29,15 +30,14 @@ public class ServletTestResponseTest {
 
     @Test
     public void testHandleRequest() throws Exception {
-        String response = "response";
+        final String response = "response";
 
         mockStatic(Files.class);
-        HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
-        ResponseSender mockResponseSender = createMock(ResponseSender.class);
-        File mockFile = createMock(File.class);
+        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final File mockFile = createMock(File.class);
 
-        expectNew(File.class, new Class[]{String.class}, FILE_NAME)
-            .andReturn(mockFile).times(1);
+        expectNew(File.class, new Class[] {String.class}, FILE_NAME).andReturn(mockFile).times(1);
         expect(Files.toString(mockFile, Charsets.UTF_8)).andReturn(response).times(1);
 
         mockResponseSender.sendResponse(response, null);
@@ -46,7 +46,7 @@ public class ServletTestResponseTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        ServletTestResponse tested = new ServletTestResponse();
+        final ServletTestResponse tested = new ServletTestResponse();
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -54,7 +54,7 @@ public class ServletTestResponseTest {
 
     @Test
     public void testGetName() throws Exception {
-        ServletTestResponse tested = new ServletTestResponse();
+        final ServletTestResponse tested = new ServletTestResponse();
         assertThat(tested.getName(), is(IsEqual.equalTo("testResponse")));
     }
 }

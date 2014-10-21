@@ -26,56 +26,57 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 
 public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBRepository<ChannelSegmentEntity, String>
-        implements RepositoryManager {
+        implements
+            RepositoryManager {
 
     @Override
     public DBEntity<ChannelSegmentEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
-        NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-        String adgroupId = row.getString("adgroup_id");
-        Timestamp modifyTime = row.getTimestamp("modified_on");
+        final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
+        final String adgroupId = row.getString("adgroup_id");
+        final Timestamp modifyTime = row.getTimestamp("modified_on");
         try {
-            String advertiserId = row.getString("advertiser_id");
-            String[] adIds = (String[]) row.getArray("ad_ids");
-            String channelId = row.getString("channel_id");
-            String externalSiteKey = row.getString("external_site_key");
-            String campaignId = row.getString("campaign_id");
-            Long[] adIncIds = (Long[]) row.getArray("ad_inc_ids");
-            long adgroupIncId = row.getLong("adgroup_inc_id");
-            boolean status = row.getBoolean("status");
-            String pricingModel = row.getString("pricing_model");
-            boolean isTestMode = row.getBoolean("is_test_mode");
-            Timestamp modified_on = row.getTimestamp("modified_on");
-            Integer[] siteRatings = (Integer[]) row.getArray("site_ratings");
-            Long[] rcList = (Long[]) row.getArray("rc_list");
-            Long[] slotIds = (Long[]) row.getArray("slot_ids");
-            Integer[] creativeTypes = (Integer[]) row.getArray("creative_types");
-            Long[] tags = null;
+            final String advertiserId = row.getString("advertiser_id");
+            final String[] adIds = (String[]) row.getArray("ad_ids");
+            final String channelId = row.getString("channel_id");
+            final String externalSiteKey = row.getString("external_site_key");
+            final String campaignId = row.getString("campaign_id");
+            final Long[] adIncIds = (Long[]) row.getArray("ad_inc_ids");
+            final long adgroupIncId = row.getLong("adgroup_inc_id");
+            final boolean status = row.getBoolean("status");
+            final String pricingModel = row.getString("pricing_model");
+            final boolean isTestMode = row.getBoolean("is_test_mode");
+            final Timestamp modified_on = row.getTimestamp("modified_on");
+            final Integer[] siteRatings = (Integer[]) row.getArray("site_ratings");
+            final Long[] rcList = (Long[]) row.getArray("rc_list");
+            final Long[] slotIds = (Long[]) row.getArray("slot_ids");
+            final Integer[] creativeTypes = (Integer[]) row.getArray("creative_types");
+            final Long[] tags = null;
             List<Integer> segmentFlags;
             if (null != row.getArray("segment_flags")) {
                 segmentFlags = Arrays.asList((Integer[]) row.getArray("segment_flags"));
             } else {
                 segmentFlags = new ArrayList<Integer>();
             }
-            HashSet<Integer> segmentFlagSet = new HashSet<Integer>();
+            final HashSet<Integer> segmentFlagSet = new HashSet<Integer>();
             segmentFlagSet.addAll(segmentFlags);
-            long platformTargeting = row.getLong("platform_targeting_int");
-            int targetingPlatform = row.getInt("targeting_platform");
-            String osVersionTargeting = row.getString("os_version_targeting");
-            String additionalParams = row.getString("additional_params");
-            ArrayList<Integer> osIds = parseOsIds(osVersionTargeting);
-            boolean udIdRequired = segmentFlagSet.contains(1);
-            boolean latlongRequired = segmentFlagSet.contains(2);
-            boolean zipCodeRequired = segmentFlagSet.contains(3);
-            boolean richMediaOnly = segmentFlagSet.contains(7);
-            boolean appUrlEnabled = segmentFlagSet.contains(10);
-            boolean stripUdId = segmentFlagSet.contains(4);
-            boolean stripZipCode = segmentFlagSet.contains(6);
-            boolean stripLatlong = segmentFlagSet.contains(5);
-            boolean interstitialOnly = segmentFlagSet.contains(8);
-            boolean nonInterstitialOnly = segmentFlagSet.contains(9);
+            final long platformTargeting = row.getLong("platform_targeting_int");
+            final int targetingPlatform = row.getInt("targeting_platform");
+            final String osVersionTargeting = row.getString("os_version_targeting");
+            final String additionalParams = row.getString("additional_params");
+            final ArrayList<Integer> osIds = parseOsIds(osVersionTargeting);
+            final boolean udIdRequired = segmentFlagSet.contains(1);
+            final boolean latlongRequired = segmentFlagSet.contains(2);
+            final boolean zipCodeRequired = segmentFlagSet.contains(3);
+            final boolean richMediaOnly = segmentFlagSet.contains(7);
+            final boolean appUrlEnabled = segmentFlagSet.contains(10);
+            final boolean stripUdId = segmentFlagSet.contains(4);
+            final boolean stripZipCode = segmentFlagSet.contains(6);
+            final boolean stripLatlong = segmentFlagSet.contains(5);
+            final boolean interstitialOnly = segmentFlagSet.contains(8);
+            final boolean nonInterstitialOnly = segmentFlagSet.contains(9);
             boolean allTags = false;
-            Integer[] catTax = (Integer[]) row.getArray("category_taxomony");
+            final Integer[] catTax = (Integer[]) row.getArray("category_taxomony");
             Long[] categoryTaxomony;
             if (null == catTax || catTax.length == 0) {
                 allTags = true;
@@ -86,28 +87,27 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                     categoryTaxomony[i] = Long.valueOf(catTax[i]);
                 }
             }
-            String sIEJson = row.getString("sie_json");
-            Set<String> sitesIE = getSites(sIEJson);
-            boolean isSiteIncl = getMode(sIEJson);
+            final String sIEJson = row.getString("sie_json");
+            final Set<String> sitesIE = getSites(sIEJson);
+            final boolean isSiteIncl = getMode(sIEJson);
             long impressionCeil = row.getLong("impression_ceil");
             if (impressionCeil == 0) {
                 impressionCeil = Integer.MAX_VALUE;
             }
-            String manufModelTargeting = row.getString("manuf_model_targeting");
-            ArrayList<Integer> manufModelTargetingList = parseManufacturingIds(manufModelTargeting);
-            double ecpmBoost = row.getDouble("ecpm_boost");
-            Timestamp eCPMBoostDate = row.getTimestamp("boost_date");
-            long millisInDay = 24 * 60 * 60 * 1000;
+            final String manufModelTargeting = row.getString("manuf_model_targeting");
+            final ArrayList<Integer> manufModelTargetingList = parseManufacturingIds(manufModelTargeting);
+            final double ecpmBoost = row.getDouble("ecpm_boost");
+            final Timestamp eCPMBoostDate = row.getTimestamp("boost_date");
+            final long millisInDay = 24 * 60 * 60 * 1000;
             Date eCPMBoostExpiryDate = null;
             if (eCPMBoostDate != null) {
-                eCPMBoostExpiryDate = new Date(((eCPMBoostDate.getTime() + 3 * millisInDay) / millisInDay)
-                        * millisInDay);
+                eCPMBoostExpiryDate = new Date((eCPMBoostDate.getTime() + 3 * millisInDay) / millisInDay * millisInDay);
             }
-            Long[] tod = (Long[]) row.getArray("tod");
-            int dst = row.getInt("dst");
-            long campaignIncId = row.getLong("campaign_inc_id");
+            final Long[] tod = (Long[]) row.getArray("tod");
+            final int dst = row.getInt("dst");
+            final long campaignIncId = row.getLong("campaign_inc_id");
 
-            ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
+            final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
             builder.setAdvertiserId(advertiserId);
             builder.setAdgroupId(adgroupId);
             builder.setAdIds(adIds);
@@ -151,11 +151,11 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setCampaignIncId(campaignIncId);
             builder.setAdFormatIds(creativeTypes);
 
-            ChannelSegmentEntity entity = builder.build();
+            final ChannelSegmentEntity entity = builder.build();
 
             logger.debug("Adding adgroup " + adgroupId + " to channel segment repository");
             return new DBEntity<ChannelSegmentEntity, String>(entity, modifyTime);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("Error in resultset row", e);
             return new DBEntity<ChannelSegmentEntity, String>(new EntityError<String>(adgroupId,
                     "ERROR_IN_EXTRACTING_SEGMENT"), modifyTime);
@@ -166,7 +166,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         if (additionalParams != null) {
             try {
                 return new JSONObject(additionalParams);
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 logger.info("Error in parsing additional params json, exception raised " + e);
             }
         }
@@ -178,13 +178,13 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         ArrayList<Integer> osIds = null;
         try {
             if (osVersionTargeting != null) {
-                JSONArray osIdsJson = new JSONObject(osVersionTargeting).getJSONArray("os");
+                final JSONArray osIdsJson = new JSONObject(osVersionTargeting).getJSONArray("os");
                 osIds = new ArrayList<Integer>(osIdsJson.length());
                 for (int index = 0; index < osIdsJson.length(); ++index) {
                     osIds.add(osIdsJson.getJSONObject(index).getInt("id"));
                 }
             }
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
 
         }
         return osIds;
@@ -195,16 +195,16 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         ArrayList<Integer> modelIds = null;
         try {
             if (manufModelTargeting != null) {
-                JSONArray modelIdsJson = new JSONObject(manufModelTargeting).getJSONArray("manuf");
+                final JSONArray modelIdsJson = new JSONObject(manufModelTargeting).getJSONArray("manuf");
                 modelIds = new ArrayList<Integer>(modelIdsJson.length());
                 for (int index = 0; index < modelIdsJson.length(); ++index) {
-                    JSONArray jsonArray = modelIdsJson.getJSONObject(index).getJSONArray("modelIds");
+                    final JSONArray jsonArray = modelIdsJson.getJSONObject(index).getJSONArray("modelIds");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         modelIds.add(jsonArray.getInt(i));
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             // Do Nothing
         }
         return modelIds;
@@ -214,9 +214,9 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
         boolean mode = false;
         if (sIEJson != null) {
             try {
-                JSONObject jObject = new JSONObject(sIEJson);
+                final JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 logger.info("wrong json in site_json in channel repo" + e);
             }
         }
@@ -224,15 +224,15 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     Set<String> getSites(final String sIEJson) {
-        Set<String> sitesIE = new HashSet<String>();
+        final Set<String> sitesIE = new HashSet<String>();
         if (sIEJson != null) {
             try {
-                JSONObject jObject = new JSONObject(sIEJson);
-                JSONArray sites = jObject.getJSONArray("sites");
+                final JSONObject jObject = new JSONObject(sIEJson);
+                final JSONArray sites = jObject.getJSONArray("sites");
                 for (int i = 0; i < sites.length(); i++) {
                     sitesIE.add(sites.getString(i));
                 }
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 logger.info("wrong json in site_json in channel repo" + e);
             }
         }
@@ -243,7 +243,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     public boolean isObjectToBeDeleted(final ChannelSegmentEntity entity) {
         List<String> matchingKeys;
         try {
-            ChannelSegmentEntity oldEntity = query(entity.getId());
+            final ChannelSegmentEntity oldEntity = query(entity.getId());
             if (oldEntity != null) {
 
                 // Cleanup from ChannelSegmentMatchingCache
@@ -253,7 +253,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 // Cleanup from ChannelSegmentAdvertiserCache
                 ChannelSegmentAdvertiserCache.cleanupEntityFromCache(oldEntity);
             }
-        } catch (RepositoryException e) {
+        } catch (final RepositoryException e) {
             logger.error("Error in cleaning entity in ChannelAdGroupRepository for id" + entity.getId());
         }
         if (entity.isStatus() && entity.getSiteRatings() != null && entity.getSlotIds() != null) {
@@ -278,13 +278,14 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     public Collection<ChannelSegmentEntity> getEntities(final long slotId, final long category, final long country,
-            final Integer targetingPlatform, final Integer siteRating, final Integer osId, Integer dst) {
-        return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId, dst);
+            final Integer targetingPlatform, final Integer siteRating, final Integer osId, final Integer dst) {
+        return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId,
+                dst);
     }
 
     /**
      * Gets all the matching segments of an advertiser.
-     *
+     * 
      * @param advertiserId
      * @return Collection of ChannelSegmentEntity
      */

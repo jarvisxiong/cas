@@ -1,5 +1,22 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
@@ -15,69 +32,53 @@ import com.inmobi.casthrift.AdGroupFeedback;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.casthrift.Feedback;
 import com.inmobi.casthrift.SiteFeedback;
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import com.inmobi.phoenix.exception.InitializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 // Assumptions:
 // siteId is never null
 
 public class SiteAerospikeFeedbackRepository {
 
-    private AerospikeClient                                           aerospikeClient;
-    private Policy                                                    policy;
-    private String                                                    namespace;
-    private String                                                    set;
-    private DataCenter                                                colo;
+    private AerospikeClient aerospikeClient;
+    private Policy policy;
+    private String namespace;
+    private String set;
+    private DataCenter colo;
     // Cache to store segment feedback entities loaded from aerospike.
     private Map<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
-    private ConcurrentHashMap<String, Boolean>                        currentlyUpdatingSites;
-    private int                                                       refreshTime;
-    private ExecutorService                                           executorService;
-    private int                                                       feedbackTimeFrame;
-    private int                                                       boostTimeFrame;
-    private double                                                    defaultECPM;
-    private static final Logger                                       LOG = LoggerFactory
-                                                                                  .getLogger(SiteAerospikeFeedbackRepository.class);
+    private ConcurrentHashMap<String, Boolean> currentlyUpdatingSites;
+    private int refreshTime;
+    private ExecutorService executorService;
+    private int feedbackTimeFrame;
+    private int boostTimeFrame;
+    private double defaultECPM;
+    private static final Logger LOG = LoggerFactory.getLogger(SiteAerospikeFeedbackRepository.class);
 
-    public void init(final Configuration config, final DataCenter colo) throws InitializationException{
-        if(null == config || null == colo) {
-            throw new InitializationException("null as a value for any input parameters is not acceptable by init method.");
+    public void init(final Configuration config, final DataCenter colo) throws InitializationException {
+        if (null == config || null == colo) {
+            throw new InitializationException(
+                    "null as a value for any input parameters is not acceptable by init method.");
         }
 
-        this.namespace         = config.getString("namespace");
-        this.set               = config.getString("set");
-        this.refreshTime       = config.getInt("refreshTime");
-        this.feedbackTimeFrame = config.getInt("feedbackTimeFrame", 15);
-        this.boostTimeFrame    = config.getInt("boostTimeFrame", 3);
-        this.defaultECPM       = config.getDouble("default.ecpm", 0.25);
+        namespace = config.getString("namespace");
+        set = config.getString("set");
+        refreshTime = config.getInt("refreshTime");
+        feedbackTimeFrame = config.getInt("feedbackTimeFrame", 15);
+        boostTimeFrame = config.getInt("boostTimeFrame", 3);
+        defaultECPM = config.getDouble("default.ecpm", 0.25);
 
-        this.siteSegmentFeedbackCache = new ConcurrentHashMap<>();
-        this.currentlyUpdatingSites = new ConcurrentHashMap<>();
+        siteSegmentFeedbackCache = new ConcurrentHashMap<>();
+        currentlyUpdatingSites = new ConcurrentHashMap<>();
 
         this.colo = colo;
-        this.executorService = Executors.newCachedThreadPool();
+        executorService = Executors.newCachedThreadPool();
 
         try {
-            ClientPolicy clientPolicy = new ClientPolicy();
+            final ClientPolicy clientPolicy = new ClientPolicy();
             clientPolicy.maxThreads = 10;
-            
-            this.aerospikeClient = new AerospikeClient(clientPolicy, config.getString("host"), config.getInt("port"));
-        } catch (AerospikeException e) {
+
+            aerospikeClient = new AerospikeClient(clientPolicy, config.getString("host"), config.getInt("port"));
+        } catch (final AerospikeException e) {
             LOG.error("Exception while creating Aerospike client: {}", e);
             throw new InitializationException("Could not instantiate Aerospike client");
         }
@@ -89,7 +90,7 @@ public class SiteAerospikeFeedbackRepository {
      * Method to get SegmentAdGroupFeedbackEntity for the request site and segment combination. Looks first in cache
      * with a configurable refresh time if hits within the refresh time , returns the hit entity otherwise makes a call
      * to aerospike to load the fresh data while returning the stale entity for the current request.
-     *
+     * 
      * @return : returns the entity matching for the site, segment and adgroup combination
      */
     public SegmentAdGroupFeedbackEntity query(final String siteId, final Integer segmentId) {
@@ -111,19 +112,20 @@ public class SiteAerospikeFeedbackRepository {
         InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_CACHE_MISS);
         asynchronouslyFetchFeedbackFromAerospike(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
-        return siteFeedbackEntity == null ? null : (siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null ? null
-                : siteFeedbackEntity.getSegmentAdGroupFeedbackMap().get(segmentId));
+        return siteFeedbackEntity == null ? null : siteFeedbackEntity.getSegmentAdGroupFeedbackMap() == null
+                ? null
+                : siteFeedbackEntity.getSegmentAdGroupFeedbackMap().get(segmentId);
     }
 
     /**
      * Method that asynchronously fetches feedback from aerospike and puts it into the cache.
      */
     private void asynchronouslyFetchFeedbackFromAerospike(final String siteId) {
-        Boolean isSiteGettingUpdated = this.currentlyUpdatingSites.putIfAbsent(siteId, true);
+        final Boolean isSiteGettingUpdated = currentlyUpdatingSites.putIfAbsent(siteId, true);
         if (isSiteGettingUpdated == null) {
             // forking new thread to fetch feedback from Aerospike
-            CacheUpdater cacheUpdater = new CacheUpdater(siteId);
-            Thread cacheUpdaterThread = new Thread(cacheUpdater);
+            final CacheUpdater cacheUpdater = new CacheUpdater(siteId);
+            final Thread cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
         } else {
             LOG.debug("Not fetching feedback as site is already updating");
@@ -151,7 +153,7 @@ public class SiteAerospikeFeedbackRepository {
          */
         void getFeedbackFromAerospike(final String siteId) {
             // getting all data for the site
-            Record record = getFromAerospike(siteId);
+            final Record record = getFromAerospike(siteId);
             if (null == record) {
                 LOG.debug("Key not found in aerospike");
                 InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE);
@@ -172,7 +174,7 @@ public class SiteAerospikeFeedbackRepository {
             try {
                 final Key key = new Key(namespace, set, site);
                 record = aerospikeClient.get(policy, key);
-            } catch (AerospikeException e) {
+            } catch (final AerospikeException e) {
                 LOG.error("Exception while retrieving record: {}", e);
                 record = null;
             }
@@ -184,21 +186,20 @@ public class SiteAerospikeFeedbackRepository {
         /**
          * Processes feedback , extract global and colo data to get the siteFeedbackEntity object
          * 
-         * @param record
-         *            : ClResult object containing the feedback
+         * @param record : ClResult object containing the feedback
          */
         SiteFeedbackEntity processResultFromAerospike(final Record record) {
             if (null != record) {
-                Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackEntityMap = new HashMap<>();
-                for (Map.Entry<String, Object> binValuePair : record.bins.entrySet()) {
+                final Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackEntityMap = new HashMap<>();
+                for (final Map.Entry<String, Object> binValuePair : record.bins.entrySet()) {
                     String bin = binValuePair.getKey();
                     if (bin.startsWith(DataCenter.ALL.toString())) {
-                        String segmentId = bin.split("\u0001")[1];
+                        final String segmentId = bin.split("\u0001")[1];
                         SiteFeedback globalFeedback = new SiteFeedback();
                         try {
-                            TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                            final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                             tDeserializer.deserialize(globalFeedback, (byte[]) binValuePair.getValue());
-                        } catch (TException exception) {
+                        } catch (final TException exception) {
                             LOG.debug("Error in deserializing thrift for global feedback for segment {} {}", segmentId,
                                     exception);
                             globalFeedback = null;
@@ -206,13 +207,13 @@ public class SiteAerospikeFeedbackRepository {
                         bin = DataCenter.RCT.toString() + "\u0001" + segmentId;
                         SiteFeedback rctFeedback = new SiteFeedback();
                         try {
-                            TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-                            Object byteArray = record.getValue(bin);
+                            final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                            final Object byteArray = record.getValue(bin);
                             if (byteArray == null) {
                                 throw new TException("No rct data");
                             }
                             tDeserializer.deserialize(rctFeedback, (byte[]) byteArray);
-                        } catch (TException exception) {
+                        } catch (final TException exception) {
                             LOG.debug("Error in deserializing thrift for rct feedback for segment {} {}", segmentId,
                                     exception);
                             rctFeedback = null;
@@ -220,26 +221,26 @@ public class SiteAerospikeFeedbackRepository {
                         bin = colo.toString() + "\u0001" + segmentId;
                         SiteFeedback coloFeedback = new SiteFeedback();
                         try {
-                            TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
-                            Object byteArray = record.getValue(bin);
+                            final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
+                            final Object byteArray = record.getValue(bin);
                             if (byteArray == null) {
                                 throw new TException("No colo data");
                             }
                             tDeserializer.deserialize(coloFeedback, (byte[]) byteArray);
-                        } catch (TException exception) {
+                        } catch (final TException exception) {
                             LOG.debug("Error in deserializing thrift for local feedback for segment {} {}", segmentId,
                                     exception);
                             coloFeedback = null;
                         }
-                        SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity = buildSiteFeedbackEntity(
-                                globalFeedback, rctFeedback, coloFeedback);
+                        final SegmentAdGroupFeedbackEntity segmentAdGroupFeedbackEntity =
+                                buildSiteFeedbackEntity(globalFeedback, rctFeedback, coloFeedback);
                         if (segmentAdGroupFeedbackEntity != null) {
                             segmentAdGroupFeedbackEntityMap.put(segmentAdGroupFeedbackEntity.getSegmentId(),
                                     segmentAdGroupFeedbackEntity);
                         }
                     }
                 }
-                SiteFeedbackEntity.Builder builder = SiteFeedbackEntity.newBuilder();
+                final SiteFeedbackEntity.Builder builder = SiteFeedbackEntity.newBuilder();
                 builder.setLastUpdated(System.currentTimeMillis());
                 builder.setSiteGuId(siteId);
                 builder.setSegmentAdGroupFeedbackMap(segmentAdGroupFeedbackEntityMap);
@@ -250,35 +251,35 @@ public class SiteAerospikeFeedbackRepository {
         }
 
         /**
-         * Builds the siteFeedbackEntity object from the global and colo feedback objects(thrift generated) fetched
-         * from aerospike
+         * Builds the siteFeedbackEntity object from the global and colo feedback objects(thrift generated) fetched from
+         * aerospike
          */
         SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(final SiteFeedback globalFeedback,
                 final SiteFeedback rctFeedback, final SiteFeedback coloFeedback) {
             if (globalFeedback == null && rctFeedback == null && coloFeedback == null) {
                 return null;
             }
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = new Date();
-            String today = dateFormat.format(date);
-            HashMap<String, ChannelSegmentFeedbackEntity.Builder> adGroupFeedbackBuilderMap = new HashMap<>();
+            final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            final Date date = new Date();
+            final String today = dateFormat.format(date);
+            final HashMap<String, ChannelSegmentFeedbackEntity.Builder> adGroupFeedbackBuilderMap = new HashMap<>();
 
             // getting global data
             if (globalFeedback != null) {
-                for (AdGroupFeedback adGroupFeedback : globalFeedback.getAdGroupFeedbacks()) {
-                    ChannelSegmentFeedbackEntity.Builder globalBuilder = buildChannelSegmentFeedbackEntityBuilder(
-                            adGroupFeedback, dateFormat, date, today);
+                for (final AdGroupFeedback adGroupFeedback : globalFeedback.getAdGroupFeedbacks()) {
+                    final ChannelSegmentFeedbackEntity.Builder globalBuilder =
+                            buildChannelSegmentFeedbackEntityBuilder(adGroupFeedback, dateFormat, date, today);
                     // adding feedback at global level
                     adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), globalBuilder);
                 }
             }
             if (rctFeedback != null) {
-                for (AdGroupFeedback adGroupFeedback : rctFeedback.getAdGroupFeedbacks()) {
-                    ChannelSegmentFeedbackEntity.Builder rctBuilder = buildChannelSegmentFeedbackEntityBuilder(
-                            adGroupFeedback, dateFormat, date, today);
+                for (final AdGroupFeedback adGroupFeedback : rctFeedback.getAdGroupFeedbacks()) {
+                    final ChannelSegmentFeedbackEntity.Builder rctBuilder =
+                            buildChannelSegmentFeedbackEntityBuilder(adGroupFeedback, dateFormat, date, today);
                     if (adGroupFeedbackBuilderMap.containsKey(adGroupFeedback.getExternalSiteKey())) {
-                        ChannelSegmentFeedbackEntity.Builder builder = adGroupFeedbackBuilderMap.get(adGroupFeedback
-                                .getExternalSiteKey());
+                        final ChannelSegmentFeedbackEntity.Builder builder =
+                                adGroupFeedbackBuilderMap.get(adGroupFeedback.getExternalSiteKey());
                         builder.setBeacons(builder.getBeacons() + rctBuilder.getBeacons());
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), builder);
                     } else { // else adding feedback entity with rct data
@@ -288,15 +289,15 @@ public class SiteAerospikeFeedbackRepository {
             }
             // getting local data
             if (coloFeedback != null) {
-                for (AdGroupFeedback adGroupFeedback : coloFeedback.getAdGroupFeedbacks()) {
-                    ChannelSegmentFeedbackEntity.Builder coloBuilder = buildChannelSegmentFeedbackEntityBuilder(
-                            adGroupFeedback, dateFormat, date, today);
+                for (final AdGroupFeedback adGroupFeedback : coloFeedback.getAdGroupFeedbacks()) {
+                    final ChannelSegmentFeedbackEntity.Builder coloBuilder =
+                            buildChannelSegmentFeedbackEntityBuilder(adGroupFeedback, dateFormat, date, today);
                     // Setting latency and Fill Ratio to colo local if global level
                     // feedback
                     // already there
                     if (adGroupFeedbackBuilderMap.containsKey(adGroupFeedback.getExternalSiteKey())) {
-                        ChannelSegmentFeedbackEntity.Builder builder = adGroupFeedbackBuilderMap.get(adGroupFeedback
-                                .getExternalSiteKey());
+                        final ChannelSegmentFeedbackEntity.Builder builder =
+                                adGroupFeedbackBuilderMap.get(adGroupFeedback.getExternalSiteKey());
                         builder.setFillRatio(coloBuilder.getFillRatio());
                         builder.setLastHourLatency(coloBuilder.getLastHourLatency());
                         adGroupFeedbackBuilderMap.put(adGroupFeedback.getExternalSiteKey(), builder);
@@ -306,8 +307,9 @@ public class SiteAerospikeFeedbackRepository {
                 }
             }
 
-            HashMap<String, ChannelSegmentFeedbackEntity> adGroupFeedbackMap = new HashMap<>();
-            for (Map.Entry<String, ChannelSegmentFeedbackEntity.Builder> entry : adGroupFeedbackBuilderMap.entrySet()) {
+            final HashMap<String, ChannelSegmentFeedbackEntity> adGroupFeedbackMap = new HashMap<>();
+            for (final Map.Entry<String, ChannelSegmentFeedbackEntity.Builder> entry : adGroupFeedbackBuilderMap
+                    .entrySet()) {
                 adGroupFeedbackMap.put(entry.getKey(), entry.getValue().build());
             }
             Integer segmentId;
@@ -331,13 +333,14 @@ public class SiteAerospikeFeedbackRepository {
             double weighedRevenue = 0.0;
             double eCPM = 0.0;
 
-            for (Map.Entry<String, Feedback> entry : adGroupFeedback.getDailyFeedback().entrySet()) {
-                Feedback feedback = entry.getValue();
+            for (final Map.Entry<String, Feedback> entry : adGroupFeedback.getDailyFeedback().entrySet()) {
+                final Feedback feedback = entry.getValue();
                 long age;
                 try {
-                    age = (date.getTime() - dateFormat.parse(entry.getKey().split(" ")[0]).getTime())
-                            / (1000 * 60 * 60 * 24);
-                } catch (ParseException e) {
+                    age =
+                            (date.getTime() - dateFormat.parse(entry.getKey().split(" ")[0]).getTime())
+                                    / (1000 * 60 * 60 * 24);
+                } catch (final ParseException e) {
                     age = feedbackTimeFrame / 2;
                 }
                 if (age >= 0 && age < feedbackTimeFrame) {
@@ -349,14 +352,14 @@ public class SiteAerospikeFeedbackRepository {
                 }
             }
             if (weightedImpressionsRendered > 0) {
-                eCPM = (weighedRevenue / weightedImpressionsRendered) * 1000;
+                eCPM = weighedRevenue / weightedImpressionsRendered * 1000;
             }
             if (eCPM == 0) {
                 eCPM = defaultECPM;
             }
-            String todayDateTime = today + "00:00:00";
+            final String todayDateTime = today + "00:00:00";
 
-            Feedback todaysFeedback = adGroupFeedback.getDailyFeedback().get(todayDateTime);
+            final Feedback todaysFeedback = adGroupFeedback.getDailyFeedback().get(todayDateTime);
             int todaysclicks = 0;
             if (todaysFeedback != null) {
                 todaysclicks = todaysFeedback.getClicks();
@@ -364,14 +367,14 @@ public class SiteAerospikeFeedbackRepository {
             // default latency and fill ratio
             double lastHoursLatency = 400;
             double fillRatio = 0.01;
-            Feedback recentHourFeedback = adGroupFeedback.getRecentHourFeedback();
-            int requests = recentHourFeedback.getRequests();
-            int fills = recentHourFeedback.getFills();
+            final Feedback recentHourFeedback = adGroupFeedback.getRecentHourFeedback();
+            final int requests = recentHourFeedback.getRequests();
+            final int fills = recentHourFeedback.getFills();
             if (requests > 0) {
                 lastHoursLatency = recentHourFeedback.getLatency() / requests;
                 fillRatio = fills / (requests + 0.0);
             }
-            ChannelSegmentFeedbackEntity.Builder builder = ChannelSegmentFeedbackEntity.newBuilder();
+            final ChannelSegmentFeedbackEntity.Builder builder = ChannelSegmentFeedbackEntity.newBuilder();
             builder.setAdvertiserId(adGroupFeedback.getAdvertiserId());
             builder.setAdGroupId(adGroupFeedback.getAdGroupGuid());
             builder.setECPM(eCPM);
@@ -388,9 +391,9 @@ public class SiteAerospikeFeedbackRepository {
          */
         void updateCache(final SiteFeedbackEntity siteFeedbackEntity) {
             if (siteFeedbackEntity != null) {
-                siteSegmentFeedbackCache.put(this.siteId, siteFeedbackEntity);
+                siteSegmentFeedbackCache.put(siteId, siteFeedbackEntity);
             }
-            currentlyUpdatingSites.remove(this.siteId);
+            currentlyUpdatingSites.remove(siteId);
         }
     }
 
@@ -398,7 +401,7 @@ public class SiteAerospikeFeedbackRepository {
      * For lookup into the cache
      */
     public SiteFeedbackEntity query(final String siteId) {
-        return this.siteSegmentFeedbackCache.get(siteId);
+        return siteSegmentFeedbackCache.get(siteId);
     }
 
 }

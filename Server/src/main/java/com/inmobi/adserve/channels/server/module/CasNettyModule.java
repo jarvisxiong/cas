@@ -16,6 +16,7 @@ import com.google.inject.TypeLiteral;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
+import com.inmobi.adserve.channels.server.CasTimeoutHandler;
 import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
@@ -32,36 +33,40 @@ import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
  */
 public class CasNettyModule extends AbstractModule {
 
-	private final Configuration serverConfiguration;
+    private final Configuration serverConfiguration;
 
-	public CasNettyModule(final Configuration serverConfiguration) {
-		this.serverConfiguration = serverConfiguration;
-	}
+    public CasNettyModule(final Configuration serverConfiguration) {
+        this.serverConfiguration = serverConfiguration;
+    }
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
-		bind(LoggingHandler.class).toInstance(new LoggingHandler());
+        bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
+        bind(LoggingHandler.class).toInstance(new LoggingHandler());
 
-		// server pipelines
-		TypeLiteral<ChannelInitializer<SocketChannel>> channelInitializerType = new TypeLiteral<ChannelInitializer<SocketChannel>>() {
-		};
-		bind(channelInitializerType).annotatedWith(ServerChannelInitializer.class).to(ChannelServerPipelineFactory.class).asEagerSingleton();
-		bind(channelInitializerType).annotatedWith(StatServerChannelInitializer.class).to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
+        // server pipelines
+        final TypeLiteral<ChannelInitializer<SocketChannel>> channelInitializerType =
+                new TypeLiteral<ChannelInitializer<SocketChannel>>() {};
+        bind(channelInitializerType).annotatedWith(ServerChannelInitializer.class)
+                .to(ChannelServerPipelineFactory.class).asEagerSingleton();
+        bind(channelInitializerType).annotatedWith(StatServerChannelInitializer.class)
+                .to(ChannelStatServerPipelineFactory.class).asEagerSingleton();
 
         bind(CasNettyServer.class).asEagerSingleton();
         bind(AsyncHttpClientProvider.class).asEagerSingleton();
         bind(NativeTemplateAttributeFinder.class).asEagerSingleton();
 
-		// thread pool to be used in AsyncHttpClient
-		bind(ExecutorService.class).annotatedWith(WorkerExecutorService.class).toInstance(Executors.newCachedThreadPool());
-	}
+        // thread pool to be used in AsyncHttpClient
+        bind(ExecutorService.class).annotatedWith(WorkerExecutorService.class).toInstance(
+                Executors.newCachedThreadPool());
+        requestStaticInjection(CasTimeoutHandler.class);
+    }
 
-	@Provides
-	@Singleton
-	ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) throws Exception {
-		return new ConnectionLimitHandler(serverConfig);
-	}
+    @Provides
+    @Singleton
+    ConnectionLimitHandler incomingConnectionLimitHandler(final ServerConfig serverConfig) throws Exception {
+        return new ConnectionLimitHandler(serverConfig);
+    }
 
 }

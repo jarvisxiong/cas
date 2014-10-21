@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.ws.rs.Path;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -7,18 +22,6 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.ws.rs.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 
 @Singleton
@@ -36,11 +39,11 @@ public class ServletChangeConfig implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
 
-        Map<String, List<String>> params = queryStringDecoder.parameters();
+        final Map<String, List<String>> params = queryStringDecoder.parameters();
         JSONObject jObject = null;
         try {
             jObject = requestParser.extractParams(params, "update");
-        } catch (JSONException exeption) {
+        } catch (final JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet, {}", exeption);
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
@@ -55,12 +58,12 @@ public class ServletChangeConfig implements Servlet {
         }
         LOG.debug("Successfully got json for config change");
         try {
-            StringBuilder updates = new StringBuilder();
+            final StringBuilder updates = new StringBuilder();
             updates.append("Successfully changed Config!!!!!!!!!!!!!!!!!\n").append("The changes are\n");
             @SuppressWarnings("unchecked")
-            Iterator<String> itr = jObject.keys();
+            final Iterator<String> itr = jObject.keys();
             while (itr.hasNext()) {
-                String configKey = itr.next().toString();
+                final String configKey = itr.next().toString();
                 if (configKey.startsWith("adapter")
                         && CasConfigUtil.getAdapterConfig().containsKey(configKey.replace("adapter.", ""))) {
                     CasConfigUtil.getAdapterConfig().setProperty(configKey.replace("adapter.", ""),
@@ -68,22 +71,22 @@ public class ServletChangeConfig implements Servlet {
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getAdapterConfig().getString(configKey.replace("adapter.", "")))
                             .append("\n");
-                }
-                else if (configKey.startsWith("server")
+                } else if (configKey.startsWith("server")
                         && CasConfigUtil.getServerConfig().containsKey(configKey.replace("server.", ""))) {
                     CasConfigUtil.getServerConfig().setProperty(configKey.replace("server.", ""),
                             jObject.getString(configKey));
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getServerConfig().getString(configKey.replace("server.", "")))
                             .append("\n");
-                }
-                else if (configKey.startsWith("resetTimers")) {
-                	InspectorStats.resetTimers();
+                } else if (configKey.startsWith("resetTimers")) {
+                    InspectorStats.resetTimers();
                 }
             }
             hrh.responseSender.sendResponse(updates.toString(), serverChannel);
-        } catch (JSONException ex) {
-            LOG.debug("Encountered Json Error while creating json object inside HttpRequest Handler for config change, exception raised {}", ex);
+        } catch (final JSONException ex) {
+            LOG.debug(
+                    "Encountered Json Error while creating json object inside HttpRequest Handler for config change, exception raised {}",
+                    ex);
             hrh.responseSender.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         }
     }

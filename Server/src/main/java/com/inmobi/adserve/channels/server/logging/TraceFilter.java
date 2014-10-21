@@ -1,10 +1,12 @@
 package com.inmobi.adserve.channels.server.logging;
 
+import org.slf4j.Marker;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
+
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
-import org.slf4j.Marker;
 
 
 /**

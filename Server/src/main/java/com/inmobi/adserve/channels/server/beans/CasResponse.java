@@ -12,7 +12,7 @@ public class CasResponse {
 
     private final boolean noFill;
 
-    private final String  htmlSnippet;
+    private final String htmlSnippet;
 
     private final boolean keepAlive;
 }

@@ -1,5 +1,39 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -22,9 +56,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.ix.AdQuality;
 import com.inmobi.casthrift.ix.App;
@@ -47,124 +81,95 @@ import com.inmobi.casthrift.ix.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 
 /**
  * Generic IX adapter.
- *
+ * 
  * @author Anshul Soni(anshul.soni@inmobi.com)
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
 
-    private static final Logger            LOG                          = LoggerFactory.getLogger(IXAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
 
     @Getter
     @Setter
-    private String                         urlBase;
+    private String urlBase;
     @Getter
     @Setter
-    private String                         urlArg;
+    private String urlArg;
     @Getter
     @Setter
-    private String                         ixMethod;
+    private String ixMethod;
     @Getter
     @Setter
-    private String                         callbackUrl;
+    private String callbackUrl;
     @Setter
-    private double                         bidPriceInUsd;
+    private double bidPriceInUsd;
     @Setter
-    private double                         bidPriceInLocal;
+    private double bidPriceInLocal;
     @Getter
     @Setter
-    IXBidRequest                           bidRequest;
+    IXBidRequest bidRequest;
     @Getter
     @Setter
-    IXBidResponse                          bidResponse;
-    private final String                   userName;
-    private final String                   password;
-    private final Integer                  accountId;
-    private final boolean                  wnRequired;
-    private int                            tmax                         = 200;
-    private boolean                        templateWN                   = true;
-    private static final String            CONTENT_TYPE_VALUE           = "application/json";
-    private static final String            DISPLAY_MANAGER_INMOBI_SDK   = "inmobi_sdk";
-    private static final String            DISPLAY_MANAGER_INMOBI_JS    = "inmobi_js";
-    private final String                   advertiserId;
+    IXBidResponse bidResponse;
+    private final String userName;
+    private final String password;
+    private final Integer accountId;
+    private final boolean wnRequired;
+    private int tmax = 200;
+    private boolean templateWN = true;
+    private static final String CONTENT_TYPE_VALUE = "application/json";
+    private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
+    private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+    private final String advertiserId;
     public static ImpressionCallbackHelper impressionCallbackHelper;
-    private final IABCategoriesInterface   iabCategoriesInterface;
-    private final IABCountriesInterface    iabCountriesInterface;
-    private final String                   advertiserName;
-    private double                         secondBidPriceInUsd          = 0;
-    private double                         secondBidPriceInLocal        = 0;
-    private String                         bidRequestJson               = "";
-    protected static final String          MRAID                        = "<script src=\"mraid.js\" ></script>";
-    private String                         encryptedBid;
-    private String                         responseSeatId;
-    private String                         responseImpressionId;
-    private String                         responseAuctionId;
-    private String                         dealId;
-    private Double                         adjustbid;
-    private String                         creativeId;
-    private Integer                        pmptier;
-    private String                         aqid;
-    private boolean                        isCoppaSet                   = false;
-    private String                         sampleImageUrl;
-    private List<String>                   advertiserDomains;
-    private List<Integer>                  creativeAttributes;
-    private boolean                        logCreative                  = false;
-    private String                         adm;
-    public final RepositoryHelper          repositoryHelper;
-    private static final String            USD                          = "USD";
+    private final IABCategoriesInterface iabCategoriesInterface;
+    private final IABCountriesInterface iabCountriesInterface;
+    private final String advertiserName;
+    private double secondBidPriceInUsd = 0;
+    private double secondBidPriceInLocal = 0;
+    private String bidRequestJson = "";
+    protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
+    private String encryptedBid;
+    private String responseSeatId;
+    private String responseImpressionId;
+    private String responseAuctionId;
+    private String dealId;
+    private Double adjustbid;
+    private String creativeId;
+    private Integer pmptier;
+    private String aqid;
+    private boolean isCoppaSet = false;
+    private String sampleImageUrl;
+    private List<String> advertiserDomains;
+    private List<Integer> creativeAttributes;
+    private boolean logCreative = false;
+    private String adm;
+    public final RepositoryHelper repositoryHelper;
+    private static final String USD = "USD";
     @Getter
-    private int                            impressionObjCount;
+    private int impressionObjCount;
     @Getter
-    private int                            responseBidObjCount;
+    private int responseBidObjCount;
 
-    private static final String SITE_BLOCKLIST_FORMAT="blk%s";
+    private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
     private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
-    private List<String> globalBlindFromConfig;
+    private final List<String> globalBlindFromConfig;
 
-    private List<String> blockedAdvertisers = Lists.newArrayList();
+    private final List<String> blockedAdvertisers = Lists.newArrayList();
 
     @Getter
-    static List<String>                    currenciesSupported          = new ArrayList<String>(Arrays.asList("USD",
-            "CNY","JPY","EUR","KRW","RUB"));
+    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
+            "RUB"));
     @Getter
-    static List<String>                    blockedAdvertiserList        = new ArrayList<String>(Arrays.asList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
+            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -180,30 +185,31 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                       final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-                       final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper, final boolean templateWinNotification) {
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper,
+            final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
-        this.advertiserId = config.getString(advertiserName + ".advertiserId");
-        this.urlArg = config.getString(advertiserName + ".urlArg");
-        this.callbackUrl = config.getString(advertiserName + ".wnUrlback");
-        this.ixMethod = config.getString(advertiserName + ".ixMethod");
-        this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
+        advertiserId = config.getString(advertiserName + ".advertiserId");
+        urlArg = config.getString(advertiserName + ".urlArg");
+        callbackUrl = config.getString(advertiserName + ".wnUrlback");
+        ixMethod = config.getString(advertiserName + ".ixMethod");
+        wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.clientBootstrap = clientBootstrap;
         this.urlBase = urlBase;
-        this.setIxPartner(true);
-        this.iabCategoriesInterface = new IABCategoriesMap();
-        this.iabCountriesInterface = new IABCountriesMap();
+        setIxPartner(true);
+        iabCategoriesInterface = new IABCategoriesMap();
+        iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
         this.repositoryHelper = repositoryHelper;
-        this.templateWN = templateWinNotification;
-        this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
-        this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
-        this.blockedAdvertisers.addAll(blockedAdvertiserList);
-        this.userName = config.getString(advertiserName + ".userName");
-        this.password = config.getString(advertiserName + ".password");
-        this.accountId = config.getInt(advertiserName + ".accountId");
-        this.globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
+        templateWN = templateWinNotification;
+        isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
+        isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
+        blockedAdvertisers.addAll(blockedAdvertiserList);
+        userName = config.getString(advertiserName + ".userName");
+        password = config.getString(advertiserName + ".password");
+        accountId = config.getInt(advertiserName + ".accountId");
+        globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
     }
 
 
@@ -216,9 +222,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
 
-        if(sasParams.getWapSiteUACEntity() != null){
-            this.wapSiteUACEntity = sasParams.getWapSiteUACEntity();
-            this.isWapSiteUACEntity=true;
+        if (sasParams.getWapSiteUACEntity() != null) {
+            wapSiteUACEntity = sasParams.getWapSiteUACEntity();
+            isWapSiteUACEntity = true;
         }
 
         // Creating site/app Object
@@ -233,18 +239,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 app = createAppObject();
             }
         }
-        //Creating Regs Object
-        Regs regs = createRegsObject();
+        // Creating Regs Object
+        final Regs regs = createRegsObject();
         // Creating Geo Object for device Object
-        Geo geo = createGeoObject();
+        final Geo geo = createGeoObject();
         // Creating Banner object
-        Banner banner = createBannerObject();
+        final Banner banner = createBannerObject();
         // Creating Device Object
-        Device device = createDeviceObject(geo);
+        final Device device = createDeviceObject(geo);
         // Creating User Object
-        User user = createUserObject();
+        final User user = createUserObject();
         // Creating Impression Object
-        List<Impression> impresssionlist = new ArrayList<Impression>();
+        final List<Impression> impresssionlist = new ArrayList<Impression>();
         String displayManager = null;
         String displayManagerVersion = null;
         if (null != sasParams.getSdkVersion()) {
@@ -253,15 +259,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
             displayManager = DISPLAY_MANAGER_INMOBI_JS;
         }
-        ProxyDemand proxyDemand = createProxyDemandObject();
+        final ProxyDemand proxyDemand = createProxyDemandObject();
 
         // Only 1 impression object is being generated.
-        Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion,proxyDemand);
+        final Impression impression =
+                createImpressionObject(banner, displayManager, displayManagerVersion, proxyDemand);
         if (null == impression) {
             return false;
         }
         impresssionlist.add(impression);
-        this.impressionObjCount = impresssionlist.size();
+        impressionObjCount = impresssionlist.size();
 
         // Creating BidRequest Object using unique auction id per auction
         bidRequest = createBidRequestObject(impresssionlist, site, app, user, device, regs);
@@ -271,7 +278,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
 
-        if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             InspectorStats.incrementStatCount(InspectorStrings.IX_SENT_AS_TRANSPARENT);
         } else {
             InspectorStats.incrementStatCount(InspectorStrings.IX_SENT_AS_BLIND);
@@ -279,7 +286,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Serializing the bidRequest Object
         bidRequestJson = serializeBidRequest();
-        if(null == bidRequestJson){
+        if (null == bidRequestJson) {
             return false;
         }
         return true;
@@ -287,25 +294,25 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private boolean checkIfBasicParamsAvailable() {
 
-        if (null == casInternalRequestParameters || null == sasParams){
+        if (null == casInternalRequestParameters || null == sasParams) {
             LOG.debug("casInternalRequestParams or sasParams cannot be null");
             return false;
         }
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
-                || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)
-                || !isRequestFormatSupported()) {
-            LOG.debug(traceMarker, "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
+                || StringUtils.isBlank(externalSiteId) || !isRequestFormatSupported()) {
+            LOG.debug(
+                    traceMarker,
+                    "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
         return true;
     }
 
 
-    private boolean isRequestFormatSupported(){
-        if(isNativeRequest()){
+    private boolean isRequestFormatSupported() {
+        if (isNativeRequest()) {
             return isNativeResponseSupported;
-        } else if(!isNativeRequest()){
+        } else if (!isNativeRequest()) {
             return isHTMLResponseSupported;
         }
 
@@ -314,8 +321,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private IXBidRequest createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-                                                final User user, final Device device,final Regs regs) {
-        IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
+            final User user, final Device device, final Regs regs) {
+        final IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
         tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
         tempBidRequest.setTmax(tmax);
@@ -339,17 +346,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private String serializeBidRequest() {
-        TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
+        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         String tempBidRequestJson;
         try {
             tempBidRequestJson = serializer.toString(bidRequest);
-            if(isNativeRequest()){
+            if (isNativeRequest()) {
                 tempBidRequestJson = tempBidRequestJson.replaceFirst("nativeObject", "native");
             }
             LOG.info(traceMarker, "IX request json is : {}", tempBidRequestJson);
-        } catch (TException e) {
+        } catch (final TException e) {
             LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}", advertiserName, e);
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
+                    advertiserName, e);
             return null;
         }
         LOG.info(traceMarker, "return true");
@@ -358,8 +366,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Regs createRegsObject() {
-        Regs regs= new Regs();
-        if(isWapSiteUACEntity) {
+        final Regs regs = new Regs();
+        if (isWapSiteUACEntity) {
             if (wapSiteUACEntity.isCoppaEnabled()) {
                 regs.setCoppa(1);
                 isCoppaSet = true;
@@ -372,26 +380,27 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private ProxyDemand createProxyDemandObject() {
-        ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(Math.max(sasParams.getMarketRate(),casInternalRequestParameters.getAuctionBidFloor()));
+        final ProxyDemand proxyDemand = new ProxyDemand();
+        proxyDemand
+                .setMarketrate(Math.max(sasParams.getMarketRate(), casInternalRequestParameters.getAuctionBidFloor()));
         return proxyDemand;
     }
 
 
     private Impression createImpressionObject(final Banner banner, final String displayManager,
-                                              final String displayManagerVersion, final ProxyDemand proxyDemand) {
+            final String displayManagerVersion, final ProxyDemand proxyDemand) {
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
             /**
-             * In order to conform to the rubicon spec, we are passing a unique integer identifier whose value
-             * starts with 1, and increments up to n for n impressions.
+             * In order to conform to the rubicon spec, we are passing a unique integer identifier whose value starts
+             * with 1, and increments up to n for n impressions.
              */
             impression = new Impression("1");
         } else {
             LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
         }
-        if(!isNativeRequest()){
+        if (!isNativeRequest()) {
             impression.setBanner(banner);
         }
         impression.setProxydemand(proxyDemand);
@@ -403,18 +412,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor());
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
-        CommonExtension impExt = new CommonExtension();
-        JSONObject additionalParams= entity.getAdditionalParams();
+        final CommonExtension impExt = new CommonExtension();
+        final JSONObject additionalParams = entity.getAdditionalParams();
         if (null != additionalParams) {
-            String zoneId = getZoneId(additionalParams);
+            final String zoneId = getZoneId(additionalParams);
             if (null != zoneId) {
-                RubiconExtension rp = new RubiconExtension();
+                final RubiconExtension rp = new RubiconExtension();
                 rp.setZone_id(zoneId);
                 impExt.setRp(rp);
-            } else{
+            } else {
                 LOG.debug(traceMarker, "zone id not present, will say false");
                 InspectorStats.incrementStatCount(InspectorStrings.IX_ZONE_ID_NOT_PRESENT);
-                //zoneID not available so returning NULL
+                // zoneID not available so returning NULL
                 return null;
             }
         }
@@ -423,14 +432,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    public String getZoneId(JSONObject additionalParams) {
+    public String getZoneId(final JSONObject additionalParams) {
         String categoryZoneId = null;
         boolean isCategorySet = false;
 
         try {
             if (sasParams.getCategories() != null) {
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
-                    String categoryIdKey = sasParams.getCategories().get(index).toString();
+                    final String categoryIdKey = sasParams.getCategories().get(index).toString();
                     if (additionalParams.has(categoryIdKey)) {
                         categoryZoneId = additionalParams.getString(categoryIdKey);
                         LOG.debug(traceMarker, "category Id is {}", categoryZoneId);
@@ -445,7 +454,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 categoryZoneId = additionalParams.getString("default");
             }
 
-        } catch (JSONException exception) {
+        } catch (final JSONException exception) {
             LOG.error("Unable to get zone_id for Rubicon, exception thrown {}", exception);
         }
         return categoryZoneId;
@@ -453,17 +462,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Banner createBannerObject() {
-        Banner banner = new Banner();
+        final Banner banner = new Banner();
         // Presently only one banner object per impression object is being sent
         // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
         banner.setId("1");
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
 
-        final CommonExtension ext= new CommonExtension();
+        final CommonExtension ext = new CommonExtension();
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             if (SlotSizeMapping.isIXSupportedSlot(sasParams.getSlot())) {
@@ -479,11 +488,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Geo createGeoObject() {
-        Geo geo = new Geo();
-        //If Coppa is not set, only then send latLong
+        final Geo geo = new Geo();
+        // If Coppa is not set, only then send latLong
         if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
@@ -498,7 +507,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private User createUserObject() {
-        User user = new User();
+        final User user = new User();
 
         user.setId(getUid());
 
@@ -507,29 +516,29 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Site createSiteObject() {
-        Site site = new Site();
+        final Site site = new Site();
 
-        JSONObject additionalParams= entity.getAdditionalParams();
+        final JSONObject additionalParams = entity.getAdditionalParams();
         Integer rubiconSiteId;
         try {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "Site Id is not configured, exception thrown {}", e);
             InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             return null;
         }
 
-        if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
 
             setParamsForTransparentSite(site);
         } else {
             setParamsForBlindSite(site);
         }
 
-        List <String> blockedList= getBlockedList();
+        final List<String> blockedList = getBlockedList();
         site.setBlocklists(blockedList);
 
-        List <Long> tempSasCategories = sasParams.getCategories();
+        final List<Long> tempSasCategories = sasParams.getCategories();
         final Publisher publisher = createPublisher(tempSasCategories);
         site.setPublisher(publisher);
 
@@ -539,7 +548,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Transparency transparency = createTransparency();
         site.setTransparency(transparency);
 
-        final CommonExtension ext= new CommonExtension();
+        final CommonExtension ext = new CommonExtension();
 
         final RubiconExtension rpForSite = new RubiconExtension();
         rpForSite.setSite_id(rubiconSiteId);
@@ -549,35 +558,35 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return site;
     }
 
-    private void setParamsForTransparentSite(Site site) {
+    private void setParamsForTransparentSite(final Site site) {
         site.setId(sasParams.getSiteId());
-        String tempSiteUrl = wapSiteUACEntity.getSiteUrl();
+        final String tempSiteUrl = wapSiteUACEntity.getSiteUrl();
         if (StringUtils.isNotEmpty(tempSiteUrl)) {
             site.setPage(tempSiteUrl);
             site.setDomain(tempSiteUrl);
         }
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())){
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             site.setName(wapSiteUACEntity.getSiteName());
         }
     }
 
-    private void setParamsForBlindSite(Site site) {
+    private void setParamsForBlindSite(final Site site) {
         site.setId(getBlindedSiteId(sasParams.getSiteIncId()));
 
         if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
             site.setName(wapSiteUACEntity.getAppType());
         } else {
-            String category = getCategories(',',false);
-            if(category != null) {
+            final String category = getCategories(',', false);
+            if (category != null) {
                 site.setName(category);
             }
         }
     }
 
-    private Publisher createPublisher(List tempSasCategories){
+    private Publisher createPublisher(final List tempSasCategories) {
 
         final Publisher publisher = new Publisher();
-        if(null != tempSasCategories) {
+        if (null != tempSasCategories) {
             publisher.setCat(iabCategoriesInterface.getIABCategories(tempSasCategories));
         }
 
@@ -591,7 +600,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private AdQuality createAdQuality() {
-        AdQuality adQuality = new AdQuality();
+        final AdQuality adQuality = new AdQuality();
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
             adQuality.setSensitivity("low");
         } else {
@@ -603,14 +612,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Transparency createTransparency() {
 
-        Transparency transparency = new Transparency();
-        if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+        final Transparency transparency = new Transparency();
+        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             transparency.setBlind(0);
-            if(null != wapSiteUACEntity.getBlindList()) {
+            if (null != wapSiteUACEntity.getBlindList()) {
                 transparency.setBlindbuyers(wapSiteUACEntity.getBlindList());
-            } else if ((!globalBlindFromConfig.isEmpty()) && !globalBlindFromConfig.get(0).isEmpty()) {
-                List<Integer> globalBlind = Lists.newArrayList();
-                for (String s : globalBlindFromConfig) {
+            } else if (!globalBlindFromConfig.isEmpty() && !globalBlindFromConfig.get(0).isEmpty()) {
+                final List<Integer> globalBlind = Lists.newArrayList();
+                for (final String s : globalBlindFromConfig) {
                     globalBlind.add(Integer.valueOf(s));
                 }
                 transparency.setBlindbuyers(globalBlind);
@@ -623,30 +632,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private App createAppObject() {
-        App app = new App();
-        JSONObject additionalParams= entity.getAdditionalParams();
+        final App app = new App();
+        final JSONObject additionalParams = entity.getAdditionalParams();
         Integer rubiconSiteId;
         try {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             LOG.debug(traceMarker, "Site Id is not configured, exception thrown {}", e);
             InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             // add trace here
             return null;
         }
 
-        if(isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()){
+        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             setParamsForTransparentApp(app);
         } else {
             setParamsForBlindApp(app);
         }
-        List <Long> tempSasCategories = sasParams.getCategories();
+        final List<Long> tempSasCategories = sasParams.getCategories();
 
-        if(null != tempSasCategories){
+        if (null != tempSasCategories) {
             app.setCat(iabCategoriesInterface.getIABCategories(tempSasCategories));
         }
 
-        List <String> blockedList= getBlockedList();
+        final List<String> blockedList = getBlockedList();
         app.setBlocklists(blockedList);
 
 
@@ -660,7 +669,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Transparency transparency = createTransparency();
         app.setTransparency(transparency);
 
-        final CommonExtension ext= new CommonExtension();
+        final CommonExtension ext = new CommonExtension();
 
         final RubiconExtension rpForApp = new RubiconExtension();
         rpForApp.setSite_id(rubiconSiteId);
@@ -671,35 +680,35 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return app;
     }
 
-    private void setParamsForTransparentApp(App app) {
+    private void setParamsForTransparentApp(final App app) {
         app.setId(sasParams.getSiteId());
-        if(StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
-        if(StringUtils.isNotEmpty(wapSiteUACEntity.getBundleId())) {
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getBundleId())) {
             app.setBundle(wapSiteUACEntity.getBundleId());
         }
-        if(StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
         }
     }
 
-    private void setParamsForBlindApp(App app) {
+    private void setParamsForBlindApp(final App app) {
         app.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
 
         if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
             app.setName(wapSiteUACEntity.getAppType());
         } else {
-            String category = getCategories(',',false);
-            if(category != null) {
+            final String category = getCategories(',', false);
+            if (category != null) {
                 app.setName(category);
             }
         }
     }
 
-    public List <String> getBlockedList() {
-        List<String> blockedList = Lists.newArrayList();
-        LOG.debug(traceMarker, "{}",sasParams.getSiteIncId());
+    public List<String> getBlockedList() {
+        final List<String> blockedList = Lists.newArrayList();
+        LOG.debug(traceMarker, "{}", sasParams.getSiteIncId());
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
         if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
 
@@ -715,16 +724,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Device createDeviceObject(final Geo geo) {
-        Device device = new Device();
+        final Device device = new Device();
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
         device.setGeo(geo);
-        Integer sasParamsOsId = sasParams.getOsId();
+        final Integer sasParamsOsId = sasParams.getOsId();
         if (sasParamsOsId > 0 && sasParamsOsId < 21) {
             device.setOs(HandSetOS.values()[sasParamsOsId - 1].toString());
         }
 
-        if(StringUtils.isNotBlank(sasParams.getOsMajorVersion())){
+        if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
             device.setOsv(sasParams.getOsMajorVersion());
         }
 
@@ -732,7 +741,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.getUidADT()) {
             try {
                 device.setLmt(Integer.parseInt(casInternalRequestParameters.getUidADT()) == 0 ? 1 : 0);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
             }
         }
@@ -755,12 +764,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting Extension for ifa
-        //if Coppa is not set, only then set IFA
+        // if Coppa is not set, only then set IFA
         if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
             device.setIfa(casInternalRequestParameters.getUidIFA());
         }
 
-        final CommonExtension ext= new CommonExtension();
+        final CommonExtension ext = new CommonExtension();
 
         final RubiconExtension rpForDevice = new RubiconExtension();
         rpForDevice.setXff(sasParams.getRemoteHostIp());
@@ -777,22 +786,21 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, USD);
         if (6 != sasParams.getDst()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE,
-                    Double.toString(secondBidPriceInLocal));
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.bidid) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.bidid);
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid()
-                    .get(0).getSeat());
+            url =
+                    url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
+                            .getSeat());
         }
         if (null == bidRequest) {
             LOG.info(traceMarker, "bidrequest is null");
             return url;
         }
-        url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0)
-                .getId());
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
 
         LOG.debug(traceMarker, "String after replaceMacros is {}", url);
         return url;
@@ -801,7 +809,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     protected Request getNingRequest() throws Exception {
-        byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
+        final byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
@@ -815,20 +823,20 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             httpRequestMethod = "POST";
         }
 
-        String authStr = userName + ":" + password;
-        String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
+        final String authStr = userName + ":" + password;
+        final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
 
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body)
-                .setHeader("Authorization", "Basic " + authEncoded)
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader("Authorization", "Basic " + authEncoded).setHeader(HttpHeaders.Names.HOST, uri.getHost())
+                .build();
     }
 
 
     @Override
     public URI getRequestUri() throws URISyntaxException {
-        StringBuilder url = new StringBuilder();
+        final StringBuilder url = new StringBuilder();
         if ("get".equalsIgnoreCase(ixMethod)) {
             url.append(urlBase).append('?').append(urlArg).append('=');
         } else {
@@ -852,7 +860,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         } else {
             statusCode = status.code();
-            boolean parsedResponse = deserializeResponse(response);
+            final boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
                 adStatus = "NO_AD";
                 responseContent = "";
@@ -862,7 +870,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             adStatus = "AD";
 
-            if(isNativeRequest()){
+            if (isNativeRequest()) {
                 // TODO add nativeAdBuilding
                 LOG.debug(traceMarker, "we do not support native request");
             } else {
@@ -874,68 +882,70 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response is {}", responseContent);
     }
 
-    public boolean updateDSPAccountInfo(String buyer) {
+    public boolean updateDSPAccountInfo(final String buyer) {
         LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
 
         Long buyerId;
         try {
             buyerId = Long.parseLong(buyer);
-        }
-        catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             LOG.debug("NumberFormatException: Invalid DSP Buyer ID Format");
             return false;
         }
 
         // Get Inmobi account id for the DSP on Rubicon side
-        IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(buyerId);
+        final IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(buyerId);
         if (null == ixAccountMapEntity) {
             LOG.error("Invalid Rubicon DSP id: {}", buyer);
             return false;
         }
-        String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
+        final String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
 
-        if(StringUtils.isEmpty(DSPAccountId)) {
+        if (StringUtils.isEmpty(DSPAccountId)) {
             LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
             return false;
         }
 
         // Get collection of Channel Segment Entities for the particular Inmobi account id
-        ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
+        final ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
         if (null == channelAdGroupRepository) {
             LOG.error("Channel AdGroup Repository is null.");
             return false;
         }
 
-        Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(DSPAccountId);
+        final Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(DSPAccountId);
 
         if (null == adGroupMap || adGroupMap.isEmpty()) {
             // If collection is empty
-            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}", buyer, DSPAccountId);
+            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}",
+                    buyer, DSPAccountId);
             return false;
         } else {
             // Else picking up the first channel segment entity and assuming that to be the correct entity
-            this.dspChannelSegmentEntity = adGroupMap.iterator().next();
+            dspChannelSegmentEntity = adGroupMap.iterator().next();
 
             // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
             // this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
-            //        auctionResponse.getAdNetworkInterface(), -1L);
+            // auctionResponse.getAdNetworkInterface(), -1L);
 
             // Get response creative type and get the incId for the respective response creative type
-            ADCreativeType responseCreativeType = this.getCreativeType();
-            long incId = this.dspChannelSegmentEntity.getIncId(responseCreativeType);
+            final ADCreativeType responseCreativeType = getCreativeType();
+            final long incId = dspChannelSegmentEntity.getIncId(responseCreativeType);
 
-            String oldImpressionId = this.getImpressionId();
+            final String oldImpressionId = getImpressionId();
             LOG.debug(traceMarker, "Old impression id: {}", oldImpressionId);
 
             // Generating new impression id
             LOG.debug(traceMarker, "Creating new impression id from incId: {}", incId);
-            String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
+            final String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 // Update beacon and click URLs
-                this.beaconUrl = ClickUrlsRegenerator.regenerateBeaconUrl(this.beaconUrl, this.getImpressionId(), newImpressionId, sasParams.isRichMedia());
-                this.clickUrl  = ClickUrlsRegenerator.regenerateClickUrl(this.clickUrl, this.getImpressionId(), newImpressionId);
-                this.impressionId = newImpressionId;
+                beaconUrl =
+                        ClickUrlsRegenerator.regenerateBeaconUrl(beaconUrl, getImpressionId(), newImpressionId,
+                                sasParams.isRichMedia());
+                clickUrl = ClickUrlsRegenerator.regenerateClickUrl(clickUrl, getImpressionId(), newImpressionId);
+                impressionId = newImpressionId;
 
                 LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
             }
@@ -971,7 +981,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 LOG.debug(traceMarker, "IX Auction response is not null so sending auction response");
                 return;
             } else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
+                final AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
                     // Update Response ChannelSegment
                     baseRequestHandler.getAuctionEngine().updateIXChannelSegment(dspChannelSegmentEntity);
@@ -994,18 +1004,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private void nonNativeAdBuilding(){
+    private void nonNativeAdBuilding() {
 
-        VelocityContext velocityContext = new VelocityContext();
+        final VelocityContext velocityContext = new VelocityContext();
 
         String admContent = getADMContent();
 
-        int admSize = admContent.length();
+        final int admSize = admContent.length();
         if (!templateWN) {
-            String winUrl = this.beaconUrl + "?b=${WIN_BID}";
+            final String winUrl = beaconUrl + "?b=${WIN_BID}";
             admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
         }
-        int admAfterMacroSize = admContent.length();
+        final int admAfterMacroSize = admContent.length();
 
         // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP response.
         admContent = String.format(RESPONSE_TEMPLATE, admContent);
@@ -1021,13 +1031,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
         createWin(velocityContext);
 
-        if (templateWN || (admAfterMacroSize ==  admSize)) {
-            velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, this.beaconUrl);
+        if (templateWN || admAfterMacroSize == admSize) {
+            velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
         }
         try {
-            responseContent = Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams,
-                    null);
-        } catch (Exception e) {
+            responseContent =
+                    Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
+        } catch (final Exception e) {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
@@ -1036,24 +1046,24 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    protected String getADMContent(){
+    protected String getADMContent() {
 
-        SeatBid seatBid = bidResponse.getSeatbid().get(0);
-        Bid bid = seatBid.getBid().get(0);
-        String admContent = bid.getAdm();
+        final SeatBid seatBid = bidResponse.getSeatbid().get(0);
+        final Bid bid = seatBid.getBid().get(0);
+        final String admContent = bid.getAdm();
         return admContent;
 
     }
 
 
-    protected void createWin(VelocityContext velocityContext){
+    protected void createWin(final VelocityContext velocityContext) {
         if (wnRequired) {
             // setCallbackContent();
             // Win notification is required
             String nUrl = null;
             try {
                 nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 LOG.debug(traceMarker, "Exception while parsing response {}", e);
             }
             LOG.debug(traceMarker, "nurl is {}", nUrl);
@@ -1069,25 +1079,25 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     /**
-     * Generates blinded site uuid from siteIncId.
-     * For a given site Id, the generated blinded SiteId will always be same.
-     *
+     * Generates blinded site uuid from siteIncId. For a given site Id, the generated blinded SiteId will always be
+     * same.
+     * 
      * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
      */
-    private String getBlindedSiteId(long siteIncId) {
-        byte[] byteArr = ByteBuffer.allocate(8).putLong(siteIncId).array();
+    private String getBlindedSiteId(final long siteIncId) {
+        final byte[] byteArr = ByteBuffer.allocate(8).putLong(siteIncId).array();
         return UUID.nameUUIDFromBytes(byteArr).toString();
     }
 
-    //This function not used, for future use
+    // This function not used, for future use
     @Override
-    protected boolean isNativeRequest(){
+    protected boolean isNativeRequest() {
         return NATIVE_STRING.equals(sasParams.getRFormat());
     }
 
 
     public boolean deserializeResponse(final String response) {
-        Gson gson = new Gson();
+        final Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, IXBidResponse.class);
             LOG.debug(traceMarker, "Done with parsing of bidresponse");
@@ -1095,9 +1105,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 LOG.error("BidResponse does not have seat bid object");
                 return false;
             }
-            //bidderCurrency is to USD by default
-            SeatBid seatBid=bidResponse.getSeatbid().get(0);
-            if(null == seatBid.getBid() || seatBid.getBidSize() == 0) {
+            // bidderCurrency is to USD by default
+            final SeatBid seatBid = bidResponse.getSeatbid().get(0);
+            if (null == seatBid.getBid() || seatBid.getBidSize() == 0) {
                 LOG.error("Seat bid object does not have bid object");
                 return false;
             }
@@ -1105,23 +1115,23 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             setBidPriceInUsd(getBidPriceInLocal());
             responseSeatId = seatBid.getSeat();
             responseBidObjCount = seatBid.getBid().size();
-            Bid bid =  seatBid.getBid().get(0);
+            final Bid bid = seatBid.getBid().get(0);
             adm = bid.getAdm();
             responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
             responseAuctionId = bidResponse.getId();
             pmptier = bid.getPmptier();
-            //estimated = bid.getEstimated(); //Not used currently
+            // estimated = bid.getEstimated(); //Not used currently
             aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
-            boolean result = updateDSPAccountInfo(seatBid.getBuyer());
+            final boolean result = updateDSPAccountInfo(seatBid.getBuyer());
             if (!result) {
-                InspectorStats.incrementStatCount(this.getName(), InspectorStrings.INVALID_DSP_ID);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_DSP_ID);
             }
             return result;
-        } catch (NullPointerException e) {
-            LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", this.getName(), e);
+        } catch (final NullPointerException e) {
+            LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(), e);
             return false;
         }
     }
@@ -1159,17 +1169,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public String getName() {
-        return this.advertiserName;
+        return advertiserName;
     }
 
 
     @Override
     public void setSecondBidPrice(final Double price) {
-        this.secondBidPriceInUsd = price;
-        this.secondBidPriceInLocal = price;
-        LOG.debug(traceMarker, "responseContent before replaceMacros is {}", this.responseContent);
-        this.responseContent = replaceIXMacros(this.responseContent);
-        ThirdPartyAdResponse adResponse = getResponseAd();
+        secondBidPriceInUsd = price;
+        secondBidPriceInLocal = price;
+        LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
+        responseContent = replaceIXMacros(responseContent);
+        final ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.setResponse(responseContent);
         LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().getResponse());
     }
@@ -1187,7 +1197,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    public void setImpressionId(String impressionId) {
+    public void setImpressionId(final String impressionId) {
         this.impressionId = impressionId;
     }
 
@@ -1248,7 +1258,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public List<Integer> getAttribute() {
-        return  creativeAttributes;
+        return creativeAttributes;
     }
 
 
@@ -1265,7 +1275,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     @Override
-    public void setLogCreative(boolean logCreative) {
+    public void setLogCreative(final boolean logCreative) {
         this.logCreative = logCreative;
     }
 

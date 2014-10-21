@@ -28,17 +28,17 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG        = LoggerFactory.getLogger(DCPLoganAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPLoganAdnetwork.class);
 
-    private transient String    latitude;
-    private transient String    longitude;
-    private int                 width;
-    private int                 height;
-    private static final String ZONE       = "zone";
-    private static final String SITE       = "site";
-    private static final String UDID       = "udid";
-    private static final String SIZE_X     = "size_x";
-    private static final String SIZE_Y     = "size_y";
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private static final String ZONE = "zone";
+    private static final String SITE = "site";
+    private static final String UDID = "udid";
+    private static final String SIZE_X = "size_x";
+    private static final String SIZE_Y = "size_y";
     private static final String MIN_SIZE_X = "min_size_x";
     private static final String MIN_SIZE_Y = "min_size_y";
 
@@ -64,12 +64,12 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -90,7 +90,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(host);
+            final StringBuilder url = new StringBuilder(host);
             appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
             appendQueryParam(url, ZONE, externalSiteId, false);
             appendQueryParam(url, SITE, blindedSiteId, false);
@@ -107,11 +107,11 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (casInternalRequestParameters.getUidMd5() != null) {
                 udid = casInternalRequestParameters.getUidMd5();
             } else if (casInternalRequestParameters.getUidIDUS1() != null) {
-                 udid =  casInternalRequestParameters.getUidIDUS1();
+                udid = casInternalRequestParameters.getUidIDUS1();
             } else if (!StringUtils.isBlank(casInternalRequestParameters.getUid())) {
                 udid = casInternalRequestParameters.getUid();
             } else {
-                String gpid = getGPID();
+                final String gpid = getGPID();
                 if (gpid != null) {
                     udid = gpid;
                 }
@@ -133,8 +133,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, SIZE_Y, height + "", false);
             }
             LOG.debug("logan url is {}", url);
-            return (new URI(url.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);
         }
@@ -162,15 +162,15 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                 } else {
                     jArray = new JSONArray(response);
                 }
-                JSONObject adResponse = jArray.getJSONObject(0);
-                boolean textAd = response.contains("\"text\" :") && !response.contains("\"text\" : \"\"");
+                final JSONObject adResponse = jArray.getJSONObject(0);
+                final boolean textAd = response.contains("\"text\" :") && !response.contains("\"text\" : \"\"");
                 boolean bannerAd = false;
                 if (!textAd) {
                     bannerAd = response.contains("\"img\" :") && !response.contains("\"img\" : \"\"");
                 }
 
                 statusCode = status.code();
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
                 context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.get("track"));
                 TemplateType t;
                 if (textAd || bannerAd) {
@@ -178,7 +178,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("text"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
@@ -195,11 +195,11 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from logan : {}", exception);
                 LOG.info("Response from logan: {}", response);
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from logan : {}", exception);
                 LOG.info("Response from logan: {}", response);

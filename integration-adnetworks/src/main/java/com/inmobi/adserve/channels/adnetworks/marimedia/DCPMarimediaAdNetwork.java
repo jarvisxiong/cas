@@ -2,6 +2,22 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 // Created by Dhanasekaran K P on 23/9/14.
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
@@ -11,20 +27,6 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.*;
-import java.net.URI;
 
 public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -57,10 +59,8 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private String resolution;
     private String networkType;
 
-    public DCPMarimediaAdNetwork(final Configuration config,
-                                 final Bootstrap clientBootstrap,
-                                 final HttpRequestHandlerBase baseRequestHandler,
-                                 final Channel serverChannel) {
+    public DCPMarimediaAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
@@ -70,31 +70,30 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("marimedia.host");
 
         // Check User Agent.
-        if(StringUtils.isBlank(sasParams.getUserAgent())) {
+        if (StringUtils.isBlank(sasParams.getUserAgent())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
         }
 
         // Check App ID.
         // i.e. Check externalSiteId.
-        if(StringUtils.isBlank(externalSiteId)) {
+        if (StringUtils.isBlank(externalSiteId)) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
         }
 
         // Check IP Address.
-        if(StringUtils.isBlank(sasParams.getRemoteHostIp())) {
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
         }
 
         // Check Resolution.
-        if (null == sasParams.getSlot()
-                || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
+        if (null == sasParams.getSlot() || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             return false;
         } else {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 
@@ -119,20 +118,20 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder url = new StringBuilder(host);
+        final StringBuilder url = new StringBuilder(host);
 
         // Set User Agent.
-        if(StringUtils.isNotBlank(sasParams.getUserAgent())) {
+        if (StringUtils.isNotBlank(sasParams.getUserAgent())) {
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         }
 
         // Set App ID.
-        if(StringUtils.isNotBlank(externalSiteId)) {
+        if (StringUtils.isNotBlank(externalSiteId)) {
             appendQueryParam(url, APP_ID, getURLEncode(externalSiteId, format), false);
         }
 
         // Set IP.
-        if(StringUtils.isNotBlank(sasParams.getRemoteHostIp())) {
+        if (StringUtils.isNotBlank(sasParams.getRemoteHostIp())) {
             appendQueryParam(url, IP_ADDRESS, getURLEncode(sasParams.getRemoteHostIp(), format), false);
         }
 
@@ -146,14 +145,14 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         // Set Resolution.
-        if(StringUtils.isNotBlank(resolution)) {
+        if (StringUtils.isNotBlank(resolution)) {
             appendQueryParam(url, RESOLUTION, getURLEncode(resolution, format), false);
         }
 
         // Set Latitude & Longitude.
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 
             appendQueryParam(url, LATITUDE, getURLEncode(latlong[0], format), false);
             appendQueryParam(url, LONGITUDE, getURLEncode(latlong[1], format), false);
@@ -193,15 +192,15 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, NETWORK_TYPE, networkType, false);
 
         // Set Age.
-        if(null != sasParams.getAge()) {
+        if (null != sasParams.getAge()) {
             appendQueryParam(url, AGE, getURLEncode(sasParams.getAge().toString(), format), false);
         }
 
         // Set Gender.
-        if(null != sasParams.getGender()) {
+        if (null != sasParams.getGender()) {
             appendQueryParam(url, GENDER, getURLEncode(sasParams.getGender(), format), false);
         }
-	appendQueryParam(url, BLINDED_SITE_ID, blindedSiteId, false);
+        appendQueryParam(url, BLINDED_SITE_ID, blindedSiteId, false);
 
         LOG.debug("Marimedia url is {}", url);
         return new URI(url.toString());
@@ -214,7 +213,8 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
-        return new RequestBuilder().setUrl(uri.toString()).setHeader("x-display-metrics", String.format("%sx%s", width, height))
+        return new RequestBuilder().setUrl(uri.toString())
+                .setHeader("x-display-metrics", String.format("%sx%s", width, height))
                 .setHeader("xplus1-user-agent", sasParams.getUserAgent())
                 .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
@@ -225,22 +225,21 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public void parseResponse(final String response,
-                              final HttpResponseStatus status) {
+    public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("Marimedia response is {}", response);
 
         if (isValidResponse(response, status)) {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             try {
-                JSONObject ad = new JSONObject(response);
+                final JSONObject ad = new JSONObject(response);
 
                 // Banner or Interstitial.
                 if ("banner".equalsIgnoreCase(ad.getString("adType"))) {
-                    String imageUrl = ad.getString("imageUrl");
+                    final String imageUrl = ad.getString("imageUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
-                } else if("html".equalsIgnoreCase(ad.getString("adType"))) {
-                    String htmlUrl = ad.getString("htmlUrl");
+                } else if ("html".equalsIgnoreCase(ad.getString("adType"))) {
+                    final String htmlUrl = ad.getString("htmlUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, htmlUrl);
                 } else {
                     // Other format.
@@ -252,20 +251,21 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 // Ad URL.
-                String adUrl = ad.getString("adUrl");
+                final String adUrl = ad.getString("adUrl");
                 context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adUrl);
 
                 // Impression URL.
-                if(ad.has("impUrl")) {
-                    String impressionUrl = ad.getString("impUrl");
+                if (ad.has("impUrl")) {
+                    final String impressionUrl = ad.getString("impUrl");
                     context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, impressionUrl);
                 }
 
                 context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
 
-                responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, beaconUrl);
+                responseContent =
+                        Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from Marimedia, exception {}", exception);
                 LOG.info("Response from Marimedia {}", response);

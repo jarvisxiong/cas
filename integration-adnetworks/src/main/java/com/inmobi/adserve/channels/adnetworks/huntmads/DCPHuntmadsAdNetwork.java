@@ -16,11 +16,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -30,15 +31,15 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
 
-    private transient String    latitude;
-    private transient String    longitude;
-    private int                 width;
-    private int                 height;
-    private boolean             isapp;
-    private static final String IDFA        = "idfa";
-    private static final String ANDROID_ID  = "androidid";
-    private static final String SITEID      = "pubsiteid";
-    
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private boolean isapp;
+    private static final String IDFA = "idfa";
+    private static final String ANDROID_ID = "androidid";
+    private static final String SITEID = "pubsiteid";
+
 
     /**
      * @param config
@@ -59,7 +60,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("huntmads.host");
-        
+
         // blocking opera traffic
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
             LOG.debug("Opera user agent found. So exiting the adapter");
@@ -67,20 +68,22 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
-        
-        isapp = (StringUtils.isBlank(sasParams.getSource()) || "WAP"
-                .equalsIgnoreCase(sasParams.getSource())) ? false : true;
-        
-       
+
+        isapp =
+                StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+                        ? false
+                        : true;
+
+
         LOG.info("Configure parameters inside huntmads returned true");
         return true;
     }
@@ -98,7 +101,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder();
+            final StringBuilder url = new StringBuilder();
             url.append(host).append("?ip=").append(sasParams.getRemoteHostIp());
             url.append("&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=").append(externalSiteId);
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
@@ -110,17 +113,17 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&long=").append(longitude);
             }
 
-           if (casInternalRequestParameters.getZipCode() != null) {
+            if (casInternalRequestParameters.getZipCode() != null) {
                 url.append("&zip=").append(casInternalRequestParameters.getZipCode());
             }
-            
+
             if (isapp) {
                 url.append("&isapp=yes");
                 url.append("&isweb=no");
             } else {
                 url.append("&isapp=no");
                 url.append("&isweb=yes");
-                
+
             }
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
@@ -155,7 +158,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
             } else {
-                String uid = getUid();
+                final String uid = getUid();
                 if (!StringUtils.isBlank(uid)) {
                     url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUid());
                 }
@@ -167,7 +170,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&country=").append(sasParams.getCountryCode().toUpperCase());
             }
 
-           
+
             if (width != 0 && height != 0) {
                 url.append("&min_size_x=").append((int) (width * .9));
                 url.append("&min_size_y=").append((int) (height * .9));
@@ -181,8 +184,8 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append("&keywords=").append(getURLEncode(getCategories(','), format));
             LOG.debug("Huntmads url is {}", url);
 
-            return (new URI(url.toString()));
-        } catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -205,19 +208,19 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("beacon url inside huntmads is {}", beaconUrl);
 
             try {
-                JSONArray jArray = new JSONArray(response);
-                JSONObject adResponse = jArray.getJSONObject(0);
-                boolean textAd = !response.contains("type\": \"image");
+                final JSONArray jArray = new JSONArray(response);
+                final JSONObject adResponse = jArray.getJSONObject(0);
+                final boolean textAd = !response.contains("type\": \"image");
 
                 statusCode = status.code();
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
 
                 TemplateType t = TemplateType.HTML;
                 if (adResponse.has("content") && StringUtils.isNotBlank(adResponse.getString("content"))) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                 } else {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("url"));
-                    String partnerBeacon = adResponse.getString("track");
+                    final String partnerBeacon = adResponse.getString("track");
                     if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
                         context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("track"));
                     }
@@ -225,7 +228,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("text"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                         if (!StringUtils.isEmpty(vmTemplate)) {
                             context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
@@ -240,17 +243,17 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            } catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from huntmads : {}", exception);
                 LOG.info("Response from huntmads: {}", response);
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response from huntmads : {}", exception);
                 LOG.info("Response from huntmads: {}", response);
                 try {
                     throw exception;
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                 }
             }

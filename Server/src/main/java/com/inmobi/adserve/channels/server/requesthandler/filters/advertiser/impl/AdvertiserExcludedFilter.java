@@ -4,8 +4,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -39,11 +37,12 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
      */
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-        SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
+        final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+        final SiteMetaDataEntity siteMetaDataEntity =
+                repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
         if (siteMetaDataEntity != null) {
-            Set<String> advertisersIncludedbySite = siteMetaDataEntity.getAdvertisersIncludedBySite();
-            Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
+            final Set<String> advertisersIncludedbySite = siteMetaDataEntity.getAdvertisersIncludedBySite();
+            final Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
             // checking if site has advertiser inclusion list
             if (!advertisersIncludedbySite.isEmpty()) {
                 return !advertisersIncludedbySite.contains(advertiserId);

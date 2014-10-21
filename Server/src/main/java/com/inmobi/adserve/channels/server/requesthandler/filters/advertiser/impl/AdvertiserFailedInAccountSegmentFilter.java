@@ -24,7 +24,7 @@ import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 @Singleton
 public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger       LOG = LoggerFactory.getLogger(AdvertiserFailedInAccountSegmentFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdvertiserFailedInAccountSegmentFilter.class);
 
     private final Map<String, String> advertiserIdNameMap;
 
@@ -38,16 +38,18 @@ public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLe
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
 
-        int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
-        String advertiserId = channelSegment.getChannelEntity().getAccountId();
+        final int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
+        final String advertiserId = channelSegment.getChannelEntity().getAccountId();
 
         LOG.debug("AccountId from ChannelEntity: {} ", channelSegment.getChannelEntity().getAccountId());
-        LOG.debug("AdvertiserId from ChannelFeedbackEntity: {}", channelSegment.getChannelFeedbackEntity().getAdvertiserId());
-        LOG.debug("AdvertiserId from ChannelSegmentEntity: {}", channelSegment.getChannelSegmentEntity().getAdvertiserId());
+        LOG.debug("AdvertiserId from ChannelFeedbackEntity: {}", channelSegment.getChannelFeedbackEntity()
+                .getAdvertiserId());
+        LOG.debug("AdvertiserId from ChannelSegmentEntity: {}", channelSegment.getChannelSegmentEntity()
+                .getAdvertiserId());
 
-        String advertiserName = advertiserIdNameMap.get(advertiserId);
+        final String advertiserName = advertiserIdNameMap.get(advertiserId);
 
-        return (advertiserName == null || (sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
-                && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment)));
+        return advertiserName == null || sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
+                && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment);
     }
 }

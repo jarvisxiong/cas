@@ -1,12 +1,12 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.casthrift.ADCreativeType;
-import com.inmobi.casthrift.DemandSourceType;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 
 public interface AdNetworkInterface {
 
@@ -30,14 +30,14 @@ public interface AdNetworkInterface {
 
     // Returns whether to log creative or not
     String getAdMarkUp();
-    
+
     ADCreativeType getCreativeType();
 
     // Returns whether to log creative or not
     boolean isLogCreative();
 
     // Set whether creative logging is required or not
-    void setLogCreative(boolean logCreative);
+    void setLogCreative(final boolean logCreative);
 
     // Return the bid price for rtb, for other will return the -1.
     double getBidPriceInUsd();
@@ -61,8 +61,10 @@ public interface AdNetworkInterface {
     // Returns true for rtb partner, false otherwise.
     boolean isRtbPartner();
 
-    //Returns true for ix partner, false otherwise.
+    // Returns true for ix partner, false otherwise.
     boolean isIxPartner();
+
+    void processResponse();
 
     // Returns auction id sent in the rtb response
     String getAuctionId();

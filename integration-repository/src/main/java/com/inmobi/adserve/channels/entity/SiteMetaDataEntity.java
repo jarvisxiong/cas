@@ -1,12 +1,13 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.adserve.channels.types.AccountType;
-import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
+import java.sql.Timestamp;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
-import java.util.Set;
+import com.inmobi.adserve.channels.types.AccountType;
+import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Getter
@@ -14,26 +15,26 @@ public class SiteMetaDataEntity implements IdentifiableEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private final String      siteId;
-    private final String      pubId;
-    private final Boolean     backFillEnabled;
+    private final String siteId;
+    private final String pubId;
+    private final Boolean backFillEnabled;
     private final AccountType accountTypesAllowed;
-    private final Timestamp   modified_on;
+    private final Timestamp modified_on;
     private final Set<String> advertisersIncludedBySite;
     private final Set<String> advertisersIncludedByPublisher;
 
-    public SiteMetaDataEntity(Builder builder) {
-        this.siteId = builder.siteId;
-        this.pubId = builder.pubId;
-        this.backFillEnabled = builder.backFillEnabled;
+    public SiteMetaDataEntity(final Builder builder) {
+        siteId = builder.siteId;
+        pubId = builder.pubId;
+        backFillEnabled = builder.backFillEnabled;
         AccountType accountsAllowed = AccountType.MANAGED;
         if (builder.selfServeAllowed) {
-           accountsAllowed = AccountType.SELF_SERVE;
+            accountsAllowed = AccountType.SELF_SERVE;
         }
-        this.accountTypesAllowed = accountsAllowed;
-        this.modified_on = builder.modified_on;
-        this.advertisersIncludedBySite = builder.advertisersIncludedBySite;
-        this.advertisersIncludedByPublisher = builder.advertisersIncludedByPublisher;
+        accountTypesAllowed = accountsAllowed;
+        modified_on = builder.modified_on;
+        advertisersIncludedBySite = builder.advertisersIncludedBySite;
+        advertisersIncludedByPublisher = builder.advertisersIncludedByPublisher;
     }
 
     public static Builder newBuilder() {
@@ -42,11 +43,11 @@ public class SiteMetaDataEntity implements IdentifiableEntity<String> {
 
     @Setter
     public static class Builder {
-        private String      siteId;
-        private String      pubId;
-        private Boolean     backFillEnabled;
-        private Boolean     selfServeAllowed;
-        private Timestamp   modified_on;
+        private String siteId;
+        private String pubId;
+        private Boolean backFillEnabled;
+        private Boolean selfServeAllowed;
+        private Timestamp modified_on;
         private Set<String> advertisersIncludedBySite;
         private Set<String> advertisersIncludedByPublisher;
 
@@ -57,7 +58,7 @@ public class SiteMetaDataEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getId() {
-        return this.siteId;
+        return siteId;
     }
 
     @Override

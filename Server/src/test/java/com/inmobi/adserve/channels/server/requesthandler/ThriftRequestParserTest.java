@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.junit.Test;
+
 import com.inmobi.adserve.adpool.AdCodeType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.Carrier;
@@ -21,19 +36,6 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 
 
 public class ThriftRequestParserTest extends TestCase {
@@ -42,7 +44,7 @@ public class ThriftRequestParserTest extends TestCase {
 
     @Override
     public void setUp() {
-        Configuration mockConfig = createMock(Configuration.class);
+        final Configuration mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -52,7 +54,7 @@ public class ThriftRequestParserTest extends TestCase {
 
     @Test
     public void testParseRequestParameters() {
-        Site site = new Site();
+        final Site site = new Site();
         site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);
         site.setCpcFloor(1);
         site.setEcpmFloor(3.2);
@@ -62,65 +64,66 @@ public class ThriftRequestParserTest extends TestCase {
         site.setPublisherId("publisherId");
         site.setSiteUrl("siteUrl");
 
-        Device device = new Device();
+        final Device device = new Device();
         device.setDeviceTypeDeprecated(DeviceType.SMARTPHONE);
         device.setUserAgent("UserAgent");
         device.setOsId(123);
         device.setModelId(234);
         device.setHandsetInternalId(456);
 
-        Carrier carrier = new Carrier();
+        final Carrier carrier = new Carrier();
         carrier.setCarrierId(12345);
 
-        User user = new User();
+        final User user = new User();
         user.setYearOfBirth((short) 1930);
         user.setGender(Gender.MALE);
 
-        Geo geo = new Geo();
-        Set<Integer> cities = new HashSet<Integer>();
+        final Geo geo = new Geo();
+        final Set<Integer> cities = new HashSet<Integer>();
         cities.add(12);
         geo.setCityIds(cities);
         geo.setCountryCode("US");
         geo.setCountryId(94);
         geo.setLocationSource(LocationSource.LATLON);
         geo.setLatLong(new LatLong(12d, 12d));
-        Set<Integer> zipIds = new HashSet<Integer>();
+        final Set<Integer> zipIds = new HashSet<Integer>();
         zipIds.add(123);
         geo.setZipIds(zipIds);
-        Set<Integer> stateIds = new HashSet<Integer>();
+        final Set<Integer> stateIds = new HashSet<Integer>();
         stateIds.add(123);
         geo.setStateIds(stateIds);
 
-        IntegrationDetails integrationDetails = new IntegrationDetails();
+        final IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setAdCodeType(AdCodeType.BASIC);
         integrationDetails.setIFrameId("009");
         integrationDetails.setIntegrationType(IntegrationType.IOS_SDK);
         integrationDetails.setIntegrationVersion(231);
 
-        AdPoolRequest adPoolRequest = new AdPoolRequest();
+        final AdPoolRequest adPoolRequest = new AdPoolRequest();
         adPoolRequest.setSite(site);
         adPoolRequest.setDevice(device);
         adPoolRequest.setCarrier(carrier);
         adPoolRequest.setUser(user);
         adPoolRequest.setGeo(geo);
         adPoolRequest.setRequestedAdType(RequestedAdType.INTERSTITIAL);
-        List<SupplyCapability> supplyCapabilities = new ArrayList<SupplyCapability>();
+        final List<SupplyCapability> supplyCapabilities = new ArrayList<SupplyCapability>();
         supplyCapabilities.add(SupplyCapability.TEXT);
         adPoolRequest.setSupplyCapabilities(supplyCapabilities);
         adPoolRequest.setRemoteHostIp("10.14.118.143");
         adPoolRequest.setSegmentId(234);
-        List<Short> selectedSlots = new ArrayList<Short>();
+        final List<Short> selectedSlots = new ArrayList<Short>();
         selectedSlots.add((short) 12);
         adPoolRequest.setSelectedSlots(selectedSlots);
         adPoolRequest.setRequestedAdCount((short) 1);
-        adPoolRequest.setRequestId("tid");
+        adPoolRequest.setTaskId("tid");
         adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
         adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
+        adPoolRequest.setReferralUrl("refUrl");
 
-        SASRequestParameters sasRequestParameters = new SASRequestParameters();
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final SASRequestParameters sasRequestParameters = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         thriftRequestParser
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
@@ -142,7 +145,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
-        assertEquals(sasRequestParameters.getCategories(), Collections.<Long> emptyList());
+        assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
         assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
         assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
@@ -165,8 +168,9 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getAppUrl(), "siteUrl");
         assertEquals(sasRequestParameters.getModelId(), 234);
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer> emptySet());
+        assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
         assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
         assertEquals(sasRequestParameters.getSst(), 100);
+        assertEquals(sasRequestParameters.getReferralUrl(), "refUrl");
     }
 }

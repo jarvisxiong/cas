@@ -35,31 +35,31 @@ import com.ning.http.client.RequestBuilder;
  */
 public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG         = LoggerFactory.getLogger(IFCAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IFCAdNetwork.class);
 
-    private String              requestId;
-    private String              deviceOsId;                                                 // Mandatory Param
-    private String              deviceOSVersion;                                          // Mandatory Param
-    private String              handset;                                                  // Mandatory Param
-    private String              carrier;                                                  // Mandatory Param
-    private String              city;
-    private String              state;
-    private String              userAgent;
-    private String              gender;
-    private String              siteID;                                                   // Mandatory Param
-    private String              slotWidth;                                                // Mandatory Param
-    private String              slotHeight;                                               // Mandatory Param
-    private String              publisherID;                                              // Mandatory Param
-    private Boolean             siteAllowBanner;
-    private Boolean             richMedia;
-    private String              adcode;
+    private String requestId;
+    private String deviceOsId; // Mandatory Param
+    private String deviceOSVersion; // Mandatory Param
+    private String handset; // Mandatory Param
+    private String carrier; // Mandatory Param
+    private String city;
+    private String state;
+    private String userAgent;
+    private String gender;
+    private String siteID; // Mandatory Param
+    private String slotWidth; // Mandatory Param
+    private String slotHeight; // Mandatory Param
+    private String publisherID; // Mandatory Param
+    private Boolean siteAllowBanner;
+    private Boolean richMedia;
+    private String adcode;
 
-    HttpRequest                 httpRequest;
+    HttpRequest httpRequest;
 
     private static final String SUPPY_SOURCE = "DCP";
-    private final String        ifcURL;
+    private final String ifcURL;
 
-    private String              adGroupID;
+    private String adGroupID;
 
     public IFCAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -77,7 +77,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(sasParams.getAllParametersJson());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.debug("cannot get AllParametersJson from sasParams, {}", e);
         }
         if (null != jsonObject) {
@@ -92,19 +92,19 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 siteAllowBanner = getFlagParams(jsonObject, "site-allowBanner", false);
                 adcode = stringifyParam(jsonObject, "adcode", true);
                 adGroupID = externalSiteId;
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 LOG.info("cannot configure parameters in IFCAdNetwork, {}", e);
                 return false;
             }
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 LOG.info("IFC Mandatory Parameter missing: handset, exception raised {}", e);
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 LOG.info("IFC Mandatory Parameter missing: carrier, exception raised {}", e);
                 return false;
             }
@@ -112,7 +112,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             // This is temporary fix, proper handling should be identified, bug
             // id:41499
             try {
-                String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
+                final String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
                 if (sdkVersion != null
                         && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
                     return false;
@@ -120,7 +120,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                     return false;
                 }*/
-            } catch (JSONException e) {
+            } catch (final JSONException e) {
                 LOG.info("Error while parsing 'sdk-version', {}", e);
             }
         } else {
@@ -141,10 +141,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             carrier = String.valueOf(sasParams.getCarrierId());
             deviceOSVersion = sasParams.getOsMajorVersion();
 
-            String tempSdkVersion = sasParams.getSdkVersion();
+            final String tempSdkVersion = sasParams.getSdkVersion();
 
-            if (tempSdkVersion != null && (tempSdkVersion.toLowerCase().startsWith("i30")
-                    || tempSdkVersion.toLowerCase().startsWith("a30"))) {
+            if (tempSdkVersion != null
+                    && (tempSdkVersion.toLowerCase().startsWith("i30") || tempSdkVersion.toLowerCase()
+                            .startsWith("a30"))) {
                 return false;
             }
         }
@@ -153,17 +154,15 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             userAgent = getURLEncode(sasParams.getUserAgent(), format);
         }
 
-        String tempGender = sasParams.getGender();
+        final String tempGender = sasParams.getGender();
 
-        if (!isEmpty(tempGender)
-                && ("m".equalsIgnoreCase(tempGender) || "male".equalsIgnoreCase(tempGender))) {
+        if (!isEmpty(tempGender) && ("m".equalsIgnoreCase(tempGender) || "male".equalsIgnoreCase(tempGender))) {
             gender = "male";
-        } else if (!isEmpty(tempGender)
-                && ("f".equalsIgnoreCase(tempGender) || "female".equalsIgnoreCase(tempGender))) {
+        } else if (!isEmpty(tempGender) && ("f".equalsIgnoreCase(tempGender) || "female".equalsIgnoreCase(tempGender))) {
             gender = "female";
-        } else{
-		gender = tempGender;
-	} 
+        } else {
+            gender = tempGender;
+        }
 
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
@@ -172,7 +171,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
         } else {
@@ -192,7 +191,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         Boolean booleanVal = null;
         try {
             booleanVal = jsonObject.getBoolean(field);
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             if (isMandatory) {
                 LOG.info("IFC Mandatory Parameter missing: {} , raised exception {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
@@ -205,7 +204,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             throws JSONException {
         try {
             return (String) jObject.get(field);
-        } catch (JSONException e) {
+        } catch (final JSONException e) {
             if (isMandatory) {
                 LOG.info("IFC Mandatory Parameter missing: {} , and exception thrown {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
@@ -224,8 +223,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
-        return new RequestBuilder("POST").setUrl(uri.toString()).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+        final byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
+        return new RequestBuilder("POST").setUrl(uri.toString())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
@@ -245,13 +245,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public JSONObject getLogline() {
         try {
-            JSONObject log = new JSONObject();
+            final JSONObject log = new JSONObject();
             log.put("adv", getId());
             log.put("3psiteid", adGroupID);
             log.put("resp", adStatus);
             log.put("latency", getLatency());
             return log;
-        } catch (JSONException exception) {
+        } catch (final JSONException exception) {
             LOG.info("Error while constructing logline inside ifc adapter, exception raised {}", exception);
             return null;
         }
@@ -263,7 +263,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private String getRequestBody() {
-        JsonObject jsonObject = new JsonObject();
+        final JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("sdkVersion", sasParams.getSdkVersion());
         jsonObject.addProperty("requestId", requestId);
         jsonObject.addProperty("deviceOsId", deviceOsId);
@@ -299,12 +299,17 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("imaiBaseUrl", sasParams.getImaiBaseUrl());
         jsonObject.addProperty("supplySource", SUPPY_SOURCE);
         jsonObject.addProperty("blindedSiteId", blindedSiteId);
-        jsonObject.addProperty("uidIFA", casInternalRequestParameters.getUidIFA());
-        jsonObject.addProperty("uidSO1", casInternalRequestParameters.getUidSO1());
+        jsonObject.addProperty("gpid", casInternalRequestParameters.getGpid());
+        jsonObject.addProperty("uid", casInternalRequestParameters.getUid());
         jsonObject.addProperty("uidO1", casInternalRequestParameters.getUidO1());
         jsonObject.addProperty("uidMD5", casInternalRequestParameters.getUidMd5());
-        jsonObject.addProperty("uidIDUS1", casInternalRequestParameters.getUidIDUS1());
+        jsonObject.addProperty("uidIFA", casInternalRequestParameters.getUidIFA());
         jsonObject.addProperty("uidIFV", casInternalRequestParameters.getUidIFV());
+        jsonObject.addProperty("uidSO1", casInternalRequestParameters.getUidSO1());
+        jsonObject.addProperty("uidIDUS1", casInternalRequestParameters.getUidIDUS1());
+        jsonObject.addProperty("uidADT", casInternalRequestParameters.getUidADT());
+        jsonObject.addProperty("uidWC", casInternalRequestParameters.getUidWC());
+        jsonObject.addProperty("uuidFromUidCookie", casInternalRequestParameters.getUuidFromUidCookie());
 
         return jsonObject.toString();
     }
@@ -318,7 +323,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String getCategoryString(final List<Long> categories) {
         if (null != categories) {
-            StringBuilder categoryString = new StringBuilder();
+            final StringBuilder categoryString = new StringBuilder();
 
             for (int i = 0; i < categories.size(); i++) {
                 if (null != CategoryList.getCategory(categories.get(i).intValue())) {
@@ -332,7 +337,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String getHandsetString(final JSONArray handset) throws JSONException {
         if (null != handset) {
-            StringBuilder handsetString = new StringBuilder();
+            final StringBuilder handsetString = new StringBuilder();
             for (int i = 0; i < handset.length(); i++) {
                 handsetString.append(handset.getString(i)).append(',');
             }
@@ -343,7 +348,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private String getCarrierString(final JSONArray carrier) throws JSONException {
         if (null != carrier) {
-            StringBuilder carrierString = new StringBuilder();
+            final StringBuilder carrierString = new StringBuilder();
             for (int i = 0; i < carrier.length(); i++) {
                 carrierString.append(carrier.getString(i)).append(',');
             }
@@ -354,7 +359,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        if (null == response || (status.code() != 200 || response.startsWith("<!--") || response.trim().isEmpty())) {
+        if (null == response || status.code() != 200 || response.startsWith("<!--") || response.trim().isEmpty()) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;

@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.entity;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final String id;
     // Type of site (Android, IOS etc.)
     private final String marketId;
-    //Bundle Id of App
+    // Bundle Id of App
     private final long siteTypeId;
     // Content Rating of the App
     private final String contentRating;
@@ -31,11 +30,13 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final boolean isCoppaEnabled;
     // last modified time of this table
     private final boolean isTransparencyEnabled;
-    //flag to see if transparency is enabled, this will be true if transparency is enabled at both publisher and site level
+    // flag to see if transparency is enabled, this will be true if transparency is enabled at both publisher and site
+    // level
     private final List<Integer> blindList;
-    //list of DSP's, for which the site is blind. Picked from wap_site table if available, otherwise from wap_publisher table
+    // list of DSP's, for which the site is blind. Picked from wap_site table if available, otherwise from wap_publisher
+    // table
     private final String siteUrl;
-    //Site page, App store URL
+    // Site page, App store URL
     private final String siteName;
     private final String appTitle;
     private final String bundleId;
@@ -79,6 +80,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         private String appTitle;
         private String bundleId;
         private Timestamp modifiedOn;
+
         public WapSiteUACEntity build() {
             return new WapSiteUACEntity(this);
         }
@@ -86,9 +88,9 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return String.format(
-                "{\"siteId\":\"%s\",\"siteTypeId\":%s,\"contentRating\":\"%s\",\"isCoppaEnabled\":%s,\"appType\":\"%s\"}", id,
-                siteTypeId, contentRating, isCoppaEnabled, appType);
+        return String
+                .format("{\"siteId\":\"%s\",\"siteTypeId\":%s,\"contentRating\":\"%s\",\"isCoppaEnabled\":%s,\"appType\":\"%s\"}",
+                        id, siteTypeId, contentRating, isCoppaEnabled, appType);
     }
 
     @Override
