@@ -102,6 +102,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Provides
     List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
         final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserDetailsInvalidFilter.class));
         advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
         return advertiserLevelFilterList;
     }
