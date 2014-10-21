@@ -298,7 +298,7 @@ pilot:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon04.ads.ua2.inmobi.com'
       scribe_endpoint1:
@@ -351,7 +351,7 @@ pilot:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon02.ads.uj1.inmobi.com'
       scribe_endpoint1:
@@ -404,7 +404,7 @@ pilot:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon03.ads.uh1.inmobi.com'
       scribe_endpoint1:
@@ -457,7 +457,7 @@ pilot:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon02.ads.lhr1.inmobi.com'
       scribe_endpoint1:
@@ -510,7 +510,7 @@ pilot:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon01.ads.hkg1.inmobi.com'
       scribe_endpoint1:
@@ -589,7 +589,7 @@ nonprod:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon02.ads.lhr1.inmobi.com'
       scribe_endpoint1:
@@ -642,7 +642,7 @@ nonprod:
       log_type :
          - 'ERROR'
       debug_log_type :
-         - 'INFO'
+         - 'ERROR'
       graphite_host :
          - 'mon04.ads.ua2.inmobi.com'
       scribe_endpoint1:
