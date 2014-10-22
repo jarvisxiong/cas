@@ -214,6 +214,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                         .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                         .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                        .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(requestParams.length()))
                         .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                         .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
         LOG.debug("WapStart request: {}", ningRequest);
@@ -225,7 +226,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {} and response length is {}", response, response.length());
+        LOG.debug("Wapstart response is {} and response length is {} and status code is {}", response, response.length(), status);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
