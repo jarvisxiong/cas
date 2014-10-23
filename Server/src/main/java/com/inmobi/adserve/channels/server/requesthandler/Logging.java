@@ -409,9 +409,7 @@ public class Logging {
     public static void sampledAdvertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         LOG.debug("came inside sampledAdvertiser log");
         final Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
-        if (!sampledAdvertiserLogger.isDebugEnabled()) {
-            return;
-        }
+
         final char sep = 0x01;
         final StringBuilder log = new StringBuilder();
         LOG.debug("got logger handle for sampledAdvertiser logs");
