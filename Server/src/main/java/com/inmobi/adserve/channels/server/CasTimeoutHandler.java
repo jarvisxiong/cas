@@ -35,7 +35,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
     private static ScheduledExecutorService executor;
     static {
         executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-    };
+    }
+    
     private volatile int dst;
 
     private DemandSourceType demandSourceType;

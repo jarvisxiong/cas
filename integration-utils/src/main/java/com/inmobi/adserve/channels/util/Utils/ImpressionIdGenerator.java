@@ -2,9 +2,6 @@ package com.inmobi.adserve.channels.util.Utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 /**
@@ -12,7 +9,6 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
  */
 
 public class ImpressionIdGenerator {
-    private static final Logger LOG = LoggerFactory.getLogger(ImpressionIdGenerator.class);
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private final short hostIdCode;
     private final byte dataCenterIdCode;
