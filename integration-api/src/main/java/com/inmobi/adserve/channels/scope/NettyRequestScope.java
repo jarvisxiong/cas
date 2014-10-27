@@ -50,6 +50,8 @@ import com.google.inject.Scope;
  */
 public class NettyRequestScope implements Scope {
 
+    public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");
+
     private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>() {
         @Override
         public Object get() {
@@ -60,7 +62,6 @@ public class NettyRequestScope implements Scope {
     };
     private final ThreadLocal<Map<Key<?>, Object>> values = new ThreadLocal<Map<Key<?>, Object>>();
 
-    public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");
 
 
     public void enter() {

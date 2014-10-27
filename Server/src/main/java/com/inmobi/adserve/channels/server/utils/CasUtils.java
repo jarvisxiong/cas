@@ -1,20 +1,18 @@
 package com.inmobi.adserve.channels.server.utils;
 
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 
 /**
@@ -23,11 +21,13 @@ import com.inmobi.adserve.channels.server.beans.CasContext;
  */
 @Singleton
 public class CasUtils {
+
     private static final Logger LOG = LoggerFactory.getLogger(CasUtils.class);
+
+    private static final String APP = "APP";
 
     private final RepositoryHelper repositoryHelper;
 
-    private static final String APP = "APP";
 
     @Inject
     public CasUtils(final RepositoryHelper repositoryHelper) {

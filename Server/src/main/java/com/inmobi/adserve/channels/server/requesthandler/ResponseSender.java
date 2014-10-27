@@ -1,38 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static com.inmobi.casthrift.DemandSourceType.DCP;
-import static com.inmobi.casthrift.DemandSourceType.IX;
-import static com.inmobi.casthrift.DemandSourceType.RTBD;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
@@ -64,6 +31,35 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static com.inmobi.casthrift.DemandSourceType.*;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -88,19 +84,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final int PRIVATE_AUCTION = 3;
     private static final int PREFERRED_DEAL = 4;
 
+    public SASRequestParameters sasParams;
+    public CasInternalRequestParameters casInternalRequestParameters;
+
     private long totalTime;
     private List<ChannelSegment> rankList;
     private ThirdPartyAdResponse adResponse;
     private boolean responseSent;
-    public SASRequestParameters sasParams;
     private int rankIndexToProcess;
     private int selectedAdIndex;
     private boolean requestCleaned;
-    public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine auctionEngine;
     private final Object lock = new Object();
     private String terminationReason;
-
     private final long initialTime;
     private Marker traceMarker;
 

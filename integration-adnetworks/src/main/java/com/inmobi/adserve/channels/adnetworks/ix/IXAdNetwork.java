@@ -1,39 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -56,9 +22,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.ix.AdQuality;
 import com.inmobi.casthrift.ix.App;
@@ -81,6 +47,36 @@ import com.inmobi.casthrift.ix.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -90,8 +86,35 @@ import com.ning.http.client.RequestBuilder;
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
+    public static ImpressionCallbackHelper impressionCallbackHelper;
 
+    protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
+
+    @Getter
+    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
+            "RUB"));
+    @Getter
+    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
+            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+
+    private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
+    private static final String CONTENT_TYPE_VALUE = "application/json";
+    private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
+    private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+    private static final String USD = "USD";
+    private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
+    private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
+    private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
+    private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+
+    @Inject
+    private static AsyncHttpClientProvider asyncHttpClientProvider;
+
+    private static final String NATIVE_STRING = "native";
+
+    @Getter
+    @Setter
+    IXBidRequest bidRequest;
     @Getter
     @Setter
     private String urlBase;
@@ -110,9 +133,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInLocal;
     @Getter
     @Setter
-    IXBidRequest bidRequest;
-    @Getter
-    @Setter
     IXBidResponse bidResponse;
     private final String userName;
     private final String password;
@@ -120,18 +140,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final boolean wnRequired;
     private int tmax = 200;
     private boolean templateWN = true;
-    private static final String CONTENT_TYPE_VALUE = "application/json";
-    private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
-    private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+
     private final String advertiserId;
-    public static ImpressionCallbackHelper impressionCallbackHelper;
     private final IABCategoriesInterface iabCategoriesInterface;
     private final IABCountriesInterface iabCountriesInterface;
     private final String advertiserName;
     private double secondBidPriceInUsd = 0;
     private double secondBidPriceInLocal = 0;
     private String bidRequestJson = "";
-    protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     private String encryptedBid;
     private String responseSeatId;
     private String responseImpressionId;
@@ -148,33 +164,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean logCreative = false;
     private String adm;
     public final RepositoryHelper repositoryHelper;
-    private static final String USD = "USD";
     @Getter
     private int impressionObjCount;
     @Getter
     private int responseBidObjCount;
 
-    private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
-    private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
-    private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
-    private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
     private final List<String> globalBlindFromConfig;
 
     private final List<String> blockedAdvertisers = Lists.newArrayList();
 
-    @Getter
-    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
-            "RUB"));
-    @Getter
-    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
-            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
 
-    @Inject
-    private static AsyncHttpClientProvider asyncHttpClientProvider;
-
-    private static final String NATIVE_STRING = "native";
     private ChannelSegmentEntity dspChannelSegmentEntity;
 
 

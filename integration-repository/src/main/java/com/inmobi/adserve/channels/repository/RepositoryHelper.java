@@ -31,6 +31,9 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 @Getter
 public class RepositoryHelper {
+
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RepositoryHelper.class);
+
     private final ChannelRepository channelRepository;
     private final ChannelAdGroupRepository channelAdGroupRepository;
     private final ChannelFeedbackRepository channelFeedbackRepository;
@@ -47,8 +50,6 @@ public class RepositoryHelper {
     private final CreativeRepository creativeRepository;
     private final RepositoryStatsProvider repositoryStatsProvider;
     private final NativeAdTemplateRepository nativeAdTemplateRepository;
-
-    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RepositoryHelper.class);
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;

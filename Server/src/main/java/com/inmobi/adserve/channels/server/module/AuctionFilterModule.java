@@ -31,13 +31,13 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 
 public class AuctionFilterModule extends AbstractModule {
 
-    private final Reflections reflections;
     private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
         @Override
         public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
             return o1.getOrder().getValue() - o2.getOrder().getValue();
         }
     };
+    private final Reflections reflections;
 
     public AuctionFilterModule() {
         reflections = new Reflections("com.inmobi.adserve.channels.server.auction.auctionfilter.impl");

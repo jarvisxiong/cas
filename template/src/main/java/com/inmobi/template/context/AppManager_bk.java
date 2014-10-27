@@ -6,8 +6,8 @@ import com.google.gson.GsonBuilder;
 
 public class AppManager_bk {
 
-    private static Gson gson = null;
     static GsonBuilder gsonBuilder = new GsonBuilder();
+    private static Gson gson = null;
     static {
         gson = gsonBuilder.create();
     }
