@@ -255,7 +255,12 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 final String imageUrl = textGraphic.getString("name");
                 context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
                 t = TemplateType.IMAGE;
-            } else if (responseJson.has("text")) {
+            } else if (responseJson.has("textgraphic")) {
+                final JSONObject textGraphic = responseJson.getJSONObject("textgraphic").getJSONObject("picture");
+                final String imageUrl = textGraphic.getString("name");
+                context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
+                t = TemplateType.IMAGE;
+            }else if (responseJson.has("text")) {
                 final JSONObject text = responseJson.getJSONObject("text");
                 context.put(VelocityTemplateFieldConstants.AD_TEXT, text.getString("title"));
                 if (text.has("content")) {
