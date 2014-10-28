@@ -7,7 +7,7 @@ prod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.ua2.inmobi.com
+         - as.ads.ua2.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -61,7 +61,7 @@ prod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.uj1.inmobi.com
+         - as.ads.uj1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -115,7 +115,7 @@ prod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.uh1.inmobi.com
+         - as.ads.uh1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -169,7 +169,7 @@ prod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.lhr1.inmobi.com
+         - as.ads.lhr1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -223,7 +223,7 @@ prod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.hkg1.inmobi.com
+         - as.ads.hkg1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -278,7 +278,7 @@ pilot:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.ua2.inmobi.com
+         - as.ads.ua2.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -331,7 +331,7 @@ pilot:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.uj1.inmobi.com
+         - as.ads.uj1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -384,7 +384,7 @@ pilot:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.uh1.inmobi.com
+         - as.ads.uh1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -437,7 +437,7 @@ pilot:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.lhr1.inmobi.com
+         - as.ads.lhr1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -490,7 +490,7 @@ pilot:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.hkg1.inmobi.com
+         - as.ads.hkg1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -542,7 +542,7 @@ nonprod:
       db_port:
          - 5499
       aerospike_host:
-         - clf.ads.lhr1.inmobi.com
+         - as.ads.lhr1.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -569,7 +569,7 @@ nonprod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.corp.inmobi.com
+         - as.corp.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
@@ -622,7 +622,7 @@ nonprod:
       database:
          - wap_prod_adserve
       aerospike_host:
-         - clf.ads.ua2.inmobi.com
+         - as.ads.ua2.inmobi.com
       aerospike_port:
          - 3000
       ifd_host:
