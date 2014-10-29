@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -24,6 +9,19 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true
@@ -31,20 +29,22 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     // success.i
     private static final Logger LOG = LoggerFactory.getLogger(DCPNexageAdNetwork.class);
 
-    private int height = 0;
-    private int width = 0;
-    private static IABCountriesInterface iABCountries;
-    private String pos;
-    protected boolean jsAdTag = false;
-    private boolean isGeo = false;
-    private boolean isApp = false;
-
     private static final String POS = "pos";
     private static final String JS_AD_TAG = "jsAdTag";
     private static final String DCN = "DCN";
     private static final String LAT_LONG = "LatLong";
     private static final String CATEGORY = "CATEGORY";
     private static final String BLINDED_SITE_ID = "BlindedSiteId";
+    private static IABCountriesInterface iABCountries;
+
+    protected boolean jsAdTag = false;
+    private int height = 0;
+    private int width = 0;
+    private String pos;
+    private boolean isGeo = false;
+    private boolean isApp = false;
+
+
 
     static {
         iABCountries = new IABCountriesMap();

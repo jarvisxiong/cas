@@ -30,10 +30,6 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPLoganAdnetwork.class);
 
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
     private static final String ZONE = "zone";
     private static final String SITE = "site";
     private static final String UDID = "udid";
@@ -41,6 +37,11 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String SIZE_Y = "size_y";
     private static final String MIN_SIZE_X = "min_size_x";
     private static final String MIN_SIZE_Y = "min_size_y";
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+
 
     /**
      * @param config

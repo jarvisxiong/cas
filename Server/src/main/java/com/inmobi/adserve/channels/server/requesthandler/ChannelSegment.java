@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.Comparator;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -15,9 +7,28 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.inject.Inject;
+import java.util.Comparator;
+import java.util.Map;
 
 
 public class ChannelSegment {
+
+    public final static Comparator<ChannelSegment> CHANNEL_SEGMENT_REVERSE_COMPARATOR =
+            new Comparator<ChannelSegment>() {
+                @Override
+                public int compare(final ChannelSegment o1, final ChannelSegment o2) {
+                    return o1.getPrioritisedECPM() > o2.getPrioritisedECPM() ? -1 : 1;
+                }
+            };
+
+    @AdvertiserIdNameMap
+    @Inject
+    private static Map<String, String> advertiserIdNameMap;
+
     @Getter
     private final ChannelSegmentEntity channelSegmentEntity;
     @Getter
@@ -34,18 +45,6 @@ public class ChannelSegment {
     @Getter
     @Setter
     private double prioritisedECPM;
-
-    @AdvertiserIdNameMap
-    @Inject
-    private static Map<String, String> advertiserIdNameMap;
-
-    public final static Comparator<ChannelSegment> CHANNEL_SEGMENT_REVERSE_COMPARATOR =
-            new Comparator<ChannelSegment>() {
-                @Override
-                public int compare(final ChannelSegment o1, final ChannelSegment o2) {
-                    return o1.getPrioritisedECPM() > o2.getPrioritisedECPM() ? -1 : 1;
-                }
-            };
 
     public ChannelSegment(final ChannelSegmentEntity channelSegmentEntity, final ChannelEntity channelEntity,
             final ChannelFeedbackEntity channelFeedbackEntity,

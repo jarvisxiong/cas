@@ -27,12 +27,13 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
+    protected static final String LAT = "latitude";
+    protected static final String LONG = "longitude";
+    protected static final String GENDER = "demo.gender";
+    protected static final String KEYWORDS = "demo.keywords";
+    protected static final String AGE = "demo.age";
 
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
 
     private static final String PUBID = "s";
     private static final String UA = "u";
@@ -43,11 +44,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String MD5UDID = "o_mcmd5";
     private static final String IFA = "o_iosadvid";
     private static final String VERSION = "v";
-    protected static final String LAT = "latitude";
-    protected static final String LONG = "longitude";
-    protected static final String GENDER = "demo.gender";
-    protected static final String KEYWORDS = "demo.keywords";
-    protected static final String AGE = "demo.age";
+
     private static final String WIDTH = "adspace.width";
     private static final String HEIGHT = "adspace.height";
     private static final String B_SITE_ID = "s_subid";
@@ -57,6 +54,12 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String MRAID_TYPE = "1";
     private static final String API_VERSION = "2.0";
     private static final String REQUEST_TYPE_VALUE = "api";
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+
 
     /**
      * @param config

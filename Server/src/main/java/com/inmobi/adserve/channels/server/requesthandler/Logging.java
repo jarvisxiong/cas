@@ -1,24 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -47,28 +28,48 @@ import com.inmobi.casthrift.Request;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
-    private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
 
+    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
+            new ConcurrentHashMap<String, String>(2000);
+
+
+    private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
     private static String sampledAdvertisementLogKey;
     private static String umpAdsLogKey;
     private static boolean enableFileLogging;
     private static boolean enableDatabusLogging;
-    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
-            new ConcurrentHashMap<String, String>(2000);
+
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String> advertiserIdNameMap;
 
+    private static int totalCount;
+
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return SAMPLED_ADVERTISER_LOG_NOS;
     }
-
-    private static int totalCount;
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
             final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {

@@ -43,8 +43,9 @@ import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 
 public class ThriftRequestMaker {
-    private static final URLCodec URL_CODEC = new URLCodec();
+
     static AtomicInteger atomicInteger = new AtomicInteger();
+    private static final URLCodec URL_CODEC = new URLCodec();
 
     private static String getImpressionId() {
         final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), 12).toString();
