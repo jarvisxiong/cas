@@ -33,7 +33,7 @@ public class ChannelSegmentMatchingCache {
             return Collections.emptySet();
         }
         if (entities.isEmpty()) {
-            logger.info("No entries found in the database for the key " + key);
+            logger.error("No entries found in the database for the key " + key);
         }
         return entities.values();
     }

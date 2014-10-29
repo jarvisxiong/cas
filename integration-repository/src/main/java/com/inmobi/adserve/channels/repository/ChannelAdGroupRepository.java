@@ -1,18 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -23,6 +10,18 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBRepository<ChannelSegmentEntity, String>
@@ -167,7 +166,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             try {
                 return new JSONObject(additionalParams);
             } catch (final JSONException e) {
-                logger.info("Error in parsing additional params json, exception raised " + e);
+                logger.error("Error in parsing additional params json, exception raised " + e);
             }
         }
         return new JSONObject();
@@ -217,7 +216,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 final JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
             } catch (final JSONException e) {
-                logger.info("wrong json in site_json in channel repo" + e);
+                logger.error("wrong json in site_json in channel repo" + e);
             }
         }
         return mode;
@@ -233,7 +232,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                     sitesIE.add(sites.getString(i));
                 }
             } catch (final JSONException e) {
-                logger.info("wrong json in site_json in channel repo" + e);
+                logger.error("wrong json in site_json in channel repo" + e);
             }
         }
         return sitesIE;

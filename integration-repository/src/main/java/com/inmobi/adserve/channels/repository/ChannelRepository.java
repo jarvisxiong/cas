@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -18,6 +10,13 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class ChannelRepository extends AbstractStatsMaintainingDBRepository<ChannelEntity, String>
@@ -89,7 +88,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
                 final JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
             } catch (final JSONException e) {
-                logger.info("wrong json in site_json in channel repo", e);
+                logger.error("wrong json in site_json in channel repo", e);
             }
         }
         return mode;
@@ -105,7 +104,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
                     sitesIE.add(sites.getString(i));
                 }
             } catch (final JSONException e) {
-                logger.info("wrong json in site_json in channel repo", e);
+                logger.error("wrong json in site_json in channel repo", e);
             }
         }
         return sitesIE;

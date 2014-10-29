@@ -1,25 +1,22 @@
 package com.inmobi.adserve.channels.server;
 
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.ReadTimeoutException;
-
-import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
-import java.util.List;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
-import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
+import java.util.List;
 
 /**
  * @author abhishek.parwal
@@ -83,7 +80,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
                 InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
                 LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
             }
-            LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
+            LOG.error(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
             responseSender.sendNoAdResponse(ctx.channel());
         }
 

@@ -1,24 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -47,6 +28,23 @@ import com.inmobi.casthrift.Request;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
@@ -119,11 +117,11 @@ public class Logging {
             final InetAddress addr = InetAddress.getLocalHost();
             host = addr.getHostName();
             if (host == null) {
-                LOG.info("host cant be empty, abandoning rr logging");
+                LOG.error("host cant be empty, abandoning rr logging");
                 return;
             }
         } catch (final UnknownHostException ex) {
-            LOG.info("could not resolve host inside rr logging so abandoning response, raised exception {}", ex);
+            LOG.error("could not resolve host inside rr logging so abandoning response, raised exception {}", ex);
             return;
         }
         final InventoryType inventory = getInventoryType(sasParams);

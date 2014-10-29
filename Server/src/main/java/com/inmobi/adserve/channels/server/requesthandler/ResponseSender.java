@@ -1,38 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static com.inmobi.casthrift.DemandSourceType.DCP;
-import static com.inmobi.casthrift.DemandSourceType.IX;
-import static com.inmobi.casthrift.DemandSourceType.RTBD;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
@@ -64,6 +31,37 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+import static com.inmobi.casthrift.DemandSourceType.IX;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -195,7 +193,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 finalResponse = AD_IMAI_START_TAG + finalResponse;
             }
         } else {
-            LOG.info("invalid slot, so not returning response, even though we got an ad");
+            LOG.error("invalid slot, so not returning response, even though we got an ad");
             InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 finalResponse = NO_AD_XHTML;
@@ -403,9 +401,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
             try {
 
-                responseBytes =
-                        inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
-                                encryptionKey.getInitializationVector());
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
@@ -415,7 +412,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 }
 
             } catch (InmobiSecureException | InvalidMessageException e) {
-                LOG.info("Exception while encrypting response from {}", e);
+                LOG.error("Exception while encrypting response from {}", e);
                 throw new RuntimeException(e);
             }
 
