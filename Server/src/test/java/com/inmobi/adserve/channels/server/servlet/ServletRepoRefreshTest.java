@@ -51,6 +51,7 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replay;
 import static org.powermock.api.easymock.PowerMock.replayAll;
+import static org.powermock.api.easymock.PowerMock.verifyAll;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,
@@ -286,6 +287,7 @@ public class ServletRepoRefreshTest {
             final ServletRepoRefresh servlet = new ServletRepoRefresh();
             servlet.handleRequest(httpRequestHandler, mockQueryStringDecoder, mockChannel);
         }
+        verifyAll();
     }
 
     @Test
