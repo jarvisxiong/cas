@@ -50,6 +50,7 @@ import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
+import static org.powermock.api.easymock.PowerMock.resetAll;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,
@@ -131,9 +132,9 @@ public class ServletRepoRefreshTest {
     private static void prepareMockConfigurationLoader() {
         ChannelServer.setConfigFile(null);
 
+        mockStatic(ConfigurationLoader.class);
         mockConfigLoader = createMock(ConfigurationLoader.class);
         final Configuration mockServerConfig = createMock(Configuration.class);
-        mockStatic(ConfigurationLoader.class);
 
         expect(ConfigurationLoader.getInstance(null)).andReturn(mockConfigLoader).anyTimes();
         expect(mockConfigLoader.getRtbConfiguration()).andReturn(null).anyTimes();
@@ -264,6 +265,7 @@ public class ServletRepoRefreshTest {
 
     @BeforeClass
     public static void setUp() {
+        resetAll();
         prepareHttpRequestHandler();
         prepareMockQueryStringDecoder();
         prepareMockChannel();
