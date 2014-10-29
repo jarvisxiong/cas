@@ -60,7 +60,7 @@ public class ServletRepoRefresh implements Servlet {
         try {
             String configFile = ChannelServer.getConfigFile();
             if (null == configFile) {
-                configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+                configFile = ChannelServer.getDEFAULT_CONFIG_FILE();
             }
             final ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
             con = DriverManager.getConnection(connectionString, dbUser, dbPassword);

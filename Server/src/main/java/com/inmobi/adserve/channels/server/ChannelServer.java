@@ -90,6 +90,7 @@ public class ChannelServer {
     private static IXAccountMapRepository ixAccountMapRepository;
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
+    @Getter
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     @Getter
     private static String configFile;

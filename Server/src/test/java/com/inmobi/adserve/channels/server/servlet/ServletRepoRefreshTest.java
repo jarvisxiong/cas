@@ -130,12 +130,12 @@ public class ServletRepoRefreshTest {
     }
 
     private static void prepareMockConfigurationLoader() {
+        String configFile = ChannelServer.getDEFAULT_CONFIG_FILE();
         mockStatic(ConfigurationLoader.class);
         mockConfigLoader = createMock(ConfigurationLoader.class);
         final Configuration mockServerConfig = createMock(Configuration.class);
 
-        expect(ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties")).andReturn(mockConfigLoader).anyTimes();
-
+        expect(ConfigurationLoader.getInstance(configFile)).andReturn(mockConfigLoader).anyTimes();
         expect(mockConfigLoader.getRtbConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getLoggerConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getServerConfiguration()).andReturn(mockServerConfig).anyTimes();
