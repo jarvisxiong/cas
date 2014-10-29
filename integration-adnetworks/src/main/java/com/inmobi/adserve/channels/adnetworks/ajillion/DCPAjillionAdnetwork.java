@@ -53,18 +53,19 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing so exiting adapter {}", name);
+            LOG.error("mandatory parameters missing so exiting adapter {}", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
         host = config.getString(name + ".host");
         final String siteRating = SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType()) ? "p" : "fs";
         placementId = config.getString(String.format(SLOT_FORMAT, name, sasParams.getSlot(), siteRating));
         if (StringUtils.isBlank(placementId)) {
-            LOG.debug("Slot is not configured for {}", externalSiteId);
+            LOG.error("Slot is not configured for {}", externalSiteId);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
 
-        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 

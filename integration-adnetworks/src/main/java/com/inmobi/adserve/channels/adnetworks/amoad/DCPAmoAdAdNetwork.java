@@ -1,24 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks.amoad;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.velocity.VelocityContext;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true
@@ -67,7 +65,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
         final String tag = slotTagMap.get(sasParams.getSlot());
         if (StringUtils.isEmpty(tag)) {
-            LOG.info("Tag is not configured for this slot: {}", sasParams.getSlot());
+            LOG.error("Tag is not configured for this slot: {}", sasParams.getSlot());
             adStatus = "NO_AD";
             return;
         }
@@ -78,7 +76,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "AD";
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.info("Error generating Static Js adtag for AmoAd  : {}", exception);
+            LOG.error("Error generating Static Js adtag for AmoAd: {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());
     }

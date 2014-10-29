@@ -68,7 +68,8 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for {} so exiting adapter", name);
+            LOG.error("mandatory parameters missing for {} so exiting adapter", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
 
@@ -83,7 +84,8 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.debug("mandatory parameters missing for {}so exiting adapter", name);
+            LOG.error("mandatory parameters missing for {} so exiting adapter", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
@@ -92,7 +94,6 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
         } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             client = 2;
         }
-        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 

@@ -57,7 +57,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for logan so exiting adapter");
+            LOG.error("mandatory parameters missing for logan so exiting adapter");
+            LOG.info("Configure parameters inside logan returned false");
             return false;
         }
         host = config.getString("logan.host");
@@ -73,7 +74,6 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
-        LOG.info("Configure parameters inside logan returned true");
         return true;
     }
 
@@ -136,7 +136,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.info("{}", exception);
+            LOG.error("{}", exception);
         }
         return null;
     }

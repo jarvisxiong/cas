@@ -1,19 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.baidu;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.Calendar;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -21,6 +7,18 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.util.Calendar;
 
 
 public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -62,7 +60,8 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for baidu so exiting adapter");
+            LOG.error("mandatory parameters missing for baidu so exiting adapter");
+            LOG.info("Configure parameters inside baidu returned false");
             return false;
         }
 
@@ -78,13 +77,15 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getWidth());
             width = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.debug("mandate parameters missing for Baidu, so returning from adapter");
+            LOG.error("mandate parameters missing for Baidu, so returning from adapter");
+            LOG.info("Configure parameters inside baidu returned false");
             return false;
         }
         uid = getUid();
 
         if (StringUtils.isBlank(uid)) {
-            LOG.debug("mandatory parameters missing for baidu so exiting adapter");
+            LOG.error("mandatory parameters missing for baidu so exiting adapter");
+            LOG.info("Configure parameters inside baidu returned false");
             return false;
 
         }
@@ -98,7 +99,6 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         } else {
             os = WEB;
         }
-        LOG.info("Configure parameters inside baidu returned true");
         return true;
     }
 
@@ -160,8 +160,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from baidu : {}", exception);
-                LOG.info("Response from baidu: {}", response);
+                LOG.error("Error parsing response {} from baidu: {}", response, exception);
                 return;
             }
             adStatus = "AD";

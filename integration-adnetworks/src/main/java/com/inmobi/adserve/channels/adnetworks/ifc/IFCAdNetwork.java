@@ -1,16 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
+import com.google.gson.JsonObject;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.List;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -19,13 +21,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonObject;
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
+import java.awt.*;
+import java.net.URI;
+import java.util.List;
 
 
 /**
@@ -93,19 +91,22 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 adcode = stringifyParam(jsonObject, "adcode", true);
                 adGroupID = externalSiteId;
             } catch (final JSONException e) {
-                LOG.info("cannot configure parameters in IFCAdNetwork, {}", e);
+                LOG.error("cannot configure parameters in IFCAdNetwork, {}", e);
+                LOG.info("IFC Configure Parameter returning false");
                 return false;
             }
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
             } catch (final JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: handset, exception raised {}", e);
+                LOG.error("IFC Mandatory Parameter missing: handset, exception raised {}", e);
+                LOG.info("IFC Configure Parameter returning false");
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
             } catch (final JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: carrier, exception raised {}", e);
+                LOG.error("IFC Mandatory Parameter missing: carrier, exception raised {}", e);
+                LOG.info("IFC Configure Parameter returning false");
                 return false;
             }
 
@@ -115,13 +116,14 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 final String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
                 if (sdkVersion != null
                         && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
+                    LOG.info("IFC Configure Parameter returning false");
                     return false;
                 }
                 /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
                     return false;
                 }*/
             } catch (final JSONException e) {
-                LOG.info("Error while parsing 'sdk-version', {}", e);
+                LOG.error("Error while parsing 'sdk-version', {}", e);
             }
         } else {
             requestId = sasParams.getTid();
@@ -146,6 +148,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             if (tempSdkVersion != null
                     && (tempSdkVersion.toLowerCase().startsWith("i30") || tempSdkVersion.toLowerCase()
                             .startsWith("a30"))) {
+                LOG.info("IFC Configure Parameter returning false");
                 return false;
             }
         }
@@ -167,7 +170,8 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
         } else {
-            LOG.info("IFC Mandatory Parameter missing: SiteName");
+            LOG.error("IFC Mandatory Parameter missing: SiteName");
+            LOG.info("IFC Configure Parameter returning false");
             return false;
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
@@ -175,14 +179,15 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
         } else {
-            LOG.info("IFC Mandatory Parameter missing: Slot");
+            LOG.error("IFC Mandatory Parameter missing: Slot");
+            LOG.info("IFC Configure Parameter returning false");
             return false;
         }
         if (null == beaconUrl) {
-            LOG.info("IFC Mandatory Parameter missing: BeaconURL");
+            LOG.error("IFC Mandatory Parameter missing: BeaconURL");
+            LOG.info("IFC Configure Parameter returning false");
             return false;
         }
-        LOG.info("IFC Configure Parameter returning true");
         return true;
     }
 
@@ -193,7 +198,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             booleanVal = jsonObject.getBoolean(field);
         } catch (final JSONException e) {
             if (isMandatory) {
-                LOG.info("IFC Mandatory Parameter missing: {} , raised exception {}", field, e);
+                LOG.error("IFC Mandatory Parameter missing: {} , raised exception {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
             }
         }
@@ -206,7 +211,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             return (String) jObject.get(field);
         } catch (final JSONException e) {
             if (isMandatory) {
-                LOG.info("IFC Mandatory Parameter missing: {} , and exception thrown {}", field, e);
+                LOG.error("IFC Mandatory Parameter missing: {} , and exception thrown {}", field, e);
                 throw new JSONException("IFC Mandatory Parameter missing:" + field);
             } else {
                 return null;
@@ -252,7 +257,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             log.put("latency", getLatency());
             return log;
         } catch (final JSONException exception) {
-            LOG.info("Error while constructing logline inside ifc adapter, exception raised {}", exception);
+            LOG.error("Error while constructing logline inside ifc adapter, exception raised {}", exception);
             return null;
         }
     }

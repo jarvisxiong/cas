@@ -69,7 +69,8 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for {} so exiting adapter", name);
+            LOG.error("mandatory parameters missing for {} so exiting adapter", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
         host = config.getString(name + ".host");
@@ -79,7 +80,8 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.debug("mandate parameters missing for {} so returning from adapter", name);
+            LOG.error("mandate parameters missing for {} so returning from adapter", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
 
@@ -96,7 +98,6 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             isApp = false;
         }
 
-        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 
@@ -198,7 +199,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from {} {}", name, exception);
+                LOG.error("Error parsing response from {} {}", name, exception);
                 LOG.info("Response from {} {}", name, response);
             }
         }
