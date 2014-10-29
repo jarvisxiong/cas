@@ -147,7 +147,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for rubicon so exiting adapter");
+            LOG.error("mandatory parameters missing for rubicon so exiting adapter");
+            LOG.info("Configure parameters inside Rubicon returned false");
             return false;
         }
         host = config.getString("rubicon.host");
@@ -159,16 +160,17 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             if (!slotIdMap.containsKey(sasParams.getSlot())) {
-                LOG.debug("Size not allowed for rubicon so exiting adapter");
+                LOG.error("Size not allowed for rubicon so exiting adapter");
+                LOG.info("Configure parameters inside Rubicon returned false");
                 return false;
             }
         } else {
-            LOG.debug("mandatory parameter size missing for rubicon so exiting adapter");
+            LOG.error("mandatory parameter size missing for rubicon so exiting adapter");
+            LOG.info("Configure parameters inside Rubicon returned false");
             return false;
         }
 
-        isApp =
-                StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
+        isApp = StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
                         ? false
                         : true;
 
@@ -177,17 +179,17 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
         try {
             siteId = additionalParams.getString(SITE_KEY_ADDL_PARAM);
         } catch (final JSONException e) {
-            LOG.debug("Site Id is not configured in rubicon so exiting adapter, raised exception {}", e);
+            LOG.error("Site Id is not configured in rubicon so exiting adapter, raised exception {}", e);
+            LOG.info("Configure parameters inside Rubicon returned false");
             return false;
         }
         zoneId = getZoneId(additionalParams);
         if (null == zoneId) {
             LOG.error("Zone Id is not configured in rubicon so exiting adapter");
+            LOG.info("Configure parameters inside Rubicon returned false");
             return false;
-
         }
 
-        LOG.info("Configure parameters inside Rubicon returned true");
         return true;
     }
 
@@ -356,8 +358,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Rubicon, raised exception {}", exception);
-                LOG.info("Response from Rubicon {}", response);
+                LOG.error("Error parsing response {} from Rubicon: {}", response, exception);
             }
         }
     }

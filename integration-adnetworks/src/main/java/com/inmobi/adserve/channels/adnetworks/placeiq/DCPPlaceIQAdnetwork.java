@@ -1,14 +1,15 @@
 package com.inmobi.adserve.channels.adnetworks.placeiq;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -19,13 +20,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -117,7 +115,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
@@ -137,7 +136,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
 
@@ -146,7 +146,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             isApp = true;
             if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
                     && StringUtils.isEmpty(casInternalRequestParameters.getUid())) {
-                LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
         } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
@@ -154,7 +155,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             isApp = true;
             if (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())
                     && StringUtils.isEmpty(casInternalRequestParameters.getUidIDUS1())) {
-                LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
         } else {
@@ -162,7 +164,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             os = "Windows";
         }
 
-        LOG.info("Configure parameters inside PlaceIQ returned true");
         return true;
     }
 

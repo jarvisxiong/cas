@@ -74,7 +74,8 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for mobfox so exiting adapter");
+            LOG.error("mandatory parameters missing for mobfox so exiting adapter");
+            LOG.info("Configure parameters inside Mobfox returned false");
             return false;
         }
         host = config.getString("mobfox.host");
@@ -90,7 +91,6 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        LOG.info("Configure parameters inside Mobfox returned true");
         return true;
     }
 

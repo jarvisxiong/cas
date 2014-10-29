@@ -1,25 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.pubmatic;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -30,6 +10,24 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 
 public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -60,7 +58,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for pubmatic so exiting adapter");
+            LOG.error("mandatory parameters missing for pubmatic so exiting adapter");
+            LOG.info("Configure parameters inside pubmatic returned false");
             return false;
         }
 
@@ -83,14 +82,16 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 return false;
             }
         } else {
-            LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.error("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.info("Configure parameters inside pubmatic returned false");
             return false;
         }
 
         deviceId = getUid();
         if (!"wap".equalsIgnoreCase(sasParams.getSource()) && StringUtils.isBlank(deviceId)) { // deviceid mandatory for
                                                                                                // App traffic
-            LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.error("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.info("Configure parameters inside pubmatic returned false");
             return false;
         }
         if (casInternalRequestParameters.getLatLong() != null) {
@@ -100,7 +101,6 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             }
         }
 
-        LOG.info("Configure parameters inside pubmatic returned true");
         return true;
     }
 
@@ -195,15 +195,13 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 partnerBeacon = adResponse.getString(trackingUrl);
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.debug("Error parsing response from pubmatic : {}", exception);
-                LOG.info("Response from pubmatic NO_AD: {}", response);
+                LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
                 return;
-            } catch (final Exception ex) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from pubmatic : {}", ex);
-                LOG.info("Response from pubmatic: {}", response);
+                LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
                 try {
-                    throw ex;
+                    throw exception;
                 } catch (final Exception e) {
                     LOG.info("Error while rethrowing the exception : {}", e);
                     return;
@@ -218,8 +216,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from pubmatic : {}", exception);
-                LOG.info("Response from pubmatic: {}", response);
+                LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent);

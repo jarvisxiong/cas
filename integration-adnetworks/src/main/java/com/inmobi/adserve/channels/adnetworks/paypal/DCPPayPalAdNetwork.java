@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.paypal;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -24,6 +8,20 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -46,7 +44,8 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for paypal so exiting adapter");
+            LOG.error("mandatory parameters missing for paypal so exiting adapter");
+            LOG.info("Configure parameters inside paypal returned false");
             return false;
         }
         host = config.getString("paypal.host");
@@ -57,13 +56,15 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.debug("mandate parameters missing for paypal, so returning from adapter");
+            LOG.error("mandate parameters missing for paypal, so returning from adapter");
+            LOG.info("Configure parameters inside paypal returned false");
             return false;
         }
         if (sasParams.getOsId() == HandSetOS.Android.getValue() || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             deviceId = getUid();
             if (StringUtils.isBlank(deviceId) || deviceId == null) {
-                LOG.debug("mandate parameters missing for paypal, so returning from adapter");
+                LOG.error("mandate parameters missing for paypal, so returning from adapter");
+                LOG.info("Configure parameters inside paypal returned false");
                 return false;
             }
         }
@@ -73,7 +74,6 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        LOG.info("Configure parameters inside paypal returned true");
         return true;
     }
 
@@ -174,12 +174,10 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from paypal : {}", exception);
-                LOG.info("Response from paypal: {}", response);
+                LOG.error("Error parsing response {} from paypal: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from paypal : {}", exception);
-                LOG.info("Response from paypal: {}", response);
+                LOG.error("Error parsing response {} from paypal: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

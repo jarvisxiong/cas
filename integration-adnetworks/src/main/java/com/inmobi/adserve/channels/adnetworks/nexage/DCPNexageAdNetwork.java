@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -24,6 +9,19 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true
@@ -61,6 +59,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandate parameters missing for nexage, so returning from adapter");
+            LOG.debug("Configure parameters inside nexage returned false");
             return false;
         }
 
@@ -80,8 +79,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             // segment table
             pos = entity.getAdditionalParams().getString(POS);
         } catch (final JSONException e) {
-            LOG.info("pos is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
+            LOG.error("pos is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
                     getName(), e);
+            LOG.debug("Configure parameters inside nexage returned false");
             return false;
         }
 
@@ -92,12 +92,10 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("exception raised while retrieving JS_AD_TAG from additional Params {}", e);
         }
 
-        isApp =
-                StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+        isApp = StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
                         ? false
                         : true;
 
-        LOG.debug("Configure parameters inside nexage returned true");
         return true;
     }
 
@@ -200,7 +198,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(finalUrl.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.info("Error Forming Url inside nexage {}", exception);
+            LOG.error("Error Forming Url inside nexage {}", exception);
         }
         return null;
     }
@@ -223,8 +221,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from nexage : {}", exception);
-                LOG.info("Response from nexage: {}", response);
+                LOG.error("Error parsing response {} from nexage: {}", response, exception);
                 try {
                     throw exception;
                 } catch (final Exception e) {
@@ -253,7 +250,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "AD";
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.info("Error generating Static Js adtag for nexage  : {}", exception);
+            LOG.error("Error generating Static Js adtag for nexage  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());
     }
