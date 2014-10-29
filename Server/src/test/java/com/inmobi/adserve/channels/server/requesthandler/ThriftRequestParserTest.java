@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.replay;
 
 
 public class ThriftRequestParserTest extends TestCase {
+    
     ThriftRequestParser thriftRequestParser;
 
     @Override
