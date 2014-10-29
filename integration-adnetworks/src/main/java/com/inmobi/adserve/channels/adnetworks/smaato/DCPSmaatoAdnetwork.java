@@ -1,22 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.smaato;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -27,6 +10,21 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -96,7 +94,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for smaato so exiting adapter");
+            LOG.error("mandatory parameters missing for smaato so exiting adapter");
+            LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
         host = config.getString("smaato.host");
@@ -109,7 +108,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
             dimension = slotIdMap.get(sasParams.getSlot().intValue());
             if (StringUtils.isBlank(dimension)) {
-                LOG.debug("mandatory parameters missing for smaato so exiting adapter");
+                LOG.error("mandatory parameters missing for smaato so exiting adapter");
+                LOG.info("Configure parameters inside Smaato returned false");
                 return false;
             }
             final Dimension dim = SlotSizeMapping.getDimension(sasParams.getSlot().longValue());
@@ -118,11 +118,11 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         }
         if (StringUtils.isBlank(getUid())) {
-            LOG.debug("mandatory parameters missing for smaato so exiting adapter");
+            LOG.error("mandatory parameters missing for smaato so exiting adapter");
+            LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
 
-        LOG.info("Configure parameters inside Smaato returned true");
         return true;
     }
 
@@ -258,8 +258,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Smaato, exception raised {}", exception);
-                LOG.info("Response from Smaato {}", response);
+                LOG.error("Error parsing response {} from Smaato: {}", response, exception);
             }
         }
     }

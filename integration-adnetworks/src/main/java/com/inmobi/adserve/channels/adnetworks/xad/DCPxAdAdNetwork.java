@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.xad;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -26,6 +10,20 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashSet;
 
 public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPxAdAdNetwork.class);
@@ -59,7 +57,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for xad so exiting adapter");
+            LOG.error("mandatory parameters missing for xad so exiting adapter");
+            LOG.info("Configure parameters inside xad returned false");
             return false;
         }
         host = config.getString("xad.host");
@@ -69,7 +68,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.debug("mandate parameters missing for xAd, so returning from adapter");
+            LOG.error("mandate parameters missing for xAd, so returning from adapter");
+            LOG.info("Configure parameters inside xad returned false");
             return false;
         }
         setDeviceIdandType();
@@ -87,7 +87,6 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
         sourceType =
                 StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource()) ? WEB : APP;
 
-        LOG.info("Configure parameters inside xad returned true");
         return true;
     }
 
@@ -195,8 +194,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from XAd : {}", exception);
-                LOG.info("Response from XAd: {}", response);
+                LOG.error("Error parsing response {} from XAd: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());
