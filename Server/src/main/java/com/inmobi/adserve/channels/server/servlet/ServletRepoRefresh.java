@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.Path;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServer;
@@ -26,6 +8,21 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.phoenix.exception.RepositoryException;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Map;
 
 
 @Singleton
@@ -61,7 +58,11 @@ public class ServletRepoRefresh implements Servlet {
         Boolean foundMatch = true;
 
         try {
-            final ConfigurationLoader config = ConfigurationLoader.getInstance(ChannelServer.getConfigFile());
+            String configFile = ChannelServer.getConfigFile();
+            if (null == configFile) {
+                configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
+            }
+            final ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
             con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
             statement = con.createStatement();
 
