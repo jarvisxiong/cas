@@ -1,49 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.UrlValidator;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.NetworkType;
@@ -70,8 +26,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
 import com.inmobi.casthrift.rtb.AppStore;
@@ -92,6 +48,46 @@ import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.UrlValidator;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generic RTB adapter.
@@ -239,6 +235,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of RTB");
 
         if (!checkIfBasicParamsAvailable()) {
+            LOG.error(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available",
+                    advertiserName);
             return false;
         }
 
@@ -275,6 +273,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         final Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion);
         if (null == impression) {
+            LOG.error(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
+                    advertiserName);
             return false;
         }
         impresssionlist.add(impression);
@@ -370,11 +370,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
         } catch (final TException e) {
             LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}",
+            LOG.error(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}",
                     advertiserName, e);
             return false;
         }
-        LOG.info(traceMarker, "Configure parameters inside rtb returned true");
         return true;
     }
 
@@ -385,7 +384,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.getImpressionId()) {
             impression = new Impression(casInternalRequestParameters.getImpressionId());
         } else {
-            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
+            LOG.error(traceMarker, "Impression id can not be null in casInternal Request Params");
             return null;
         }
 
@@ -429,7 +428,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final NativeAdTemplateEntity templateEntity =
                 repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
         if (templateEntity == null) {
-            LOG.info(traceMarker,
+            LOG.error(traceMarker,
                     String.format("This site id %s doesn't have native template :", sasParams.getSiteId()));
             return null;
         }
@@ -780,7 +779,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                             .getSeat());
         }
         if (null == bidRequest) {
-            LOG.info(traceMarker, "bidrequest is null");
+            LOG.error(traceMarker, "bidrequest is null");
             return url;
         }
         url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
@@ -840,7 +839,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 adStatus = NO_AD;
                 responseContent = "";
                 statusCode = 500;
-                LOG.info(traceMarker, "Error in parsing rtb response");
+                LOG.error(traceMarker, "Error in parsing rtb response");
                 return;
             }
             adStatus = "AD";
@@ -892,7 +891,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.error(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
 
@@ -934,7 +933,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.error(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
     }
@@ -1027,7 +1026,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             return true;
         } catch (final NullPointerException e) {
-            LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(),
+            LOG.error(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(),
                     e);
             return false;
         }
@@ -1075,26 +1074,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean checkRequiredParametersInVideoResponse(final BidExtensions ext) {
         // Validate the adm content for a valid URL/XML.
         if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
-            LOG.info(traceMarker, "Invalid VAST response adm - {}", adm);
+            LOG.error(traceMarker, "Invalid VAST response adm - {}", adm);
             return false;
         }
 
         // Validate supported VAST type.
         if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
-            LOG.info(traceMarker, "Unsupported VAST type - {}", ext.getVideo().getType());
+            LOG.error(traceMarker, "Unsupported VAST type - {}", ext.getVideo().getType());
             return false;
         }
 
         // Validate supported video duration.
         if (ext.getVideo().duration < EXT_VIDEO_MINDURATION || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
-            LOG.info(traceMarker, "VAST response video duration {} should be within {} and {}.", ext.getVideo()
+            LOG.error(traceMarker, "VAST response video duration {} should be within {} and {}.", ext.getVideo()
                     .getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
             return false;
         }
 
         // Validate Linearity
         if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
-            LOG.info(traceMarker, "Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
+            LOG.error(traceMarker, "Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
             return false;
         }
         return true;
@@ -1123,7 +1122,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             try {
                 xmlStr = URIUtil.decode(encodedXmlStr);
             } catch (final URIException e) {
-                LOG.info(traceMarker, "VAST XML response is NOT properly URL encode. {}", e);
+                LOG.error(traceMarker, "VAST XML response is NOT properly URL encode. {}", e);
                 return false;
             }
         } else {

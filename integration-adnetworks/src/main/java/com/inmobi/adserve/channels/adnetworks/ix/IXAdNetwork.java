@@ -1,39 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -56,9 +22,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.ix.AdQuality;
 import com.inmobi.casthrift.ix.App;
@@ -81,6 +47,36 @@ import com.inmobi.casthrift.ix.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -219,6 +215,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of IX");
 
         if (!checkIfBasicParamsAvailable()) {
+            LOG.error(traceMarker, "Configure parameters inside IX returned false {}: BasicParams Not Available",
+                    advertiserName);
             return false;
         }
 
@@ -265,6 +263,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Impression impression =
                 createImpressionObject(banner, displayManager, displayManagerVersion, proxyDemand);
         if (null == impression) {
+            LOG.error(traceMarker, "Configure parameters inside IX returned false {}: Impression Obj is null",
+                    advertiserName);
             return false;
         }
         impresssionlist.add(impression);
@@ -274,7 +274,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidRequest = createBidRequestObject(impresssionlist, site, app, user, device, regs);
 
         if (null == bidRequest) {
-            LOG.debug(traceMarker, "Failed inside createBidRequest");
+            LOG.error(traceMarker, "Configure parameters inside IX returned false {}: Failed inside createBidRequest",
+                    advertiserName);
             return false;
         }
 
@@ -353,14 +354,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (isNativeRequest()) {
                 tempBidRequestJson = tempBidRequestJson.replaceFirst("nativeObject", "native");
             }
-            LOG.info(traceMarker, "IX request json is : {}", tempBidRequestJson);
+            LOG.info(traceMarker, "IX request json is: {}", tempBidRequestJson);
         } catch (final TException e) {
-            LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
+            LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
+            LOG.error(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
                     advertiserName, e);
             return null;
         }
-        LOG.info(traceMarker, "return true");
         return tempBidRequestJson;
     }
 
@@ -397,7 +397,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
              */
             impression = new Impression("1");
         } else {
-            LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
+            LOG.error(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
         }
         if (!isNativeRequest()) {
@@ -797,7 +797,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                             .getSeat());
         }
         if (null == bidRequest) {
-            LOG.info(traceMarker, "bidrequest is null");
+            LOG.error(traceMarker, "bidrequest is null");
             return url;
         }
         url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
@@ -865,7 +865,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 adStatus = "NO_AD";
                 responseContent = "";
                 statusCode = 500;
-                LOG.info(traceMarker, "Error in parsing ix response");
+                LOG.error(traceMarker, "Error in parsing ix response");
                 return;
             }
             adStatus = "AD";
@@ -1039,7 +1039,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.error(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
                     advertiserName, e);
         }
 
@@ -1131,7 +1131,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             return result;
         } catch (final NullPointerException e) {
-            LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(), e);
+            LOG.error(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(), e);
             return false;
         }
     }
