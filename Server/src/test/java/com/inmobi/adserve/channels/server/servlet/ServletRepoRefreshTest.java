@@ -49,9 +49,7 @@ import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.powermock.api.easymock.PowerMock.replay;
 import static org.powermock.api.easymock.PowerMock.replayAll;
-import static org.powermock.api.easymock.PowerMock.verifyAll;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,
@@ -131,12 +129,12 @@ public class ServletRepoRefreshTest {
     }
 
     private static void prepareMockConfigurationLoader() {
-        mockStatic(ChannelServer.class);
+        ChannelServer.setConfigFile(null);
+
         mockConfigLoader = createMock(ConfigurationLoader.class);
         final Configuration mockServerConfig = createMock(Configuration.class);
         mockStatic(ConfigurationLoader.class);
 
-        expect(ChannelServer.getConfigFile()).andReturn(null).anyTimes();
         expect(ConfigurationLoader.getInstance(null)).andReturn(mockConfigLoader).anyTimes();
         expect(mockConfigLoader.getRtbConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getLoggerConfiguration()).andReturn(null).anyTimes();
@@ -178,7 +176,6 @@ public class ServletRepoRefreshTest {
                 mockServerConfig).anyTimes();
         expect(mockServerConfig.getString(ChannelServerStringLiterals.QUERY)).andReturn(LAST_UPDATE).anyTimes();
         replayAll();
-        replay(ChannelServer.class);
     }
 
     private static void prepareMockDriverManager() throws SQLException {
@@ -287,7 +284,6 @@ public class ServletRepoRefreshTest {
             final ServletRepoRefresh servlet = new ServletRepoRefresh();
             servlet.handleRequest(httpRequestHandler, mockQueryStringDecoder, mockChannel);
         }
-        verifyAll();
     }
 
     @Test
