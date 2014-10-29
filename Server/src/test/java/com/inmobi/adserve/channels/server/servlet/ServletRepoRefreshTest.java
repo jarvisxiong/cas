@@ -1,33 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.createNiceMock;
-import static org.powermock.api.easymock.PowerMock.expectLastCall;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.powermock.api.easymock.PowerMock.replayAll;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.configuration.Configuration;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -51,6 +23,33 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.phoenix.exception.RepositoryException;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.apache.commons.configuration.Configuration;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.easymock.EasyMock.expect;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
+import static org.powermock.api.easymock.PowerMock.expectLastCall;
+import static org.powermock.api.easymock.PowerMock.mockStatic;
+import static org.powermock.api.easymock.PowerMock.replayAll;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,
@@ -130,15 +129,13 @@ public class ServletRepoRefreshTest {
     }
 
     private static void prepareMockConfigurationLoader() {
-        final String configFile = "/opt/mkhoj/conf/cas/channel-server.properties";
-
         mockStatic(ChannelServer.class);
         mockConfigLoader = createMock(ConfigurationLoader.class);
         final Configuration mockServerConfig = createMock(Configuration.class);
         mockStatic(ConfigurationLoader.class);
 
-        expect(ChannelServer.getConfigFile()).andReturn(configFile).anyTimes();
-        expect(ConfigurationLoader.getInstance(configFile)).andReturn(mockConfigLoader).anyTimes();
+        expect(ChannelServer.getConfigFile()).andReturn(null).anyTimes();
+        expect(ConfigurationLoader.getInstance(null)).andReturn(mockConfigLoader).anyTimes();
         expect(mockConfigLoader.getRtbConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getLoggerConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getServerConfiguration()).andReturn(mockServerConfig).anyTimes();
