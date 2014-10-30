@@ -30,16 +30,14 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
-
+    private static final String IDFA = "idfa";
+    private static final String ANDROID_ID = "androidid";
+    private static final String SITEID = "pubsiteid";
     private transient String latitude;
     private transient String longitude;
     private int width;
     private int height;
     private boolean isapp;
-    private static final String IDFA = "idfa";
-    private static final String ANDROID_ID = "androidid";
-    private static final String SITEID = "pubsiteid";
-
 
     /**
      * @param config

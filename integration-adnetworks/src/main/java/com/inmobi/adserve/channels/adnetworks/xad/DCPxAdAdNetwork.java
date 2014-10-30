@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.xad;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -26,19 +10,24 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashSet;
 
 public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPxAdAdNetwork.class);
 
-    private String latitude = null;
-    private String longitude = null;
-    private int width;
-    private int height;
-    private String deviceId;
-    private String deviceIdType;
-    private String sourceType;
-    private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
-    private boolean isLocSourceDerived;
     private static final String APP_ID_FORMAT = "%s_%s"; // <blinded_id>_<category>
     private static final String UUID_MD5 = "UUID|MD5";
     private static final String UUID_SHA1 = "UUID|SHA1";
@@ -49,6 +38,16 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String WEB = "web";
 
     private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
+    private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
+
+    private String latitude = null;
+    private String longitude = null;
+    private int width;
+    private int height;
+    private String deviceId;
+    private String deviceIdType;
+    private String sourceType;
+    private boolean isLocSourceDerived;
 
     public DCPxAdAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {

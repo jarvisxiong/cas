@@ -39,8 +39,9 @@ public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevel
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
         final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
         final boolean isRtbPartner = advertiserIdConfigMap.get(advertiserId).isRtb();
+        final boolean isIxPartner = advertiserIdConfigMap.get(advertiserId).isIx();
         boolean result = false;
-        if (isRtbPartner) {
+        if (isRtbPartner || isIxPartner) {
             result =
                     channelSegment.getChannelFeedbackEntity().getBalance() < serverConfiguration
                             .getRtbBalanceFilterAmount();

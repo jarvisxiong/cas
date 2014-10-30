@@ -1,22 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TDeserializer;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
@@ -33,11 +16,29 @@ import com.inmobi.casthrift.DataCenter;
 import com.inmobi.casthrift.Feedback;
 import com.inmobi.casthrift.SiteFeedback;
 import com.inmobi.phoenix.exception.InitializationException;
+import org.apache.commons.configuration.Configuration;
+import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 // Assumptions:
 // siteId is never null
 
 public class SiteAerospikeFeedbackRepository {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SiteAerospikeFeedbackRepository.class);
 
     private AerospikeClient aerospikeClient;
     private Policy policy;
@@ -52,7 +53,6 @@ public class SiteAerospikeFeedbackRepository {
     private int feedbackTimeFrame;
     private int boostTimeFrame;
     private double defaultECPM;
-    private static final Logger LOG = LoggerFactory.getLogger(SiteAerospikeFeedbackRepository.class);
 
     public void init(final Configuration config, final DataCenter colo) throws InitializationException {
         if (null == config || null == colo) {

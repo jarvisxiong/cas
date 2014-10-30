@@ -1,16 +1,5 @@
 package com.inmobi.adserve.channels.server.module;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
-
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -32,6 +21,16 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -40,14 +39,14 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl
  */
 public class ChannelSegmentFilterModule extends AbstractModule {
 
-    private final Reflections reflections;
-
     private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
         @Override
         public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
             return o1.getOrder().getValue() - o2.getOrder().getValue();
         }
     };
+
+    private final Reflections reflections;
 
     public ChannelSegmentFilterModule() {
         final ConfigurationBuilder configurationBuilder =
@@ -102,6 +101,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Provides
     List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
         final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserDetailsInvalidFilter.class));
         advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
         return advertiserLevelFilterList;
     }

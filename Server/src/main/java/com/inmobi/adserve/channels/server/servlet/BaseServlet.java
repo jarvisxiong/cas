@@ -1,17 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -37,22 +25,35 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public abstract class BaseServlet implements Servlet {
+
+    static List<String> nativeSites = new ArrayList<String>(Arrays.asList("69d6ab27d03f407f9f6fa9c5fad77afd",
+            "31588012724c4e8ea477c88d7d2b2e15", "495362deeca64c52bd14e2108d34b4c2", "7a2b63166a0f47bb98e3269c16e76fcd",
+            "55b798bd8f1c4de5b89823fbacf419bc"));
+
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
 
-    private final MatchSegments matchSegments;
     protected final Provider<Marker> traceMarkerProvider;
+
+    private final MatchSegments matchSegments;
     private final ChannelSegmentFilterApplier channelSegmentFilterApplier;
     private final CasUtils casUtils;
     private final RequestFilters requestFilters;
     private final AsyncRequestMaker asyncRequestMaker;
     private final List<AdvertiserLevelFilter> advertiserLevelFilters;
     private final List<AdGroupLevelFilter> adGroupLevelFilters;
-    static List<String> nativeSites = new ArrayList<String>(Arrays.asList("69d6ab27d03f407f9f6fa9c5fad77afd",
-            "31588012724c4e8ea477c88d7d2b2e15", "495362deeca64c52bd14e2108d34b4c2", "7a2b63166a0f47bb98e3269c16e76fcd",
-            "55b798bd8f1c4de5b89823fbacf419bc"));
 
     BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
             final ChannelSegmentFilterApplier channelSegmentFilterApplier, final CasUtils casUtils,

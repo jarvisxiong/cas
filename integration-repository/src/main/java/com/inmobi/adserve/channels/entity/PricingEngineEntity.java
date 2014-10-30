@@ -1,29 +1,27 @@
 package com.inmobi.adserve.channels.entity;
 
-import java.util.Map;
-import java.util.Set;
-
+import com.inmobi.adserve.channels.query.PricingEngineQuery;
+import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Data;
 import lombok.Setter;
 
-import com.inmobi.adserve.channels.query.PricingEngineQuery;
-import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
+import java.util.Map;
+import java.util.Set;
 
 
 @Data
 public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuery> {
 
+    public static final byte[][] DEFAULT_SUPPLY_DEMAND_MAPPING = { {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},};
     private static final long serialVersionUID = 1L;
     private final Integer countryId;
     private final Integer osId;
     private final double rtbFloor;
     private final double dcpFloor;
     private final Map<String, Set<String>> supplyToDemandMap;
-
-    public static final byte[][] DEFAULT_SUPPLY_DEMAND_MAPPING = { {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-            {1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-            {1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},};
 
     public PricingEngineEntity(final Builder builder) {
         countryId = builder.countryId;
