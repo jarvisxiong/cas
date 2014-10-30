@@ -67,6 +67,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     // get URI
     @Override
     public URI getRequestUri() throws Exception {
+    	//af,c.gender for gen
         final StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountryCode().toLowerCase())
                 .append("&dma=").append(sasParams.getState());
@@ -92,6 +93,11 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&did.ai.md5=").append(casInternalRequestParameters.getUidMd5());
             finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.getUidO1());
         }
+        String gpid = getGPID();
+        if(null != gpid){
+        	finalUrl.append("&did.adid=").append(gpid);
+        }
+        
 
         finalUrl.append("&did=").append(casInternalRequestParameters.getUid());
 
