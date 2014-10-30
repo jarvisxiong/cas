@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.verve;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -23,17 +8,24 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPVerveAdNetwork.class);
 
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-    private String portalKeyword;
-    private String adUnit;
     private static final String IPHONE_KEYWORD = "iphn";
     private static final String ANDROID_KEYWORD = "anap";
     private static final String WAP_KEYWORD = "ptnr";
@@ -43,6 +35,13 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String MMA = "mma";
     private static final String BANNER = "banner";
     private static final String INTER = "inter";
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String portalKeyword;
+    private String adUnit;
+
     private boolean sendTrueLatLongOnly;
 
     public DCPVerveAdNetwork(final Configuration config, final Bootstrap clientBootstrap,

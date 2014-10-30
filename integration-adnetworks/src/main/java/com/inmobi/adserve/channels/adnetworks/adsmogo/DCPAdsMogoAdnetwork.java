@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.adsmogo;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URLDecoder;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -25,20 +9,24 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URLDecoder;
 
 public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPAdsMogoAdnetwork.class);
-
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-
-    private String os = null;
-    private String authSignature = null;
-    private final String authKey;
-    private final String authSecret;
     private static final String SIGNATURE_HEADER = "MOGO_API_SIGNATURE";
     private static final String AUTHKEY_HEADER = "MOGO_API_AUTHKEY";
     private static final String APPID = "aid";
@@ -59,6 +47,17 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_AGE = "AGE";
     private static final String INTERSTITIAL = "interstitial";
     private static final String BANNER = "banner";
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+
+    private String os = null;
+    private String authSignature = null;
+    private final String authKey;
+    private final String authSecret;
+
 
     private boolean isApp;
 

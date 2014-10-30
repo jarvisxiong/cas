@@ -39,6 +39,8 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
 
     private static final String NO_AD = "NO_AD";
+    private static Map<Long, Integer> categoryMap = new HashMap<Long, Integer>();
+    private static Map<Integer, Integer> carrierIdMap;
     private transient String key;
     private transient String secretKey;
     private transient String latitude;
@@ -49,8 +51,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
     private int siteType;
     private String uuid;
 
-    private static Map<Long, Integer> categoryMap = new HashMap<Long, Integer>();
-    private static Map<Integer, Integer> carrierIdMap;
+
     static {
         carrierIdMap = new HashMap<Integer, Integer>();
         // carrier ip map

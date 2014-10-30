@@ -30,13 +30,16 @@ import com.inmobi.template.formatter.TemplateParser;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 
 public class NativeResponseMaker {
-    private final static Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
-    private final TemplateParser templateParser;
-    private final TemplateDecorator templateDecorator;
+
+    private static final Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
     private static final String ERROR_STR = "%s can't be null.";
-    private Gson gson = null;
+
     @Inject
     RepositoryHelper repositoryHepler = null;
+
+    private final TemplateParser templateParser;
+    private final TemplateDecorator templateDecorator;
+    private Gson gson = null;
 
     @Inject
     public NativeResponseMaker(final TemplateParser parser, final TemplateConfiguration tc) throws TemplateException {

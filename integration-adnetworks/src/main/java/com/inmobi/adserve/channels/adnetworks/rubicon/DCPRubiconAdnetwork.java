@@ -36,10 +36,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPRubiconAdnetwork.class);
 
-    private String latitude;
-    private String longitude;
-    private String zoneId;
-    private String siteId;
 
     private static final String APP_BUNDLE = "app.bundle";
     private static final String SITE_ID = "site_id";
@@ -91,14 +87,20 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
     private static final String SITE_FLOOR_KEF_FORMAT = "%s_%d";
 
+    private static Map<String, Double> siteFloorMap;
+    private static Map<Short, Integer> slotIdMap;
+
+    private String latitude;
+    private String longitude;
+    private String zoneId;
+    private String siteId;
+
     private final String userName;
     private final String password;
     private final double ECPM_PERCENTAGE;
 
     private boolean isApp;
 
-    private static Map<String, Double> siteFloorMap;
-    private static Map<Short, Integer> slotIdMap;
     static {
         slotIdMap = new HashMap<Short, Integer>();
         slotIdMap.put((short) 4, 44);

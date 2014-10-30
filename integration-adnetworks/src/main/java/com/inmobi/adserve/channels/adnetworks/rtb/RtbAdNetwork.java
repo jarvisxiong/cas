@@ -1,49 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.UrlValidator;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.NetworkType;
@@ -70,8 +26,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
 import com.inmobi.casthrift.rtb.AppStore;
@@ -92,6 +48,46 @@ import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.UrlValidator;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generic RTB adapter.
@@ -100,7 +96,65 @@ import com.ning.http.client.RequestBuilder;
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
 
-    private final static Logger LOG = LoggerFactory.getLogger(RtbAdNetwork.class);
+    public static ImpressionCallbackHelper impressionCallbackHelper;
+
+    protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
+
+    @Getter
+    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
+            "RUB"));
+    @Getter
+    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
+            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+
+    private static final Logger LOG = LoggerFactory.getLogger(RtbAdNetwork.class);
+    private static final int AUCTION_TYPE = 2;
+    private static final String X_OPENRTB_VERSION = "x-openrtb-version";
+    private static final String CONTENT_TYPE = "application/json";
+    private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
+    private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+    private static List<String> image_mimes = Arrays.asList("image/jpeg", "image/gif", "image/png");
+    private static List<Integer> fsBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16);
+    private static List<Integer> performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+            13, 14, 15, 16);
+    private static List<Integer> videoBlockedAttributes = Arrays.asList(7, 8, 9, 10, 14);
+    private static List<Integer> videoBlockCreativeType = Arrays.asList(4); // iframe
+
+    private static final String FAMILY_SAFE_RATING = "1";
+    private static final String PERFORMANCE_RATING = "0";
+    private static final String RATING_KEY = "fs";
+    private static final String NO_AD = "NO_AD";
+    private static final String USD = "USD";
+
+    private static final List<String> VIDEO_MIMES = Arrays.asList("video/mp4");
+    private static final int EXT_VIDEO_LINEARITY = 1; // only linear ads
+    private static final int EXT_VIDEO_MINDURATION = 15; // in secs.
+    private static final int EXT_VIDEO_MAXDURATION = 30; // in secs.
+    private static final List<String> EXT_VIDEO_TYPE = Arrays.asList("VAST 2.0", "VAST 3.0", "VAST 2.0 Wrapper",
+            "VAST 3.0 Wrapper");
+
+    @Inject
+    private static AsyncHttpClientProvider asyncHttpClientProvider;
+
+    @Inject
+    private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
+
+    @Inject
+    private static NativeBuilderFactory nativeBuilderfactory;
+
+    @Inject
+    private static NativeResponseMaker nativeResponseMaker;
+
+
+    private static final String NATIVE_STRING = "native";
+
+    @Getter
+    @Setter
+    BidRequest bidRequest;
+
+    @Getter
+    @Setter
+    BidResponse bidResponse;
 
     @Getter
     @Setter
@@ -121,22 +175,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInUsd;
     @Setter
     private double bidPriceInLocal;
-    @Getter
-    @Setter
-    BidRequest bidRequest;
-    @Getter
-    @Setter
-    BidResponse bidResponse;
+
     private final boolean wnRequired;
-    private static final int AUCTION_TYPE = 2;
     private int tmax = 200;
     private boolean templateWN = true;
-    private static final String X_OPENRTB_VERSION = "x-openrtb-version";
-    private static final String CONTENT_TYPE = "application/json";
-    private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
-    private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+
     private final String advertiserId;
-    public static ImpressionCallbackHelper impressionCallbackHelper;
     private final IABCategoriesInterface iabCategoriesInterface;
     private final IABCountriesInterface iabCountriesInterface;
     private final boolean siteBlinded;
@@ -144,19 +188,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private double secondBidPriceInUsd = 0;
     private double secondBidPriceInLocal = 0;
     private String bidRequestJson = "";
-    protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     private String encryptedBid;
-    private static List<String> image_mimes = Arrays.asList("image/jpeg", "image/gif", "image/png");
-    private static List<Integer> fsBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16);
-    private static List<Integer> performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-            13, 14, 15, 16);
-    private static List<Integer> videoBlockedAttributes = Arrays.asList(7, 8, 9, 10, 14);
-    private static List<Integer> videoBlockCreativeType = Arrays.asList(4); // iframe
 
-    private static final String FAMILY_SAFE_RATING = "1";
-    private static final String PERFORMANCE_RATING = "0";
-    private static final String RATING_KEY = "fs";
-    private static final String NO_AD = "NO_AD";
     private String responseSeatId;
     private String responseImpressionId;
     private String responseAuctionId;
@@ -168,37 +201,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String adm;
     private final RepositoryHelper repositoryHelper;
     private String bidderCurrency = "USD";
-    private static final String USD = "USD";
     private final List<String> blockedAdvertisers = Lists.newArrayList();
 
-    private static final List<String> VIDEO_MIMES = Arrays.asList("video/mp4");
-    private static final int EXT_VIDEO_LINEARITY = 1; // only linear ads
-    private static final int EXT_VIDEO_MINDURATION = 15; // in secs.
-    private static final int EXT_VIDEO_MAXDURATION = 30; // in secs.
-    private static final List<String> EXT_VIDEO_TYPE = Arrays.asList("VAST 2.0", "VAST 3.0", "VAST 2.0 Wrapper",
-            "VAST 3.0 Wrapper");
-
-    @Getter
-    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
-            "RUB"));
-    @Getter
-    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
-            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
-
-    @Inject
-    private static AsyncHttpClientProvider asyncHttpClientProvider;
-
-    @Inject
-    private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
-
-    @Inject
-    private static NativeBuilderFactory nativeBuilderfactory;
-
-    @Inject
-    private static NativeResponseMaker nativeResponseMaker;
-
-
-    private static final String NATIVE_STRING = "native";
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {

@@ -1,5 +1,12 @@
 package com.inmobi.adserve.channels.server;
 
+import com.google.inject.Inject;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.servlet.ServletIXFill;
+import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DemandSourceType;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -13,36 +20,33 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.google.inject.Inject;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.servlet.ServletIXFill;
-import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.casthrift.DemandSourceType;
-
 /**
  * @author abhishek.parwal
  * @author rajashekhar.c
  */
 public class CasTimeoutHandler extends ChannelDuplexHandler {
 
+    private static ScheduledExecutorService executor;
+
+    @Inject
+    private static Map<String, Servlet> pathToServletMap;
+
+    static {
+        executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+    }
+
     private volatile long timeoutInMillis;
     private final long timeoutMillisForRTB;
     private final long timeoutMillisForDCP;
     private volatile long lastReadTime;
     private volatile ScheduledFuture<?> timeout;
-    private static ScheduledExecutorService executor;
-    static {
-        executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-    }
+
     
     private volatile int dst;
 
     private DemandSourceType demandSourceType;
 
-    @Inject
-    private static Map<String, Servlet> pathToServletMap;
+
 
     public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForDCP) {
         this.timeoutMillisForRTB = timeoutMillisForRTB;

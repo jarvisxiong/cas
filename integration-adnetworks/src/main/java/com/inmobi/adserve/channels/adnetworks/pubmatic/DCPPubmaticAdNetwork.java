@@ -1,25 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.pubmatic;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -30,22 +10,40 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 
 public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPPubmaticAdNetwork.class);
 
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static String creativeTag = "creative_tag";
+    private static String trackingUrl = "tracking_url";
+    private static String pubMaticBid = "PubMatic_Bid";
+    private static IABCountriesInterface iABCountries;
     private transient String pubId;
     private String latlong = null;
     private int width;
     private int height;
     private String deviceId;
     private String adId;
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static String creativeTag = "creative_tag";
-    private static String trackingUrl = "tracking_url";
-    private static String pubMaticBid = "PubMatic_Bid";
-    private static IABCountriesInterface iABCountries;
 
     static {
         iABCountries = new IABCountriesMap();
