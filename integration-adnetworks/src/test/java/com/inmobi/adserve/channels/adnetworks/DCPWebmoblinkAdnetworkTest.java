@@ -18,9 +18,7 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import com.inmobi.adserve.channels.adnetworks.smaato.DCPSmaatoAdnetwork;
 import com.inmobi.adserve.channels.adnetworks.webmoblink.DCPWebmoblinkAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
