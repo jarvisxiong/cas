@@ -174,10 +174,10 @@ public class ServletRepoRefresh implements Servlet {
                 hrh.responseSender.sendResponse("OK", serverChannel);
             }
         } catch (final SQLException e1) {
-            LOG.error("error is {}", e1);
+            LOG.info("error is {}", e1);
             hrh.responseSender.sendResponse("NOTOK", serverChannel);
         } catch (final RepositoryException e2) {
-            LOG.error("error is {}", e2);
+            LOG.info("error is {}", e2);
             hrh.responseSender.sendResponse("NOTOK", serverChannel);
         } finally {
             if (null != statement) {

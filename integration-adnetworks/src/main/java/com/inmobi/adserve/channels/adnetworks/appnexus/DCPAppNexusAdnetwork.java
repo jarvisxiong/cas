@@ -200,7 +200,6 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from {}: {}", response, name, exception);
-
             }
         }
     }

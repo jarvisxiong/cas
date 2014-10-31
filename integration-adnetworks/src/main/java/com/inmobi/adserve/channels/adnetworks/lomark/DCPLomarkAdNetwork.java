@@ -129,13 +129,13 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 || sasParams.getOsId() == HandSetOS.Windows_RT.getValue()) {
             client = 3;
         } else {
-            LOG.error("Lomark: Device OS - Unsupported OS");
+            LOG.debug("Lomark: Device OS - Unsupported OS");
             LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
         // filter non udid app traffic for Lomark
         if (client < 3 && StringUtils.isBlank(uuid)) {
-            LOG.error("Lomark: Udid - mandatory paramter for app - missing");
+            LOG.debug("Lomark: Udid - mandatory paramter for app - missing");
             LOG.info("Configure parameters inside lomark returned false");
             return false;
         }

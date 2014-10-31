@@ -16,7 +16,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.Calendar;
 

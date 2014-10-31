@@ -68,7 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -357,7 +357,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "IX request json is: {}", tempBidRequestJson);
         } catch (final TException e) {
             LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
-            LOG.error(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
                     advertiserName, e);
             return null;
         }

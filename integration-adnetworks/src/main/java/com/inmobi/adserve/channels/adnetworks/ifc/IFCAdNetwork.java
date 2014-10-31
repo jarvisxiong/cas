@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.List;
 
@@ -97,13 +97,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
             } catch (final JSONException e) {
-                LOG.info("IFC Configure Parameter returning false as mandatory parameter handset is missing");
+                LOG.info("IFC Configure Parameter returning false as mandatory param: handset is missing");
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
             } catch (final JSONException e) {
-                LOG.info("IFC Configure Parameter returning false as mandatory parameter carrier is missing");
+                LOG.info("IFC Configure Parameter returning false as mandatory param: carrier is missing");
                 return false;
             }
 
@@ -167,7 +167,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
         } else {
-            LOG.info("IFC Configure Parameter returning false as mandatory parameter SiteName is missing");
+            LOG.info("IFC Configure Parameter returning false as mandatory param: SiteName is missing");
             return false;
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
@@ -175,11 +175,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
         } else {
-            LOG.info("IFC Configure Parameter returning false  as mandatory parameter Slot is missing");
+            LOG.info("IFC Configure Parameter returning false as mandatory param: Slot is missing");
             return false;
         }
         if (null == beaconUrl) {
-            LOG.info("IFC Configure Parameter returning false as mandatory parameter BeaconURL is missing");
+            LOG.info("IFC Configure Parameter returning false as mandatory param: BeaconURL is missing");
             return false;
         }
         return true;
