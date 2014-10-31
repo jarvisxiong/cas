@@ -137,7 +137,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -174,10 +174,10 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from paypal: {}", response, exception);
+                LOG.info("Error parsing response {} from paypal: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from paypal: {}", response, exception);
+                LOG.info("Error parsing response {} from paypal: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

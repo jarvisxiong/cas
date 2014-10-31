@@ -200,7 +200,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(finalUrl.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("Error Forming Url inside nexage {}", exception);
+            LOG.info("Error Forming Url inside nexage {}", exception);
         }
         return null;
     }
@@ -223,7 +223,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from nexage: {}", response, exception);
+                LOG.info("Error parsing response {} from nexage: {}", response, exception);
             }
             adStatus = "AD";
         }
@@ -247,7 +247,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "AD";
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.error("Error generating Static Js adtag for nexage  : {}", exception);
+            LOG.info("Error generating Static Js adtag for nexage  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());
     }

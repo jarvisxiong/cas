@@ -160,7 +160,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from baidu: {}", response, exception);
+                LOG.info("Error parsing response {} from baidu: {}", response, exception);
                 return;
             }
             adStatus = "AD";

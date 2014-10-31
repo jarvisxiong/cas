@@ -115,7 +115,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(finalUrl.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("Error Forming Url inside openx {}", exception);
+            LOG.info("Error Forming Url inside openx {}", exception);
         }
         return null;
     }
@@ -139,7 +139,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from openx: {}", response, exception);
+                LOG.info("Error parsing response {} from openx: {}", response, exception);
             }
             adStatus = "AD";
         }

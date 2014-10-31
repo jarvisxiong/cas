@@ -245,7 +245,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                     // Other format.
                     // adType is "video" or "empty".
                     adStatus = "NO_AD";
-                    LOG.error("Error parsing response {} from Marimedia", response);
+                    LOG.info("Error parsing response {} from Marimedia", response);
                     return;
                 }
 
@@ -266,7 +266,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from Marimedia: {}", response, exception);
+                LOG.info("Error parsing response {} from Marimedia: {}", response, exception);
             }
         }
     }

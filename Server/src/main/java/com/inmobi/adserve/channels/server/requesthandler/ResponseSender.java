@@ -193,7 +193,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 finalResponse = AD_IMAI_START_TAG + finalResponse;
             }
         } else {
-            LOG.error("invalid slot, so not returning response, even though we got an ad");
+            LOG.info("invalid slot, so not returning response, even though we got an ad");
             InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 finalResponse = NO_AD_XHTML;
@@ -412,7 +412,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 }
 
             } catch (InmobiSecureException | InvalidMessageException e) {
-                LOG.error("Exception while encrypting response from {}", e);
+                LOG.info("Exception while encrypting response from {}", e);
                 throw new RuntimeException(e);
             }
 

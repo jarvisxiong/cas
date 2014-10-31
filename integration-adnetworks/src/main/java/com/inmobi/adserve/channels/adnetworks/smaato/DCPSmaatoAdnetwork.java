@@ -260,7 +260,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from Smaato: {}", response, exception);
+                LOG.info("Error parsing response {} from Smaato: {}", response, exception);
             }
         }
     }

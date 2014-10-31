@@ -99,7 +99,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -190,7 +190,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug(requestBody);
             return requestBody;
         } catch (final JsonProcessingException e) {
-            LOG.error("{}", e);
+            LOG.info("{}", e);
         }
         return null;
 
@@ -283,7 +283,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             statusCode = 200;
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.error("Error parsing response {} from Wapstart: {}", response, exception);
+            LOG.info("Error parsing response {} from Wapstart: {}", response, exception);
             return;
         }
         LOG.debug("response length is {}", responseContent.length());

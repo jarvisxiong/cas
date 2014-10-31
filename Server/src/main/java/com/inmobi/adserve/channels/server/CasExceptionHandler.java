@@ -80,7 +80,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
                 InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
                 LOG.debug(traceMarker, "Channel is terminated {}", ctx.channel());
             }
-            LOG.error(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
+            LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
             responseSender.sendNoAdResponse(ctx.channel());
         }
 

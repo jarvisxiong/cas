@@ -123,7 +123,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             }
 
         } catch (final JSONException e) {
-            LOG.error("Error while forming request object, exception raised {}", e);
+            LOG.info("Error while forming request object, exception raised {}", e);
         }
         LOG.debug("Mable request {}", request);
         return request.toString();
@@ -137,7 +137,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -181,7 +181,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from Mable: {}", response, exception);
+                LOG.info("Error parsing response {} from Mable: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

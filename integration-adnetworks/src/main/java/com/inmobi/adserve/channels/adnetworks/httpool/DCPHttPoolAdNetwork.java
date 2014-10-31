@@ -185,10 +185,10 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from httpool: {}", response, exception);
+                LOG.info("Error parsing response {} from httpool: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from httpool: {}", response, exception);
+                LOG.info("Error parsing response {} from httpool: {}", response, exception);
             }
         }
 

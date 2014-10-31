@@ -196,11 +196,11 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 partnerBeacon = adResponse.getString(trackingUrl);
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
+                LOG.info("Error parsing response {} from pubmatic: {}", response, exception);
                 return;
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
+                LOG.info("Error parsing response {} from pubmatic: {}", response, exception);
                 return;
             }
 
@@ -212,7 +212,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
+                LOG.info("Error parsing response {} from pubmatic: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent);

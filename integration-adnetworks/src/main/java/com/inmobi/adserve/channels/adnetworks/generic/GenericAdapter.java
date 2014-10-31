@@ -110,7 +110,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return new URI(finalUrl);
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error(traceMarker, "Error Forming Url inside {} {}", advertiserName, exception);
+            LOG.info(traceMarker, "Error Forming Url inside {} {}", advertiserName, exception);
         }
         return null;
     }

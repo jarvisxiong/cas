@@ -220,7 +220,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
                 statusCode = 200;
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from AdsMogo: {}", response, exception);
+                LOG.info("Error parsing response {} from AdsMogo: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());
