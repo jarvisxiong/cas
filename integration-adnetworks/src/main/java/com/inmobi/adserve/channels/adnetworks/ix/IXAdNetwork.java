@@ -461,7 +461,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
 
         } catch (final JSONException exception) {
-            LOG.error("Unable to get zone_id for Rubicon, exception thrown {}", exception);
+            LOG.info("Unable to get zone_id for Rubicon, exception thrown {}", exception);
         }
         return categoryZoneId;
     }
@@ -803,7 +803,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                             .getSeat());
         }
         if (null == bidRequest) {
-            LOG.error(traceMarker, "bidrequest is null");
+            LOG.info(traceMarker, "bidrequest is null");
             return url;
         }
         url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
@@ -871,7 +871,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 adStatus = "NO_AD";
                 responseContent = "";
                 statusCode = 500;
-                LOG.error(traceMarker, "Error in parsing ix response");
+                LOG.info(traceMarker, "Error in parsing ix response");
                 return;
             }
             adStatus = "AD";
@@ -908,14 +908,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
 
         if (StringUtils.isEmpty(DSPAccountId)) {
-            LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
+            LOG.info("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
             return false;
         }
 
         // Get collection of Channel Segment Entities for the particular Inmobi account id
         final ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
         if (null == channelAdGroupRepository) {
-            LOG.error("Channel AdGroup Repository is null.");
+            LOG.debug("Channel AdGroup Repository is null.");
             return false;
         }
 
@@ -1045,7 +1045,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
-            LOG.error(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
                     advertiserName, e);
         }
 
@@ -1108,15 +1108,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             bidResponse = gson.fromJson(response, IXBidResponse.class);
             LOG.debug(traceMarker, "Done with parsing of bidresponse");
             if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
-                LOG.error("BidResponse does not have seat bid object");
+                LOG.info("BidResponse does not have seat bid object");
+                return false;
+            }
+            final SeatBid seatBid = bidResponse.getSeatbid().get(0);
+            if (null == seatBid.getBid() || seatBid.getBidSize() == 0) {
+                LOG.info("Seat bid object does not have bid object");
                 return false;
             }
             // bidderCurrency is to USD by default
-            final SeatBid seatBid = bidResponse.getSeatbid().get(0);
-            if (null == seatBid.getBid() || seatBid.getBidSize() == 0) {
-                LOG.error("Seat bid object does not have bid object");
-                return false;
-            }
             setBidPriceInLocal(seatBid.getBid().get(0).getPrice());
             setBidPriceInUsd(getBidPriceInLocal());
             responseSeatId = seatBid.getSeat();

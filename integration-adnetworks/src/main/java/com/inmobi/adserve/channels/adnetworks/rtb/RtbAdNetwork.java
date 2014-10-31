@@ -379,7 +379,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
         } catch (final TException e) {
             LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.error(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}",
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}",
                     advertiserName, e);
             return false;
         }
@@ -393,7 +393,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.getImpressionId()) {
             impression = new Impression(casInternalRequestParameters.getImpressionId());
         } else {
-            LOG.error(traceMarker, "Impression id can not be null in casInternal Request Params");
+            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
             return null;
         }
 
@@ -437,7 +437,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final NativeAdTemplateEntity templateEntity =
                 repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
         if (templateEntity == null) {
-            LOG.error(traceMarker,
+            LOG.info(traceMarker,
                     String.format("This site id %s doesn't have native template :", sasParams.getSiteId()));
             return null;
         }
@@ -788,7 +788,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                             .getSeat());
         }
         if (null == bidRequest) {
-            LOG.error(traceMarker, "bidrequest is null");
+            LOG.info(traceMarker, "bidrequest is null");
             return url;
         }
         url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
@@ -848,7 +848,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 adStatus = NO_AD;
                 responseContent = "";
                 statusCode = 500;
-                LOG.error(traceMarker, "Error in parsing rtb response");
+                LOG.info(traceMarker, "Error in parsing rtb response");
                 return;
             }
             adStatus = "AD";
@@ -900,7 +900,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
-            LOG.error(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
 
@@ -942,7 +942,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
-            LOG.error(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
         }
     }
@@ -996,9 +996,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             adStatus = NO_AD;
             responseContent = "";
-            LOG.error(
-                    "Some exception is caught while filling the native template for partner {}, advertiser = {}, exception = {}",
-                    e.getLocalizedMessage(), advertiserName, e);
+            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, exception = {}",
+                    sasParams.getSiteId(), advertiserName, e);
         }
 
     }
@@ -1035,7 +1034,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             return true;
         } catch (final NullPointerException e) {
-            LOG.error(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(),
+            LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(),
                     e);
             return false;
         }
@@ -1083,26 +1082,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean checkRequiredParametersInVideoResponse(final BidExtensions ext) {
         // Validate the adm content for a valid URL/XML.
         if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
-            LOG.error(traceMarker, "Invalid VAST response adm - {}", adm);
+            LOG.info(traceMarker, "Invalid VAST response adm - {}", adm);
             return false;
         }
 
         // Validate supported VAST type.
         if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
-            LOG.error(traceMarker, "Unsupported VAST type - {}", ext.getVideo().getType());
+            LOG.info(traceMarker, "Unsupported VAST type - {}", ext.getVideo().getType());
             return false;
         }
 
         // Validate supported video duration.
         if (ext.getVideo().duration < EXT_VIDEO_MINDURATION || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
-            LOG.error(traceMarker, "VAST response video duration {} should be within {} and {}.", ext.getVideo()
+            LOG.info(traceMarker, "VAST response video duration {} should be within {} and {}.", ext.getVideo()
                     .getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
             return false;
         }
 
         // Validate Linearity
         if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
-            LOG.error(traceMarker, "Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
+            LOG.info(traceMarker, "Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
             return false;
         }
         return true;
@@ -1131,7 +1130,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             try {
                 xmlStr = URIUtil.decode(encodedXmlStr);
             } catch (final URIException e) {
-                LOG.error(traceMarker, "VAST XML response is NOT properly URL encode. {}", e);
+                LOG.info(traceMarker, "VAST XML response is NOT properly URL encode. {}", e);
                 return false;
             }
         } else {
