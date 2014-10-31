@@ -88,7 +88,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
                 final JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
             } catch (final JSONException e) {
-                logger.error("wrong json in site_json in channel repo", e);
+                logger.info("wrong json in site_json in channel repo", e);
             }
         }
         return mode;
@@ -104,7 +104,7 @@ public class ChannelRepository extends AbstractStatsMaintainingDBRepository<Chan
                     sitesIE.add(sites.getString(i));
                 }
             } catch (final JSONException e) {
-                logger.error("wrong json in site_json in channel repo", e);
+                logger.info("wrong json in site_json in channel repo", e);
             }
         }
         return sitesIE;

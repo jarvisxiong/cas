@@ -75,7 +75,7 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;

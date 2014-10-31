@@ -27,7 +27,7 @@ public class ChannelSegmentAdvertiserCache {
             return Collections.emptySet();
         }
         if (entities.isEmpty()) {
-            logger.error("No entries found in the database for the advertiser Id: " + advertiserId);
+            logger.info("No entries found in the database for the advertiser Id: " + advertiserId);
         }
         return entities.values();
     }

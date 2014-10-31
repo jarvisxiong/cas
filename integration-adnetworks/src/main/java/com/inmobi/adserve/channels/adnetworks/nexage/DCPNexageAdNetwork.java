@@ -19,7 +19,7 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -79,7 +79,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             // segment table
             pos = entity.getAdditionalParams().getString(POS);
         } catch (final JSONException e) {
-            LOG.error("pos is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
+            LOG.debug("POS is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
                     getName(), e);
             LOG.info("Configure parameters inside nexage returned false");
             return false;

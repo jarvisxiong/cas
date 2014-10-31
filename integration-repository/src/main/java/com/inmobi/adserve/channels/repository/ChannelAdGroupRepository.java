@@ -166,7 +166,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             try {
                 return new JSONObject(additionalParams);
             } catch (final JSONException e) {
-                logger.error("Error in parsing additional params json, exception raised " + e);
+                logger.info("Error in parsing additional params json, exception raised " + e);
             }
         }
         return new JSONObject();
@@ -216,7 +216,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 final JSONObject jObject = new JSONObject(sIEJson);
                 mode = "inclusion".equals(jObject.getString("mode"));
             } catch (final JSONException e) {
-                logger.error("wrong json in site_json in channel repo" + e);
+                logger.info("wrong json in site_json in channel repo" + e);
             }
         }
         return mode;
@@ -232,7 +232,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                     sitesIE.add(sites.getString(i));
                 }
             } catch (final JSONException e) {
-                logger.error("wrong json in site_json in channel repo" + e);
+                logger.info("wrong json in site_json in channel repo" + e);
             }
         }
         return sitesIE;
