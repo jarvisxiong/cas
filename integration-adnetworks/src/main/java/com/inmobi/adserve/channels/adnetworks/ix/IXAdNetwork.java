@@ -215,7 +215,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of IX");
 
         if (!checkIfBasicParamsAvailable()) {
-            LOG.error(traceMarker, "Configure parameters inside IX returned false {}: BasicParams Not Available",
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}: BasicParams Not Available",
                     advertiserName);
             return false;
         }
@@ -263,7 +263,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Impression impression =
                 createImpressionObject(banner, displayManager, displayManagerVersion, proxyDemand);
         if (null == impression) {
-            LOG.error(traceMarker, "Configure parameters inside IX returned false {}: Impression Obj is null",
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Impression Obj is null",
                     advertiserName);
             return false;
         }
@@ -274,7 +274,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidRequest = createBidRequestObject(impresssionlist, site, app, user, device, regs);
 
         if (null == bidRequest) {
-            LOG.error(traceMarker, "Configure parameters inside IX returned false {}: Failed inside createBidRequest",
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Failed inside createBidRequest",
                     advertiserName);
             return false;
         }
@@ -397,7 +397,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
              */
             impression = new Impression("1");
         } else {
-            LOG.error(traceMarker, "Impression id can not be null in Cas Internal Request Params");
+            LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
         }
         if (!isNativeRequest()) {

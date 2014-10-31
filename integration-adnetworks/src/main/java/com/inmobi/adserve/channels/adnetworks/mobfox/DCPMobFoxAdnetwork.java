@@ -1,28 +1,25 @@
 package com.inmobi.adserve.channels.adnetworks.mobfox;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.*;
+import java.net.URI;
 
 
 public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -74,7 +71,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for mobfox so exiting adapter");
+            LOG.debug("mandatory parameters missing for mobfox so exiting adapter");
             LOG.info("Configure parameters inside Mobfox returned false");
             return false;
         }
@@ -183,8 +180,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Mobfox, Exception raised {}", exception);
-                LOG.info("Response from Mobfox {}", response);
+                LOG.error("Error parsing response {} from Mobfox: {}", response, exception);
             }
         }
     }

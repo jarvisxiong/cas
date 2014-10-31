@@ -53,7 +53,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for wapstart so exiting adapter");
+            LOG.debug("mandatory parameters missing for wapstart so exiting adapter");
             LOG.info("Configure parameters inside wapstart returned false");
             return false;
         }
@@ -64,7 +64,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.error("mandate parameters missing for WapStart, so returning from adapter");
+            LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
             LOG.info("Configure parameters inside wapstart returned false");
             return false;
         }
@@ -79,7 +79,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
         udid = getUid();
         if (StringUtils.isBlank(udid)) {
-            LOG.error("Udid mandatory for Wapstart");
+            LOG.debug("Udid mandatory for Wapstart");
             LOG.info("Configure parameters inside wapstart returned false");
             return false;
         }

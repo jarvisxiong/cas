@@ -57,7 +57,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for xad so exiting adapter");
+            LOG.debug("mandatory parameters missing for xad so exiting adapter");
             LOG.info("Configure parameters inside xad returned false");
             return false;
         }
@@ -68,7 +68,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.error("mandate parameters missing for xAd, so returning from adapter");
+            LOG.debug("mandate parameters missing for xAd, so returning from adapter");
             LOG.info("Configure parameters inside xad returned false");
             return false;
         }

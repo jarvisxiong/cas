@@ -169,11 +169,6 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from tapit: {}", response, exception);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.error("Error while rethrowing the exception : {}", e);
-                }
             }
         }
         LOG.debug("response length is {}", responseContent.length());

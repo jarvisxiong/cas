@@ -432,11 +432,11 @@ public class ChannelServer {
             Transport.send(message);
         } catch (final MessagingException mex) {
             // logger.info("Error while sending mail");
-            logger.info("MessagingException raised while sending mail " + mex);
+            logger.error("MessagingException raised while sending mail " + mex);
             // mex.printStackTrace();
         } catch (final UnknownHostException ex) {
             // logger.debug("could not resolve host inside send mail");
-            logger.info("UnknownException raised while sending mail " + ex);
+            logger.error("UnknownException raised while sending mail " + ex);
             // ex.printStackTrace();
         }
     }

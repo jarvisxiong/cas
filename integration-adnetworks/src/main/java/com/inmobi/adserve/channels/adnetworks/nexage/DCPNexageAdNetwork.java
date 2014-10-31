@@ -59,7 +59,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandate parameters missing for nexage, so returning from adapter");
-            LOG.debug("Configure parameters inside nexage returned false");
+            LOG.info("Configure parameters inside nexage returned false");
             return false;
         }
 
@@ -81,7 +81,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         } catch (final JSONException e) {
             LOG.error("pos is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
                     getName(), e);
-            LOG.debug("Configure parameters inside nexage returned false");
+            LOG.info("Configure parameters inside nexage returned false");
             return false;
         }
 
@@ -222,11 +222,6 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from nexage: {}", response, exception);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
             }
             adStatus = "AD";
         }

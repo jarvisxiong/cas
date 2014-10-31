@@ -291,7 +291,7 @@ public class Logging {
                     final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
                     msg = new Message(tSerializer.serialize(creativeLog));
                 } catch (final TException e) {
-                    LOG.debug("Error while creating creative logs for databus, raised exception {}", e);
+                    LOG.error("Error while creating creative logs for databus, raised exception {}", e);
                 }
                 if (null != msg) {
                     dataBusPublisher.publish(umpAdsLogKey, msg);

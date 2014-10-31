@@ -58,7 +58,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for pubmatic so exiting adapter");
+            LOG.debug("mandatory parameters missing for pubmatic so exiting adapter");
             LOG.info("Configure parameters inside pubmatic returned false");
             return false;
         }
@@ -77,12 +77,13 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adId = additionalParams.getString(sasParams.getSlot().toString());
 
             } catch (final Exception e) {
-                LOG.error("AdId is not configured for the segment:{}, exception raised {}",
+                LOG.debug("AdId is not configured for the segment:{}, exception raised {}",
                         entity.getExternalSiteKey(), e);
+                LOG.info("Configure parameters inside pubmatic returned false");
                 return false;
             }
         } else {
-            LOG.error("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             LOG.info("Configure parameters inside pubmatic returned false");
             return false;
         }
@@ -90,7 +91,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         deviceId = getUid();
         if (!"wap".equalsIgnoreCase(sasParams.getSource()) && StringUtils.isBlank(deviceId)) { // deviceid mandatory for
                                                                                                // App traffic
-            LOG.error("mandate parameters missing for pubmatic, so returning from adapter");
+            LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
             LOG.info("Configure parameters inside pubmatic returned false");
             return false;
         }
@@ -200,12 +201,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from pubmatic: {}", response, exception);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                    return;
-                }
+                return;
             }
 
             final VelocityContext context = new VelocityContext();

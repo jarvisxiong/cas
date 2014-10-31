@@ -44,7 +44,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for paypal so exiting adapter");
+            LOG.debug("mandatory parameters missing for paypal so exiting adapter");
             LOG.info("Configure parameters inside paypal returned false");
             return false;
         }
@@ -56,14 +56,14 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.error("mandate parameters missing for paypal, so returning from adapter");
+            LOG.debug("mandate parameters missing for paypal, so returning from adapter");
             LOG.info("Configure parameters inside paypal returned false");
             return false;
         }
         if (sasParams.getOsId() == HandSetOS.Android.getValue() || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             deviceId = getUid();
             if (StringUtils.isBlank(deviceId) || deviceId == null) {
-                LOG.error("mandate parameters missing for paypal, so returning from adapter");
+                LOG.debug("mandate parameters missing for paypal, so returning from adapter");
                 LOG.info("Configure parameters inside paypal returned false");
                 return false;
             }

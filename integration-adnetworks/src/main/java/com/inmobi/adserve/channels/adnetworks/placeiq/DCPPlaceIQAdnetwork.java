@@ -115,7 +115,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
             LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
@@ -136,7 +136,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
             LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
@@ -146,7 +146,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             isApp = true;
             if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
                     && StringUtils.isEmpty(casInternalRequestParameters.getUid())) {
-                LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
                 LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
@@ -155,7 +155,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             isApp = true;
             if (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())
                     && StringUtils.isEmpty(casInternalRequestParameters.getUidIDUS1())) {
-                LOG.error("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
                 LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
@@ -284,8 +284,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from PlaceIQ : {}", exception);
-                LOG.info("Response from PlaceIQ: {}", response);
+                LOG.error("Error parsing response {} from PlaceIQ: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

@@ -56,7 +56,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for huntmads so exiting adapter");
+            LOG.debug("mandatory parameters missing for huntmads so exiting adapter");
             LOG.info("Configure parameters inside huntmads returned false");
             return false;
         }
@@ -243,17 +243,10 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from huntmads : {}", exception);
-                LOG.info("Response from huntmads: {}", response);
+                LOG.error("Error parsing response {} from huntmads: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from huntmads : {}", exception);
-                LOG.info("Response from huntmads: {}", response);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.error("Error parsing response {} from huntmads: {}", response, exception);
             }
         }
 

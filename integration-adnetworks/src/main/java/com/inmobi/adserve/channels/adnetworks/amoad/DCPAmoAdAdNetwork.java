@@ -65,7 +65,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
         final String tag = slotTagMap.get(sasParams.getSlot());
         if (StringUtils.isEmpty(tag)) {
-            LOG.error("Tag is not configured for this slot: {}", sasParams.getSlot());
+            LOG.info("Tag is not configured for this slot: {}", sasParams.getSlot());
             adStatus = "NO_AD";
             return;
         }
@@ -76,7 +76,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "AD";
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.error("Error generating Static Js adtag for AmoAd: {}", exception);
+            LOG.info("Error generating Static Js adtag for AmoAd  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());
     }

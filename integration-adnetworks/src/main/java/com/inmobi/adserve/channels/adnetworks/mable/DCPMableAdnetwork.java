@@ -54,7 +54,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for Mable so exiting adapter");
+            LOG.debug("mandatory parameters missing for Mable so exiting adapter");
             LOG.info("Configure parameters inside Mable returned false");
             return false;
         }
@@ -64,7 +64,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {
-            LOG.error("mandate parameters missing for Mable, so returning from adapter");
+            LOG.debug("mandate parameters missing for Mable, so returning from adapter");
             LOG.info("Configure parameters inside Mable returned false");
             return false;
         }
@@ -158,8 +158,8 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                         .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                         .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
-        LOG.info("Mable request: {}", ningRequest);
-        LOG.info("Mable request Body: {}", requestParams);
+        LOG.debug("Mable request: {}", ningRequest);
+        LOG.debug("Mable request Body: {}", requestParams);
         return ningRequest;
     }
 
@@ -181,8 +181,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response from Mable : {}", exception);
-                LOG.error("Response from Mable: {}", response);
+                LOG.error("Error parsing response {} from Mable: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

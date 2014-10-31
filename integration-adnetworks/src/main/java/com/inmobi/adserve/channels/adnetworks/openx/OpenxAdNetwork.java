@@ -134,11 +134,6 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.error("Error parsing response {} from openx: {}", response, exception);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
             }
             adStatus = "AD";
         }

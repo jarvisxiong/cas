@@ -296,7 +296,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.DESCRIPTION, displayInfo.getString("subtitle"));
                     final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
-                        LOG.error("No template found for the slot");
+                        LOG.info("No template found for the slot");
                         adStatus = NO_AD;
                         return;
                     } else {
@@ -359,7 +359,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 return 4;
             }
         } catch (final Exception e) {
-            LOG.error("Cannot map carrier Id for Lomark, exception raised {}", e);
+            LOG.info("Cannot map carrier Id for Lomark, exception raised {}", e);
         }
         return 4;
     }

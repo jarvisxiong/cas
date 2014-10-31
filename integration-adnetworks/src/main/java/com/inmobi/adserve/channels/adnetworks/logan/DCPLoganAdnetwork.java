@@ -57,7 +57,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for logan so exiting adapter");
+            LOG.debug("mandatory parameters missing for logan so exiting adapter");
             LOG.info("Configure parameters inside logan returned false");
             return false;
         }

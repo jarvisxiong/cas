@@ -235,7 +235,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of RTB");
 
         if (!checkIfBasicParamsAvailable()) {
-            LOG.error(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available",
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available",
                     advertiserName);
             return false;
         }
@@ -273,7 +273,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         final Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion);
         if (null == impression) {
-            LOG.error(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
                     advertiserName);
             return false;
         }

@@ -43,9 +43,9 @@ public class ChannelServerHelper {
                 return hostId;
             }
         } catch (final NumberFormatException e) {
-            LOG.info("NumberFormatException in getHostId, exception raised {}", e);
+            LOG.error("NumberFormatException in getHostId, exception raised {}", e);
         } catch (final StringIndexOutOfBoundsException e) {
-            LOG.info("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
+            LOG.error("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
         }
 
         LOG.debug("hostid is {}", hostId);

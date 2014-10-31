@@ -93,7 +93,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "AD";
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.error("Error generating Static Js adtag for GoogleAdX  : {}", exception);
+            LOG.info("Error generating Static Js adtag for GoogleAdX  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());
     }

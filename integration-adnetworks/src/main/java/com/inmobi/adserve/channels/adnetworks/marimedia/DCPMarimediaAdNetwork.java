@@ -69,7 +69,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
         // Check User Agent.
         if (StringUtils.isBlank(sasParams.getUserAgent())) {
-            LOG.error("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         }
@@ -77,21 +77,21 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         // Check App ID.
         // i.e. Check externalSiteId.
         if (StringUtils.isBlank(externalSiteId)) {
-            LOG.error("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         }
 
         // Check IP Address.
         if (StringUtils.isBlank(sasParams.getRemoteHostIp())) {
-            LOG.error("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         }
 
         // Check Resolution.
         if (null == sasParams.getSlot() || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
-            LOG.error("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         } else {
@@ -245,8 +245,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                     // Other format.
                     // adType is "video" or "empty".
                     adStatus = "NO_AD";
-                    LOG.info("Error parsing response from Marimedia");
-                    LOG.info("Response from Marimedia {}", response);
+                    LOG.error("Error parsing response {} from Marimedia", response);
                     return;
                 }
 
@@ -267,8 +266,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Marimedia, exception {}", exception);
-                LOG.info("Response from Marimedia {}", response);
+                LOG.error("Error parsing response {} from Marimedia: {}", response, exception);
             }
         }
     }

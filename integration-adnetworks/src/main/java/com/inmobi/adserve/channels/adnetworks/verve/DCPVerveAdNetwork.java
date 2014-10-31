@@ -52,7 +52,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.error("mandatory parameters missing for verve so exiting adapter");
+            LOG.debug("mandatory parameters missing for verve so exiting adapter");
             LOG.info("Configure parameters inside verve returned false");
             return false;
         }
@@ -64,7 +64,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             sendTrueLatLongOnly = Boolean.parseBoolean(entity.getAdditionalParams().getString(TRUE_LAT_LONG_ONLY));
         } catch (final JSONException e) {
             sendTrueLatLongOnly = false;
-            LOG.error("trueLatLong is not configured for the segment:{} {}, exception raised {}",
+            LOG.info("trueLatLong is not configured for the segment:{} {}, exception raised {}",
                     entity.getExternalSiteKey(), getName(), e);
         }
 
@@ -111,14 +111,12 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         } else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
             if (StringUtils.isBlank(sasParams.getSdkVersion())
                     || sasParams.getSdkVersion().toLowerCase().startsWith("a35")) {
-                LOG.info("Blocking traffic for 3.5.* android version");
-                LOG.info("Configure parameters inside verve returned false");
+                LOG.info("Configure parameters inside verve returned false as Android Version is 3.5.*");
                 return false;
             }
             portalKeyword = ANDROID_KEYWORD;
         } else {
-            LOG.info("param source {}", sasParams.getSource());
-            LOG.info("Configure parameters inside verve returned false");
+            LOG.info("Configure parameters inside verve returned false as unsupported source: {}", sasParams.getSource());
             return false;
         }
 
