@@ -30,11 +30,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPPlaceIQAdnetwork.class);
 
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-    private String os = null;
     private static final String SIZE_FORMAT = "%dx%d";
 
     private static final String LAT = "LT";
@@ -70,6 +65,13 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private final String requestFormat;
     private final String responseFormat;
     private static Map<Integer, String> categoryList = new HashMap<Integer, String>();
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String os = null;
+
 
     private boolean isApp;
 

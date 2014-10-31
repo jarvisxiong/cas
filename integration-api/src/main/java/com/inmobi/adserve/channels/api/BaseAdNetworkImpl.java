@@ -54,55 +54,9 @@ import com.ning.http.client.Response;
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
-
-    protected ChannelFuture future;
-    protected Bootstrap clientBootstrap;
-    protected HttpRequest request;
-    protected long startTime;
-    public volatile boolean isRequestComplete = false;
-    protected int statusCode;
-    @Getter
-    protected String responseContent;
-    private Map responseHeaders;
-    private long latency;
-    private long connectionLatency;
-    @Getter
-    protected String adStatus = "NO_AD";
-    protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
-
-    protected boolean isHTMLResponseSupported = true;
-    protected boolean isNativeResponseSupported = false;
-    protected boolean isBannerVideoResponseSupported = false;
-    protected boolean isVideoResponseReceived = false;
-
-    protected SASRequestParameters sasParams;
-    protected CasInternalRequestParameters casInternalRequestParameters;
-    protected HttpRequestHandlerBase baseRequestHandler = null;
-    protected String requestUrl = "";
-    private ThirdPartyAdResponse responseStruct;
-    private boolean isRtbPartner = false;
-    private boolean isIxPartner = false;
-    protected ChannelSegmentEntity entity;
     protected static Marker traceMarker;
-
-    protected String externalSiteId;
-    protected String host;
-    protected String impressionId;
-    protected String clickUrl;
-    protected String beaconUrl;
-    protected String source;
-    protected String blindedSiteId;
-    protected Short slot;
-    private static final String DEFAULT_EMPTY_STRING = "";
-    protected String format = "UTF-8";
-    private String adapterName;
-
-    protected final Channel serverChannel;
     protected static String SITE_RATING_PERFORMANCE = "PERFORMANCE";
     protected static final String WAP = "WAP";
-    private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
-
     protected static final String UA = "ua";
     protected static final String IP = "ip";
     protected static final String LAT = "lat";
@@ -111,21 +65,63 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String ZIP = "zip";
     protected static final String COUNTRY = "country";
     protected static final String GENDER = "gender";
-
-    @Inject
-    private static AsyncHttpClientProvider asyncHttpClientProvider;
-
     @Inject
     protected static JaxbHelper jaxbHelper;
 
     @Inject
     protected static DocumentBuilderHelper documentBuilderHelper;
 
+    private static final Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
+    private static final String DEFAULT_EMPTY_STRING = "";
+    private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
+
+    @Inject
+    private static AsyncHttpClientProvider asyncHttpClientProvider;
+
     @Inject
     private static NettyRequestScope scope;
 
     @Inject
     private static Provider<Marker> traceMarkerProvider;
+
+    public volatile boolean isRequestComplete = false;
+    protected ChannelFuture future;
+    protected Bootstrap clientBootstrap;
+    protected HttpRequest request;
+    protected long startTime;
+    protected int statusCode;
+    @Getter
+    protected String responseContent;
+    @Getter
+    protected String adStatus = "NO_AD";
+    protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
+    protected boolean isHTMLResponseSupported = true;
+    protected boolean isNativeResponseSupported = false;
+    protected boolean isBannerVideoResponseSupported = false;
+    protected boolean isVideoResponseReceived = false;
+    protected SASRequestParameters sasParams;
+    protected CasInternalRequestParameters casInternalRequestParameters;
+    protected HttpRequestHandlerBase baseRequestHandler = null;
+    protected String requestUrl = "";
+    protected ChannelSegmentEntity entity;
+    protected String externalSiteId;
+    protected String host;
+    protected String impressionId;
+    protected String clickUrl;
+    protected String beaconUrl;
+    protected String source;
+    protected String blindedSiteId;
+    protected Short slot;
+    protected String format = "UTF-8";
+    protected final Channel serverChannel;
+
+    private Map responseHeaders;
+    private long latency;
+    private long connectionLatency;
+    private ThirdPartyAdResponse responseStruct;
+    private boolean isRtbPartner = false;
+    private boolean isIxPartner = false;
+    private String adapterName;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;

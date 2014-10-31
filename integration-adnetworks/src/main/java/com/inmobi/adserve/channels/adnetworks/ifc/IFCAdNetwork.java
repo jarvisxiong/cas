@@ -34,6 +34,9 @@ import java.util.List;
 public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(IFCAdNetwork.class);
+    private static final String SUPPY_SOURCE = "DCP";
+
+    HttpRequest httpRequest;
 
     private String requestId;
     private String deviceOsId; // Mandatory Param
@@ -52,9 +55,6 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     private Boolean richMedia;
     private String adcode;
 
-    HttpRequest httpRequest;
-
-    private static final String SUPPY_SOURCE = "DCP";
     private final String ifcURL;
 
     private String adGroupID;

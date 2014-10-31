@@ -29,13 +29,12 @@ import java.util.Map;
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DCPSmaatoAdnetwork.class);
+    protected static final String LATLONG = "gps";
+    protected static final String GENDER = "gender";
+    protected static final String KEYWORDS = "kws";
+    protected static final String AGE = "age";
 
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-    private String dimension;
+    private static final Logger LOG = LoggerFactory.getLogger(DCPSmaatoAdnetwork.class);
 
     private static final String PUBID = "pub";
     private static final String UA = "device";
@@ -48,10 +47,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID = "androidid";
     private static final String ODIN1 = "odin";
     // private static final String VERSION = "apiver";
-    protected static final String LATLONG = "gps";
-    protected static final String GENDER = "gender";
-    protected static final String KEYWORDS = "kws";
-    protected static final String AGE = "age";
+
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
     private static final String FORMAT = "format";
@@ -65,9 +61,15 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String RESPONSE_FORMAT = "all";
     private static final String STRICT_FIELD = "true";
     private static final String LAT_LONG_FORMAT = "%s,%s";
+    private static Map<Integer, String> slotIdMap;
+
     private final String publisherId;
 
-    private static Map<Integer, String> slotIdMap;
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String dimension;
 
     static {
         slotIdMap = new HashMap<Integer, String>();

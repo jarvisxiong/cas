@@ -23,14 +23,6 @@ import java.util.Calendar;
 
 public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPBaiduAdNetwork.class);
-
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-    private String uid;
-    private String os;
-
     private static final String APP_ID = "appid";
     private static final String WIDTH = "w";
     private static final String HEIGHT = "h";
@@ -49,6 +41,14 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String IOS = "iOS";
     private static final String SYMBIAN = "symbian";
     private static final String WEB = "web";
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String uid;
+    private String os;
+
 
     public DCPBaiduAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {

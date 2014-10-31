@@ -10,10 +10,9 @@ import java.util.Set;
 
 public class IABCategoriesMap implements IABCategoriesInterface {
 
-    private static HashMap<Long, String[]> categoriesToIABMapping = new HashMap<Long, String[]>();
-
     public static final Long FAMILY_SAFE_BLOCK_CATEGORIES = 10000L;
     public static final Long PERFORMANCE_BLOCK_CATEGORIES = 10001L;
+    private static HashMap<Long, String[]> categoriesToIABMapping = new HashMap<Long, String[]>();
 
     static {
         categoriesToIABMapping.put(1L, new String[] {"IAB24"});

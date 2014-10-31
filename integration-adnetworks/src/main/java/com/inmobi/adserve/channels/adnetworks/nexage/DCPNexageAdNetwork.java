@@ -29,20 +29,22 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     // success.i
     private static final Logger LOG = LoggerFactory.getLogger(DCPNexageAdNetwork.class);
 
-    private int height = 0;
-    private int width = 0;
-    private static IABCountriesInterface iABCountries;
-    private String pos;
-    protected boolean jsAdTag = false;
-    private boolean isGeo = false;
-    private boolean isApp = false;
-
     private static final String POS = "pos";
     private static final String JS_AD_TAG = "jsAdTag";
     private static final String DCN = "DCN";
     private static final String LAT_LONG = "LatLong";
     private static final String CATEGORY = "CATEGORY";
     private static final String BLINDED_SITE_ID = "BlindedSiteId";
+    private static IABCountriesInterface iABCountries;
+
+    protected boolean jsAdTag = false;
+    private int height = 0;
+    private int width = 0;
+    private String pos;
+    private boolean isGeo = false;
+    private boolean isApp = false;
+
+
 
     static {
         iABCountries = new IABCountriesMap();

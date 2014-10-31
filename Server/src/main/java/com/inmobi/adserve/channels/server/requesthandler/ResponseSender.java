@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,19 +86,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final int PRIVATE_AUCTION = 3;
     private static final int PREFERRED_DEAL = 4;
 
+    public SASRequestParameters sasParams;
+    public CasInternalRequestParameters casInternalRequestParameters;
+
     private long totalTime;
     private List<ChannelSegment> rankList;
     private ThirdPartyAdResponse adResponse;
     private boolean responseSent;
-    public SASRequestParameters sasParams;
     private int rankIndexToProcess;
     private int selectedAdIndex;
     private boolean requestCleaned;
-    public CasInternalRequestParameters casInternalRequestParameters;
     private final AuctionEngine auctionEngine;
     private final Object lock = new Object();
     private String terminationReason;
-
     private final long initialTime;
     private Marker traceMarker;
 

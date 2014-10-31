@@ -27,16 +27,6 @@ import java.net.URLDecoder;
 public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPAdsMogoAdnetwork.class);
-
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-
-    private String os = null;
-    private String authSignature = null;
-    private final String authKey;
-    private final String authSecret;
     private static final String SIGNATURE_HEADER = "MOGO_API_SIGNATURE";
     private static final String AUTHKEY_HEADER = "MOGO_API_AUTHKEY";
     private static final String APPID = "aid";
@@ -57,6 +47,17 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_AGE = "AGE";
     private static final String INTERSTITIAL = "interstitial";
     private static final String BANNER = "banner";
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+
+    private String os = null;
+    private String authSignature = null;
+    private final String authKey;
+    private final String authSecret;
+
 
     private boolean isApp;
 

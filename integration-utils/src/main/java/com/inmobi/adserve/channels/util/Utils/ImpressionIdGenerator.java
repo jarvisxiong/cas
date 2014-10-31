@@ -1,8 +1,8 @@
 package com.inmobi.adserve.channels.util.Utils;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by ishanbhatnagar on 16/9/14.
@@ -10,10 +10,14 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 public class ImpressionIdGenerator {
     private static final AtomicInteger COUNTER = new AtomicInteger();
+    private static ImpressionIdGenerator instance = null;
     private final short hostIdCode;
     private final byte dataCenterIdCode;
-    private static ImpressionIdGenerator instance = null;
 
+    private ImpressionIdGenerator(final short hostIdCode, final byte dataCenterIdCode) {
+        this.hostIdCode = hostIdCode;
+        this.dataCenterIdCode = dataCenterIdCode;
+    }
 
     public static ImpressionIdGenerator getInstance() {
         if (null == instance) {
@@ -21,7 +25,6 @@ public class ImpressionIdGenerator {
         }
         return instance;
     }
-
 
     public static void init(final short hostIdCode, final byte dataCenterIdCode) {
         if (instance == null) {
@@ -32,13 +35,6 @@ public class ImpressionIdGenerator {
             }
         }
     }
-
-
-    private ImpressionIdGenerator(final short hostIdCode, final byte dataCenterIdCode) {
-        this.hostIdCode = hostIdCode;
-        this.dataCenterIdCode = dataCenterIdCode;
-    }
-
 
     public String getImpressionId(final long adId) {
         final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId).toString();

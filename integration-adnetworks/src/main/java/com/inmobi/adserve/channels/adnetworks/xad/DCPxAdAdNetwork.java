@@ -28,15 +28,6 @@ import java.util.HashSet;
 public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPxAdAdNetwork.class);
 
-    private String latitude = null;
-    private String longitude = null;
-    private int width;
-    private int height;
-    private String deviceId;
-    private String deviceIdType;
-    private String sourceType;
-    private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
-    private boolean isLocSourceDerived;
     private static final String APP_ID_FORMAT = "%s_%s"; // <blinded_id>_<category>
     private static final String UUID_MD5 = "UUID|MD5";
     private static final String UUID_SHA1 = "UUID|SHA1";
@@ -47,6 +38,16 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String WEB = "web";
 
     private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
+    private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
+
+    private String latitude = null;
+    private String longitude = null;
+    private int width;
+    private int height;
+    private String deviceId;
+    private String deviceIdType;
+    private String sourceType;
+    private boolean isLocSourceDerived;
 
     public DCPxAdAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {

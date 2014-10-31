@@ -74,6 +74,11 @@ import java.util.Properties;
  * "/opt/mkhoj/conf/cas/channel-server.properties"
  */
 public class ChannelServer {
+
+    public static byte dataCenterIdCode;
+    public static short hostIdCode;
+    public static String dataCentreName;
+
     private static Logger logger;
     private static ChannelAdGroupRepository channelAdGroupRepository;
     private static ChannelRepository channelRepository;
@@ -90,12 +95,11 @@ public class ChannelServer {
     private static IXAccountMapRepository ixAccountMapRepository;
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
+    @Getter
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     @Getter
     private static String configFile;
-    public static byte dataCenterIdCode;
-    public static short hostIdCode;
-    public static String dataCentreName;
+
 
     public static void main(final String[] args) throws Exception {
         configFile = System.getProperty("configFile", DEFAULT_CONFIG_FILE);

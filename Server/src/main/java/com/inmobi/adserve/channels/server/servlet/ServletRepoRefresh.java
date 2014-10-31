@@ -58,7 +58,11 @@ public class ServletRepoRefresh implements Servlet {
         Boolean foundMatch = true;
 
         try {
-            final ConfigurationLoader config = ConfigurationLoader.getInstance(ChannelServer.getConfigFile());
+            String configFile = ChannelServer.getConfigFile();
+            if (null == configFile) {
+                configFile = ChannelServer.getDEFAULT_CONFIG_FILE();
+            }
+            final ConfigurationLoader config = ConfigurationLoader.getInstance(configFile);
             con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
             statement = con.createStatement();
 

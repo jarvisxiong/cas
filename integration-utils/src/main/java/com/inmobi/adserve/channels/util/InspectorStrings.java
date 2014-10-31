@@ -2,10 +2,6 @@ package com.inmobi.adserve.channels.util;
 
 public class InspectorStrings {
 
-    private InspectorStrings() {
-        // dummy private constructor to avoid instantiation from other classes
-    }
-
     public static final String TOTAL_REQUESTS = "TotalRequests";
     public static final String RULE_ENGINE_REQUESTS = "RuleEngineRequests";
     public static final String BACK_FILL_REQUESTS = "BackFillRequests";
@@ -89,4 +85,8 @@ public class InspectorStrings {
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
     public static final String INVALID_DSP_ID = "DroppedDueToInvalidDspId";
+
+    private InspectorStrings() {
+        // dummy private constructor to avoid instantiation from other classes
+    }
 }

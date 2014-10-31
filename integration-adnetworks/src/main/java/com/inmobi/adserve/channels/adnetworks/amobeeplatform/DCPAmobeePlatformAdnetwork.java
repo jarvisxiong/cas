@@ -1,19 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.amobeeplatform;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -23,17 +9,23 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPAmobeePlatformAdnetwork.class);
 
-    private int width;
-    private int height;
-    private String latitude;
-    private String longitude;
-    private int client = 0;
-    private String name;
     private static final String EXT_SITE_KEY = "as";
     private static final String IP_ADDR = "i";
     private static final String DEVICE_ID = "uid";
@@ -51,7 +43,12 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String COUNTRY_CODE = "co";
     private static final String ZIP_CODE = "zip";
     private static final String NEGATIVE_KEYWORD = "nk";
-
+    private int width;
+    private int height;
+    private String latitude;
+    private String longitude;
+    private int client = 0;
+    private String name;
 
     /**
      * @param config

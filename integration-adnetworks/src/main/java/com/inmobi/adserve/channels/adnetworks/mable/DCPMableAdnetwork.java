@@ -30,6 +30,11 @@ import java.net.URISyntaxException;
 
 public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPMableAdnetwork.class);
+    private static final String SIZE_FORMAT = "%dx%d";
+    private static final String UDID_FORMAT = "UDID";
+    private static final String ODIN_FORMAT = "ODIN1";
+    private static final String SODIN1_FORMAT = "SODIN1";
+    private static final String IFA_FORMAT = "IFA";
 
     private int width;
     private int height;
@@ -37,11 +42,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     private String longitude;
     private final String authKey;
     private String uidType = null;
-    private static final String SIZE_FORMAT = "%dx%d";
-    private static final String UDID_FORMAT = "UDID";
-    private static final String ODIN_FORMAT = "ODIN1";
-    private static final String SODIN1_FORMAT = "SODIN1";
-    private static final String IFA_FORMAT = "IFA";
 
     public DCPMableAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {

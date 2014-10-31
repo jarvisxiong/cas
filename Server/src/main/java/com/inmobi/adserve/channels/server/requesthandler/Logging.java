@@ -48,25 +48,28 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Logging {
-    private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
 
+    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
+            new ConcurrentHashMap<String, String>(2000);
+
+
+    private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
     private static String sampledAdvertisementLogKey;
     private static String umpAdsLogKey;
     private static boolean enableFileLogging;
     private static boolean enableDatabusLogging;
-    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
-            new ConcurrentHashMap<String, String>(2000);
+
     @AdvertiserIdNameMap
     @Inject
     private static Map<String, String> advertiserIdNameMap;
 
+    private static int totalCount;
+
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return SAMPLED_ADVERTISER_LOG_NOS;
     }
-
-    private static int totalCount;
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
             final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {

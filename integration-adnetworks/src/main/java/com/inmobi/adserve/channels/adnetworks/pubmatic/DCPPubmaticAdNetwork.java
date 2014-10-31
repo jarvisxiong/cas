@@ -33,17 +33,17 @@ import java.util.Calendar;
 public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPPubmaticAdNetwork.class);
 
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static String creativeTag = "creative_tag";
+    private static String trackingUrl = "tracking_url";
+    private static String pubMaticBid = "PubMatic_Bid";
+    private static IABCountriesInterface iABCountries;
     private transient String pubId;
     private String latlong = null;
     private int width;
     private int height;
     private String deviceId;
     private String adId;
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static String creativeTag = "creative_tag";
-    private static String trackingUrl = "tracking_url";
-    private static String pubMaticBid = "PubMatic_Bid";
-    private static IABCountriesInterface iABCountries;
 
     static {
         iABCountries = new IABCountriesMap();

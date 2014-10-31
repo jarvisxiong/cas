@@ -26,12 +26,6 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPVerveAdNetwork.class);
 
-    private transient String latitude;
-    private transient String longitude;
-    private int width;
-    private int height;
-    private String portalKeyword;
-    private String adUnit;
     private static final String IPHONE_KEYWORD = "iphn";
     private static final String ANDROID_KEYWORD = "anap";
     private static final String WAP_KEYWORD = "ptnr";
@@ -41,6 +35,13 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String MMA = "mma";
     private static final String BANNER = "banner";
     private static final String INTER = "inter";
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String portalKeyword;
+    private String adUnit;
+
     private boolean sendTrueLatLongOnly;
 
     public DCPVerveAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
