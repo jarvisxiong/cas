@@ -77,7 +77,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 adId = additionalParams.getString(sasParams.getSlot().toString());
 
             } catch (final Exception e) {
-                LOG.debug("AdId is not configured for the segment:{}, exception raised {}",
+                LOG.error("AdId is not configured for the segment:{}, exception raised {}",
                         entity.getExternalSiteKey(), e);
                 LOG.info("Configure parameters inside pubmatic returned false");
                 return false;
