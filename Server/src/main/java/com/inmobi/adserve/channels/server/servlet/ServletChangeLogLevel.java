@@ -10,8 +10,6 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -39,13 +37,13 @@ public class ServletChangeLogLevel implements Servlet {
         final JSONObject jObject = jsonArray.getJSONObject(0);
 
         String failedResponse = "Incorrect Query Format. Here's an example: " + TestUtils.SampleServletQueries.servletChangeLogLevel;
-        String successfulResponse = "";
+        String successfulResponse = "Successfully changed logging level.";
 
         try {
             String appenderName = jObject.getString("appender");
             String levelName    = jObject.getString("level");
 
-            Level level = getLogger(levelName);
+            ch.qos.logback.classic.Level level = getLogger(levelName);
             if (null == level) {
                 LOG.error("Invalid Logger Level");
                 hrh.responseSender.sendResponse(failedResponse, serverChannel);
@@ -55,10 +53,23 @@ public class ServletChangeLogLevel implements Servlet {
                 hrh.responseSender.sendResponse(failedResponse, serverChannel);
             }
 
-            // Get sub loggers of root
-            LogManager.getRootLogger().setLevel(level);
+            //((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ServletChangeLogLevel.class)).setLevel(ch.qos.logback.classic.Level.ERROR);
+            ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(level);
+            /*LogManager.getRootLogger().setLevel(level);
+            Enumeration allLoggers = LogManager.getLoggerRepository().getCurrentLoggers();
+            while(allLoggers.hasMoreElements()) {
+                ((org.apache.log4j.Logger)allLoggers.nextElement()).setLevel(level);
+            }*/
+            for(ch.qos.logback.classic.Logger logger: ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).getLoggerContext().getLoggerList()) {
+                logger.setLevel(level);
+            }
+
+            LOG.debug("DEBUG is on");
+            LOG.info("INFO is on");
+            LOG.error("ERROR is on");
+
             LOG.error("Successfully changed log level of {} to {}", appenderName, levelName);
-            hrh.responseSender.sendResponse(failedResponse, serverChannel);
+            hrh.responseSender.sendResponse(successfulResponse, serverChannel);
         }
         catch (Exception e) {
 
@@ -70,26 +81,19 @@ public class ServletChangeLogLevel implements Servlet {
         return "lbstatus";
     }
 
-    /**
-     * Partially mimics functionality of getLogger in log4j 2.x
-     * On migrating to log4j 2.x simply replace calls to this function with calls to getLogger present in log4j 2.x
-     * @param sArg
-     * @return
-     */
-    private Level getLogger(String sArg) {
-        Level level = null;
+    private ch.qos.logback.classic.Level getLogger(String sArg) {
+        ch.qos.logback.classic.Level level = null;
         switch(sArg) {
-            case "OFF": level   = Level.OFF;   break;
-            case "DEBUG": level = Level.DEBUG; break;
-            case "INFO": level  = Level.INFO;  break;
-            case "WARN": level  = Level.WARN;  break;
-            case "ERROR": level = Level.ERROR; break;
+            case "OFF": level = ch.qos.logback.classic.Level.OFF;   break;
+            case "DEBUG": level = ch.qos.logback.classic.Level.DEBUG;   break;
+            case "WARN": level = ch.qos.logback.classic.Level.WARN;   break;
+            case "ERROR": level = ch.qos.logback.classic.Level.ERROR;   break;
             default: level = null;
         }
         return level;
     }
 
     private Boolean isValidAppender(String appender) {
-        return null;
+        return true;
     }
 }
