@@ -505,9 +505,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
+        }
+
+        if ("LATLON".equals(sasParams.getLocSrc()) || "BSSID_DERIVED".equals(sasParams.getLocSrc())
+            || "VISIBLE_BSSID".equals(sasParams.getLocSrc())) {
             geo.setType(1);
         }
-        else {
+        else if ("CCID".equals(sasParams.getLocSrc()) || "WIFI".equals(sasParams.getLocSrc())
+            || "DERIVED_LAT_LON".equals(sasParams.getLocSrc()) || "CELL_TOWER".equals(sasParams.getLocSrc())) {
             geo.setType(2);
         }
 
