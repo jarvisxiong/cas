@@ -50,6 +50,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for httpool so exiting adapter");
+            LOG.info("Configure parameters inside HttPool returned false");
             return false;
         }
         host = config.getString("httpool.host");
@@ -71,7 +72,6 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             slotFormat = String.format("%dx%d", (int) Math.ceil(dim.getWidth()), (int) Math.ceil(dim.getHeight()));
         }
 
-        LOG.info("Configure parameters inside httpool returned true");
         return true;
     }
 
@@ -185,17 +185,10 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from httpool : {}", exception);
-                LOG.info("Response from httpool: {}", response);
+                LOG.info("Error parsing response {} from httpool: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from httpool : {}", exception);
-                LOG.info("Response from httpool: {}", response);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.info("Error parsing response {} from httpool: {}", response, exception);
             }
         }
 

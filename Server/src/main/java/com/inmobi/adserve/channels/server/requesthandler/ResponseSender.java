@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,7 +59,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.inmobi.casthrift.DemandSourceType.*;
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+import static com.inmobi.casthrift.DemandSourceType.IX;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -399,9 +401,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
             try {
 
-                responseBytes =
-                        inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
-                                encryptionKey.getInitializationVector());
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(

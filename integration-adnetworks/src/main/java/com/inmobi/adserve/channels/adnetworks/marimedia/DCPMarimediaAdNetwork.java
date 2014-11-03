@@ -2,22 +2,6 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 // Created by Dhanasekaran K P on 23/9/14.
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
@@ -27,6 +11,20 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.Dimension;
+import java.net.URI;
 
 public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -72,6 +70,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         // Check User Agent.
         if (StringUtils.isBlank(sasParams.getUserAgent())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         }
 
@@ -79,18 +78,21 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         // i.e. Check externalSiteId.
         if (StringUtils.isBlank(externalSiteId)) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         }
 
         // Check IP Address.
         if (StringUtils.isBlank(sasParams.getRemoteHostIp())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         }
 
         // Check Resolution.
         if (null == sasParams.getSlot() || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
+            LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         } else {
             final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
@@ -111,8 +113,6 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             networkType = "carrier";
         }
 
-        // Configuration successful.
-        LOG.info("Configure parameters inside Marimedia returned true");
         return true;
     }
 
@@ -245,8 +245,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                     // Other format.
                     // adType is "video" or "empty".
                     adStatus = "NO_AD";
-                    LOG.info("Error parsing response from Marimedia");
-                    LOG.info("Response from Marimedia {}", response);
+                    LOG.info("Error parsing response {} from Marimedia", response);
                     return;
                 }
 
@@ -267,8 +266,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Marimedia, exception {}", exception);
-                LOG.info("Response from Marimedia {}", response);
+                LOG.info("Error parsing response {} from Marimedia: {}", response, exception);
             }
         }
     }

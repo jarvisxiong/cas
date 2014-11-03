@@ -55,6 +55,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for huntmads so exiting adapter");
+            LOG.info("Configure parameters inside huntmads returned false");
             return false;
         }
         host = config.getString("huntmads.host");
@@ -62,6 +63,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
         // blocking opera traffic
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
             LOG.debug("Opera user agent found. So exiting the adapter");
+            LOG.info("Configure parameters inside huntmads returned false");
             return false;
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
@@ -76,13 +78,9 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        isapp =
-                StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
-                        ? false
-                        : true;
+        isapp = StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+                        ? false : true;
 
-
-        LOG.info("Configure parameters inside huntmads returned true");
         return true;
     }
 
@@ -185,7 +183,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -243,17 +241,10 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from huntmads : {}", exception);
-                LOG.info("Response from huntmads: {}", response);
+                LOG.info("Error parsing response {} from huntmads: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from huntmads : {}", exception);
-                LOG.info("Response from huntmads: {}", response);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.info("Error parsing response {} from huntmads: {}", response, exception);
             }
         }
 

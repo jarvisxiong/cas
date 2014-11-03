@@ -54,6 +54,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing so exiting adapter {}", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
         host = config.getString(name + ".host");
@@ -61,10 +62,10 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         placementId = config.getString(String.format(SLOT_FORMAT, name, sasParams.getSlot(), siteRating));
         if (StringUtils.isBlank(placementId)) {
             LOG.debug("Slot is not configured for {}", externalSiteId);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
 
-        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 
@@ -98,7 +99,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -147,7 +148,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from {}  {}", response, name, exception);
+                LOG.info("Error parsing response {} from {}  {}", response, name, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

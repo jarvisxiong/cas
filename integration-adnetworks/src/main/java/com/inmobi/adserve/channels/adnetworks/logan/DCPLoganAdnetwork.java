@@ -59,6 +59,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for logan so exiting adapter");
+            LOG.info("Configure parameters inside logan returned false");
             return false;
         }
         host = config.getString("logan.host");
@@ -74,7 +75,6 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
-        LOG.info("Configure parameters inside logan returned true");
         return true;
     }
 
@@ -198,12 +198,10 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from logan : {}", exception);
-                LOG.info("Response from logan: {}", response);
+                LOG.info("Error parsing response {} from logan: {}", response, exception);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from logan : {}", exception);
-                LOG.info("Response from logan: {}", response);
+                LOG.info("Error parsing response {} from logan: {}", response, exception);
             }
 
         }

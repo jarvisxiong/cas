@@ -20,7 +20,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -59,6 +59,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for xad so exiting adapter");
+            LOG.info("Configure parameters inside xad returned false");
             return false;
         }
         host = config.getString("xad.host");
@@ -69,6 +70,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandate parameters missing for xAd, so returning from adapter");
+            LOG.info("Configure parameters inside xad returned false");
             return false;
         }
         setDeviceIdandType();
@@ -86,7 +88,6 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
         sourceType =
                 StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource()) ? WEB : APP;
 
-        LOG.info("Configure parameters inside xad returned true");
         return true;
     }
 
@@ -169,7 +170,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -194,8 +195,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from XAd : {}", exception);
-                LOG.info("Response from XAd: {}", response);
+                LOG.info("Error parsing response {} from XAd: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

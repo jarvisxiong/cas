@@ -16,7 +16,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.Calendar;
 
@@ -61,6 +61,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for baidu so exiting adapter");
+            LOG.info("Configure parameters inside baidu returned false");
             return false;
         }
 
@@ -77,12 +78,14 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             width = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandate parameters missing for Baidu, so returning from adapter");
+            LOG.info("Configure parameters inside baidu returned false");
             return false;
         }
         uid = getUid();
 
         if (StringUtils.isBlank(uid)) {
             LOG.debug("mandatory parameters missing for baidu so exiting adapter");
+            LOG.info("Configure parameters inside baidu returned false");
             return false;
 
         }
@@ -96,7 +99,6 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         } else {
             os = WEB;
         }
-        LOG.info("Configure parameters inside baidu returned true");
         return true;
     }
 
@@ -158,8 +160,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, null);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from baidu : {}", exception);
-                LOG.info("Response from baidu: {}", response);
+                LOG.info("Error parsing response {} from baidu: {}", response, exception);
                 return;
             }
             adStatus = "AD";

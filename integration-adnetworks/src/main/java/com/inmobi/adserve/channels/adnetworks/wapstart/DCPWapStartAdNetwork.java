@@ -1,23 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.wapstart;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
@@ -29,6 +11,22 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Calendar;
 
 
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -56,6 +54,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for wapstart so exiting adapter");
+            LOG.info("Configure parameters inside wapstart returned false");
             return false;
         }
         host = config.getString("wapstart.host");
@@ -66,6 +65,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandate parameters missing for WapStart, so returning from adapter");
+            LOG.info("Configure parameters inside wapstart returned false");
             return false;
         }
 
@@ -80,11 +80,10 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         udid = getUid();
         if (StringUtils.isBlank(udid)) {
             LOG.debug("Udid mandatory for Wapstart");
+            LOG.info("Configure parameters inside wapstart returned false");
             return false;
         }
 
-
-        LOG.info("Configure parameters inside wapstart returned true");
         return true;
     }
 
@@ -191,7 +190,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug(requestBody);
             return requestBody;
         } catch (final JsonProcessingException e) {
-            LOG.error("{}", e);
+            LOG.info("{}", e);
         }
         return null;
 
@@ -284,8 +283,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             statusCode = 200;
         } catch (final Exception exception) {
             adStatus = "NO_AD";
-            LOG.info("Error parsing response from Wapstart : {}", exception);
-            LOG.info("Response from WapStart: {}", response);
+            LOG.info("Error parsing response {} from Wapstart: {}", response, exception);
             return;
         }
         LOG.debug("response length is {}", responseContent.length());

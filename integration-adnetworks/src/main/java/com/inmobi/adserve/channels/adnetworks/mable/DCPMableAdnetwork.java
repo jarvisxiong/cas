@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -55,6 +55,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for Mable so exiting adapter");
+            LOG.info("Configure parameters inside Mable returned false");
             return false;
         }
 
@@ -64,6 +65,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandate parameters missing for Mable, so returning from adapter");
+            LOG.info("Configure parameters inside Mable returned false");
             return false;
         }
 
@@ -74,7 +76,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             longitude = latlong[1];
         }
 
-        LOG.info("Configure parameters inside Mable returned true");
         return true;
     }
 
@@ -136,7 +137,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -157,8 +158,8 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                         .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                         .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
-        LOG.info("Mable request: {}", ningRequest);
-        LOG.info("Mable request Body: {}", requestParams);
+        LOG.debug("Mable request: {}", ningRequest);
+        LOG.debug("Mable request Body: {}", requestParams);
         return ningRequest;
     }
 
@@ -180,8 +181,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response from Mable : {}", exception);
-                LOG.error("Response from Mable: {}", response);
+                LOG.info("Error parsing response {} from Mable: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

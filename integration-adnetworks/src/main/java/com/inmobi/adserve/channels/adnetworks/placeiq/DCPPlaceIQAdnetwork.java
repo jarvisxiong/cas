@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -118,6 +118,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
@@ -138,6 +139,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         } else {
             LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
 
@@ -147,6 +149,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
                     && StringUtils.isEmpty(casInternalRequestParameters.getUid())) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
         } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
@@ -155,6 +158,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())
                     && StringUtils.isEmpty(casInternalRequestParameters.getUidIDUS1())) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
         } else {
@@ -162,7 +166,6 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             os = "Windows";
         }
 
-        LOG.info("Configure parameters inside PlaceIQ returned true");
         return true;
     }
 
@@ -283,8 +286,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from PlaceIQ : {}", exception);
-                LOG.info("Response from PlaceIQ: {}", response);
+                LOG.info("Error parsing response {} from PlaceIQ: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

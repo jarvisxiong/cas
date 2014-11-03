@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import org.slf4j.LoggerFactory;
 
 
 public class ChannelServerHelper {
@@ -15,7 +15,7 @@ public class ChannelServerHelper {
         try {
             dataCenterIdCode = Byte.parseByte(System.getProperty(dataCenterIdKey));
         } catch (final NumberFormatException e) {
-            LOG.info("NumberFormatException in getDataCenterId");
+            LOG.error("NumberFormatException in getDataCenterId");
             dataCenterIdCode = 0;
         }
 
@@ -33,7 +33,7 @@ public class ChannelServerHelper {
                 addr = InetAddress.getLocalHost();
                 hostName = addr.getHostName();
             } catch (final UnknownHostException e1) {
-                LOG.info("UnknownHostException in getHostId, exception raised {}", e1);
+                LOG.error("UnknownHostException in getHostId, exception raised {}", e1);
             }
         }
         try {
@@ -43,9 +43,9 @@ public class ChannelServerHelper {
                 return hostId;
             }
         } catch (final NumberFormatException e) {
-            LOG.info("NumberFormatException in getHostId, exception raised {}", e);
+            LOG.error("NumberFormatException in getHostId, exception raised {}", e);
         } catch (final StringIndexOutOfBoundsException e) {
-            LOG.info("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
+            LOG.error("StringIndexOutOfRangeException in getHostId, exception raised {}", e);
         }
 
         LOG.debug("hostid is {}", hostId);

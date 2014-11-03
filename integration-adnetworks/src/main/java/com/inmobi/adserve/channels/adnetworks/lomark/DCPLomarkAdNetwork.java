@@ -96,6 +96,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for lomark so exiting adapter");
+            LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
         host = config.getString("lomark.host");
@@ -129,16 +130,17 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 || sasParams.getOsId() == HandSetOS.Windows_RT.getValue()) {
             client = 3;
         } else {
-            LOG.info("Lomark: Device OS - Unsupported OS");
+            LOG.debug("Lomark: Device OS - Unsupported OS");
+            LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
         // filter non udid app traffic for Lomark
         if (client < 3 && StringUtils.isBlank(uuid)) {
-            LOG.info("Lomark: Udid - mandatory paramter for app - missing");
+            LOG.debug("Lomark: Udid - mandatory paramter for app - missing");
+            LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
 
-        LOG.info("Configure parameters inside lomark returned true");
         return true;
     }
 
@@ -222,7 +224,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -309,8 +311,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
                 adStatus = NO_AD;
-                LOG.info("Error parsing response from lomark : {}", exception);
-                LOG.info("Response from lomark : {}", response);
+                LOG.info("Error parsing response {} from lomark: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());
