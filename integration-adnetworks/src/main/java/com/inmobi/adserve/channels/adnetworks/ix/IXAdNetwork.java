@@ -107,6 +107,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
     private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+    private static final String LATLON = "LATLON";
+    private static final String BSSID_DERIVED = "BSSID_DERIVED";
+    private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
+    private static final String CCID = "CCID";
+    private static final String WIFI = "WIFI";
+    private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
+    private static final String CELL_TOWER = "CELL_TOWER";
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -507,12 +514,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
 
-        if ("LATLON".equals(sasParams.getLocSrc()) || "BSSID_DERIVED".equals(sasParams.getLocSrc())
-            || "VISIBLE_BSSID".equals(sasParams.getLocSrc())) {
+        if (LATLON.equals(sasParams.getLocSrc()) || BSSID_DERIVED.equals(sasParams.getLocSrc())
+            || VISIBLE_BSSID.equals(sasParams.getLocSrc())) {
             geo.setType(1);
         }
-        else if ("CCID".equals(sasParams.getLocSrc()) || "WIFI".equals(sasParams.getLocSrc())
-            || "DERIVED_LAT_LON".equals(sasParams.getLocSrc()) || "CELL_TOWER".equals(sasParams.getLocSrc())) {
+        else if (CCID.equals(sasParams.getLocSrc()) || WIFI.equals(sasParams.getLocSrc())
+            || DERIVED_LAT_LON.equals(sasParams.getLocSrc()) || CELL_TOWER.equals(sasParams.getLocSrc())) {
             geo.setType(2);
         }
 
