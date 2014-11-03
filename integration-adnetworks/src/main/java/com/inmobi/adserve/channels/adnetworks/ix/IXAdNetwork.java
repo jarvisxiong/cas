@@ -44,6 +44,7 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
+import com.inmobi.casthrift.ix.API_FRAMEWORKS;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -474,6 +475,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             banner.setH((int) dim.getHeight());
         }
 
+        if (StringUtils.isNotBlank(sasParams.getSdkVersion())) {
+            final int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
+            if (sdkVersion >= 370) {
+                banner.setApi(Arrays.asList(API_FRAMEWORKS.MRAID_2.getValue()));
+            }
+        }
+
         final CommonExtension ext = new CommonExtension();
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
@@ -497,7 +505,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
+            geo.setType(1);
         }
+        else {
+            geo.setType(2);
+        }
+
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
