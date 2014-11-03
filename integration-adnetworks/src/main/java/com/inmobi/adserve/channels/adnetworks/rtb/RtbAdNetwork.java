@@ -992,9 +992,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             adStatus = NO_AD;
             responseContent = "";
-            LOG.error(
-                    "Some exception is caught while filling the native template for partner {}, advertiser = {}, exception = {}",
-                    e.getLocalizedMessage(), advertiserName, e);
+            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, exception = {}",
+                    sasParams.getSiteId(), advertiserName, e);
         }
 
     }
