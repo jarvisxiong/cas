@@ -332,4 +332,5 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         return StringUtils.isBlank(category) ? "uc" : category;
     }
+    
 }
