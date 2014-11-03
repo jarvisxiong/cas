@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.List;
 
@@ -91,19 +91,19 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 adcode = stringifyParam(jsonObject, "adcode", true);
                 adGroupID = externalSiteId;
             } catch (final JSONException e) {
-                LOG.info("cannot configure parameters in IFCAdNetwork, {}", e);
+                LOG.info("IFC Configure Parameter returning false: {}", e);
                 return false;
             }
             try {
                 handset = getHandsetString(jsonObject.getJSONArray("handset"));
             } catch (final JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: handset, exception raised {}", e);
+                LOG.info("IFC Configure Parameter returning false as mandatory param: handset is missing");
                 return false;
             }
             try {
                 carrier = getCarrierString(jsonObject.getJSONArray("carrier"));
             } catch (final JSONException e) {
-                LOG.info("IFC Mandatory Parameter missing: carrier, exception raised {}", e);
+                LOG.info("IFC Configure Parameter returning false as mandatory param: carrier is missing");
                 return false;
             }
 
@@ -113,6 +113,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 final String sdkVersion = stringifyParam(jsonObject, "sdk-version", false);
                 if (sdkVersion != null
                         && (sdkVersion.toLowerCase().startsWith("i30") || sdkVersion.toLowerCase().startsWith("a30"))) {
+                    LOG.info("IFC Configure Parameter returning false");
                     return false;
                 }
                 /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
@@ -144,6 +145,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             if (tempSdkVersion != null
                     && (tempSdkVersion.toLowerCase().startsWith("i30") || tempSdkVersion.toLowerCase()
                             .startsWith("a30"))) {
+                LOG.info("IFC Configure Parameter returning false");
                 return false;
             }
         }
@@ -165,7 +167,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getSiteId()) {
             siteID = sasParams.getSiteId();
         } else {
-            LOG.info("IFC Mandatory Parameter missing: SiteName");
+            LOG.info("IFC Configure Parameter returning false as mandatory param: SiteName is missing");
             return false;
         }
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
@@ -173,14 +175,13 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
         } else {
-            LOG.info("IFC Mandatory Parameter missing: Slot");
+            LOG.info("IFC Configure Parameter returning false as mandatory param: Slot is missing");
             return false;
         }
         if (null == beaconUrl) {
-            LOG.info("IFC Mandatory Parameter missing: BeaconURL");
+            LOG.info("IFC Configure Parameter returning false as mandatory param: BeaconURL is missing");
             return false;
         }
-        LOG.info("IFC Configure Parameter returning true");
         return true;
     }
 

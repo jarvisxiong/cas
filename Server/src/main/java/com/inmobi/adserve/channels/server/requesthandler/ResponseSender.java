@@ -53,17 +53,18 @@ import org.slf4j.Marker;
 
 import javax.inject.Inject;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.inmobi.casthrift.DemandSourceType.*;
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+import static com.inmobi.casthrift.DemandSourceType.IX;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -351,7 +352,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final Channel serverChannel) throws NullPointerException {
         LOG.debug("Inside send Response");
         responseBytes = encryptResponseIfRequired(responseBytes);
-        System.err.println("Length ->" + responseBytes.length + " , Data ->" + new String(responseBytes));
 
         final FullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
@@ -397,9 +397,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
             try {
-                responseBytes =
-                        inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
-                                encryptionKey.getInitializationVector());
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
                             encryptionKey.getAesKey(), CharsetUtil.UTF_8),
@@ -727,7 +726,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     STRING_TO_FORMAT_MAP.put(format, responseFormat);
                 }
             }
-
         }
 
         private ResponseFormat(final String... formats) {

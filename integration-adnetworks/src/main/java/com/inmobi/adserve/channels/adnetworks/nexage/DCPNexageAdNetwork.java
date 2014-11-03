@@ -19,7 +19,7 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -61,6 +61,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandate parameters missing for nexage, so returning from adapter");
+            LOG.info("Configure parameters inside nexage returned false");
             return false;
         }
 
@@ -80,8 +81,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             // segment table
             pos = entity.getAdditionalParams().getString(POS);
         } catch (final JSONException e) {
-            LOG.info("pos is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
+            LOG.debug("POS is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
                     getName(), e);
+            LOG.info("Configure parameters inside nexage returned false");
             return false;
         }
 
@@ -92,12 +94,10 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("exception raised while retrieving JS_AD_TAG from additional Params {}", e);
         }
 
-        isApp =
-                StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+        isApp = StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
                         ? false
                         : true;
 
-        LOG.debug("Configure parameters inside nexage returned true");
         return true;
     }
 
@@ -223,13 +223,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from nexage : {}", exception);
-                LOG.info("Response from nexage: {}", response);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.info("Error parsing response {} from nexage: {}", response, exception);
             }
             adStatus = "AD";
         }

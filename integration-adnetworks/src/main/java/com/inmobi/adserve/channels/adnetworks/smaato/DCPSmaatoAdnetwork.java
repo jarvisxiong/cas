@@ -97,6 +97,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for smaato so exiting adapter");
+            LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
         host = config.getString("smaato.host");
@@ -110,6 +111,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             dimension = slotIdMap.get(sasParams.getSlot().intValue());
             if (StringUtils.isBlank(dimension)) {
                 LOG.debug("mandatory parameters missing for smaato so exiting adapter");
+                LOG.info("Configure parameters inside Smaato returned false");
                 return false;
             }
             final Dimension dim = SlotSizeMapping.getDimension(sasParams.getSlot().longValue());
@@ -119,10 +121,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         if (StringUtils.isBlank(getUid())) {
             LOG.debug("mandatory parameters missing for smaato so exiting adapter");
+            LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
 
-        LOG.info("Configure parameters inside Smaato returned true");
         return true;
     }
 
@@ -258,8 +260,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Smaato, exception raised {}", exception);
-                LOG.info("Response from Smaato {}", response);
+                LOG.info("Error parsing response {} from Smaato: {}", response, exception);
             }
         }
     }

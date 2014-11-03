@@ -44,6 +44,7 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
+import com.inmobi.casthrift.ix.API_FRAMEWORKS;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -68,7 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -106,6 +107,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
     private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+    private static final String LATLON = "LATLON";
+    private static final String BSSID_DERIVED = "BSSID_DERIVED";
+    private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
+    private static final String CCID = "CCID";
+    private static final String WIFI = "WIFI";
+    private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
+    private static final String CELL_TOWER = "CELL_TOWER";
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -221,6 +229,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of IX");
 
         if (!checkIfBasicParamsAvailable()) {
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}: BasicParams Not Available",
+                    advertiserName);
             return false;
         }
 
@@ -267,6 +277,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Impression impression =
                 createImpressionObject(banner, displayManager, displayManagerVersion, proxyDemand);
         if (null == impression) {
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Impression Obj is null",
+                    advertiserName);
             return false;
         }
         impresssionlist.add(impression);
@@ -276,7 +288,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidRequest = createBidRequestObject(impresssionlist, site, app, user, device, regs);
 
         if (null == bidRequest) {
-            LOG.debug(traceMarker, "Failed inside createBidRequest");
+            LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Failed inside createBidRequest",
+                    advertiserName);
             return false;
         }
 
@@ -355,14 +368,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (isNativeRequest()) {
                 tempBidRequestJson = tempBidRequestJson.replaceFirst("nativeObject", "native");
             }
-            LOG.info(traceMarker, "IX request json is : {}", tempBidRequestJson);
+            LOG.info(traceMarker, "IX request json is: {}", tempBidRequestJson);
         } catch (final TException e) {
-            LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
+            LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
             LOG.info(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
                     advertiserName, e);
             return null;
         }
-        LOG.info(traceMarker, "return true");
         return tempBidRequestJson;
     }
 
@@ -457,7 +469,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
 
         } catch (final JSONException exception) {
-            LOG.error("Unable to get zone_id for Rubicon, exception thrown {}", exception);
+            LOG.info("Unable to get zone_id for Rubicon, exception thrown {}", exception);
         }
         return categoryZoneId;
     }
@@ -472,6 +484,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
+        }
+
+        if (StringUtils.isNotBlank(sasParams.getSdkVersion())) {
+            final int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
+            if (sdkVersion >= 370) {
+                banner.setApi(Arrays.asList(API_FRAMEWORKS.MRAID_2.getValue()));
+            }
         }
 
         final CommonExtension ext = new CommonExtension();
@@ -498,6 +517,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
+
+        if (LATLON.equals(sasParams.getLocSrc()) || BSSID_DERIVED.equals(sasParams.getLocSrc())
+            || VISIBLE_BSSID.equals(sasParams.getLocSrc())) {
+            geo.setType(1);
+        }
+        else if (CCID.equals(sasParams.getLocSrc()) || WIFI.equals(sasParams.getLocSrc())
+            || DERIVED_LAT_LON.equals(sasParams.getLocSrc()) || CELL_TOWER.equals(sasParams.getLocSrc())) {
+            geo.setType(2);
+        }
+
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
@@ -911,7 +940,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Get collection of Channel Segment Entities for the particular Inmobi account id
         final ChannelAdGroupRepository channelAdGroupRepository = repositoryHelper.getChannelAdGroupRepository();
         if (null == channelAdGroupRepository) {
-            LOG.error("Channel AdGroup Repository is null.");
+            LOG.debug("Channel AdGroup Repository is null.");
             return false;
         }
 
@@ -1041,7 +1070,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
                     advertiserName, e);
         }
 
@@ -1104,15 +1133,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             bidResponse = gson.fromJson(response, IXBidResponse.class);
             LOG.debug(traceMarker, "Done with parsing of bidresponse");
             if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
-                LOG.error("BidResponse does not have seat bid object");
+                LOG.info("BidResponse does not have seat bid object");
+                return false;
+            }
+            final SeatBid seatBid = bidResponse.getSeatbid().get(0);
+            if (null == seatBid.getBid() || seatBid.getBidSize() == 0) {
+                LOG.info("Seat bid object does not have bid object");
                 return false;
             }
             // bidderCurrency is to USD by default
-            final SeatBid seatBid = bidResponse.getSeatbid().get(0);
-            if (null == seatBid.getBid() || seatBid.getBidSize() == 0) {
-                LOG.error("Seat bid object does not have bid object");
-                return false;
-            }
             setBidPriceInLocal(seatBid.getBid().get(0).getPrice());
             setBidPriceInUsd(getBidPriceInLocal());
             responseSeatId = seatBid.getSeat();
@@ -1133,7 +1162,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             return result;
         } catch (final NullPointerException e) {
-            LOG.info(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(), e);
+            LOG.error(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(), e);
             return false;
         }
     }

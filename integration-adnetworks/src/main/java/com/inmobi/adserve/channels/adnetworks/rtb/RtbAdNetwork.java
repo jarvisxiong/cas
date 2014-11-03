@@ -75,7 +75,8 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
+
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -243,6 +244,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of RTB");
 
         if (!checkIfBasicParamsAvailable()) {
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available",
+                    advertiserName);
             return false;
         }
 
@@ -279,6 +282,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         final Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion);
         if (null == impression) {
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
+                    advertiserName);
             return false;
         }
         impresssionlist.add(impression);
@@ -378,7 +383,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     advertiserName, e);
             return false;
         }
-        LOG.info(traceMarker, "Configure parameters inside rtb returned true");
         return true;
     }
 
@@ -992,9 +996,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             adStatus = NO_AD;
             responseContent = "";
-            LOG.error(
-                    "Some exception is caught while filling the native template for partner {}, advertiser = {}, exception = {}",
-                    e.getLocalizedMessage(), advertiserName, e);
+            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, exception = {}",
+                    sasParams.getSiteId(), advertiserName, e);
         }
 
     }

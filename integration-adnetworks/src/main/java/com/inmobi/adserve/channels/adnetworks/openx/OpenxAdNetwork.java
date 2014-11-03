@@ -1,18 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.openx;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -20,6 +7,17 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -67,6 +65,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     // get URI
     @Override
     public URI getRequestUri() throws Exception {
+    	//af,c.gender for gen
         final StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountryCode().toLowerCase())
                 .append("&dma=").append(sasParams.getState());
@@ -92,6 +91,11 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&did.ai.md5=").append(casInternalRequestParameters.getUidMd5());
             finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.getUidO1());
         }
+        String gpid = getGPID();
+        if(null != gpid){
+        	finalUrl.append("&did.adid=").append(gpid);
+        }
+        
 
         finalUrl.append("&did=").append(casInternalRequestParameters.getUid());
 
@@ -135,13 +139,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from openx : {}", exception);
-                LOG.info("Response from openx: {}", response);
-                try {
-                    throw exception;
-                } catch (final Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.info("Error parsing response {} from openx: {}", response, exception);
             }
             adStatus = "AD";
         }

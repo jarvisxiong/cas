@@ -18,7 +18,7 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -54,6 +54,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for verve so exiting adapter");
+            LOG.info("Configure parameters inside verve returned false");
             return false;
         }
         host = config.getString("verve.host");
@@ -70,6 +71,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (sendTrueLatLongOnly) {
             if (DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())) {
+                LOG.info("Configure parameters inside verve returned false");
                 return false;
             } else if (casInternalRequestParameters.getLatLong() != null
                     && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
@@ -77,15 +79,18 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 latitude = latlong[0];
                 longitude = latlong[1];
             } else {
+                LOG.info("Configure parameters inside verve returned false");
                 return false;
             }
             if (StringUtils.isBlank(latitude) || StringUtils.isBlank(longitude)) {
+                LOG.info("Configure parameters inside verve returned false");
                 return false;
             }
         } else if (!DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())
                 && StringUtils.isNotBlank(sasParams.getLocSrc())) { // request
             // has true
             // lat-long
+            LOG.info("Configure parameters inside verve returned false");
             return false;
         }
         adUnit = MMA;
@@ -107,17 +112,15 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         } else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
             if (StringUtils.isBlank(sasParams.getSdkVersion())
                     || sasParams.getSdkVersion().toLowerCase().startsWith("a35")) {
-                LOG.info("Blocking traffic for 3.5.* android version");
+                LOG.info("Configure parameters inside verve returned false as Android Version is 3.5.*");
                 return false;
             }
             portalKeyword = ANDROID_KEYWORD;
         } else {
-            LOG.info("param source {}", sasParams.getSource());
-            LOG.info("Configure parameters inside verve returned false");
+            LOG.info("Configure parameters inside verve returned false as unsupported source: {}", sasParams.getSource());
             return false;
         }
 
-        LOG.info("Configure parameters inside verve returned true");
         return true;
     }
 
@@ -193,7 +196,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -218,8 +221,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = "AD";
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from verve : {}", exception);
-                LOG.info("Response from verve : {}", response);
+                LOG.info("Error parsing response {} from verve: {}", response, exception);
             }
         }
         LOG.debug("response length is {}", responseContent.length());

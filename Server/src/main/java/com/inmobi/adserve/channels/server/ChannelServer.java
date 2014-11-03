@@ -217,10 +217,10 @@ public class ChannelServer {
             // lbStatus as NOT_OK.
 
         } catch (final Exception exception) {
-            logger.info("Exception in Channel Server " + exception);
+            logger.error("Exception in Channel Server " + exception);
             ServerStatusInfo.statusString = getMyStackTrace(exception);
             ServerStatusInfo.statusCode = 404;
-            logger.info("stack trace is " + getMyStackTrace(exception));
+            logger.error("stack trace is " + getMyStackTrace(exception));
             if (logger.isDebugEnabled()) {
                 logger.debug("{}", exception);
                 sendMail(exception.getMessage(), getMyStackTrace(exception));
@@ -436,11 +436,11 @@ public class ChannelServer {
             Transport.send(message);
         } catch (final MessagingException mex) {
             // logger.info("Error while sending mail");
-            logger.info("MessagingException raised while sending mail " + mex);
+            logger.error("MessagingException raised while sending mail " + mex);
             // mex.printStackTrace();
         } catch (final UnknownHostException ex) {
             // logger.debug("could not resolve host inside send mail");
-            logger.info("UnknownException raised while sending mail " + ex);
+            logger.error("UnknownException raised while sending mail " + ex);
             // ex.printStackTrace();
         }
     }

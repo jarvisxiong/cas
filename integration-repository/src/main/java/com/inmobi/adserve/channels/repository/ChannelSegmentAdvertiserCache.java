@@ -1,13 +1,12 @@
 package com.inmobi.adserve.channels.repository;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import org.apache.log4j.Logger;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.log4j.Logger;
-
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 /**
  * Created by yasir.imteyaz on 09/09/14.
