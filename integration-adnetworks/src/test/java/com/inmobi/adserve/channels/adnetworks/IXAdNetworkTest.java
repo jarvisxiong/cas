@@ -467,7 +467,7 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "TESTSITE");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPage(), "www.testSite.com");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
-                    Lists.newArrayList("blk423", "InMobiPERF"));
+                    Lists.newArrayList("blk423", "InMobiPERF", "InMobiSTRATEGIC"));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
 
             // checking for blocked list if siteType is not PERFORMANCE, also if site is not transparent
@@ -493,7 +493,7 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "Games");
             assertNull(ixAdNetwork.getBidRequest().getSite().getPage());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
-                    Lists.newArrayList("blk423", "InMobiFS"));
+                    Lists.newArrayList("blk423", "InMobiFS", "InMobiSTRATEGIC"));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
 
             sasParams.setSource("app");
