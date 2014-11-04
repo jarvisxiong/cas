@@ -48,6 +48,7 @@ import com.inmobi.casthrift.ix.API_FRAMEWORKS;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -55,6 +56,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -69,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -195,6 +198,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
+    @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
             final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper,
@@ -615,7 +619,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private Publisher createPublisher(final List tempSasCategories) {
+    private Publisher createPublisher(final List<Long> tempSasCategories) {
 
         final Publisher publisher = new Publisher();
         if (null != tempSasCategories) {
