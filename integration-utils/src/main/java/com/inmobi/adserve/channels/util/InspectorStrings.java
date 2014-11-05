@@ -24,6 +24,10 @@ public class InspectorStrings {
     public static final String SUCCESSFUL_REQUESTS = "success";
     public static final String JSON_PARSING_ERROR = "Terminated_JsonError";
     public static final String THRIFT_PARSING_ERROR = "Terminated_ThriftError";
+    public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
+    public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
+    public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
+    public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";
     public static final String PROCESSING_ERROR = "Terminated_ServerError";
     public static final String MISSING_SITE_ID = "Terminated_NoSite";
     public static final String CLIENT_TIMER_LATENCY = "ClientTimerLatency";

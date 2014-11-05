@@ -56,7 +56,7 @@ public class RequestFilters {
 
         if (hrh.responseSender.sasParams.getSiteType() != null
                 && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
-            LOG.error("Terminating request as incompatible content type");
+            LOG.info("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;

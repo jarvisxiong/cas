@@ -1047,6 +1047,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
                     advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.BANNER_PARSE_RESPONSE_EXCEPTION);
         }
 
     }
