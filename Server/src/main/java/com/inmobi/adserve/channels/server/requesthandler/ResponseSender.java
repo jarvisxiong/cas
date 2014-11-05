@@ -176,8 +176,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send Ad Response
-    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel)
-            throws NullPointerException {
+    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel) {
 
         // Making sure response is sent only once
         if (checkResponseSent()) {
@@ -341,7 +340,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     // send response to the caller
     private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
-            final Channel serverChannel) throws NullPointerException {
+            final Channel serverChannel) {
 
         final byte[] bytes = responseString.getBytes(Charsets.UTF_8);
         sendResponse(status, bytes, responseHeaders, serverChannel);
@@ -349,7 +348,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     // send response to the caller
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
-            final Channel serverChannel) throws NullPointerException {
+            final Channel serverChannel) {
         LOG.debug("Inside send Response");
         responseBytes = encryptResponseIfRequired(responseBytes);
 
@@ -397,8 +396,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
             try {
-                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
-                        encryptionKey.getInitializationVector());
+                responseBytes =
+                        inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                                encryptionKey.getInitializationVector());
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
                             encryptionKey.getAesKey(), CharsetUtil.UTF_8),
@@ -414,7 +414,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
-    public void sendResponse(final String responseString, final Channel serverChannel) throws NullPointerException {
+    public void sendResponse(final String responseString, final Channel serverChannel) {
         sendResponse(HttpResponseStatus.OK, responseString, null, serverChannel);
     }
 
@@ -424,7 +424,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public void sendNoAdResponse(final Channel serverChannel) throws NullPointerException {
+    public void sendNoAdResponse(final Channel serverChannel) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;

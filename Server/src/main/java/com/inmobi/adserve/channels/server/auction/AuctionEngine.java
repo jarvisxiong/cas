@@ -36,12 +36,10 @@ public class AuctionEngine implements AuctionEngineInterface {
     public SASRequestParameters sasParams;
     public CasInternalRequestParameters casInternalRequestParameters;
 
-    private boolean auctionComplete = false;
+    private boolean auctionComplete;
     private ChannelSegment auctionResponse;
     private double secondBidPrice;
     private List<ChannelSegment> unfilteredChannelSegmentList;
-
-    public AuctionEngine() {}
 
     /***
      * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after auctioning If no of rtb segments selected

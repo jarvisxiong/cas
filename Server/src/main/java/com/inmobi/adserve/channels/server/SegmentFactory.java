@@ -22,9 +22,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 @Singleton
 public class SegmentFactory {
-
     private final static Logger LOG = LoggerFactory.getLogger(SegmentFactory.class);
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     @Inject

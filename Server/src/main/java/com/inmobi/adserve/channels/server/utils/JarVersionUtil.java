@@ -1,8 +1,8 @@
 /**
- * 
  */
 package com.inmobi.adserve.channels.server.utils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,11 +15,10 @@ import java.util.jar.Manifest;
  * @author ritwik.kumar
  * 
  */
-public class JarVersionUtil {
-    /**
-   * 
-   */
+public final class JarVersionUtil {
     private static Map<String, String> manifestMap;
+
+    private JarVersionUtil() { }
 
     /**
      * 
@@ -56,7 +55,7 @@ public class JarVersionUtil {
                 manifestMap.put("ERROR", "Class not from JAR");
             }
 
-        } catch (final Exception e) {
+        } catch (final IOException e) {
             manifestMap.put("ERROR", e.getMessage());
         }
     }

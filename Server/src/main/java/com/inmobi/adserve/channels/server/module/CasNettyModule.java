@@ -41,13 +41,12 @@ public class CasNettyModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
         bind(LoggingHandler.class).toInstance(new LoggingHandler());
 
         // server pipelines
         final TypeLiteral<ChannelInitializer<SocketChannel>> channelInitializerType =
-                new TypeLiteral<ChannelInitializer<SocketChannel>>() {};
+                new TypeLiteral<ChannelInitializer<SocketChannel>>() { };
         bind(channelInitializerType).annotatedWith(ServerChannelInitializer.class)
                 .to(ChannelServerPipelineFactory.class).asEagerSingleton();
         bind(channelInitializerType).annotatedWith(StatServerChannelInitializer.class)
