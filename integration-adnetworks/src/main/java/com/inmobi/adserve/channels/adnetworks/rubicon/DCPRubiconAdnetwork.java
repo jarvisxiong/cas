@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -135,7 +136,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPRubiconAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -231,7 +232,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
         final String uacContentRating = getUACContentRating(url);
         final List<String> blockedList = Lists.newArrayList();
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
-        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
             appendQueryParam(url, AD_SENSITIVE, SENSITIVITY_LOW, false);
             blockedList.add(RUBICON_PERF_BLOCKLIST_ID);
             if (isApp) {

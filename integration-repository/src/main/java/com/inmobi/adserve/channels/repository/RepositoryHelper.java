@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.googlecode.cqengine.query.Query;
+import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -13,6 +15,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
@@ -28,6 +31,8 @@ import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
+import static com.googlecode.cqengine.query.QueryFactory.and;
+import static com.googlecode.cqengine.query.QueryFactory.in;
 
 @Getter
 public class RepositoryHelper {
@@ -50,6 +55,7 @@ public class RepositoryHelper {
     private final CreativeRepository creativeRepository;
     private final RepositoryStatsProvider repositoryStatsProvider;
     private final NativeAdTemplateRepository nativeAdTemplateRepository;
+    private final IXPackageRepository ixPackageRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -67,6 +73,7 @@ public class RepositoryHelper {
         ixAccountMapRepository = builder.ixAccountMapRepository;
         creativeRepository = builder.creativeRepository;
         nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
+        ixPackageRepository = builder.ixPackageRepository;
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
                 .addRepositoryToStats(channelRepository).addRepositoryToStats(channelAdGroupRepository)
@@ -100,6 +107,7 @@ public class RepositoryHelper {
         private IXAccountMapRepository ixAccountMapRepository;
         private CreativeRepository creativeRepository;
         private NativeAdTemplateRepository nativeAdTemplateRepository;
+        private IXPackageRepository ixPackageRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -117,6 +125,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixAccountMapRepository);
             Preconditions.checkNotNull(creativeRepository);
             Preconditions.checkNotNull(nativeAdTemplateRepository);
+            Preconditions.checkNotNull(ixPackageRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -176,7 +185,7 @@ public class RepositoryHelper {
     }
 
     public SegmentAdGroupFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId,
-            final Integer segmentId) {
+                                                                             final Integer segmentId) {
         return siteAerospikeFeedbackRepository.query(siteId, segmentId);
     }
 
@@ -254,5 +263,16 @@ public class RepositoryHelper {
             LOG.debug("Exception while querying NativeAdTemplate Repository, {}", ignored);
         }
         return null;
+    }
+
+    public ResultSet<IXPackageEntity> queryIXPackageRepository(final int osId, final String siteId, final int countryId, final int slotId) {
+        // Prepare query for CQEngine repository
+        Query query =
+                and(in(IXPackageRepository.OS_ID, osId, IXPackageRepository.ALL_OS_ID),
+                        in(IXPackageRepository.SITE_ID, siteId, IXPackageRepository.ALL_SITE_ID),
+                        in(IXPackageRepository.COUNTRY_ID, countryId, IXPackageRepository.ALL_COUNTRY_ID),
+                        in(IXPackageRepository.SLOT_ID, slotId, IXPackageRepository.ALL_SLOT_ID));
+
+        return ixPackageRepository.getPackageIndex().retrieve(query);
     }
 }

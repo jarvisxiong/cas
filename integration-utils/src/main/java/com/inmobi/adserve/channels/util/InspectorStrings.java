@@ -85,6 +85,10 @@ public class InspectorStrings {
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
     public static final String INVALID_DSP_ID = "DroppedDueToInvalidDspId";
+    public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
+    public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
+    public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
+    public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
 
     private InspectorStrings() {
         // dummy private constructor to avoid instantiation from other classes

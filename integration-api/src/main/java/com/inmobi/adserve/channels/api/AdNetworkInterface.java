@@ -64,12 +64,12 @@ public interface AdNetworkInterface {
     // Returns true for ix partner, false otherwise.
     boolean isIxPartner();
 
-    //Processes the response
+    // Processes the response
     void processResponse();
-    
-    //Sets the internal AD status
+
+    // Sets the internal AD status
     void setAdStatus(String adStatus);
-    
+
     // Returns auction id sent in the rtb response
     String getAuctionId();
 

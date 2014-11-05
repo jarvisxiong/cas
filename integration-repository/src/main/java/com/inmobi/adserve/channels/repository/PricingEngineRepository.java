@@ -75,7 +75,7 @@ public class PricingEngineRepository
         final Type type = new TypeToken<HashMap<String, HashSet<String>>>() {
 
             /**
-           * 
+           *
            */
             private static final long serialVersionUID = 1L;
         }.getType();

@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.amobeeplatform;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -54,7 +55,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPAmobeePlatformAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -157,7 +158,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getPostalCode() != null) {
                 appendQueryParam(url, ZIP_CODE, sasParams.getPostalCode(), false);
             }
-            if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+            if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
                 appendQueryParam(url, NEGATIVE_KEYWORD,
                         getURLEncode(CategoryList.getBlockedCategoryForPerformance(), format), false);
             } else {

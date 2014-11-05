@@ -440,8 +440,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean configureParameters() {
         return false;
     }
-    
-    public void setAdStatus(String adStatus){
+
+    public void setAdStatus(String adStatus) {
         this.adStatus = adStatus;
     }
 

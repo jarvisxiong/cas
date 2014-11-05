@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.rtb;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -339,7 +340,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.debug(traceMarker, "blockedCategories are {}", casInternalRequestParameters.getBlockedIabCategories());
         }
         // Setting blocked categories
-        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
             bCatSet.addAll(iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
         } else {
             bCatSet.addAll(iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
@@ -477,7 +478,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         banner.setMimes(image_mimes);
 
         // Setting battributes
-        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
             banner.setBattr(performanceBlockedAttributes);
         } else {
             banner.setBattr(fsBlockedAttributes);
@@ -582,7 +583,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         final Map<String, String> siteExtensions = new HashMap<String, String>();
         String siteRating;
-        if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.FAMILY_SAFE == sasParams.getSiteContentType()) {
             // Family safe
             siteRating = FAMILY_SAFE_RATING;
         } else {
@@ -624,7 +625,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final AppExt ext = new AppExt();
 
         String appRating;
-        if (!SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.FAMILY_SAFE == sasParams.getSiteContentType()) {
             // Family safe
             appRating = FAMILY_SAFE_RATING;
         } else {

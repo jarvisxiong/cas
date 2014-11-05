@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -49,6 +50,7 @@ public class AuctionEngineIXTest {
     CasInternalRequestParameters casInternalRequestParameters;
     AuctionFilterApplier auctionFilterApplier;
     AuctionEngine auctionEngine;
+    SASRequestParameters sasParams;
 
     @BeforeMethod
     public void setUp() throws IOException {
@@ -78,6 +80,14 @@ public class AuctionEngineIXTest {
         expect(mockConfig.getInt("rtb.maxconnections")).andReturn(50).anyTimes();
 
         replay(mockConfig);
+
+        sasParams = new SASRequestParameters();
+        sasParams.setDst(DemandSourceType.IX.getValue());
+        sasParams.setCountryId(94L);
+        sasParams.setCarrierId(1);
+        sasParams.setSiteId("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        sasParams.setSiteContentType(ContentType.PERFORMANCE);
+        sasParams.setDst(DemandSourceType.IX.getValue());
 
         casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setAuctionId("auctionId");
@@ -164,8 +174,7 @@ public class AuctionEngineIXTest {
         final String expectedRTBAdNetworkName = "A";
 
         final AuctionEngine auctionEngine = new AuctionEngine();
-        auctionEngine.sasParams = new SASRequestParameters();
-        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        auctionEngine.sasParams = sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -193,8 +202,7 @@ public class AuctionEngineIXTest {
         final String expectedRTBAdNetworkName = "A";
 
         final AuctionEngine auctionEngine = new AuctionEngine();
-        auctionEngine.sasParams = new SASRequestParameters();
-        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        auctionEngine.sasParams = this.sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -223,8 +231,7 @@ public class AuctionEngineIXTest {
         final String expectedAuctionEngineResponse = null;
 
         final AuctionEngine auctionEngine = new AuctionEngine();
-        auctionEngine.sasParams = new SASRequestParameters();
-        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        auctionEngine.sasParams = this.sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
@@ -255,8 +262,7 @@ public class AuctionEngineIXTest {
         final String expectedAuctionEngineResponse = null;
 
         final AuctionEngine auctionEngine = new AuctionEngine();
-        auctionEngine.sasParams = new SASRequestParameters();
-        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        auctionEngine.sasParams = this.sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);

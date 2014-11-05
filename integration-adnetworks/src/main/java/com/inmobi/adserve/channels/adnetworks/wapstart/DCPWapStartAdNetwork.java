@@ -225,7 +225,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("Wapstart response is {} and response length is {} and status code is {}", response, response.length(), status);
+        LOG.debug("Wapstart response is {} and response length is {} and status code is {}", response,
+                response.length(), status);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {

@@ -13,6 +13,7 @@ public final class ChannelServerStringLiterals {
     public static final String CURRENCY_CONVERSION_REPOSITORY = "CurrencyConversionRepository";
     public static final String WAP_SITE_UAC_REPOSITORY = "WapSiteUACRepository";
     public static final String IX_ACCOUNT_MAP_REPOSITORY = "IXAccountMapRepository";
+    public static final String IX_PACKAGE_REPOSITORY = "IXPackageRepository";
     public static final String CREATIVE_REPOSITORY = "CreativeRepository";
     public static final String NATIVE_AD_TEMPLATE_REPOSITORY = "NativeAdTemplateRepository";
     public static final String AEROSPIKE_FEEDBACK = "aerospike";
