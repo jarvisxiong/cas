@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -26,12 +27,14 @@ import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.ix.AdQuality;
 import com.inmobi.casthrift.ix.App;
 import com.inmobi.casthrift.ix.Banner;
 import com.inmobi.casthrift.ix.Bid;
 import com.inmobi.casthrift.ix.CommonExtension;
 import com.inmobi.casthrift.ix.Device;
+import com.inmobi.casthrift.ix.ExtRubiconTarget;
 import com.inmobi.casthrift.ix.Geo;
 import com.inmobi.casthrift.ix.IXBidRequest;
 import com.inmobi.casthrift.ix.IXBidResponse;
@@ -165,6 +168,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String responseImpressionId;
     private String responseAuctionId;
     private String dealId;
+    private List<String> packageIds;
     private Double adjustbid;
     private String creativeId;
     private Integer pmptier;
@@ -446,6 +450,24 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 return null;
             }
         }
+
+        long startTime = System.currentTimeMillis();
+        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper);
+        long endTime = System.currentTimeMillis();
+        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
+                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+
+        if (!packageIds.isEmpty()) {
+            LOG.debug("No. of matching deal packages - {}", packageIds.size());
+            RubiconExtension rp = (impExt.getRp() == null) ? new RubiconExtension() : impExt.getRp();
+            ExtRubiconTarget target = new ExtRubiconTarget();
+            target.packages = packageIds;
+            impExt.setRp(rp.setTarget(target));
+
+            // Update the stats
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
+        }
+
         impression.setExt(impExt);
         return impression;
     }
@@ -637,7 +659,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private AdQuality createAdQuality() {
         final AdQuality adQuality = new AdQuality();
-        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
             adQuality.setSensitivity("low");
         } else {
             adQuality.setSensitivity("high");
@@ -746,14 +768,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final List<String> blockedList = Lists.newArrayList();
         LOG.debug(traceMarker, "{}", sasParams.getSiteIncId());
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
-        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
-
+        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
             blockedList.add(RUBICON_PERF_BLOCKLIST_ID);
-
         } else {
-
             blockedList.add(RUBICON_FS_BLOCKLIST_ID);
-
         }
         blockedList.add(RUBICON_STRATEGIC_BLOCKLIST_ID);
         return blockedList;
@@ -1163,6 +1181,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
+            if (dealId != null) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
+            }
             final boolean result = updateDSPAccountInfo(seatBid.getBuyer());
             if (!result) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_DSP_ID);
@@ -1198,6 +1219,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return aqid;
     }
 
+    public List<String> getPackageIds() {
+        return packageIds;
+    }
 
     @Override
     public String getId() {

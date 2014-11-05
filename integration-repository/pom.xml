@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>4.10-SNAPSHOT</version>
+		<version>4.11-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -37,6 +37,18 @@
 			<artifactId>data</artifactId>
 			<scope>compile</scope>
 			<optional>false</optional>
+		</dependency>
+		<dependency>
+			<groupId>inmobi.phoenix.batteries</groupId>
+			<artifactId>dataV2</artifactId>
+			<scope>compile</scope>
+			<optional>false</optional>
+		</dependency>
+		<dependency>
+			<groupId>inmobi.phoenix.batteries</groupId>
+			<artifactId>data</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>inmobi.phoenix.batteries</groupId>
@@ -89,7 +101,22 @@
 			<artifactId>adtemplate-idl</artifactId>
 			<version>2.0.2</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>com.googlecode.cqengine</groupId>
+			<artifactId>cqengine</artifactId>
+			<version>1.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi</groupId>
+			<artifactId>segments</artifactId>
+			<version>${segments.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi</groupId>
+			<artifactId>experimentation</artifactId>
+			<version>${experimentation.version}</version>
+		</dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>

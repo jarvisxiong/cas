@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -128,7 +129,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         finalUrl.append("&ip=").append(sasParams.getRemoteHostIp());
         finalUrl.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
         finalUrl.append("&p(site)=");
-        if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
             finalUrl.append('p');
         } else {
             finalUrl.append("fs");

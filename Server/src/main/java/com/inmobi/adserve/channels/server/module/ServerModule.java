@@ -44,7 +44,6 @@ import com.inmobi.template.module.TemplateModule;
  * 
  */
 public class ServerModule extends AbstractModule {
-
     private final Configuration loggerConfiguration;
     private final RepositoryHelper repositoryHelper;
     private final Reflections reflections;

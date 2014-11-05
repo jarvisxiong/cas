@@ -12,6 +12,7 @@ import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 
@@ -38,7 +39,7 @@ public class RequestParserTest extends TestCase {
     public void testParseRequestParameters() throws JSONException {
         final JSONObject jObject =
                 new JSONObject(
-                        "{\"site-type\":\"PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4\""
+                        "{\"site-type\":\"PERFORMANCE\""
                                 + ",\"handset\":[42279,\"apple_ipod_touch_ver4_3_1_subua\"],\"rqMkAdcount\":\"1\",\"new-category\":[70,42],\"site-floor\":0"
                                 + ",\"rqMkAdSlot\":\"9\",\"raw-uid\":{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}"
                                 + ",\"carrier\":[406,94,\"US\",12328,31118],\"site-url\":\"ww.inmobi.com\",\"tid\":\"0e919b0a-73c4-44cb-90ec-2b37b2249219\""
@@ -51,10 +52,7 @@ public class RequestParserTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         requestParser.parseRequestParameters(jObject, sasRequestParameters, casInternalRequestParameters);
         assertNotNull(sasRequestParameters);
-        assertEquals(
-                "PE (iPod; U; CPU iPhone OS 4_3_1 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8G4"
-                        .toUpperCase(),
-                sasRequestParameters.getSiteType());
+        assertEquals(ContentType.PERFORMANCE, sasRequestParameters.getSiteContentType());
         assertEquals(sasRequestParameters.getHandsetInternalId(), 42279);
         assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getSiteFloor(), 0.0);

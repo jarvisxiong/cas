@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+import com.googlecode.cqengine.resultset.ResultSet;
 import io.netty.channel.Channel;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -23,6 +25,7 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -32,6 +35,7 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.ix.Bid;
@@ -48,6 +52,9 @@ public class IXAdNetworkTest extends TestCase {
     private final SASRequestParameters sasParams = new SASRequestParameters();
     private final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     private final String ixAdvId = "id";
+    private static final int OS_ID = 14;
+    private static final String SITE_ID = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    private static final long COUNTRY_ID = 94L;
     IXBidResponse bidResponse;
 
     public void prepareMockConfig() {
@@ -86,7 +93,12 @@ public class IXAdNetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        sasParams.setCountryId(COUNTRY_ID);
+        sasParams.setOsId(OS_ID);
+        sasParams.setSlot((short)14);
+        sasParams.setSiteId(SITE_ID);
         sasParams.setSource("app");
+        sasParams.setCarrierId(0);
         sasParams.setDst(8);
         final String urlBase = "";
         final CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
@@ -95,6 +107,48 @@ public class IXAdNetworkTest extends TestCase {
         final RepositoryHelper repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
         EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
                 .andReturn(currencyConversionEntity).anyTimes();
+        final ResultSet<IXPackageEntity> resultSet = new ResultSet<IXPackageEntity>() {
+            @Override
+            public Iterator<IXPackageEntity> iterator() {
+                return new Iterator<IXPackageEntity>() {
+                    @Override
+                    public boolean hasNext() {
+                        return false;
+                    }
+
+                    @Override
+                    public IXPackageEntity next() {
+                        return null;
+                    }
+
+                    @Override
+                    public void remove() {}
+                };
+            }
+
+            @Override
+            public boolean contains(IXPackageEntity object) {
+                return false;
+            }
+
+            @Override
+            public int getRetrievalCost() {
+                return 0;
+            }
+
+            @Override
+            public int getMergeCost() {
+                return 0;
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+        };
+
+        EasyMock.expect(repositoryHelper.queryIXPackageRepository(OS_ID, SITE_ID, (int) COUNTRY_ID, OS_ID))
+                .andReturn(resultSet).anyTimes();
         EasyMock.replay(repositoryHelper);
 
         ixAdNetwork =
@@ -201,8 +255,8 @@ public class IXAdNetworkTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, false, false, false, false, false, false, false, false, false, false,
+                        new JSONObject(), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl),
                 false);
@@ -223,7 +277,7 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId("some_site_id");
+            sasParams.setSiteId(SITE_ID);
             sasParams.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
@@ -260,7 +314,7 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId("some_site_id");
+            sasParams.setSiteId(SITE_ID);
             sasParams.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
@@ -280,7 +334,6 @@ public class IXAdNetworkTest extends TestCase {
         } catch (final JSONException e) {
             System.out.println("JSON EXCEPtion in creating new channel segment entity");
         }
-
     }
 
     @Test
@@ -299,7 +352,7 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId("some_site_id");
+            sasParams.setSiteId(SITE_ID);
             sasParams.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setTransparencyEnabled(false);
@@ -383,7 +436,7 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId("some_site_id");
+            sasParams.setSiteId(SITE_ID);
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
@@ -406,7 +459,7 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getApp().getAq().getSensitivity(), "high");
 
             // if site type is performance
-            sasParams.setSiteType("PERFORMANCE");
+            sasParams.setSiteContentType(ContentType.PERFORMANCE);
 
             sasParams.setSource("wap");
             adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
@@ -445,9 +498,9 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId("some_site_id");
+            sasParams.setSiteId(SITE_ID);
             sasParams.setSource("wap");
-            sasParams.setSiteType("PERFORMANCE");
+            sasParams.setSiteContentType(ContentType.PERFORMANCE);
             sasParams.setSiteIncId(423);
             builder = WapSiteUACEntity.newBuilder();
             builder.setAppType("Games");
@@ -472,7 +525,7 @@ public class IXAdNetworkTest extends TestCase {
 
             // checking for blocked list if siteType is not PERFORMANCE, also if site is not transparent
 
-            sasParams.setSiteType("FAMILYSAFE");
+            sasParams.setSiteContentType(ContentType.FAMILY_SAFE);
             sasParams.setSiteIncId(423);
             builder = WapSiteUACEntity.newBuilder();
             builder.setAppType("Games");
@@ -487,7 +540,7 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getApp());
             assertNotNull(ixAdNetwork.getBidRequest().getSite());
-            assertNotSame(ixAdNetwork.getBidRequest().getSite().getId(), "some_site_id");
+            assertNotSame(ixAdNetwork.getBidRequest().getSite().getId(), SITE_ID);
             // assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), getBlindedSiteId(sasParams.getSiteIncId(),
             // entity.getIncId(getCreativeType())));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "Games");
@@ -521,7 +574,7 @@ public class IXAdNetworkTest extends TestCase {
 
                 CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
                 sasParams.setRemoteHostIp("206.29.182.240");
-                sasParams.setSiteId("some_site_id");
+                sasParams.setSiteId(SITE_ID);
                 sasParams.setSource("wap");
                 WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
                 //   builder.setAppType("Games");
@@ -535,7 +588,7 @@ public class IXAdNetworkTest extends TestCase {
                 assertTrue(adapterCreated);
 
                 assertNotNull(ixAdNetwork.getBidRequest().getSite());
-                assertEquals(ixAdNetwork.getBidRequest().getSite().getId(),"some_site_id");
+                assertEquals(ixAdNetwork.getBidRequest().getSite().getId(),SITE_ID);
                 assertEquals(ixAdNetwork.getBidRequest().getSite().getName(),"");
 
                 sasParams.setSource("app");
@@ -563,7 +616,7 @@ public class IXAdNetworkTest extends TestCase {
                     new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
             CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId("some_site_id");
+            sasParams.setSiteId(SITE_ID);
             sasParams.setSource("wap");
             WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setAppType("Games");

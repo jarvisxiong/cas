@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -149,6 +151,14 @@ public class Logging {
             ad = new Ad(adChain, adMeta);
             impression = new Impression(channelSegment.getAdNetworkInterface().getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
+
+            // For IX, log all the package IDs which were sent to RP.
+            if (channelSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
+                IXAdNetwork ixadNetwork = (IXAdNetwork) channelSegment.getAdNetworkInterface();
+                if (null != ixadNetwork.getPackageIds()) {
+                    impression.setIxPackageIds(ixadNetwork.getPackageIds());
+                }
+            }
             final double winBid = channelSegment.getAdNetworkInterface().getSecondBidPriceInUsd();
             if (winBid != -1) {
                 ad.setWinBid(winBid);
@@ -399,7 +409,7 @@ public class Logging {
     }
 
     /**
-     * 
+     *
      * @param rankList
      * @param config
      */
@@ -455,7 +465,6 @@ public class Logging {
     }
 
     /**
-     * 
      * @param casAdvertisementLog
      */
     private static void sendToDatabus(final CasAdvertisementLog casAdvertisementLog,
@@ -499,17 +508,16 @@ public class Logging {
     }
 
     public static ContentRating getContentRating(final SASRequestParameters sasParams) {
-        String sasSiteType;
-        if (sasParams == null || null == sasParams.getSiteType()) {
+        if (sasParams == null || null == sasParams.getSiteContentType()) {
             return null;
         } else {
-            sasSiteType = sasParams.getSiteType();
+            ContentType sasSiteContentType = sasParams.getSiteContentType();
 
-            if ("performance".equalsIgnoreCase(sasSiteType)) {
+            if (ContentType.PERFORMANCE == sasSiteContentType) {
                 return ContentRating.PERFORMANCE;
-            } else if ("FAMILY_SAFE".equalsIgnoreCase(sasSiteType)) {
+            } else if (ContentType.FAMILY_SAFE == sasSiteContentType) {
                 return ContentRating.FAMILY_SAFE;
-            } else if ("MATURE".equalsIgnoreCase(sasSiteType)) {
+            } else if (ContentType.MATURE == sasSiteContentType) {
                 return ContentRating.MATURE;
             }
         }

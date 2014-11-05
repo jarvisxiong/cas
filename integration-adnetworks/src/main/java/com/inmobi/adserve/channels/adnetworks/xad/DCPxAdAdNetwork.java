@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.xad;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -158,7 +159,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
                 bCatSet.addAll(casInternalRequestParameters.getBlockedIabCategories());
             }
 
-            if (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) {
+            if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
                 bCatSet.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
             } else {
                 bCatSet.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));

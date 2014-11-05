@@ -13,6 +13,7 @@ import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
 import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
+import com.inmobi.adserve.channels.repository.IXPackageRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -93,6 +94,7 @@ public class ChannelServer {
     private static CurrencyConversionRepository currencyConversionRepository;
     private static WapSiteUACRepository wapSiteUACRepository;
     private static IXAccountMapRepository ixAccountMapRepository;
+    private static IXPackageRepository ixPackageRepository;
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     @Getter
@@ -166,6 +168,7 @@ public class ChannelServer {
             creativeRepository = new CreativeRepository();
             nativeAdTemplateRepository = new NativeAdTemplateRepository();
             ixAccountMapRepository = new IXAccountMapRepository();
+            ixPackageRepository = new IXPackageRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -181,6 +184,7 @@ public class ChannelServer {
             repoHelperBuilder.setCurrencyConversionRepository(currencyConversionRepository);
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
             repoHelperBuilder.setIxAccountMapRepository(ixAccountMapRepository);
+            repoHelperBuilder.setIxPackageRepository(ixPackageRepository);
 
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
@@ -341,6 +345,9 @@ public class ChannelServer {
             nativeAdTemplateRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY),
                     ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY);
+            ixPackageRepository.init(ds,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
+                    ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
 
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)

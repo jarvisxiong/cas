@@ -4,17 +4,14 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
 import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
 
 
 public class CasConfigUtil {
-
-
     // TODO: clear up all these responses, configs to separate module
     public static final String JSON_PARSING_ERROR = "EJSON";
     public static final String THRIFT_PARSING_ERROR = "ETHRIFT";
@@ -25,13 +22,11 @@ public class CasConfigUtil {
     public static final String MISSING_CATEGORY = "MISSINGCATEGORY";
     public static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
     public static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
+    public static final Random RANDOM = new Random();
 
     public static RepositoryHelper repositoryHelper;
     public static List<String> allowedSiteTypes;
     public static int rollCount = 0;
-    public static final Random RANDOM = new Random();
-
-    private static final Logger LOG = LoggerFactory.getLogger(CasConfigUtil.class);
 
     private static Configuration serverConfig;
     private static Configuration rtbConfig;
@@ -39,7 +34,8 @@ public class CasConfigUtil {
     private static Configuration loggerConfig;
     private static Configuration log4jConfig;
     private static Configuration databaseConfig;
-
+    
+    @SuppressWarnings("unchecked")
     public static void init(final ConfigurationLoader config, final RepositoryHelper repositoryHelper) {
         CasConfigUtil.rtbConfig = config.getRtbConfiguration();
         CasConfigUtil.loggerConfig = config.getLoggerConfiguration();

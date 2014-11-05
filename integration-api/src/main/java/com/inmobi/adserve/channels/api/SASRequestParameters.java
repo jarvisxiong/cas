@@ -6,6 +6,7 @@ import java.util.Set;
 
 import lombok.Data;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
@@ -32,8 +33,7 @@ public class SASRequestParameters {
     private String clurl;
     private String siteId;
     private Short slot;
-    // TODO: Convert this to ENUM.
-    private String siteType;
+    private ContentType siteContentType;
     private String sdkVersion;
     private long siteIncId;
     private long adIncId;

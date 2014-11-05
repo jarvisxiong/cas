@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import com.inmobi.adserve.adpool.AdCodeType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.Carrier;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.DeviceType;
 import com.inmobi.adserve.adpool.Geo;
@@ -141,7 +142,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getClurl(), null); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
         assertEquals(sasRequestParameters.getSlot(), new Short("12"));
-        assertEquals(sasRequestParameters.getSiteType(), "FAMILY_SAFE");
+        assertEquals(sasRequestParameters.getSiteContentType(), ContentType.FAMILY_SAFE);
         assertEquals(sasRequestParameters.getSdkVersion(), "i231");
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0); // Internal, Populated in cas

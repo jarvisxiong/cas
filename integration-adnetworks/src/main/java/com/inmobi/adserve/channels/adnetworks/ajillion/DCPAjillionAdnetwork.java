@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -44,7 +45,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPAjillionAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -60,7 +61,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString(name + ".host");
-        final String siteRating = SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType()) ? "p" : "fs";
+        final String siteRating = ContentType.PERFORMANCE == sasParams.getSiteContentType() ? "p" : "fs";
         placementId = config.getString(String.format(SLOT_FORMAT, name, sasParams.getSlot(), siteRating));
         if (StringUtils.isBlank(placementId)) {
             LOG.debug("Slot is not configured for {}", externalSiteId);

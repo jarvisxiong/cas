@@ -64,7 +64,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
                 // We need to send one response from this point, so take the best from here and return it.
                 for (final ChannelSegment channelSegment : segmentList) {
                     if (channelSegment.getAdNetworkInterface().isRequestCompleted() == false) {
-                      channelSegment.getAdNetworkInterface().setAdStatus("TIME_OUT");
+                        channelSegment.getAdNetworkInterface().setAdStatus("TIME_OUT");
                     }
                     channelSegment.getAdNetworkInterface().processResponse();
                 }

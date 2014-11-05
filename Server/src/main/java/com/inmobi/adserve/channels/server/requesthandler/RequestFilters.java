@@ -54,9 +54,9 @@ public class RequestFilters {
             return true;
         }
 
-        if (hrh.responseSender.sasParams.getSiteType() != null
-                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
-            LOG.info("Terminating request as incompatible content type");
+        if (hrh.responseSender.sasParams.getSiteContentType() != null
+                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteContentType().name())) {
+            LOG.error("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;

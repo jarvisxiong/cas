@@ -3,7 +3,7 @@ package com.inmobi.template.exception;
 public class TemplateException extends Exception {
 
     /**
-   * 
+   *
    */
     private static final long serialVersionUID = 1L;
 

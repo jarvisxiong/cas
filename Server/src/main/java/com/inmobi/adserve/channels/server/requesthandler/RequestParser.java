@@ -23,6 +23,7 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 
@@ -108,11 +109,11 @@ public class RequestParser {
             sdkVersion = null;
         }
         params.setSdkVersion(sdkVersion);
-        params.setSiteType(stringify(jObject, "site-type"));
-        params.setAdcode(stringify(jObject, "adcode"));
-        if (params.getSiteType() != null) {
-            params.setSiteType(params.getSiteType().toUpperCase());
+        String siteType = stringify(jObject, "site-type");
+        if (null != siteType) {
+            params.setSiteContentType(ContentType.valueOf(siteType));
         }
+        params.setAdcode(stringify(jObject, "adcode"));
         params.setCategories(getCategory(jObject, "new-category"));
         params.setRqIframe(stringify(jObject, "rqIframe"));
         params.setRFormat(stringify(jObject, "r-format"));

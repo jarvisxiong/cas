@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
@@ -100,8 +101,9 @@ public class ThriftRequestParser {
                 params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
                         tObject.geo.countryId, (int) tObject.device.osId));
             }
-            params.setSiteType(tObject.site.isSetContentRatingDeprecated() ? tObject.site.contentRatingDeprecated
-                    .toString() : "FAMILY_SAFE");
+            params.setSiteContentType(tObject.site.isSetSiteContentType()
+                    ? tObject.site.getSiteContentType()
+                    : ContentType.FAMILY_SAFE);
             params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
             final double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
@@ -140,7 +142,7 @@ public class ThriftRequestParser {
             }
             params.setLatLong(latLong);
             params.setCountryCode(tObject.geo.countryCode);
-            params.setCountryId((long) tObject.geo.getCountryId());
+            params.setCountryId((long) tObject.geo.getCountryId()); // TODO: Evaluate if int->long casting is needed?
             final Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(null != cities && cities.iterator().hasNext()
                     ? tObject.geo.getCityIds().iterator().next()
@@ -194,8 +196,6 @@ public class ThriftRequestParser {
         if (tObject.isSetCarrier()) {
             params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
             params.setNetworkType(tObject.carrier.networkType);
-
-
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());

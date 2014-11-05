@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -96,18 +97,18 @@ public class MatchSegments {
         final Long countryId = sasParams.getCountryId();
         final int osId = sasParams.getOsId();
         final String sourceStr = sasParams.getSource();
-        final String siteRatingStr = sasParams.getSiteType();
+        final ContentType siteRatingEnum = sasParams.getSiteContentType();
         final Integer targetingPlatform = sourceStr == null || "wap".equalsIgnoreCase(sourceStr) ? 2 : 1 /* app */;
         Integer siteRating = -1;
-        if (null == siteRatingStr || slotId == null || sasParams.getCategories() == null
+        if (null == siteRatingEnum || slotId == null || sasParams.getCategories() == null
                 || sasParams.getCategories().isEmpty()) {
             return null;
         }
-        if ("performance".equalsIgnoreCase(siteRatingStr)) {
+        if (ContentType.PERFORMANCE == siteRatingEnum) {
             siteRating = 0;
-        } else if ("mature".equalsIgnoreCase(siteRatingStr)) {
+        } else if (ContentType.MATURE == siteRatingEnum) {
             siteRating = 1;
-        } else if ("family_safe".equalsIgnoreCase(siteRatingStr)) {
+        } else if (ContentType.FAMILY_SAFE == siteRatingEnum) {
             siteRating = 2;
         }
         try {

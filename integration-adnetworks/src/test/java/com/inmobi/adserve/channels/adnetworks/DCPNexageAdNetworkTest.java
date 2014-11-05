@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -768,7 +769,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
-        sasParams.setSiteType("PERFORMANCE");
+        sasParams.setSiteContentType(ContentType.PERFORMANCE);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         final String burl =
@@ -801,7 +802,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
-        sasParams.setSiteType("FAMILY_SAFE");
+        sasParams.setSiteContentType(ContentType.FAMILY_SAFE);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
         SlotSizeMapping.init();
         final String burl =

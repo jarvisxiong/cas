@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>4.10-SNAPSHOT</version>
+	<version>4.11-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -25,7 +25,11 @@
 		<creative-validator>5.0.90</creative-validator>
 		<guice-assistedinject.version>3.0</guice-assistedinject.version>
 		<commons.pool.version>2.2</commons.pool.version>
-	</properties>
+		<phoenix.batteries.version>2.3.31</phoenix.batteries.version>
+		<segments.version>1.1.4</segments.version>
+		<experimentation.version>1.6.2</experimentation.version>
+		<guava.version>15.0</guava.version>
+    </properties>
 
 	<modules>
 		<module>Server</module>
@@ -182,14 +186,26 @@
 			<dependency>
 				<groupId>inmobi.phoenix.batteries</groupId>
 				<artifactId>data</artifactId>
-				<version>2.3.28</version>
+				<version>${phoenix.batteries.version}</version>
 				<scope>compile</scope>
 				<optional>false</optional>
 			</dependency>
 			<dependency>
 				<groupId>inmobi.phoenix.batteries</groupId>
+				<artifactId>dataV2</artifactId>
+				<version>${phoenix.batteries.version}</version>
+			</dependency>
+            <dependency>
+                <groupId>inmobi.phoenix.batteries</groupId>
+                <artifactId>data</artifactId>
+                <version>${phoenix.batteries.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+			<dependency>
+				<groupId>inmobi.phoenix.batteries</groupId>
 				<artifactId>util</artifactId>
-				<version>2.3.28</version>
+				<version>${phoenix.batteries.version}</version>
 				<scope>compile</scope>
 				<optional>false</optional>
 			</dependency>
@@ -211,7 +227,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>14.0-rc1</version>
+				<version>${guava.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>
@@ -290,7 +306,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>2.1</version>
+				<version>2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
