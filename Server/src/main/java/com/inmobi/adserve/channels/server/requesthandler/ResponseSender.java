@@ -31,6 +31,7 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -40,6 +41,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
+
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
+
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -348,12 +351,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) throws NullPointerException {
         LOG.debug("Inside send Response");
-
         responseBytes = encryptResponseIfRequired(responseBytes);
 
         final FullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
-
         if (null != responseHeaders) {
             for (final Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
                 response.headers().add(entry.getKey().toString(), responseHeaders.get(entry.getValue()));
@@ -361,14 +362,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         response.headers().add(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-
         // TODO: to fix keep alive, we need to fix whole flow
-        // HttpHeaders.setKeepAlive(response, serverChannel.isKeepAlive());
         response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, responseBytes.length);
-
         response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
+        System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
 
         if (sasParams.isKeepAlive()) {
             serverChannel.writeAndFlush(response);
@@ -394,28 +393,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (sasParams.getSdkVersion() != null
                 && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
                 && sasParams.getDst() == 2) {
-
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
-
             try {
-
                 responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
                         encryptionKey.getInitializationVector());
-
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
                             encryptionKey.getAesKey(), CharsetUtil.UTF_8),
                             new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(
                                     responseBytes, CharsetUtil.UTF_8));
                 }
-
             } catch (InmobiSecureException | InvalidMessageException e) {
                 LOG.info("Exception while encrypting response from {}", e);
                 throw new RuntimeException(e);
             }
-
         }
         return responseBytes;
     }
@@ -430,7 +423,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return auctionEngine;
     }
 
-    // TODO: does it need to be synchronized?
     @Override
     public void sendNoAdResponse(final Channel serverChannel) throws NullPointerException {
         // Making sure response is sent only once
@@ -438,9 +430,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return;
         }
         LOG.debug("Sending No ads");
-
         responseSent = true;
-
         // dst != 0 is true only for servlets rtbdFill, backFill, ixFill
         // This check has been added to prevent totalNoFills from being updated, when any servlet other than the ones
         // mentioned above throws an exception in HttpRequestHandler.
@@ -736,7 +726,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     STRING_TO_FORMAT_MAP.put(format, responseFormat);
                 }
             }
-
         }
 
         private ResponseFormat(final String... formats) {

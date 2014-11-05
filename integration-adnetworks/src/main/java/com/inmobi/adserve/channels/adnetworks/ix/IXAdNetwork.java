@@ -44,9 +44,11 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
+import com.inmobi.casthrift.ix.API_FRAMEWORKS;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -54,6 +56,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -68,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -105,7 +109,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
+    private static final String RUBICON_STRATEGIC_BLOCKLIST_ID = "InMobiSTRATEGIC";
     private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
+    private static final String LATLON = "LATLON";
+    private static final String BSSID_DERIVED = "BSSID_DERIVED";
+    private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
+    private static final String CCID = "CCID";
+    private static final String WIFI = "WIFI";
+    private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
+    private static final String CELL_TOWER = "CELL_TOWER";
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -186,6 +198,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
+    @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
             final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper,
@@ -478,6 +491,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             banner.setH((int) dim.getHeight());
         }
 
+        if (StringUtils.isNotBlank(sasParams.getSdkVersion())) {
+            final int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
+            if (sdkVersion >= 370) {
+                banner.setApi(Arrays.asList(API_FRAMEWORKS.MRAID_2.getValue()));
+            }
+        }
+
         final CommonExtension ext = new CommonExtension();
 
         if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
@@ -502,6 +522,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
+
+        if (LATLON.equals(sasParams.getLocSrc()) || BSSID_DERIVED.equals(sasParams.getLocSrc())
+            || VISIBLE_BSSID.equals(sasParams.getLocSrc())) {
+            geo.setType(1);
+        }
+        else if (CCID.equals(sasParams.getLocSrc()) || WIFI.equals(sasParams.getLocSrc())
+            || DERIVED_LAT_LON.equals(sasParams.getLocSrc()) || CELL_TOWER.equals(sasParams.getLocSrc())) {
+            geo.setType(2);
+        }
+
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
         }
@@ -589,7 +619,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private Publisher createPublisher(final List tempSasCategories) {
+    private Publisher createPublisher(final List<Long> tempSasCategories) {
 
         final Publisher publisher = new Publisher();
         if (null != tempSasCategories) {
@@ -725,6 +755,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             blockedList.add(RUBICON_FS_BLOCKLIST_ID);
 
         }
+        blockedList.add(RUBICON_STRATEGIC_BLOCKLIST_ID);
         return blockedList;
     }
 

@@ -133,13 +133,9 @@ public class Logging {
         AdMeta adMeta;
         Ad ad;
         Impression impression = null;
-        boolean isServerImpression = false;
-        String advertiserId = null;
         if (channelSegment != null) {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.SERVER_IMPRESSION);
-            isServerImpression = true;
-            advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
             adsServed = 1;
             final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
             adChain =
