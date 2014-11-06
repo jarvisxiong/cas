@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.httpool;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -27,12 +29,12 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG        = LoggerFactory.getLogger(DCPHttPoolAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPHttPoolAdNetwork.class);
 
-    private transient String    latitude;
-    private transient String    longitude;
-    private String              slotFormat;
-    private boolean             acceptShop = false;
+    private transient String latitude;
+    private transient String longitude;
+    private String slotFormat;
+    private boolean acceptShop = false;
 
     /**
      * @param config
@@ -50,28 +52,28 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for httpool so exiting adapter");
+            LOG.info("Configure parameters inside HttPool returned false");
             return false;
         }
         host = config.getString("httpool.host");
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Long slotSize = (long) sasParams.getSlot();
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            Short slotSize = selectedSlotId;
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
-            if (slotSize == 9l || slotSize == 24l) {
-                slotSize = 15l;
+            if (slotSize == (short)9 || slotSize == (short)24) {
+                slotSize = 15;
             }
-            Dimension dim = SlotSizeMapping.getDimension(slotSize);
+            final Dimension dim = SlotSizeMapping.getDimension(slotSize);
             acceptShop = dim.getWidth() > 299;
             slotFormat = String.format("%dx%d", (int) Math.ceil(dim.getWidth()), (int) Math.ceil(dim.getHeight()));
         }
 
-        LOG.info("Configure parameters inside httpool returned true");
         return true;
     }
 
@@ -88,7 +90,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(host);
+            final StringBuilder url = new StringBuilder(host);
 
             url.append("type=rich%2Ctpt");
             if (acceptShop) {
@@ -106,26 +108,25 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
 
             String did = getUid();
-            if (StringUtils.isEmpty(did) || did.equals("null")) {
+            if (StringUtils.isEmpty(did) || "null".equals(did)) {
                 did = "nodeviceid-1234567890";
             }
             url.append("&did=").append(did);
-            if (null != slot) {
+            if (null != selectedSlotId) {
                 url.append("&format=").append(slotFormat);
             }
-            String category = getCategories(';');
+            final String category = getCategories(';');
             if (!StringUtils.isEmpty(category)) {
                 url.append("&ct=").append(getURLEncode(category, format));
             }
-            String gender = sasParams.getGender();
+            final String gender = sasParams.getGender();
             if (StringUtils.isNotBlank(gender)) {
-                url.append("&dd_gnd=").append(gender.equalsIgnoreCase("f") ? 2 : 1);
+                url.append("&dd_gnd=").append("f".equalsIgnoreCase(gender) ? 2 : 1);
             }
             LOG.debug("httpool url is {}", url.toString());
 
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.error("{}", exception);
         }
@@ -143,12 +144,11 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside httpool is {}", beaconUrl);
 
             try {
-                JSONObject adResponse = new JSONObject(response);
+                final JSONObject adResponse = new JSONObject(response);
                 if (adResponse.getInt("status") == 0) {
                     statusCode = 500;
                     responseContent = "";
@@ -156,54 +156,43 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
                 statusCode = status.code();
                 TemplateType t;
-                VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("impression_url"));
-                String adType = adResponse.getString("ad_type");
+                final VelocityContext context = new VelocityContext();
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("impression_url"));
+                final String adType = adResponse.getString("ad_type");
                 if ("tpt".equalsIgnoreCase(adType)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("content"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                     t = TemplateType.HTML;
-                }
-                else {
-                    String landingUrl = adResponse.getString("click_url") + "&url="
-                            + adResponse.getString("redirect_url");
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, landingUrl);
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("image_url"));
+                } else {
+                    final String landingUrl =
+                            adResponse.getString("click_url") + "&url=" + adResponse.getString("redirect_url");
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, landingUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("image_url"));
                     if ("shop".equalsIgnoreCase(adType)) {
-                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("content"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                        context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("content"));
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             LOG.info("No template found for the slot");
                             adStatus = "NO_AD";
                             return;
-                        }
-                        else {
-                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                        } else {
+                            context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
                         }
-                    }
-                    else {
+                    } else {
                         t = TemplateType.IMAGE;
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from httpool : {}", exception);
-                LOG.info("Response from httpool: {}", response);
-            }
-            catch (Exception exception) {
+                LOG.info("Error parsing response {} from httpool: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from httpool : {}", exception);
-                LOG.info("Response from httpool: {}", response);
-                try {
-                    throw exception;
-                }
-                catch (Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.info("Error parsing response {} from httpool: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
         }
 
@@ -212,6 +201,6 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("httpool.advertiserId"));
+        return config.getString("httpool.advertiserId");
     }
 }

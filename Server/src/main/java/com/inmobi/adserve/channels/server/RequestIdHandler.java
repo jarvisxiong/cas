@@ -19,8 +19,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class RequestIdHandler extends ChannelInboundHandlerAdapter {
 
-    public RequestIdHandler() {
-    }
+    public RequestIdHandler() {}
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {

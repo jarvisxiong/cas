@@ -6,12 +6,12 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,48 +30,52 @@ import java.util.Map;
 
 public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger         LOG           = LoggerFactory.getLogger(DCPPlaceIQAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPPlaceIQAdnetwork.class);
 
-    private transient String            latitude;
-    private transient String            longitude;
-    private int                         width;
-    private int                         height;
-    private String                      os            = null;
-    private static final String         sizeFormat    = "%dx%d";
+    private static final String SIZE_FORMAT = "%dx%d";
 
-    private static final String         LAT           = "LT";
-    private static final String         LONG          = "LG";
-    private static final String         RESPONSE_TYPE = "ST";
-    private static final String         REQUEST_TYPE  = "RT";
-    private static final String         SIZE          = "SZ";
-    private static final String         ANDROIDMD5    = "AM";
-    private static final String         ANDROIDIDSHA1 = "AH";
-    private static final String         IOSSHA1       =  "DS";
-    private static final String         IDFA          = "IA";
-    private static final String         UA            = "UA";
-    private static final String         CLIENT_IP     = "IP";
-    private static final String         PT            = "PT";
-    private static final String         ADUNIT        = "AU";
-    private static final String         OS            = "DO";
-    private static final String         APPID         = "AP";
-    private static final String         SITEID        = "SI";
+    private static final String LAT = "LT";
+    private static final String LONG = "LG";
+    private static final String RESPONSE_TYPE = "ST";
+    private static final String REQUEST_TYPE = "RT";
+    private static final String SIZE = "SZ";
+    private static final String ANDROIDMD5 = "AM";
+    private static final String ANDROIDIDSHA1 = "AH";
+    private static final String IOSSHA1 = "DS";
+    private static final String IDFA = "IA";
+    private static final String UA = "UA";
+    private static final String CLIENT_IP = "IP";
+    private static final String PT = "PT";
+    private static final String ADUNIT = "AU";
+    private static final String OS = "DO";
+    private static final String APPID = "AP";
+    private static final String SITEID = "SI";
     // private static final String ZIP = "ZP";
-    private static final String         COUNTRY       = "CO";
+    private static final String COUNTRY = "CO";
     // private static final String SECRET = "SK";
-    private static final String         ADTYPE        = "AT";
-    private static final String         APPTYPE_BANNER="STG,RMG,MRD";
-    private static final String         APPTYPE_INT   = "STG,RMG,MRD,MRI";
-    private static final String         WAPTYPE       = "STG,STW,RMG,MRD";
-    private static final String         ANDROID       = "Android";
-    private static final String         IOS           = "iOS";
-    private static final String         auIdFormat    = "%s/%s/%s/%s";
-    private static final String         XMLFORMAT     = "xml";
-    private final String                partnerId;
-    private final String                requestFormat;
-    private final String                responseFormat;
-    private static Map<Integer, String> categoryList  = new HashMap<Integer, String>();
+    private static final String ADTYPE = "AT";
+    private static final String GPID = "GR";
 
-    private boolean                     isApp;
+    private static final String APPTYPE_BANNER = "STG,RMG,MRD";
+    private static final String APPTYPE_INT = "STG,RMG,MRD,MRI";
+    private static final String WAPTYPE = "STG,STW,RMG,MRD";
+    private static final String ANDROID = "Android";
+    private static final String IOS = "iOS";
+    private static final String AU_ID_FORMAT = "%s/%s/%s/%s";
+    private static final String XMLFORMAT = "xml";
+    private final String partnerId;
+    private final String requestFormat;
+    private final String responseFormat;
+    private static Map<Integer, String> categoryList = new HashMap<Integer, String>();
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private String os = null;
+
+
+    private boolean isApp;
 
     static {
         categoryList.put(2, "bk");
@@ -116,54 +120,54 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
 
-            Long slotSize = (long) sasParams.getSlot();
-            if (slotSize == 9l) {
-                slotSize = 15l;
+            Short slotSize = selectedSlotId;
+            if (slotSize == (short)9) {
+                slotSize = (short)15;
             }
-            Dimension dim = SlotSizeMapping.getDimension(slotSize);
+            final Dimension dim = SlotSizeMapping.getDimension(slotSize);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+            LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
-            if ((StringUtils.isEmpty(casInternalRequestParameters.uidMd5)
-                    && StringUtils.isEmpty(casInternalRequestParameters.uid) )) {
+            if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
+                    && StringUtils.isEmpty(casInternalRequestParameters.getUid())) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
-        }
-        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+        } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.uidIFA) && StringUtils
-                    .isEmpty(casInternalRequestParameters.uidIDUS1)) {
+            if (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())
+                    && StringUtils.isEmpty(casInternalRequestParameters.getUidIDUS1())) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
+                LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
             }
-        }
-        else {
+        } else {
             isApp = false;
             os = "Windows";
         }
 
-        LOG.info("Configure parameters inside PlaceIQ returned true");
         return true;
     }
 
@@ -174,16 +178,17 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder url = new StringBuilder(host);
+        final StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, REQUEST_TYPE, requestFormat, true);
         appendQueryParam(url, RESPONSE_TYPE, responseFormat, false);
         // appendQueryParam(url, SECRET,
         // getHashedValue(dateFormat.format(now.getTime()) + seed, "MD5"),
         // false);
         appendQueryParam(url, PT, partnerId, false);
-        String category = getCategory();
-        String auId = String.format(auIdFormat, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
-                Long.toHexString(this.entity.getAdgroupIncId()));
+        final String category = getCategory();
+        final String auId =
+                String.format(AU_ID_FORMAT, externalSiteId, category, Long.toHexString(sasParams.getSiteIncId()),
+                        Long.toHexString(entity.getAdgroupIncId()));
         appendQueryParam(url, ADUNIT, getURLEncode(auId, format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
 
@@ -203,37 +208,38 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, COUNTRY, sasParams.getCountryCode().toUpperCase(), false);
         }
 
-        appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);
+        appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
         if (os.equalsIgnoreCase(IOS)) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                appendQueryParam(url, IDFA, casInternalRequestParameters.uidIFA, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+                appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
 
             }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                appendQueryParam(url, IOSSHA1, casInternalRequestParameters.uidIDUS1, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                appendQueryParam(url, IOSSHA1, casInternalRequestParameters.getUidIDUS1(), false);
             }
         }
         if (os.equalsIgnoreCase(ANDROID)) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uidMd5, false);
+            final String gpid = getGPID();
+            if (null != gpid) {
+                appendQueryParam(url, GPID, gpid, false);
             }
-            else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.uid, false);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.getUidMd5(), false);
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+                appendQueryParam(url, ANDROIDMD5, casInternalRequestParameters.getUid(), false);
             }
-            
+
         }
-       
+
 
         if (isApp) {
-            appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);     
-            if (isInterstitial()){
-            appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_INT, format), false);
-            }
-            else{
+            appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
+            if (isInterstitial()) {
+                appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_INT, format), false);
+            } else {
                 appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_BANNER, format), false);
             }
-        }
-        else {
+        } else {
             appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
             appendQueryParam(url, ADTYPE, getURLEncode(WAPTYPE, format), false);
         }
@@ -241,52 +247,50 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         return new URI(url.toString());
     }
-    
+
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
         statusCode = status.code();
-        if (StringUtils.isBlank(response) || status.code() != 200
-                || (XMLFORMAT.equalsIgnoreCase(responseFormat) && response.contains("<NOAD>"))) {
+        if (StringUtils.isBlank(response) || status.code() != 200 || XMLFORMAT.equalsIgnoreCase(responseFormat)
+                && response.contains("<NOAD>")) {
             if (200 == statusCode) {
                 statusCode = 500;
             }
             adStatus = "NO_AD";
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             try {
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
                 if (XMLFORMAT.equalsIgnoreCase(responseFormat)) {
                     if (response.contains("<NOAD>")) {
                         adStatus = "NO_AD";
                         responseContent = "";
                         return;
                     }
-                    Document doc = documentBuilderHelper.parse(response);
+                    final Document doc = documentBuilderHelper.parse(response);
                     doc.getDocumentElement().normalize();
-                    NodeList reportNodes = doc.getElementsByTagName("PLACEIQ");
-                    Node rootNode = reportNodes.item(0);
+                    final NodeList reportNodes = doc.getElementsByTagName("PLACEIQ");
+                    final Node rootNode = reportNodes.item(0);
                     if (rootNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element rootElement = (Element) rootNode;
+                        final Element rootElement = (Element) rootNode;
 
-                        Element htmlContent = (Element) rootElement.getElementsByTagName("CONTENT").item(0);
-                        context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlContent.getTextContent());
+                        final Element htmlContent = (Element) rootElement.getElementsByTagName("CONTENT").item(0);
+                        context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlContent.getTextContent());
                     }
-                }
-                else {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response);
+                } else {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
                 }
 
                 statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from PlaceIQ : {}", exception);
-                LOG.info("Response from PlaceIQ: {}", response);
+                LOG.info("Error parsing response {} from PlaceIQ: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
             }
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -295,7 +299,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("placeiq.advertiserId"));
+        return config.getString("placeiq.advertiserId");
     }
 
     private String getCategory() {
@@ -316,11 +320,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                 break;
             }
 
-        }
-        else {
+        } else {
             for (int index = 0; index < sasParams.getCategories().size(); index++) {
 
-                int cat = sasParams.getCategories().get(index).intValue();
+                final int cat = sasParams.getCategories().get(index).intValue();
                 for (int i = 0; i < segmentCategories.length; i++) {
                     if (cat == segmentCategories[i]) {
                         category = categoryList.get(cat);
@@ -335,5 +338,5 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         return StringUtils.isBlank(category) ? "uc" : category;
     }
-
+    
 }

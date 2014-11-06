@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -24,8 +22,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger              LOG = LoggerFactory.getLogger(AdvertiserBurnLimitExceededFilter.class);
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     @Inject
@@ -38,7 +34,7 @@ public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilte
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
 
-        AdapterConfig adapterConfig = advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId());
+        final AdapterConfig adapterConfig = advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId());
 
         if (adapterConfig == null) {
             return true;

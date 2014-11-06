@@ -1,13 +1,17 @@
 package com.inmobi.adserve.channels.adnetworks.tapit;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -16,22 +20,19 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
+
     private static final Logger LOG = LoggerFactory.getLogger(DCPTapitAdNetwork.class);
 
-    private String              latitude;
-    private String              longitude;
-    private double              width;
-    private double              height;
+    private String latitude;
+    private String longitude;
+    private double width;
+    private double height;
 
     public DCPTapitAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -50,14 +51,14 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("tapit.host");
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = dim.getWidth();
             height = dim.getHeight();
         }
@@ -78,7 +79,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder();
+            final StringBuilder url = new StringBuilder();
             url.append(host).append("?format=").append(config.getString("tapit.responseFormat")).append("&ip=");
             url.append(sasParams.getRemoteHostIp()).append("&ua=")
                     .append(getURLEncode(sasParams.getUserAgent(), format));
@@ -91,25 +92,22 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&long=").append(longitude);
             }
 
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-                url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.uidIFA);
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
+                url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.getUidIFA());
             }
-            
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-                url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.uidO1);
+
+            if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
+                url.append("&enctype=sha1&udid=").append(casInternalRequestParameters.getUidO1());
+            } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+                url.append("&enctype=md5&udid=").append(casInternalRequestParameters.getUidMd5());
+            } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                appendQueryParam(url, "&enctype=sha1&udid=", casInternalRequestParameters.getUidIDUS1(), false);
             }
-            else if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-                url.append("&enctype=md5&udid=").append(casInternalRequestParameters.uidMd5);
+            final String gpid = getGPID();
+            if (gpid != null) {
+                url.append("&adid=").append(gpid);
             }
-            else if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                appendQueryParam(url,"&enctype=sha1&udid=", casInternalRequestParameters.uidIDUS1, false);
-            }
-            else {
-               String gpid = getGPID();
-               if (gpid != null) {
-               url.append("&enctype=raw&udid=").append(gpid);
-               }
-            }
+
 
             if (width != 0 && height != 0) {
                 url.append("&w=").append(width);
@@ -118,11 +116,10 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append("&tpsid=").append(blindedSiteId);
 
             LOG.debug("Tapit url is {}", url);
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -137,57 +134,47 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             LOG.debug("beacon url inside mullah media is {}", beaconUrl);
             try {
                 statusCode = status.code();
-                JSONObject adResponse = new JSONObject(response);
-                VelocityContext context = new VelocityContext();
+                final JSONObject adResponse = new JSONObject(response);
+                final VelocityContext context = new VelocityContext();
                 TemplateType t;
-                if (adResponse.getString("type").equals("html")) {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("html"));
+                if ("html".equals(adResponse.getString("type"))) {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("html"));
                     t = TemplateType.HTML;
-                }
-                else {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("clickurl"));
-                    context.put(VelocityTemplateFieldConstants.Width, adResponse.getString("adWidth"));
-                    context.put(VelocityTemplateFieldConstants.Height, adResponse.getString("adHeight"));
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                    if (adResponse.getString("type").equals("text")) {
-                        context.put(VelocityTemplateFieldConstants.AdText, adResponse.getString("adtext"));
-                        String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                } else {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
+                    context.put(VelocityTemplateFieldConstants.WIDTH, adResponse.getString("adWidth"));
+                    context.put(VelocityTemplateFieldConstants.HEIGHT, adResponse.getString("adHeight"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    if ("text".equals(adResponse.getString("type"))) {
+                        context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("adtext"));
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             t = TemplateType.PLAIN;
-                        }
-                        else {
-                            context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                        } else {
+                            context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                             t = TemplateType.RICH;
                         }
-                    }
-                    else {
-                        context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("imageurl"));
+                    } else {
+                        context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("imageurl"));
                         t = TemplateType.IMAGE;
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from tapit : {}", exception);
-                LOG.info("Response from tapit: {}", response);
-            }
-            catch (Exception exception) {
+                LOG.info("Error parsing response {} from tapit: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from tapit : {}", exception);
-                LOG.info("Response from tapit: {}", response);
-                try {
-                    throw exception;
-                }
-                catch (Exception e) {
-                    LOG.info("Error while rethrowing the exception : {}", e);
-                }
+                LOG.info("Error parsing response {} from tapit: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
             }
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -195,6 +182,6 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("tapit.advertiserId"));
+        return config.getString("tapit.advertiserId");
     }
 }

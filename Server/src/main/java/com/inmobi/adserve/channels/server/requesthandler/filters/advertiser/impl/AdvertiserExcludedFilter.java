@@ -4,8 +4,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -25,13 +23,11 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger    LOG = LoggerFactory.getLogger(AdvertiserExcludedFilter.class);
-
     private final RepositoryHelper repositoryHelper;
 
     @Inject
     public AdvertiserExcludedFilter(final Provider<Marker> traceMarkerProvider, final RepositoryHelper repositoryHelper) {
-        super(traceMarkerProvider, InspectorStrings.droppedinAdvertiserInclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_ADVERTISER_EXCLUSION_FILTER);
         this.repositoryHelper = repositoryHelper;
     }
 
@@ -41,17 +37,16 @@ public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
      */
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-        SiteMetaDataEntity siteMetaDataEntity = repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
+        final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+        final SiteMetaDataEntity siteMetaDataEntity =
+                repositoryHelper.querySiteMetaDetaRepository(sasParams.getSiteId());
         if (siteMetaDataEntity != null) {
-            Set<String> advertisersIncludedbySite = siteMetaDataEntity.getAdvertisersIncludedBySite();
-            Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
+            final Set<String> advertisersIncludedbySite = siteMetaDataEntity.getAdvertisersIncludedBySite();
+            final Set<String> advertisersIncludedbyPublisher = siteMetaDataEntity.getAdvertisersIncludedByPublisher();
             // checking if site has advertiser inclusion list
             if (!advertisersIncludedbySite.isEmpty()) {
                 return !advertisersIncludedbySite.contains(advertiserId);
-            }
-            // else checking in publisher advertiser inclusion list if any
-            else {
+            } else { // else checking in publisher advertiser inclusion list if any
                 return !advertisersIncludedbyPublisher.isEmpty()
                         && !advertisersIncludedbyPublisher.contains(advertiserId);
             }

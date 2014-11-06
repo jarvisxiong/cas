@@ -28,14 +28,14 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupSiteExclusionFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinSiteInclusionFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SITE_EXCLUSION_FILTER);
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        boolean isFilterAtAdvertiserLevel = channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty();
+        final boolean isFilterAtAdvertiserLevel = channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty();
 
         // applying site inclusion-exclusion at advertiser level
         if (isFilterAtAdvertiserLevel) {
@@ -56,8 +56,7 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
         boolean result;
         if (channelSegment.getChannelSegmentEntity().getSitesIE().contains(sasParams.getSiteId())) {
             result = !channelSegment.getChannelSegmentEntity().isSiteInclusion();
-        }
-        else {
+        } else {
             result = channelSegment.getChannelSegmentEntity().isSiteInclusion();
         }
         return result;
@@ -73,8 +72,7 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
         boolean result;
         if (channelSegment.getChannelEntity().getSitesIE().contains(sasParams.getSiteId())) {
             result = !channelSegment.getChannelEntity().isSiteInclusion();
-        }
-        else {
+        } else {
             result = channelSegment.getChannelEntity().isSiteInclusion();
         }
         return result;

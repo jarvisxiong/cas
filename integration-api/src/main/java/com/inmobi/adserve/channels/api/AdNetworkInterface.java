@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.casthrift.ADCreativeType;
-
+import com.inmobi.casthrift.DemandSourceType;
 
 public interface AdNetworkInterface {
 
@@ -30,14 +30,14 @@ public interface AdNetworkInterface {
 
     // Returns whether to log creative or not
     String getAdMarkUp();
-    
+
     ADCreativeType getCreativeType();
 
     // Returns whether to log creative or not
     boolean isLogCreative();
 
     // Set whether creative logging is required or not
-    void setLogCreative(boolean logCreative);
+    void setLogCreative(final boolean logCreative);
 
     // Return the bid price for rtb, for other will return the -1.
     double getBidPriceInUsd();
@@ -61,6 +61,15 @@ public interface AdNetworkInterface {
     // Returns true for rtb partner, false otherwise.
     boolean isRtbPartner();
 
+    // Returns true for ix partner, false otherwise.
+    boolean isIxPartner();
+
+    // Processes the response
+    void processResponse();
+
+    // Sets the internal AD status
+    void setAdStatus(String adStatus);
+
     // Returns auction id sent in the rtb response
     String getAuctionId();
 
@@ -80,7 +89,7 @@ public interface AdNetworkInterface {
     // success.
     boolean configureParameters(final SASRequestParameters param,
             final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl);
+            final String clickUrl, final String beaconUrl, final long SlotId);
 
     // Makes asynchronous request to Ad Network server. Returns true on success.
     boolean makeAsyncRequest();
@@ -140,4 +149,8 @@ public interface AdNetworkInterface {
 
     void setName(final String adapterName);
 
+    Short getSelectedSlotId();
+
+    // Get Demand Source Type
+    DemandSourceType getDst();
 }

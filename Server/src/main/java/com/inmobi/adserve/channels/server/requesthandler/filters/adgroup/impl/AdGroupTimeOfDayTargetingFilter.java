@@ -30,24 +30,24 @@ public class AdGroupTimeOfDayTargetingFilter extends AbstractAdGroupLevelFilter 
      */
     @Inject
     protected AdGroupTimeOfDayTargetingFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedInTODFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_TOD_FILTER);
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        Long[] timeOfDayTargetingArray = channelSegment.getChannelSegmentEntity().getTod();
+        final Long[] timeOfDayTargetingArray = channelSegment.getChannelSegmentEntity().getTod();
         if (timeOfDayTargetingArray == null) {
             return false;
         }
 
-        Calendar now = Calendar.getInstance();
-        int hourOfDay = 1 << now.get(Calendar.HOUR_OF_DAY);
+        final Calendar now = Calendar.getInstance();
+        final int hourOfDay = 1 << now.get(Calendar.HOUR_OF_DAY);
         LOG.debug(traceMarker, "ToD array is :  {}", (Object[]) timeOfDayTargetingArray);
-        long dayOfWeek = timeOfDayTargetingArray[now.get(Calendar.DAY_OF_WEEK) - 1];
-        long todt = dayOfWeek & hourOfDay;
+        final long dayOfWeek = timeOfDayTargetingArray[now.get(Calendar.DAY_OF_WEEK) - 1];
+        final long todt = dayOfWeek & hourOfDay;
         LOG.debug(traceMarker, "dayOfWeek is : {} hourOfDay is : {} todt calculated is : {}", dayOfWeek, hourOfDay,
                 todt);
 

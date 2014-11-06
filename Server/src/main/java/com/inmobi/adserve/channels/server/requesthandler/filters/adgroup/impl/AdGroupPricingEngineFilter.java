@@ -32,24 +32,24 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupPricingEngineFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinPricingEngineFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_PRICING_ENGINE_FILTER);
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
+        final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
 
-        Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
+        final Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
 
         if (dcpFloor != null) {
             // applying the boost
-            Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
-            Date today = new Date();
-            double ecpm = channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getECPM();
+            final Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
+            final Date today = new Date();
+            double ecpm = channelSegment.getChannelSegmentAerospikeFeedbackEntity().getECPM();
             if (null != eCPMBoostExpiryDate && eCPMBoostExpiryDate.compareTo(today) > 0) {
                 LOG.debug(traceMarker, "EcpmBoost is applied for {}", channelSegment.getChannelSegmentEntity()
                         .getAdgroupId());
@@ -61,27 +61,23 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
             // applying dcp floor
             int percentage;
             if (dcpFloor > 0.0) {
-                percentage = (int) ((ecpm / dcpFloor) * 100);
-            }
-            else {
+                percentage = (int) (ecpm / dcpFloor * 100);
+            } else {
                 percentage = 150;
             }
 
             // Allow percentage of times any segment
             if (percentage > 100) {
                 percentage = 100;
-            }
-            else if (percentage == 100) {
+            } else if (percentage == 100) {
                 percentage = 50;
-            }
-            else if (percentage >= 80) {
+            } else if (percentage >= 80) {
                 percentage = 10;
-            }
-            else {
+            } else {
                 percentage = 1;
             }
 
-            return CasConfigUtil.random.nextInt(100) >= percentage;
+            return CasConfigUtil.RANDOM.nextInt(100) >= percentage;
         }
 
         return false;

@@ -2,9 +2,12 @@ package com.inmobi.adserve.channels.repository;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
@@ -17,82 +20,117 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
-public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<WapSiteUACEntity, String> implements
-		RepositoryManager {
-	// private static final long IOS_SITE_TYPE = 21;
-	private static final long ANDROID_SITE_TYPE = 22;
-	private static final Map<String, String> CONTENT_RATING_MAP = new HashMap<>();
+public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<WapSiteUACEntity, String>
+        implements
+            RepositoryManager {
+    // private static final long IOS_SITE_TYPE = 21;
+    private static final long ANDROID_SITE_TYPE = 22;
+    private static final Map<String, String> CONTENT_RATING_MAP = new HashMap<>();
 
-	static {
-		CONTENT_RATING_MAP.put("High Maturity", "17+");
-		CONTENT_RATING_MAP.put("Medium Maturity", "12+");
-		CONTENT_RATING_MAP.put("Low Maturity", "9+");
-		CONTENT_RATING_MAP.put("Everyone", "4+");
-		CONTENT_RATING_MAP.put("Not rated", "Not yet rated");
-	}
+    static {
+        CONTENT_RATING_MAP.put("High Maturity", "17+");
+        CONTENT_RATING_MAP.put("Medium Maturity", "12+");
+        CONTENT_RATING_MAP.put("Low Maturity", "9+");
+        CONTENT_RATING_MAP.put("Everyone", "4+");
+        CONTENT_RATING_MAP.put("Not rated", "Not yet rated");
+    }
 
-	@Override
-	public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow) throws RepositoryException {
-		final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-		final String id = row.getString("id");
-		final Timestamp modifiedOn = row.getTimestamp("modified_on");
+    @Override
+    public DBEntity<WapSiteUACEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
+            throws RepositoryException {
+        final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
+        final String id = row.getString("id");
+        final Timestamp modifiedOn = row.getTimestamp("modified_on");
+        try {
+            final String marketId = row.getString("market_id");
+            final long siteTypeId = row.getLong("site_type_id");
+            final String contentRating = row.getString("content_rating");
+            final String appType = row.getString("app_type");
+            final String categories = row.getString("categories");
+            final boolean coppaEnabled = row.getBoolean("coppa_enabled");
+            final Integer exchange_settings = row.getInt("exchange_settings");
+            final Integer pubBlindArr[] = (Integer[]) row.getArray("pub_blind_list");
+            final Integer siteBlindArr[] = (Integer[]) row.getArray("site_blind_list");
+            final boolean siteTransparencyEnabled = row.getBoolean("is_site_transparent");
+            final String siteUrl = row.getString("site_url");
+            final String siteName = row.getString("site_name");
+            final String appTitle = row.getString("title");
+            final String bundleId = row.getString("bundle_id");
 
-		try {
-			final long siteTypeId = row.getLong("site_type_id");
-			final String contentRating = row.getString("content_rating");
-			final String appType = row.getString("app_type");
-			final String categories = row.getString("categories");
-			final boolean isCoppaEnabled = row.getBoolean("coppa_enabled");
-			final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-			builder.setId(id);
-			builder.setModifiedOn(modifiedOn);
-			builder.setSiteTypeId(siteTypeId);
-			builder.setCoppaEnabled(isCoppaEnabled);
-			if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
-				builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
-			} else {
-				builder.setContentRating(contentRating);
-			}
+            boolean pubTransparencyEnabled = false;
+            if (1 == exchange_settings) {
+                // exchange_settings==1 => Publisher is transparent and exchange enabled
+                pubTransparencyEnabled = true;
+            }
 
-			builder.setAppType(appType);
-			final List<String> catList = new ArrayList<>();
-			if (categories != null && !categories.isEmpty()) {
-				for (String cat : categories.split(",")) {
-					if (cat != null) {
-						cat = cat.trim();
-						if (!cat.isEmpty() && !"ALL".equalsIgnoreCase(cat)) {
-							catList.add(cat);
-						}
-					}
-				}
-				builder.setCategories(catList);
-			}
-			final WapSiteUACEntity entity = builder.build();
-			if (logger.isDebugEnabled()) {
-				logger.debug("Found WapSiteUACEntity : " + entity);
-			}
-			return new DBEntity<WapSiteUACEntity, String>(entity, modifiedOn);
-		} catch (final Exception exp) {
-			logger.error("Error in resultset row", exp);
-			return new DBEntity<WapSiteUACEntity, String>(new EntityError<String>(id, "ERROR_IN_EXTRACTING_WAP_SITE_UAC"),
-					modifiedOn);
-		}
+            final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
 
-	}
+            if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
+                builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
+            } else {
+                builder.setContentRating(contentRating);
+            }
 
-	@Override
-	public boolean isObjectToBeDeleted(final WapSiteUACEntity entity) {
-		return false;
-	}
+            final List<String> catList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(categories)) {
+                for (String cat : categories.split(",")) {
+                    if (cat != null) {
+                        cat = cat.trim();
+                        if (!cat.isEmpty() && !"ALL".equalsIgnoreCase(cat)) {
+                            catList.add(cat);
+                        }
+                    }
+                }
+                builder.setCategories(catList);
+            }
 
-	@Override
-	public HashIndexKeyBuilder<WapSiteUACEntity> getHashIndexKeyBuilder(final String className) {
-		return null;
-	}
+            // Both Publisher level and site level transparency have to be enabled for an ad request to be transparent
+            builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
 
-	@Override
-	public WapSiteUACEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
-		return null;
-	}
+            // If Site Id is set, we take site level blindlist, otherwise publisher level blind list
+            if (null != siteBlindArr && siteBlindArr.length > 0) {
+                builder.setBlindList(Arrays.asList(siteBlindArr));
+            } else if (null != pubBlindArr && pubBlindArr.length > 0) {
+                builder.setBlindList(Arrays.asList(pubBlindArr));
+            }
+
+            builder.setId(id);
+            builder.setMarketId(marketId);
+            builder.setSiteTypeId(siteTypeId);
+            builder.setCoppaEnabled(coppaEnabled);
+            builder.setAppType(appType);
+            builder.setSiteUrl(siteUrl);
+            builder.setSiteName(siteName);
+            builder.setAppTitle(appTitle);
+            builder.setBundleId(bundleId);
+            builder.setModifiedOn(modifiedOn);
+
+            final WapSiteUACEntity entity = builder.build();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found WapSiteUACEntity : " + entity);
+            }
+            return new DBEntity<WapSiteUACEntity, String>(entity, modifiedOn);
+        } catch (final Exception exp) {
+            logger.error("Error in resultset row", exp);
+            return new DBEntity<WapSiteUACEntity, String>(new EntityError<String>(id,
+                    "ERROR_IN_EXTRACTING_WAP_SITE_UAC"), modifiedOn);
+        }
+
+    }
+
+    @Override
+    public boolean isObjectToBeDeleted(final WapSiteUACEntity entity) {
+        return false;
+    }
+
+    @Override
+    public HashIndexKeyBuilder<WapSiteUACEntity> getHashIndexKeyBuilder(final String className) {
+        return null;
+    }
+
+    @Override
+    public WapSiteUACEntity queryUniqueResult(final RepositoryQuery q) throws RepositoryException {
+        return null;
+    }
 
 }

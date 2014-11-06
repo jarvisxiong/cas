@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.util;
 
 import java.util.HashMap;
+
 import org.apache.commons.lang.StringUtils;
 
 
@@ -261,11 +262,11 @@ public class IABCountriesMap implements IABCountriesInterface {
     }
 
     @Override
-    public String getIabCountry(String country) {
+    public String getIabCountry(final String country) {
         if (null == country) {
             return null;
         }
-        String iabCountry = countriesToIABMapping.get(country);
+        final String iabCountry = countriesToIABMapping.get(country);
         return StringUtils.isEmpty(iabCountry) ? countriesToIABMapping.get(country.toUpperCase()) : iabCountry;
     }
 

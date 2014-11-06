@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.lomark;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -35,21 +37,23 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 
 public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
-	
-    private static final Logger          LOG         = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
 
-    private transient String             key;
-    private transient String             secretKey;
-    private transient String             latitude;
-    private transient String             longitude;
-    private int                          width;
-    private int                          height;
-    private int                          client;
-    private int                          siteType;
-    private String                       uuid;
+    private static final Logger LOG = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
 
-    private static Map<Long, Integer>    categoryMap = new HashMap<Long, Integer>();
+    private static final String NO_AD = "NO_AD";
+    private static Map<Long, Integer> categoryMap = new HashMap<Long, Integer>();
     private static Map<Integer, Integer> carrierIdMap;
+    private transient String key;
+    private transient String secretKey;
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+    private int client;
+    private int siteType;
+    private String uuid;
+
+
     static {
         carrierIdMap = new HashMap<Integer, Integer>();
         // carrier ip map
@@ -57,25 +61,25 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         carrierIdMap.put(787, 1);
         carrierIdMap.put(788, 2);
         // category ip map
-        categoryMap.put(4l, 1);
-        categoryMap.put(23l, 1);
-        categoryMap.put(24l, 1);
-        categoryMap.put(13l, 2);
-        categoryMap.put(3l, 3);
-        categoryMap.put(3l, 9);
-        categoryMap.put(6l, 4);
-        categoryMap.put(10l, 4);
-        categoryMap.put(18l, 4);
-        categoryMap.put(31l, 4);
-        categoryMap.put(30l, 5);
-        categoryMap.put(12l, 6);
-        categoryMap.put(29l, 7);
-        categoryMap.put(11l, 8);
-        categoryMap.put(25l, 8);
-        categoryMap.put(19l, 9);
-        categoryMap.put(32l, 9);
-        categoryMap.put(15l, 10);
-        categoryMap.put(28l, 11);
+        categoryMap.put(4L, 1);
+        categoryMap.put(23L, 1);
+        categoryMap.put(24L, 1);
+        categoryMap.put(13L, 2);
+        categoryMap.put(3L, 3);
+        categoryMap.put(3L, 9);
+        categoryMap.put(6L, 4);
+        categoryMap.put(10L, 4);
+        categoryMap.put(18L, 4);
+        categoryMap.put(31L, 4);
+        categoryMap.put(30L, 5);
+        categoryMap.put(12L, 6);
+        categoryMap.put(29L, 7);
+        categoryMap.put(11L, 8);
+        categoryMap.put(25L, 8);
+        categoryMap.put(19L, 9);
+        categoryMap.put(32L, 9);
+        categoryMap.put(15L, 10);
+        categoryMap.put(28L, 11);
     }
 
     /**
@@ -94,20 +98,21 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for lomark so exiting adapter");
+            LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
         host = config.getString("lomark.host");
         key = config.getString("lomark.key");
         secretKey = config.getString("lomark.secretkey");
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
@@ -118,28 +123,26 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             client = 1;
             siteType = 1; // app
-        }
-        else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
+        } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             client = 2;
             siteType = 1;// app
-        }
-        else if (sasParams.getOsId() == HandSetOS.Windows_Mobile_OS.getValue()
+        } else if (sasParams.getOsId() == HandSetOS.Windows_Mobile_OS.getValue()
                 || sasParams.getOsId() == HandSetOS.Windows_CE.getValue()
                 || sasParams.getOsId() == HandSetOS.Windows_Phone_OS.getValue()
                 || sasParams.getOsId() == HandSetOS.Windows_RT.getValue()) {
             client = 3;
-        }
-        else {
-            LOG.info("Lomark: Device OS - Unsupported OS");
+        } else {
+            LOG.debug("Lomark: Device OS - Unsupported OS");
+            LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
         // filter non udid app traffic for Lomark
         if (client < 3 && StringUtils.isBlank(uuid)) {
-            LOG.info("Lomark: Udid - mandatory paramter for app - missing");
+            LOG.debug("Lomark: Udid - mandatory paramter for app - missing");
+            LOG.info("Configure parameters inside lomark returned false");
             return false;
         }
 
-        LOG.info("Configure parameters inside lomark returned true");
         return true;
     }
 
@@ -151,8 +154,8 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder();
-            HashMap<String, String> requestMap = new HashMap<String, String>();
+            final StringBuilder url = new StringBuilder();
+            final HashMap<String, String> requestMap = new HashMap<String, String>();
             requestMap.put("Format", "json");
             requestMap.put("Ip", sasParams.getRemoteHostIp());
             requestMap.put("Client", String.valueOf(client));
@@ -166,18 +169,17 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
             url.append("&AppId=").append(externalSiteId);
             requestMap.put("AppId", externalSiteId);
-            
-         // ("1 Banner 2 interstitial");
-            if(isInterstitial()){
-            	url.append("&AdSpaceType=2");
-            	requestMap.put("AdSpaceType", "2");
-            }
-            else{
-            	url.append("&AdSpaceType=1");
-            	requestMap.put("AdSpaceType", "1");
+
+            // ("1 Banner 2 interstitial");
+            if (isInterstitial()) {
+                url.append("&AdSpaceType=2");
+                requestMap.put("AdSpaceType", "2");
+            } else {
+                url.append("&AdSpaceType=1");
+                requestMap.put("AdSpaceType", "1");
             }
             // map operator
-            Integer carrierId = getCarrierId();
+            final Integer carrierId = getCarrierId();
             url.append("&Operator=").append(carrierId);// .append("1:China Mobile,2:China Unicom,3:China Telecom,4:other");
             requestMap.put("Operator", carrierId.toString());
             if (!StringUtils.isEmpty(latitude) && !StringUtils.isEmpty(longitude)) {
@@ -194,11 +196,10 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             requestMap.put("AppName", blindedSiteId);
             // map Category
             int category = 12;
-            Long[] segmentCategories = entity.getTags();
+            final Long[] segmentCategories = entity.getTags();
             if (null != segmentCategories && 1 != segmentCategories[0] && null != categoryMap.get(segmentCategories[0])) {
                 category = categoryMap.get(segmentCategories[0]);
-            }
-            else if (null != sasParams.getCategories()) {
+            } else if (null != sasParams.getCategories()) {
                 for (int i = 0; i < sasParams.getCategories().size(); i++) {
                     if (null != categoryMap.get(sasParams.getCategories().get(i))) {
                         category = categoryMap.get(sasParams.getCategories().get(i));
@@ -217,16 +218,15 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 requestMap.put("SdkVersion", sasParams.getSdkVersion());
                 url.append("&SdkVersion=").append(sasParams.getSdkVersion());
             }
-            String millisec = String.valueOf(Calendar.getInstance().getTimeInMillis()).substring(0, 10);
+            final String millisec = String.valueOf(Calendar.getInstance().getTimeInMillis()).substring(0, 10);
             url.append("&Timestamp=").append(millisec);
             requestMap.put("Timestamp", String.valueOf(millisec));
             url.append("&Sign=").append(getSignature(requestMap, secretKey));
             LOG.debug("lomark url is {}", url);
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -241,32 +241,33 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
 
             try {
-                JSONObject jsonObject = new JSONObject(response);
+                final JSONObject jsonObject = new JSONObject(response);
                 if (jsonObject.getInt("status") != 100) {
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     return;
                 }
-                JSONObject adResponse = jsonObject.getJSONObject("data").getJSONObject("ad").getJSONObject("creative");
-                JSONObject displayInfo = adResponse.getJSONObject("displayinfo");
-                JSONObject clickInfo = adResponse.getJSONArray("clkinfos").getJSONObject(0);
-                int clickType = clickInfo.getInt("type");
-                int creativeType = displayInfo.getInt("type");
+                final JSONObject adResponse =
+                        jsonObject.getJSONObject("data").getJSONObject("ad").getJSONObject("creative");
+                final JSONObject displayInfo = adResponse.getJSONObject("displayinfo");
+                final JSONObject clickInfo = adResponse.getJSONArray("clkinfos").getJSONObject(0);
+                final int clickType = clickInfo.getInt("type");
+                final int creativeType = displayInfo.getInt("type");
                 if (creativeType == 3 || clickType > 3) {
                     LOG.info("Unsupported Creative type or click type for Lomark");
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     return;
                 }
-                String imageUrl = displayInfo.getString("img");
-                String partnerClickUrl = clickInfo.getString("url");
-                JSONObject trackUrlInfo = adResponse.getJSONObject("trackers");
+                final String imageUrl = displayInfo.getString("img");
+                final String partnerClickUrl = clickInfo.getString("url");
+                final JSONObject trackUrlInfo = adResponse.getJSONObject("trackers");
 
-                JSONArray clickBeacons = trackUrlInfo.getJSONArray("clicks").getJSONObject(0).getJSONArray("urls");
-                JSONArray impressionBeacon = trackUrlInfo.getJSONObject("display").getJSONArray("urls");
+                final JSONArray clickBeacons =
+                        trackUrlInfo.getJSONArray("clicks").getJSONObject(0).getJSONArray("urls");
+                final JSONArray impressionBeacon = trackUrlInfo.getJSONObject("display").getJSONArray("urls");
 
                 String partnerClickBeacon = null;
                 if (clickBeacons.length() > 0) {
@@ -277,46 +278,44 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                     partnerImpressionBeacon = impressionBeacon.getString(0);
                 }
 
-                VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                context.put(VelocityTemplateFieldConstants.PartnerClickUrl, partnerClickUrl);
+                final VelocityContext context = new VelocityContext();
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, partnerClickUrl);
 
                 if (StringUtils.isNotBlank(imageUrl)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, imageUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
                 }
                 if (StringUtils.isNotBlank(partnerClickBeacon)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickBeacon, partnerClickBeacon);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_BEACON, partnerClickBeacon);
                 }
                 if (StringUtils.isNotBlank(partnerImpressionBeacon)) {
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, partnerImpressionBeacon);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerImpressionBeacon);
                 }
 
                 TemplateType type;
                 if (creativeType == 2) {
-                    context.put(VelocityTemplateFieldConstants.AdText,
+                    context.put(VelocityTemplateFieldConstants.AD_TEXT,
                             displayInfo.getJSONObject("title").getString("text"));
-                    context.put(VelocityTemplateFieldConstants.Description, displayInfo.getString("subtitle"));
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                    context.put(VelocityTemplateFieldConstants.DESCRIPTION, displayInfo.getString("subtitle"));
+                    final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         LOG.info("No template found for the slot");
-                        adStatus = "NO_AD";
+                        adStatus = NO_AD;
                         return;
-                    }
-                    else {
-                        context.put(VelocityTemplateFieldConstants.Template, vmTemplate);
+                    } else {
+                        context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                         type = TemplateType.RICH;
                     }
-                }
-                else {
+                } else {
                     type = TemplateType.IMAGE;
                     adStatus = "AD";
                 }
                 responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl);
-            }
-            catch (Exception exception) {
-                adStatus = "NO_AD";
-                LOG.info("Error parsing response from lomark : {}", exception);
-                LOG.info("Response from lomark : {}", response);
+            } catch (final Exception exception) {
+                adStatus = NO_AD;
+                LOG.info("Error parsing response {} from lomark: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
             }
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -324,7 +323,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("lomark.advertiserId"));
+        return config.getString("lomark.advertiserId");
     }
 
     @Override
@@ -332,23 +331,21 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException
-
-    {
+    private String getSignature(final HashMap<String, String> params, final String secret) throws IOException {
         // first sort asc as per the paramter names
-        Map<String, String> sortedParams = new TreeMap<String, String>(params);
-        Set<Entry<String, String>> entrys = sortedParams.entrySet();
+        final Map<String, String> sortedParams = new TreeMap<String, String>(params);
+        final Set<Entry<String, String>> entrys = sortedParams.entrySet();
         // after sorting organize all paramters with key=value"format
-        StringBuilder basestring = new StringBuilder();
-        for (Entry<String, String> param : entrys) {
+        final StringBuilder basestring = new StringBuilder();
+        for (final Entry<String, String> param : entrys) {
             basestring.append(param.getKey()).append('=').append(param.getValue());
         }
         basestring.append(secret);
         // MD5 Hashed
-        byte[] bytes = DigestUtils.md5(basestring.toString().getBytes());
-        StringBuilder sign = new StringBuilder();
+        final byte[] bytes = DigestUtils.md5(basestring.toString().getBytes());
+        final StringBuilder sign = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(bytes[i] & 0xFF);
+            final String hex = Integer.toHexString(bytes[i] & 0xFF);
             if (hex.length() == 1) {
                 sign.append('0');
             }
@@ -360,16 +357,14 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private Integer getCarrierId() {
         try {
-            int carrierId = sasParams.getCarrierId();
+            final int carrierId = sasParams.getCarrierId();
             if (carrierIdMap.containsKey(carrierId)) {
                 return carrierIdMap.get(carrierId);
-            }
-            else {
+            } else {
                 return 4;
             }
-        }
-        catch (Exception e) {
-            LOG.info("Cannot map carrier Id for Lomark");
+        } catch (final Exception e) {
+            LOG.info("Cannot map carrier Id for Lomark, exception raised {}", e);
         }
         return 4;
     }

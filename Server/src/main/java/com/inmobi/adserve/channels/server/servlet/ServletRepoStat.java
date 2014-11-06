@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
@@ -29,7 +29,7 @@ public class ServletRepoStat implements Servlet {
 
     @Override
     public String getName() {
-        return "Repostat";
+        return "repostat";
     }
 
 }

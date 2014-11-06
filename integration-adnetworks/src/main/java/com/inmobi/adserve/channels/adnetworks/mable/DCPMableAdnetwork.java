@@ -1,14 +1,21 @@
 package com.inmobi.adserve.channels.adnetworks.mable;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -18,38 +25,31 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
-    private static final Logger LOG          = LoggerFactory.getLogger(DCPMableAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMableAdnetwork.class);
+    private static final String SIZE_FORMAT = "%dx%d";
+    private static final String UDID_FORMAT = "UDID";
+    private static final String ODIN_FORMAT = "ODIN1";
+    private static final String SODIN1_FORMAT = "SODIN1";
+    private static final String IFA_FORMAT = "IFA";
 
-    private int                 width;
-    private int                 height;
-    private String              latitude;
-    private String              longitude;
-    private final String        authKey;
-    private String              uidType      = null;
-    private static final String sizeFormat   = "%dx%d";
-    private static final String udidFormat   = "UDID";
-    private static final String odinFormat   = "ODIN1";
-    private static final String sodin1Format = "SODIN1";
-    private static final String ifaFormat    = "IFA";
+    private int width;
+    private int height;
+    private String latitude;
+    private String longitude;
+    private final String authKey;
+    private String uidType = null;
 
     public DCPMableAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
-        this.authKey = config.getString("mable.authKey");
-        this.host = config.getString("mable.host");
+        authKey = config.getString("mable.authKey");
+        host = config.getString("mable.host");
     }
 
     @Override
@@ -57,27 +57,27 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for Mable so exiting adapter");
+            LOG.info("Configure parameters inside Mable returned false");
             return false;
         }
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for Mable, so returning from adapter");
+            LOG.info("Configure parameters inside Mable returned false");
             return false;
         }
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
 
-        LOG.info("Configure parameters inside Mable returned true");
         return true;
     }
 
@@ -87,7 +87,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private String getRequestParams() {
-        JSONObject request = new JSONObject();
+        final JSONObject request = new JSONObject();
         try {
             request.put("imp_beacon", "");
             request.put("auth_key", authKey);
@@ -98,12 +98,12 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             request.put("client_agent", sasParams.getUserAgent());
             request.put("client_ip", sasParams.getRemoteHostIp());
             request.put("blind_id", blindedSiteId);
-            String uid = getUid();
+            final String uid = getUid();
             if (uid != null) {
                 request.put("device_id", uid);
                 request.put("did_format", uidType);
             }
-            request.put("slot_size", String.format(sizeFormat, width, height));
+            request.put("slot_size", String.format(SIZE_FORMAT, width, height));
             if (!StringUtils.isEmpty(latitude)) {
                 request.put("lat", latitude);
             }
@@ -124,9 +124,8 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
                 request.put("zip", sasParams.getPostalCode());
             }
 
-        }
-        catch (JSONException e) {
-            LOG.info("Error while forming request object");
+        } catch (final JSONException e) {
+            LOG.info("Error while forming request object, exception raised {}", e);
         }
         LOG.debug("Mable request {}", request);
         return request.toString();
@@ -135,13 +134,12 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            String host = config.getString("mable.host");
-            StringBuilder url = new StringBuilder(host);
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+            final String host = config.getString("mable.host");
+            final StringBuilder url = new StringBuilder(host);
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -153,16 +151,17 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        String requestParams = getRequestParams();
-        Request ningRequest = new RequestBuilder("POST").setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
-        LOG.info("Mable request: {}", ningRequest);
-        LOG.info("Mable request Body: {}", requestParams);
+        final String requestParams = getRequestParams();
+        final Request ningRequest =
+                new RequestBuilder("POST").setUrl(uri.toString())
+                        .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                        .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                        .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                        .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
+                        .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                        .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
+        LOG.debug("Mable request: {}", ningRequest);
+        LOG.debug("Mable request Body: {}", requestParams);
         return ningRequest;
     }
 
@@ -176,18 +175,17 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
-            VelocityContext context = new VelocityContext();
-            context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, response.trim());
+        } else {
+            final VelocityContext context = new VelocityContext();
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response from Mable : {}", exception);
-                LOG.error("Response from Mable: {}", response);
+                LOG.info("Error parsing response {} from Mable: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
             }
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -195,46 +193,42 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString("mable.advertiserId"));
+        return config.getString("mable.advertiserId");
     }
 
     @Override
     protected String getUid() {
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()
-                && StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-            uidType = ifaFormat;
-            return casInternalRequestParameters.uidIFA;
+                && StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
+            uidType = IFA_FORMAT;
+            return casInternalRequestParameters.getUidIFA();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-            uidType = udidFormat;
-            return casInternalRequestParameters.uidMd5;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+            uidType = UDID_FORMAT;
+            return casInternalRequestParameters.getUidMd5();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-            uidType = udidFormat;
-            return casInternalRequestParameters.uid;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
+            uidType = UDID_FORMAT;
+            return casInternalRequestParameters.getUid();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-            uidType = odinFormat;
-            return casInternalRequestParameters.uidO1;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
+            uidType = ODIN_FORMAT;
+            return casInternalRequestParameters.getUidO1();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
-            uidType = sodin1Format;
-            return casInternalRequestParameters.uidSO1;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
+            uidType = SODIN1_FORMAT;
+            return casInternalRequestParameters.getUidSO1();
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
-            uidType = udidFormat;
-            return casInternalRequestParameters.uidIDUS1;
-        }
-        else {
-            String gpid = getGPID();
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
+            uidType = UDID_FORMAT;
+            return casInternalRequestParameters.getUidIDUS1();
+        } else {
+            final String gpid = getGPID();
             if (gpid != null) {
-                uidType = udidFormat;
+                uidType = UDID_FORMAT;
                 return gpid;
             }
             return null;
         }
     }
 }
-        
-    
- 

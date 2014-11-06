@@ -1,14 +1,14 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.util.ArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DemandSourceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 
 public class RequestFilters {
@@ -17,26 +17,18 @@ public class RequestFilters {
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
         if (null != hrh.getTerminationReason()) {
             LOG.debug("Request not being served because of the termination reason {}", hrh.getTerminationReason());
-            if (CasConfigUtil.jsonParsingError.equalsIgnoreCase(hrh.getTerminationReason())) {
-                InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            if (CasConfigUtil.JSON_PARSING_ERROR.equalsIgnoreCase(hrh.getTerminationReason())) {
+                InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
+            } else {
+                InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
             }
-            else {
-                InspectorStats.incrementStatCount(InspectorStrings.thriftParsingError, InspectorStrings.count);
-            }
-            return true;
-        }
-
-        // Send noad if new-category is not present in the request
-        if (CasConfigUtil.random.nextInt(100) >= CasConfigUtil.percentRollout) {
-            LOG.debug("Request not being served because of limited percentage rollout");
-            InspectorStats.incrementStatCount(InspectorStrings.droppedRollout, InspectorStrings.count);
             return true;
         }
 
         if (null == hrh.responseSender.sasParams) {
             LOG.error("Terminating request as sasParam is null");
-            hrh.setTerminationReason(CasConfigUtil.jsonParsingError);
-            InspectorStats.incrementStatCount(InspectorStrings.jsonParsingError, InspectorStrings.count);
+            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
+            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             return true;
         }
 
@@ -44,52 +36,57 @@ public class RequestFilters {
             LOG.error("Category field is not present in the request so sending noad");
             hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
-            InspectorStats.incrementStatCount(InspectorStrings.missingCategory, InspectorStrings.count);
+            InspectorStats.incrementStatCount(InspectorStrings.MISSING_CATEGORY, InspectorStrings.COUNT);
             return true;
         }
 
         if (null == hrh.responseSender.sasParams.getSiteId()) {
             LOG.error("Terminating request as site id was missing");
-            hrh.setTerminationReason(CasConfigUtil.missingSiteId);
-            InspectorStats.incrementStatCount(InspectorStrings.missingSiteId, InspectorStrings.count);
+            hrh.setTerminationReason(CasConfigUtil.MISSING_SITE_ID);
+            InspectorStats.incrementStatCount(InspectorStrings.MISSING_SITE_ID, InspectorStrings.COUNT);
             return true;
         }
 
-        if (!hrh.responseSender.sasParams.getAllowBannerAds() || hrh.responseSender.sasParams.getSiteFloor() > 5) {
-            LOG.error("Request not being served because of banner not allowed or site floor above threshold");
+        if (!hrh.responseSender.sasParams.getAllowBannerAds()) {
+            LOG.error("Request not being served because of banner not allowed.");
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER,
+                    InspectorStrings.COUNT);
             return true;
         }
 
-        if (hrh.responseSender.sasParams.getSiteType() != null
-                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteType())) {
+        if (hrh.responseSender.sasParams.getSiteContentType() != null
+                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteContentType().name())) {
             LOG.error("Terminating request as incompatible content type");
-            hrh.setTerminationReason(CasConfigUtil.incompatibleSiteType);
-            InspectorStats.incrementStatCount(InspectorStrings.incompatibleSiteType, InspectorStrings.count);
+            hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
+            InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
+            return true;
+        }
+        final String tempSdkVersion = hrh.responseSender.sasParams.getSdkVersion();
+
+        if (null != tempSdkVersion) {
+            try {
+                if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1)) || "a".equalsIgnoreCase(tempSdkVersion
+                        .substring(0, 1))) && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
+                    LOG.error("Terminating request as sdkVersion is less than 3");
+                    hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
+                    InspectorStats.incrementStatCount(InspectorStrings.LOW_SDK_VERSION, InspectorStrings.COUNT);
+                    return true;
+                } else {
+                    LOG.debug("sdk-version : {}", tempSdkVersion);
+                }
+            } catch (final StringIndexOutOfBoundsException exception) {
+                LOG.error("Invalid sdk-version, Exception raised {}", exception);
+            } catch (final NumberFormatException exception) {
+                LOG.error("Invalid sdk-version, Exception raised {}", exception);
+            }
+
+        }
+
+        if (hrh.responseSender.sasParams.getRqMkSlot().isEmpty()) {
+            LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
 
-        if (hrh.responseSender.sasParams.getSdkVersion() != null) {
-            try {
-                if ((hrh.responseSender.sasParams.getSdkVersion().substring(0, 1).equalsIgnoreCase("i") || hrh.responseSender.sasParams
-                        .getSdkVersion().substring(0, 1).equalsIgnoreCase("a"))
-                        && Integer.parseInt(hrh.responseSender.sasParams.getSdkVersion().substring(1, 2)) < 3) {
-                    LOG.error("Terminating request as sdkVersion is less than 3");
-                    hrh.setTerminationReason(CasConfigUtil.lowSdkVersion);
-                    InspectorStats.incrementStatCount(InspectorStrings.lowSdkVersion, InspectorStrings.count);
-                    return true;
-                }
-                else {
-                    LOG.debug("sdk-version : {}", hrh.responseSender.sasParams.getSdkVersion());
-                }
-            }
-            catch (StringIndexOutOfBoundsException exception) {
-                LOG.error("Invalid sdk-version " + exception.getMessage());
-            }
-            catch (NumberFormatException exception) {
-                LOG.error("Invalid sdk-version " + exception.getMessage());
-            }
-
-        }
         return false;
     }
 }

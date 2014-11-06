@@ -7,14 +7,19 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbAdGroupLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbdAdvertiserLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.IXAdGroupLevelFilters;
+import com.inmobi.adserve.channels.server.requesthandler.filters.IxAdvertiserLevelFilters;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPartnerCountFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupTotalCountFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -34,26 +39,25 @@ import java.util.Set;
  */
 public class ChannelSegmentFilterModule extends AbstractModule {
 
-    private final Reflections                             reflections;
-
     private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
-                                                                                @Override
-                                                                                public int compare(
-                                                                                        final ChannelSegmentFilter o1,
-                                                                                        final ChannelSegmentFilter o2) {
-                                                                                    return o1.getOrder().getValue()
-                                                                                            - o2.getOrder().getValue();
-                                                                                }
-                                                                            };
+        @Override
+        public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
+            return o1.getOrder().getValue() - o2.getOrder().getValue();
+        }
+    };
+
+    private final Reflections reflections;
 
     public ChannelSegmentFilterModule() {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .filterInputsBy(
-                        new FilterBuilder().includePackage(
-                                "com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl")
-                                .includePackage(
-                                        "com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl"))
-                .setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner());
+        final ConfigurationBuilder configurationBuilder =
+                new ConfigurationBuilder()
+                        .filterInputsBy(
+                                new FilterBuilder()
+                                        .includePackage(
+                                                "com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl")
+                                        .includePackage(
+                                                "com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl"))
+                        .setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner());
 
         reflections = new Reflections(configurationBuilder);
     }
@@ -63,23 +67,24 @@ public class ChannelSegmentFilterModule extends AbstractModule {
 
     }
 
+
+    @DcpAndRtbdAdvertiserLevelFilters
     @Singleton
     @Provides
-    List<AdvertiserLevelFilter> provideAdvertiserLevelFilters(final Injector injector) {
-        List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+    List<AdvertiserLevelFilter> provideDcpAndRtbdAdvertiserLevelFilters(final Injector injector) {
+        final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
 
-        Set<Class<? extends AdvertiserLevelFilter>> classes = reflections.getSubTypesOf(AdvertiserLevelFilter.class);
+        final Set<Class<? extends AdvertiserLevelFilter>> classes =
+                reflections.getSubTypesOf(AdvertiserLevelFilter.class);
         classes.addAll(reflections.getSubTypesOf(AbstractAdvertiserLevelFilter.class));
 
-        for (Class<? extends AdvertiserLevelFilter> class1 : classes) {
-            AdvertiserLevelFilter filter = injector.getInstance(class1);
+        for (final Class<? extends AdvertiserLevelFilter> class1 : classes) {
+            final AdvertiserLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdvertiserDetailsInvalidFilter) {
                 filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AdvertiserExcludedFilter) {
+            } else if (filter instanceof AdvertiserExcludedFilter) {
                 filter.setOrder(FilterOrder.SECOND);
-            }
-            else {
+            } else {
                 filter.setOrder(FilterOrder.DEFAULT);
             }
 
@@ -91,26 +96,34 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         return advertiserLevelFilterList;
     }
 
+    @IxAdvertiserLevelFilters
     @Singleton
     @Provides
-    List<AdGroupLevelFilter> provideAdGroupLevelFilters(final Injector injector) {
-        List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
+    List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
+        final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserDetailsInvalidFilter.class));
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
+        return advertiserLevelFilterList;
+    }
 
-        Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
+    @DcpAndRtbAdGroupLevelFilters
+    @Singleton
+    @Provides
+    List<AdGroupLevelFilter> provideDcpAndRtbAdGroupLevelFilters(final Injector injector) {
+        final List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
+
+        final Set<Class<? extends AdGroupLevelFilter>> classes = reflections.getSubTypesOf(AdGroupLevelFilter.class);
         classes.addAll(reflections.getSubTypesOf(AbstractAdGroupLevelFilter.class));
 
-        for (Class<? extends AdGroupLevelFilter> class1 : classes) {
-            AdGroupLevelFilter filter = injector.getInstance(class1);
+        for (final Class<? extends AdGroupLevelFilter> class1 : classes) {
+            final AdGroupLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
                 filter.setOrder(FilterOrder.FIRST);
-            }
-            else if (filter instanceof AdGroupTotalCountFilter) {
+            } else if (filter instanceof AdGroupMaxSegmentPerRequestFilter) {
                 filter.setOrder(FilterOrder.LAST);
-            }
-            else if (filter instanceof AdGroupPartnerCountFilter) {
+            } else if (filter instanceof AdGroupPartnerCountFilter) {
                 filter.setOrder(FilterOrder.SECOND_LAST);
-            }
-            else {
+            } else {
                 filter.setOrder(FilterOrder.DEFAULT);
             }
 
@@ -119,6 +132,16 @@ public class ChannelSegmentFilterModule extends AbstractModule {
 
         Collections.sort(adGroupLevelFilterList, FILTER_COMPARATOR);
 
+        return adGroupLevelFilterList;
+    }
+
+
+    @IXAdGroupLevelFilters
+    @Singleton
+    @Provides
+    List<AdGroupLevelFilter> provideIXAdGroupLevelFilters(final Injector injector) {
+        final List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
+        adGroupLevelFilterList.add(injector.getInstance(AdGroupPartnerCountFilter.class));
         return adGroupLevelFilterList;
     }
 }

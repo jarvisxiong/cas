@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.api;
 import static org.easymock.EasyMock.expect;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import org.apache.commons.configuration.Configuration;
@@ -33,17 +34,16 @@ public class FormatterTest {
     public void testInit() {
         try {
             Formatter.init();
-        }
-        catch (Exception e) {
+        } catch (final Exception e) {
             fail();
         }
     }
 
     @Test
     public void testrequestFromSDK360Onwards() {
-        SASRequestParameters sasParams = new SASRequestParameters();
+        final SASRequestParameters sasParams = new SASRequestParameters();
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
-        sasParams.setSdkVersion("i350");
+        sasParams.setSdkVersion("i359");
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
         sasParams.setSdkVersion("a350");
         assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
@@ -59,50 +59,49 @@ public class FormatterTest {
 
     @Test
     public void testupdateVelocityContextWithNoBeaconUrlAndWapRequest() {
-        SASRequestParameters sasParams = new SASRequestParameters();
+        final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("wap");
-        VelocityContext context = new VelocityContext();
+        final VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, null);
-        assertNull(context.get(VelocityTemplateFieldConstants.IMBeaconUrl));
+        assertNull(context.get(VelocityTemplateFieldConstants.IM_BEACON_URL));
         assertNull(context.get(VelocityTemplateFieldConstants.SDK));
-        assertNull(context.get(VelocityTemplateFieldConstants.SDK360Onwards));
-        assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
+        assertNull(context.get(VelocityTemplateFieldConstants.SDK360_ONWARDS));
+        assertNull(context.get(VelocityTemplateFieldConstants.IMAI_BASE_URL));
     }
 
     @Test
     public void testupdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI() {
-        SASRequestParameters sasParams = new SASRequestParameters();
+        final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");
-        VelocityContext context = new VelocityContext();
+        final VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, "beacon");
-        assertEquals(context.get(VelocityTemplateFieldConstants.IMBeaconUrl), "beacon");
+        assertEquals(context.get(VelocityTemplateFieldConstants.IM_BEACON_URL), "beacon");
         assertEquals(context.get(VelocityTemplateFieldConstants.SDK), true);
-        assertEquals(context.get(VelocityTemplateFieldConstants.SDK360Onwards), true);
-        assertNull(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl));
+        assertEquals(context.get(VelocityTemplateFieldConstants.SDK360_ONWARDS), true);
+        assertNull(context.get(VelocityTemplateFieldConstants.IMAI_BASE_URL));
     }
 
     @Test
     public void testupdateVelocityContextWithBeaconUrlAndAppRequestIMAI() {
-        SASRequestParameters sasParams = new SASRequestParameters();
+        final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("imai");
-        VelocityContext context = new VelocityContext();
+        final VelocityContext context = new VelocityContext();
         Formatter.updateVelocityContext(context, sasParams, "beacon");
-        assertEquals(context.get(VelocityTemplateFieldConstants.IMAIBaseUrl), "imai");
+        assertEquals(context.get(VelocityTemplateFieldConstants.IMAI_BASE_URL), "imai");
     }
 
     @DataProvider(name = "slot")
     public Object[][] slot() {
-        return new Object[][] { { "1" }, { "1.0" }, { "2" }, { "2.0" }, { "3" }, { "3.0" }, { "4" }, { "4.0" },
-                { "9" }, { "9.0" }, { "11" }, { "11.0" }, { "12" }, { "12.0" }, { "15" }, { "15.0" }, { "5.0" },
-                { "10.1" } };
+        return new Object[][] { {"1"}, {"1.0"}, {"2"}, {"2.0"}, {"3"}, {"3.0"}, {"4"}, {"4.0"}, {"9"}, {"9.0"}, {"11"},
+                {"11.0"}, {"12"}, {"12.0"}, {"15"}, {"15.0"}, {"5.0"}, {"10.1"}};
     }
 
     @Test(dataProvider = "slot")
     public void testGetRichTextTemplateForSlot(final String slot) {
-        String template = Formatter.getRichTextTemplateForSlot(slot);
+        final String template = Formatter.getRichTextTemplateForSlot(slot);
         Double slotType = Double.valueOf(slot);
         if (!slot.equals(slotType.toString()) && slot.equals(slotType.toString() + ".0")) {
             slotType = 0.0;
@@ -136,5 +135,13 @@ public class FormatterTest {
                 assertNull(template);
                 break;
         }
+    }
+
+    @Test
+    public void testgetNamespace() {
+        final String namespace = Formatter.getNamespace();
+
+        // Verify namespace
+        assertTrue(namespace.matches("im_1\\d{4}_"));
     }
 }

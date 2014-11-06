@@ -27,35 +27,27 @@ import com.inmobi.adserve.channels.server.utils.CasUtils;
  */
 @Singleton
 public class ChannelSegmentFilterApplier {
-    private static final Logger               LOG = LoggerFactory.getLogger(ChannelSegmentFilterApplier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ChannelSegmentFilterApplier.class);
 
-    private final Provider<Marker>            traceMarkerProvider;
-
-    private final List<AdvertiserLevelFilter> advertiserLevelFilters;
-
-    private final List<AdGroupLevelFilter>    adGroupLevelFilters;
-
-    private final CasUtils                    casUtils;
+    private final Provider<Marker> traceMarkerProvider;
+    private final CasUtils casUtils;
 
     @Inject
-    public ChannelSegmentFilterApplier(final Provider<Marker> traceMarkerProvider,
-            final List<AdvertiserLevelFilter> advertiserLevelFilters,
-            final List<AdGroupLevelFilter> adGroupLevelFilters, final CasUtils casUtils) {
+    public ChannelSegmentFilterApplier(final Provider<Marker> traceMarkerProvider, final CasUtils casUtils) {
         this.traceMarkerProvider = traceMarkerProvider;
-        this.advertiserLevelFilters = advertiserLevelFilters;
-        this.adGroupLevelFilters = adGroupLevelFilters;
         this.casUtils = casUtils;
     }
 
     public List<ChannelSegment> getChannelSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
-            final SASRequestParameters sasParams, final CasContext casContext) {
+            final SASRequestParameters sasParams, final CasContext casContext,
+            final List<AdvertiserLevelFilter> advertiserLevelFilters, final List<AdGroupLevelFilter> adGroupLevelFilters) {
 
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
         // apply all filters
 
         // advertiser level filter
-        for (AdvertiserLevelFilter advertiserLevelFilter : advertiserLevelFilters) {
+        for (final AdvertiserLevelFilter advertiserLevelFilter : advertiserLevelFilters) {
             advertiserLevelFilter.filter(matchedSegmentDetails, sasParams);
         }
 
@@ -65,20 +57,20 @@ public class ChannelSegmentFilterApplier {
         casContext.setPricingEngineEntity(casUtils.fetchPricingEngineEntity(sasParams));
 
         // get the channel segments
-        List<ChannelSegment> channelSegmentList = Lists.newArrayList();
+        final List<ChannelSegment> channelSegmentList = Lists.newArrayList();
 
-        for (AdvertiserMatchedSegmentDetail matchedSegmentDetail : matchedSegmentDetails) {
+        for (final AdvertiserMatchedSegmentDetail matchedSegmentDetail : matchedSegmentDetails) {
             channelSegmentList.addAll(matchedSegmentDetail.getChannelSegmentList());
         }
 
         int sumOfSiteImpressions = 0;
-        for (ChannelSegment channelSegment : channelSegmentList) {
-            sumOfSiteImpressions += channelSegment.getChannelSegmentCitrusLeafFeedbackEntity().getBeacons();
+        for (final ChannelSegment channelSegment : channelSegmentList) {
+            sumOfSiteImpressions += channelSegment.getChannelSegmentAerospikeFeedbackEntity().getBeacons();
         }
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
         LOG.debug(traceMarker, "Sum of Site impressions:{}", sumOfSiteImpressions);
 
-        for (AdGroupLevelFilter adGroupLevelFilter : adGroupLevelFilters) {
+        for (final AdGroupLevelFilter adGroupLevelFilter : adGroupLevelFilters) {
             adGroupLevelFilter.filter(channelSegmentList, sasParams, casContext);
         }
 
@@ -93,24 +85,22 @@ public class ChannelSegmentFilterApplier {
      * @param channelSegmentList
      */
     private void printSegments(final Marker traceMarker, final List<ChannelSegment> channelSegmentList) {
-        for (ChannelSegment channelSegment : channelSegmentList) {
-            LOG.debug(traceMarker, "Segment with advertiserId {} adGroupId {} Pecpm {}", channelSegment
-                    .getChannelSegmentEntity().getAdvertiserId(), channelSegment.getChannelSegmentEntity()
-                    .getAdgroupId(), channelSegment.getPrioritisedECPM());
+        if (LOG.isDebugEnabled() || null != traceMarker) {
+            for (final ChannelSegment channelSegment : channelSegmentList) {
+                LOG.debug(traceMarker, "Segment with advertiserId {} adGroupId {} Pecpm {}", channelSegment
+                        .getChannelSegmentEntity().getAdvertiserId(), channelSegment.getChannelSegmentEntity()
+                        .getAdgroupId(), channelSegment.getPrioritisedECPM());
+            }
         }
     }
 
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails) {
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        if (LOG.isDebugEnabled()) {
-
+        if (LOG.isDebugEnabled() || null != traceMarker) {
             LOG.debug(traceMarker, "Remaining AdGroups are :");
-
-            for (AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : matchedSegmentDetails) {
-
-                for (ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
-
+            for (final AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : matchedSegmentDetails) {
+                for (final ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
                     LOG.debug(traceMarker, "Advertiser is {} and AdGp is {}", channelSegment.getChannelEntity()
                             .getAccountId(), channelSegment.getChannelSegmentEntity().getAdgroupId());
                 }

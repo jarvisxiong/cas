@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.imp
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -22,14 +20,12 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserBurnLimitExceededFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AdvertiserBurnLimitExceededFilter.class);
-
-    private final ServerConfig  serverConfiguration;
+    private final ServerConfig serverConfiguration;
 
     @Inject
     public AdvertiserBurnLimitExceededFilter(final Provider<Marker> traceMarkerProvider,
             final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInburnFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_BURN_FILTER);
         this.serverConfiguration = serverConfiguration;
     }
 

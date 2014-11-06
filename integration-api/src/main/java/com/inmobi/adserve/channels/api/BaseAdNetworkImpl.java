@@ -20,6 +20,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import lombok.Getter;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -29,6 +31,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
@@ -40,6 +43,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
@@ -50,74 +54,102 @@ import com.ning.http.client.Response;
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
-    private final static Logger                   LOG                     = LoggerFactory
-                                                                                  .getLogger(BaseAdNetworkImpl.class);
-
-    protected ChannelFuture                       future;
-    protected Bootstrap                           clientBootstrap;
-    protected HttpRequest                         request;
-    protected long                                startTime;
-    public volatile boolean                       isRequestComplete       = false;
-    protected int                                 statusCode;
-    public String                                 responseContent;
-    public Map                                    responseHeaders;
-    private long                                  latency;
-    public long                                   connectionLatency;
-    public String                                 adStatus                = "NO_AD";
-    protected ThirdPartyAdResponse.ResponseStatus errorStatus             = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
-    
-    protected boolean 							  isHTMLResponseSupported = true;
-    protected boolean 							  isNativeResponseSupported = false;
-
-    protected SASRequestParameters                sasParams;
-    protected CasInternalRequestParameters        casInternalRequestParameters;
-    protected HttpRequestHandlerBase              baseRequestHandler      = null;
-    protected String                              requestUrl              = "";
-    private ThirdPartyAdResponse                  responseStruct;
-    private boolean                               isRtbPartner            = false;
-    protected ChannelSegmentEntity                entity;
-
-    protected String                              externalSiteId;
-    protected String                              host;
-    protected String                              impressionId;
-    protected String                              clickUrl;
-    protected String                              beaconUrl;
-    protected String                              source;
-    protected String                              blindedSiteId;
-    protected Short                               slot;
-    private static final String                   DEFAULT_EMPTY_STRING    = "";
-    protected String                              format                  = "UTF-8";
-    private String                                adapterName;
-
-    protected final Channel                       serverChannel;
-    protected static String                       SITE_RATING_PERFORMANCE = "PERFORMANCE";
-    protected static final String                 WAP                     = "WAP";
-    private static final IABCategoriesInterface   iabCategoryMap          = new IABCategoriesMap();
-
-    protected static final String                 UA                      = "ua";
-    protected static final String                 IP                      = "ip";
-    protected static final String                 LAT                     = "lat";
-    protected static final String                 LONG                    = "long";
-    protected static final String                 SIZE                    = "size";
-    protected static final String                 ZIP                     = "zip";
-    protected static final String                 COUNTRY                 = "country";
-    protected static final String                 GENDER                  = "gender";
+    protected static Marker traceMarker;
+    protected static String SITE_RATING_PERFORMANCE = "PERFORMANCE";
+    protected static final String WAP = "WAP";
+    protected static final String UA = "ua";
+    protected static final String IP = "ip";
+    protected static final String LAT = "lat";
+    protected static final String LONG = "long";
+    protected static final String SIZE = "size";
+    protected static final String ZIP = "zip";
+    protected static final String COUNTRY = "country";
+    protected static final String GENDER = "gender";
+    @Inject
+    protected static JaxbHelper jaxbHelper;
 
     @Inject
-    private static AsyncHttpClientProvider        asyncHttpClientProvider;
+    protected static DocumentBuilderHelper documentBuilderHelper;
+
+    private static final Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
+    private static final String DEFAULT_EMPTY_STRING = "";
+    private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
 
     @Inject
-    protected static JaxbHelper                   jaxbHelper;
+    private static AsyncHttpClientProvider asyncHttpClientProvider;
 
     @Inject
-    protected static DocumentBuilderHelper        documentBuilderHelper;
+    private static NettyRequestScope scope;
 
     @Inject
-    private static NettyRequestScope              scope;
+    private static Provider<Marker> traceMarkerProvider;
+
+    public volatile boolean isRequestComplete = false;
+    protected ChannelFuture future;
+    protected Bootstrap clientBootstrap;
+    protected HttpRequest request;
+    protected long startTime;
+    protected int statusCode;
+    @Getter
+    protected String responseContent;
+    @Getter
+    protected String adStatus = "NO_AD";
+    protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
+    protected boolean isHTMLResponseSupported = true;
+    protected boolean isNativeResponseSupported = false;
+    protected boolean isBannerVideoResponseSupported = false;
+    protected boolean isVideoResponseReceived = false;
+    protected SASRequestParameters sasParams;
+    protected CasInternalRequestParameters casInternalRequestParameters;
+    protected HttpRequestHandlerBase baseRequestHandler = null;
+    protected String requestUrl = "";
+    protected ChannelSegmentEntity entity;
+    protected String externalSiteId;
+    protected String host;
+    protected String impressionId;
+    protected String clickUrl;
+    protected String beaconUrl;
+    protected String source;
+    protected String blindedSiteId;
+    protected Short selectedSlotId;
+    protected String format = "UTF-8";
+    protected final Channel serverChannel;
+
+    private Map responseHeaders;
+    private long latency;
+    private long connectionLatency;
+    private ThirdPartyAdResponse responseStruct;
+    private boolean isRtbPartner = false;
+    private boolean isIxPartner = false;
+    private String adapterName;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
         this.serverChannel = serverChannel;
+        if (traceMarkerProvider != null) {
+            traceMarker = traceMarkerProvider.get();
+        }
+    }
+
+    // Overriding these methods in IXAdNetwork
+    public String returnBuyer() {
+        return null;
+    }
+
+    public String returnDealId() {
+        return null;
+    }
+
+    public double returnAdjustBid() {
+        return 0;
+    }
+
+    public Integer returnPmpTier() {
+        return 0;
+    }
+
+    public String returnAqid() {
+        return null;
     }
 
     @Override
@@ -139,6 +171,16 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.isRtbPartner = isRtbPartner;
     }
 
+    @Override
+    public boolean isIxPartner() {
+        return isIxPartner;
+    }
+
+    public void setIxPartner(final boolean isIxPartner) {
+        this.isIxPartner = isIxPartner;
+    }
+
+    @Override
     public void processResponse() {
         LOG.debug("Inside process Response for the partner: {}", getName());
         if (isRequestComplete) {
@@ -148,38 +190,36 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
-        if (baseRequestHandler.getAuctionEngine().isAllRtbComplete()) {
-            LOG.debug("isAllRtbComplete is true");
+        if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
+            LOG.debug("areAllChannelSegmentRequestsComplete is true");
             if (baseRequestHandler.getAuctionEngine().isAuctionComplete()) {
-                LOG.debug("Rtb auction has run already");
-                if (baseRequestHandler.getAuctionEngine().isRtbResponseNull()) {
-                    LOG.debug("rtb auction has returned null so processing dcp list");
+                LOG.debug("Auction has run already");
+                if (baseRequestHandler.getAuctionEngine().isAuctionResponseNull()) {
+                    LOG.debug("Auction has returned null so processing dcp list");
                     // Process dcp partner response.
                     baseRequestHandler.processDcpPartner(serverChannel, this);
                     return;
                 }
-                LOG.debug("rtb response is not null so sending rtb response");
+                LOG.debug("Auction response is not null so sending auction response");
                 return;
-            }
-            else {
-                AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runRtbSecondPriceAuctionEngine();
+            } else {
+                final AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
-                    LOG.debug("Sending rtb response of {}", highestBid.getName());
+                    LOG.debug("Sending auction response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);
                     // highestBid.impressionCallback();
-                    LOG.debug("sent rtb response");
+                    LOG.debug("sent auction response");
                     return;
-                }
-                else {
+                } else {
                     LOG.debug("rtb auction has returned null so processing dcp list");
                     baseRequestHandler.processDcpList(serverChannel);
                 }
             }
         }
-        LOG.debug("rtb auction has not run so waiting....");
+        LOG.debug("Auction has not run so waiting....");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public boolean makeAsyncRequest() {
         LOG.debug("In Adapter {}", this.getClass().getSimpleName());
@@ -195,10 +235,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
         try {
             requestUrl = getRequestUri().toString();
-            Request ningRequest = getNingRequest();
+            final Request ningRequest = getNingRequest();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
-            final boolean isTraceEnabled = casInternalRequestParameters.traceEnabled;
+            final boolean isTraceEnabled = casInternalRequestParameters.isTraceEnabled();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
@@ -210,8 +250,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         scope.enter();
                         try {
                             scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
-                        }
-                        finally {
+                        } finally {
                             scope.exit();
                         }
                     }
@@ -219,8 +258,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (!isRequestCompleted()) {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
-                        String responseStr = response.getResponseBody();
-                        HttpResponseStatus httpResponseStatus = HttpResponseStatus.valueOf(response.getStatusCode());
+                        final String responseStr = response.getResponseBody("UTF-8");
+                        final HttpResponseStatus httpResponseStatus =
+                                HttpResponseStatus.valueOf(response.getStatusCode());
                         parseResponse(responseStr, httpResponseStatus);
                         processResponse();
                     }
@@ -236,22 +276,29 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         scope.enter();
                         try {
                             scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
-                        }
-                        finally {
+                        } finally {
                             scope.exit();
                         }
                     }
 
                     LOG.debug("error while fetching response from: {} {}", getName(), t);
 
-                    if (isRequestComplete) {
-                        return;
+                    String dst;
+                    if (isRtbPartner()) {
+                        dst = "RTBD";
+                    } else if (isIxPartner()) {
+                        dst = "IX";
+                    } else {
+                        dst = "DCP";
                     }
+                    InspectorStats.updateYammerTimerStats(dst, InspectorStrings.CLIENT_TIMER_LATENCY, latency);
+
 
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
-                        InspectorStats.incrementStatCount(getName(), InspectorStrings.connectionTimeout);
+                        InspectorStats.incrementStatCount(getName(), InspectorStrings.CONNECTION_TIMEOUT);
+                        InspectorStats.incrementStatCount(InspectorStrings.CONNECTION_TIMEOUT);
                         processResponse();
                         return;
                     }
@@ -260,6 +307,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("{} timeout latency {}", getName(), latency);
                         adStatus = "TIME_OUT";
                         processResponse();
+                        InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
+                        return;
+                    }
+
+                    if (isRequestComplete) {
                         return;
                     }
 
@@ -268,9 +320,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     processResponse();
                 }
             });
-        }
-        catch (Exception e) {
-            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e.getMessage());
+        } catch (final Exception e) {
+            LOG.debug("Exception in {} makeAsyncRequest : {}", getName(), e);
         }
         LOG.debug("{} returning from make NingRequest", getName());
         return true;
@@ -287,7 +338,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        return new RequestBuilder().setUrl(uri.toString()).setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+        return new RequestBuilder().setUrl(uri.toString())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
@@ -339,11 +391,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (!isRequestCompleted()) {
             isRequestComplete = true;
 
-            LOG.debug("inside cleanup for channel {}", this.getId());
+            LOG.debug("inside cleanup for channel {}", getId());
             adStatus = "TERM";
             responseStruct = new ThirdPartyAdResponse();
-            responseStruct.latency = latency;
-            responseStruct.adStatus = adStatus;
+            responseStruct.setLatency(latency);
+            responseStruct.setAdStatus(adStatus);
         }
     }
 
@@ -356,34 +408,32 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.responseFormat = isNativeRequest()?ThirdPartyAdResponse.ResponseFormat.JSON:ThirdPartyAdResponse.ResponseFormat.HTML;
-        responseStruct.response = getHttpResponseContent();
-        responseStruct.responseHeaders = getResponseHeaders();
+        responseStruct.setResponseFormat(isNativeRequest()
+                ? ThirdPartyAdResponse.ResponseFormat.JSON
+                : ThirdPartyAdResponse.ResponseFormat.HTML);
+        responseStruct.setResponse(getHttpResponseContent());
+        responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR;
-        }
-        else if (statusCode >= 300) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
-        }
-        else if (statusCode == 200) {
-            if (StringUtils.isBlank(responseContent) || !adStatus.equalsIgnoreCase("AD")) {
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR);
+        } else if (statusCode >= 300) {
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR);
+        } else if (statusCode == 200) {
+            if (StringUtils.isBlank(responseContent) || !"AD".equalsIgnoreCase(adStatus)) {
                 adStatus = "NO_AD";
-                responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
-            }
-            else {
-                responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
+                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
+            } else {
+                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.SUCCESS);
                 adStatus = "AD";
             }
+        } else if (statusCode >= 204) {
+            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
         }
-        else if (statusCode >= 204) {
-            responseStruct.responseStatus = ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
-        }
-        responseStruct.latency = latency;
-        LOG.debug("getting response ad for channel {}", this.getId());
+        responseStruct.setLatency(latency);
+        LOG.debug("getting response ad for channel {}", getId());
         if (isClickUrlRequired()) {
-            responseStruct.clickUrl = getClickUrl();
+            responseStruct.setClickUrl(getClickUrl());
         }
-        responseStruct.adStatus = adStatus;
+        responseStruct.setAdStatus(adStatus);
         return responseStruct;
     }
 
@@ -391,18 +441,22 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return false;
     }
 
+    public void setAdStatus(String adStatus) {
+        this.adStatus = adStatus;
+    }
+
     @Override
     public boolean configureParameters(final SASRequestParameters param,
             final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl) {
-        this.sasParams = param;
+            final String clickUrl, final String beaconUrl, final long slotId) {
+        sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
-        this.externalSiteId = entity.getExternalSiteKey();
-        this.slot = sasParams.getSlot();
+        externalSiteId = entity.getExternalSiteKey();
+        selectedSlotId = (short) slotId;
         this.clickUrl = clickUrl;
         this.beaconUrl = beaconUrl;
-        this.impressionId = param.getImpressionId();
-        this.blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
+        impressionId = param.getImpressionId();
+        blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
         return configureParameters();
     }
@@ -462,8 +516,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             responseContent = response;
             statusCode = status.code();
             adStatus = "AD";
@@ -478,7 +531,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected static String getBlindedSiteId(final long siteIncId, final long adGroupIncId) {
-        return (new UUID(adGroupIncId, siteIncId)).toString();
+        return new UUID(adGroupIncId, siteIncId).toString();
     }
 
     protected String getCategories(final char seperator) {
@@ -491,7 +544,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected String getCategories(final char seperator, final boolean isAllRequired, final boolean isIABCategory) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         Long[] segmentCategories = null;
         boolean allTags = false;
         if (entity != null) {
@@ -500,27 +553,25 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (allTags) {
             if (isIABCategory) {
-                return getValueFromListAsString(iabCategoryMap.getIABCategories(sasParams.getCategories()), seperator);
+                return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(sasParams.getCategories()), seperator);
 
-            }
-            else {
+            } else if (null != sasParams.getCategories()) {
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
-                    String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
+                    final String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
                     appendCategories(sb, category, seperator);
                     if (!isAllRequired) {
                         break;
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (int index = 0; index < sasParams.getCategories().size(); index++) {
                 String category = null;
-                int cat = sasParams.getCategories().get(index).intValue();
+                final int cat = sasParams.getCategories().get(index).intValue();
                 for (int i = 0; i < segmentCategories.length; i++) {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
-                            return getValueFromListAsString(iabCategoryMap.getIABCategories(segmentCategories[i]),
+                            return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
                                     seperator);
 
                         }
@@ -536,7 +587,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (sb.length() > 0) {
             sb.setLength(sb.length() - 1);
-            return (sb.toString());
+            return sb.toString();
         }
         if (isIABCategory) {
             return "IAB24";
@@ -550,23 +601,22 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      * @return
      */
     protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIFA)) {
-            return casInternalRequestParameters.uidIFA;
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidSO1)) {
-            return casInternalRequestParameters.uidSO1;
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidMd5)) {
-            return casInternalRequestParameters.uidMd5;
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidO1)) {
-            return casInternalRequestParameters.uidO1;
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uidIDUS1)) {
-            return casInternalRequestParameters.uidIDUS1;
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.uid)) {
-            return casInternalRequestParameters.uid;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
+                && "1".equals(casInternalRequestParameters.getUidADT())) {
+            return casInternalRequestParameters.getUidIFA();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getGpid())
+                && "1".equals(casInternalRequestParameters.getUidADT())) {
+            return casInternalRequestParameters.getGpid();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
+            return casInternalRequestParameters.getUidSO1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
+            return casInternalRequestParameters.getUidMd5();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
+            return casInternalRequestParameters.getUidO1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
+            return casInternalRequestParameters.getUidIDUS1();
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
+            return casInternalRequestParameters.getUid();
         }
         return null;
     }
@@ -595,15 +645,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     // return year of birth
     protected String getYearofBirth() {
         if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
-            Calendar cal = new GregorianCalendar();
-            return (Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge()));
+            final Calendar cal = new GregorianCalendar();
+            return Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge());
         }
         return null;
-    }
-
-    @Override
-    public String getAdStatus() {
-        return this.adStatus;
     }
 
     @Override
@@ -638,15 +683,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     tobeEndoded = decoded;
                     decoded = URLDecoder.decode(tobeEndoded, format);
                 }
-            }
-            catch (UnsupportedEncodingException uee) {
-                LOG.debug("Error during decode in getURLEncode() for {} for string {}", getName(), param);
+            } catch (final UnsupportedEncodingException uee) {
+                LOG.debug("Error during decode in getURLEncode() for {} for string {}, exception raised {}", getName(),
+                        param, uee);
             }
             try {
                 encodedString = URLEncoder.encode(decoded.trim(), format);
-            }
-            catch (UnsupportedEncodingException e) {
-                LOG.debug("Error during encode in getURLEncode() for {} for string {}", getName(), param);
+            } catch (final UnsupportedEncodingException e) {
+                LOG.debug("Error during encode in getURLEncode() for {} for string {}, exception raised {}", getName(),
+                        param, e);
             }
         }
         return encodedString;
@@ -657,10 +702,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected String getValueFromListAsString(final List<String> list, final char seperatar) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return "";
         }
-        StringBuilder s = new StringBuilder(list.get(0));
+        final StringBuilder s = new StringBuilder(list.get(0));
         for (int i = 1; i < list.size(); i++) {
             s.append(seperatar).append(list.get(i));
         }
@@ -681,48 +726,52 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public void setEncryptedBid(final String encryptedBid) {
 
     }
-    
-    protected boolean isNativeRequest(){
-    	return false;
+
+    protected boolean isNativeRequest() {
+        return false;
     }
-    
+
     @Override
-    public ADCreativeType getCreativeType(){
-    	if(isNativeRequest()){
-    		return ADCreativeType.NATIVE;
-    	}else{
-    		return ADCreativeType.BANNER;
-    	}
+    public ADCreativeType getCreativeType() {
+        if (isNativeRequest()) {
+            return ADCreativeType.NATIVE;
+        } else if (isVideoResponseReceived) {
+            return ADCreativeType.INTERSTITIAL_VIDEO;
+        } else {
+            return ADCreativeType.BANNER;
+        }
     }
 
     protected String getHashedValue(final String message, final String hashingType) {
         try {
-            MessageDigest md = MessageDigest.getInstance(hashingType);
-            byte[] array = md.digest(message.getBytes());
-            StringBuffer sb = new StringBuffer();
+            final MessageDigest md = MessageDigest.getInstance(hashingType);
+            final byte[] array = md.digest(message.getBytes());
+            final StringBuffer sb = new StringBuffer();
             for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+                sb.append(Integer.toHexString(array[i] & 0xFF | 0x100).substring(1, 3));
             }
             return sb.toString();
-        }
-        catch (java.security.NoSuchAlgorithmException e) {
+        } catch (final java.security.NoSuchAlgorithmException e) {
+            LOG.debug("exception raised in BaseAdNetwork {}", e);
         }
         return null;
     }
 
-    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-            final int paramValue, final boolean isFirstParam) {
+    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName, final int paramValue,
+            final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
-   }
+    }
+
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
+
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
             final double paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
-    
+
 
     @Override
     public String getAuctionId() {
@@ -756,7 +805,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public List<Integer> getAttribute() {
-        return  null;
+        return null;
     }
 
     @Override
@@ -770,67 +819,71 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public void setLogCreative(boolean logCreative) {
-    	 //
+    public void setLogCreative(final boolean logCreative) {
+        //
     }
 
     @Override
-    public String getAdMarkUp()  {
-      return null;
+    public String getAdMarkUp() {
+        return null;
     }
-    
+
     protected boolean isInterstitial() {
-		Short slot = sasParams.getSlot();
-		if (10 == slot // 300X250
-				|| 14 == slot // 320X480
-				|| 16 == slot // 768X1024
-				|| 17 == slot /* 800x1280 */
-				|| 32 == slot //480x320
-				|| 33 == slot //1024x768
-				|| 34 == slot) /* 1280x800 */ {
-			return true;
-		}
-		return false;
-	}
 
-  public boolean isIOS() {
-    return sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue();
-  }
+        if (10 == selectedSlotId // 300X250
+                || 14 == selectedSlotId // 320X480
+                || 16 == selectedSlotId // 768X1024
+                || 17 == selectedSlotId /* 800x1280 */
+                || 32 == selectedSlotId // 480x320
+                || 33 == selectedSlotId // 1024x768
+                || 34 == selectedSlotId) /* 1280x800 */{
+            return true;
+        }
+        return false;
+    }
 
-  public boolean isAndroid() {
-    return sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue();
-  }
+    public boolean isIOS() {
+        return sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue();
+    }
 
-  public boolean isApp(){
-      if(StringUtils.isBlank(sasParams.getSource())) {
-          return false;
-      }
-      else if (WAP.equalsIgnoreCase(sasParams.getSource())) {
-          return false;
-      }
-      else {
-          return true;
-      }
-  }
+    public boolean isAndroid() {
+        return sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue();
+    }
 
-  // Response is empty or null or status code other than 200.
-  public boolean isValidResponse(final String response, final HttpResponseStatus status) {
-      if(null == response || response.trim().isEmpty() || status.code() != 200) {
-          statusCode = status.code();
-          if (200 == statusCode) {
-              statusCode = 500;
-          }
-          responseContent = "";
-          return false;
-      }
-      else {
-          return true;
-      }
-  }
+    public boolean isApp() {
+        if (StringUtils.isBlank(sasParams.getSource())) {
+            return false;
+        } else {
+            return !WAP.equalsIgnoreCase(sasParams.getSource());
+        }
+    }
 
-  protected String getGPID(){
-    return (StringUtils.isNotBlank(casInternalRequestParameters.gpid) &&
-        "1".equals(casInternalRequestParameters.uidADT))
-               ? casInternalRequestParameters.gpid:null;
-  }
+    // Response is empty or null or status code other than 200.
+    public boolean isValidResponse(final String response, final HttpResponseStatus status) {
+        if (null == response || response.trim().isEmpty() || status.code() != 200) {
+            statusCode = status.code();
+            if (200 == statusCode) {
+                statusCode = 500;
+            }
+            responseContent = "";
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    protected String getGPID() {
+        return StringUtils.isNotBlank(casInternalRequestParameters.getGpid())
+                && "1".equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters.getGpid() : null;
+    }
+
+    @Override
+    public DemandSourceType getDst() {
+        return DemandSourceType.findByValue(sasParams.getDst());
+    }
+
+    @Override
+    public Short getSelectedSlotId() {
+        return selectedSlotId;
+    }
 }

@@ -1,17 +1,18 @@
 package com.inmobi.adserve.channels.server.config;
 
+import javax.annotation.Nullable;
+
+import lombok.EqualsAndHashCode;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.config.CasConfig;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
-import com.inmobi.adserve.channels.util.AdapterType;
-import lombok.EqualsAndHashCode;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -21,11 +22,11 @@ import javax.annotation.Nullable;
 @EqualsAndHashCode
 public class AdapterConfig implements CasConfig {
 
-    private final Configuration             adapterConfig;
-    private final String                    dcName;
-    private final String                    adapterName;
+    private final Configuration adapterConfig;
+    private final String dcName;
+    private final String adapterName;
     private final Class<AdNetworkInterface> adapterClass;
-    private final ServerConfig              serverConfig;
+    private final ServerConfig serverConfig;
 
     @SuppressWarnings("unchecked")
     @AssistedInject
@@ -37,9 +38,8 @@ public class AdapterConfig implements CasConfig {
         this.serverConfig = serverConfig;
 
         try {
-            this.adapterClass = (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
-        }
-        catch (ClassNotFoundException e) {
+            adapterClass = (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
+        } catch (final ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -62,14 +62,9 @@ public class AdapterConfig implements CasConfig {
      * @return the isActive
      */
     public boolean isActive() {
-        String status = adapterConfig.getString("status", "on");
+        final String status = adapterConfig.getString("status", "on");
 
-        if (status.equalsIgnoreCase("on")) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return "on".equalsIgnoreCase(status);
     }
 
     /**
@@ -90,19 +85,9 @@ public class AdapterConfig implements CasConfig {
     }
 
     public boolean isValidHost() {
-        String hostName = getAdapterHost();
+        final String hostName = getAdapterHost();
 
         return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);
-    }
-
-    /**
-     * @return the adapterType
-     */
-    public AdapterType getAdapterType() {
-        if (isRtb()) {
-            return AdapterType.RTB;
-        }
-        return AdapterType.DCP;
     }
 
     /*

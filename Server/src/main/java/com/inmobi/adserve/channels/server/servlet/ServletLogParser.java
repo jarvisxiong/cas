@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 
 
@@ -31,28 +31,28 @@ public class ServletLogParser implements Servlet {
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
-        Map<String, List<String>> params = queryStringDecoder.parameters();
-        HttpRequest request = hrh.getHttpRequest();
+        final Map<String, List<String>> params = queryStringDecoder.parameters();
+        final HttpRequest request = hrh.getHttpRequest();
         String targetStrings = "";
         String logFilePath = "";
-        // Handle post request
+
+        // Handle POST request
         if (request.getMethod() == HttpMethod.POST) {
             @SuppressWarnings("deprecation")
-            String jObject = URLDecoder.decode(((FullHttpRequest) request).content().toString(CharsetUtil.UTF_8))
-                    .toString();
-            String[] array = jObject.split("&");
+            final String jObject =
+                    URLDecoder.decode(((FullHttpRequest) request).content().toString(CharsetUtil.UTF_8)).toString();
+            final String[] array = jObject.split("&");
             targetStrings = array[0].split("=")[1];
             logFilePath = array[1].split("=")[1];
-        }
-        else {// handle get request
+        } else {
+            // Handle GET request
             if (!params.isEmpty()) {
-                for (Entry<String, List<String>> p : params.entrySet()) {
-                    String key = p.getKey();
-                    List<String> vals = p.getValue();
-                    if (key.equalsIgnoreCase("search")) {
+                for (final Entry<String, List<String>> p : params.entrySet()) {
+                    final String key = p.getKey();
+                    final List<String> vals = p.getValue();
+                    if ("search".equalsIgnoreCase(key)) {
                         targetStrings = vals.get(0);
-                    }
-                    else if (key.equalsIgnoreCase("logFilePath")) {
+                    } else if ("logFilePath".equalsIgnoreCase(key)) {
                         logFilePath = vals.get(0);
                     }
                 }
@@ -62,14 +62,14 @@ public class ServletLogParser implements Servlet {
             logFilePath = "/opt/mkhoj/logs/cas/debug/";
         }
 
-        ProcessBuilder pb = new ProcessBuilder(CasConfigUtil.getServerConfig().getString("logParserScript"), "-t",
-                targetStrings, "-l", logFilePath);
-        Process process = pb.start();
-        int exitStatus = process.waitFor();
+        final ProcessBuilder pb =
+                new ProcessBuilder(CasConfigUtil.getServerConfig().getString("logParserScript"), "-t", targetStrings,
+                        "-l", logFilePath);
+        final Process process = pb.start();
+        final int exitStatus = process.waitFor();
         if (exitStatus == 0) {
             hrh.responseSender.sendResponse("PASS", serverChannel);
-        }
-        else {
+        } else {
             hrh.responseSender.sendResponse("FAIL", serverChannel);
         }
     }

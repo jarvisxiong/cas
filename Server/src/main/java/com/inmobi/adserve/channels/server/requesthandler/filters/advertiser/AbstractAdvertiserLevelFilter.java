@@ -1,16 +1,17 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -19,11 +20,11 @@ import java.util.List;
  */
 public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFilter {
 
-    private static final Logger       LOG = LoggerFactory.getLogger(AbstractAdvertiserLevelFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAdvertiserLevelFilter.class);
 
-    private final Provider<Marker>    traceMarkerProvider;
+    private final Provider<Marker> traceMarkerProvider;
 
-    private final String              inspectorString;
+    private final String inspectorString;
 
     private FilterOrder order;
 
@@ -36,24 +37,29 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     public final void filter(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
             final SASRequestParameters sasParams) {
 
-        Marker traceMarker = traceMarkerProvider.get();
+        final Marker traceMarker = traceMarkerProvider.get();
 
-        for (Iterator<AdvertiserMatchedSegmentDetail> iterator = matchedSegmentDetails.iterator(); iterator.hasNext();) {
-            AdvertiserMatchedSegmentDetail matchedSegmentDetail = iterator.next();
+        for (final Iterator<AdvertiserMatchedSegmentDetail> iterator = matchedSegmentDetails.iterator(); iterator
+                .hasNext();) {
+            final AdvertiserMatchedSegmentDetail matchedSegmentDetail = iterator.next();
 
-            ChannelSegment channelSegment = matchedSegmentDetail.getChannelSegmentList().get(0);
+            /*
+             * All the Advertiser Level filters (extending this abstract class) are on advertiser level properties.
+             * The filer is applied only on the first channelSegment in the ChannelSegmentList for an advertiser. Being a
+             * filter on advertiser level properties, the filtering result is expected to be same for all segments.
+             */
+            final ChannelSegment channelSegment = matchedSegmentDetail.getChannelSegmentList().get(0);
 
-            boolean result = failedInFilter(channelSegment, sasParams);
+            final boolean result = failedInFilter(channelSegment, sasParams);
 
-            String advertiserId = channelSegment.getChannelEntity().getAccountId();
+            final String advertiserId = channelSegment.getChannelEntity().getAccountId();
 
             if (result) {
                 iterator.remove();
                 LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
                         advertiserId);
-                incrementStats(channelSegment);
-            }
-            else {
+                incrementStats(matchedSegmentDetail.getChannelSegmentList());
+            } else {
                 LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                         advertiserId);
             }
@@ -61,10 +67,10 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     }
 
     /**
-     * @param channelSegment
+     * @param channelSegments
      */
-    protected void incrementStats(final ChannelSegment channelSegment) {
-        channelSegment.incrementInspectorStats(inspectorString);
+    protected void incrementStats(final List<ChannelSegment> channelSegments) {
+        channelSegments.get(0).incrementInspectorStats(inspectorString, channelSegments.size());
     }
 
     /**

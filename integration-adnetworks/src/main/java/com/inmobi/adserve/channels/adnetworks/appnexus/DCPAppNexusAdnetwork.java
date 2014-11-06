@@ -1,13 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks.appnexus;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -16,44 +21,39 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG             = LoggerFactory.getLogger(DCPAppNexusAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAppNexusAdnetwork.class);
 
-    private String              latitude        = null;
-    private String              longitude       = null;
-    private int                 width;
-    private int                 height;
-    private static final String ID              = "id";
-    private static final String APP_ID          = "appid";
-    private static final String SIZE            = "size";
-    private static final String LOCATION        = "loc";
-    private static final String POSTAL_CODE     = "pcode";
-    private static final String IDFA            = "idfa";
+    private static final String ID = "id";
+    private static final String APP_ID = "appid";
+    private static final String SIZE = "size";
+    private static final String LOCATION = "loc";
+    private static final String POSTAL_CODE = "pcode";
+    private static final String IDFA = "idfa";
     private static final String ANDROID_ID_SHA1 = "sha1udid";
-    private static final String ANDROID_ID_MD5  = "md5udid";
-    private static final String ODIN1           = "sha1mac";
-    private static final String OPENUDID_SHA1   = "openudid";
-    private static final String ST           	= "st";
-    private static final String TRAFFIC_TYPE    = "mobile_web";
+    private static final String ANDROID_ID_MD5 = "md5udid";
+    private static final String ODIN1 = "sha1mac";
+    private static final String OPENUDID_SHA1 = "openudid";
+    private static final String ST = "st";
+    private static final String TRAFFIC_TYPE = "mobile_web";
     // private static final String CLICKURL = "pubclick";
 
-    private static final String sizeFormat      = "%dx%d";
-    private static final String latlongFormat   = "%s,%s";
-    
-    private String              name;
-    private boolean             isApp;
+    private static final String SIZE_FORMAT = "%dx%d";
+    private static final String LAT_LONG_FORMAT = "%s,%s";
+    private String latitude = null;
+    private String longitude = null;
+    private int width;
+    private int height;
+
+
+    private String name;
+    private boolean isApp;
 
     /**
      * @param config
@@ -71,36 +71,34 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for {} so exiting adapter", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
         host = config.getString(name + ".host");
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-        }
-        else {
+        } else {
             LOG.debug("mandate parameters missing for {} so returning from adapter", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
 
-        if (casInternalRequestParameters.latLong != null
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (casInternalRequestParameters.getLatLong() != null
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
 
-        if (sasParams.getOsId() == HandSetOS.Android.getValue()
-                || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
+        if (sasParams.getOsId() == HandSetOS.Android.getValue() || sasParams.getOsId() == HandSetOS.iOS.getValue()) {
             isApp = true;
-        }
-        else {
+        } else {
             isApp = false;
         }
 
-        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 
@@ -112,65 +110,62 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(host);
+            final StringBuilder url = new StringBuilder(host);
             appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
             appendQueryParam(url, ID, externalSiteId, false);
             if (isApp) {
                 appendQueryParam(url, APP_ID, blindedSiteId, false);
+            } else {
+                appendQueryParam(url, ST, TRAFFIC_TYPE, false);
             }
-            else{
-            	appendQueryParam(url, ST, TRAFFIC_TYPE, false);
-            }
-            appendQueryParam(url, SIZE, String.format(sizeFormat, width, height), false);
+            appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
 
             if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
                 appendQueryParam(url, LOCATION,
-                        getURLEncode(String.format(latlongFormat, latitude, longitude), format), false);
+                        getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format), false);
             }
             if (null != sasParams.getPostalCode()) {
                 appendQueryParam(url, POSTAL_CODE, sasParams.getPostalCode().toString(), false);
             }
 
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uidMd5, format),
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                    appendQueryParam(url, ANDROID_ID_MD5,
+                            getURLEncode(casInternalRequestParameters.getUidMd5(), format), false);
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.getUid(), format),
                             false);
                 }
-                else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-                    appendQueryParam(url, ANDROID_ID_MD5, getURLEncode(casInternalRequestParameters.uid, format), false);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                    appendQueryParam(url, ANDROID_ID_SHA1,
+                            getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                    appendQueryParam(url, ANDROID_ID_SHA1, getURLEncode(casInternalRequestParameters.uidO1, format),
-                            false);
-                }
-                
+
 
             }
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidO1, format), false);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.getUidSO1(), format), false);
                 }
-                else if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-                    appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.uidSO1, format), false);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+                    appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.getUidIFA(), format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-                    appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.uidIFA, format), false);
-                }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-                    appendQueryParam(url, OPENUDID_SHA1, getURLEncode(casInternalRequestParameters.uidIDUS1, format),
-                            false);
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+                    appendQueryParam(url, OPENUDID_SHA1,
+                            getURLEncode(casInternalRequestParameters.getUidIDUS1(), format), false);
                 }
             }
 
             // appendQueryParam(url, CLICKURL, getURLEncode(clickUrl, format), false);
             LOG.debug("{} url is {}", name, url);
 
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -186,36 +181,35 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             try {
-                JSONObject responseJson = new JSONObject(response);
-                JSONArray responseArray = responseJson.getJSONArray("ads");
+                final JSONObject responseJson = new JSONObject(response);
+                final JSONArray responseArray = responseJson.getJSONArray("ads");
                 if (responseArray.length() == 0) {
                     responseContent = "";
                     statusCode = 500;
                     adStatus = "NO_AD";
                     return;
                 }
-                JSONObject adsJson = responseArray.getJSONObject(0);
-                context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adsJson.getString("content"));
+                final JSONObject adsJson = responseArray.getJSONObject(0);
+                context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adsJson.getString("content"));
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from {} {}", name, exception);
-                LOG.info("Response from {} {}", name, response);
+                LOG.info("Error parsing response {} from {}: {}", response, name, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
             }
         }
     }
 
     @Override
     public String getId() {
-        return (config.getString(name + ".advertiserId"));
+        return config.getString(name + ".advertiserId");
     }
 
     @Override

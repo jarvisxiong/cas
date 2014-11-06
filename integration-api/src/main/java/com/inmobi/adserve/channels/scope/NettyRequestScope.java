@@ -1,16 +1,17 @@
 package com.inmobi.adserve.channels.scope;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.util.Map;
+
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+
 import com.google.common.collect.Maps;
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkState;
 
 
 /**
@@ -49,26 +50,23 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class NettyRequestScope implements Scope {
 
-    private static final Provider<Object>          SEEDED_KEY_PROVIDER = new Provider<Object>() {
-                                                                           @Override
-                                                                           public Object get() {
-                                                                               throw new IllegalStateException(
-                                                                                       "If you got here then it means"
-                                                                                               + " that your code asked"
-                                                                                               + " for scoped object which"
-                                                                                               + " should have been explicitly"
-                                                                                               + " seeded in this scope by calling"
-                                                                                               + " SimpleScope.seed(), but was not.");
-                                                                           }
-                                                                       };
-    private final ThreadLocal<Map<Key<?>, Object>> values              = new ThreadLocal<Map<Key<?>, Object>>();
-
     public static final Marker TRACE_MAKER = MarkerFactory.getMarker("TRACE_MAKER");
+
+    private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>() {
+        @Override
+        public Object get() {
+            throw new IllegalStateException("If you got here then it means" + " that your code asked"
+                    + " for scoped object which" + " should have been explicitly" + " seeded in this scope by calling"
+                    + " SimpleScope.seed(), but was not.");
+        }
+    };
+    private final ThreadLocal<Map<Key<?>, Object>> values = new ThreadLocal<Map<Key<?>, Object>>();
+
 
 
     public void enter() {
         checkState(values.get() == null, "A scoping block is already in progress");
-        values.set(Maps.<Key<?>, Object> newHashMap());
+        values.set(Maps.<Key<?>, Object>newHashMap());
     }
 
     public void exit() {
@@ -77,9 +75,10 @@ public class NettyRequestScope implements Scope {
     }
 
     public <T> void seed(final Key<T> key, final T value) {
-        Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
-        checkState(!scopedObjects.containsKey(key), "A value for the key %s was "
-                + "already seeded in this scope. Old value: %s New value: %s", key, scopedObjects.get(key), value);
+        final Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
+        checkState(scopedObjects.get(key) == null,
+                "A value for the key %s was already seeded in this scope. Old value: %s New value: %s", key,
+                scopedObjects.get(key), value);
         scopedObjects.put(key, value);
     }
 
@@ -92,7 +91,7 @@ public class NettyRequestScope implements Scope {
         return new Provider<T>() {
             @Override
             public T get() {
-                Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
+                final Map<Key<?>, Object> scopedObjects = getScopedObjectMap(key);
 
                 @SuppressWarnings("unchecked")
                 T current = (T) scopedObjects.get(key);
@@ -106,7 +105,7 @@ public class NettyRequestScope implements Scope {
     }
 
     private <T> Map<Key<?>, Object> getScopedObjectMap(final Key<T> key) {
-        Map<Key<?>, Object> scopedObjects = values.get();
+        final Map<Key<?>, Object> scopedObjects = values.get();
         if (scopedObjects == null) {
             throw new OutOfScopeException("Cannot access " + key + " outside of a scoping block");
         }
@@ -119,7 +118,7 @@ public class NettyRequestScope implements Scope {
      * 
      * @return typed provider
      */
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public static <T> Provider<T> seededKeyProvider() {
         return (Provider<T>) SEEDED_KEY_PROVIDER;
     }

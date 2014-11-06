@@ -25,18 +25,16 @@ public class ServletEnableLbStatus implements Servlet {
             final Channel serverChannel) throws JSONException {
         if (hrh.isRequestFromLocalHost()) {
             hrh.responseSender.sendResponse("OK", serverChannel);
-            ServerStatusInfo.statusCode = 200;
-            ServerStatusInfo.statusString = "OK";
+            ServerStatusInfo.setStatusCodeAndString(200, "OK");
             LOG.debug("asked to shut down the server");
-        }
-        else {
+        } else {
             hrh.responseSender.sendResponse("NOT AUTHORIZED", serverChannel);
         }
     }
 
     @Override
     public String getName() {
-        return "enaablelbstatus";
+        return "enablelbstatus";
     }
 
 }

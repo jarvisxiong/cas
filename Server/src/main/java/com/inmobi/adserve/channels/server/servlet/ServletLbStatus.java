@@ -34,16 +34,17 @@ public class ServletLbStatus implements Servlet {
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         LOG.debug("asked for load balancer status");
-        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.totalRequests);
-        if (ServerStatusInfo.statusCode != 404) {
-            InspectorStats.incrementStatCount("LbStatus", InspectorStrings.successfulRequests);
+        InspectorStats.incrementStatCount("LbStatus", InspectorStrings.TOTAL_REQUESTS);
+        if (ServerStatusInfo.getStatusCode() != 404) {
+            InspectorStats.incrementStatCount("LbStatus", InspectorStrings.SUCCESSFUL_REQUESTS);
             hrh.responseSender.sendResponse("OK", serverChannel);
             return;
         }
         // TODO: remove header validation
-        HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-                Unpooled.copiedBuffer(ServerStatusInfo.statusString, Charset.defaultCharset()));
-        ChannelFuture future = serverChannel.writeAndFlush(response);
+        final HttpResponse response =
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
+                        ServerStatusInfo.getStatusString(), Charset.defaultCharset()));
+        final ChannelFuture future = serverChannel.writeAndFlush(response);
         future.addListener(ChannelFutureListener.CLOSE);
     }
 

@@ -5,9 +5,9 @@ import java.util.Map;
 
 
 public class CategoryList {
-    private static Map<Integer, String> categoryList                 = new HashMap<Integer, String>();
-    private static int                  FAMILY_SAFE_BLOCK_CATEGORIES = 10000;
-    private static int                  PERFORMANCE_BLOCK_CATEGORIES = 10001;
+    private static Map<Integer, String> categoryList = new HashMap<Integer, String>();
+    private static int FAMILY_SAFE_BLOCK_CATEGORIES = 10000;
+    private static int PERFORMANCE_BLOCK_CATEGORIES = 10001;
 
     static {
         categoryList.put(1, "Aggregator");
@@ -85,16 +85,14 @@ public class CategoryList {
         categoryList.put(73, "WAP Portals");
         categoryList.put(74, "Weather");
         categoryList
-                .put(
-                    FAMILY_SAFE_BLOCK_CATEGORIES,
-                    "Law,Govermentt & Politics,Immigration,Legal Issues,U.S. Government Resources,Politics,Commentary,News,International News,National News,Local News,Hedge Fund,Investing,Dating,Divorce Support,Gay Life,Paranormal Phenomena,Hunting/Shooting,Pagan/Wiccan,Atheism/Agnosticism,Latter-Day Saints,Non-Standard Content,Unmoderated UGC,Extreme Graphic/Explicit Violence,Pornography,Profane Content,Hate Content,Incentivized,Illegal Content,Illegal Content,Warez,Spyware/Malware,Copyright Infringement,Adult Education,Pregnancy,Health & Fitness,Brain Tumor,Cancer,Cholesterol,Chronic Fatigue Syndrome,Chronic Pain,Deafness,Depression,Dermatology,A.D.D.,Diabetes,Epilepsy,GERD/Acid Reflux,Heart Disease,Herbs for Health,IBS/Crohn's Disease,Incest/Abuse Support,Incontinence,AIDS/HIV,Infertility,Men's Health,Panic/Anxiety Disorders,Physical Therapy,Psychology/Psychiatry,Senor Health,Sexuality,Allergies,Sleep Disorders,Smoking Cessation,Weight Loss,Women's Health,Alternative Medicine,Arthritis,Autism/PDD,Bipolar Disorder,Cocktails/Beer,Cigars");
+                .put(FAMILY_SAFE_BLOCK_CATEGORIES,
+                        "Law,Government & Politics,Immigration,Legal Issues,U.S. Government Resources,Politics,Commentary,News,International News,National News,Local News,Hedge Fund,Investing,Dating,Divorce Support,Gay Life,Paranormal Phenomena,Hunting/Shooting,Pagan/Wiccan,Atheism/Agnosticism,Latter-Day Saints,Non-Standard Content,Unmoderated UGC,Extreme Graphic/Explicit Violence,Pornography,Profane Content,Hate Content,Incentivized,Illegal Content,Illegal Content,Warez,Spyware/Malware,Copyright Infringement,Adult Education,Pregnancy,Health & Fitness,Brain Tumor,Cancer,Cholesterol,Chronic Fatigue Syndrome,Chronic Pain,Deafness,Depression,Dermatology,A.D.D.,Diabetes,Epilepsy,GERD/Acid Reflux,Heart Disease,Herbs for Health,IBS/Crohn's Disease,Incest/Abuse Support,Incontinence,AIDS/HIV,Infertility,Men's Health,Panic/Anxiety Disorders,Physical Therapy,Psychology/Psychiatry,Senor Health,Sexuality,Allergies,Sleep Disorders,Smoking Cessation,Weight Loss,Women's Health,Alternative Medicine,Arthritis,Autism/PDD,Bipolar Disorder,Cocktails/Beer,Cigars");
         categoryList
-                .put(
-                    PERFORMANCE_BLOCK_CATEGORIES,
-                    "Immigration,Legal Issues,Gay Life,Atheism/Agnosticism,Extreme Graphic/Explicit Violence,Pornography,Profane Content,Hate Content,Illegal Content,Warez,Spyware/Malware,Copyright Infringement,Adult Education,Pregnancy,Brain Tumor,Cancer,Cholesterol,Chronic Fatigue Syndrome,Chronic Pain,Deafness,Depression,Dermatology,A.D.D.,Diabetes,Epilepsy,GERD/Acid Reflux,Heart Disease,Herbs for Health,IBS/Crohn's Disease,Incest/Abuse Support,Incontinence,AIDS/HIV,Infertility,Men's Health,Panic/Anxiety Disorders,Physical Therapy,Psychology/Psychiatry,Senor Health,Sexuality,Sleep Disorders,Weight Loss,Women's Health,Alternative Medicine,Autism/PDD,Bipolar Disorder,Cocktails/Beer");
+                .put(PERFORMANCE_BLOCK_CATEGORIES,
+                        "Immigration,Legal Issues,Gay Life,Atheism/Agnosticism,Extreme Graphic/Explicit Violence,Pornography,Profane Content,Hate Content,Illegal Content,Warez,Spyware/Malware,Copyright Infringement,Adult Education,Pregnancy,Brain Tumor,Cancer,Cholesterol,Chronic Fatigue Syndrome,Chronic Pain,Deafness,Depression,Dermatology,A.D.D.,Diabetes,Epilepsy,GERD/Acid Reflux,Heart Disease,Herbs for Health,IBS/Crohn's Disease,Incest/Abuse Support,Incontinence,AIDS/HIV,Infertility,Men's Health,Panic/Anxiety Disorders,Physical Therapy,Psychology/Psychiatry,Senor Health,Sexuality,Sleep Disorders,Weight Loss,Women's Health,Alternative Medicine,Autism/PDD,Bipolar Disorder,Cocktails/Beer");
     }
 
-    public static String getCategory(int index) {
+    public static String getCategory(final int index) {
         return categoryList.get(index);
     }
 

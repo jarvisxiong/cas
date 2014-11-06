@@ -18,14 +18,14 @@ import lombok.experimental.Builder;
 @Accessors(fluent = true)
 public class CasRequest {
 
-    private final boolean            isKeepAlive;
+    private final boolean isKeepAlive;
 
     // TODO: probably remove later , when unified request
     private final QueryStringDecoder queryStringDecoder;
 
     // TODO: probably remove later , when unified request
-    private final HttpRequest        httpRequest;
+    private final HttpRequest httpRequest;
 
     // TODO: probably remove later , when unified response handling
-    private final Channel            channel;
+    private final Channel channel;
 }

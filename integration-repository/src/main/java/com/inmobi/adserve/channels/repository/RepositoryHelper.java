@@ -3,78 +3,86 @@ package com.inmobi.adserve.channels.repository;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
+import com.googlecode.cqengine.query.Query;
+import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.entity.PublisherFilterEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
+import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
-import com.inmobi.adserve.channels.query.PublisherFilterQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
+import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
+import static com.googlecode.cqengine.query.QueryFactory.and;
+import static com.googlecode.cqengine.query.QueryFactory.in;
 
 @Getter
 public class RepositoryHelper {
-    private final ChannelRepository                channelRepository;
-    private final ChannelAdGroupRepository         channelAdGroupRepository;
-    private final ChannelFeedbackRepository        channelFeedbackRepository;
+
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RepositoryHelper.class);
+
+    private final ChannelRepository channelRepository;
+    private final ChannelAdGroupRepository channelAdGroupRepository;
+    private final ChannelFeedbackRepository channelFeedbackRepository;
     private final ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
-    private final SiteMetaDataRepository           siteMetaDataRepository;
-    private final SiteTaxonomyRepository           siteTaxonomyRepository;
-    private final SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
-    private final PricingEngineRepository          pricingEngineRepository;
-    private final PublisherFilterRepository        publisherFilterRepository;
-    private final SiteEcpmRepository               siteEcpmRepository;
-    private final CurrencyConversionRepository     currencyConversionRepository;
-    private final WapSiteUACRepository             wapSiteUACRepository;
-    private final CreativeRepository               creativeRepository;
-    private final RepositoryStatsProvider          repositoryStatsProvider;
-    private final NativeAdTemplateRepository	   nativeAdTemplateRepository;
+    private final SiteMetaDataRepository siteMetaDataRepository;
+    private final SiteTaxonomyRepository siteTaxonomyRepository;
+    private final SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository;
+    private final PricingEngineRepository pricingEngineRepository;
+    private final SiteFilterRepository siteFilterRepository;
+    private final SiteEcpmRepository siteEcpmRepository;
+    private final CurrencyConversionRepository currencyConversionRepository;
+    private final WapSiteUACRepository wapSiteUACRepository;
+    private final IXAccountMapRepository ixAccountMapRepository;
+    private final CreativeRepository creativeRepository;
+    private final RepositoryStatsProvider repositoryStatsProvider;
+    private final NativeAdTemplateRepository nativeAdTemplateRepository;
+    private final IXPackageRepository ixPackageRepository;
 
     public RepositoryHelper(final Builder builder) {
-        this.channelRepository = builder.channelRepository;
-        this.channelAdGroupRepository = builder.channelAdGroupRepository;
-        this.channelFeedbackRepository = builder.channelFeedbackRepository;
-        this.channelSegmentFeedbackRepository = builder.channelSegmentFeedbackRepository;
-        this.siteMetaDataRepository = builder.siteMetaDataRepository;
-        this.siteTaxonomyRepository = builder.siteTaxonomyRepository;
-        this.siteCitrusLeafFeedbackRepository = builder.siteCitrusLeafFeedbackRepository;
-        this.pricingEngineRepository = builder.pricingEngineRepository;
-        this.publisherFilterRepository = builder.publisherFilterRepository;
-        this.siteEcpmRepository = builder.siteEcpmRepository;
-        this.currencyConversionRepository = builder.currencyConversionRepository;
-        this.wapSiteUACRepository = builder.wapSiteUACRepository;
-        this.creativeRepository = builder.creativeRepository;
-        this.nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
-        this.repositoryStatsProvider = new RepositoryStatsProvider();
-        this.repositoryStatsProvider
-        .addRepositoryToStats(this.nativeAdTemplateRepository)
-                .addRepositoryToStats(this.channelRepository)
-                    .addRepositoryToStats(this.channelAdGroupRepository)
-                    .addRepositoryToStats(this.channelFeedbackRepository)
-                    .addRepositoryToStats(this.channelSegmentFeedbackRepository)
-                    .addRepositoryToStats(this.siteMetaDataRepository)
-                    .addRepositoryToStats(this.siteTaxonomyRepository)
-                    .addRepositoryToStats(this.pricingEngineRepository)
-                    .addRepositoryToStats(this.publisherFilterRepository)
-                    .addRepositoryToStats(this.siteEcpmRepository)
-                    .addRepositoryToStats(this.currencyConversionRepository)
-                    .addRepositoryToStats(this.wapSiteUACRepository)
-                    .addRepositoryToStats(this.creativeRepository)
-                    .addRepositoryToStats(this.nativeAdTemplateRepository);
+        channelRepository = builder.channelRepository;
+        channelAdGroupRepository = builder.channelAdGroupRepository;
+        channelFeedbackRepository = builder.channelFeedbackRepository;
+        channelSegmentFeedbackRepository = builder.channelSegmentFeedbackRepository;
+        siteMetaDataRepository = builder.siteMetaDataRepository;
+        siteTaxonomyRepository = builder.siteTaxonomyRepository;
+        siteAerospikeFeedbackRepository = builder.siteAerospikeFeedbackRepository;
+        pricingEngineRepository = builder.pricingEngineRepository;
+        siteFilterRepository = builder.siteFilterRepository;
+        siteEcpmRepository = builder.siteEcpmRepository;
+        currencyConversionRepository = builder.currencyConversionRepository;
+        wapSiteUACRepository = builder.wapSiteUACRepository;
+        ixAccountMapRepository = builder.ixAccountMapRepository;
+        creativeRepository = builder.creativeRepository;
+        nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
+        ixPackageRepository = builder.ixPackageRepository;
+        repositoryStatsProvider = new RepositoryStatsProvider();
+        repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
+                .addRepositoryToStats(channelRepository).addRepositoryToStats(channelAdGroupRepository)
+                .addRepositoryToStats(channelFeedbackRepository).addRepositoryToStats(channelSegmentFeedbackRepository)
+                .addRepositoryToStats(siteMetaDataRepository).addRepositoryToStats(siteTaxonomyRepository)
+                .addRepositoryToStats(pricingEngineRepository).addRepositoryToStats(siteFilterRepository)
+                .addRepositoryToStats(siteEcpmRepository).addRepositoryToStats(currencyConversionRepository)
+                .addRepositoryToStats(wapSiteUACRepository).addRepositoryToStats(ixAccountMapRepository)
+                .addRepositoryToStats(creativeRepository).addRepositoryToStats(nativeAdTemplateRepository);
 
     }
 
@@ -84,20 +92,22 @@ public class RepositoryHelper {
 
     @Setter
     public static class Builder {
-        private ChannelRepository                channelRepository;
-        private ChannelAdGroupRepository         channelAdGroupRepository;
-        private ChannelFeedbackRepository        channelFeedbackRepository;
+        private ChannelRepository channelRepository;
+        private ChannelAdGroupRepository channelAdGroupRepository;
+        private ChannelFeedbackRepository channelFeedbackRepository;
         private ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
-        private SiteMetaDataRepository           siteMetaDataRepository;
-        private SiteTaxonomyRepository           siteTaxonomyRepository;
-        private SiteCitrusLeafFeedbackRepository siteCitrusLeafFeedbackRepository;
-        private PricingEngineRepository          pricingEngineRepository;
-        private PublisherFilterRepository        publisherFilterRepository;
-        private SiteEcpmRepository               siteEcpmRepository;
-        private CurrencyConversionRepository     currencyConversionRepository;
-        private WapSiteUACRepository             wapSiteUACRepository;
-        private CreativeRepository               creativeRepository;
-        private NativeAdTemplateRepository       nativeAdTemplateRepository;
+        private SiteMetaDataRepository siteMetaDataRepository;
+        private SiteTaxonomyRepository siteTaxonomyRepository;
+        private SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository;
+        private PricingEngineRepository pricingEngineRepository;
+        private SiteFilterRepository siteFilterRepository;
+        private SiteEcpmRepository siteEcpmRepository;
+        private CurrencyConversionRepository currencyConversionRepository;
+        private WapSiteUACRepository wapSiteUACRepository;
+        private IXAccountMapRepository ixAccountMapRepository;
+        private CreativeRepository creativeRepository;
+        private NativeAdTemplateRepository nativeAdTemplateRepository;
+        private IXPackageRepository ixPackageRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -106,14 +116,16 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(channelSegmentFeedbackRepository);
             Preconditions.checkNotNull(siteMetaDataRepository);
             Preconditions.checkNotNull(siteTaxonomyRepository);
-            Preconditions.checkNotNull(siteCitrusLeafFeedbackRepository);
+            Preconditions.checkNotNull(siteAerospikeFeedbackRepository);
             Preconditions.checkNotNull(pricingEngineRepository);
-            Preconditions.checkNotNull(publisherFilterRepository);
+            Preconditions.checkNotNull(siteFilterRepository);
             Preconditions.checkNotNull(siteEcpmRepository);
             Preconditions.checkNotNull(currencyConversionRepository);
             Preconditions.checkNotNull(wapSiteUACRepository);
+            Preconditions.checkNotNull(ixAccountMapRepository);
             Preconditions.checkNotNull(creativeRepository);
             Preconditions.checkNotNull(nativeAdTemplateRepository);
+            Preconditions.checkNotNull(ixPackageRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -121,8 +133,8 @@ public class RepositoryHelper {
     public ChannelEntity queryChannelRepository(final String channelId) {
         try {
             return channelRepository.query(channelId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying Channel Repository, {}", ignored);
         }
         return null;
     }
@@ -130,8 +142,8 @@ public class RepositoryHelper {
     public ChannelSegmentEntity queryChannelAdGroupRepository(final String adGroupId) {
         try {
             return channelAdGroupRepository.query(adGroupId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying ChannelAdGroup Repository, {}", ignored);
         }
         return null;
     }
@@ -139,8 +151,8 @@ public class RepositoryHelper {
     public ChannelSegmentFeedbackEntity queryChannelSegmentFeedbackRepository(final String adGroupId) {
         try {
             return channelSegmentFeedbackRepository.query(adGroupId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying ChannelSegmentFeedback Repository, {}", ignored);
         }
         return null;
     }
@@ -148,8 +160,8 @@ public class RepositoryHelper {
     public ChannelFeedbackEntity queryChannelFeedbackRepository(final String advertiserId) {
         try {
             return channelFeedbackRepository.query(advertiserId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying ChannelFeedback Repository, {}", ignored);
         }
         return null;
     }
@@ -157,8 +169,8 @@ public class RepositoryHelper {
     public SiteTaxonomyEntity querySiteTaxonomyRepository(final String id) {
         try {
             return siteTaxonomyRepository.query(id);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteTaxonomy Repository, {}", ignored);
         }
         return null;
     }
@@ -166,26 +178,26 @@ public class RepositoryHelper {
     public SiteMetaDataEntity querySiteMetaDetaRepository(final String siteId) {
         try {
             return siteMetaDataRepository.query(siteId);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteMetaData Repository, {}", ignored);
         }
         return null;
     }
 
-    public SegmentAdGroupFeedbackEntity querySiteCitrusLeafFeedbackRepository(final String siteId,
-            final Integer segmentId) {
-        return siteCitrusLeafFeedbackRepository.query(siteId, segmentId);
+    public SegmentAdGroupFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId,
+                                                                             final Integer segmentId) {
+        return siteAerospikeFeedbackRepository.query(siteId, segmentId);
     }
 
-    public SiteFeedbackEntity querySiteCitrusLeafFeedbackRepository(final String siteId) {
-        return siteCitrusLeafFeedbackRepository.query(siteId);
+    public SiteFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId) {
+        return siteAerospikeFeedbackRepository.query(siteId);
     }
 
-    public PricingEngineEntity queryPricingEngineRepository(final int country, final int os) {
+    public PricingEngineEntity queryPricingEngineRepository(final Integer country, final Integer os) {
         try {
             return pricingEngineRepository.query(new PricingEngineQuery(country, os));
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying PricingEngine Repository, {}", ignored);
         }
         return null;
     }
@@ -193,17 +205,17 @@ public class RepositoryHelper {
     public CreativeEntity queryCreativeRepository(final String advertiserId, final String creativeId) {
         try {
             return creativeRepository.query(new CreativeQuery(advertiserId, creativeId));
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying Creative Repository, {}", ignored);
         }
         return null;
     }
 
-    public PublisherFilterEntity queryPublisherFilterRepository(final String siteId, final Integer ruleType) {
+    public SiteFilterEntity querySiteFilterRepository(final String siteId, final Integer ruleType) {
         try {
-            return publisherFilterRepository.query(new PublisherFilterQuery(siteId, ruleType));
-        }
-        catch (RepositoryException ignored) {
+            return siteFilterRepository.query(new SiteFilterQuery(siteId, ruleType));
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteFilter Repository, {}", ignored);
         }
         return null;
     }
@@ -211,8 +223,8 @@ public class RepositoryHelper {
     public SiteEcpmEntity querySiteEcpmRepository(final String siteId, final Integer countryId, final Integer osId) {
         try {
             return siteEcpmRepository.query(new SiteEcpmQuery(siteId, countryId, osId));
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SiteEcpm Repository, {}", ignored);
         }
         return null;
     }
@@ -220,27 +232,47 @@ public class RepositoryHelper {
     public CurrencyConversionEntity queryCurrencyConversionRepository(final String countryId) {
         try {
             return currencyConversionRepository.query(countryId);
-        }
-        catch (RepositoryException ignored) {
-        }
-        return null;
-    }
-    
-    public WapSiteUACEntity queryWapSiteUACRepository(final String id) {
-        try {
-            return wapSiteUACRepository.query(id);
-        }
-        catch (RepositoryException ignored) {
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying CurrencyConversion Repository, {}", ignored);
         }
         return null;
     }
 
-   public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
+    public WapSiteUACEntity queryWapSiteUACRepository(final String id) {
         try {
-            return nativeAdTemplateRepository.query(siteId);
-        }
-        catch (RepositoryException ignored) {
+            return wapSiteUACRepository.query(id);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying WapSiteUAC Repository, {}", ignored);
         }
         return null;
+    }
+
+    public IXAccountMapEntity queryIXAccountMapRepository(final Long rpNetworkId) {
+        try {
+            return ixAccountMapRepository.query(rpNetworkId);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying IXAccountMap Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
+        try {
+            return nativeAdTemplateRepository.query(siteId);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying NativeAdTemplate Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public ResultSet<IXPackageEntity> queryIXPackageRepository(final int osId, final String siteId, final int countryId, final int slotId) {
+        // Prepare query for CQEngine repository
+        Query query =
+                and(in(IXPackageRepository.OS_ID, osId, IXPackageRepository.ALL_OS_ID),
+                        in(IXPackageRepository.SITE_ID, siteId, IXPackageRepository.ALL_SITE_ID),
+                        in(IXPackageRepository.COUNTRY_ID, countryId, IXPackageRepository.ALL_COUNTRY_ID),
+                        in(IXPackageRepository.SLOT_ID, slotId, IXPackageRepository.ALL_SLOT_ID));
+
+        return ixPackageRepository.getPackageIndex().retrieve(query);
     }
 }

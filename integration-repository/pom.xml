@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>3.164-SNAPSHOT</version>
+		<version>4.11-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -40,6 +40,18 @@
 		</dependency>
 		<dependency>
 			<groupId>inmobi.phoenix.batteries</groupId>
+			<artifactId>dataV2</artifactId>
+			<scope>compile</scope>
+			<optional>false</optional>
+		</dependency>
+		<dependency>
+			<groupId>inmobi.phoenix.batteries</groupId>
+			<artifactId>data</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>inmobi.phoenix.batteries</groupId>
 			<artifactId>util</artifactId>
 			<scope>compile</scope>
 			<optional>false</optional>
@@ -61,8 +73,8 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.citrusleaf</groupId>
-			<artifactId>citrusleaf-client</artifactId>
+			<groupId>com.aerospike</groupId>
+			<artifactId>aerospike-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -71,15 +83,40 @@
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
-			<artifactId>easymockclassextension</artifactId>
+			<artifactId>easymock</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		  <groupId>com.inmobi.adtemplate</groupId>
-		  <artifactId>adtemplate-idl</artifactId>
-		  <version>2.0.2</version>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
+			<type>zip</type>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi.adtemplate</groupId>
+			<artifactId>adtemplate-idl</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.cqengine</groupId>
+			<artifactId>cqengine</artifactId>
+			<version>1.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi</groupId>
+			<artifactId>segments</artifactId>
+			<version>${segments.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi</groupId>
+			<artifactId>experimentation</artifactId>
+			<version>${experimentation.version}</version>
+		</dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>

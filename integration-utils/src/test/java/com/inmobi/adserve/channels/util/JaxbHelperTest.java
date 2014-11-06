@@ -25,7 +25,7 @@ public class JaxbHelperTest {
      */
     @Test
     public void testJaxbHelper_1() throws Exception {
-        JaxbHelper result = new JaxbHelper();
+        final JaxbHelper result = new JaxbHelper();
         assertNotNull(result);
     }
 
@@ -38,9 +38,9 @@ public class JaxbHelperTest {
      */
     @Test
     public void testGetPoolConfig_1() throws Exception {
-        JaxbHelper fixture = new JaxbHelper();
+        final JaxbHelper fixture = new JaxbHelper();
 
-        GenericKeyedObjectPoolConfig result = fixture.getPoolConfig();
+        final GenericKeyedObjectPoolConfig result = fixture.getPoolConfig();
 
         assertNotNull(result);
     }
@@ -54,13 +54,13 @@ public class JaxbHelperTest {
      */
     @Test
     public void testMarshal_1() throws Exception {
-        JaxbHelper fixture = new JaxbHelper();
+        final JaxbHelper fixture = new JaxbHelper();
 
-        Customer customer = new Customer();
+        final Customer customer = new Customer();
         customer.setId(10);
         customer.setName("abhishek parwal");
 
-        String result = fixture.marshal(customer);
+        final String result = fixture.marshal(customer);
 
         assertNotNull(result);
     }
@@ -74,10 +74,10 @@ public class JaxbHelperTest {
      */
     @Test
     public void testUnmarshal_1() throws Exception {
-        JaxbHelper fixture = new JaxbHelper();
-        String data = "<customer id=\"100\"><name>abhishek</name></customer>";
+        final JaxbHelper fixture = new JaxbHelper();
+        final String data = "<customer id=\"100\"><name>abhishek</name></customer>";
 
-        Object result = fixture.unmarshal(data, Customer.class);
+        final Object result = fixture.unmarshal(data, Customer.class);
 
         assertNotNull(result);
     }
@@ -91,10 +91,10 @@ public class JaxbHelperTest {
      */
     @Test(expected = Exception.class)
     public void testUnmarshal_2() throws Exception {
-        JaxbHelper fixture = new JaxbHelper();
-        String data = "<ad id=\"100\"><name>abhishek</name></ad>";
+        final JaxbHelper fixture = new JaxbHelper();
+        final String data = "<ad id=\"100\"><name>abhishek</name></ad>";
 
-        Object result = fixture.unmarshal(data, Customer.class);
+        final Object result = fixture.unmarshal(data, Customer.class);
 
         assertNotNull(result);
     }
@@ -103,7 +103,7 @@ public class JaxbHelperTest {
     public static class Customer {
 
         private String name;
-        private int    id;
+        private int id;
 
         public String getName() {
             return name;

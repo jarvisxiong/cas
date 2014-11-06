@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.ajillion;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -14,6 +16,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -24,25 +27,25 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
 public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG                = LoggerFactory.getLogger(DCPAjillionAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPAjillionAdnetwork.class);
 
-    private final String        FORMAT             = "format";
-    private final String        KEYWORD            = "keyword";
-    private final String        PUBID              = "pubid";
-    private final String        CLIENT_IP          = "clientip";
-    private final String        CLIENT_UA          = "clientua";
-    private final String        AGE                = "age";
-    private final String        IS_BEACON_RQD      = "use_beacon";
-    private final String        slotFormat         = "%s.slot_%s_%s";
-    private final String        beaconRequiredFlag = "1";
-    private String              placementId        = null;
-    private String              name;
+    private static final String FORMAT = "format";
+    private static final String KEYWORD = "keyword";
+    private static final String PUBID = "pubid";
+    private static final String CLIENT_IP = "clientip";
+    private static final String CLIENT_UA = "clientua";
+    private static final String AGE = "age";
+    private static final String IS_BEACON_RQD = "use_beacon";
+    private static final String SLOT_FORMAT = "%s.slot_%s_%s";
+    private static final String BEACON_REQUIRED_FLAG = "1";
+    private String placementId = null;
+    private String name;
 
     /**
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPAjillionAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -54,17 +57,18 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing so exiting adapter {}", name);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
         host = config.getString(name + ".host");
-        String siteRating = (SITE_RATING_PERFORMANCE.equalsIgnoreCase(sasParams.getSiteType())) ? "p" : "fs";
-        placementId = config.getString(String.format(slotFormat, name, sasParams.getSlot(), siteRating));
+        final String siteRating = ContentType.PERFORMANCE == sasParams.getSiteContentType() ? "p" : "fs";
+        placementId = config.getString(String.format(SLOT_FORMAT, name, selectedSlotId, siteRating));
         if (StringUtils.isBlank(placementId)) {
             LOG.debug("Slot is not configured for {}", externalSiteId);
+            LOG.info("Configure parameters inside {} returned false", name);
             return false;
         }
 
-        LOG.info("Configure parameters inside {} returned true", name);
         return true;
     }
 
@@ -81,9 +85,9 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            StringBuilder url = new StringBuilder(String.format(host, placementId));
+            final StringBuilder url = new StringBuilder(String.format(host, placementId));
             appendQueryParam(url, FORMAT, "json", true);
-            appendQueryParam(url, IS_BEACON_RQD, beaconRequiredFlag, false);
+            appendQueryParam(url, IS_BEACON_RQD, BEACON_REQUIRED_FLAG, false);
             appendQueryParam(url, KEYWORD, getURLEncode(getCategories(','), format), false);
             appendQueryParam(url, PUBID, blindedSiteId, false);
             appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
@@ -95,11 +99,10 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
             }
             LOG.debug("{} url is {}", name, url);
-            return (new URI(url.toString()));
-        }
-        catch (URISyntaxException exception) {
+            return new URI(url.toString());
+        } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
-            LOG.error("{}", exception);
+            LOG.info("{}", exception);
         }
         return null;
     }
@@ -114,10 +117,9 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             try {
-                JSONObject adResponse = new JSONObject(response);
+                final JSONObject adResponse = new JSONObject(response);
 
                 if (!"true".equals(adResponse.getString("success"))) {
                     adStatus = "NO_AD";
@@ -127,32 +129,31 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 statusCode = status.code();
-                VelocityContext context = new VelocityContext();
+                final VelocityContext context = new VelocityContext();
 
                 TemplateType t = TemplateType.IMAGE;
                 if (adResponse.has("beacon_url")) {
-                    context.put(VelocityTemplateFieldConstants.PartnerBeaconUrl, adResponse.getString("beacon_url"));
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("beacon_url"));
                 }
-                if (adResponse.getString("creative_type").equalsIgnoreCase("image")) {
-                    context.put(VelocityTemplateFieldConstants.PartnerClickUrl, adResponse.getString("click_url"));
-                    context.put(VelocityTemplateFieldConstants.IMClickUrl, clickUrl);
-                    context.put(VelocityTemplateFieldConstants.PartnerImgUrl, adResponse.getString("creative_url"));
-                }
-                else if (adResponse.getString("creative_type").equalsIgnoreCase("3rdparty")) {
-                    context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, adResponse.getString("creative_url"));
+                if ("image".equalsIgnoreCase(adResponse.getString("creative_type"))) {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("click_url"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("creative_url"));
+                } else if ("3rdparty".equalsIgnoreCase(adResponse.getString("creative_type"))) {
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("creative_url"));
                     t = TemplateType.HTML;
-                }
-                else {
+                } else {
                     adStatus = "NO_AD";
                     responseContent = "";
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.error("Error parsing response {} from {}  {}", response, name, exception);
+                LOG.info("Error parsing response {} from {}  {}", response, name, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                return;
             }
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -160,7 +161,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getId() {
-        return (config.getString(name + ".advertiserId"));
+        return config.getString(name + ".advertiserId");
     }
 
     @Override

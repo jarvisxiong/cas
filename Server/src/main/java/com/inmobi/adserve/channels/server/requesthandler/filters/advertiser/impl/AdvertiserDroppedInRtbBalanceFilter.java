@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -25,28 +23,28 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @Singleton
 public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevelFilter {
 
-    private static final Logger              LOG = LoggerFactory.getLogger(AdvertiserDroppedInRtbBalanceFilter.class);
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
-    private final ServerConfig        serverConfiguration;
+    private final ServerConfig serverConfiguration;
 
     @Inject
     public AdvertiserDroppedInRtbBalanceFilter(final Provider<Marker> traceMarkerProvider,
             final Map<String, AdapterConfig> advertiserIdConfigMap, final ServerConfig serverConfiguration) {
-        super(traceMarkerProvider, InspectorStrings.droppedInRtbBalanceFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_BALANCE_FILTER);
         this.advertiserIdConfigMap = advertiserIdConfigMap;
         this.serverConfiguration = serverConfiguration;
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-        String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-        boolean isRtbPartner = advertiserIdConfigMap.get(advertiserId).isRtb();
+        final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+        final boolean isRtbPartner = advertiserIdConfigMap.get(advertiserId).isRtb();
+        final boolean isIxPartner = advertiserIdConfigMap.get(advertiserId).isIx();
         boolean result = false;
-        if (isRtbPartner) {
-            result = channelSegment.getChannelFeedbackEntity().getBalance() < serverConfiguration
-                    .getRtbBalanceFilterAmount();
+        if (isRtbPartner || isIxPartner) {
+            result =
+                    channelSegment.getChannelFeedbackEntity().getBalance() < serverConfiguration
+                            .getRtbBalanceFilterAmount();
         }
         return result;
     }

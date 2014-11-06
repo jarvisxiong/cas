@@ -1,62 +1,64 @@
 package com.inmobi.adserve.channels.adnetworks.mobfox;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.Dimension;
+import java.net.URI;
 
 
 public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger   LOG          = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
+    protected static final String LAT = "latitude";
+    protected static final String LONG = "longitude";
+    protected static final String GENDER = "demo.gender";
+    protected static final String KEYWORDS = "demo.keywords";
+    protected static final String AGE = "demo.age";
 
-    private transient String      latitude;
-    private transient String      longitude;
-    private int                   width;
-    private int                   height;
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMobFoxAdnetwork.class);
 
-    private static final String   PUBID        = "s";
-    private static final String   UA           = "u";
-    private static final String   CLIENT_IP    = "i";
-    private static final String   TRAFFICTYPE  = "m";
-    private static final String   MRAIDSUPPORT = "c_mraid";
-    private static final String   SHA1UDID     = "o_mcsha1";
-    private static final String   MD5UDID      = "o_mcmd5";
-    private static final String   IFA          = "o_iosadvid";
-    private static final String   VERSION      = "v";
-    protected static final String LAT          = "latitude";
-    protected static final String LONG         = "longitude";
-    protected static final String GENDER       = "demo.gender";
-    protected static final String KEYWORDS     = "demo.keywords";
-    protected static final String AGE          = "demo.age";
-    private static final String   WIDTH        = "adspace.width";
-    private static final String   HEIGHT       = "adspace.height";
-    private static final String   B_SITE_ID    = "s_subid";
-    private static final String   REQUEST_TYPE = "rt";
+    private static final String PUBID = "s";
+    private static final String UA = "u";
+    private static final String CLIENT_IP = "i";
+    private static final String TRAFFICTYPE = "m";
+    private static final String MRAIDSUPPORT = "c_mraid";
+    private static final String SHA1UDID = "o_mcsha1";
+    private static final String MD5UDID = "o_mcmd5";
+    private static final String IFA = "o_iosadvid";
+    private static final String VERSION = "v";
 
-    private static final String   type         = "live";
-    private static final String   mraidType    = "1";
-    private static final String   apiVersion   = "2.0";
-    private static final String   requestType  = "api";
+    private static final String WIDTH = "adspace.width";
+    private static final String HEIGHT = "adspace.height";
+    private static final String B_SITE_ID = "s_subid";
+    private static final String REQUEST_TYPE = "rt";
+
+    private static final String TYPE = "live";
+    private static final String MRAID_TYPE = "1";
+    private static final String API_VERSION = "2.0";
+    private static final String REQUEST_TYPE_VALUE = "api";
+
+    private transient String latitude;
+    private transient String longitude;
+    private int width;
+    private int height;
+
 
     /**
      * @param config
@@ -75,22 +77,22 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for mobfox so exiting adapter");
+            LOG.info("Configure parameters inside Mobfox returned false");
             return false;
         }
         host = config.getString("mobfox.host");
-        if (StringUtils.isNotBlank(casInternalRequestParameters.latLong)
-                && StringUtils.countMatches(casInternalRequestParameters.latLong, ",") > 0) {
-            String[] latlong = casInternalRequestParameters.latLong.split(",");
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        LOG.info("Configure parameters inside Mobfox returned true");
         return true;
     }
 
@@ -101,39 +103,36 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder url = new StringBuilder(host);
-        appendQueryParam(url, REQUEST_TYPE, requestType, true);
+        final StringBuilder url = new StringBuilder(host);
+        appendQueryParam(url, REQUEST_TYPE, REQUEST_TYPE_VALUE, true);
         appendQueryParam(url, PUBID, externalSiteId, false);
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
         // TODO is [p(url for sites) required?]
-        appendQueryParam(url, TRAFFICTYPE, type, false);
-        appendQueryParam(url, MRAIDSUPPORT, mraidType, false);
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidIFA)) {
-            appendQueryParam(url, IFA, casInternalRequestParameters.uidIFA, false);
+        appendQueryParam(url, TRAFFICTYPE, TYPE, false);
+        appendQueryParam(url, MRAIDSUPPORT, MRAID_TYPE, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
+            appendQueryParam(url, IFA, casInternalRequestParameters.getUidIFA(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidSO1)) {
-            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidSO1, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidSO1(), false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
+            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidO1(), false);
         }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uidO1)) {
-            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidO1, false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+            appendQueryParam(url, MD5UDID, casInternalRequestParameters.getUidMd5(), false);
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
+            appendQueryParam(url, MD5UDID, casInternalRequestParameters.getUid(), false);
         }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidMd5)) {
-            appendQueryParam(url, MD5UDID, casInternalRequestParameters.uidMd5, false);
-        }
-        else if (StringUtils.isNotBlank(casInternalRequestParameters.uid)) {
-            appendQueryParam(url, MD5UDID, casInternalRequestParameters.uid, false);
-        }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.uidIDUS1)) {
-            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.uidIDUS1, false);
-        }
-        else {
-            String gpid = getGPID();
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
+            appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidIDUS1(), false);
+        } else {
+            final String gpid = getGPID();
             if (gpid != null) {
                 url.append("&o_andadvid=").append(gpid);
             }
         }
-        appendQueryParam(url, VERSION, apiVersion, false);
+        appendQueryParam(url, VERSION, API_VERSION, false);
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);
@@ -168,35 +167,33 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             responseContent = "";
             return;
-        }
-        else {
+        } else {
             statusCode = status.code();
-            VelocityContext context = new VelocityContext();
+            final VelocityContext context = new VelocityContext();
             try {
-                Request request = jaxbHelper.unmarshal(response, Request.class);
-                String htmlContent = request.getHtmlString();
+                final Request request = jaxbHelper.unmarshal(response, Request.class);
+                final String htmlContent = request.getHtmlString();
                 if (StringUtils.isBlank(htmlContent)) {
                     adStatus = "NO_AD";
                     statusCode = 500;
                     responseContent = "";
                     return;
                 }
-                context.put(VelocityTemplateFieldConstants.PartnerHtmlCode, htmlContent);
+                context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlContent);
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
                 adStatus = "AD";
-            }
-            catch (Exception exception) {
+            } catch (final Exception exception) {
                 adStatus = "NO_AD";
-                LOG.info("Error parsing response from Mobfox");
-                LOG.info("Response from Mobfox {}", response);
+                LOG.info("Error parsing response {} from Mobfox: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
         }
     }
 
     @Override
     public String getId() {
-        return (config.getString("mobfox.advertiserId"));
+        return config.getString("mobfox.advertiserId");
     }
 
     @XmlRootElement

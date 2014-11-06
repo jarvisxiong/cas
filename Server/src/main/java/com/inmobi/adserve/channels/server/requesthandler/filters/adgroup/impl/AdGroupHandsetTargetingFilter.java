@@ -31,14 +31,15 @@ public class AdGroupHandsetTargetingFilter extends AbstractAdGroupLevelFilter {
      */
     @Inject
     protected AdGroupHandsetTargetingFilter(final Provider<Marker> traceMarkerProvider) {
-        super(traceMarkerProvider, InspectorStrings.droppedinHandsetTargetingFilter);
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_HANDSET_TARGETING_FILTER);
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
 
-        List<Integer> manufModelTargetingList = channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
+        final List<Integer> manufModelTargetingList =
+                channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
         return CollectionUtils.isNotEmpty(manufModelTargetingList)
                 && !manufModelTargetingList.contains(sasParams.getModelId());
     }
