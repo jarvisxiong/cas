@@ -4,6 +4,8 @@ import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -170,6 +172,8 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                     }
                 } catch (final Exception e) {
                     LOG.debug(traceMarker, "Exception in converting json object from response {}", e);
+                    InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                    return;
                 }
             }
         } else if (responseFormat.equals(MacrosAndStrings.HTML)) {
