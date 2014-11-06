@@ -8,6 +8,8 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -285,6 +287,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         } catch (final Exception exception) {
             adStatus = "NO_AD";
             LOG.info("Error parsing response {} from Wapstart: {}", response, exception);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             return;
         }
         LOG.debug("response length is {}", responseContent.length());

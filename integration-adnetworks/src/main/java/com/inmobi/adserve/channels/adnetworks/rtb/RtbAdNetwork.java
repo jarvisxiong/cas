@@ -27,6 +27,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.rtb.App;
@@ -903,6 +905,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             adStatus = NO_AD;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
                     advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.BANNER_PARSE_RESPONSE_EXCEPTION);
         }
 
     }
@@ -943,8 +946,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
                     advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.VIDEO_PARSE_RESPONSE_EXCEPTION);
         }
     }
 
@@ -999,6 +1003,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             responseContent = "";
             LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, exception = {}",
                     sasParams.getSiteId(), advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
 
     }

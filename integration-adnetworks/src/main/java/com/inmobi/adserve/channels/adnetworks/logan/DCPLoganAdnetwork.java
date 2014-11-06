@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.logan;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -199,9 +201,11 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response {} from logan: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             } catch (final Exception exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response {} from logan: {}", response, exception);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
 
         }
