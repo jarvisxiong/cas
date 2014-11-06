@@ -26,7 +26,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
@@ -69,7 +68,6 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         Formatter.init();
         LifecycleInjector
                 .builder()
@@ -93,7 +91,6 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short) 11);
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -109,7 +106,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                                 "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -130,7 +127,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
     }
 
     @Test
@@ -150,7 +147,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
     }
 
     @Test
@@ -167,18 +164,16 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot((short) 15);
         sasParams.setGender("m");
         sasParams.setAge((short) 32);
         final String externalKey = "6378ef4a7db50d955c90f7dffb05ee20";
-        SlotSizeMapping.init();
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(mobfoxAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15)) {
             final String actualUrl = dcpMobfoxAdNetwork.getRequestUri().toString();
 
             final String expectedUrl =
@@ -198,14 +193,12 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("38.5,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot((short) 15);
         final List<Long> category = new ArrayList<Long>();
         category.add(3l);
         category.add(2l);
         sasParams.setCategories(category);
 
         final String externalKey = "01212121";
-        SlotSizeMapping.init();
         final String clurl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
@@ -216,7 +209,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
+        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
             final String actualUrl = dcpMobfoxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://my.mobfox.com/request.php?rt=api&s=01212121&u=Mozilla&i=206.29.182.240&m=live&c_mraid=1&o_mcmd5=202cb962ac59075b964b07152d234b70&v=2.0&latitude=38.5&longitude=-122.1514&demo.keywords=Business%2CBooks+%26+Reference&adspace.width=320&adspace.height=50&s_subid=00000000-0000-0000-0000-000000000000";
@@ -232,7 +225,6 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
         casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 15);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c"
@@ -245,7 +237,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
         final String response =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><request type=\"textAd\"><htmlString><![CDATA[<body style=\"text-align:center;margin:0;padding:0;\"><div align=\"center\"><a href=\"http://account.mobfox.com/activation-info.php\" target=\"_self\"><img src=\"http://creative1cdn.mobfox.com/static/documents/testbanner/300x250.jpg\" border=\"0\"/></a></div></body>]]></htmlString><clicktype>inapp</clicktype><clickurl><![CDATA[http://account.mobfox.com/activation-info.php]]></clickurl><urltype>link</urltype><refresh>60</refresh><scale>no</scale><skippreflight>yes</skippreflight></request>";
         dcpMobfoxAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -295,7 +287,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
+        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpMobfoxAdNetwork.getImpressionId());
     }
 

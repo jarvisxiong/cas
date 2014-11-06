@@ -452,7 +452,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         long startTime = System.currentTimeMillis();
-        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper);
+        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
         long endTime = System.currentTimeMillis();
         InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
                 InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
@@ -507,14 +507,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Presently only one banner object per impression object is being sent
         // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
         banner.setId("1");
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
 
         if (StringUtils.isNotBlank(sasParams.getSdkVersion())) {
             final int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
+
             if (sdkVersion >= 370) {
                 banner.setApi(Arrays.asList(API_FRAMEWORKS.MRAID_2.getValue()));
             }
@@ -522,10 +523,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final CommonExtension ext = new CommonExtension();
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            if (SlotSizeMapping.isIXSupportedSlot(sasParams.getSlot())) {
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            if (SlotSizeMapping.isIXSupportedSlot(selectedSlotId)) {
                 final RubiconExtension rp = new RubiconExtension();
-                rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(sasParams.getSlot()));
+                rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(selectedSlotId));
                 ext.setRp(rp);
             }
         }

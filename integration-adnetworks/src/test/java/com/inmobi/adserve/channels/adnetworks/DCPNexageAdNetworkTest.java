@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
@@ -62,7 +61,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         Formatter.init();
         dcpNexageAdnetwork = new DCPNexageAdNetwork(mockConfig, null, base, serverChannel);
     }
@@ -75,7 +73,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -87,7 +84,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
+        assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9));
     }
 
     @Test
@@ -98,7 +95,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        sasParams.setSlot(Short.valueOf("9"));
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -109,7 +105,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
+        assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9));
     }
 
     @Test
@@ -120,7 +116,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        sasParams.setSlot(Short.valueOf("9"));
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -131,7 +126,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
+        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9));
     }
 
     @Test
@@ -151,7 +146,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
+        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15));
     }
 
     @Test
@@ -171,7 +166,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
+        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15));
     }
 
     @Test
@@ -190,7 +185,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl));
+        assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15));
     }
 
     @Test
@@ -203,12 +198,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(13l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final Long[] categories = new Long[] {13l, 15l};
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -220,7 +213,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject(new JSONObject("{\"pos\":\"header\"}")), new ArrayList<Integer>(), 0.0d, null,
                         null, 32, new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&req(loc)=37.4429%2C-122.1514&cn=Adventure&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -238,10 +231,8 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         sasParams.setCategories(Arrays.asList(new Long[] {10l, 26l}));
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -252,7 +243,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -270,13 +261,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setSource("APP");
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -287,7 +276,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&d(id12)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -305,12 +294,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(63l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -321,7 +308,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"leader\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=leader&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28iPad%3B+U%3B+CPU+OS+3_2+like+Mac+OS+X%3B+en-us%29+AppleWebKit%2F531.21.10+%28KHTML%2C+like+Gecko%29+Version%2F4.0.4+Mobile%2F7B334b+Safari%2F531.21.10&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB20&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -339,13 +326,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(48l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
         sasParams.setSiteIncId(123456);
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
@@ -356,7 +341,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 56789,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB7&p(blind_id)=00000000-0000-ddd5-0000-00000001e240";
@@ -374,12 +359,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -389,7 +372,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=NokiaC3-00%2F5.0+%2808.65%29+Profile%2FMIDP-2.1+Configuration%2FCLDC-1.1+Mozilla%2F5.0+AppleWebKit%2F420++%28KHTML%2C+like+Gecko%29+Safari%2F420&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -407,12 +390,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c"
                         + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
@@ -422,7 +403,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -440,13 +421,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         sasParams.setCountryCode("US");
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -455,7 +434,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(country)=USA";
@@ -473,12 +452,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -487,7 +464,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -505,13 +482,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         sasParams.setState(1);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -520,7 +495,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000&u(dma)=1";
@@ -538,12 +513,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -552,7 +525,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -570,13 +543,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         casInternalRequestParameters.setZipCode("123456");
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -585,7 +556,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&req(zip)=123456&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -603,12 +574,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -617,7 +586,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -635,13 +604,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         sasParams.setGender("m");
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -650,7 +617,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(gender)=m&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -668,12 +635,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -682,7 +647,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -700,13 +665,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         sasParams.setAge(Short.valueOf("30"));
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -715,7 +678,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&u(age)=30&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -733,12 +696,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -747,7 +708,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -765,13 +726,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -780,7 +739,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=p&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -798,13 +757,11 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         sasParams.setSiteContentType(ContentType.FAMILY_SAFE);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -813,7 +770,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -831,12 +788,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("15"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String blurl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -845,7 +800,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl, (short) 15)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x50&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -863,12 +818,10 @@ public class DCPNexageAdNetworkTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("9"));
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
-        SlotSizeMapping.init();
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         final ChannelSegmentEntity entity =
@@ -877,7 +830,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl)) {
+        if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB1&p(blind_id)=00000000-0000-0000-0000-000000000000";
@@ -892,7 +845,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("APP");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -906,7 +858,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
 
         final String response =
                 "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -924,7 +876,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("wap");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -938,7 +889,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
 
         final String response =
                 "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -956,7 +907,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus "
                 + "Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534" + ".30");
-        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -969,7 +919,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
 
         final String response =
                 "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -987,7 +937,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -1002,7 +951,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
 
         final String response =
                 "<!-- AdPlacement : header --><img src=\"http://bos.ads.nexage.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.nexage.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=Nexage&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.nexage.com/testads/300x50-Nexage-Test-Adv2.gif\" /></a></div>";
@@ -1020,7 +969,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -1038,7 +986,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null,
                         null, 0, new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
 
         dcpNexageAdnetwork.generateJsAdResponse();
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
@@ -1054,7 +1002,6 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
-        sasParams.setSlot(Short.valueOf("4"));
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -1072,7 +1019,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null,
                         null, 0, new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
 
         dcpNexageAdnetwork.generateJsAdResponse();
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
@@ -1119,7 +1066,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl);
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl, (short) 15);
         assertEquals(dcpNexageAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 

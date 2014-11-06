@@ -68,15 +68,15 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("pubmatic.host");
         pubId = config.getString("pubmatic.pubId");
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
             try {
                 final JSONObject additionalParams = entity.getAdditionalParams();
                 // ad id is configured as the additional param in the
                 // segment table
-                adId = additionalParams.getString(sasParams.getSlot().toString());
+                adId = additionalParams.getString(selectedSlotId.toString());
 
             } catch (final Exception e) {
                 LOG.error("AdId is not configured for the segment:{}, exception raised {}",

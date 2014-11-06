@@ -140,6 +140,8 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Singleton
     @Provides
     List<AdGroupLevelFilter> provideIXAdGroupLevelFilters(final Injector injector) {
-        return Lists.newArrayList();
+        final List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
+        adGroupLevelFilterList.add(injector.getInstance(AdGroupPartnerCountFilter.class));
+        return adGroupLevelFilterList;
     }
 }

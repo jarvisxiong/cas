@@ -63,9 +63,9 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
         statusCode = HttpResponseStatus.OK.code();
         final VelocityContext context = new VelocityContext();
 
-        final String tag = slotTagMap.get(sasParams.getSlot());
+        final String tag = slotTagMap.get(selectedSlotId);
         if (StringUtils.isEmpty(tag)) {
-            LOG.info("Tag is not configured for this slot: {}", sasParams.getSlot());
+            LOG.info("Tag is not configured for this slot: {}", selectedSlotId);
             adStatus = "NO_AD";
             return;
         }

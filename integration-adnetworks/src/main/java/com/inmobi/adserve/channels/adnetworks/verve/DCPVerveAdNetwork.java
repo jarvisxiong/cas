@@ -96,13 +96,13 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         adUnit = MMA;
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-            if (sasParams.getSlot() == 11) {
+            if (selectedSlotId == (short)11) {
                 adUnit = BANNER;
-            } else if (sasParams.getSlot() == 10 || sasParams.getSlot() == 14) {
+            } else if (selectedSlotId == (short)10 || selectedSlotId == (short)14) {
                 adUnit = INTER;
             }
         }

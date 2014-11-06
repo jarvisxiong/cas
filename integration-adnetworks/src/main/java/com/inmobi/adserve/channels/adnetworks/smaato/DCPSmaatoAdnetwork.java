@@ -109,14 +109,14 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            dimension = slotIdMap.get(sasParams.getSlot().intValue());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            dimension = slotIdMap.get(selectedSlotId.intValue());
             if (StringUtils.isBlank(dimension)) {
                 LOG.debug("mandatory parameters missing for smaato so exiting adapter");
                 LOG.info("Configure parameters inside Smaato returned false");
                 return false;
             }
-            final Dimension dim = SlotSizeMapping.getDimension(sasParams.getSlot().longValue());
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 
@@ -246,7 +246,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     t = TemplateType.IMAGE;
                 } else if (TEXT_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getAdtext())) {
                     context.put(VelocityTemplateFieldConstants.AD_TEXT, ad.getAdtext());
-                    final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                    final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
                     } else {

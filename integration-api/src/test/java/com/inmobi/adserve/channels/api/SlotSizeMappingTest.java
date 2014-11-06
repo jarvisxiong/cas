@@ -15,9 +15,8 @@ public class SlotSizeMappingTest {
 
     @Test
     public void testGetDimension() throws Exception {
-        final Long slot = 29L;
+        final Short slot = (short)29;
         final Dimension expectedDimensions = new Dimension(250, 250);
-        SlotSizeMapping.init();
         assertThat(SlotSizeMapping.getDimension(slot), is(equalTo(expectedDimensions)));
     }
 
@@ -25,7 +24,6 @@ public class SlotSizeMappingTest {
     public void testIsIXSupportedSlot() throws Exception {
         final short slot = 21;
         final Boolean expected = true;
-        SlotSizeMapping.init();
         assertThat(SlotSizeMapping.isIXSupportedSlot(slot), is(equalTo(expected)));
     }
 
@@ -33,7 +31,6 @@ public class SlotSizeMappingTest {
     public void testIsIXSupportedSlotFalse() throws Exception {
         final short slot = -1;
         final Boolean expected = false;
-        SlotSizeMapping.init();
         assertThat(SlotSizeMapping.isIXSupportedSlot(slot), is(equalTo(expected)));
     }
 
@@ -41,7 +38,6 @@ public class SlotSizeMappingTest {
     public void testGetIXMappedSlotId() throws Exception {
         final short slot = 29;
         final Integer expectedMappedValue = 14;
-        SlotSizeMapping.init();
         assertThat(SlotSizeMapping.getIXMappedSlotId(slot), is(equalTo(expectedMappedValue)));
     }
 }

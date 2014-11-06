@@ -26,7 +26,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 public class DCPAdsMogoAdnetworkTest extends TestCase {
@@ -68,9 +67,9 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         final Channel serverChannel = createMock(Channel.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         Formatter.init();
-        dcpadsmogoAdNetwork = new DCPAdsMogoAdnetwork(mockConfig, clientBootstrap, base, serverChannel);;
+        dcpadsmogoAdNetwork = new DCPAdsMogoAdnetwork(mockConfig, clientBootstrap, base, serverChannel);
+        ;
     }
 
     @Test
@@ -78,7 +77,6 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -94,7 +92,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -102,7 +100,6 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setSource("APP");
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams
@@ -118,7 +115,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -126,7 +123,6 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setSource("APP");
         sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
@@ -143,7 +139,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -151,7 +147,6 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setOsId(HandSetOS.webOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -166,7 +161,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -187,7 +182,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
     }
 
     @Test
@@ -207,7 +202,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
     }
 
     @Test
@@ -227,18 +222,16 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
         final String externalKey = "adsmogo_test_7";
-        SlotSizeMapping.init();
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
-        dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null);
+        dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15);
 
         final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
         final String expectedUrl =
@@ -266,17 +259,15 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final List<Long> category = new ArrayList<Long>();
         category.add(1l);
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
         final String externalKey = "adsmogo_test_7";
-        SlotSizeMapping.init();
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+        if (dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15)) {
             final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=adsmogo_test_7&ip=206.29.182.240&ast=banner&ua=Mozilla&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
@@ -289,7 +280,6 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setSource("APP");
         sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
@@ -306,7 +296,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
         final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=f6wqjq1r5v&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&os=iOS&lat=37.4429&lon=-122.1514&w=728&h=90&ida=23e2ewq445545";
@@ -320,7 +310,6 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot(Short.valueOf("15"));
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setOsId(HandSetOS.Android.getValue());
         casInternalRequestParameters.setUid("23e2ewq445545saasw232323");
@@ -336,7 +325,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
         final String response =
                 "<meta http-equiv='Content-Type'content='text/html; charset=UTF-8'/><style type='text/css'>*{padding:0px;margin:0px;-webkit-touch-callout: none;} a:link{text-decoration:none;}.tit{ font-size:[font_1]em;text-decoration: underline;font-weight;}.desc{ font-size:[font_2]em;margin-top:2px;}</style><a href='���http://#####'style='display: block; width: 100%; height: 100%;background-color: #000000'><table border='0'cellpadding='0'cellspacing='0'style='width: 320px; height: 50px;'><tr><td style='padding: 0px 2px; color: #ffffff'id='con'><span class='tit'>ad tilte</span><p class='desc'> Ad Text</p></td></tr></table></a>";
         dcpadsmogoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -380,7 +369,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
+        dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpadsmogoAdNetwork.getImpressionId());
     }
 

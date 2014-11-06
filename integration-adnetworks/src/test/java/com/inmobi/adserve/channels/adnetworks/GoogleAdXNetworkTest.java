@@ -20,7 +20,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 /**
@@ -57,7 +56,6 @@ public class GoogleAdXNetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         Formatter.init();
         googleAdXNetwork = new GoogleAdXAdNetwork(mockConfig, null, base, serverChannel);
     }
@@ -66,8 +64,6 @@ public class GoogleAdXNetworkTest extends TestCase {
     public void testGoogleAdXNetworkConfigureParameters() throws JSONException {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setSlot(Short.valueOf("15"));
-
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
@@ -75,7 +71,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        assertTrue(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
+        assertTrue(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15));
 
 
         // If we know the request is from FeaturePhones Or Opera then return false
@@ -87,7 +83,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
 
-        assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
+        assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15));
 
         // If we know the request is from FeaturePhones Or Opera then return false
         sasParams
@@ -99,7 +95,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
 
-        assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null));
+        assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15));
     }
 
     @Test
@@ -107,7 +103,6 @@ public class GoogleAdXNetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         // Setting slot for 320x50
-        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setReferralUrl("http://www.referral.inmobi.com");
         sasParams.setAppUrl("http://www.inmobi.com");
 
@@ -120,7 +115,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
 
         googleAdXNetwork.generateJsAdResponse();
         assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);
@@ -135,7 +130,6 @@ public class GoogleAdXNetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         // Setting slot for 320x50
-        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setAppUrl("http://www.inmobi.com");
 
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
@@ -147,7 +141,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
 
         googleAdXNetwork.generateJsAdResponse();
         assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);
@@ -163,7 +157,6 @@ public class GoogleAdXNetworkTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setSource("APP");
         // Setting slot for 320x50
-        sasParams.setSlot(Short.valueOf("15"));
         sasParams.setAppUrl("http://www.inmobi.com");
 
         final String externalKey = "8a809449013c3c643cad82cb412b5857";
@@ -175,7 +168,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
 
         googleAdXNetwork.generateJsAdResponse();
         assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);

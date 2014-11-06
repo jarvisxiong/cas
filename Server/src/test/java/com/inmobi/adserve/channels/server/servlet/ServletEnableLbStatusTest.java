@@ -35,8 +35,8 @@ public class ServletEnableLbStatusTest {
 
         final ServletEnableLbStatus tested = new ServletEnableLbStatus();
         tested.handleRequest(mockHttpRequestHandler, null, null);
-        assertThat(ServerStatusInfo.statusCode, is(equalTo(200)));
-        assertThat(ServerStatusInfo.statusString, is(equalTo("OK")));
+        assertThat(ServerStatusInfo.getStatusCode(), is(equalTo(200)));
+        assertThat(ServerStatusInfo.getStatusString(), is(equalTo("OK")));
 
         verifyAll();
     }

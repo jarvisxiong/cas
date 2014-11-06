@@ -192,7 +192,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                     t = TemplateType.IMAGE;
 
                 } else {
-                    String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                    String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                     if (StringUtils.isEmpty(vmTemplate)) {
                         t = TemplateType.PLAIN;
                     } else {

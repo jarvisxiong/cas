@@ -29,13 +29,13 @@ public class IXPackageMatcher {
     public static final int PACKAGE_MAX_LIMIT = 30;
 
     public static List<String> findMatchingPackageIds(final SASRequestParameters sasParams,
-            final RepositoryHelper repositoryHelper) {
+            final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
         List<String> matchedPackageIds = new ArrayList<>();
 
-        Segment requestSegment = createRequestSegment(sasParams);
+        Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
         ResultSet<IXPackageEntity> resultSet =
                 repositoryHelper.queryIXPackageRepository(sasParams.getOsId(), sasParams.getSiteId(), sasParams
-                        .getCountryId().intValue(), sasParams.getSlot());
+                        .getCountryId().intValue(), selectedSlotId);
 
         int matchedPackagesCount = 0;
         for (IXPackageEntity packageEntity : resultSet) {
@@ -53,7 +53,7 @@ public class IXPackageMatcher {
         return matchedPackageIds;
     }
 
-    private static Segment createRequestSegment(final SASRequestParameters sasParams) {
+    private static Segment createRequestSegment(final SASRequestParameters sasParams, final Short selectedSlotId) {
 
         Country reqCountry = new Country();
         DeviceOs reqDeviceOs = new DeviceOs();
@@ -71,7 +71,7 @@ public class IXPackageMatcher {
         reqCountry.init(Collections.singleton(sasParams.getCountryId().intValue()));
         reqDeviceOs.init(Collections.singleton(sasParams.getOsId()));
         reqSiteId.init(Collections.singleton(sasParams.getSiteId()));
-        reqSlotId.init(Collections.singleton(sasParams.getSlot().intValue()));
+        reqSlotId.init(Collections.singleton(selectedSlotId.intValue()));
         reqLatlongPresent.init(StringUtils.isNotEmpty(sasParams.getLatLong()));
         reqUidPresent.init(isUdIdPresent(sasParams));
         reqCarrierId.init(Collections.singleton((long) sasParams.getCarrierId())); // TODO: fix long->int cast in ThriftRequestParser

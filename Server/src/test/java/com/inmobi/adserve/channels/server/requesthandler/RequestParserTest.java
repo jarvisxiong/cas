@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
@@ -70,7 +71,7 @@ public class RequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSiteIncId(), 34093);
         assertEquals(sasRequestParameters.getRemoteHostIp(), "3.0.0.0");
         assertEquals(sasRequestParameters.getLocSrc(), "wifi");
-        assertEquals(sasRequestParameters.getSlot(), new Short("9"));
+        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getRFormat(), "xhtml");
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.TRUE);
         assertEquals(sasRequestParameters.getCategories().toString(), "[70, 42]");

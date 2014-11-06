@@ -35,8 +35,8 @@ public class ServletDisableLbStatusTest {
 
         final ServletDisableLbStatus tested = new ServletDisableLbStatus();
         tested.handleRequest(mockHttpRequestHandler, null, null);
-        assertThat(ServerStatusInfo.statusCode, is(equalTo(404)));
-        assertThat(ServerStatusInfo.statusString, is(equalTo("NOT_OK")));
+        assertThat(ServerStatusInfo.getStatusCode(), is(equalTo(404)));
+        assertThat(ServerStatusInfo.getStatusString(), is(equalTo("NOT_OK")));
 
         verifyAll();
     }

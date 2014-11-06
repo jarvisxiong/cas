@@ -130,11 +130,11 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             longitude = latlong[1];
         }
 
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
 
-            Long slotSize = (long) sasParams.getSlot();
-            if (slotSize == 9L) {
-                slotSize = 15L;
+            Short slotSize = selectedSlotId;
+            if (slotSize == (short)9) {
+                slotSize = (short)15;
             }
             final Dimension dim = SlotSizeMapping.getDimension(slotSize);
             width = (int) Math.ceil(dim.getWidth());

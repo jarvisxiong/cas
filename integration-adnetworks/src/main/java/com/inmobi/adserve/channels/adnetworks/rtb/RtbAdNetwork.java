@@ -463,8 +463,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Banner createBannerObject() {
         final Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.getImpressionId());
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
@@ -487,7 +487,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // This request supports in-Banner Video on interstitial slot and this partner supports video.
-        if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
+        if (null != casInternalRequestParameters.getImpressionIdForVideo() && isBannerVideoResponseSupported) {
             // Set video specific attributes to the Banner object
             banner.setBattr(videoBlockedAttributes);
             banner.setBtype(videoBlockCreativeType);
@@ -1034,7 +1034,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             responseAuctionId = bidResponse.getId();
 
             // Check bid response for video
-            if (sasParams.isBannerVideoSupported() && isBannerVideoResponseSupported) {
+            if (null != casInternalRequestParameters.getImpressionIdForVideo() && isBannerVideoResponseSupported) {
                 return checkBidResponseForBannerVideo(bid.getExt());
             }
 

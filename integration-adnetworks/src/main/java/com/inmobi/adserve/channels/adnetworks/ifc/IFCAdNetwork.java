@@ -170,8 +170,8 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("IFC Configure Parameter returning false as mandatory param: SiteName is missing");
             return false;
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
         } else {

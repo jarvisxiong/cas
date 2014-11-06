@@ -52,7 +52,7 @@ public class ServletLbStatusTest {
 
         replayAll();
 
-        ServerStatusInfo.statusCode = 200;
+        ServerStatusInfo.setStatusCodeAndString(200, "testOK");
 
         final ServletLbStatus tested = new ServletLbStatus();
         tested.handleRequest(httpRequestHandler, null, null);
@@ -68,16 +68,15 @@ public class ServletLbStatusTest {
         final Channel mockChannel = createMock(Channel.class);
         final ChannelFuture mockFuture = createMock(ChannelFuture.class);
 
-        ServerStatusInfo.statusCode = 404;
-        ServerStatusInfo.statusString = "test";
+        ServerStatusInfo.setStatusCodeAndString(404, "test");
 
         final HttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
-                        ServerStatusInfo.statusString, Charset.defaultCharset()));
+                        ServerStatusInfo.getStatusString(), Charset.defaultCharset()));
         final HttpRequestHandler httpRequestHandler = new HttpRequestHandler(null, null, mockResponseSender);
 
         expectNew(DefaultFullHttpResponse.class, HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
-                Unpooled.copiedBuffer(ServerStatusInfo.statusString, Charset.defaultCharset())).andReturn(
+                Unpooled.copiedBuffer(ServerStatusInfo.getStatusString(), Charset.defaultCharset())).andReturn(
                 (DefaultFullHttpResponse) response).times(1);
         expect(mockChannel.writeAndFlush(response)).andReturn(mockFuture).times(1);
         expect(mockFuture.addListener(ChannelFutureListener.CLOSE)).andReturn(null).times(1);

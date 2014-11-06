@@ -7,6 +7,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -120,7 +121,6 @@ public class IXAdNetworkTest2 {
 
         expect(mockStatus.code()).andReturn(200).times(2);
         expect(mockSasParams.getSource()).andReturn("wap").times(3);
-        expect(mockSasParams.getSlot()).andReturn((short) 15).times(1);
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
         expect(mockSasParams.getSdkVersion()).andReturn("SdkVer").times(1);
@@ -147,7 +147,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl);
+                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -189,7 +189,6 @@ public class IXAdNetworkTest2 {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(1234L).anyTimes();
 
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
-        expect(mockSasParams.getSlot()).andReturn((short) 15).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
 
@@ -210,7 +209,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl);
+                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15);
         ImpressionIdGenerator.init((short) 123, (byte) 10);
         ClickUrlsRegenerator.init(mockConfig);
 

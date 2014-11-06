@@ -62,7 +62,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString(name + ".host");
         final String siteRating = ContentType.PERFORMANCE == sasParams.getSiteContentType() ? "p" : "fs";
-        placementId = config.getString(String.format(SLOT_FORMAT, name, sasParams.getSlot(), siteRating));
+        placementId = config.getString(String.format(SLOT_FORMAT, name, selectedSlotId, siteRating));
         if (StringUtils.isBlank(placementId)) {
             LOG.debug("Slot is not configured for {}", externalSiteId);
             LOG.info("Configure parameters inside {} returned false", name);

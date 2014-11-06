@@ -63,11 +63,11 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            Long slotSize = (long) sasParams.getSlot();
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            Short slotSize = selectedSlotId;
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
-            if (slotSize == 9L || slotSize == 24L) {
-                slotSize = 15L;
+            if (slotSize == (short)9 || slotSize == (short)24) {
+                slotSize = 15;
             }
             final Dimension dim = SlotSizeMapping.getDimension(slotSize);
             acceptShop = dim.getWidth() > 299;
@@ -112,7 +112,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 did = "nodeviceid-1234567890";
             }
             url.append("&did=").append(did);
-            if (null != slot) {
+            if (null != selectedSlotId) {
                 url.append("&format=").append(slotFormat);
             }
             final String category = getCategories(';');
@@ -170,7 +170,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("image_url"));
                     if ("shop".equalsIgnoreCase(adType)) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("content"));
-                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             LOG.info("No template found for the slot");
                             adStatus = "NO_AD";

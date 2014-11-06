@@ -82,9 +82,8 @@ public class RequestFilters {
 
         }
 
-        if (DemandSourceType.IX.getValue() == hrh.responseSender.sasParams.getDst()
-                && -1 == hrh.responseSender.sasParams.getSlot()) {
-            LOG.info("Request for ix dropped since no slot in the list RqMkSlot has a mapping to Rubicon's slots");
+        if (hrh.responseSender.sasParams.getRqMkSlot().isEmpty()) {
+            LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
 

@@ -89,7 +89,7 @@ public interface AdNetworkInterface {
     // success.
     boolean configureParameters(final SASRequestParameters param,
             final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl);
+            final String clickUrl, final String beaconUrl, final long SlotId);
 
     // Makes asynchronous request to Ad Network server. Returns true on success.
     boolean makeAsyncRequest();
@@ -148,6 +148,8 @@ public interface AdNetworkInterface {
     void generateJsAdResponse();
 
     void setName(final String adapterName);
+
+    Short getSelectedSlotId();
 
     // Get Demand Source Type
     DemandSourceType getDst();

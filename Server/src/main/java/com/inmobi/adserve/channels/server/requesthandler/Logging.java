@@ -74,7 +74,7 @@ public class Logging {
     }
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
-            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
+                            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -86,8 +86,8 @@ public class Logging {
 
     // Writing rrlogs
     public static void rrLogging(final Marker traceMarker, final ChannelSegment channelSegment,
-            final List<ChannelSegment> rankList, final SASRequestParameters sasParams, String terminationReason,
-            final long totalTime) throws JSONException, TException {
+                                 final List<ChannelSegment> rankList, final SASRequestParameters sasParams, String terminationReason,
+                                 final long totalTime) throws JSONException, TException {
         InspectorStats.incrementStatCount(InspectorStrings.LATENCY, totalTime);
 
         if (null != sasParams) {
@@ -135,6 +135,9 @@ public class Logging {
         AdMeta adMeta;
         Ad ad;
         Impression impression = null;
+
+        Short slotServed = null;
+
         if (channelSegment != null) {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.SERVER_IMPRESSION);
@@ -163,9 +166,9 @@ public class Logging {
             if (winBid != -1) {
                 ad.setWinBid(winBid);
             }
+            slotServed = channelSegment.getAdNetworkInterface().getSelectedSlotId();
         }
-        Short requestSlot = null;
-        Short slotServed = null;
+        Short requestSlot = slotServed;
         Long handsetInternalId = null;
         Long countryId = null;
         Integer carrierId = null;
@@ -173,10 +176,9 @@ public class Logging {
         Integer city = null;
         if (null != sasParams) {
             handsetInternalId = sasParams.getHandsetInternalId();
-            slotServed = sasParams.getSlot();
             countryId = sasParams.getCountryId();
             carrierId = sasParams.getCarrierId();
-            if (null != sasParams.getRqMkSlot() && !sasParams.getRqMkSlot().isEmpty()) {
+            if (null == requestSlot) {
                 requestSlot = sasParams.getRqMkSlot().get(0);
             }
             state = sasParams.getState();
@@ -262,7 +264,7 @@ public class Logging {
 
     // Writing creatives
     public static void creativeLogging(final List<ChannelSegment> channelSegments,
-            final SASRequestParameters sasRequestParameters) {
+                                       final SASRequestParameters sasRequestParameters) {
         LOG.debug("inside creativeLogging");
         if (null == channelSegments || channelSegments.isEmpty()) {
             return;
@@ -409,7 +411,10 @@ public class Logging {
     }
 
     /**
+<<<<<<< HEAD
+=======
      *
+>>>>>>> 3ea8b2606376fa7b22afbf64cf65b7f21977d0f6
      * @param rankList
      * @param config
      */
@@ -468,7 +473,7 @@ public class Logging {
      * @param casAdvertisementLog
      */
     private static void sendToDatabus(final CasAdvertisementLog casAdvertisementLog,
-            final String sampledAdvertisementLogKey) {
+                                      final String sampledAdvertisementLogKey) {
         Message msg = null;
         try {
             final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
@@ -483,7 +488,6 @@ public class Logging {
     }
 
     /**
-     * 
      * @param partnerName
      * @param externalSiteId
      * @return true if logging required otherwise false

@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -26,6 +22,8 @@ import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+
+import static org.easymock.EasyMock.*;
 
 // TODO: Needs fixing
 public class CreateThriftResponseIXTest {
@@ -71,9 +69,7 @@ public class CreateThriftResponseIXTest {
         expect(mockIXAdNetwork.returnDealId()).andReturn("dealId").anyTimes();
         expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.5).anyTimes();
         expect(mockIXAdNetwork.returnPmpTier()).andReturn(3).anyTimes();
-
-        expect(mockSASRequestParameters.getSlot()).andReturn((short) 0).anyTimes();
-
+        expect(mockIXAdNetwork.getSelectedSlotId()).andReturn((short) 0).anyTimes();
 
         // Create responseSender (the class to be tested)
         // The object of the class to be tested is partially mocked

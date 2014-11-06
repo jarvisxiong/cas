@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
@@ -67,7 +66,6 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         Formatter.init();
         dcpBaiduAdNetwork = new DCPBaiduAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
     }
@@ -77,7 +75,6 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short) 11);
         sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -92,7 +89,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+        assertFalse(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -100,7 +97,6 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSlot((short) 11);
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setOsId(HandSetOS.iOS.getValue());
         sasParams
@@ -116,7 +112,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+        assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -137,7 +133,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -157,7 +153,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
     }
 
     @Test
@@ -174,11 +170,9 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         category.add(3l);
         sasParams.setCategories(category);
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot((short) 15);
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
         final String externalKey = "debug";
-        SlotSizeMapping.init();
 
         final String clurl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
@@ -192,7 +186,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl)) {
+        if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 15)) {
             final String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
 
             final String expectedUrl =
@@ -215,18 +209,15 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         category.add(1l);
         sasParams.setCategories(category);
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot((short) 15);
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(HandSetOS.Android.getValue());
         final String externalKey = "debug";
-        SlotSizeMapping.init();
-
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+        if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15)) {
             final String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
             final String urlWithOutGeo = actualUrl.substring(0, actualUrl.indexOf("&g="));
             final String expectedUrl =
@@ -242,7 +233,6 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 15);
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setOsId(HandSetOS.Android.getValue());
         casInternalRequestParameters.setUid("23e2ewq445545saasw232323");
@@ -258,7 +248,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
         final String response =
                 "<html lang=\"en\"><head>    <meta charset=\"UTF-8\">    <meta name=\"viewport\" content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\">    <title>mobads</title>    <script type=\"text/javascript\">        function mobadsAdClicked(){            new Image().src = \"http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1\";        }    </script>    </head>    <body style=\"margin:0;\">        <div class=\"mobads-api-container\" style=\"max-width:100%;font-size:100%;\">            <div class=\"mobads-api-ad\" style='margin:0;border:1px solid #ebebeb;position:relative;overflow:hidden;padding:0.2em 0 0.2em 1.3em;'>    <a target=\"_blank\" href=\"http://mobads.baidu.com/ad.html?url=http%3A%2F%2Fpage.baidu.com%2Fwww.webinternational.com.cn%2F3bq4k_3pi1_i.html%3F__mobads_clickid%3DuANBIyIxnHDvP1m1g1csnhPBrHmzmyndrH0LPyc4PWwBnjTkPHFbnWnYmWTs%26__mobads_charge%3DnHDvP1m1r1fznHTzr1RdrjR4nWfenHcdPWDePH0snj_zr1DeuANBIyIxmLKzrvw-mMNMr1csnhPBrHmzmyndrH0LPyc4PWwBnjTkPHFbnWnYmWTsr1_hFW0hFW0hFBmhnamhnamh%26__mobads_ta%3DmLwzrWmYnik9uAGdTLfln0%26__mobads_qk%3D5329763a47869774f9b5f55a%26__mobads_curl_check%3D1302967414&v=api2&sn=&clk=1\" onclick=\"mobadsAdClicked();\" style=\"text-decoration: none;line-height:0;\">        <span style=\"white-space:nowrap;font-family:Microsoft YaHei;font-size:150%;\">            <span class=\"tit\" style=\"font-weight:bold;color:#003399;line-height:1.2em;\">YES YES</span><br>            <span class=\"desc\" style=\"color:#999;font-size:63%;line-height:1.2em;\">Come on</span>        </span>    </a>    <img src=\"http://mobads.baidu.com/ads/img/logo_bottom_left.png\" style=\"position:absolute;bottom:0;left:0;width:7.4em;height:1.2em;margin-left:-5.6em;\"></div>        <img src=\"http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true\" style=\"display:none;\"><img src=\"http://cq01-testing-mobads06.vm.baidu.com:8092/ad.log?url2=nHDvP1m1QjfznHTzQjRdrjR4nWf_nHcdPWD_PH0snaszQaYzPHmdnj0zP1f_uANBIyIxmLKzQAw-mMNMQjcsnhPBrHmzmyndrH0LPyc4PWwBnjTkPHFbnWnYmWTsQashFW0hFW0hFBmhnamhnamh&__mobads_ta=mLwzrWmYnik9uAGdTLfln000&__mobads_qk=5329763a47869774f9b5f55a&v=api2&extra2=nj0snjDsnj0snj0snj0sniskrHTsnjDsnH0snj0sn0Cb\" style=\"display:none;\">        </div>    </body></html>";
         dcpBaiduAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -308,7 +298,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null);
+        dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpBaiduAdNetwork.getImpressionId());
     }
 

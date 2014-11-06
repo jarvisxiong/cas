@@ -19,7 +19,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 public class DCPMarimediaAdNetworkTest extends TestCase {
@@ -54,7 +53,6 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         dcpMarimediaAdNetwork = new DCPMarimediaAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -75,7 +73,6 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
-        sasParams.setSlot((short) 3);
         final String externalKey = "918a1f78-811c-4145-912e-c1a45f7705a0";
 
         final ChannelSegmentEntity entity =
@@ -85,7 +82,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                         null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         assertTrue(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
-                null));
+                null, (short) 3));
     }
 
     @Test
@@ -105,7 +102,6 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
-        sasParams.setSlot((short) 3);
         final String externalKey = "918a1f78-811c-4145-912e-c1a45f7705a0";
 
         final ChannelSegmentEntity entity =
@@ -119,7 +115,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                         + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1"
                         + "/9cddca11?beacon=true";
 
-        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 3);
 
         // Compare the expected URL with actual URL.
         final String actualUrl = dcpMarimediaAdNetwork.getRequestUri().toString();
@@ -145,7 +141,6 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
-        sasParams.setSlot((short) 3);
         final String externalKey = "918a1f78-811c-4145-912e-c1a45f7705a0";
 
         final ChannelSegmentEntity entity =
@@ -162,7 +157,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         final String response =
                 "{\"adyxAdRequestGuid\": \"3b327792-f364-41b4-9f34-501f1acc3109\", \"adType\": \"banner\", \"imageUrl\": \"http://media.go2speed.org/brand/files/taptica/4278/Bingo_2tixanimated_Banner_320x50.gif\", \"imageAltText\": null, \"adUrl\": \"http://tracking.taptica.com/aff_ic?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9TWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d\",    \"impUrl\": \"http://ad.taptica.com/aff_i?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9UTWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d\", \"urlType\": \"web\", \"beacon\": null, \"adInterval\": \"10\", \"advAppId\": \"542781249\", \"storeUrl\": null, \"payout\": \"1.05000\"}";
 
-        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 3);
         dcpMarimediaAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMarimediaAdNetwork.getHttpResponseStatusCode(), 200);
 
@@ -189,7 +184,6 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         sasParams.setUserAgent("Mozilla%2F5.0+%28compatible%3B+MSIE+9.0%3B+Windows+NT+6.1%3B+Trident%2F5.0%29");
         sasParams.setSource("APP");
         sasParams.setOsId(SASRequestParameters.HandSetOS.iOS.getValue());
-        sasParams.setSlot((short) 21);
         final String externalKey = "918a1f78-811c-4145-912e-c1a45f7705a0";
 
         final ChannelSegmentEntity entity =
@@ -205,7 +199,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
 
         final String response = "{\"code\":0,\"adType\":\"empty\",\"description\":\"\"}";
 
-        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl);
+        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 21);
         dcpMarimediaAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMarimediaAdNetwork.getHttpResponseStatusCode(), 200);
 

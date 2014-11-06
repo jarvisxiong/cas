@@ -24,8 +24,7 @@ public class ServletDisableLbStatus implements Servlet {
             final Channel serverChannel) throws Exception {
         if (hrh.isRequestFromLocalHost()) {
             hrh.responseSender.sendResponse("OK", serverChannel);
-            ServerStatusInfo.statusCode = 404;
-            ServerStatusInfo.statusString = "NOT_OK";
+            ServerStatusInfo.setStatusCodeAndString(404, "NOT_OK");
             LOG.debug("asked to shut down the server");
         } else {
             hrh.responseSender.sendResponse("NOT AUTHORIZED", serverChannel);

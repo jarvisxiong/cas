@@ -44,10 +44,10 @@ public class AsyncRequestMaker {
      * it to segment list else we drop it
      */
     public List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows, final Configuration config,
-            final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
-            final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
-            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
-            final List<ChannelSegment> rtbSegments) throws Exception {
+                                                       final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
+                                                       final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
+                                                       final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
+                                                       final List<ChannelSegment> rtbSegments) throws Exception {
 
         final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
@@ -69,7 +69,7 @@ public class AsyncRequestMaker {
             final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             final AdNetworkInterface network =
                     segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row.getChannelSegmentEntity()
-                            .getChannelId(), adapterConfig, null, null, base, channel, advertiserSet, isRtbEnabled,
+                                    .getChannelId(), adapterConfig, null, null, base, channel, advertiserSet, isRtbEnabled,
                             rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
@@ -93,13 +93,14 @@ public class AsyncRequestMaker {
             String beaconUrl = null;
             sasParams.setImpressionId(ImpressionIdGenerator.getInstance().getImpressionId(incId));
             final CasInternalRequestParameters casInternalRequestParameters =
-                    getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal, channelSegmentEntity);
+                    getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal, channelSegmentEntity, row.getRequestedSlotId());
 
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
             sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
-            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
+            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired())
+                    && null != sasParams.getImpressionId()) {
                 boolean isCpc = false;
                 if (null != channelSegmentEntity.getPricingModel()
                         && "cpc".equalsIgnoreCase(channelSegmentEntity.getPricingModel())) {
@@ -118,7 +119,7 @@ public class AsyncRequestMaker {
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
             if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,
-                    beaconUrl)) {
+                    beaconUrl, row.getRequestedSlotId())) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner() || network.isIxPartner()) {
@@ -133,8 +134,8 @@ public class AsyncRequestMaker {
     }
 
     private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternalRequestParameterGlobal,
-            final ChannelSegmentEntity channelSegmentEntity) {
+                                                                         final CasInternalRequestParameters casInternalRequestParameterGlobal,
+                                                                         final ChannelSegmentEntity channelSegmentEntity, final Long selectedSlotId) {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setImpressionId(sasParams.getImpressionId());
         casInternalRequestParameters.setBlockedIabCategories(casInternalRequestParameterGlobal
@@ -162,16 +163,21 @@ public class AsyncRequestMaker {
 
         // Set impressionIdForVideo if banner video is supported on this request.
         casInternalRequestParameters.setImpressionIdForVideo(getImpressionIdForVideo(sasParams,
-                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds()));
+                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds(), selectedSlotId));
 
         return casInternalRequestParameters;
     }
 
     private String getImpressionIdForVideo(final SASRequestParameters sasParams, final Integer[] adFormatIds,
-            final Long[] adIncIds) {
+                                           final Long[] adIncIds, final Long selectedSlotId) {
 
         if (!sasParams.isBannerVideoSupported() || adFormatIds == null || adIncIds == null) {
             LOG.debug("In-banner video ad is not supported.");
+            return null;
+        }
+
+        // Only slot size 320x480 and 480x320 are supported
+        if (14L != selectedSlotId && 32L != selectedSlotId) {
             return null;
         }
 
@@ -188,7 +194,7 @@ public class AsyncRequestMaker {
     }
 
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
-            final ChannelSegmentEntity channelSegmentEntity) {
+                                   final ChannelSegmentEntity channelSegmentEntity) {
         if (channelSegmentEntity.isStripUdId()) {
             casInternalRequestParameters.setUid(null);
             casInternalRequestParameters.setUidO1(null);
@@ -213,7 +219,7 @@ public class AsyncRequestMaker {
     }
 
     public List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final Channel channel,
-            final List<ChannelSegment> rtbSegments) {
+                                                  final List<ChannelSegment> rtbSegments) {
         final Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
             final ChannelSegment channelSegment = itr.next();
@@ -243,7 +249,7 @@ public class AsyncRequestMaker {
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
-            final SASRequestParameters sasParams, final Integer dst) {
+                                                  final SASRequestParameters sasParams, final Integer dst) {
         final ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
@@ -260,8 +266,8 @@ public class AsyncRequestMaker {
         builder.setUdIdVal(sasParams.getTUidParams());
         builder.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
         builder.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
-        builder.setImageBeaconFlag(true);// true/false
-        builder.setBeaconEnabledOnSite(true);// do not know
+        builder.setImageBeaconFlag(true); // true/false
+        builder.setBeaconEnabledOnSite(true); // do not know
         builder.setTestMode(false);
         builder.setRmAd(sasParams.isRichMedia());
         builder.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
@@ -269,7 +275,7 @@ public class AsyncRequestMaker {
         builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
         builder.setTestRequest(false);
         builder.setLatlonval(sasParams.getLatLong());
-        builder.setRtbSite(sasParams.getSst() != 0);// TODO:- Change this according to thrift enums
+        builder.setRtbSite(sasParams.getSst() != 0); // TODO:- Change this according to thrift enums
         builder.setDst(dst.toString());
         builder.setBudgetBucketId("101"); // Default Value
         return new ClickUrlMakerV6(builder);

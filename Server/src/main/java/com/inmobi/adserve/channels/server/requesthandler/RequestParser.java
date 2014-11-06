@@ -56,7 +56,7 @@ public class RequestParser {
     }
 
     public void parseRequestParameters(final JSONObject jObject, SASRequestParameters params,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                       final CasInternalRequestParameters casInternalRequestParameters) {
         final Marker traceMarker = traceMarkerProvider.get();
 
         LOG.debug(traceMarker, "Inside parameter parser");
@@ -97,12 +97,9 @@ public class RequestParser {
             LOG.debug(traceMarker, "State not found in request");
         }
         final String slot = stringify(jObject, "slot-served");
+
         if (StringUtils.isNotEmpty(slot)) {
-            params.setSlot(Short.parseShort(slot));
-        }
-        final String rqMkSlot = stringify(jObject, "rqMkAdSlot");
-        if (StringUtils.isNotEmpty(rqMkSlot)) {
-            params.setRqMkSlot(Arrays.asList(Short.parseShort(rqMkSlot)));
+            params.setRqMkSlot(Arrays.asList(Short.parseShort(slot)));
         }
         String sdkVersion = stringify(jObject, "sdk-version");
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {

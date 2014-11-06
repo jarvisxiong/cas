@@ -46,6 +46,10 @@ public class ChannelSegment {
     @Setter
     private double prioritisedECPM;
 
+    @Getter
+    @Setter
+    private Long requestedSlotId;
+
     public ChannelSegment(final ChannelSegmentEntity channelSegmentEntity, final ChannelEntity channelEntity,
             final ChannelFeedbackEntity channelFeedbackEntity,
             final ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity,
@@ -66,6 +70,12 @@ public class ChannelSegment {
 
     public void incrementInspectorStats(final String inspectorString, final long value) {
         final String advertiserId = channelSegmentEntity.getAdvertiserId();
+        if (advertiserIdNameMap.containsKey(advertiserId)) {
+            InspectorStats.incrementStatCount(advertiserIdNameMap.get(advertiserId), inspectorString, value);
+        }
+    }
+
+    public static void incrementInspectorStats(final String advertiserId, final String inspectorString, long value) {
         if (advertiserIdNameMap.containsKey(advertiserId)) {
             InspectorStats.incrementStatCount(advertiserIdNameMap.get(advertiserId), inspectorString, value);
         }

@@ -57,8 +57,8 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = dim.getWidth();
             height = dim.getHeight();
         }
@@ -151,7 +151,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
                     if ("text".equals(adResponse.getString("type"))) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("adtext"));
-                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(slot.toString());
+                        final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             t = TemplateType.PLAIN;
                         } else {

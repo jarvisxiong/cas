@@ -60,7 +60,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private String networkType;
 
     public DCPMarimediaAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+                                 final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
@@ -92,12 +92,12 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         // Check Resolution.
-        if (null == sasParams.getSlot() || null == SlotSizeMapping.getDimension((long) sasParams.getSlot())) {
+        if (null == selectedSlotId || null == SlotSizeMapping.getDimension(selectedSlotId)) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         } else {
-            final Dimension dim = SlotSizeMapping.getDimension((long) sasParams.getSlot());
+            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 

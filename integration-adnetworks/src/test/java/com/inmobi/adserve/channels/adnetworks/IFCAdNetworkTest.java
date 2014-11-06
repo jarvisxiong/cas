@@ -21,9 +21,7 @@ import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.phoenix.logging.DebugLogger;
 
 
 public class IFCAdNetworkTest extends TestCase {
@@ -35,8 +33,6 @@ public class IFCAdNetworkTest extends TestCase {
     private final String isTest = "0";
     private final String filter = "clean";
     private final String debug = "debug";
-    private final String loggerConf = "/tmp/channel-server.properties";
-    private DebugLogger logger;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -62,7 +58,6 @@ public class IFCAdNetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         ifcAdNetwork = new IFCAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -82,7 +77,6 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "NON-JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot(Short.valueOf("11"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -94,7 +88,7 @@ public class IFCAdNetworkTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
+        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 11), true);
     }
 
     @Test
@@ -114,7 +108,6 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -126,7 +119,7 @@ public class IFCAdNetworkTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
+        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 1), true);
     }
 
     @Test
@@ -146,7 +139,6 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i301");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -158,7 +150,7 @@ public class IFCAdNetworkTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), false);
+        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 1), false);
     }
 
     @Test
@@ -188,7 +180,6 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("sdk-version", "i351");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -201,7 +192,7 @@ public class IFCAdNetworkTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
+        ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 1);
         try {
             ifcAdNetwork.parseResponse("", HttpResponseStatus.OK);
             ifcAdNetwork.parseResponse(null, HttpResponseStatus.OK);
@@ -228,7 +219,6 @@ public class IFCAdNetworkTest extends TestCase {
         jsonObject.put("adcode", "JS");
         sasParams.setAllParametersJson(jsonObject.toString());
         sasParams.setSiteId("12");
-        sasParams.setSlot(Short.valueOf("1"));
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -240,6 +230,6 @@ public class IFCAdNetworkTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", ""), true);
+        assertEquals(ifcAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 1), true);
     }
 }

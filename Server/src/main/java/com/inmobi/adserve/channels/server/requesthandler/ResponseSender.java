@@ -172,11 +172,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
-        sendAdResponse(adResponse, serverChannel);
+        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId());
     }
 
     // send Ad Response
-    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel) {
+    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel, final Short selectedSlotId) {
 
         // Making sure response is sent only once
         if (checkResponseSent()) {
@@ -185,10 +185,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         LOG.debug("ad received so trying to send ad response");
         String finalResponse = adResponse.getResponse();
-        if (sasParams.getSlot() != null && SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot())) != null) {
-            LOG.debug("slot served is {}", sasParams.getSlot());
+        if (selectedSlotId != null && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            LOG.debug("slot served is {}", selectedSlotId);
+
+
             if (getResponseFormat() == ResponseFormat.XHTML) {
-                final Dimension dim = SlotSizeMapping.getDimension(Long.valueOf(sasParams.getSlot()));
+                final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
                 final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalResponse = startElement + finalResponse + END_TAG;
             } else if (getResponseFormat() == ResponseFormat.IMAI) {
@@ -322,7 +324,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         rtbdAd.setBid(bid);
         final UUID uuid = UUID.fromString(getRtbResponse().getAdNetworkInterface().getImpressionId());
         rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
-        rtbdAd.setSlotServed(sasParams.getSlot());
+        rtbdAd.setSlotServed(getRtbResponse().getAdNetworkInterface().getSelectedSlotId());
         final Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
         rtbdAd.setCreative(rtbdCreative);

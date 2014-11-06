@@ -40,7 +40,7 @@ public class ThriftRequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
-            final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
+                                       final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
         LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
@@ -50,10 +50,8 @@ public class ThriftRequestParser {
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
 
-        final Short slotId = getSlotId(tObject.selectedSlots, dst);
+        getSlotList(tObject.selectedSlots, params, dst);
 
-        params.setSlot(slotId);
-        params.setRqMkSlot(tObject.selectedSlots);
         params.setRFormat(getResponseFormat(tObject.responseFormat));
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.taskId);
@@ -94,7 +92,6 @@ public class ThriftRequestParser {
             params.setSource(isApp ? "APP" : "WAP");
 
             if (CasConfigUtil.repositoryHelper != null) {
-
                 params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper
                         .queryWapSiteUACRepository(tObject.site.siteId));
 
@@ -194,32 +191,11 @@ public class ThriftRequestParser {
 
         // Fill params from Carrier Object
         if (tObject.isSetCarrier()) {
-            params.setCarrierId(new Long(tObject.carrier.carrierId).intValue());
+            params.setCarrierId((int) tObject.carrier.carrierId);
             params.setNetworkType(tObject.carrier.networkType);
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
-    }
-
-    private Short getSlotId(final List<Short> selectedSlots, final int dst) {
-        // TODO Iterate over the segments using all slots
-        Short slotId;
-
-        if (DemandSourceType.IX.getValue() != dst) {
-            slotId = null != selectedSlots && !selectedSlots.isEmpty() ? selectedSlots.get(0) : (short) 0;
-        } else { /* From the list of slots received in ad pool request, pick the first IX supported slot. If no slot
-                 is IX supported set the slotId = -1, this will be dropped in RequestFilters */
-            slotId = -1;
-            if (null != selectedSlots) {
-                for (final short tempSlot : selectedSlots) {
-                    if (SlotSizeMapping.isIXSupportedSlot(tempSlot)) {
-                        slotId = tempSlot;
-                        break;
-                    }
-                }
-            }
-        }
-        return slotId;
     }
 
     private String getResponseFormat(final ResponseFormat rqFormat) {
@@ -374,5 +350,23 @@ public class ThriftRequestParser {
             return "i" + version;
         }
         return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void getSlotList(final List<Short> selectedSlots, final SASRequestParameters sasRequestParameters,
+            final int dst) {
+        List<Short> listOfUmpSlots = new ArrayList<Short>();
+        int slotListSize = selectedSlots.size();
+        final Map map =
+                DemandSourceType.IX.getValue() == dst ? SlotSizeMapping.getIX_SLOT_ID_MAP() : SlotSizeMapping
+                        .getSLOT_MAP();
+        // Keep at most 5 slots in the list
+        for (int slotIndex = 0; slotIndex < slotListSize && listOfUmpSlots.size() < 5; slotIndex++) {
+            final Short slotId = selectedSlots.get(slotIndex);
+            if (map.containsKey(slotId)) {// check if Slot present in IXSupportedSlot
+                listOfUmpSlots.add(slotId);
+            }
+        }
+        sasRequestParameters.setRqMkSlot(listOfUmpSlots);
     }
 }

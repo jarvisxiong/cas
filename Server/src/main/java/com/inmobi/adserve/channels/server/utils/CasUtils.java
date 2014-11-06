@@ -79,6 +79,10 @@ public class CasUtils {
     public boolean isBannerVideoSupported(final SASRequestParameters sasParams) {
         boolean isSupported = false;
 
+        if(!(sasParams.getRqMkSlot().contains((short)14) || sasParams.getRqMkSlot().contains((short)32))) {
+            return false;
+        }
+
         // Only requests from app are supported
         if (!APP.equalsIgnoreCase(sasParams.getSource())) {
             return false;
@@ -87,11 +91,7 @@ public class CasUtils {
         if (!requestFromSDK370Onwards(sasParams)) {
             return false;
         }
-        // Only slot size 320x480 and 480x320 are supported
-        final Short slot = sasParams.getSlot();
-        if (14 != slot && 32 != slot) {
-            return false;
-        }
+        //Slot Size check in AsyncRequestMaker since slots would differ for each segment
 
         String osVersion = sasParams.getOsMajorVersion();
         if (StringUtils.isNotEmpty(osVersion)) {

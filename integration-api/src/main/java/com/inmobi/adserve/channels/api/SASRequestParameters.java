@@ -32,7 +32,6 @@ public class SASRequestParameters {
     private String impressionId;
     private String clurl;
     private String siteId;
-    private Short slot;
     private ContentType siteContentType;
     private String sdkVersion;
     private long siteIncId;

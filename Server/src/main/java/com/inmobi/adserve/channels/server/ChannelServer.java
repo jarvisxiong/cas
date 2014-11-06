@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.server;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -113,9 +112,8 @@ public class ChannelServer {
                 return;
             }
             // Set the status code for load balancer status.
-            ServerStatusInfo.statusCode = 200;
+            ServerStatusInfo.setStatusCodeAndString(200, "OK");
 
-            SlotSizeMapping.init();
             Formatter.init();
 
             PropertyConfigurator.configure(configurationLoader.getLoggerConfiguration().getString("log4jLoggerConf"));
@@ -222,8 +220,7 @@ public class ChannelServer {
 
         } catch (final Exception exception) {
             logger.error("Exception in Channel Server " + exception);
-            ServerStatusInfo.statusString = getMyStackTrace(exception);
-            ServerStatusInfo.statusCode = 404;
+            ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
             logger.error("stack trace is " + getMyStackTrace(exception));
             if (logger.isDebugEnabled()) {
                 logger.debug("{}", exception);
@@ -355,12 +352,10 @@ public class ChannelServer {
 
         } catch (final NamingException exception) {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
-            ServerStatusInfo.statusCode = 404;
-            ServerStatusInfo.statusString = getMyStackTrace(exception);
+            ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
         } catch (final InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
-            ServerStatusInfo.statusCode = 404;
-            ServerStatusInfo.statusString = getMyStackTrace(exception);
+            ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
             if (logger.isDebugEnabled()) {
                 logger.debug(ChannelServer.getMyStackTrace(exception));
             }
@@ -414,8 +409,7 @@ public class ChannelServer {
                 return true;
             }
         }
-        ServerStatusInfo.statusCode = 404;
-        ServerStatusInfo.statusString = "StackTrace is: one or more log folders missing";
+        ServerStatusInfo.setStatusCodeAndString(404, "StackTrace is: one or more log folders missing");
         return false;
     }
 

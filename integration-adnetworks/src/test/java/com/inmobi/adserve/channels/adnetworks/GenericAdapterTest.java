@@ -19,7 +19,6 @@ import com.inmobi.adserve.channels.adnetworks.generic.MacrosAndStrings;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
@@ -68,7 +67,6 @@ public class GenericAdapterTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         genericAdapter = new GenericAdapter(mockConfig, null, base, serverChannel, "httpool");
     }
 
@@ -80,7 +78,6 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.setUid("1234");
         final String externalKey = "118398";
-        sasParams.setSlot(Short.valueOf("9"));
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
@@ -89,7 +86,7 @@ public class GenericAdapterTest extends TestCase {
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl),
+                genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9),
                 true);
     }
 
@@ -102,13 +99,12 @@ public class GenericAdapterTest extends TestCase {
         casInternalRequestParameters.setUid("1234");
         sasParams.setAdIncId(32);
         sasParams.setSiteIncId(18);
-        sasParams.setSlot(Short.valueOf("9"));
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvertiserId, null, null,
                         null, 0, null, null, true, true, null, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, null),
+        assertEquals(genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9),
                 false);
     }
 
@@ -120,7 +116,6 @@ public class GenericAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.setUid("1234");
         final String externalKey = "118398";
-        sasParams.setSlot(Short.valueOf("9"));
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
@@ -128,7 +123,7 @@ public class GenericAdapterTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl)) {
+        if (genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9)) {
             final String actualUrl = genericAdapter.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?did=1234&zid=118398&format=320x48&sdkid=api&sdkver=100&uip=206.29.182.240&ua=Mozilla&ormma=0&fh=1&test=0";

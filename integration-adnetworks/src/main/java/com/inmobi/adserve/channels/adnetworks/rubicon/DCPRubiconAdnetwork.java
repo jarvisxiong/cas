@@ -163,8 +163,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != sasParams.getSlot() && SlotSizeMapping.getDimension((long) sasParams.getSlot()) != null) {
-            if (!slotIdMap.containsKey(sasParams.getSlot())) {
+        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            if (!slotIdMap.containsKey(selectedSlotId)) {
                 LOG.debug("Size not allowed for rubicon so exiting adapter");
                 LOG.info("Configure parameters inside Rubicon returned false");
                 return false;
@@ -221,7 +221,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
             appendQueryParam(url, OS_VERSION, sasParams.getOsMajorVersion(), false);
         }
-        appendQueryParam(url, SIZE_ID, slotIdMap.get(sasParams.getSlot()), false);
+        appendQueryParam(url, SIZE_ID, slotIdMap.get(selectedSlotId), false);
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);

@@ -111,7 +111,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String beaconUrl;
     protected String source;
     protected String blindedSiteId;
-    protected Short slot;
+    protected Short selectedSlotId;
     protected String format = "UTF-8";
     protected final Channel serverChannel;
 
@@ -448,11 +448,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public boolean configureParameters(final SASRequestParameters param,
             final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl) {
+            final String clickUrl, final String beaconUrl, final long slotId) {
         sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
         externalSiteId = entity.getExternalSiteKey();
-        slot = sasParams.getSlot();
+        selectedSlotId = (short) slotId;
         this.clickUrl = clickUrl;
         this.beaconUrl = beaconUrl;
         impressionId = param.getImpressionId();
@@ -829,14 +829,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected boolean isInterstitial() {
-        final Short slot = sasParams.getSlot();
-        if (10 == slot // 300X250
-                || 14 == slot // 320X480
-                || 16 == slot // 768X1024
-                || 17 == slot /* 800x1280 */
-                || 32 == slot // 480x320
-                || 33 == slot // 1024x768
-                || 34 == slot) /* 1280x800 */{
+
+        if (10 == selectedSlotId // 300X250
+                || 14 == selectedSlotId // 320X480
+                || 16 == selectedSlotId // 768X1024
+                || 17 == selectedSlotId /* 800x1280 */
+                || 32 == selectedSlotId // 480x320
+                || 33 == selectedSlotId // 1024x768
+                || 34 == selectedSlotId) /* 1280x800 */{
             return true;
         }
         return false;
@@ -880,5 +880,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public DemandSourceType getDst() {
         return DemandSourceType.findByValue(sasParams.getDst());
+    }
+
+    @Override
+    public Short getSelectedSlotId() {
+        return selectedSlotId;
     }
 }

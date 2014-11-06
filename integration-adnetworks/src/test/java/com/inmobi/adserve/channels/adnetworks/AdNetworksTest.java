@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
@@ -70,7 +69,6 @@ public class AdNetworksTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        SlotSizeMapping.init();
         Formatter.init();
         openxAdNetwork = new OpenxAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
         dcpTapitAdNetwork = new DCPTapitAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
@@ -82,6 +80,7 @@ public class AdNetworksTest extends TestCase {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
+
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -95,7 +94,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
     }
 
     @Test
@@ -116,7 +115,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
     }
 
     @Test
@@ -137,7 +136,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
     }
 
     @Test
@@ -158,7 +157,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
     }
 
     @Test
@@ -178,7 +177,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null));
+                dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
     }
 
 
@@ -201,7 +200,7 @@ public class AdNetworksTest extends TestCase {
                         null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+        if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 14)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.ia=dfjksahfdjksahdkaw2e23231&did=1234";
@@ -228,7 +227,7 @@ public class AdNetworksTest extends TestCase {
                         null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+        if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 14)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.o1=dfjksahfdjksahdkaw2e23231&did=1234";
@@ -253,7 +252,7 @@ public class AdNetworksTest extends TestCase {
                         null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null)) {
+        if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 14)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did=1234";
@@ -270,7 +269,6 @@ public class AdNetworksTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        sasParams.setSlot((short) 15);
         sasParams.setSiteIncId(18);
         casInternalRequestParameters.setUidIFA("202cb962ac59075b964b07152d234b70");
         final String externalKey = "19100";
@@ -283,7 +281,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=raw&idfa=202cb962ac59075b964b07152d234b70&w=320.0&h=50.0&tpsid=00000000-0000-0020-0000-000000000012";
@@ -300,7 +298,6 @@ public class AdNetworksTest extends TestCase {
         casInternalRequestParameters.setLatLong(" ,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setSlot((short) 15);
         sasParams.setSiteIncId(18);
         casInternalRequestParameters.setUidO1("202cb962ac59075b964b07152d234b70");
         sasParams.setSource("iphone");
@@ -313,7 +310,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&enctype=sha1&udid=202cb962ac59075b964b07152d234b70&w=320.0&h=50.0&tpsid=00000000-0000-0020-0000-000000000012";
@@ -341,7 +338,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=md5&udid=202cb962ac59075b964b07152d234b70&tpsid=00000000-0000-0020-0000-000000000012";
@@ -371,7 +368,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://r.tapit.com/adrequest.php?format=json&ip=206.29.182.240&ua=Mozilla&zone=19100&lat=37.4429&long=-122.1514&enctype=md5&udid=202cb962ac59075b964b07152d234b70&adid=ASAD-SDSSD-SDADADAD-AAQW&tpsid=00000000-0000-0020-0000-000000000012";
@@ -385,7 +382,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c"
@@ -399,7 +395,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
 
-        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14);
 
         final String response =
                 "<div id='beacon_79353898' style='position: absolute; left: 0px; top: 0px; visibility: hidden;'><img src='http://mediaservices-d.openxenterprise.com/ma/1.0/ri?ai=147ef9de-ac38-70bf-b4aa-366291a13406&ts=1fHNpZD00NjU0OXxhdWlkPTIyMjAwOXxhaWQ9NTQ3NjM3fHB1Yj01ODg0NXxsaWQ9MzEzOTA5fHQ9MTB8cmlkPTliMTg5NzE3LTc3NWQtNGEyYS1iMjk0LTZmZGU0NGIwZjQzNHxvaWQ9Mjk1MzZ8Ym09QlVZSU5HLk5PTkdVQVJBTlRFRUR8cGM9VVNEfHA9MzAwfGFjPVVTRHxwbT1QUklDSU5HLkNQTXxydD0xMzQ5OTUxODE2fHByPTMwMHxhZHY9MjAzODU&cb=79353898'/></div><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var suid = getSuid();var admax_vars = { dcn: \"8a809449013333b278e3f67d30e90d65\",        cn: \"inMobi\",   pos: \"inmobironentertainment_320x50\",           \"req(loc)\": \"32.759,-97.333\"};if (suid){    admax_vars[\"u(id)\"]=suid;}admaxAd(admax_vars);</script>    ";
@@ -416,7 +412,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -431,7 +426,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
 
-        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14);
 
         final String response =
                 "<div id='beacon_79353898' style='position: absolute; left: 0px; top: 0px; visibility: hidden;'><img src='http://mediaservices-d.openxenterprise.com/ma/1.0/ri?ai=147ef9de-ac38-70bf-b4aa-366291a13406&ts=1fHNpZD00NjU0OXxhdWlkPTIyMjAwOXxhaWQ9NTQ3NjM3fHB1Yj01ODg0NXxsaWQ9MzEzOTA5fHQ9MTB8cmlkPTliMTg5NzE3LTc3NWQtNGEyYS1iMjk0LTZmZGU0NGIwZjQzNHxvaWQ9Mjk1MzZ8Ym09QlVZSU5HLk5PTkdVQVJBTlRFRUR8cGM9VVNEfHA9MzAwfGFjPVVTRHxwbT1QUklDSU5HLkNQTXxydD0xMzQ5OTUxODE2fHByPTMwMHxhZHY9MjAzODU&cb=79353898'/></div><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var suid = getSuid();var admax_vars = { dcn: \"8a809449013333b278e3f67d30e90d65\",        cn: \"inMobi\",   pos: \"inmobironentertainment_320x50\",           \"req(loc)\": \"32.759,-97.333\"};if (suid){    admax_vars[\"u(id)\"]=suid;}admaxAd(admax_vars);</script>    ";
@@ -449,7 +444,6 @@ public class AdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("app");
-        sasParams.setSlot((short) 4);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c"
@@ -463,7 +457,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
 
-        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14);
 
         final String response =
                 "<div id='beacon_79353898' style='position: absolute; left: 0px; top: 0px; visibility: hidden;'><img src='http://mediaservices-d.openxenterprise.com/ma/1.0/ri?ai=147ef9de-ac38-70bf-b4aa-366291a13406&ts=1fHNpZD00NjU0OXxhdWlkPTIyMjAwOXxhaWQ9NTQ3NjM3fHB1Yj01ODg0NXxsaWQ9MzEzOTA5fHQ9MTB8cmlkPTliMTg5NzE3LTc3NWQtNGEyYS1iMjk0LTZmZGU0NGIwZjQzNHxvaWQ9Mjk1MzZ8Ym09QlVZSU5HLk5PTkdVQVJBTlRFRUR8cGM9VVNEfHA9MzAwfGFjPVVTRHxwbT1QUklDSU5HLkNQTXxydD0xMzQ5OTUxODE2fHByPTMwMHxhZHY9MjAzODU&cb=79353898'/></div><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var suid = getSuid();var admax_vars = { dcn: \"8a809449013333b278e3f67d30e90d65\",        cn: \"inMobi\",   pos: \"inmobironentertainment_320x50\",           \"req(loc)\": \"32.759,-97.333\"};if (suid){    admax_vars[\"u(id)\"]=suid;}admaxAd(admax_vars);</script>    ";
@@ -481,7 +475,6 @@ public class AdNetworksTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("app");
-        sasParams.setSlot((short) 4);
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         final String externalKey = "19100";
@@ -497,7 +490,7 @@ public class AdNetworksTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
 
-        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
+        openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14);
 
         final String response =
                 "<div id='beacon_79353898' style='position: absolute; left: 0px; top: 0px; visibility: hidden;'><img src='http://mediaservices-d.openxenterprise.com/ma/1.0/ri?ai=147ef9de-ac38-70bf-b4aa-366291a13406&ts=1fHNpZD00NjU0OXxhdWlkPTIyMjAwOXxhaWQ9NTQ3NjM3fHB1Yj01ODg0NXxsaWQ9MzEzOTA5fHQ9MTB8cmlkPTliMTg5NzE3LTc3NWQtNGEyYS1iMjk0LTZmZGU0NGIwZjQzNHxvaWQ9Mjk1MzZ8Ym09QlVZSU5HLk5PTkdVQVJBTlRFRUR8cGM9VVNEfHA9MzAwfGFjPVVTRHxwbT1QUklDSU5HLkNQTXxydD0xMzQ5OTUxODE2fHByPTMwMHxhZHY9MjAzODU&cb=79353898'/></div><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var suid = getSuid();var admax_vars = { dcn: \"8a809449013333b278e3f67d30e90d65\",        cn: \"inMobi\",   pos: \"inmobironentertainment_320x50\",           \"req(loc)\": \"32.759,-97.333\"};if (suid){    admax_vars[\"u(id)\"]=suid;}admaxAd(admax_vars);</script>    ";
@@ -514,7 +507,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -526,7 +518,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14)) {
             final String response =
                     "{\"type\":\"banner\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -543,7 +535,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -555,7 +546,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14)) {
             final String response =
                     "{\"type\":\"html\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -572,7 +563,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("app");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -584,7 +574,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14)) {
             final String response =
                     "{\"type\":\"html\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -601,7 +591,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -615,7 +604,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14)) {
             final String response =
                     "{\"type\":\"html\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"\",\"adtext\":\"\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&cid=106800&adtype=1&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&adnetwork=1&tpsid=1659216000069348&w=320&h=50\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -632,7 +621,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("wap");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -644,7 +632,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4)) {
             final String response =
                     "{\"type\":\"text\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"sample title\",\"adtext\":\"sample text\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -661,7 +649,6 @@ public class AdNetworksTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
-        sasParams.setSlot((short) 4);
         sasParams.setSource("app");
         sasParams.setSdkVersion("i360");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
@@ -675,7 +662,7 @@ public class AdNetworksTest extends TestCase {
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
                         0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl)) {
+        if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4)) {
             final String response =
                     "{\"type\":\"text\",\"html\":\"<a href=\\\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;w=320.0&amp;h=50.0&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;adnetwork=1&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;tpsid=1659216000069348\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/i.tapit.com\\/adimage.php?zone=6579&amp;cid=106800&amp;adtype=1&amp;xid=dd3b9df3694433f01389c222f8059f39&amp;ip=174.141.213.29&amp;udid=&amp;ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&amp;adnetwork=1&amp;tpsid=1659216000069348&amp;w=320&amp;h=50\\\" width=\\\"320\\\" height=\\\"50\\\" alt=\\\"\\\"\\/><\\/a>\",\"adId\":\"106800\",\"adWidth\":\"320\",\"adHeight\":\"50\",\"cpc\":0.025,\"adtitle\":\"sample title\",\"adtext\":\"sample text\",\"clickurl\":\"http:\\/\\/c.tapit.com\\/advalidate.php?zone=6579&cid=106800&adtype=1&w=320.0&h=50.0&xid=dd3b9df3694433f01389c222f8059f39&ip=174.141.213.29&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.3.4%3B+en-us%3B+LG-MS910+Build%2FGINGERBREAD%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&tpsid=1659216000069348\",\"imageurl\":\"\",\"domain\":\"c.tapit.com\"}";
             dcpTapitAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -687,16 +674,16 @@ public class AdNetworksTest extends TestCase {
     }
 
     public static ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,
-            final String adgroupId, final String[] adIds, final String channelId, final long platformTargeting,
-            final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
-            final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
-            final Long[] incIds, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
-            final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
-            final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
-            final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
-            final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
-            final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-            final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
+                                                                              final String adgroupId, final String[] adIds, final String channelId, final long platformTargeting,
+                                                                              final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
+                                                                              final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
+                                                                              final Long[] incIds, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
+                                                                              final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
+                                                                              final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
+                                                                              final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
+                                                                              final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
+                                                                              final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
+                                                                              final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
         final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
