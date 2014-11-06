@@ -30,5 +30,7 @@ public class TestUtils {
     public static class SampleServletQueries {
         public static final String servletRepoRefresh =
                 "http://localhost/repoRefresh?args={\"repoName\":\"ChannelRepository\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
+        public static final String servletChangeLogLevel =
+                "http://localhost:8800/changeLogLevel?debug=ERROR";
     }
 }
