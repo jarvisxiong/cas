@@ -4,6 +4,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.casthrift.DemandSourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,14 @@ public class RequestFilters {
         }
 
         if (hrh.responseSender.sasParams.getProcessedMkSlot().isEmpty()) {
-            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_NO_VALID_SLOT_REQUEST_FILTER);
+            if (DemandSourceType.IX.getValue() == hrh.responseSender.sasParams.getDst()) {
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_IX_INVALID_SLOT_REQUEST_FILTER);
+            } else if (DemandSourceType.RTBD.getValue() == hrh.responseSender.sasParams.getDst()) {
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_RTBD_INVALID_SLOT_REQUEST_FILTER);
+            } else {
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_DCP_INVALID_SLOT_REQUEST_FILTER);
+            }
+
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }

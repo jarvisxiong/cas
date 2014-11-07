@@ -84,7 +84,9 @@ public class InspectorStrings {
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
-    public static final String DROPPED_IN_NO_VALID_SLOT_REQUEST_FILTER = "DroppedInNoValidSlotRequestFilter";
+    public static final String DROPPED_IN_IX_INVALID_SLOT_REQUEST_FILTER = "DroppedInIxInvalidSlotRequestFilter";
+    public static final String DROPPED_IN_DCP_INVALID_SLOT_REQUEST_FILTER = "DroppedInDcpInvalidSlotRequestFilter";
+    public static final String DROPPED_IN_RTBD_INVALID_SLOT_REQUEST_FILTER = "DroppedInRtbdInValidSlotRequestFilter";
     public static final String IX_SENT_AS_TRANSPARENT = "IXSentAsTransparent";
     public static final String IX_SENT_AS_BLIND = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
