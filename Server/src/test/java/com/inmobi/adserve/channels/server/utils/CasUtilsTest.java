@@ -41,10 +41,10 @@ public class CasUtilsTest extends TestCase {
             // Set SasParams values
             sasParams.setSource(data.source);
             sasParams.setSdkVersion(data.sdkVersion);
-            sasParams.setRqMkSlot(Arrays.asList(data.slot));
+            sasParams.setProcessedMkSlot(Arrays.asList(data.slot));
             sasParams.setOsId(data.osId);
             sasParams.setOsMajorVersion(data.osVersion);
-            sasParams.setRqMkSlot(data.rqMkSlot);
+            sasParams.setProcessedMkSlot(data.rqMkSlot);
 
             final boolean testResult = casUtils.isBannerVideoSupported(sasParams);
             assertEquals(data.expectedResult, testResult);

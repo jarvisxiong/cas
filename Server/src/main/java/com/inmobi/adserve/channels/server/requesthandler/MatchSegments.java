@@ -94,7 +94,7 @@ public class MatchSegments {
 
         final Marker traceMarker = traceMarkerProvider.get();
         final List<Long> slotIdsFromUmp = new ArrayList<Long>();
-        for (Short s : sasParams.getRqMkSlot()) {
+        for (Short s : sasParams.getProcessedMkSlot()) {
             slotIdsFromUmp.add(Long.valueOf(s));
         }
         final Long countryId = sasParams.getCountryId();

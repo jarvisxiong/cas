@@ -79,7 +79,7 @@ public class CasUtils {
     public boolean isBannerVideoSupported(final SASRequestParameters sasParams) {
         boolean isSupported = false;
 
-        if(!(sasParams.getRqMkSlot().contains((short)14) || sasParams.getRqMkSlot().contains((short)32))) {
+        if(!(sasParams.getProcessedMkSlot().contains((short)14) || sasParams.getProcessedMkSlot().contains((short)32))) {
             return false;
         }
 

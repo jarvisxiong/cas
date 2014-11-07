@@ -50,6 +50,7 @@ public class ThriftRequestParser {
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
 
+        params.setRqMkSlot(tObject.selectedSlots);
         getSlotList(tObject.selectedSlots, params, dst);
 
         params.setRFormat(getResponseFormat(tObject.responseFormat));
@@ -367,6 +368,6 @@ public class ThriftRequestParser {
                 listOfUmpSlots.add(slotId);
             }
         }
-        sasRequestParameters.setRqMkSlot(listOfUmpSlots);
+        sasRequestParameters.setProcessedMkSlot(listOfUmpSlots);
     }
 }

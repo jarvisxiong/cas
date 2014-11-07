@@ -164,7 +164,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getCarrierId(), 12345);
         assertEquals(sasRequestParameters.getCity(), new Integer(12));
         assertEquals(sasRequestParameters.getState(), new Integer(123));
-        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("12"));
+        assertEquals(sasRequestParameters.getProcessedMkSlot().get(0), new Short("12"));
         assertEquals(sasRequestParameters.getIpFileVersion(), new Integer(3456));
         assertEquals(sasRequestParameters.isRichMedia(), false);
         assertEquals(sasRequestParameters.getRqAdType(), "int");
@@ -257,7 +257,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 8);
 
         assertEquals(sasRequestParameters.getDst(), 8);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 4, (short) 9, (short) 10, (short) 11));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 4, (short) 9, (short) 10, (short) 11));
         selectedSlots.clear();
 
         //List in sasParams should contain only 5 slots, even if more than 5 slots are sent by UMP
@@ -268,7 +268,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 8);
 
         assertEquals(sasRequestParameters.getDst(), 8);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 4, (short) 9, (short) 10, (short) 11, (short) 12));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 4, (short) 9, (short) 10, (short) 11, (short) 12));
         selectedSlots.clear();
 
         //List in sasParams should contain only the slots present in SLOT_MAP
@@ -279,7 +279,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 8);
 
         assertEquals(sasRequestParameters.getDst(), 8);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 9, (short) 10, (short) 4, (short) 11));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 9, (short) 10, (short) 4, (short) 11));
         selectedSlots.clear();
 
         //List in sasParams should contain only the slots present in SLOT_MAP
@@ -290,7 +290,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 8);
 
         assertEquals(sasRequestParameters.getDst(), 8);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 9, (short) 10, (short) 4, (short) 12, (short) 11));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 9, (short) 10, (short) 4, (short) 12, (short) 11));
         selectedSlots.clear();
     }
 
@@ -373,7 +373,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4));
         selectedSlots.clear();
 
         //List in sasParams should contain only 5 slots, even if more than 5 slots are sent by UMP
@@ -384,7 +384,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 9));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 9));
         selectedSlots.clear();
 
         //List in sasParams should contain only the slots present in SLOT_MAP
@@ -395,7 +395,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10));
         selectedSlots.clear();
 
         //List in sasParams should contain only the slots present in SLOT_MAP
@@ -406,7 +406,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10, (short) 9));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10, (short) 9));
         selectedSlots.clear();
 
 

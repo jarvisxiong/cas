@@ -4,7 +4,6 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.casthrift.DemandSourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +81,7 @@ public class RequestFilters {
 
         }
 
-        if (hrh.responseSender.sasParams.getRqMkSlot().isEmpty()) {
+        if (hrh.responseSender.sasParams.getProcessedMkSlot().isEmpty()) {
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
