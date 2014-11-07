@@ -100,6 +100,7 @@ public class RequestParser {
 
         if (StringUtils.isNotEmpty(slot)) {
             params.setRqMkSlot(Arrays.asList(Short.parseShort(slot)));
+            params.setProcessedMkSlot(Arrays.asList(Short.parseShort(slot)));
         }
         String sdkVersion = stringify(jObject, "sdk-version");
         if (StringUtils.isBlank(sdkVersion) || "null".equalsIgnoreCase(sdkVersion)) {

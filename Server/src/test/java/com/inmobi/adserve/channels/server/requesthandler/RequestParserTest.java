@@ -58,7 +58,7 @@ public class RequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getSiteFloor(), 0.0);
         assertEquals(sasRequestParameters.getOsId(), 6);
-        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("9"));
+        assertEquals(sasRequestParameters.getProcessedMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getUidParams(),
                 "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
         assertEquals(sasRequestParameters.getCarrierId(), 406);
@@ -71,7 +71,7 @@ public class RequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSiteIncId(), 34093);
         assertEquals(sasRequestParameters.getRemoteHostIp(), "3.0.0.0");
         assertEquals(sasRequestParameters.getLocSrc(), "wifi");
-        assertEquals(sasRequestParameters.getRqMkSlot().get(0), new Short("9"));
+        assertEquals(sasRequestParameters.getProcessedMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getRFormat(), "xhtml");
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.TRUE);
         assertEquals(sasRequestParameters.getCategories().toString(), "[70, 42]");
