@@ -23,8 +23,6 @@ import com.inmobi.phoenix.exception.RepositoryException;
 public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<WapSiteUACEntity, String>
         implements
             RepositoryManager {
-    // private static final long IOS_SITE_TYPE = 21;
-    private static final long ANDROID_SITE_TYPE = 22;
     private static final Map<String, String> CONTENT_RATING_MAP = new HashMap<>();
 
     static {
@@ -65,7 +63,8 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
 
-            if (siteTypeId == ANDROID_SITE_TYPE && contentRating != null && !contentRating.trim().isEmpty()) {
+            if (siteTypeId == WapSiteUACEntity.ANDROID_SITE_TYPE && contentRating != null
+                    && !contentRating.trim().isEmpty()) {
                 builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
             } else {
                 builder.setContentRating(contentRating);

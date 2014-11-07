@@ -176,8 +176,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send Ad Response
-    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel, final Short selectedSlotId) {
 
+    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel, final Short selectedSlotId) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
