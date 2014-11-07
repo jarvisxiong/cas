@@ -82,6 +82,7 @@ public class RequestFilters {
         }
 
         if (hrh.responseSender.sasParams.getProcessedMkSlot().isEmpty()) {
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_NO_VALID_SLOT_REQUEST_FILTER);
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
