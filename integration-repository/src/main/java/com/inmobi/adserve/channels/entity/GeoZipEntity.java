@@ -48,7 +48,9 @@ public class GeoZipEntity implements IdentifiableEntity<Integer> {
 
     @Override
     public String getJSON() {
-        return null;
+        return String
+                .format("{\"zipId\":\"%s\",\"zipCode\":%s,\"modifiedOn\":\"%s\"}",
+                        zipId, zipCode, modifiedOn);
     }
 
 }
