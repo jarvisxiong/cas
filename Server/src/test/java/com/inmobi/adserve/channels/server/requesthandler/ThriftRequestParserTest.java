@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Arrays;
 
+import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.repository.GeoZipRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.phoenix.exception.RepositoryException;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
@@ -48,10 +52,15 @@ public class ThriftRequestParserTest extends TestCase {
     @Override
     public void setUp() {
         final Configuration mockConfig = createMock(Configuration.class);
+        RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        GeoZipRepository mockGeoZipRepository = createMock(GeoZipRepository.class);
+        GeoZipEntity mockGeoZipEntity = createMock(GeoZipEntity.class);
+
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
-        replay(mockConfig);
+
+        replay(mockConfig, mockRepositoryHelper);
         CasConfigUtil.repositoryHelper = null;
         thriftRequestParser = new ThriftRequestParser();
     }
@@ -91,9 +100,7 @@ public class ThriftRequestParserTest extends TestCase {
         geo.setCountryId(94);
         geo.setLocationSource(LocationSource.LATLON);
         geo.setLatLong(new LatLong(12d, 12d));
-        final Set<Integer> zipIds = new HashSet<Integer>();
-        zipIds.add(123);
-        geo.setZipIds(zipIds);
+
         final Set<Integer> stateIds = new HashSet<Integer>();
         stateIds.add(123);
         geo.setStateIds(stateIds);
@@ -138,7 +145,6 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getAge(), new Short("84"));
         assertEquals(sasRequestParameters.getGender(), "M");
         assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
-        assertEquals(sasRequestParameters.getPostalCode(), new Integer(123));
         assertEquals(sasRequestParameters.getCountryCode(), "US");
         assertEquals(sasRequestParameters.getCountryId(), new Long(94));
         assertEquals(sasRequestParameters.getImpressionId(), null); // Internal, Populated in cas
@@ -212,9 +218,7 @@ public class ThriftRequestParserTest extends TestCase {
         geo.setCountryId(94);
         geo.setLocationSource(LocationSource.LATLON);
         geo.setLatLong(new LatLong(12d, 12d));
-        final Set<Integer> zipIds = new HashSet<Integer>();
-        zipIds.add(123);
-        geo.setZipIds(zipIds);
+
         final Set<Integer> stateIds = new HashSet<Integer>();
         stateIds.add(123);
         geo.setStateIds(stateIds);
@@ -328,9 +332,7 @@ public class ThriftRequestParserTest extends TestCase {
         geo.setCountryId(94);
         geo.setLocationSource(LocationSource.LATLON);
         geo.setLatLong(new LatLong(12d, 12d));
-        final Set<Integer> zipIds = new HashSet<Integer>();
-        zipIds.add(123);
-        geo.setZipIds(zipIds);
+
         final Set<Integer> stateIds = new HashSet<Integer>();
         stateIds.add(123);
         geo.setStateIds(stateIds);

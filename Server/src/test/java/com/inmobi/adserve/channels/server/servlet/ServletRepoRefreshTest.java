@@ -16,6 +16,7 @@ import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
@@ -221,6 +222,7 @@ public class ServletRepoRefreshTest {
         final IXAccountMapRepository mockIxAccountMapRepository = createMock(IXAccountMapRepository.class);
         final CreativeRepository mockCreativeRepository = createMock(CreativeRepository.class);
         final NativeAdTemplateRepository mockNativeAdTemplateRepository = createMock(NativeAdTemplateRepository.class);
+        final GeoZipRepository mockGeoZipRepository = createMock(GeoZipRepository.class);
 
         expect(mockRepositoryHelper.getChannelRepository()).andReturn(mockChannelRepository).anyTimes();
         expect(mockRepositoryHelper.getChannelAdGroupRepository()).andReturn(mockChannelAdGroupRepository).anyTimes();
@@ -239,6 +241,8 @@ public class ServletRepoRefreshTest {
         expect(mockRepositoryHelper.getCreativeRepository()).andReturn(mockCreativeRepository).anyTimes();
         expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockNativeAdTemplateRepository)
                 .anyTimes();
+        expect(mockRepositoryHelper.getGeoZipRepository()).andReturn(mockGeoZipRepository)
+                .anyTimes();
 
         expect(mockChannelRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockChannelAdGroupRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
@@ -256,6 +260,7 @@ public class ServletRepoRefreshTest {
         expect(mockIxAccountMapRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockCreativeRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockNativeAdTemplateRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
+        expect(mockGeoZipRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
 
         mockStatic(CasConfigUtil.class);
         CasConfigUtil.repositoryHelper = mockRepositoryHelper;

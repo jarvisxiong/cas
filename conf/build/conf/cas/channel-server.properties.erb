@@ -119,6 +119,14 @@ database.socketTimeout=300
 
 
 
+Cache.Name = GeoZipRepository
+Cache.GeoZipRepository.Manager = com.inmobi.adserve.channels.repository.GeoZipRepository
+Cache.GeoZipRepository.query = select * from geo_zip where modified_on >=('${last_update}')
+Cache.GeoZipRepository.initialDelay = 300
+Cache.GeoZipRepository.refreshTime = 300
+Cache.GeoZipRepository.isUpdatable = true
+Cache.GeoZipRepository.dataSourceName = jdbc
+
 Cache.Name = CreativeRepository
 Cache.CreativeRepository.Manager = com.inmobi.adserve.channels.repository.CreativeRepository
 Cache.CreativeRepository.query = select * from rtbd_creative_fun('${last_update}')
