@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server;
 
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
+import com.inmobi.adserve.adpool.Geo;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
@@ -22,6 +23,7 @@ import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -96,6 +98,7 @@ public class ChannelServer {
     private static IXPackageRepository ixPackageRepository;
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
+    private static GeoZipRepository geoZipRepository;
     @Getter
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     @Getter
@@ -167,6 +170,7 @@ public class ChannelServer {
             nativeAdTemplateRepository = new NativeAdTemplateRepository();
             ixAccountMapRepository = new IXAccountMapRepository();
             ixPackageRepository = new IXPackageRepository();
+            geoZipRepository = new GeoZipRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -186,6 +190,7 @@ public class ChannelServer {
 
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
+            repoHelperBuilder.setGeoZipRepository(geoZipRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -345,6 +350,9 @@ public class ChannelServer {
             ixPackageRepository.init(ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
+            geoZipRepository.init(logger,
+                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY),
+                    ChannelServerStringLiterals.GEO_ZIP_REPOSITORY);
 
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)

@@ -176,7 +176,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
         }
         if (null != sasParams.getPostalCode()) {
-            appendQueryParam(url, ZIP, sasParams.getPostalCode().toString(), false);
+            appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
         }
         appendQueryParam(url, KEYWORDS, getURLEncode(getCategories(',', true, false), format), false);
         if (width != 0) {

@@ -126,7 +126,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                         getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format), false);
             }
             if (null != sasParams.getPostalCode()) {
-                appendQueryParam(url, POSTAL_CODE, sasParams.getPostalCode().toString(), false);
+                appendQueryParam(url, POSTAL_CODE, sasParams.getPostalCode(), false);
             }
 
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {

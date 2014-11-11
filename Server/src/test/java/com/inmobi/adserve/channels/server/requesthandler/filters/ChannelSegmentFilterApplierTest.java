@@ -254,7 +254,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(s2);
         sasParams = new SASRequestParameters();
         sasParams.setUidParams("xxx");
-        sasParams.setPostalCode(110051);
+        sasParams.setPostalCode("110051");
         sasParams.setLatLong("11.35&12.56");
         sasParams.setRichMedia(true);
         sasParams.setRqAdType("int");

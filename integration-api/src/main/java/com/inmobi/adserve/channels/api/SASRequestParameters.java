@@ -24,7 +24,7 @@ public class SASRequestParameters {
     private Short age;
     private String gender;
     private String locSrc; // wifi/ip
-    private Integer postalCode;
+    private String postalCode;
     // User location parameters
     private String latLong;
     private String countryCode; // Country Code like US for USA
