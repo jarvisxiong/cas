@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     private final RepositoryHelper repositoryHelper;
     private final ServerConfig serverConfig;
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
+    private final List<String> adGroupSupplyDemandExclusionList = CasConfigUtil.getServerConfig().getList("adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList());
 
     @Inject
     protected AdGroupSupplyDemandClassificationFilter(final Provider<Marker> traceMarkerProvider,
@@ -157,7 +159,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     }
 
     public boolean isNotApplicable(final String advertiserId) {
-        return CasConfigUtil.getServerConfig().getList("adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList()).contains(advertiserId);
+        return adGroupSupplyDemandExclusionList.contains(advertiserId);
     }
 
 }
