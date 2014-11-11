@@ -82,7 +82,15 @@ public class RequestFilters {
 
         }
 
-        if (hrh.responseSender.sasParams.getRqMkSlot().isEmpty()) {
+        if (hrh.responseSender.sasParams.getProcessedMkSlot().isEmpty()) {
+            if (DemandSourceType.IX.getValue() == hrh.responseSender.sasParams.getDst()) {
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_IX_INVALID_SLOT_REQUEST_FILTER);
+            } else if (DemandSourceType.RTBD.getValue() == hrh.responseSender.sasParams.getDst()) {
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_RTBD_INVALID_SLOT_REQUEST_FILTER);
+            } else {
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_DCP_INVALID_SLOT_REQUEST_FILTER);
+            }
+
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }

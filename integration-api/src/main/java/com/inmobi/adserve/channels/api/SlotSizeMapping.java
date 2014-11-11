@@ -29,6 +29,7 @@ public class SlotSizeMapping {
         SLOT_MAP.put((short) 17, new Dimension(800, 1280));
         SLOT_MAP.put((short) 18, new Dimension(160, 600));
         SLOT_MAP.put((short) 19, new Dimension(1024, 90));
+        SLOT_MAP.put((short) 20, new Dimension(38, 38));
         SLOT_MAP.put((short) 21, new Dimension(480, 75));
         SLOT_MAP.put((short) 22, new Dimension(768, 66));
         SLOT_MAP.put((short) 23, new Dimension(480, 60));

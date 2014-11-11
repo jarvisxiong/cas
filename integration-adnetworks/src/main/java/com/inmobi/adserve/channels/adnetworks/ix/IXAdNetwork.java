@@ -547,11 +547,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         if (LATLON.equals(sasParams.getLocSrc()) || BSSID_DERIVED.equals(sasParams.getLocSrc())
-            || VISIBLE_BSSID.equals(sasParams.getLocSrc())) {
+                || VISIBLE_BSSID.equals(sasParams.getLocSrc())) {
             geo.setType(1);
-        }
-        else if (CCID.equals(sasParams.getLocSrc()) || WIFI.equals(sasParams.getLocSrc())
-            || DERIVED_LAT_LON.equals(sasParams.getLocSrc()) || CELL_TOWER.equals(sasParams.getLocSrc())) {
+        } else if (CCID.equals(sasParams.getLocSrc()) || WIFI.equals(sasParams.getLocSrc())
+                || DERIVED_LAT_LON.equals(sasParams.getLocSrc()) || CELL_TOWER.equals(sasParams.getLocSrc())) {
             geo.setType(2);
         }
 
@@ -744,8 +743,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getBundleId())) {
-            app.setBundle(wapSiteUACEntity.getBundleId());
+        String bundleId = wapSiteUACEntity.getBundleId();
+        if (StringUtils.isEmpty(bundleId) && wapSiteUACEntity.isAndroid()) {
+            bundleId = wapSiteUACEntity.getMarketId();
+        }
+        if (StringUtils.isNotEmpty(bundleId)) {
+            app.setBundle(bundleId);
         }
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
@@ -1191,7 +1194,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             return result;
         } catch (final NullPointerException e) {
-            LOG.error(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(), e);
+            LOG.error(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(),
+                    e);
             return false;
         }
     }

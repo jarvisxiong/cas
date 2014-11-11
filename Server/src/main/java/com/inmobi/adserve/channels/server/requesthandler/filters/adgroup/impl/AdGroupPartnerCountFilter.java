@@ -86,9 +86,9 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
                 }
             }
             // Now choose all other ChannelSegment based on order of requested slot
-            final int slotListSize = sasParams.getRqMkSlot().size();
+            final int slotListSize = sasParams.getProcessedMkSlot().size();
             for (int i = 0; i < slotListSize && !breakFromSlotLoop; i++) {
-                final Long slotIdFromUmp = Long.valueOf(sasParams.getRqMkSlot().get(i));
+                final Long slotIdFromUmp = Long.valueOf(sasParams.getProcessedMkSlot().get(i));
                 for (final Iterator<ChannelSegment> iterator = segmentListForAdvertiser.listIterator(); iterator
                         .hasNext();) {
                     final ChannelSegment channelSegment = iterator.next();
