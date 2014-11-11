@@ -62,6 +62,8 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("wapstart.host");
 
         if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+            if(selectedSlotId == 9 || selectedSlotId == 15 || selectedSlotId == 24 )
+                selectedSlotId=4;
             final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
