@@ -35,7 +35,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     private final RepositoryHelper repositoryHelper;
     private final ServerConfig serverConfig;
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
-    private final List<String> adGroupSupplyDemandExclusionList = CasConfigUtil.getServerConfig().getList("adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList());
+    private final List<String> adGroupSupplyDemandExclusionList;
 
     @Inject
     protected AdGroupSupplyDemandClassificationFilter(final Provider<Marker> traceMarkerProvider,
@@ -45,6 +45,7 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
         this.repositoryHelper = repositoryHelper;
         this.serverConfig = serverConfig;
         this.advertiserIdConfigMap = advertiserIdConfigMap;
+        this.adGroupSupplyDemandExclusionList = CasConfigUtil.getServerConfig().getList("adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList());
     }
 
     @Override
