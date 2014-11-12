@@ -51,6 +51,7 @@ import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -58,6 +59,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
@@ -206,7 +208,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper repositoryHelper;
     private String bidderCurrency = "USD";
     private final List<String> blockedAdvertisers = Lists.newArrayList();
-
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -583,6 +584,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if ((category = getCategories(',', false)) != null) {
             site.setName(category);
         }
+
         final Map<String, String> siteExtensions = new HashMap<String, String>();
         String siteRating;
         if (ContentType.FAMILY_SAFE == sasParams.getSiteContentType()) {
@@ -615,13 +617,31 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if ((category = getCategories(',', false)) != null) {
             app.setName(category);
         }
-
+        if (entity != null && isNativeRequest() &&  entity.isTransparencyEnabled()) {
+            setParamsForTransparentApp(app);
+        }
+        
         // set App Ext fields
         final AppExt ext = createAppExt(entity);
-
         app.setExt(ext);
         return app;
     }
+
+
+    private void setParamsForTransparentApp(final App app) {
+        if (StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getSiteUrl())) {
+            app.setStoreurl(sasParams.getWapSiteUACEntity().getSiteUrl());
+        }
+        
+        String bundleId = sasParams.getWapSiteUACEntity().getBundleId();
+        if (StringUtils.isEmpty(bundleId) && sasParams.getWapSiteUACEntity().isAndroid()) {
+            bundleId = sasParams.getWapSiteUACEntity().getMarketId();
+        }
+        if (StringUtils.isNotEmpty(bundleId)) {
+            app.setBundle(bundleId);
+        }
+    }
+
 
     private AppExt createAppExt(final WapSiteUACEntity entity) {
         final AppExt ext = new AppExt();
@@ -1001,7 +1021,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             adStatus = NO_AD;
             responseContent = "";
-            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, exception = {}",
+            LOG.error(
+                    "Some exception is caught while filling the native template for siteId = {}, advertiser = {}, exception = {}",
                     sasParams.getSiteId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
