@@ -98,6 +98,14 @@ public class InspectorStrings {
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
     
     
+    
+    //TestStrings:
+    public static final String LATENCY_FOR_READING = "LatencyForReading";
+    public static final String LATENCY_FOR_WRITE = "LatencyForWriting";
+    public static final String NUMBER_OF_TIMES_READ_EXCEPTION_CALLED = "NumberOfTimesReadExceptionCalled";
+    public static final String NUMBER_OF_TIMES_READ_EXCEPTION_EXECUTED = "NumberOfTimesReadExceptionExecuted";
+    public static final String NUMBER_OF_TIMES_WRITE_CALLED = "NumberOfTimesWriteExceptionCalled";
+    public static final String NUMBER_OF_TIMES_WRITE_EXECUTED = "NumberOfTimesWriteExceptionExecuted";
 
     private InspectorStrings() {
         // dummy private constructor to avoid instantiation from other classes
