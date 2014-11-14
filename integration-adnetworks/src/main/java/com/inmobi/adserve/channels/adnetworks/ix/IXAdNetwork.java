@@ -121,6 +121,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String WIFI = "WIFI";
     private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     private static final String CELL_TOWER = "CELL_TOWER";
+    private static final String MIME = "mime";
+    private static final String MIME_HTML = "text/html";
+    private static final String MIME_VALUE = "html";
+
+    private boolean isResponseHTML = false;
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -439,8 +444,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final JSONObject additionalParams = entity.getAdditionalParams();
         if (null != additionalParams) {
             final String zoneId = getZoneId(additionalParams);
+            final RubiconExtension rp = new RubiconExtension();
             if (null != zoneId) {
-                final RubiconExtension rp = new RubiconExtension();
                 rp.setZone_id(zoneId);
                 impExt.setRp(rp);
             } else {
@@ -449,6 +454,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 // zoneID not available so returning NULL
                 return null;
             }
+            setMimeTypeForImpExt(rp, additionalParams);
         }
 
         long startTime = System.currentTimeMillis();
@@ -470,6 +476,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         impression.setExt(impExt);
         return impression;
+    }
+
+    private void setMimeTypeForImpExt(RubiconExtension rp, JSONObject additionalParams) {
+        try {
+            if (additionalParams.has(MIME) && MIME_VALUE.equals(additionalParams.getString(MIME))) {
+                rp.setMime(MIME_HTML);
+                isResponseHTML = true;
+            }
+        }catch (JSONException e){
+            LOG.info("Error reading additional Param in IX");
+        }
     }
 
 
@@ -1076,8 +1093,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         final int admAfterMacroSize = admContent.length();
 
-        // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP response.
-        admContent = String.format(RESPONSE_TEMPLATE, admContent);
+        if(!isResponseHTML) {
+            // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP response.
+            admContent = String.format(RESPONSE_TEMPLATE, admContent);
+        }
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
             velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
         } else {

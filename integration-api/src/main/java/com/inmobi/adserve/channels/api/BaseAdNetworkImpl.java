@@ -269,6 +269,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                 @Override
                 public void onThrowable(final Throwable t) {
+                    if(isRequestCompleted()){
+                        return;
+                    }
                     latency = System.currentTimeMillis() - startTime;
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
@@ -308,10 +311,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         adStatus = "TIME_OUT";
                         processResponse();
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
-                        return;
-                    }
-
-                    if (isRequestComplete) {
                         return;
                     }
 

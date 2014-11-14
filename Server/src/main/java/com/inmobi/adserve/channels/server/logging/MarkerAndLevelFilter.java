@@ -16,8 +16,8 @@ import com.inmobi.adserve.channels.scope.NettyRequestScope;
  */
 public class MarkerAndLevelFilter extends TurboFilter {
     private static final Marker TRACE_MARKER = NettyRequestScope.TRACE_MAKER;
-    private Level levelToEnforce = Level.ERROR;
 
+    private Level levelToEnforce = Level.ERROR;
     private String excludedTurboFilteringLogs = "";
 
     @Override
@@ -48,9 +48,9 @@ public class MarkerAndLevelFilter extends TurboFilter {
      * @param levelStr
      */
     public void setLevel(final String levelStr) {
-        if (levelStr != null) {
-            levelToEnforce = Level.toLevel(levelStr);
-        }
+        Level level = getLevel(levelStr);
+        if (null != level)
+            levelToEnforce = level;
     }
 
     /**
@@ -62,4 +62,18 @@ public class MarkerAndLevelFilter extends TurboFilter {
         }
     }
 
+    private Level getLevel(String sArg) {
+        if (null != sArg) {
+            sArg = sArg.toUpperCase();
+        }
+        Level level = null;
+        switch(sArg) {
+            case "DEBUG": level = Level.DEBUG;   break;
+            case "WARN":  level = Level.WARN;    break;
+            case "INFO":  level = Level.INFO;    break;
+            case "ERROR": level = Level.ERROR;   break;
+            case "OFF":   level = Level.OFF;     break;
+        }
+        return level;
+    }
 }

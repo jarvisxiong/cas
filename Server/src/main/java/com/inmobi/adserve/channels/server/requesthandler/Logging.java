@@ -342,9 +342,11 @@ public class Logging {
                     break;
                 case "TIME_OUT":
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
+                    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
                     break;
                 default:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
+                    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
                     break;
             }
         }
