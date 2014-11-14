@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.Getter;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 import static com.inmobi.casthrift.DemandSourceType.IX;
 import static com.inmobi.casthrift.DemandSourceType.RTBD;
@@ -139,6 +140,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     public long getTotalTime() {
         return totalTime;
+    }
+    
+    public long getTimeElapsed(){
+        return System.currentTimeMillis() - initialTime;
     }
 
     @Inject
@@ -614,6 +619,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (null != getAuctionEngine().getUnfilteredChannelSegmentList()) {
             list.addAll(getAuctionEngine().getUnfilteredChannelSegmentList());
         }
+        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "writeLogs", getTimeElapsed());
         long totalTime = getTotalTime();
         if (totalTime > 2000) {
             totalTime = 0;
