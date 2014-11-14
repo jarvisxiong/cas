@@ -33,7 +33,7 @@ public class SegmentFactory {
     public AdNetworkInterface getChannel(final String advertiserId, final String channelId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
             final Channel channel, final Set<String> advertiserSet, final boolean isRtbEnabled,
-            final int rtbMaxTimemout, final int dst, final RepositoryHelper repositoryHelper) {
+            final int dst, final RepositoryHelper repositoryHelper) {
 
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 
@@ -42,6 +42,8 @@ public class SegmentFactory {
         }
 
         final Class<AdNetworkInterface> adNetworkInterfaceClass = adapterConfig.getAdNetworkInterfaceClass();
+        
+        final int tmaxForAdapter = adapterConfig.getTMAX();
 
         if (adapterConfig.isRtb() || adapterConfig.isIx()) {
             LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
@@ -54,7 +56,7 @@ public class SegmentFactory {
                                 new Class[] {Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
                                         Channel.class, String.class, String.class, int.class, RepositoryHelper.class,
                                         boolean.class}).newInstance(config, rtbClientBootstrap, base, channel,
-                                adapterConfig.getAdapterHost(), adapterConfig.getAdapterName(), rtbMaxTimemout,
+                                adapterConfig.getAdapterHost(), adapterConfig.getAdapterName(), tmaxForAdapter,
                                 repositoryHelper, adapterConfig.templateWinNotification());
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);

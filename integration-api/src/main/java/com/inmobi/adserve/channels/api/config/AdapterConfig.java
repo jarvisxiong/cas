@@ -105,6 +105,10 @@ public class AdapterConfig implements CasConfig {
     public boolean isRtb() {
         return adapterConfig.getBoolean("isRtb", false);
     }
+    
+    public int getTMAX() {
+        return adapterConfig.getInt("TMAX", 180);
+    }
 
     public boolean isIx() {
         return adapterConfig.getBoolean("isIx", false);
