@@ -480,7 +480,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private void setMimeTypeForImpExt(RubiconExtension rp, JSONObject additionalParams) {
         try {
-            if (additionalParams.has(MIME) && MIME_VALUE.equalsIgnoreCase(additionalParams.getString(MIME))) {
+            if (additionalParams.has(MIME) && MIME_VALUE.equals(additionalParams.getString(MIME))) {
                 rp.setMime(MIME_HTML);
                 isResponseHTML = true;
             }
