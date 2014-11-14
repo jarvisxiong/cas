@@ -198,6 +198,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
                 if(adResponse.has(ERROR_CODE)){
                     adStatus = "NO_AD";
                     LOG.info("Error response from pubmatic: {}", response);
+                    return;
                 }
                 htmlCode = adResponse.getString(CREATIVE_TAG).trim();
                 partnerBeacon = adResponse.getString(TRACKING_URL);
