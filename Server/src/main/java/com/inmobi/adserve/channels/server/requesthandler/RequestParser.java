@@ -232,7 +232,7 @@ public class RequestParser {
                 parameter.setGender(stringify(userMap, "u-gender"));
             }
             if (null != stringify(userMap, "u-postalcode")) {
-                parameter.setPostalCode(Integer.parseInt(stringify(userMap, "u-postalcode")));
+                parameter.setPostalCode(stringify(userMap, "u-postalcode"));
             }
             parameter = encodeParams(parameter, userMap);
         } catch (final JSONException exception) {
@@ -255,8 +255,8 @@ public class RequestParser {
                 parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
             }
             if (null != parameter.getPostalCode()) {
-                parameter.setPostalCode(Integer.valueOf(URLEncoder.encode(String.valueOf(parameter.getPostalCode()),
-                        utf8)));
+                parameter.setPostalCode(URLEncoder.encode(String.valueOf(parameter.getPostalCode()),
+                        utf8));
             }
             String[] advertiserList = null;
             if (userMap.get("u-adapter") != null) {

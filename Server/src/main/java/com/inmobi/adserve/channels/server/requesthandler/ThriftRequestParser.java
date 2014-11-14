@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,9 +146,8 @@ public class ThriftRequestParser {
             params.setCity(null != cities && cities.iterator().hasNext()
                     ? tObject.geo.getCityIds().iterator().next()
                     : null);
-            final Set<Integer> postalCodes = tObject.geo.getZipIds();
-            params.setPostalCode(null != postalCodes && postalCodes.iterator().hasNext() ? tObject.geo.getZipIds()
-                    .iterator().next() : null);
+
+            params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
             params.setState(null != states && states.iterator().hasNext()
                     ? tObject.geo.getStateIds().iterator().next()
@@ -197,6 +197,18 @@ public class ThriftRequestParser {
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
+    }
+
+    protected String getPostalCode(Set<Integer> postalCodes) {
+        final Integer zipId = (null != postalCodes && postalCodes.iterator().hasNext() ? postalCodes
+                .iterator().next() : null);
+        if(zipId != null) {
+            final String probableZipCode = CasConfigUtil.repositoryHelper.queryGeoZipRepository(zipId).getZipCode();
+            if (NumberUtils.isNumber(probableZipCode)) {
+                return probableZipCode;
+            }
+        }
+        return null;
     }
 
     private String getResponseFormat(final ResponseFormat rqFormat) {
@@ -355,7 +367,7 @@ public class ThriftRequestParser {
 
     @SuppressWarnings("rawtypes")
     public void getSlotList(final List<Short> selectedSlots, final SASRequestParameters sasRequestParameters,
-            final int dst) {
+                            final int dst) {
         List<Short> listOfUmpSlots = new ArrayList<Short>();
         int slotListSize = selectedSlots.size();
         final Map map =

@@ -1,9 +1,12 @@
 package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.Lists;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -25,7 +28,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 
 /**
  * @author abhishek.parwal
- * 
  */
 @Singleton
 public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLevelFilter {
@@ -33,25 +35,31 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     private final RepositoryHelper repositoryHelper;
     private final ServerConfig serverConfig;
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
+    private final List<String> adGroupSupplyDemandExclusionList;
 
     @Inject
     protected AdGroupSupplyDemandClassificationFilter(final Provider<Marker> traceMarkerProvider,
-            final RepositoryHelper repositoryHelper, final ServerConfig serverConfig,
-            final Map<String, AdapterConfig> advertiserIdConfigMap) {
+                                                      final RepositoryHelper repositoryHelper, final ServerConfig serverConfig,
+                                                      final Map<String, AdapterConfig> advertiserIdConfigMap) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER);
         this.repositoryHelper = repositoryHelper;
         this.serverConfig = serverConfig;
         this.advertiserIdConfigMap = advertiserIdConfigMap;
+        this.adGroupSupplyDemandExclusionList = CasConfigUtil.getServerConfig().getList("adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList());
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-            final CasContext casContext) {
+                                     final CasContext casContext) {
 
         final Marker traceMarker = traceMarkerProvider.get();
 
         if (advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId()).isRtb()) {
             LOG.debug(traceMarker, "SDC is disabled for RTBD partners");
+            return false;
+        }
+
+        if (isNotApplicable(channelSegment.getChannelEntity().getAccountId())) {
             return false;
         }
 
@@ -149,6 +157,10 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
             ecpmClass++;
         }
         return ecpmClass;
+    }
+
+    public boolean isNotApplicable(final String advertiserId) {
+        return adGroupSupplyDemandExclusionList.contains(advertiserId);
     }
 
 }

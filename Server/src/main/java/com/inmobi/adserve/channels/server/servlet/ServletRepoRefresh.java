@@ -166,6 +166,14 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getNativeAdTemplateRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)) {
+                final String query =
+                        config.getCacheConfiguration()
+                                .subset(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)
+                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getGeoZipRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
             } else {
                 // RepoName could not be matched
                 LOG.debug("RepoName: {} could not be matched", repoName);

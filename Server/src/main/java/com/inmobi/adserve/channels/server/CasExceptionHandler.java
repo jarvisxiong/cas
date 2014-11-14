@@ -45,7 +45,6 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
         if (cause instanceof ReadTimeoutException) {
             // increment the totalTimeout. It means server could not write the response with in the timeout we specified
             LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
-            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
             LOG.debug(traceMarker, "server timeout");
 
             // This list contains rtb or ix channel segments

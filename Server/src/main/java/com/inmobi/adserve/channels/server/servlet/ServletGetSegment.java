@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import com.inmobi.adserve.channels.server.config.CasConfig;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
@@ -121,6 +122,8 @@ public class ServletGetSegment implements Servlet {
                     entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryNativeAdTemplateRepository(id);
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 }
             }
             segmentInfo.put(key, entity);

@@ -53,7 +53,7 @@ public class AsyncRequestMaker {
 
         LOG.debug("Total channels available for sending requests {}", rows.size());
         final boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-        final int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
+        final int rtbMaxTimeOut = rtbConfig.getInt("TMAX", 180);
         LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
 
         /*
@@ -154,7 +154,7 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.setUidMd5(casInternalRequestParameterGlobal.getUidMd5());
         casInternalRequestParameters.setUidADT(casInternalRequestParameterGlobal.getUidADT());
         if (null != sasParams.getPostalCode()) {
-            casInternalRequestParameters.setZipCode(sasParams.getPostalCode().toString());
+            casInternalRequestParameters.setZipCode(sasParams.getPostalCode());
         }
         casInternalRequestParameters.setLatLong(sasParams.getLatLong());
         casInternalRequestParameters.setAppUrl(sasParams.getAppUrl());
