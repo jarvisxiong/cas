@@ -202,7 +202,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 final JSONArray jArray = new JSONArray(response);
                 final JSONObject adResponse = jArray.getJSONObject(0);
-                final boolean textAd = !response.contains("\"image/png\"");
+                final boolean textAd = !response.contains("\"image");
 
                 statusCode = status.code();
                 final VelocityContext context = new VelocityContext();
