@@ -41,8 +41,8 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
-
         if (cause instanceof ReadTimeoutException) {
+            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "CasExceptionStart", responseSender.getTimeElapsed());
             // increment the totalTimeout. It means server could not write the response with in the timeout we specified
             LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
             LOG.debug(traceMarker, "server timeout");
@@ -67,11 +67,13 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
                     }
                     channelSegment.getAdNetworkInterface().processResponse();
                 }
+                InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "CasExceptionEnd", responseSender.getTimeElapsed());
                 return;
             }
 
             responseSender.sendNoAdResponse(ctx.channel());
         } else {
+            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "channelExceptionStart", responseSender.getTimeElapsed());
             final String exceptionString = cause.getClass().getSimpleName();
             InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, exceptionString);
             InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, InspectorStrings.COUNT);
@@ -81,6 +83,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
             }
             LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
             responseSender.sendNoAdResponse(ctx.channel());
+            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "channelExceptionEnd", responseSender.getTimeElapsed());
         }
 
     }
