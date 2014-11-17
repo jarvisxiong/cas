@@ -55,10 +55,11 @@ final class DefaultChannelHandlerContext extends DefaultAttributeMap implements 
     private volatile Runnable invokeReadTask;
     private volatile Runnable invokeChannelWritableStateChangedTask;
     private volatile Runnable invokeFlushTask;
+    private long startLatencyTime;
 
     DefaultChannelHandlerContext(DefaultChannelPipeline pipeline, EventExecutorGroup group, String name,
             ChannelHandler handler) {
-
+        
         if (name == null) {
             throw new NullPointerException("name");
         }
@@ -622,6 +623,7 @@ final class DefaultChannelHandlerContext extends DefaultAttributeMap implements 
 
     @Override
     public ChannelHandlerContext read() {
+        startLatencyTime = System.currentTimeMillis();
         final DefaultChannelHandlerContext next = findContextOutbound();
         EventExecutor executor = next.executor();
         if (executor.inEventLoop()) {
@@ -728,7 +730,10 @@ final class DefaultChannelHandlerContext extends DefaultAttributeMap implements 
 
     
     private void write(Object msg, boolean flush, ChannelPromise promise) {
-
+        long tempLatencyTime = System.currentTimeMillis() - startLatencyTime;
+        
+        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + name, tempLatencyTime);
+        
         DefaultChannelHandlerContext next = findContextOutbound();
         EventExecutor executor = next.executor();
         if (executor.inEventLoop()) {
