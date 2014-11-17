@@ -4,8 +4,11 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
-import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -23,7 +26,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 
 public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {

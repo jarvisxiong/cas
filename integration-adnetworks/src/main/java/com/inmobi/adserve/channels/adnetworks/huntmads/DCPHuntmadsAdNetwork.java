@@ -22,7 +22,6 @@ import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
