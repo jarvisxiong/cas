@@ -1,15 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks.huntmads;
 
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -19,14 +18,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -45,7 +39,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPHuntmadsAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -208,7 +202,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 final JSONArray jArray = new JSONArray(response);
                 final JSONObject adResponse = jArray.getJSONObject(0);
-                final boolean textAd = !response.contains("type\": \"image");
+                final boolean textAd = !response.contains("\"image/png\"");
 
                 statusCode = status.code();
                 final VelocityContext context = new VelocityContext();

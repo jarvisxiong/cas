@@ -1,26 +1,35 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.*;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.ix.*;
+import com.inmobi.casthrift.ix.Transparency;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -34,57 +43,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.channels.api.AdNetworkInterface;
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
-import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.casthrift.ADCreativeType;
-import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.ix.API_FRAMEWORKS;
-import com.inmobi.casthrift.ix.AdQuality;
-import com.inmobi.casthrift.ix.App;
-import com.inmobi.casthrift.ix.Banner;
-import com.inmobi.casthrift.ix.Bid;
-import com.inmobi.casthrift.ix.CommonExtension;
-import com.inmobi.casthrift.ix.Device;
-import com.inmobi.casthrift.ix.ExtRubiconTarget;
-import com.inmobi.casthrift.ix.Geo;
-import com.inmobi.casthrift.ix.IXBidRequest;
-import com.inmobi.casthrift.ix.IXBidResponse;
-import com.inmobi.casthrift.ix.Impression;
-import com.inmobi.casthrift.ix.ProxyDemand;
-import com.inmobi.casthrift.ix.Publisher;
-import com.inmobi.casthrift.ix.Regs;
-import com.inmobi.casthrift.ix.RubiconExtension;
-import com.inmobi.casthrift.ix.SeatBid;
-import com.inmobi.casthrift.ix.Site;
-import com.inmobi.casthrift.ix.Transparency;
-import com.inmobi.casthrift.ix.User;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
+import javax.inject.Inject;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.List;
 
 
 /**
@@ -1095,7 +1060,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int admAfterMacroSize = admContent.length();
 
         if(!isResponseHTML) {
-            // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP response.
+            // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP
+            // response.
             admContent = String.format(RESPONSE_TEMPLATE, admContent);
         }
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
