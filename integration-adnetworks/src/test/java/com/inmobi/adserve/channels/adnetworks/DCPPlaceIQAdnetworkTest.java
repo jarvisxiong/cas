@@ -1,31 +1,37 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.util.Modules;
-import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
-import com.inmobi.adserve.channels.api.*;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
-import com.inmobi.adserve.channels.util.JaxbHelper;
-import com.netflix.governator.guice.LifecycleInjector;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.util.Modules;
+import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
+import com.inmobi.adserve.channels.util.JaxbHelper;
+import com.netflix.governator.guice.LifecycleInjector;
 
 
 public class DCPPlaceIQAdnetworkTest extends TestCase {
