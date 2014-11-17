@@ -106,8 +106,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '180'
 
    uh1:
       db_host:
@@ -162,8 +160,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '180'
 
    lhr1:
       db_host:
@@ -218,8 +214,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '180'
 
    hkg1:
       db_host:
@@ -274,8 +268,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '180'
 
 pilot:
    ua2:
@@ -384,8 +376,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '110'
 
    uh1:
       db_host:
@@ -440,8 +430,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '110'
 
    lhr1:
       db_host:
@@ -496,8 +484,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '110'
 
    hkg1:
       db_host:
@@ -552,8 +538,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      ix_tmax:
-         - '110'
 
 nonprod:
    lhr1:
