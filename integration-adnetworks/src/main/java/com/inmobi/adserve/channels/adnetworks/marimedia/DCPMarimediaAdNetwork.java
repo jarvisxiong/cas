@@ -4,10 +4,8 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.api.*;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -25,7 +23,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URI;
 
 public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -113,6 +111,19 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             networkType = "wifi";
         } else {
             networkType = "carrier";
+        }
+
+        if (sasParams.getOsId() == HandSetOS.Android.getValue() && StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
+            //version value can  be 3.2.4 or 3.2
+            String version = sasParams.getOsMajorVersion();
+            int index = version.indexOf(".");
+            String versionPart = version.substring(index+1);
+            versionPart = versionPart.replace(".", "");
+
+            if(Float.valueOf(version.substring(0,index+1)+ versionPart) < 2.1){
+                LOG.info("Blocking traffic for Android version less than 2.1");
+                return false;
+            }
         }
 
         return true;
