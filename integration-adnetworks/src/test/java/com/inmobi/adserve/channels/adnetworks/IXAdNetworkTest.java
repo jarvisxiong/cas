@@ -528,6 +528,8 @@ public class IXAdNetworkTest extends TestCase {
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+            List<Integer> apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
+            assertNull(apiFrameworkValues); // Will not set any apiFramework values for wap sites.
 
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getApp());
@@ -566,12 +568,22 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
 
             sasParams.setSource("app");
+            sasParams.setSdkVersion("a430");
             adapterCreated =
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+            apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
+            assertEquals(5, apiFrameworkValues.get(0).intValue());
+            assertEquals(1001, apiFrameworkValues.get(1).intValue());
 
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getSite());
             assertNotNull(ixAdNetwork.getBidRequest().getApp());
+
+            sasParams.setSource("app");
+            sasParams.setSdkVersion("a350");
+            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+            apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
+            assertNull(apiFrameworkValues); // Will not set any api framework values for sdk version < 370
 
         } catch (final JSONException e) {
             System.out.println("JSON EXCEPtion in creating new channel segment entity");
