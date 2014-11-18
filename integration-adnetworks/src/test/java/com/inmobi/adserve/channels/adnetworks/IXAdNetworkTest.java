@@ -372,6 +372,7 @@ public class IXAdNetworkTest extends TestCase {
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 1);
+            assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain());
 
             sasParams.setSource("app");
             adapterCreated =
@@ -379,6 +380,7 @@ public class IXAdNetworkTest extends TestCase {
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 1);
+            assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
 
             // Test Cases for transparency=true
             blindList = new ArrayList<Integer>(Arrays.asList(1, 2));
@@ -394,6 +396,7 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blindbuyers, blindList);
+            assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain());
 
             sasParams.setSource("app");
             adapterCreated =
@@ -402,6 +405,7 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blindbuyers, blindList);
+            assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
 
             // Test case when site_blind_list or pub_blind_list is present
             sasParams.setSource("wap");
@@ -416,6 +420,7 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blindbuyers, blindList);
+            assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getPage());
 
             sasParams.setSource("app");
             adapterCreated =
@@ -424,6 +429,7 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blindbuyers, blindList);
+            assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
 
         } catch (final JSONException e) {
             System.out.println("JSON EXCEPtion in creating new channel segment entity");
@@ -558,11 +564,11 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getApp());
             assertNotNull(ixAdNetwork.getBidRequest().getSite());
-            assertNotSame(ixAdNetwork.getBidRequest().getSite().getId(), SITE_ID);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), SITE_ID);
             // assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), getBlindedSiteId(sasParams.getSiteIncId(),
             // entity.getIncId(getCreativeType())));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "Games");
-            assertNull(ixAdNetwork.getBidRequest().getSite().getPage());
+            assertNotNull(ixAdNetwork.getBidRequest().getSite().getPage());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
                     Lists.newArrayList("blk423", "InMobiFS", "InMobiSTRATEGIC"));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
@@ -578,6 +584,7 @@ public class IXAdNetworkTest extends TestCase {
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getSite());
             assertNotNull(ixAdNetwork.getBidRequest().getApp());
+            assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
 
             sasParams.setSource("app");
             sasParams.setSdkVersion("a350");
