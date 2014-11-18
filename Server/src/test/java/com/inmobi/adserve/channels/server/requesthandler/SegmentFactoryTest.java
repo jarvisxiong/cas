@@ -47,7 +47,6 @@ package com.inmobi.adserve.channels.server.requesthandler;
  * out.write("logger.rr = rr \n"); out.write("logger.channel = channel"); out.write("\n logger.debug = debug \n");
  * out.write("logger.advertiser = advertiser\n"); out.write("logger.sampledadvertiser = sampledadvertiser");
  * out.write("\nlogger.loggerConf = /opt/mkhoj/conf/cas/channel-server.properties\n");
- * out.write("\nrtb.RTBreadtimeoutMillis = 200"); out.write("\nrtb.isRtbEnabled = true");
  * out.write("\nrtb.bidFloor = 0.1"); out.write("\nrtb.maxconnections = 2");
  * out.write("\nadapter.rtbAdvertiserName.host.default = http://localhost:10005");
  * out.write("\nadapter.rtbAdvertiserName.isRtb = true"); out.write("\nadapter.rtbAdvertiserName.status = on");

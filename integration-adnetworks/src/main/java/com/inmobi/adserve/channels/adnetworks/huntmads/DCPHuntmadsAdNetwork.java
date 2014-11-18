@@ -28,7 +28,6 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
-
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
@@ -45,7 +44,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPHuntmadsAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -208,7 +207,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 final JSONArray jArray = new JSONArray(response);
                 final JSONObject adResponse = jArray.getJSONObject(0);
-                final boolean textAd = !response.contains("type\": \"image");
+                final boolean textAd = !response.contains("\"image");
 
                 statusCode = status.code();
                 final VelocityContext context = new VelocityContext();

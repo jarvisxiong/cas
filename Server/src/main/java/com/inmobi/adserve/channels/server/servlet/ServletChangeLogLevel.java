@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import ch.qos.logback.classic.turbo.TurboFilter;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -59,11 +62,31 @@ public class ServletChangeLogLevel implements Servlet {
                 return;
             }
 
-            ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(loggerName)).setLevel(level);
+            if(params.containsKey("debug")) {
+                /**
+                 * Why special handling of debug logs was needed?
+                 * Debug logs and trace logs both depend on the "com.inmobi.adserve.channels" logger. In order to
+                 * change the debug logs level while keeping the trace logs level the same (i.e. DEBUG),
+                 * a turboFilter(MarkerAndLevelFilter) was being used to enforce the log level of debug logs separately.
+                 *
+                 * So in this case, we change the level of the turboFilter instead of changing the level of the logger.
+                 */
+
+                Iterator<TurboFilter> itr = ((ch.qos.logback.classic.LoggerContext)LoggerFactory.getILoggerFactory()).getTurboFilterList().iterator();
+                while(itr.hasNext()) {
+                    TurboFilter filter = itr.next();
+                    if (filter instanceof MarkerAndLevelFilter) {
+                        ((MarkerAndLevelFilter)filter).setLevel(levelName);
+                    }
+                }
+            } else {
+                ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(loggerName)).setLevel(level);
+            }
 
             String successMessage = "Successfully changed log level of " + loggerName
                     + " and all it's descendants to " + levelName;
             LOG.error(successMessage);
+
             hrh.responseSender.sendResponse(successMessage, serverChannel);
         }
         catch (Exception e) {
@@ -79,6 +102,9 @@ public class ServletChangeLogLevel implements Servlet {
     }
 
     private ch.qos.logback.classic.Level getLevel(String sArg) {
+        if (null != sArg) {
+            sArg = sArg.toUpperCase();
+        }
         ch.qos.logback.classic.Level level = null;
         switch(sArg) {
             case "DEBUG": level = ch.qos.logback.classic.Level.DEBUG;   break;

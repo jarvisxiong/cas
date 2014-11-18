@@ -376,6 +376,7 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+
    uh1:
       db_host:
          - dbadserve.vip.uh1.inmobi.com
@@ -429,6 +430,7 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+
    lhr1:
       db_host:
          - dbadserve.vip.lhr1.inmobi.com
@@ -482,6 +484,7 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+
    hkg1:
       db_host:
          - dbadserve.vip.hkg1.inmobi.com
@@ -535,6 +538,7 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+
 nonprod:
    lhr1:
       db_host:

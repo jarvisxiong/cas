@@ -75,7 +75,6 @@ public class AuctionEngineIXTest {
         expect(mockConfig.getDouble("feedbackPower", 2.0)).andReturn(1.0).anyTimes();
         expect(mockConfig.getInt("partnerSegmentNo", 2)).andReturn(2).anyTimes();
         expect(mockConfig.getInt("whiteListedSitesRefreshtime", 1000 * 300)).andReturn(0).anyTimes();
-        expect(mockConfig.getInt("RTBreadtimeoutMillis")).andReturn(200).anyTimes();
         expect(mockConfig.getBoolean("isRtbEnabled")).andReturn(true).anyTimes();
         expect(mockConfig.getInt("rtb.maxconnections")).andReturn(50).anyTimes();
 

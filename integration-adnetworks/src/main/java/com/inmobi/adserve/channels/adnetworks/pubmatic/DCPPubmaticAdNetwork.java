@@ -36,9 +36,10 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPPubmaticAdNetwork.class);
 
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static String creativeTag = "creative_tag";
-    private static String trackingUrl = "tracking_url";
-    private static String pubMaticBid = "PubMatic_Bid";
+    private static String CREATIVE_TAG = "creative_tag";
+    private static String TRACKING_URL = "tracking_url";
+    private static String PUBMATIC_BID = "PubMatic_Bid";
+    private static String ERROR_CODE = "error_code";
     private static IABCountriesInterface iABCountries;
     private transient String pubId;
     private String latlong = null;
@@ -193,9 +194,14 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 statusCode = status.code();
                 JSONObject adResponse = new JSONObject(response.replace("\n", " "));
-                adResponse = adResponse.getJSONObject(pubMaticBid);
-                htmlCode = adResponse.getString(creativeTag).trim();
-                partnerBeacon = adResponse.getString(trackingUrl);
+                adResponse = adResponse.getJSONObject(PUBMATIC_BID);
+                if(adResponse.has(ERROR_CODE)){
+                    adStatus = "NO_AD";
+                    LOG.info("Error response from pubmatic: {}", response);
+                    return;
+                }
+                htmlCode = adResponse.getString(CREATIVE_TAG).trim();
+                partnerBeacon = adResponse.getString(TRACKING_URL);
             } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response {} from pubmatic: {}", response, exception);
