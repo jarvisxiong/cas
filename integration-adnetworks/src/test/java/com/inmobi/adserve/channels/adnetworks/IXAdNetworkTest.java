@@ -360,6 +360,8 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setTransparencyEnabled(false);
+            builder.setBundleId("com.play.google.testApp");
+            builder.setSiteUrl("http://www.testSite.com");
             sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
             sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sasParams
@@ -379,8 +381,11 @@ public class IXAdNetworkTest extends TestCase {
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
 
             assertTrue(adapterCreated);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 1);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle(), "com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474");
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getBundle(), "com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474");
 
             // Test Cases for transparency=true
             blindList = new ArrayList<Integer>(Arrays.asList(1, 2));
@@ -394,18 +399,23 @@ public class IXAdNetworkTest extends TestCase {
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
 
             assertTrue(adapterCreated);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sasParams.getSiteId());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blindbuyers, blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain());
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain(), "http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474");
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getPage(),"http://www.testSite.com");
 
             sasParams.setSource("app");
             adapterCreated =
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
 
             assertTrue(adapterCreated);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blindbuyers, blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getBundle(), "com.play.google.testApp");
 
             // Test case when site_blind_list or pub_blind_list is present
             sasParams.setSource("wap");
@@ -418,15 +428,18 @@ public class IXAdNetworkTest extends TestCase {
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
 
             assertTrue(adapterCreated);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sasParams.getSiteId());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blindbuyers, blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getPage());
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain(),"http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474");
 
             sasParams.setSource("app");
             adapterCreated =
                     ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
 
             assertTrue(adapterCreated);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 0);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blindbuyers, blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());

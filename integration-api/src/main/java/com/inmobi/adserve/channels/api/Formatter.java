@@ -36,7 +36,6 @@ public class Formatter {
     private static Template velocityTemplateRtbBannerVideo;
     private static Template velocityTemplateJsAdTag;
     private static Template velocityTemplateWapHtmlJsAdTag;
-    private static Template velocityTemplateIx;
 
     public static void init() throws Exception {
         velocityEngine = new VelocityEngine();
@@ -47,7 +46,6 @@ public class Formatter {
         velocityTemplateRichTxt = velocityEngine.getTemplate("richTxtFormat.vm");
         velocityTemplateImg = velocityEngine.getTemplate("ImageAdFormat.vm");
         velocityTemplateRtb = velocityEngine.getTemplate("rtbHtmlAdFormat.vm");
-        velocityTemplateIx = velocityEngine.getTemplate("ixHtmlAdFormat.vm");
         velocityTemplateRtbBannerVideo = velocityEngine.getTemplate("rtbBannerVideoAdFormat.vm");
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
@@ -123,9 +121,6 @@ public class Formatter {
                 break;
             case WAP_HTML_JS_AD_TAG:
                 velocityTemplateWapHtmlJsAdTag.merge(context, writer);
-                break;
-            case IX_HTML:
-                velocityTemplateIx.merge(context, writer);
                 break;
             default:
                 break;
