@@ -53,8 +53,7 @@ public class AsyncRequestMaker {
 
         LOG.debug("Total channels available for sending requests {}", rows.size());
         final boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-        final int rtbMaxTimeOut = rtbConfig.getInt("RTBreadtimeoutMillis", 200);
-        LOG.debug("isRtbEnabled is {}  and rtbMaxTimeout is {}", isRtbEnabled, rtbMaxTimeOut);
+        LOG.debug("isRtbEnabled is {} ", isRtbEnabled);
 
         /*
          NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
@@ -70,7 +69,7 @@ public class AsyncRequestMaker {
             final AdNetworkInterface network =
                     segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row.getChannelSegmentEntity()
                                     .getChannelId(), adapterConfig, null, null, base, channel, advertiserSet, isRtbEnabled,
-                            rtbMaxTimeOut, sasParams.getDst(), repositoryHelper);
+                            sasParams.getDst(), repositoryHelper);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;

@@ -1,5 +1,39 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.ContentType;
@@ -23,11 +57,12 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.ix.API_FRAMEWORKS;
 import com.inmobi.casthrift.ix.AdQuality;
 import com.inmobi.casthrift.ix.App;
 import com.inmobi.casthrift.ix.Banner;
@@ -47,43 +82,9 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
-import com.inmobi.casthrift.ix.API_FRAMEWORKS;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 
 /**
@@ -121,6 +122,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String WIFI = "WIFI";
     private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     private static final String CELL_TOWER = "CELL_TOWER";
+    private static final String MIME = "mime";
+    private static final String MIME_HTML = "text/html";
+    private static final String MIME_VALUE = "html";
+
+    private boolean isResponseHTML = false;
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -439,8 +445,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final JSONObject additionalParams = entity.getAdditionalParams();
         if (null != additionalParams) {
             final String zoneId = getZoneId(additionalParams);
+            final RubiconExtension rp = new RubiconExtension();
             if (null != zoneId) {
-                final RubiconExtension rp = new RubiconExtension();
                 rp.setZone_id(zoneId);
                 impExt.setRp(rp);
             } else {
@@ -451,16 +457,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
         }
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
-        long endTime = System.currentTimeMillis();
+        final long endTime = System.currentTimeMillis();
         InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
                 InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
         if (!packageIds.isEmpty()) {
             LOG.debug("No. of matching deal packages - {}", packageIds.size());
-            RubiconExtension rp = (impExt.getRp() == null) ? new RubiconExtension() : impExt.getRp();
-            ExtRubiconTarget target = new ExtRubiconTarget();
+            final RubiconExtension rp = impExt.getRp() == null ? new RubiconExtension() : impExt.getRp();
+            final ExtRubiconTarget target = new ExtRubiconTarget();
             target.packages = packageIds;
             impExt.setRp(rp.setTarget(target));
 
@@ -470,6 +476,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         impression.setExt(impExt);
         return impression;
+    }
+
+    private void setMimeTypeForBannerExt(final RubiconExtension rp) {
+        final JSONObject additionalParams = entity.getAdditionalParams();
+        try {
+            if (additionalParams != null && additionalParams.has(MIME)
+                    && MIME_VALUE.equals(additionalParams.getString(MIME))) {
+                rp.setMime(MIME_HTML);
+                isResponseHTML = true;
+            }
+        } catch (final JSONException e) {
+            LOG.info("Error reading additional Param in IX");
+        }
     }
 
 
@@ -522,15 +541,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final CommonExtension ext = new CommonExtension();
-
         if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
             if (SlotSizeMapping.isIXSupportedSlot(selectedSlotId)) {
                 final RubiconExtension rp = new RubiconExtension();
+                setMimeTypeForBannerExt(rp);
                 rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(selectedSlotId));
                 ext.setRp(rp);
             }
         }
-
         banner.setExt(ext);
         return banner;
     }
@@ -1076,8 +1094,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         final int admAfterMacroSize = admContent.length();
 
-        // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP response.
-        admContent = String.format(RESPONSE_TEMPLATE, admContent);
+        if (!isResponseHTML) {
+            // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP
+            // response.
+            admContent = String.format(RESPONSE_TEMPLATE, admContent);
+        }
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
             velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
         } else {

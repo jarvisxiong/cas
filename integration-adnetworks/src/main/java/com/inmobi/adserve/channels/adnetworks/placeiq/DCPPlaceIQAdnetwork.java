@@ -144,12 +144,11 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
-
+        String udid = getUid();
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.getUidMd5())
-                    && StringUtils.isEmpty(casInternalRequestParameters.getUid())) {
+            if (udid == null) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
                 LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;
@@ -157,8 +156,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) { // iPhone
             os = IOS;
             isApp = true;
-            if (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())
-                    && StringUtils.isEmpty(casInternalRequestParameters.getUidIDUS1())) {
+            if (udid == null) {
                 LOG.debug("mandatory parameters missing for placeiq so exiting adapter");
                 LOG.info("Configure parameters inside PlaceIQ returned false");
                 return false;

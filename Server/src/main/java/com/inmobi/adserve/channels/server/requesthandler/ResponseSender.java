@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.Getter;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 import static com.inmobi.casthrift.DemandSourceType.IX;
 import static com.inmobi.casthrift.DemandSourceType.RTBD;
@@ -139,6 +140,17 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     public long getTotalTime() {
         return totalTime;
+    }
+    
+    public long getTimeElapsed(){
+        return System.currentTimeMillis() - initialTime;
+    }
+    
+    public String getDST(){
+        if(sasParams.getDst() == 0){
+            return "";
+        }
+        return DemandSourceType.findByValue(sasParams.getDst()).toString();
     }
 
     @Inject
@@ -369,7 +381,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
         System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
-
+        
+        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "sendResponse_"+getDST(), getTimeElapsed());
         if (sasParams.isKeepAlive()) {
             serverChannel.writeAndFlush(response);
         } else {
@@ -614,6 +627,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (null != getAuctionEngine().getUnfilteredChannelSegmentList()) {
             list.addAll(getAuctionEngine().getUnfilteredChannelSegmentList());
         }
+        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "writeLogs_"+getDST(), getTimeElapsed());
         long totalTime = getTotalTime();
         if (totalTime > 2000) {
             totalTime = 0;

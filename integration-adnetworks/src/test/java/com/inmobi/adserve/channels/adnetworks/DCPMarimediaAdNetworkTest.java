@@ -21,6 +21,7 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
+
 public class DCPMarimediaAdNetworkTest extends TestCase {
     private Configuration mockConfig = null;
     private final String debug = "debug";
@@ -83,6 +84,35 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
 
         assertTrue(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
                 null, (short) 3));
+    }
+
+    @Test
+    public void testDCPMarimediaConfigureParametersAndroidVersionSpecific() throws Exception {
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+
+        // casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+                .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        sasParams.setSource("APP");
+        sasParams.setOsId(SASRequestParameters.HandSetOS.Android.getValue());
+        final String externalKey = "918a1f78-811c-4145-912e-c1a45f7705a0";
+        sasParams.setOsMajorVersion("2.0.1");
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(marimediaAdvId, "adgroupid",
+                        null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true,
+                        null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                        null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+
+        assertFalse(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
+                null, (short) 3));
+        sasParams.setOsMajorVersion("2.3.1");
+        assertTrue(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
+                null, (short) 3));
+
     }
 
     @Test
