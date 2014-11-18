@@ -23,7 +23,7 @@ public class Formatter {
     private static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
 
     public enum TemplateType {
-        HTML, PLAIN, RICH, IMAGE, RTB_HTML, RTB_BANNER_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML
+        HTML, PLAIN, RICH, IMAGE, RTB_HTML, RTB_BANNER_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG
     }
 
     private static final String APP = "APP";
