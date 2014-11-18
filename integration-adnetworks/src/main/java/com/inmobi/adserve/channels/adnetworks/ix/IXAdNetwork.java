@@ -82,6 +82,7 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
+import com.inmobi.casthrift.ix.Blind;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -125,6 +126,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String MIME = "mime";
     private static final String MIME_HTML = "text/html";
     private static final String MIME_VALUE = "html";
+    private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
+    private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
 
     private boolean isResponseHTML = false;
 
@@ -604,11 +607,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
 
+        final CommonExtension ext = new CommonExtension();
+
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
 
-            setParamsForTransparentSite(site);
+            setParamsForTransparentSite(site, ext);
         } else {
-            setParamsForBlindSite(site);
+            setParamsForBlindSite(site, ext);
         }
 
         final List<String> blockedList = getBlockedList();
@@ -624,8 +629,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Transparency transparency = createTransparency();
         site.setTransparency(transparency);
 
-        final CommonExtension ext = new CommonExtension();
-
         final RubiconExtension rpForSite = new RubiconExtension();
         rpForSite.setSite_id(rubiconSiteId);
         ext.setRp(rpForSite);
@@ -634,7 +637,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return site;
     }
 
-    private void setParamsForTransparentSite(final Site site) {
+    private void setParamsForTransparentSite(final Site site, final CommonExtension ext) {
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         site.setId(sasParams.getSiteId());
         final String tempSiteUrl = wapSiteUACEntity.getSiteUrl();
         if (StringUtils.isNotEmpty(tempSiteUrl)) {
@@ -644,11 +648,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             site.setName(wapSiteUACEntity.getSiteName());
         }
+        final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
+        final Blind blindForSite = new Blind();
+        blindForSite.setPage(blindDomain);
+        blindForSite.setDomain(blindDomain);
+        ext.setBlind(blindForSite);
     }
 
-    private void setParamsForBlindSite(final Site site) {
-        site.setId(getBlindedSiteId(sasParams.getSiteIncId()));
-
+    private void setParamsForBlindSite(final Site site, final CommonExtension ext) {
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        site.setId(sasParams.getSiteId());
         if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
             site.setName(wapSiteUACEntity.getAppType());
         } else {
@@ -657,6 +666,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 site.setName(category);
             }
         }
+        final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
+        site.setPage(blindDomain);
+        site.setDomain(blindDomain);
+        final Blind blindForSite = new Blind();
+        blindForSite.setPage(blindDomain);
+        blindForSite.setDomain(blindDomain);
+        ext.setBlind(blindForSite);
     }
 
     private Publisher createPublisher(final List<Long> tempSasCategories) {
@@ -720,10 +736,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
 
+        final CommonExtension ext = new CommonExtension();
+
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
-            setParamsForTransparentApp(app);
+            setParamsForTransparentApp(app, ext);
         } else {
-            setParamsForBlindApp(app);
+            setParamsForBlindApp(app, ext);
         }
         final List<Long> tempSasCategories = sasParams.getCategories();
 
@@ -745,8 +763,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Transparency transparency = createTransparency();
         app.setTransparency(transparency);
 
-        final CommonExtension ext = new CommonExtension();
-
         final RubiconExtension rpForApp = new RubiconExtension();
         rpForApp.setSite_id(rubiconSiteId);
         ext.setRp(rpForApp);
@@ -756,7 +772,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return app;
     }
 
-    private void setParamsForTransparentApp(final App app) {
+    private void setParamsForTransparentApp(final App app, final CommonExtension ext) {
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         app.setId(sasParams.getSiteId());
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
@@ -771,11 +788,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
         }
+        final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
+        final Blind blindForApp = new Blind();
+        blindForApp.setBundle(blindBundle);
+        ext.setBlind(blindForApp);
     }
 
-    private void setParamsForBlindApp(final App app) {
-        app.setId(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
-
+    private void setParamsForBlindApp(final App app, final CommonExtension ext) {
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        app.setId(sasParams.getSiteId());
         if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
             app.setName(wapSiteUACEntity.getAppType());
         } else {
@@ -784,6 +805,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 app.setName(category);
             }
         }
+        final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
+        app.setBundle(blindBundle);
+        final Blind blindForApp = new Blind();
+        blindForApp.setBundle(blindBundle);
+        ext.setBlind(blindForApp);
     }
 
     public List<String> getBlockedList() {
