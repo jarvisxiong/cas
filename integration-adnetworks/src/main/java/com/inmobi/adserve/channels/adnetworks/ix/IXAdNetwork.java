@@ -90,7 +90,7 @@ import com.ning.http.client.RequestBuilder;
 
 /**
  * Generic IX adapter.
- * 
+ *
  * @author Anshul Soni(anshul.soni@inmobi.com)
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
@@ -126,6 +126,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String MIME = "mime";
     private static final String MIME_HTML = "text/html";
     private static final String MIME_VALUE = "html";
+    public static final int INMOBI_SDK_VERSION_370 = 370;
+    private static final int IX_MRAID_VALUE = 1001;
+    private static final List<Integer> MRAID_FRAMEWORK_VALUES =
+            Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(), IX_MRAID_VALUE);
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
 
@@ -538,8 +542,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(sasParams.getSdkVersion())) {
             final int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
 
-            if (sdkVersion >= 370) {
-                banner.setApi(Arrays.asList(API_FRAMEWORKS.MRAID_2.getValue()));
+            if (sdkVersion >= INMOBI_SDK_VERSION_370) {
+                banner.setApi(MRAID_FRAMEWORK_VALUES);
             }
         }
 
@@ -1188,7 +1192,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     /**
      * Generates blinded site uuid from siteIncId. For a given site Id, the generated blinded SiteId will always be
      * same.
-     * 
+     *
      * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
      */
     private String getBlindedSiteId(final long siteIncId) {
