@@ -730,10 +730,6 @@ final class DefaultChannelHandlerContext extends DefaultAttributeMap implements 
 
     
     private void write(Object msg, boolean flush, ChannelPromise promise) {
-        long tempLatencyTime = System.currentTimeMillis() - startLatencyTime;
-        
-        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + name, tempLatencyTime);
-        
         DefaultChannelHandlerContext next = findContextOutbound();
         EventExecutor executor = next.executor();
         if (executor.inEventLoop()) {
