@@ -15,6 +15,7 @@ import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteCategoryEnum;
 import com.inmobi.segment.impl.SlotId;
 import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -34,6 +35,7 @@ public class IXPackageRepositoryTest {
     @Test
     public void testRepo() throws SQLException {
         Configuration mockConfig = createMock(Configuration.class);
+        Logger mockLogger = createMock(Logger.class);
         EasyMock.expect(mockConfig.getString("query")).andReturn("select * from ix_packages;").once();
         EasyMock.expect(mockConfig.getInt("initialDelay")).andReturn(1).once();
         EasyMock.expect(mockConfig.getInt("refreshTime")).andReturn(300).once();
@@ -41,7 +43,7 @@ public class IXPackageRepositoryTest {
 
         IXPackageRepository repository = new IXPackageRepository();
 
-        repository.init(NoOpDataSource.getNoOpDataSource(),
+        repository.init(mockLogger, NoOpDataSource.getNoOpDataSource(),
                 mockConfig,
                 "dummy");
 
