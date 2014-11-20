@@ -17,10 +17,6 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.data.repository.DBReaderDelegate;
 import com.inmobi.data.repository.ScheduledDbReader;
 import com.inmobi.segment.Segment;
-import com.inmobi.segment.impl.AdType;
-import com.inmobi.segment.impl.AdTypeEnum;
-import com.inmobi.segment.impl.AppStoreCategory;
-import com.inmobi.segment.impl.CSId;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
@@ -28,20 +24,18 @@ import com.inmobi.segment.impl.InventoryType;
 import com.inmobi.segment.impl.InventoryTypeEnum;
 import com.inmobi.segment.impl.LatlongPresent;
 import com.inmobi.segment.impl.NetworkType;
-import com.inmobi.segment.impl.SDKVersion;
 import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteCategoryEnum;
 import com.inmobi.segment.impl.SiteId;
 import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
-import com.inmobi.segment.impl.ZipCode;
 import com.inmobi.segment.impl.ZipCodePresent;
 import com.inmobi.segmentparameter.SegmentParameter;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -61,13 +55,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-@Slf4j
 public class IXPackageRepository {
     private volatile Map<Long, IXPackageEntity> packageSet = Collections.emptyMap();
     @Getter
     private IndexedCollection<IXPackageEntity> packageIndex;
     private ScheduledDbReader reader;
     private static final Integer[][] EMPTY_2D_INTEGER_ARRAY = new Integer[0][];
+    private Logger logger;
 
     public static final String ALL_SITE_ID = "A";
     public static final Integer ALL_COUNTRY_ID = -1;
@@ -142,8 +136,9 @@ public class IXPackageRepository {
                 }
             };
 
-    public void init(DataSource dataSource, Configuration config, String instanceName) {
+    public void init(Logger logger, DataSource dataSource, Configuration config, String instanceName) {
 
+        this.logger = logger;
         String query = config.getString("query");
         MetricRegistry metricsRegistry = new MetricRegistry();
 
@@ -191,8 +186,6 @@ public class IXPackageRepository {
                 Long[] carrierIds = (Long[]) rs.getArray("carrier_ids").getArray();
                 String[] siteCategories = (String[]) rs.getArray("site_categories").getArray();
                 String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
-                Integer[] appStoreCategories = (Integer[]) rs.getArray("app_store_categories").getArray();
-                String[] sdkVersions = (String[]) rs.getArray("sdk_versions").getArray();
                 int dataVendorId = rs.getInt("data_vendor_id");
                 int dmpId = rs.getInt("dmp_id");
 
@@ -200,19 +193,15 @@ public class IXPackageRepository {
                 try {
                     dmpFilterSegmentExpression = extractDmpFilterExpression(rs.getString("dmp_filter_expression"));
                 } catch (JSONException e) {
-                    log.error("Invalid dmpFilterExpressionJson in IXPackageRepository for id {} - {} ", id, e);
+                    logger.error("Invalid dmpFilterExpressionJson in IXPackageRepository for id " + id, e);
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
                 }
-
-                String[] zipCodes = (String[]) rs.getArray("zip_codes").getArray();
-                Integer[] csIds = (Integer[]) rs.getArray("cs_ids").getArray();
 
                 Object[] outputArray = (Object[]) rs.getArray("scheduled_tods").getArray();
                 Integer[][] scheduleTimeOfDays =
                         (outputArray.length == 0) ? EMPTY_2D_INTEGER_ARRAY : (Integer[][]) outputArray;
 
-                String[] adTypes = (String[]) rs.getArray("placement_ad_types").getArray();
                 Integer[] slotIds = (Integer[]) rs.getArray("placement_slot_ids").getArray();
 
                 SiteId site = null;
@@ -287,40 +276,6 @@ public class IXPackageRepository {
                     networkType.init(ImmutableSet.copyOf(networkTypeIds));
                 }
 
-                AppStoreCategory appStoreCategory = null;
-                if (ArrayUtils.isNotEmpty(appStoreCategories)) {
-                    appStoreCategory = new AppStoreCategory();
-                    appStoreCategory.init(ImmutableSet.copyOf(appStoreCategories));
-                }
-
-                SDKVersion sdkVersion = null;
-                if (ArrayUtils.isNotEmpty(sdkVersions)) {
-                    sdkVersion = new SDKVersion();
-                    sdkVersion.init(ImmutableSet.copyOf(sdkVersions));
-                }
-
-                ZipCode zipCode = null;
-                if (ArrayUtils.isNotEmpty(zipCodes)) {
-                    zipCode = new ZipCode();
-                    zipCode.init(ImmutableSet.copyOf(zipCodes));
-                }
-
-                CSId csId = null;
-                if (ArrayUtils.isNotEmpty(csIds)) {
-                    csId = new CSId();
-                    csId.init(ImmutableSet.copyOf(csIds));
-                }
-
-                AdType adType = null;
-                if (ArrayUtils.isNotEmpty(adTypes)) {
-                    AdTypeEnum[] adTypeEnums = new AdTypeEnum[adTypes.length];
-                    for (int i = 0; i < adTypes.length; i++) {
-                        adTypeEnums[i++] = AdTypeEnum.valueOf(adTypes[i]);
-                    }
-                    adType = new AdType();
-                    adType.init(ImmutableSet.copyOf(adTypeEnums));
-                }
-
                 SlotId slotId = null;
                 if (ArrayUtils.isNotEmpty(slotIds)) {
                     slotId = new SlotId();
@@ -369,26 +324,6 @@ public class IXPackageRepository {
                     repoSegmentBuilder.addSegmentParameter(networkType);
                 }
 
-                if (appStoreCategory != null) {
-                    repoSegmentBuilder.addSegmentParameter(appStoreCategory);
-                }
-
-                if (sdkVersion != null) {
-                    repoSegmentBuilder.addSegmentParameter(sdkVersion);
-                }
-
-                if (zipCode != null) {
-                    repoSegmentBuilder.addSegmentParameter(zipCode);
-                }
-
-                if (csId != null) {
-                    repoSegmentBuilder.addSegmentParameter(csId);
-                }
-
-                if (adType != null) {
-                    repoSegmentBuilder.addSegmentParameter(adType);
-                }
-
                 if (slotId != null) {
                     repoSegmentBuilder.addSegmentParameter(slotId);
                 }
@@ -408,15 +343,15 @@ public class IXPackageRepository {
                 boolean active = rs.getBoolean("is_active");
                 if (active) {
                     newIXPackageSet.put(id, entity);
-                    log.debug("Adding entity to index: {}", entity);
+                    logger.debug("Adding entity with id: " + id + " to IXPackageRepository.");
                 } else {
                     newIXPackageSet.remove(id);
-                    log.debug("Removing entity from index: {}", entity);
+                    logger.debug("Removing entity with id: " + id + " from IXPackageRepository.");
                 }
                 ts = rs.getTimestamp("last_modified");
 
             } catch (Exception e) {
-                log.error("Error while reading row in IXPackageRepository - {}", e);
+                logger.error("Error while reading row in IXPackageRepository.", e);
                 ts = new Timestamp(0);
             }
             return ts;
@@ -431,12 +366,12 @@ public class IXPackageRepository {
     }
 
     private void start() {
-        log.info("Start IXPackageRepository updates.");
+        logger.info("Start IXPackageRepository updates.");
         reader.startAsync();
     }
 
     public void stop() {
-        log.info("Stop IXPackageRepository updates.");
+        logger.info("Stop IXPackageRepository updates.");
         reader.stopAsync();
     }
 

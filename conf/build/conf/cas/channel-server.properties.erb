@@ -238,7 +238,7 @@ Cache.Name = IXPackageRepository
 Cache.IXPackageRepository.Manager = com.inmobi.adserve.channels.repository.IXPackageRepository
 Cache.IXPackageRepository.query = select * from ix_packages where is_active=true and (start_date is null or start_date <= now()+interval '1 minute') and (end_date is null or end_date >= now())
 Cache.IXPackageRepository.initialDelay = 1
-Cache.IXPackageRepository.refreshTime = 300
+Cache.IXPackageRepository.refreshTime = 1200
 Cache.IXPackageRepository.dataSourceName = jdbc
 
 Cache.Name = SiteEcpmRepository

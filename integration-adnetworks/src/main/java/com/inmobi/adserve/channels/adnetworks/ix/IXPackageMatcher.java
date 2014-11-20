@@ -18,6 +18,7 @@ import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteId;
 import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
+import com.inmobi.segment.impl.ZipCodePresent;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class IXPackageMatcher {
         SlotId reqSlotId = new SlotId();
         CarrierId reqCarrierId = new CarrierId();
         LatlongPresent reqLatlongPresent = new LatlongPresent();
+        ZipCodePresent reqZipCodePresent = new ZipCodePresent();
         UidPresent reqUidPresent = new UidPresent();
         InventoryType reqInventoryType = new InventoryType();
 
@@ -73,6 +75,7 @@ public class IXPackageMatcher {
         reqSiteId.init(Collections.singleton(sasParams.getSiteId()));
         reqSlotId.init(Collections.singleton(selectedSlotId.intValue()));
         reqLatlongPresent.init(StringUtils.isNotEmpty(sasParams.getLatLong()));
+        reqZipCodePresent.init(StringUtils.isNotEmpty(sasParams.getPostalCode()));
         reqUidPresent.init(isUdIdPresent(sasParams));
         reqCarrierId.init(Collections.singleton((long) sasParams.getCarrierId())); // TODO: fix long->int cast in ThriftRequestParser
 
@@ -97,8 +100,10 @@ public class IXPackageMatcher {
                 .addSegmentParameter(reqSiteId)
                 .addSegmentParameter(reqSlotId)
                 .addSegmentParameter(reqLatlongPresent)
+                .addSegmentParameter(reqZipCodePresent)
                 .addSegmentParameter(reqCarrierId)
-                .addSegmentParameter(reqUidPresent);
+                .addSegmentParameter(reqUidPresent)
+                .addSegmentParameter(reqInventoryType);
 
         if (reqNetworkType != null) {
             requestSegmentBuilder.addSegmentParameter(reqNetworkType);

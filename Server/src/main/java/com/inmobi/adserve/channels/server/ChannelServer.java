@@ -347,7 +347,7 @@ public class ChannelServer {
             nativeAdTemplateRepository.init(logger,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY),
                     ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY);
-            ixPackageRepository.init(ds,
+            ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
             geoZipRepository.init(logger,
