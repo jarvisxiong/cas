@@ -1228,6 +1228,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             responseBidObjCount = seatBid.getBid().size();
             final Bid bid = seatBid.getBid().get(0);
             adm = bid.getAdm();
+
+            // TODO: hack for IX beacon discrepancy fix
+            adm = adm.replace("src=\"//beacon","src=\"http://beacon");
+
             responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
             responseAuctionId = bidResponse.getId();
