@@ -1115,7 +1115,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final VelocityContext velocityContext = new VelocityContext();
 
-        String admContent = getADMContent();
+        String admContent = getAdMarkUp();
 
         final int admSize = admContent.length();
         if (!templateWN) {
@@ -1155,17 +1155,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
     }
-
-
-    protected String getADMContent() {
-
-        final SeatBid seatBid = bidResponse.getSeatbid().get(0);
-        final Bid bid = seatBid.getBid().get(0);
-        final String admContent = bid.getAdm();
-        return admContent;
-
-    }
-
 
     protected void createWin(final VelocityContext velocityContext) {
         if (wnRequired) {
