@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import com.googlecode.cqengine.resultset.ResultSet;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -1238,6 +1240,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             dealId = bid.getDealid();
             if (dealId != null) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
+                ResultSet<IXPackageEntity> resultSet =
+                        repositoryHelper.queryByDeal(Integer.parseInt(dealId));
+                for (IXPackageEntity packageEntity : resultSet) {
+                    System.out.println("awesome");
+                }
             }
             final boolean result = updateDSPAccountInfo(seatBid.getBuyer());
             if (!result) {
