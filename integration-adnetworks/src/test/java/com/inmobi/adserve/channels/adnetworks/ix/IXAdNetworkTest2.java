@@ -141,7 +141,7 @@ public class IXAdNetworkTest2 {
                                 advertiserName, 0, mockRepositoryHelper, true).createMock();
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
-        expect(ixAdNetwork.getADMContent()).andReturn(TestUtils.SampleStrings.ixResponseADM).times(1);
+        expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).times(1);
         expect(ixAdNetwork.configureParameters()).andReturn(true).times(1);
         expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
         replay(ixAdNetwork);
