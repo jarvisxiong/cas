@@ -49,6 +49,7 @@ public class ServletChangeLogLevel implements Servlet {
 
 
     public static void init() {
+        LOG.debug("Initializing servlet ChangeLogLevel...");
         LoggerContext lc = (LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
         defaultAdvertiserLoggerLevel = lc.getLogger("advertiser").getLevel();
         defaultSampledAdvertiserLoggerLevel = lc.getLogger("sampledadvertiser").getLevel();
