@@ -1,7 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.turbo.TurboFilter;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter;
@@ -15,6 +18,10 @@ import javax.ws.rs.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by ishanbhatnagar on 31/10/14.
@@ -24,41 +31,81 @@ import java.util.Map;
 @Path("/changeLogLevel")
 public class ServletChangeLogLevel implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletChangeLogLevel.class);
-    private static final String invalidLoggerName =
+    private static final String INVALID_LOGGER_NAME =
             "Invalid Logger Name or Incorrect Query Format.\n"
             + "Valid logger names are: debug, advertiser, sampledadvertiser\n"
             + "Valid Query Format: " + TestUtils.SampleServletQueries.servletChangeLogLevel;
-    private static final String invalidLoggerLevel =
+    private static final String INVALID_LOGGER_LEVEL =
             "Invalid Logger Level. Valid logger levels are: DEBUG, INFO, WARN, ERROR, OFF";
+    private static final String TIMER_ALREADY_RUNNING_ERROR = "Aborting request to change log level as a timer thread is "
+            + "already running. Please wait a minute for the timer thread to finish executing.";
+
+    private static ScheduledFuture<?> scheduledFuture = null;
+
+    private static long  defaultDelayTime = 15000;   // 15 seconds
+    private static Level defaultAdvertiserLoggerLevel;
+    private static Level defaultSampledAdvertiserLoggerLevel;
+    private static Level defaultTurboFilterLevel;
+
+
+    public static void init() {
+        LOG.debug("Initializing servlet ChangeLogLevel...");
+        LoggerContext lc = (LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
+        defaultAdvertiserLoggerLevel = lc.getLogger("advertiser").getLevel();
+        defaultSampledAdvertiserLoggerLevel = lc.getLogger("sampledadvertiser").getLevel();
+        defaultTurboFilterLevel = ((MarkerAndLevelFilter) lc.getTurboFilterList().get(0)).getLevelToEnforce();
+    }
 
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
                               final Channel serverChannel) throws Exception {
         LOG.error("Inside Change Log Level Servlet");
 
         try {
+            long delayTime = CasConfigUtil.getServerConfig().subset("servletChangeLogLevel")
+                    .getLong("timerDelay", defaultDelayTime);
+            String timerMessage = null;
+
+            /**
+             * Timer Logic:
+             *     If a timerThread is already running or is scheduled to run
+             *         then abort servlet and display 'TIMER_ALREADY_RUNNING_ERROR' error
+             *     Else
+             *         change log level and create a timer thread to revert the log level change after a minute
+             */
+
+            if (null != scheduledFuture && !scheduledFuture.isDone()) {
+                LOG.error(TIMER_ALREADY_RUNNING_ERROR);
+                hrh.responseSender.sendResponse(TIMER_ALREADY_RUNNING_ERROR, serverChannel);
+                return;
+            }
+
             final Map<String, List<String>> params = queryStringDecoder.parameters();
-            String loggerName = null;
-            String levelName = null;
+            final String loggerName;
+            final String levelName;
 
             if (params.containsKey("debug")) {
                 loggerName = "com.inmobi.adserve.channels";
                 levelName = params.get("debug").get(0).toString();
+                timerMessage = ". The log level will be reverted back to " + defaultTurboFilterLevel + " in: " + String.valueOf(delayTime) + "ms";
             } else if (params.containsKey("advertiser")) {
                 loggerName = "advertiser";
                 levelName = params.get("advertiser").get(0).toString();
+                timerMessage = ". The log level will be reverted back to " + defaultAdvertiserLoggerLevel + " in: " + String.valueOf(delayTime) + "ms";
             } else if (params.containsKey("sampledadvertiser")) {
                 loggerName = "sampledadvertiser";
                 levelName = params.get("sampledadvertiser").get(0).toString();
+                timerMessage = ". The log level will be reverted back to " + defaultSampledAdvertiserLoggerLevel + " in: " + String.valueOf(delayTime) + "ms";
             } else {
-                LOG.error(invalidLoggerName);
-                hrh.responseSender.sendResponse(invalidLoggerName, serverChannel);
+                LOG.error(INVALID_LOGGER_NAME);
+                hrh.responseSender.sendResponse(INVALID_LOGGER_NAME, serverChannel);
                 return;
             }
 
-            ch.qos.logback.classic.Level level = getLevel(levelName);
+            final ch.qos.logback.classic.Level level = getLevel(levelName);
+
             if (null == level) {
-                LOG.error(invalidLoggerLevel);
-                hrh.responseSender.sendResponse(invalidLoggerLevel, serverChannel);
+                LOG.error(INVALID_LOGGER_LEVEL);
+                hrh.responseSender.sendResponse(INVALID_LOGGER_LEVEL, serverChannel);
                 return;
             }
 
@@ -72,11 +119,13 @@ public class ServletChangeLogLevel implements Servlet {
                  * So in this case, we change the level of the turboFilter instead of changing the level of the logger.
                  */
 
-                Iterator<TurboFilter> itr = ((ch.qos.logback.classic.LoggerContext)LoggerFactory.getILoggerFactory()).getTurboFilterList().iterator();
+                Iterator<TurboFilter> itr = ((ch.qos.logback.classic.LoggerContext)LoggerFactory.getILoggerFactory())
+                        .getTurboFilterList().iterator();
                 while(itr.hasNext()) {
                     TurboFilter filter = itr.next();
                     if (filter instanceof MarkerAndLevelFilter) {
                         ((MarkerAndLevelFilter)filter).setLevel(levelName);
+                        break;
                     }
                 }
             } else {
@@ -85,9 +134,38 @@ public class ServletChangeLogLevel implements Servlet {
 
             String successMessage = "Successfully changed log level of " + loggerName
                     + " and all it's descendants to " + levelName;
-            LOG.error(successMessage);
 
-            hrh.responseSender.sendResponse(successMessage, serverChannel);
+            Runnable servletChangeLogLevelTimerTask = new Runnable() {
+                @Override
+                public void run() {
+                    // Resets log levels to default values
+                    if (params.containsKey("debug")) {
+                        Iterator<TurboFilter> itr =
+                                ((ch.qos.logback.classic.LoggerContext) LoggerFactory.getILoggerFactory())
+                                        .getTurboFilterList().iterator();
+                        while (itr.hasNext()) {
+                            TurboFilter filter = itr.next();
+                            if (filter instanceof MarkerAndLevelFilter) {
+                                ((MarkerAndLevelFilter) filter).setLevel(defaultTurboFilterLevel);
+                                break;
+                            }
+                        }
+                    } else if (params.containsKey("advertiser")){
+                        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
+                                .setLevel(defaultAdvertiserLoggerLevel);
+                    } else if (params.containsKey("sampledadvertiser")){
+                        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
+                                .setLevel(defaultSampledAdvertiserLoggerLevel);
+                    }
+                }
+            };
+
+            ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+            scheduledFuture = timer.schedule(servletChangeLogLevelTimerTask, delayTime, TimeUnit.MILLISECONDS);
+            timer.shutdown();
+
+            LOG.error(successMessage + timerMessage);
+            hrh.responseSender.sendResponse(successMessage + timerMessage, serverChannel);
         }
         catch (Exception e) {
             LOG.error("Exception caught: {}", e.toString());

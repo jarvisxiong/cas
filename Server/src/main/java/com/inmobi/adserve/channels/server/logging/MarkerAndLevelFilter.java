@@ -17,8 +17,8 @@ import com.inmobi.adserve.channels.scope.NettyRequestScope;
 public class MarkerAndLevelFilter extends TurboFilter {
     private static final Marker TRACE_MARKER = NettyRequestScope.TRACE_MAKER;
 
-    private Level levelToEnforce = Level.ERROR;
-    private String excludedTurboFilteringLogs = "";
+    private Level levelToEnforce = Level.ERROR; // This value is overwritten when logger.xml is read
+    private String excludedTurboFilteringLogs = ""; // This value is overwritten when logger.xml is read
 
     @Override
     public void start() {
@@ -75,5 +75,13 @@ public class MarkerAndLevelFilter extends TurboFilter {
             case "OFF":   level = Level.OFF;     break;
         }
         return level;
+    }
+
+    public Level getLevelToEnforce() {
+        return levelToEnforce;
+    }
+
+    public void setLevel(Level level) {
+        levelToEnforce = level;
     }
 }
