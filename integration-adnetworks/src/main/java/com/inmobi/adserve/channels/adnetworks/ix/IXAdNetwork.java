@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -969,11 +970,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             statusCode = status.code();
             final boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
-                adStatus = "NO_AD";
+                // Incase of unexpected error in deserializeResponse(), the adStatus is set to TERM.
+                // Otherwise, it is already set as NO_AD.
                 responseContent = "";
                 statusCode = 500;
-                LOG.info(traceMarker, "Error in parsing ix response");
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                LOG.info(traceMarker, "Could not get an Ad by parsing ix response. Ad status: {}", adStatus);
                 return;
             }
             adStatus = "AD";
@@ -1238,9 +1239,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_DSP_ID);
             }
             return result;
-        } catch (final NullPointerException e) {
-            LOG.error(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(),
-                    e);
+        } catch (final Exception e) {
+            // Incase of JSON parsing error, increase the respective stat counter.
+            if (e instanceof JsonParseException) {
+                LOG.error(traceMarker, "Caught JSON parsing exception while parsing the IX response", e);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.JSON_PARSING_ERROR);
+            } else {
+                LOG.error(traceMarker, "Caught Exception while parsing the ix response.", e);
+            }
+            // Set AdStatus as TERM incase of unexpected errors in deserializing the response.
+            adStatus = "TERM";
             return false;
         }
     }
