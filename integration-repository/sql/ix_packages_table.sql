@@ -42,6 +42,33 @@ CREATE TABLE ix_packages
 );
 ALTER TABLE public.ix_packages OWNER TO postgres;
 
+CREATE TABLE ix_package_deals
+(
+  rp_deal_id character varying(100) NOT NULL,
+  package_id integer NOT NULL,
+  modified_on timestamp without time zone,
+  modified_by character varying(100),
+  created_on timestamp without time zone,
+  created_by character varying(100),
+  deal_floor double precision NOT NULL DEFAULT 0.0,
+  CONSTRAINT id_deals_packages_pkey PRIMARY KEY (rp_deal_id),
+  CONSTRAINT id_deals_packages_package_id_fkey FOREIGN KEY (package_id)
+      REFERENCES ix_packages (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE ix_package_deals
+  OWNER TO postgres;
+
+CREATE AGGREGATE makeList (anyelement)
+(
+    sfunc = array_append,
+    stype = anyarray,
+    initcond = '{}'
+);
+
 --
 -- Comment on the above table and its columns
 --
