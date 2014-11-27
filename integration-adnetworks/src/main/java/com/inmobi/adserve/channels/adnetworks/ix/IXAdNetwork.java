@@ -989,6 +989,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 responseContent = "";
                 statusCode = 500;
                 LOG.info(traceMarker, "Error in parsing ix response");
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             }
             adStatus = "AD";

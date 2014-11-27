@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.server;
 
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
-import com.inmobi.adserve.adpool.Geo;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
@@ -12,6 +11,7 @@ import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
 import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.IXPackageRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
@@ -23,10 +23,10 @@ import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
-import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
+import com.inmobi.adserve.channels.server.servlet.ServletChangeLogLevel;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
@@ -209,6 +209,8 @@ public class ChannelServer {
 
             final LifecycleManager manager = injector.getInstance(LifecycleManager.class);
             manager.start();
+
+            ServletChangeLogLevel.init();
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
 

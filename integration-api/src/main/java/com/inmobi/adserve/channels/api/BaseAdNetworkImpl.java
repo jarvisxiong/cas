@@ -242,6 +242,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    if(!serverChannel.isOpen()){
+                        return response;
+                    }
                     latency = System.currentTimeMillis() - startTime;
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
@@ -269,7 +272,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    if(isRequestCompleted()){
+                    
+                    if (t instanceof java.io.IOException) {
+                        InspectorStats.incrementStatCount(InspectorStrings.IO_EXCEPTION);
+                        InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
+                    }
+                    
+                    if(isRequestCompleted() || !serverChannel.isOpen()){
                         return;
                     }
                     latency = System.currentTimeMillis() - startTime;
@@ -313,7 +322,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
                         return;
                     }
-
+                    
                     LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
                     processResponse();

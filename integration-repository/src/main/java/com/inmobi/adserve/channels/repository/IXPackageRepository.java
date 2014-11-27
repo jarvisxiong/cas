@@ -370,10 +370,14 @@ public class IXPackageRepository {
                 boolean active = rs.getBoolean("is_active");
                 if (active) {
                     newIXPackageSet.put(id, entity);
-                    logger.debug("Adding entity with id: " + id + " to IXPackageRepository.");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding entity with id: " + id + " to IXPackageRepository.");
+                    }
                 } else {
                     newIXPackageSet.remove(id);
-                    logger.debug("Removing entity with id: " + id + " from IXPackageRepository.");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Removing entity with id: " + id + " from IXPackageRepository.");
+                    }
                 }
                 ts = rs.getTimestamp("last_modified");
 

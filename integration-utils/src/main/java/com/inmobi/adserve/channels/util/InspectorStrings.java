@@ -34,6 +34,7 @@ public class InspectorStrings {
     public static final String CAS_TIMEOUT_HANDLER_LATENCY = "CasTimeoutHandlerLatency";
     public static final String TIMER_LATENCY = "timerLatency";
     public static final String TIMEOUT_EXCEPTION = "TimeoutException";
+    public static final String IO_EXCEPTION = "IOException";
     public static final String INCOMPATIBLE_SITE_TYPE = "Termninated_IncompatibleSite";
     public static final String PERCENT_ROLL_OUT = "PercentRollout";
     public static final String NO_MATCH_SEGMENT_LATENCY = "NoMatchSegmentLatency";
