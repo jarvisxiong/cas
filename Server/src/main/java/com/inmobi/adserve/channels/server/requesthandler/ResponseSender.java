@@ -383,10 +383,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
         
         InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "sendResponse_"+getDST(), getTimeElapsed());
-        if (sasParams.isKeepAlive()) {
-            serverChannel.writeAndFlush(response);
-        } else {
-            serverChannel.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+       
+        if(serverChannel.isOpen()){
+            if (sasParams.isKeepAlive()) {
+                serverChannel.writeAndFlush(response);
+            } else {
+                serverChannel.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            }
         }
 
         totalTime = System.currentTimeMillis() - initialTime;
