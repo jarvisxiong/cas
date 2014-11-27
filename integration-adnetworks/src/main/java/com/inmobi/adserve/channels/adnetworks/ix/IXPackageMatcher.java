@@ -45,7 +45,7 @@ public class IXPackageMatcher {
 
                 // TODO: 1) Evaluate expression, 2) Honor scheduledTimeOfDay [Not in the scope of MVP]
                 //Add to matchedPackageIds only if csId's match
-                if (!checkForCsidMatch(sasParams.getCsiTags(), packageEntity)){
+                if (packageEntity.getDmpFilterSegmentExpression().size() > 0 && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity)){
                     continue;
                 }
                 matchedPackageIds.add(String.valueOf(packageEntity.getId()));

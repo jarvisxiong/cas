@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.inject.Inject;
 
@@ -24,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -183,6 +186,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String responseImpressionId;
     private String responseAuctionId;
     private String dealId;
+    private Double dealFloor;
+    private Double dataVendorCost;
     private List<String> packageIds;
     private Double adjustbid;
     private String creativeId;
@@ -199,6 +204,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private int impressionObjCount;
     @Getter
     private int responseBidObjCount;
+    public boolean isExternalDeal;
+    private Set<Integer> usedCsIds;
 
 
     private WapSiteUACEntity wapSiteUACEntity;
@@ -905,6 +912,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
                             .getSeat());
         }
+        if (isExternalDeal) {
+            url=url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id="+dealId);
+        }
+        else {
+            url=url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "");
+        }
+        //url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, dealId);
         if (null == bidRequest) {
             LOG.info(traceMarker, "bidrequest is null");
             return url;
@@ -1148,7 +1162,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         try {
             responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
+                    Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
@@ -1231,13 +1245,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
+            isExternalDeal = false;
             if (dealId != null) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
-                ResultSet<IXPackageEntity> resultSet =
-                        repositoryHelper.queryByDeal(Integer.parseInt(dealId));
-                for (IXPackageEntity packageEntity : resultSet) {
-                    System.out.println("awesome");
-                }
+                setFloorVendorUsedCsids();
             }
             final boolean result = updateDSPAccountInfo(seatBid.getBuyer());
             if (!result) {
@@ -1251,6 +1262,36 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
+    private void setFloorVendorUsedCsids() {
+        int i;
+        ResultSet<IXPackageEntity> resultSet =
+                repositoryHelper.queryByDeal(dealId);
+        for (IXPackageEntity packageEntity : resultSet) {
+            List <String> dealsInPackage = packageEntity.getDealIds();
+            for (i = 0; i < dealsInPackage.size(); i++) {
+                if (StringUtils.equals(dealId, dealsInPackage.get(i))) {
+                    break;
+                }
+            }
+            dealFloor = packageEntity.getDealFloors().size() > i ? packageEntity.getDealFloors().get(i) : 0;
+//            dealFloor = packageEntity.getDealFloors().get(0);
+            dataVendorCost = packageEntity.getDataVendorCost();
+            if (dataVendorCost > 0.0) {
+                isExternalDeal = true;
+            }
+            usedCsIds = new HashSet<Integer>();
+
+            Set<Set<Integer>> csIdInPackages = packageEntity.getDmpFilterSegmentExpression();
+            for(Set<Integer> smallSet: csIdInPackages) {
+                for (Integer csIdInSet : smallSet) {
+                    if(sasParams.getCsiTags().contains(csIdInSet)) {
+                        usedCsIds.add(csIdInSet);
+                    }
+                }
+            }
+        }
+        return;
+    }
 
     @Override
     public double returnAdjustBid() {
@@ -1261,6 +1302,22 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String returnDealId() {
         return dealId;
+    }
+
+    public boolean returnisExternalDeal() {
+        return isExternalDeal;
+    }
+
+    public double returndealFloor() {
+        return dealFloor;
+    }
+
+    public double returnDataVendorCost() {
+        return dataVendorCost;
+    }
+
+    public Set<Integer> returnUsedCsids() {
+        return usedCsIds;
     }
 
 

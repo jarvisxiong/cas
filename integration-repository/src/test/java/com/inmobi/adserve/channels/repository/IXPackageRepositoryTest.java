@@ -17,6 +17,7 @@ import com.inmobi.segment.impl.SlotId;
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
+import static org.easymock.EasyMock.createNiceMock;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,8 +26,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.powermock.api.easymock.PowerMock.createMock;
 
@@ -60,6 +63,11 @@ public class IXPackageRepositoryTest {
         String[] siteIds = {};
         EasyMock.expect(rs.getArray("site_ids")).andReturn(sitesArray).anyTimes();
         EasyMock.expect(sitesArray.getArray()).andReturn(siteIds).anyTimes();
+
+        Array dealsArray = EasyMock.createNiceMock(Array.class);
+        String[] dealIds = {"1","2"};
+        EasyMock.expect(rs.getArray("deal_ids")).andReturn(dealsArray).anyTimes();
+        EasyMock.expect(dealsArray.getArray()).andReturn(dealIds).anyTimes();
 
         Array countriesArray = EasyMock.createNiceMock(Array.class);
         Integer[] countries = new Integer[] {94, 46};
@@ -111,6 +119,11 @@ public class IXPackageRepositoryTest {
         EasyMock.expect(rs.getArray("cs_ids")).andReturn(csIdsArray).anyTimes();
         EasyMock.expect(csIdsArray.getArray()).andReturn(csIds).anyTimes();
 
+        Array dealFloorsArray = EasyMock.createNiceMock(Array.class);
+        Double[] dealFloors = {};
+        EasyMock.expect(rs.getArray("deal_floors")).andReturn(dealFloorsArray).anyTimes();
+        EasyMock.expect(dealFloorsArray.getArray()).andReturn(dealFloors).anyTimes();
+
         Array todArray = EasyMock.createNiceMock(Array.class);
         Integer[] tods = {};
         EasyMock.expect(rs.getArray("scheduled_tods")).andReturn(todArray).anyTimes();
@@ -136,6 +149,7 @@ public class IXPackageRepositoryTest {
 
         EasyMock.replay(osArray);
         EasyMock.replay(sitesArray);
+        EasyMock.replay(dealsArray);
         EasyMock.replay(countriesArray);
         EasyMock.replay(slotsArray);
         EasyMock.replay(inventoryTypeArray);

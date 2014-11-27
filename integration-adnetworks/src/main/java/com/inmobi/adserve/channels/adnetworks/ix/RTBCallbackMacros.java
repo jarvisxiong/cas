@@ -14,6 +14,7 @@ public class RTBCallbackMacros {
     // InMobi specific macros
     public static final String AUCTION_PRICE_ENCRYPTED = "${WIN_BID}";
     public static final String AUCTION_WIN_URL = "${BILLABLE_BEACON}";
+    public static final String DEAL_ID = "${DEAL_GET_PARAM}";
 
     public static final String AUCTION_ID_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_ID);
     public static final String AUCTION_BID_ID_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_BID_ID);
@@ -22,6 +23,7 @@ public class RTBCallbackMacros {
     public static final String AUCTION_AD_ID_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_AD_ID);
     public static final String AUCTION_PRICE_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_PRICE);
     public static final String AUCTION_CURRENCY_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_CURRENCY);
+    public static final String DEAL_ID_INSENSITIVE = "(?i)" + Pattern.quote(DEAL_ID);
     // InMobi specific macros
     public static final String AUCTION_PRICE_ENCRYPTED_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_PRICE_ENCRYPTED);
     public static final String AUCTION_WIN_URL_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_WIN_URL);

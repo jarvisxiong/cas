@@ -78,6 +78,7 @@ public class SASRequestParameters {
 
     private EncryptionKeys encryptionKey;
     private boolean isKeepAlive;
+    private Set<Integer> csiTags;
 
     // UAC enrichment data
     private WapSiteUACEntity wapSiteUACEntity;

@@ -289,4 +289,10 @@ public class RepositoryHelper {
 
         return ixPackageRepository.getPackageIndex().retrieve(query);
     }
+
+    public ResultSet<IXPackageEntity> queryByDeal(final String dealId) {
+        //Prepare query for CQEngine repository
+        Query query = in(IXPackageRepository.DEAL_IDS, dealId, "");
+        return ixPackageRepository.getPackageIndex().retrieve(query);
+    }
 }

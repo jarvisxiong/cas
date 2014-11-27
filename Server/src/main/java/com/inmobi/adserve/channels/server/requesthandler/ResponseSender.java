@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import com.aerospike.client.Log;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
@@ -24,6 +25,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.adooolResponse.Csids;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -43,6 +45,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
 
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -273,6 +276,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         final AdPoolResponse adPoolResponse = new AdPoolResponse();
         final AdInfo rtbdAd = new AdInfo();
         final AdIdChain adIdChain = new AdIdChain();
+        final Csids csids = new Csids();
 
         final ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
         final ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
@@ -301,6 +305,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     if (null != dealId) {
                         // If dealId is present, then auction type is set to PREFERRED_DEAL
                         // and dealId is set
+                        if (ixAdNetwork.isExternalDeal) {
+                            csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
+                            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                            try {
+                                adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
+                            } catch (TException exc) {
+                                LOG.info("Could not send csId to UMP, thrift exception {}", exc);
+                            }
+                        }
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
                         if (PRIVATE_AUCTION == pmpTier) {

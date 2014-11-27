@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -67,6 +68,14 @@ public class IXPackageRepository {
     public static final Integer ALL_COUNTRY_ID = -1;
     public static final Integer ALL_OS_ID = -1;
     public static final Integer ALL_SLOT_ID = -1;
+
+    public static final Attribute<IXPackageEntity, String> DEAL_IDS = new MultiValueAttribute<IXPackageEntity, String>(
+            "deal_ids") {
+        public List<String> getValues(IXPackageEntity entity) {
+            List<String> dealIds = entity.getDealIds();
+            return dealIds;
+        }
+    };
 
     public static final Attribute<IXPackageEntity, String> SITE_ID = new MultiValueAttribute<IXPackageEntity, String>(
             "site_id") {
@@ -152,6 +161,7 @@ public class IXPackageRepository {
         packageIndex.addIndex(HashIndex.onAttribute(COUNTRY_ID));
         packageIndex.addIndex(HashIndex.onAttribute(OS_ID));
         packageIndex.addIndex(HashIndex.onAttribute(SLOT_ID));
+        packageIndex.addIndex(HashIndex.onAttribute(DEAL_IDS));
 
         metricsRegistry.register(MetricRegistry.name(this.getClass(), "size"), new Gauge<Integer>() {
             @Override
@@ -187,7 +197,17 @@ public class IXPackageRepository {
                 String[] siteCategories = (String[]) rs.getArray("site_categories").getArray();
                 String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
                 int dataVendorId = rs.getInt("data_vendor_id");
+                Double dataVendorCost = rs.getDouble("data_vendor_cost");
                 int dmpId = rs.getInt("dmp_id");
+                String[] dealIds = null;
+                if (null != rs.getArray("deal_ids")) {
+                    dealIds = (String[]) rs.getArray("deal_ids").getArray();
+                }
+    //            final Integer pubBlindArr[] = (Integer[]) row.getArray("pub_blind_list");
+                Double[] dealFloors = null;
+                if (null != rs.getArray("deal_floors")) {
+                    dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
+                }
 
                 Set<Set<Integer>> dmpFilterSegmentExpression;
                 try {
@@ -337,6 +357,13 @@ public class IXPackageRepository {
                 entityBuilder.setDmpVendorId(dataVendorId);
                 entityBuilder.setDmpFilterSegmentExpression(dmpFilterSegmentExpression);
                 entityBuilder.setScheduledTimeOfDays(scheduleTimeOfDays);
+                if (null != dealIds) {
+                    entityBuilder.setDealIds(Arrays.asList(dealIds));
+                }
+                if (null != dealFloors) {
+                    entityBuilder.setDealFloors(Arrays.asList(dealFloors));
+                }
+                entityBuilder.setDataVendorCost(dataVendorCost);
 
                 IXPackageEntity entity = entityBuilder.build();
 
@@ -396,7 +423,7 @@ public class IXPackageRepository {
 
     private Set<Set<Integer>> extractDmpFilterExpression(String dmpFilterExpressionJson) throws JSONException {
         Set<Set<Integer>> dmpFilterSegmentExpression = new HashSet<>();
-        if (!(StringUtils.isEmpty(dmpFilterExpressionJson))) {
+        if (null != dmpFilterExpressionJson && !(StringUtils.isEmpty(dmpFilterExpressionJson))) {
             JSONArray dmpSegmentsJsonArray = new JSONArray(dmpFilterExpressionJson);
             for (int andSetIdx = 0; andSetIdx < dmpSegmentsJsonArray.length(); andSetIdx++) {
                 JSONArray andJsonArr = (JSONArray) dmpSegmentsJsonArray.get(andSetIdx);
