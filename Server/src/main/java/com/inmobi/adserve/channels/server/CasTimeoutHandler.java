@@ -119,19 +119,16 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 
         @Override
         public void run() {
-            if (!ctx.channel().isOpen()) {
-                return;
-            }
-
             final long currentTime = System.currentTimeMillis();
 
-            // if rtbd we are going with timeout of 170ms
+            // if rtbd & ix, then we are going with timeout of 170ms
             // else if dcp we are going with timeout of 600 ms
             final long latency = currentTime - lastReadTime;
 
             InspectorStats.updateYammerTimerStats(demandSourceType.name(),
                     InspectorStrings.CAS_TIMEOUT_HANDLER_LATENCY, latency);
-            if (latency >= timeoutInMillis) {
+            
+            if (ctx.channel().isOpen() && latency >= timeoutInMillis) {
                 readTimedOut(ctx);
             }
         }
