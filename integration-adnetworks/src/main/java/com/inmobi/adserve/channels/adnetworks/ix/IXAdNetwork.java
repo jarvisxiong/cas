@@ -1148,7 +1148,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         try {
             responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
+                    Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
