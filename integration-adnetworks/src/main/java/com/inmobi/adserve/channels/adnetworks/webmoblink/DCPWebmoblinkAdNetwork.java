@@ -144,7 +144,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
 
         }
 
-        LOG.info("webmoblink url is {}", url);
+        LOG.debug("webmoblink url is {}", url);
 
         return new URI(url.toString());
     }
