@@ -918,7 +918,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         else {
             url=url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "");
         }
-        //url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, dealId);
+
         if (null == bidRequest) {
             LOG.info(traceMarker, "bidrequest is null");
             return url;
