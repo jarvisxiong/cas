@@ -12,6 +12,7 @@ import com.googlecode.cqengine.CQEngine;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.MultiValueAttribute;
+import com.googlecode.cqengine.attribute.MultiValueNullableAttribute;
 import com.googlecode.cqengine.index.hash.HashIndex;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.data.repository.DBReaderDelegate;
@@ -69,9 +70,9 @@ public class IXPackageRepository {
     public static final Integer ALL_OS_ID = -1;
     public static final Integer ALL_SLOT_ID = -1;
 
-    public static final Attribute<IXPackageEntity, String> DEAL_IDS = new MultiValueAttribute<IXPackageEntity, String>(
-            "deal_ids") {
-        public List<String> getValues(IXPackageEntity entity) {
+    public static final Attribute<IXPackageEntity, String> DEAL_IDS = new MultiValueNullableAttribute<IXPackageEntity, String>("deal_ids", false) {
+        @Override
+        public List<String> getNullableValues(IXPackageEntity entity) {
             List<String> dealIds = entity.getDealIds();
             return dealIds;
         }
