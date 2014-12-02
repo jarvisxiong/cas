@@ -17,7 +17,6 @@ public final class ChannelServerStringLiterals {
     public static final String CREATIVE_REPOSITORY = "CreativeRepository";
     public static final String NATIVE_AD_TEMPLATE_REPOSITORY = "NativeAdTemplateRepository";
     public static final String GEO_ZIP_REPOSITORY = "GeoZipRepository";
-    public static final String DEALS_PACKAGES_MAPPING_REPOSITORY = "dealsPackagesMappingRepository";
     public static final String AEROSPIKE_FEEDBACK = "aerospike";
     public static final String DATABASE = "database";
     public static final String QUERY = "query";

@@ -55,9 +55,6 @@ CREATE TABLE ix_package_deals
   CONSTRAINT id_deals_packages_package_id_fkey FOREIGN KEY (package_id)
       REFERENCES ix_packages (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
 );
 ALTER TABLE ix_package_deals
   OWNER TO postgres;
@@ -69,6 +66,9 @@ CREATE AGGREGATE makeList (anyelement)
     initcond = '{}'
 );
 
+COMMENT ON TABLE ix_package_deals IS 'Stores the deal definition for deals on IX.';
+COMMENT ON COLUMN ix_package_deals.rp_deal_id IS 'Unique Deal Id';
+COMMENT ON COLUMN ix_package_deals.package_id IS 'Package id corresponding to the deal';
 --
 -- Comment on the above table and its columns
 --

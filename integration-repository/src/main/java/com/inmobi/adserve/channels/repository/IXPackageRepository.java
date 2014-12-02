@@ -203,7 +203,6 @@ public class IXPackageRepository {
                 if (null != rs.getArray("deal_ids")) {
                     dealIds = (String[]) rs.getArray("deal_ids").getArray();
                 }
-    //            final Integer pubBlindArr[] = (Integer[]) row.getArray("pub_blind_list");
                 Double[] dealFloors = null;
                 if (null != rs.getArray("deal_floors")) {
                     dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
@@ -427,7 +426,7 @@ public class IXPackageRepository {
 
     private Set<Set<Integer>> extractDmpFilterExpression(String dmpFilterExpressionJson) throws JSONException {
         Set<Set<Integer>> dmpFilterSegmentExpression = new HashSet<>();
-        if (null != dmpFilterExpressionJson && !(StringUtils.isEmpty(dmpFilterExpressionJson))) {
+        if (!(StringUtils.isEmpty(dmpFilterExpressionJson))) {
             JSONArray dmpSegmentsJsonArray = new JSONArray(dmpFilterExpressionJson);
             for (int andSetIdx = 0; andSetIdx < dmpSegmentsJsonArray.length(); andSetIdx++) {
                 JSONArray andJsonArr = (JSONArray) dmpSegmentsJsonArray.get(andSetIdx);

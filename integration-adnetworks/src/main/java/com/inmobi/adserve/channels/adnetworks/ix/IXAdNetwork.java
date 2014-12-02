@@ -1275,7 +1275,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 }
             }
             dealFloor = packageEntity.getDealFloors().size() > i ? packageEntity.getDealFloors().get(i) : 0;
-//            dealFloor = packageEntity.getDealFloors().get(0);
             dataVendorCost = packageEntity.getDataVendorCost();
             if (dataVendorCost > 0.0) {
                 isExternalDeal = true;
