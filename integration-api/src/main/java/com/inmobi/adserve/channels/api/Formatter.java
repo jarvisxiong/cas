@@ -117,6 +117,7 @@ public class Formatter {
                 break;
             case IX_HTML:
                 velocityTemplateIx.merge(context, writer);
+                break;
             case RTB_BANNER_VIDEO:
                 velocityTemplateRtbBannerVideo.merge(context, writer);
                 break;
