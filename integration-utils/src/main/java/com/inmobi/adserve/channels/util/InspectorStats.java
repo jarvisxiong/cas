@@ -136,7 +136,7 @@ public class InspectorStats {
         if (yammerTimerStats.get(dst).get(parameter) == null) {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst).get(parameter) == null) {
-                    yammerTimerStats.get(dst).put(parameter, Metrics.newHistogram(InspectorStats.class, fullKey));
+                    yammerTimerStats.get(dst).put(parameter, Metrics.newHistogram(InspectorStats.class, fullKey, true));
                 }
             }
         }
