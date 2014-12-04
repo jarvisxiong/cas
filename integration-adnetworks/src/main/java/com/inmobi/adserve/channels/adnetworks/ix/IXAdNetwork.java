@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import com.googlecode.cqengine.resultset.ResultSet;
+import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -1271,32 +1272,40 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void setFloorVendorUsedCsids() {
+        IXPackageEntity matchedPackageEntity;
         int i;
-        ResultSet<IXPackageEntity> resultSet =
-                repositoryHelper.queryByDeal(dealId);
-        for (IXPackageEntity packageEntity : resultSet) {
-            List <String> dealsInPackage = packageEntity.getDealIds();
-            for (i = 0; i < dealsInPackage.size(); i++) {
-                if (StringUtils.equals(dealId, dealsInPackage.get(i))) {
-                    break;
-                }
-            }
-            dealFloor = packageEntity.getDealFloors().size() > i ? packageEntity.getDealFloors().get(i) : 0;
-            dataVendorCost = packageEntity.getDataVendorCost();
-            if (dataVendorCost > 0.0) {
-                isExternalDeal = true;
-            }
-            usedCsIds = new HashSet<Integer>();
+        try {
+            matchedPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
+        } catch (NoSuchObjectException exception) {
+            LOG.error("Rubicon DealId not stored in ix_package_deals table, {}", dealId);
+            return;
+        } catch (NonUniqueObjectException exception) {
+            LOG.error("Rubicon DealId not unique in ix_package_deals table, {}", dealId);
+            return;
+        }
 
-            Set<Set<Integer>> csIdInPackages = packageEntity.getDmpFilterSegmentExpression();
-            for(Set<Integer> smallSet: csIdInPackages) {
-                for (Integer csIdInSet : smallSet) {
-                    if(sasParams.getCsiTags().contains(csIdInSet)) {
-                        usedCsIds.add(csIdInSet);
-                    }
+        List<String> dealsInPackage = matchedPackageEntity.getDealIds();
+        for (i = 0; i < dealsInPackage.size(); i++) {
+            if (StringUtils.equals(dealId, dealsInPackage.get(i))) {
+                break;
+            }
+        }
+        dealFloor = matchedPackageEntity.getDealFloors().size() > i ? matchedPackageEntity.getDealFloors().get(i) : 0;
+        dataVendorCost = matchedPackageEntity.getDataVendorCost();
+        if (dataVendorCost > 0.0) {
+            isExternalDeal = true;
+        }
+        usedCsIds = new HashSet<Integer>();
+
+        Set<Set<Integer>> csIdInPackages = matchedPackageEntity.getDmpFilterSegmentExpression();
+        for (Set<Integer> smallSet : csIdInPackages) {
+            for (Integer csIdInSet : smallSet) {
+                if (sasParams.getCsiTags().contains(csIdInSet)) {
+                    usedCsIds.add(csIdInSet);
                 }
             }
         }
+
         return;
     }
 

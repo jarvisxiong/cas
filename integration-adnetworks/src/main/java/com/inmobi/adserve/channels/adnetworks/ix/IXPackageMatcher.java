@@ -43,7 +43,7 @@ public class IXPackageMatcher {
         for (IXPackageEntity packageEntity : resultSet) {
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
 
-                // TODO: 1) Evaluate expression, 2) Honor scheduledTimeOfDay [Not in the scope of MVP]
+                // TODO: 1) Honor scheduledTimeOfDay [Not in the scope of MVP]
                 //Add to matchedPackageIds only if csId's match
                 if (packageEntity.getDmpFilterSegmentExpression().size() > 0 && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity)){
                     continue;

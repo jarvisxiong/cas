@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.aerospike.client.Log;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
@@ -25,7 +24,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.adooolResponse.Csids;
+import com.inmobi.casthrift.rrCasSpecificInfo.Csids;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -45,7 +44,6 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
 
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
-import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -311,7 +309,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                             try {
                                 adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
                             } catch (TException exc) {
-                                LOG.info("Could not send csId to UMP, thrift exception {}", exc);
+                                LOG.error("Could not send csId to UMP, thrift exception {}", exc);
                             }
                         }
                         rtbdAd.setDealId(dealId);
