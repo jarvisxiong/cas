@@ -65,30 +65,40 @@ public class IXAdNetworkTest2 {
     @Test
     public void testParseResponseNoAd() {
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        expect(mockStatus.code()).andReturn(404).times(4).andReturn(200).times(4);
+        expect(mockStatus.code()).andReturn(404).times(4).andReturn(200).times(6);
         replay(mockStatus);
 
         final String response1 = "";
         final String response2 = "Dummy";
         final String response3 = null;
+        final String response4 = "{\"id\":\"ce3adf2d-0149-1000-e483-3e96d9a8a2c1\",\"bidid\":\"1bc93e72-3c81-4bad-ba35-9458b54e109a\",\"seatbid\":[{\"bid\":[]}],\"statuscode\":10}";
         final IXAdNetwork ixAdNetwork =
                 new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, null, false);
 
         ixAdNetwork.parseResponse(response1, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(404)));
+        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
 
         ixAdNetwork.parseResponse(response2, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(404)));
+        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
 
         ixAdNetwork.parseResponse(response1, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
+        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
 
         ixAdNetwork.parseResponse(response3, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
+        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
+
+        ixAdNetwork.parseResponse(response4, mockStatus);
+        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
+        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
+        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
     }
 
     @Test
@@ -97,17 +107,16 @@ public class IXAdNetworkTest2 {
         expect(mockStatus.code()).andReturn(200).times(2);
         replay(mockStatus);
 
-        final String response = "Dummy";
+        final String response = "{INVALID_JSON}";
         final IXAdNetwork ixAdNetwork =
-                createMockBuilder(IXAdNetwork.class).addMockedMethod("deserializeResponse").createMock();
-
-        expect(ixAdNetwork.deserializeResponse(response)).andReturn(false).times(1);
+                createMockBuilder(IXAdNetwork.class).addMockedMethod("getName").createMock();
+        expect(ixAdNetwork.getName()).andReturn("ix").times(1);
         replay(ixAdNetwork);
 
         ixAdNetwork.parseResponse(response, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
-        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
+        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("TERM")));
     }
 
     @Test
@@ -133,7 +142,7 @@ public class IXAdNetworkTest2 {
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final IXAdNetwork ixAdNetwork =
                 createMockBuilder(IXAdNetwork.class)
-                        .addMockedMethod("getADMContent")
+                        .addMockedMethod("getAdMarkUp")
                         .addMockedMethod("isNativeRequest")
                         .addMockedMethod("configureParameters", null)
                         .addMockedMethod("updateDSPAccountInfo")

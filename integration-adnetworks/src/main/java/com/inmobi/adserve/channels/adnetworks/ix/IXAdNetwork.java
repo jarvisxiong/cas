@@ -1,41 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -57,9 +24,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.ix.API_FRAMEWORKS;
@@ -67,6 +34,7 @@ import com.inmobi.casthrift.ix.AdQuality;
 import com.inmobi.casthrift.ix.App;
 import com.inmobi.casthrift.ix.Banner;
 import com.inmobi.casthrift.ix.Bid;
+import com.inmobi.casthrift.ix.Blind;
 import com.inmobi.casthrift.ix.CommonExtension;
 import com.inmobi.casthrift.ix.Device;
 import com.inmobi.casthrift.ix.ExtRubiconTarget;
@@ -82,10 +50,39 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
-import com.inmobi.casthrift.ix.Blind;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -132,6 +129,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(), IX_MRAID_VALUE);
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
+    private static final short AGE_LIMIT_FOR_COPPA = 8;
 
     private boolean isResponseHTML = false;
 
@@ -404,7 +402,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Regs createRegsObject() {
         final Regs regs = new Regs();
         if (isWapSiteUACEntity) {
-            if (wapSiteUACEntity.isCoppaEnabled()) {
+            if (wapSiteUACEntity.isCoppaEnabled()
+                    || (sasParams.getAge() != null && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA)) {
                 regs.setCoppa(1);
                 isCoppaSet = true;
             } else {
@@ -969,11 +968,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             statusCode = status.code();
             final boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
-                adStatus = "NO_AD";
+                // Incase of unexpected error in deserializeResponse(), the adStatus is set to TERM.
+                // Otherwise, it is already set as NO_AD.
                 responseContent = "";
                 statusCode = 500;
-                LOG.info(traceMarker, "Error in parsing ix response");
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                LOG.info(traceMarker, "Could not get an Ad by parsing ix response. Ad status: {}", adStatus);
                 return;
             }
             adStatus = "AD";
@@ -1147,7 +1146,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         try {
             responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
+                    Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
@@ -1238,9 +1237,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_DSP_ID);
             }
             return result;
-        } catch (final NullPointerException e) {
-            LOG.error(traceMarker, "Could not parse the ix response from partner: {}, exception raised {}", getName(),
-                    e);
+        } catch (final Exception e) {
+            // Incase of JSON parsing error, increase the respective stat counter.
+            if (e instanceof JsonParseException) {
+                LOG.error(traceMarker, "Caught JSON parsing exception while parsing the IX response", e);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.JSON_PARSING_ERROR);
+            } else {
+                LOG.error(traceMarker, "Caught Exception while parsing the ix response.", e);
+            }
+            // Set AdStatus as TERM incase of unexpected errors in deserializing the response.
+            adStatus = "TERM";
             return false;
         }
     }
