@@ -870,14 +870,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting Extension for ifa
-        // if Coppa is not set, only then set IFA and GPID
-        if (!isCoppaSet && !StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
+        // if Coppa is not set, only then set IFA
+        if (!isCoppaSet) && !StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
             device.setIfa(casInternalRequestParameters.getUidIFA());
-        } else {
-            String gpid = getGPID();
-            if (!isCoppaSet && StringUtils.isNotEmpty(gpid)) {
-                device.setIfa(gpid);
-            }
         }
 
         final CommonExtension ext = new CommonExtension();
