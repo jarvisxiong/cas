@@ -24,7 +24,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.rrCasSpecificInfo.Csids;
+import com.inmobi.casthrift.umprr.Csids;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -63,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.Getter;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 import static com.inmobi.casthrift.DemandSourceType.IX;
 import static com.inmobi.casthrift.DemandSourceType.RTBD;
@@ -303,7 +302,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     if (null != dealId) {
                         // If dealId is present, then auction type is set to PREFERRED_DEAL
                         // and dealId is set
-                        if (ixAdNetwork.isExternalDeal) {
+                        if (ixAdNetwork.isExternalPersonaDeal()) {
                             csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
                             TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
                             try {

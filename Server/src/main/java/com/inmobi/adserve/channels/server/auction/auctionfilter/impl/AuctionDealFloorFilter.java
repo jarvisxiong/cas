@@ -28,7 +28,7 @@ public class AuctionDealFloorFilter extends AbstractAuctionFilter {
                                      final CasInternalRequestParameters casInternalRequestParameters) {
         if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
             final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
-            if (ixAdNetwork.returnisExternalDeal()) {
+            if (ixAdNetwork.isExternalPersonaDeal()) {
                 if ((ixAdNetwork.getBidPriceInUsd()
                         < casInternalRequestParameters.getSiteFloor() + ixAdNetwork.returnDataVendorCost())
                         || (ixAdNetwork.getBidPriceInUsd() < ixAdNetwork.returndealFloor())) {

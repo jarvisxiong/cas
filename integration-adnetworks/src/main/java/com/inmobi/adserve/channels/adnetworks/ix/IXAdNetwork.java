@@ -205,7 +205,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private int impressionObjCount;
     @Getter
     private int responseBidObjCount;
-    public boolean isExternalDeal;
+    @Getter
+    private boolean isExternalPersonaDeal;
     private Set<Integer> usedCsIds;
 
 
@@ -913,7 +914,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
                             .getSeat());
         }
-        if (isExternalDeal) {
+        if (isExternalPersonaDeal) {
             url=url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id="+dealId);
         }
         else {
@@ -1247,7 +1248,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             aqid = bid.getAqid();
             adjustbid = bid.getAdjustbid();
             dealId = bid.getDealid();
-            isExternalDeal = false;
+            isExternalPersonaDeal = false;
             if (dealId != null) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
                 setFloorVendorUsedCsids();
@@ -1273,7 +1274,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private void setFloorVendorUsedCsids() {
         IXPackageEntity matchedPackageEntity;
-        int i;
+
         try {
             matchedPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
         } catch (NoSuchObjectException exception) {
@@ -1284,16 +1285,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         }
 
-        List<String> dealsInPackage = matchedPackageEntity.getDealIds();
-        for (i = 0; i < dealsInPackage.size(); i++) {
-            if (StringUtils.equals(dealId, dealsInPackage.get(i))) {
-                break;
-            }
-        }
-        dealFloor = matchedPackageEntity.getDealFloors().size() > i ? matchedPackageEntity.getDealFloors().get(i) : 0;
+        int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
+        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(indexOfDealId) : 0;
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
-            isExternalDeal = true;
+            isExternalPersonaDeal = true;
         }
         usedCsIds = new HashSet<Integer>();
 
@@ -1318,10 +1314,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String returnDealId() {
         return dealId;
-    }
-
-    public boolean returnisExternalDeal() {
-        return isExternalDeal;
     }
 
     public double returndealFloor() {
