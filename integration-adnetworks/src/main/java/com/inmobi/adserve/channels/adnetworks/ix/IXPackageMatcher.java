@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class IXPackageMatcher {
 
@@ -42,7 +43,11 @@ public class IXPackageMatcher {
         for (IXPackageEntity packageEntity : resultSet) {
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
 
-                // TODO: 1) Evaluate expression, 2) Honor scheduledTimeOfDay [Not in the scope of MVP]
+                // TODO: 1) Honor scheduledTimeOfDay [Not in the scope of MVP]
+                //Add to matchedPackageIds only if csId's match
+                if (packageEntity.getDmpFilterSegmentExpression().size() > 0 && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity)){
+                    continue;
+                }
                 matchedPackageIds.add(String.valueOf(packageEntity.getId()));
                 // Break the loop if we reach the threshold.
                 if (++matchedPackagesCount == PACKAGE_MAX_LIMIT) {
@@ -52,6 +57,15 @@ public class IXPackageMatcher {
             }
         }
         return matchedPackageIds;
+    }
+
+    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final IXPackageEntity packageEntity) {
+        for(Set<Integer> smallSet: packageEntity.getDmpFilterSegmentExpression()) {
+            if(Collections.disjoint(smallSet,csiReqTags)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static Segment createRequestSegment(final SASRequestParameters sasParams, final Short selectedSlotId) {

@@ -35,4 +35,5 @@ public class CasInternalRequestParameters {
     private String zipCode;
     private String latLong;
     private String appUrl;
+    private double siteFloor;
 }

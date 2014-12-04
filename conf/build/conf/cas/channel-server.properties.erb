@@ -237,7 +237,7 @@ Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = IXPackageRepository
 Cache.IXPackageRepository.Manager = com.inmobi.adserve.channels.repository.IXPackageRepository
-Cache.IXPackageRepository.query = select * from ix_packages where is_active=true and (start_date is null or start_date <= now()+interval '1 minute') and (end_date is null or end_date >= now())
+Cache.IXPackageRepository.query = select * from ix_packages LEFT JOIN (select makeList(rp_deal_id) AS deal_ids\,makeList(deal_floor) AS deal_floors\,package_id from ix_package_deals group by package_id) AS deals ON deals.package_id = ix_packages.id where is_active=true and (start_date is null or start_date <= now()+interval '1 minute') and (end_date is null or end_date >= now())
 Cache.IXPackageRepository.initialDelay = 1
 Cache.IXPackageRepository.refreshTime = 1200
 Cache.IXPackageRepository.dataSourceName = jdbc
