@@ -1290,14 +1290,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;
-        }
-        usedCsIds = new HashSet<Integer>();
 
-        Set<Set<Integer>> csIdInPackages = matchedPackageEntity.getDmpFilterSegmentExpression();
-        for (Set<Integer> smallSet : csIdInPackages) {
-            for (Integer csIdInSet : smallSet) {
-                if (sasParams.getCsiTags().contains(csIdInSet)) {
-                    usedCsIds.add(csIdInSet);
+            usedCsIds = new HashSet<Integer>();
+
+            Set<Set<Integer>> csIdInPackages = matchedPackageEntity.getDmpFilterSegmentExpression();
+            for (Set<Integer> smallSet : csIdInPackages) {
+                for (Integer csIdInSet : smallSet) {
+                    if (sasParams.getCsiTags().contains(csIdInSet)) {
+                        usedCsIds.add(csIdInSet);
+                    }
                 }
             }
         }

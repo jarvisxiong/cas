@@ -70,6 +70,7 @@ public class CreateThriftResponseIXTest {
         expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.5).anyTimes();
         expect(mockIXAdNetwork.returnPmpTier()).andReturn(3).anyTimes();
         expect(mockIXAdNetwork.getSelectedSlotId()).andReturn((short) 0).anyTimes();
+        expect(mockIXAdNetwork.isExternalPersonaDeal()).andReturn(false).anyTimes();
 
         // Create responseSender (the class to be tested)
         // The object of the class to be tested is partially mocked
