@@ -915,14 +915,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Setting Extension for ifa
         // if Coppa is not set, only then set IFA
+        String id;
         if (!isCoppaSet) {
-            if (!StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
+            if (!StringUtils.isEmpty(id = casInternalRequestParameters.getUidIFA())) {
                 //Set to UIDIFA for IOS Device
-                device.setIfa(casInternalRequestParameters.getUidIFA());
+                device.setIfa(id);
             }
-            else if (!StringUtils.isEmpty(getGPID())) {
+            else if (!StringUtils.isEmpty(id = getGPID())) {
                 //Set to GPID for Android Device
-                device.setIfa(getGPID());
+                device.setIfa(id);
             }
         }
 
