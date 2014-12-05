@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
+import com.inmobi.adserve.adpool.UserProfile;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
@@ -164,6 +165,9 @@ public class ThriftRequestParser {
             if (yob > currentYear - 100 && yob < currentYear) {
                 final int age = currentYear - yob;
                 params.setAge((short) age);
+            }
+            if (tObject.user.isSetUserProfile()) {
+                params.setCsiTags(tObject.user.userProfile.csiTags);
             }
 
             if (tObject.user.gender != null) {

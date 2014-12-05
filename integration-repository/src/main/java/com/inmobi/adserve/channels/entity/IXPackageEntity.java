@@ -4,6 +4,7 @@ import com.inmobi.segment.Segment;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,6 +17,9 @@ public class IXPackageEntity {
     private int dmpVendorId;
     private Set<Set<Integer>> dmpFilterSegmentExpression;
     private Integer[][] scheduledTimeOfDays;
+    private List<String> dealIds;
+    private List<Double> dealFloors;
+    private Double dataVendorCost;
 
     public IXPackageEntity(final Builder builder) {
         id = builder.id;
@@ -24,6 +28,9 @@ public class IXPackageEntity {
         dmpVendorId = builder.dmpVendorId;
         dmpFilterSegmentExpression = builder.dmpFilterSegmentExpression;
         scheduledTimeOfDays = builder.scheduledTimeOfDays;
+        dealIds = builder.dealIds;
+        dealFloors = builder.dealFloors;
+        dataVendorCost = builder.dataVendorCost;
     }
 
     public static Builder newBuilder() {
@@ -38,6 +45,9 @@ public class IXPackageEntity {
         private int dmpVendorId;
         private Set<Set<Integer>> dmpFilterSegmentExpression;
         private Integer[][] scheduledTimeOfDays;
+        private List<String> dealIds;
+        private List<Double> dealFloors;
+        private Double dataVendorCost;
 
         public IXPackageEntity build() {
             return new IXPackageEntity(this);

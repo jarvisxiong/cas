@@ -66,6 +66,7 @@ public class InspectorStrings {
     public static final String MISSING_CATEGORY = "MissingCategory";
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
+    public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
     public static final String DROPPED_IN_RTB_AUCTION_ID_MIS_MATCH_FILTER = "DroppedInRtbAuctionIdMisMatchFilter";
     public static final String DROPPED_IN_RTB_SEATID_MIS_MATCH_FILTER = "DroppedInRtbSeatidMisMatchFilter";
     public static final String DROPPED_IN_RTB_IMPRESSION_ID_MIS_MATCH_FILTER = "DroppedInRtbImpressionIdMisMatchFilter";

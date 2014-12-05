@@ -34,6 +34,7 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 import static com.googlecode.cqengine.query.QueryFactory.and;
 import static com.googlecode.cqengine.query.QueryFactory.in;
+import static com.googlecode.cqengine.query.QueryFactory.equal;
 
 @Getter
 public class RepositoryHelper {
@@ -288,5 +289,11 @@ public class RepositoryHelper {
                         in(IXPackageRepository.SLOT_ID, slotId, IXPackageRepository.ALL_SLOT_ID));
 
         return ixPackageRepository.getPackageIndex().retrieve(query);
+    }
+
+    public IXPackageEntity queryIxPackageByDeal(final String dealId) {
+        //Prepare query for CQEngine repository
+        Query query = equal(IXPackageRepository.DEAL_IDS, dealId);
+        return ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
     }
 }
