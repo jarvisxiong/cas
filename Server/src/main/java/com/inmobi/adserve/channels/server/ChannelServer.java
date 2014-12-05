@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
+import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.exception.InitializationException;
 import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
@@ -301,60 +302,27 @@ public class ChannelServer {
             ChannelSegmentAdvertiserCache.init(logger);
 
             // Reusing the repository from phoenix adserving framework.
-
-            creativeRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CREATIVE_REPOSITORY),
-                    ChannelServerStringLiterals.CREATIVE_REPOSITORY);
-            currencyConversionRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY),
-                    ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY);
-            wapSiteUACRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY),
-                    ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY);
-            ixAccountMapRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY),
-                    ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY);
-            channelAdGroupRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY);
-            channelRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_REPOSITORY);
-            channelFeedbackRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY);
-            channelSegmentFeedbackRepository.init(
-                    logger,
-                    config.getCacheConfiguration().subset(
-                            ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY),
-                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY);
-            siteTaxonomyRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY);
-            siteMetaDataRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
-            pricingEngineRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY),
-                    ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY);
-            siteFilterRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_FILTER_REPOSITORY);
+            loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config, 0);
+            loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config, 0);
+            loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config, 0);
+            loadRepos(ixAccountMapRepository, ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY, config, 0);
+            loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config, 0);
+            loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config, 0);
+            loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, config, 0);
+            loadRepos(channelSegmentFeedbackRepository, ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config, 0);
+            loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config, 0);
+            loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config, 0);
+            loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config, 0);
+            loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config, 0);
             siteAerospikeFeedbackRepository.init(
                     config.getServerConfiguration().subset(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK),
                     getDataCenter());
-            siteEcpmRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY),
-                    ChannelServerStringLiterals.SITE_ECPM_REPOSITORY);
-            nativeAdTemplateRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY),
-                    ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY);
+            loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config, 0);
+            loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY, config, 0);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
-            geoZipRepository.init(logger,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY),
-                    ChannelServerStringLiterals.GEO_ZIP_REPOSITORY);
+            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config, 0);
 
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
@@ -370,6 +338,28 @@ public class ChannelServer {
                 logger.debug(ChannelServer.getMyStackTrace(exception));
             }
         }
+    }
+
+    private static void loadRepos(final AbstractStatsMaintainingDBRepository repository, final String repoName,
+                                  final ConfigurationLoader config, int tryCount) throws InitializationException {
+        logger.debug("trying to load repo "+ repoName+" for "+tryCount+" time");
+        if (tryCount > 3) {
+            logger.debug("tried 3 times could not load repo "+ repoName);
+            return;
+        }
+        try {
+            repository.init(logger,
+                    config.getCacheConfiguration().subset(repoName),
+                    repoName);
+        } catch (InitializationException exc) {
+            if (tryCount < 3) {
+                loadRepos(repository, repoName, config, ++tryCount);
+            }
+            else {
+                throw exc;
+            }
+        }
+        return;
     }
 
     private static DataCenter getDataCenter() {
