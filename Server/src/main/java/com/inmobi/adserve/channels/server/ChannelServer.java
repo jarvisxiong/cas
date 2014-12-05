@@ -304,6 +304,9 @@ public class ChannelServer {
 
             // Reusing the repository from phoenix adserving framework.
             repoLoadRetryCount = config.getServerConfiguration().getInt("repoLoadRetryCount", 1);
+            if (repoLoadRetryCount < 1) {
+                repoLoadRetryCount = 1;
+            }
             loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config);
             loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config);
             loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config);
@@ -356,7 +359,7 @@ public class ChannelServer {
                 exp = exc;
             }
         }
-        if (tryCount == repoLoadRetryCount) {
+        if (tryCount >= repoLoadRetryCount) {
             String msg = String.format("Tried %s times but still could not load repo %s", String.valueOf(repoLoadRetryCount), repoName);
             logger.error(msg);
             throw new InitializationException(msg,exp);
