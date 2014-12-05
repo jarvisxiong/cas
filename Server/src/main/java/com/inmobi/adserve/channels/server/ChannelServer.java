@@ -104,6 +104,7 @@ public class ChannelServer {
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     @Getter
     private static String configFile;
+    private static int repoLoadRetryCount;
 
 
     public static void main(final String[] args) throws Exception {
@@ -302,26 +303,26 @@ public class ChannelServer {
             ChannelSegmentAdvertiserCache.init(logger);
 
             // Reusing the repository from phoenix adserving framework.
-            int repoReloadCount = config.getServerConfiguration().getInt("repoReloadCount");
-            loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(ixAccountMapRepository, ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(channelSegmentFeedbackRepository, ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config, 0, repoReloadCount);
-            loadSiteAeroSpikeFeedbackRepo(config, 0, repoReloadCount);
-            loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config, 0, repoReloadCount);
-            loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY, config, 0, repoReloadCount);
+            repoLoadRetryCount = config.getServerConfiguration().getInt("repoLoadRetryCount", 1);
+            loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config);
+            loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config);
+            loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config);
+            loadRepos(ixAccountMapRepository, ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY, config);
+            loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config);
+            loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config);
+            loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, config);
+            loadRepos(channelSegmentFeedbackRepository, ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config);
+            loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config);
+            loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config);
+            loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config);
+            loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config);
+            loadRepos(siteAerospikeFeedbackRepository, ChannelServerStringLiterals.AEROSPIKE_FEEDBACK ,config);
+            loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config);
+            loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY, config);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
-            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config, 0, repoReloadCount);
+            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config);
 
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
@@ -339,49 +340,36 @@ public class ChannelServer {
         }
     }
 
-    private static void loadRepos(final AbstractStatsMaintainingDBRepository repository, final String repoName,
-                                  final ConfigurationLoader config, int tryCount, final int repReloadCount) throws InitializationException {
-        logger.debug("trying to load repo "+ repoName+" for "+tryCount+" time");
-        if (tryCount > repReloadCount) {
-            logger.error("tried 3 times could not load repo "+ repoName);
-            return;
+    private static void loadRepos(final Object repo, final String repoName,
+                                  final ConfigurationLoader config) throws InitializationException {
+        int tryCount;
+        AbstractStatsMaintainingDBRepository repository = null;
+        SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository = null;
+        if (repo instanceof AbstractStatsMaintainingDBRepository) {
+            repository = (AbstractStatsMaintainingDBRepository) repo;
+        } else if (repo instanceof SiteAerospikeFeedbackRepository) {
+            siteAerospikeFeedbackRepository = (SiteAerospikeFeedbackRepository) repo;
         }
-        try {
-            repository.init(logger,
-                    config.getCacheConfiguration().subset(repoName),
-                    repoName);
-        } catch (InitializationException exc) {
-            if (tryCount < repReloadCount) {
-                tryCount +=1;
-                logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
-                loadRepos(repository, repoName, config, tryCount, repReloadCount);
-            }
-            else {
-                throw exc;
-            }
-        }
-        return;
-    }
+        Exception exp = null;
+        for (tryCount = 0; tryCount < repoLoadRetryCount ; tryCount++) {
+            logger.debug("trying to load repo " + repoName + " for " + tryCount + " time");
+            try {
 
-    private static void loadSiteAeroSpikeFeedbackRepo(final ConfigurationLoader config, int tryCount, final int repReloadCount) throws InitializationException {
-        logger.debug("trying to load repo SiteAeroSpikeFeedbackRepo for "+tryCount+" time");
-        if (tryCount > repReloadCount) {
-            logger.error("tried 3 times could not load repo SiteAeroSpikeFeedbackRepo");
-            return;
+                if (null != repository) {
+                    repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
+                } else if (null != siteAerospikeFeedbackRepository) {
+                    siteAerospikeFeedbackRepository.init(config.getServerConfiguration().subset(repoName), getDataCenter());
+                }
+                break;
+            } catch (InitializationException exc) {
+                logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
+                exp = exc;
+            }
         }
-        try {
-            siteAerospikeFeedbackRepository.init(
-                    config.getServerConfiguration().subset(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK),
-                    getDataCenter());
-        } catch (InitializationException exc) {
-            if (tryCount < repReloadCount) {
-                tryCount +=1;
-                logger.error("trying to load repo SiteAeroSpikeFeedbackRepo for " + tryCount + " time");
-                loadSiteAeroSpikeFeedbackRepo(config, tryCount, repReloadCount);
-            }
-            else {
-                throw exc;
-            }
+        if (tryCount == repoLoadRetryCount) {
+            String msg = String.format("Tried %s times but still could not load repo %s", String.valueOf(repoLoadRetryCount), repoName);
+            logger.error(msg);
+            throw new InitializationException(msg,exp);
         }
         return;
     }
