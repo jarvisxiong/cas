@@ -304,6 +304,9 @@ public class ChannelServer {
 
             // Reusing the repository from phoenix adserving framework.
             repoLoadRetryCount = config.getServerConfiguration().getInt("repoLoadRetryCount", 1);
+            if (repoLoadRetryCount < 1) {
+                repoLoadRetryCount = 1;
+            }
             loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config);
             loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config);
             loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config);
@@ -316,13 +319,15 @@ public class ChannelServer {
             loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config);
             loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config);
             loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config);
-            loadRepos(siteAerospikeFeedbackRepository, ChannelServerStringLiterals.AEROSPIKE_FEEDBACK ,config);
             loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config);
             loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY, config);
+            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
-            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config);
+            siteAerospikeFeedbackRepository.init(
+                    config.getServerConfiguration().subset(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK),
+                    getDataCenter());
 
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
@@ -340,33 +345,21 @@ public class ChannelServer {
         }
     }
 
-    private static void loadRepos(final Object repo, final String repoName,
+    private static void loadRepos(final AbstractStatsMaintainingDBRepository repository, final String repoName,
                                   final ConfigurationLoader config) throws InitializationException {
         int tryCount;
-        AbstractStatsMaintainingDBRepository repository = null;
-        SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository = null;
-        if (repo instanceof AbstractStatsMaintainingDBRepository) {
-            repository = (AbstractStatsMaintainingDBRepository) repo;
-        } else if (repo instanceof SiteAerospikeFeedbackRepository) {
-            siteAerospikeFeedbackRepository = (SiteAerospikeFeedbackRepository) repo;
-        }
         Exception exp = null;
         for (tryCount = 0; tryCount < repoLoadRetryCount ; tryCount++) {
             logger.debug("trying to load repo " + repoName + " for " + tryCount + " time");
             try {
-
-                if (null != repository) {
-                    repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
-                } else if (null != siteAerospikeFeedbackRepository) {
-                    siteAerospikeFeedbackRepository.init(config.getServerConfiguration().subset(repoName), getDataCenter());
-                }
+                repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
             } catch (InitializationException exc) {
                 logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
                 exp = exc;
             }
         }
-        if (tryCount == repoLoadRetryCount) {
+        if (tryCount >= repoLoadRetryCount) {
             String msg = String.format("Tried %s times but still could not load repo %s", String.valueOf(repoLoadRetryCount), repoName);
             logger.error(msg);
             throw new InitializationException(msg,exp);
