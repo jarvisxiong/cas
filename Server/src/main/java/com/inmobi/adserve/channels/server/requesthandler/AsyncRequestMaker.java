@@ -152,6 +152,7 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.setUidIDUS1(casInternalRequestParameterGlobal.getUidIDUS1());
         casInternalRequestParameters.setUidMd5(casInternalRequestParameterGlobal.getUidMd5());
         casInternalRequestParameters.setUidADT(casInternalRequestParameterGlobal.getUidADT());
+        casInternalRequestParameters.setSiteFloor(sasParams.getSiteFloor());
         if (null != sasParams.getPostalCode()) {
             casInternalRequestParameters.setZipCode(sasParams.getPostalCode());
         }

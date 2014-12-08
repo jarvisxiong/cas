@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.casthrift.umprr.Csids;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -62,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.Getter;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 import static com.inmobi.casthrift.DemandSourceType.IX;
 import static com.inmobi.casthrift.DemandSourceType.RTBD;
@@ -273,6 +273,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         final AdPoolResponse adPoolResponse = new AdPoolResponse();
         final AdInfo rtbdAd = new AdInfo();
         final AdIdChain adIdChain = new AdIdChain();
+        final Csids csids = new Csids();
 
         final ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
         final ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
@@ -301,6 +302,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     if (null != dealId) {
                         // If dealId is present, then auction type is set to PREFERRED_DEAL
                         // and dealId is set
+                        if (ixAdNetwork.isExternalPersonaDeal()) {
+                            csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
+                            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                            try {
+                                adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
+                            } catch (TException exc) {
+                                LOG.error("Could not send csId to UMP, thrift exception {}", exc);
+                            }
+                        }
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
                         if (PRIVATE_AUCTION == pmpTier) {
