@@ -374,8 +374,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) {
         LOG.debug("Inside send Response");
-        responseBytes = encryptResponseIfRequired(responseBytes);
-
+        if (responseBytes.length > 0) {
+            responseBytes = encryptResponseIfRequired(responseBytes);
+        }
         final FullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
         if (null != responseHeaders) {
