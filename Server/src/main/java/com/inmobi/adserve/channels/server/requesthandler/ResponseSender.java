@@ -363,14 +363,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send response to the caller
+    @SuppressWarnings("rawtypes")
     private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
             final Channel serverChannel) {
-
         final byte[] bytes = responseString.getBytes(Charsets.UTF_8);
         sendResponse(status, bytes, responseHeaders, serverChannel);
     }
 
     // send response to the caller
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) {
         LOG.debug("Inside send Response");

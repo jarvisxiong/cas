@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
-import com.inmobi.adserve.adpool.UserProfile;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
