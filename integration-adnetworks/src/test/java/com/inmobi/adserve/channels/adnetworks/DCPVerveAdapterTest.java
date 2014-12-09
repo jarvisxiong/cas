@@ -3,15 +3,20 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -32,6 +37,7 @@ public class DCPVerveAdapterTest extends TestCase {
     private final String verveHost = "http://adcel.vrvm.com/htmlad";
     private final String verveStatus = "on";
     private final String verveAdvId = "verveadv1";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -55,6 +61,36 @@ public class DCPVerveAdapterTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpVerveAdnetwork = new DCPVerveAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -77,7 +113,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -100,7 +136,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"trueLatLongOnly\":\"false\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -123,7 +159,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -144,7 +180,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -165,7 +201,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -185,7 +221,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -206,7 +242,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+        assertFalse(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -227,7 +263,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+        assertTrue(dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -250,7 +286,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&size=320x48&adunit=mma";
@@ -278,7 +314,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"trueLatLongOnly\":\"false\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 10)) {
+        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 10, repositoryHelper)) {
             final String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&size=300x250&adunit=inter";
@@ -306,7 +342,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
-        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11)) {
+        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper)) {
             final String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=iphn&b=1324&site=00000000-0000-0020-0000-000000000000&ua=Mozilla&uis=v&ui=202cb962ac59075b964b07152d234b70&c=97&adunit=320x48";
@@ -334,7 +370,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"trueLatLongOnly\":\"true\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11)) {
+        if (dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper)) {
             final String actualUrl = dcpVerveAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://adcel.vrvm.com/htmlad?ip=206.29.182.240&p=ptnr&b=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&c=97&size=728x90&adunit=banner";
@@ -359,7 +395,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "<a href=\"http://c.ypcdn.com/2/c/rtd?rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&vrid=6318744211295763877&&lsrc=SP&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&ptsid=imtest&tl=1933&dest=http%3A%2F%2Fapi.yp.com%2Fdisplay%2Fv1%2Fmip%3Fappid%3Dnchx22pyyt%26requestid%3D3258f028-8ab0-4b04-86ed-d7935132def1%26category%3DMedical%2520Clinics%26visitorid%3D6318744211295763877%26srid%3Dcffe8661-a6ba-4a45-817b-41a68eca9e84_%26listings%3D171643024_%26uselid%3D1%26distance%3D171643024%3A25.8_%26numListings%3D1%26city%3DPalo%2BAlto%252C%2BCA%252C%2B94301%26searchLat%3D37.444324%26searchLon%3D-122.14969%26product%3Dimage_snapshot%26selected%3D0%26selectedLat%3D37.80506134033203%26selectedLon%3D-122.27301788330078%26time%3D1355818336208\" target=\"_blank\"><img src=\"http://display-img.g.atti.com/image-api/adimage?x=eNoVxkEKwjAQAMDXuBeppGmr8bAHEbwJBV-wTVJdXJOSpGB_bzzNJHbY6cHMSpvG0KSaflJ9Y47eNe507oa2087PLVgqePeOLclOq6twYJvrgqdUGUli5SIlwrRmvNGHZduPQiFweO4fi7dMwrlkcJxRDwcDiYpFWF4IuVBCsHGtlfifoKP0hm0RVOC_BX9v6Tat\"/></a><img src=\"http://c.ypcdn.com/2/i/rtd?vrid=6318744211295763877&rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&srid=cffe8661-a6ba-4a45-817b-41a68eca9e84&lsrc=SP&cp=_&ptsid=imtest\" style=\"display:none;\"/><img src=\"http://b.scorecardresearch.com/p?c1=3&amp;c2=6035991&amp;c14=1\" height=\"1\" width=\"1\" alt=\"*\"><img src=\"http://go.vrvm.com/t?poid=4&adnet=33&r=6405519111883133169&e=AdImpInternal&paid=5721\" width=\"1\" height=\"1\" style=\"display:none;\"/>";
         dcpVerveAdnetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -386,7 +422,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "<a href=\"http://c.ypcdn.com/2/c/rtd?rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&vrid=6318744211295763877&&lsrc=SP&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&ptsid=imtest&tl=1933&dest=http%3A%2F%2Fapi.yp.com%2Fdisplay%2Fv1%2Fmip%3Fappid%3Dnchx22pyyt%26requestid%3D3258f028-8ab0-4b04-86ed-d7935132def1%26category%3DMedical%2520Clinics%26visitorid%3D6318744211295763877%26srid%3Dcffe8661-a6ba-4a45-817b-41a68eca9e84_%26listings%3D171643024_%26uselid%3D1%26distance%3D171643024%3A25.8_%26numListings%3D1%26city%3DPalo%2BAlto%252C%2BCA%252C%2B94301%26searchLat%3D37.444324%26searchLon%3D-122.14969%26product%3Dimage_snapshot%26selected%3D0%26selectedLat%3D37.80506134033203%26selectedLon%3D-122.27301788330078%26time%3D1355818336208\" target=\"_blank\"><img src=\"http://display-img.g.atti.com/image-api/adimage?x=eNoVxkEKwjAQAMDXuBeppGmr8bAHEbwJBV-wTVJdXJOSpGB_bzzNJHbY6cHMSpvG0KSaflJ9Y47eNe507oa2087PLVgqePeOLclOq6twYJvrgqdUGUli5SIlwrRmvNGHZduPQiFweO4fi7dMwrlkcJxRDwcDiYpFWF4IuVBCsHGtlfifoKP0hm0RVOC_BX9v6Tat\"/></a><img src=\"http://c.ypcdn.com/2/i/rtd?vrid=6318744211295763877&rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&srid=cffe8661-a6ba-4a45-817b-41a68eca9e84&lsrc=SP&cp=_&ptsid=imtest\" style=\"display:none;\"/><img src=\"http://b.scorecardresearch.com/p?c1=3&amp;c2=6035991&amp;c14=1\" height=\"1\" width=\"1\" alt=\"*\"><img src=\"http://go.vrvm.com/t?poid=4&adnet=33&r=6405519111883133169&e=AdImpInternal&paid=5721\" width=\"1\" height=\"1\" style=\"display:none;\"/>";
@@ -416,7 +452,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "<a href=\"http://c.ypcdn.com/2/c/rtd?rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&vrid=6318744211295763877&&lsrc=SP&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&ptsid=imtest&tl=1933&dest=http%3A%2F%2Fapi.yp.com%2Fdisplay%2Fv1%2Fmip%3Fappid%3Dnchx22pyyt%26requestid%3D3258f028-8ab0-4b04-86ed-d7935132def1%26category%3DMedical%2520Clinics%26visitorid%3D6318744211295763877%26srid%3Dcffe8661-a6ba-4a45-817b-41a68eca9e84_%26listings%3D171643024_%26uselid%3D1%26distance%3D171643024%3A25.8_%26numListings%3D1%26city%3DPalo%2BAlto%252C%2BCA%252C%2B94301%26searchLat%3D37.444324%26searchLon%3D-122.14969%26product%3Dimage_snapshot%26selected%3D0%26selectedLat%3D37.80506134033203%26selectedLon%3D-122.27301788330078%26time%3D1355818336208\" target=\"_blank\"><img src=\"http://display-img.g.atti.com/image-api/adimage?x=eNoVxkEKwjAQAMDXuBeppGmr8bAHEbwJBV-wTVJdXJOSpGB_bzzNJHbY6cHMSpvG0KSaflJ9Y47eNe507oa2087PLVgqePeOLclOq6twYJvrgqdUGUli5SIlwrRmvNGHZduPQiFweO4fi7dMwrlkcJxRDwcDiYpFWF4IuVBCsHGtlfifoKP0hm0RVOC_BX9v6Tat\"/></a><img src=\"http://c.ypcdn.com/2/i/rtd?vrid=6318744211295763877&rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&srid=cffe8661-a6ba-4a45-817b-41a68eca9e84&lsrc=SP&cp=_&ptsid=imtest\" style=\"display:none;\"/><img src=\"http://b.scorecardresearch.com/p?c1=3&amp;c2=6035991&amp;c14=1\" height=\"1\" width=\"1\" alt=\"*\"><img src=\"http://go.vrvm.com/t?poid=4&adnet=33&r=6405519111883133169&e=AdImpInternal&paid=5721\" width=\"1\" height=\"1\" style=\"display:none;\"/>";
@@ -448,7 +484,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "<a href=\"http://c.ypcdn.com/2/c/rtd?rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&vrid=6318744211295763877&&lsrc=SP&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&ptsid=imtest&tl=1933&dest=http%3A%2F%2Fapi.yp.com%2Fdisplay%2Fv1%2Fmip%3Fappid%3Dnchx22pyyt%26requestid%3D3258f028-8ab0-4b04-86ed-d7935132def1%26category%3DMedical%2520Clinics%26visitorid%3D6318744211295763877%26srid%3Dcffe8661-a6ba-4a45-817b-41a68eca9e84_%26listings%3D171643024_%26uselid%3D1%26distance%3D171643024%3A25.8_%26numListings%3D1%26city%3DPalo%2BAlto%252C%2BCA%252C%2B94301%26searchLat%3D37.444324%26searchLon%3D-122.14969%26product%3Dimage_snapshot%26selected%3D0%26selectedLat%3D37.80506134033203%26selectedLon%3D-122.27301788330078%26time%3D1355818336208\" target=\"_blank\"><img src=\"http://display-img.g.atti.com/image-api/adimage?x=eNoVxkEKwjAQAMDXuBeppGmr8bAHEbwJBV-wTVJdXJOSpGB_bzzNJHbY6cHMSpvG0KSaflJ9Y47eNe507oa2087PLVgqePeOLclOq6twYJvrgqdUGUli5SIlwrRmvNGHZduPQiFweO4fi7dMwrlkcJxRDwcDiYpFWF4IuVBCsHGtlfifoKP0hm0RVOC_BX9v6Tat\"/></a><img src=\"http://c.ypcdn.com/2/i/rtd?vrid=6318744211295763877&rid=3258f028-8ab0-4b04-86ed-d7935132def1&ptid=nchx22pyyt&iid=7f173043-fad2-4708-9f4c-f6ddb38670bd&srid=cffe8661-a6ba-4a45-817b-41a68eca9e84&lsrc=SP&cp=_&ptsid=imtest\" style=\"display:none;\"/><img src=\"http://b.scorecardresearch.com/p?c1=3&amp;c2=6035991&amp;c14=1\" height=\"1\" width=\"1\" alt=\"*\"><img src=\"http://go.vrvm.com/t?poid=4&adnet=33&r=6405519111883133169&e=AdImpInternal&paid=5721\" width=\"1\" height=\"1\" style=\"display:none;\"/>";
@@ -497,7 +533,7 @@ public class DCPVerveAdapterTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpVerveAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals(dcpVerveAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 

@@ -174,6 +174,14 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getGeoZipRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
+                final String query =
+                        config.getCacheConfiguration()
+                                .subset(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)
+                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getSlotSizeMapRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
             } else {
                 // RepoName could not be matched
                 LOG.debug("RepoName: {} could not be matched", repoName);

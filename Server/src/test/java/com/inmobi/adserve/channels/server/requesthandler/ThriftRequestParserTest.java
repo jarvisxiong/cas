@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,12 +13,15 @@ import java.util.Set;
 import java.util.Arrays;
 
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.phoenix.exception.RepositoryException;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 import com.inmobi.adserve.adpool.AdCodeType;
@@ -61,7 +65,76 @@ public class ThriftRequestParserTest extends TestCase {
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
 
         replay(mockConfig, mockRepositoryHelper);
-        CasConfigUtil.repositoryHelper = null;
+        final WapSiteUACEntity wapSiteUACEntity = EasyMock.createMock(WapSiteUACEntity.class);
+        final SiteEcpmEntity siteEcpmEntity = EasyMock.createMock(SiteEcpmEntity.class);
+        final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor1);
+        final SlotSizeMapEntity slotSizeMapEntityFor2 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor2.getDimension()).andReturn(new Dimension(168, 28)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor2);
+        final SlotSizeMapEntity slotSizeMapEntityFor3 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor3.getDimension()).andReturn(new Dimension(216, 36)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor3);
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor12);
+        final SlotSizeMapEntity slotSizeMapEntityFor13 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor13.getDimension()).andReturn(new Dimension(120, 600)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor13);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        RepositoryHelper repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.queryWapSiteUACRepository(EasyMock.isA(String.class)))
+                .andReturn(wapSiteUACEntity).anyTimes();
+        EasyMock.expect(repositoryHelper.querySiteEcpmRepository(EasyMock.isA(String.class), EasyMock.isA(Integer.class), EasyMock.isA(Integer.class)))
+                .andReturn(siteEcpmEntity).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)1))
+                .andReturn(slotSizeMapEntityFor1).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)2))
+                .andReturn(slotSizeMapEntityFor2).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)3))
+                .andReturn(slotSizeMapEntityFor3).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)5))
+                .andReturn(null).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)6))
+                .andReturn(null).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)7))
+                .andReturn(null).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)10))
+                .andReturn(slotSizeMapEntityFor10).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)12))
+                .andReturn(slotSizeMapEntityFor12).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)13))
+                .andReturn(slotSizeMapEntityFor13).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
+        CasConfigUtil.repositoryHelper = repositoryHelper;
         thriftRequestParser = new ThriftRequestParser();
     }
 

@@ -3,10 +3,14 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +18,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.adpool.ContentType;
@@ -37,6 +42,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
     private final String AjilionTest = "1";
     private final String placementId = "240";
     private final String fsPlacementId = "230";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -63,6 +69,33 @@ public class DCPAjillionAdnetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
 
         dcpAjillionAdNetwork = new DCPAjillionAdnetwork(mockConfig, clientBootstrap, base, serverChannel);
         dcpAjillionAdNetwork.setName("Ajilion");
@@ -87,7 +120,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4));
+                null, (short) 4, repositoryHelper));
     }
 
     @Test
@@ -109,7 +142,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4));
+                null, (short) 4, repositoryHelper));
     }
 
     @Test
@@ -131,7 +164,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4));
+                null, (short) 4, repositoryHelper));
     }
 
     @Test
@@ -152,7 +185,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4));
+                null, (short) 4, repositoryHelper));
     }
 
     @Test
@@ -174,7 +207,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4)) {
+        if (dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper)) {
             final String actualUrl = dcpAjillionAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.AjillionMAX.com/ad/240/4?format=json&use_beacon=1&keyword=Food+%26+Drink%2CAdventure%2CWord&pubid=00000000-0000-0000-0000-000000000000&clientip=206.29.182.240&clientua=Mozilla";
@@ -203,7 +236,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4)) {
+        if (dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper)) {
             final String actualUrl = dcpAjillionAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.AjillionMAX.com/ad/230/4?format=json&use_beacon=1&keyword=Food+%26+Drink%2CAdventure%2CWord&pubid=00000000-0000-0000-0000-000000000000&clientip=206.29.182.240&clientua=Mozilla";
@@ -231,7 +264,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 4);
+        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"click_url\": \"http://ad.Ajilionmedia.com/traffic/f446a48aa6b011e2aa3a06311cd1216a/4/240/1541/1/8d35d80adcbc11e2b8aa06311cc966ad/?clientip=206.29.182.240&clientua=Mozilla&csize=300X50&keyword=Food+%26+Drink%2CAdventure%2CWord&cid=1516\", \"pmodel\": 3, \"price\": 0.005, \"placement_id\": 240, \"height\": 50, \"creative_display\": \"static\", \"creative_url\": \"http://mead-production.s3.amazonaws.com/advertiser_creative/2013/05/02/300x50_dog_1.jpg\", \"success\": true, \"creative_type\": \"image\", \"width\": 300, \"error\": \"\"}";
         dcpAjillionAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -261,7 +294,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 4);
+        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"click_url\": \"http://ad.ajillionmax.com/traffic/226044fbef96400fa80ba238a665122d/4/424/13075/1/a21fec1952f04fb0a2e7e225b941216b-198/?keyword=Media+%26+Video&cid=131230&pubid=00000000-000b-b7fd-0000-00000002022a&csize=320x50&use_beacon=1&clientua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+es-us%3B+ALCATEL+ONE+TOUCH+5020A+Build%2FJRO03C%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.1+Mobile+Safari%2F534.30%5E&clientip=189.186.213.199\", \"pmodel\": 2, \"price\": 0.003, \"placement_id\": 424, \"height\": 50, \"rate\": 0.0012414800389483934, \"creative_display\": \"static\", \"creative_url\": \"http://mead-production.s3.amazonaws.com/advertiser_creative/2014/01/26/078bd4e7-6572-44b8-b583-5dd8639fe89a.gif\", \"success\": true, \"creative_type\": \"image\", \"content_identifier\": \"\", \"width\": 320, \"error\": \"\", \"beacon_url\": \"http://ad.ajillionmax.com/ad/beacon/a21fec1952f04fb0a2e7e225b941216b-198/11826/0.000000/\"}";
         dcpAjillionAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -291,7 +324,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 4);
+        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"click_url\": \"http://ad.Ajilionmedia.com/traffic/f446a48aa6b011e2aa3a06311cd1216a/4/240/1541/1/8d35d80adcbc11e2b8aa06311cc966ad/?clientip=206.29.182.240&clientua=Mozilla&csize=300X50&keyword=Food+%26+Drink%2CAdventure%2CWord&cid=1516\", \"pmodel\": 3, \"price\": 0.005, \"placement_id\": 240, \"height\": 50, \"creative_display\": \"static\", \"creative_url\": \"http://mead-production.s3.amazonaws.com/advertiser_creative/2013/05/02/300x50_dog_1.jpg\", \"success\": true, \"creative_type\": \"image\", \"width\": 300, \"error\": \"\"}";
         dcpAjillionAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -342,7 +375,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4);
+        dcpAjillionAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper);
         assertEquals(dcpAjillionAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 

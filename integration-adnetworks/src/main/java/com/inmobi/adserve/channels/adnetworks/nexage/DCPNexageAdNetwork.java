@@ -5,8 +5,8 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -72,9 +72,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
             isGeo = true;
         }
-
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }

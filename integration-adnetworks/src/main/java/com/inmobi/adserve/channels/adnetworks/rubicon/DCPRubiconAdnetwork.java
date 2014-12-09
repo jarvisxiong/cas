@@ -30,7 +30,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -163,7 +162,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+        if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
             if (!slotIdMap.containsKey(selectedSlotId)) {
                 LOG.debug("Size not allowed for rubicon so exiting adapter");
                 LOG.info("Configure parameters inside Rubicon returned false");

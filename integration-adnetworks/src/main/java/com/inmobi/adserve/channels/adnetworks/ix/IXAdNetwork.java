@@ -2,6 +2,10 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -52,11 +56,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
@@ -231,7 +231,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    public final RepositoryHelper repositoryHelper;
     @Getter
     private int impressionObjCount;
     @Getter
@@ -260,8 +259,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper,
-            final boolean templateWinNotification) {
+            final String advertiserName, final int tmax, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -275,7 +273,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
-        this.repositoryHelper = repositoryHelper;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
@@ -576,8 +573,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Presently only one banner object per impression object is being sent
         // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
         banner.setId("1");
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
@@ -591,7 +589,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final CommonExtension ext = new CommonExtension();
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+        if (null != selectedSlotId) {
             if (SlotSizeMapping.isIXSupportedSlot(selectedSlotId)) {
                 final RubiconExtension rp = new RubiconExtension();
                 setMimeTypeForBannerExt(rp);

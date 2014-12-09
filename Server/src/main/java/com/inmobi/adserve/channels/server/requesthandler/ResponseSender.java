@@ -13,10 +13,11 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
@@ -184,12 +185,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
-        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId());
+        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(), selectedAdNetwork.getRepositoryHelper());
     }
 
     // send Ad Response
 
-    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel, final Short selectedSlotId) {
+    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel, final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
@@ -197,12 +198,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         LOG.debug("ad received so trying to send ad response");
         String finalResponse = adResponse.getResponse();
-        if (selectedSlotId != null && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (slotSizeMapEntity != null) {
             LOG.debug("slot served is {}", selectedSlotId);
 
 
             if (getResponseFormat() == ResponseFormat.XHTML) {
-                final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+                final Dimension dim = slotSizeMapEntity.getDimension();
                 final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalResponse = startElement + finalResponse + END_TAG;
             } else if (getResponseFormat() == ResponseFormat.IMAI) {
@@ -374,8 +376,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
             final Channel serverChannel) {
         LOG.debug("Inside send Response");
-        responseBytes = encryptResponseIfRequired(responseBytes);
-
+        if (responseBytes.length > 0) {
+            responseBytes = encryptResponseIfRequired(responseBytes);
+        }
         final FullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
         if (null != responseHeaders) {

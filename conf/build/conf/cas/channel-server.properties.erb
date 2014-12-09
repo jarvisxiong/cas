@@ -131,6 +131,14 @@ Cache.GeoZipRepository.refreshTime = 300
 Cache.GeoZipRepository.isUpdatable = true
 Cache.GeoZipRepository.dataSourceName = jdbc
 
+Cache.Name = SlotSizeMapRepository
+Cache.SlotSizeMapRepository.Manager = com.inmobi.adserve.channels.repository.SlotSizeMapRepository
+Cache.SlotSizeMapRepository.query = select id\,height\,width\,modified_on from serving_unit where modified_on >=('${last_update}')
+Cache.SlotSizeMapRepository.initialDelay = 300
+Cache.SlotSizeMapRepository.refreshTime = 300
+Cache.SlotSizeMapRepository.isUpdatable = true
+Cache.SlotSizeMapRepository.dataSourceName = jdbc
+
 Cache.Name = CreativeRepository
 Cache.CreativeRepository.Manager = com.inmobi.adserve.channels.repository.CreativeRepository
 Cache.CreativeRepository.query = select * from rtbd_creative_fun('${last_update}')

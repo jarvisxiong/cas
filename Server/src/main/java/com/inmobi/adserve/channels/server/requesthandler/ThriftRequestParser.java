@@ -372,18 +372,29 @@ public class ThriftRequestParser {
     @SuppressWarnings("rawtypes")
     public void getSlotList(final List<Short> selectedSlots, final SASRequestParameters sasRequestParameters,
                             final int dst) {
-        List<Short> listOfUmpSlots = new ArrayList<Short>();
-        int slotListSize = selectedSlots.size();
-        final Map map =
-                DemandSourceType.IX.getValue() == dst ? SlotSizeMapping.getIX_SLOT_ID_MAP() : SlotSizeMapping
-                        .getSLOT_MAP();
-        // Keep at most 5 slots in the list
-        for (int slotIndex = 0; slotIndex < slotListSize && listOfUmpSlots.size() < 5; slotIndex++) {
-            final Short slotId = selectedSlots.get(slotIndex);
-            if (map.containsKey(slotId)) {// check if Slot present in IXSupportedSlot
-                listOfUmpSlots.add(slotId);
+
+        if (DemandSourceType.IX.getValue() == dst) {
+            // Keep at most 5 slots in the list
+            List<Short> listOfIXSupportedSlots = new ArrayList<Short>();
+            int slotListSize = selectedSlots.size();
+            for (int slotIndex = 0; slotIndex < slotListSize && listOfIXSupportedSlots.size() < 5; slotIndex++) {
+                final Short slotId = selectedSlots.get(slotIndex);
+                if (SlotSizeMapping.getIX_SLOT_ID_MAP().containsKey(slotId)) {// check if Slot present in IXSupportedSlot
+                    listOfIXSupportedSlots.add(slotId);
+                }
             }
+            sasRequestParameters.setProcessedMkSlot(listOfIXSupportedSlots);
+        } else {
+            List<Short> listOfUmpSlots = new ArrayList<Short>();
+            int slotListSize = selectedSlots.size();
+            for (int slotIndex = 0; slotIndex < slotListSize && listOfUmpSlots.size() < 5; slotIndex++) {
+                final Short slotId = selectedSlots.get(slotIndex);
+                if (null != CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(slotId)) {// check if Slot present in SlotSizeRepo
+                    listOfUmpSlots.add(slotId);
+                }
+            }
+            sasRequestParameters.setProcessedMkSlot(listOfUmpSlots);
         }
-        sasRequestParameters.setProcessedMkSlot(listOfUmpSlots);
+        return;
     }
 }
