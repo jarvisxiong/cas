@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork;
@@ -41,6 +46,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
     private final String lomarkAdvId = "lomarkadv1";
     private final String lomarkKey = "1000";
     private final String lomarkSecretKey = "SecretKey";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -66,6 +72,44 @@ public class DCPLomarkAdnetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor1);
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor12);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)12))
+                .andReturn(slotSizeMapEntityFor12).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpLomarkAdnetwork = new DCPLomarkAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -89,7 +133,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -112,7 +156,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
-                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -135,7 +179,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -160,7 +204,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
-                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -187,7 +231,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
-                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -211,7 +255,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
-                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -237,7 +281,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {12121212L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
-        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
             String millisec = "";
@@ -300,7 +344,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {12121212L},
                         true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
                         false, null, new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
-        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
             String millisec = "";
@@ -365,7 +409,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {12121212L},
                         true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
                         false, null, new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
-        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
             String millisec = "";
@@ -429,7 +473,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {12121212L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
-        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
             requestMap.put("Format", "json");
@@ -483,7 +527,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"status\":\"100\",\"msg\":\"������\",\"data\":{\"ad\":{\"aid\":\"1\",\"ts\":\"1355799274\",\"sessionid\":\"4d2b62c51e6e4b069e380017168beff3\",\"creative\":{\"cid\":\"1\",\"ts\":\"1355799221\",\"displayinfo\":{\"type\":\"1\",\"img\":\"http://apitest.lomark.cn/upload/201212/201212181053416444os_320_50.jpg\",\"schema\":\"fb98e702541d4f17acd7af0015e0779a\"},\"clkinfos\":[{\"type\":\"1\",\"schema\":\"fb98e702541d4f17acd7af0015e0779a\",\"url\":\"http://www.donson.com.cn\"}],\"trackers\":{\"clicks\":[{\"schema\":\"fb98e702541d4f17acd7af0015e0779a\",\"urls\":[\"http://apitest.lomark.cn/v2/callback?sessionid={$sessionid$}&key={$key$}&appid={$appid$}&appname={$appname$}&uuid={$uuid$}&client={$client$}&operator={$operator$}&net={$net$}&devicetype={$devicetype$}&adspacetype={$adspacetype$}&category={$category$}&ip={$ip$}&os_version={$os_version$}&aw={$aw$}&ah={$ah$}&timestamp={$timestamp$}&sign={$sign$}&format={$format$}&density={$density$}&long={$long$}&lat={$lat$}&devicenum={$devicenum$}&sdkversion={$sdkversion$}&cid={$cid$}&callbacktype={$callbacktype$}&schema={$schema$}&pw={$pw$}&ph={$ph$}\"]}],\"display\":{\"urls\":[\"http://apitest.lomark.cn/v2/callback?sessionid={$sessionid$}&key={$key$}&appid={$appid$}&appname={$appname$}&uuid={$uuid$}&client={$client$}&operator={$operator$}&net={$net$}&devicetype={$devicetype$}&adspacetype={$adspacetype$}&category={$category$}&ip={$ip$}&os_version={$os_version$}&aw={$aw$}&ah={$ah$}&timestamp={$timestamp$}&sign={$sign$}&format={$format$}&density={$density$}&long={$long$}&lat={$lat$}&devicenum={$devicenum$}&sdkversion={$sdkversion$}&cid={$cid$}&callbacktype={$callbacktype$}&schema={$schema$}&pw={$pw$}&ph={$ph$}\"]}}}}}}";
@@ -514,7 +558,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"status\":\"100\",\"msg\":\"������\",\"data\":{\"ad\":{\"aid\":\"7\",\"ts\":\"1355801288\",\"sessionid\":\"e13ef4470f1e4f798c17e066ed4f1de1\",\"creative\":{\"cid\":\"9\",\"ts\":\"1355801272\",\"displayinfo\":{\"type\":\"4\",\"img\":\"http://apitest.lomark.cn/upload/201212/201212181127521380l9_320_50.gif\",\"schema\":\"bf9e2a0844e840b3aa8af4ad14b6924a\"},\"clkinfos\":[{\"type\":\"1\",\"schema\":\"bf9e2a0844e840b3aa8af4ad14b6924a\",\"url\":\"http://www.sohu.com\"}],\"trackers\":{\"clicks\":[{\"schema\":\"bf9e2a0844e840b3aa8af4ad14b6924a\",\"urls\":[\"http://apitest.lomark.cn/v2/callback?sessionid={$sessionid$}&key={$key$}&appid={$appid$}&appname={$appname$}&uuid={$uuid$}&client={$client$}&operator={$operator$}&net={$net$}&devicetype={$devicetype$}&adspacetype={$adspacetype$}&category={$category$}&ip={$ip$}&os_version={$os_version$}&aw={$aw$}&ah={$ah$}&timestamp={$timestamp$}&sign={$sign$}&format={$format$}&density={$density$}&long={$long$}&lat={$lat$}&devicenum={$devicenum$}&sdkversion={$sdkversion$}&cid={$cid$}&callbacktype={$callbacktype$}&schema={$schema$}&pw={$pw$}&ph={$ph$}\"]}],\"display\":{\"urls\":[\"http://apitest.lomark.cn/v2/callback?sessionid={$sessionid$}&key={$key$}&appid={$appid$}&appname={$appname$}&uuid={$uuid$}&client={$client$}&operator={$operator$}&net={$net$}&devicetype={$devicetype$}&adspacetype={$adspacetype$}&category={$category$}&ip={$ip$}&os_version={$os_version$}&aw={$aw$}&ah={$ah$}&timestamp={$timestamp$}&sign={$sign$}&format={$format$}&density={$density$}&long={$long$}&lat={$lat$}&devicenum={$devicenum$}&sdkversion={$sdkversion$}&cid={$cid$}&callbacktype={$callbacktype$}&schema={$schema$}&pw={$pw$}&ph={$ph$}\"]}}}}}}";
@@ -564,7 +608,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpLomarkAdnetwork.getImpressionId());
     }
 

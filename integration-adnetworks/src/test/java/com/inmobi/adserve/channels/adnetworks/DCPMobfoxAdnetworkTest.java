@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +18,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -44,6 +49,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
     private final String mobfoxAdvId = "mobfoxadv1";
     private final String mobfoxTest = "1";
     private final String mobfoxAdNetworkId = "test";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -83,6 +89,33 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                 }), new TestScopeModule())
                 .usingBasePackages("com.inmobi.adserve.channels.server.netty",
                         "com.inmobi.adserve.channels.api.provider").build().createInjector();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpMobfoxAdNetwork = new DCPMobFoxAdnetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -106,7 +139,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                                 "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
+                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
 
     @Test
@@ -127,7 +160,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -147,7 +180,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -173,7 +206,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15)) {
+        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpMobfoxAdNetwork.getRequestUri().toString();
 
             final String expectedUrl =
@@ -209,7 +242,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpMobfoxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://my.mobfox.com/request.php?rt=api&s=01212121&u=Mozilla&i=206.29.182.240&m=live&c_mraid=1&o_mcmd5=202cb962ac59075b964b07152d234b70&v=2.0&latitude=38.5&longitude=-122.1514&demo.keywords=Business%2CBooks+%26+Reference&adspace.width=320&adspace.height=50&s_subid=00000000-0000-0000-0000-000000000000";
@@ -237,7 +270,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
+        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><request type=\"textAd\"><htmlString><![CDATA[<body style=\"text-align:center;margin:0;padding:0;\"><div align=\"center\"><a href=\"http://account.mobfox.com/activation-info.php\" target=\"_self\"><img src=\"http://creative1cdn.mobfox.com/static/documents/testbanner/300x250.jpg\" border=\"0\"/></a></div></body>]]></htmlString><clicktype>inapp</clicktype><clickurl><![CDATA[http://account.mobfox.com/activation-info.php]]></clickurl><urltype>link</urltype><refresh>60</refresh><scale>no</scale><skippreflight>yes</skippreflight></request>";
         dcpMobfoxAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -287,7 +320,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpMobfoxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpMobfoxAdNetwork.getImpressionId());
     }
 

@@ -124,6 +124,8 @@ public class ServletGetSegment implements Servlet {
                     entity = CasConfigUtil.repositoryHelper.queryNativeAdTemplateRepository(id);
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
                 }
             }
             segmentInfo.put(key, entity);

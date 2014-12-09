@@ -5,7 +5,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -130,13 +129,13 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             longitude = latlong[1];
         }
 
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+        if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
 
             Short slotSize = selectedSlotId;
             if (slotSize == (short)9) {
                 slotSize = (short)15;
             }
-            final Dimension dim = SlotSizeMapping.getDimension(slotSize);
+            final Dimension dim = repositoryHelper.querySlotSizeMapRepository(slotSize).getDimension();
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {

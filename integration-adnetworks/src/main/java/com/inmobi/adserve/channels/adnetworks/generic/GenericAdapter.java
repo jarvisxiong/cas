@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.adnetworks.generic;
 
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -219,7 +218,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             return casInternalRequestParameters.getUid();
         }
         if (macro.equals(MacrosAndStrings.FORMAT)) {
-            final Dimension format = SlotSizeMapping.getDimension(selectedSlotId);
+            final Dimension format = repositoryHelper.querySlotSizeMapRepository(selectedSlotId).getDimension();
             if (format != null) {
                 return (int) format.getWidth() + "x" + (int) format.getHeight();
             }

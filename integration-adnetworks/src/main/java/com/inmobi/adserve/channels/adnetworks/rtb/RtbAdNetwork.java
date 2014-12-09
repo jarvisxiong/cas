@@ -10,7 +10,6 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
 import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
@@ -21,8 +20,8 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesInterface;
@@ -205,7 +204,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    private final RepositoryHelper repositoryHelper;
     private String bidderCurrency = "USD";
     private final List<String> blockedAdvertisers = Lists.newArrayList();
 
@@ -216,8 +214,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final RepositoryHelper repositoryHelper,
-            final boolean templateWinNotification) {
+            final String advertiserName, final int tmax, final boolean templateWinNotification) {
 
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
@@ -234,7 +231,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
-        this.repositoryHelper = repositoryHelper;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
@@ -464,8 +460,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Banner createBannerObject() {
         final Banner banner = new Banner();
         banner.setId(casInternalRequestParameters.getImpressionId());
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }

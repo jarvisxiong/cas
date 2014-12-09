@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
@@ -63,13 +62,13 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+        if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
             Short slotSize = selectedSlotId;
             // Httpool doesnt support 320x48 & 320x53. so mapping to 320x50
             if (slotSize == (short)9 || slotSize == (short)24) {
                 slotSize = 15;
             }
-            final Dimension dim = SlotSizeMapping.getDimension(slotSize);
+            final Dimension dim = repositoryHelper.querySlotSizeMapRepository(slotSize).getDimension();
             acceptShop = dim.getWidth() > 299;
             slotFormat = String.format("%dx%d", (int) Math.ceil(dim.getWidth()), (int) Math.ceil(dim.getHeight()));
         }

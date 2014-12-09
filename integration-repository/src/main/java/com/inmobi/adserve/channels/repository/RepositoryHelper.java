@@ -26,6 +26,7 @@ import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
@@ -59,6 +60,7 @@ public class RepositoryHelper {
     private final NativeAdTemplateRepository nativeAdTemplateRepository;
     private final IXPackageRepository ixPackageRepository;
     private final GeoZipRepository geoZipRepository;
+    private final SlotSizeMapRepository slotSizeMapRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -78,6 +80,7 @@ public class RepositoryHelper {
         nativeAdTemplateRepository = builder.nativeAdTemplateRepository;
         ixPackageRepository = builder.ixPackageRepository;
         geoZipRepository = builder.geoZipRepository;
+        slotSizeMapRepository = builder.slotSizeMapRepository;
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
                 .addRepositoryToStats(channelRepository).addRepositoryToStats(channelAdGroupRepository)
@@ -86,7 +89,8 @@ public class RepositoryHelper {
                 .addRepositoryToStats(pricingEngineRepository).addRepositoryToStats(siteFilterRepository)
                 .addRepositoryToStats(siteEcpmRepository).addRepositoryToStats(currencyConversionRepository)
                 .addRepositoryToStats(wapSiteUACRepository).addRepositoryToStats(ixAccountMapRepository)
-                .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository);
+                .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
+                .addRepositoryToStats(slotSizeMapRepository);
 
     }
 
@@ -113,6 +117,7 @@ public class RepositoryHelper {
         private NativeAdTemplateRepository nativeAdTemplateRepository;
         private IXPackageRepository ixPackageRepository;
         private GeoZipRepository geoZipRepository;
+        private SlotSizeMapRepository slotSizeMapRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -132,6 +137,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(nativeAdTemplateRepository);
             Preconditions.checkNotNull(ixPackageRepository);
             Preconditions.checkNotNull(geoZipRepository);
+            Preconditions.checkNotNull(slotSizeMapRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -141,6 +147,15 @@ public class RepositoryHelper {
             return geoZipRepository.query(zipId);
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying Geo Zip Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public SlotSizeMapEntity querySlotSizeMapRepository(final Short slotId) {
+        try {
+            return slotSizeMapRepository.query(slotId);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SlotSizeMap Repository, {}", ignored);
         }
         return null;
     }

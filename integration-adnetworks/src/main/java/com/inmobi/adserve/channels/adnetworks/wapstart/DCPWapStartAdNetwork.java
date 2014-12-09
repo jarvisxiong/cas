@@ -6,7 +6,6 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -61,11 +60,11 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString("wapstart.host");
 
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
+        if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
             if(selectedSlotId == 9 || selectedSlotId == 15 || selectedSlotId == 24) {
                 selectedSlotId = 4;
             }
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+            final Dimension dim = repositoryHelper.querySlotSizeMapRepository(selectedSlotId).getDimension();
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         } else {

@@ -3,15 +3,20 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.generic.GenericAdapter;
@@ -31,6 +36,7 @@ public class GenericAdapterTest extends TestCase {
     // private String loggerConf = "/tmp/channel-server.properties";
     private final String debug = "debug";
     private final String advertiserName = "httpool";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -67,6 +73,41 @@ public class GenericAdapterTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor12);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)12))
+                .andReturn(slotSizeMapEntityFor12).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         genericAdapter = new GenericAdapter(mockConfig, null, base, serverChannel, "httpool");
     }
 
@@ -86,7 +127,7 @@ public class GenericAdapterTest extends TestCase {
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9),
+                genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9, repositoryHelper),
                 true);
     }
 
@@ -104,7 +145,7 @@ public class GenericAdapterTest extends TestCase {
                         null, 0, null, null, true, true, null, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9),
+        assertEquals(genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper),
                 false);
     }
 
@@ -123,7 +164,7 @@ public class GenericAdapterTest extends TestCase {
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9)) {
+        if (genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9, repositoryHelper)) {
             final String actualUrl = genericAdapter.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?did=1234&zid=118398&format=320x48&sdkid=api&sdkver=100&uip=206.29.182.240&ua=Mozilla&ormma=0&fh=1&test=0";
