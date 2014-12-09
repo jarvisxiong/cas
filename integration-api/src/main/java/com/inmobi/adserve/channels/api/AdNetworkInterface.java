@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 
@@ -88,8 +89,8 @@ public interface AdNetworkInterface {
     // Updates the request parameters according to the Ad Network. Returns true on
     // success.
     boolean configureParameters(final SASRequestParameters param,
-            final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl, final long SlotId);
+                                final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
+                                final String clickUrl, final String beaconUrl, final long SlotId, final RepositoryHelper repositoryHelper);
 
     // Makes asynchronous request to Ad Network server. Returns true on success.
     boolean makeAsyncRequest();
@@ -148,6 +149,7 @@ public interface AdNetworkInterface {
     void generateJsAdResponse();
 
     void setName(final String adapterName);
+    RepositoryHelper getRepositoryHelper();
 
     Short getSelectedSlotId();
 

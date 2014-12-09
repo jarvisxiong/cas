@@ -23,6 +23,7 @@ import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.repository.SlotSizeMapRepository;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -100,6 +101,7 @@ public class ChannelServer {
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     private static GeoZipRepository geoZipRepository;
+    private static SlotSizeMapRepository slotSizeMapRepository;
     @Getter
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     @Getter
@@ -173,6 +175,7 @@ public class ChannelServer {
             ixAccountMapRepository = new IXAccountMapRepository();
             ixPackageRepository = new IXPackageRepository();
             geoZipRepository = new GeoZipRepository();
+            slotSizeMapRepository = new SlotSizeMapRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -193,6 +196,7 @@ public class ChannelServer {
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
+            repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -322,6 +326,7 @@ public class ChannelServer {
             loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config);
             loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY, config);
             loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config);
+            loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);

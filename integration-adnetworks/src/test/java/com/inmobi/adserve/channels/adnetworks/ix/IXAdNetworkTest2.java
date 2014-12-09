@@ -8,14 +8,17 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,6 +38,7 @@ import com.inmobi.casthrift.ADCreativeType;
 public class IXAdNetworkTest2 {
     private static Configuration mockConfig;
     private static final String advertiserName = "ix";
+    private static RepositoryHelper repositoryHelper;
 
     private static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -60,6 +64,33 @@ public class IXAdNetworkTest2 {
     @BeforeClass
     public static void setUp() {
         prepareMockConfig();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
     }
 
     @Test
@@ -73,7 +104,7 @@ public class IXAdNetworkTest2 {
         final String response3 = null;
         final String response4 = "{\"id\":\"ce3adf2d-0149-1000-e483-3e96d9a8a2c1\",\"bidid\":\"1bc93e72-3c81-4bad-ba35-9458b54e109a\",\"seatbid\":[{\"bid\":[]}],\"statuscode\":10}";
         final IXAdNetwork ixAdNetwork =
-                new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, null, false);
+                new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, false);
 
         ixAdNetwork.parseResponse(response1, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
@@ -156,7 +187,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15);
+                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, repositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -218,7 +249,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15);
+                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, repositoryHelper);
         ImpressionIdGenerator.init((short) 123, (byte) 10);
         ClickUrlsRegenerator.init(mockConfig);
 

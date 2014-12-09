@@ -3,15 +3,20 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.marimedia.DCPMarimediaAdNetwork;
@@ -31,6 +36,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
     private final String marimediaHost = "http://ad.taptica.com/aff_ad?rt=0";
     private final String marimediaStatus = "on";
     private final String marimediaAdvId = "marimedia";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -54,6 +60,43 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
+        final SlotSizeMapEntity slotSizeMapEntityFor3 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor3.getDimension()).andReturn(new Dimension(216, 36)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor3);
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        final SlotSizeMapEntity slotSizeMapEntityFor21 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor21.getDimension()).andReturn(new Dimension(480, 75)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor21);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)3))
+                .andReturn(slotSizeMapEntityFor3).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)21))
+                .andReturn(slotSizeMapEntityFor21).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpMarimediaAdNetwork = new DCPMarimediaAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -83,7 +126,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                         null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         assertTrue(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
-                null, (short) 3));
+                null, (short) 3, repositoryHelper));
     }
 
     @Test
@@ -108,10 +151,10 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                         null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         assertFalse(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
-                null, (short) 3));
+                null, (short) 3, repositoryHelper));
         sasParams.setOsMajorVersion("2.3.1");
         assertTrue(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
-                null, (short) 3));
+                null, (short) 3, repositoryHelper));
 
     }
 
@@ -145,7 +188,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                         + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1"
                         + "/9cddca11?beacon=true";
 
-        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 3);
+        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 3, repositoryHelper);
 
         // Compare the expected URL with actual URL.
         final String actualUrl = dcpMarimediaAdNetwork.getRequestUri().toString();
@@ -187,7 +230,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
         final String response =
                 "{\"adyxAdRequestGuid\": \"3b327792-f364-41b4-9f34-501f1acc3109\", \"adType\": \"banner\", \"imageUrl\": \"http://media.go2speed.org/brand/files/taptica/4278/Bingo_2tixanimated_Banner_320x50.gif\", \"imageAltText\": null, \"adUrl\": \"http://tracking.taptica.com/aff_ic?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9TWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d\",    \"impUrl\": \"http://ad.taptica.com/aff_i?tt_cid=3b327792f36441b49f34501f1acc3109&el=GbtixRMFpAr%2boJEVHfprXTgVAQ3Ld8jjq6x3iEWyaxyyAB9XQaJ2hY1C%2bRbXbyCqSUxUNfry7uYwwqJoGMRB4DXDBgQXPm3cW0TjdSjP3GwU4L4c80snbxBqkCNTlGzYfeDOTGlIBc72p%2bKawW1NjSO6o5imY%2fv08FTGqOkRkhtpsdYOVHKXY6dYrgs57S2lAlmQgY62z3717Io%2f82fSHB4vgiY9rovVowp65VpiBKbt3a6VLqOpERRikOpS6NDRe4qtJFdK326mBMsVETyPW1Egv4eZAnn1baZ5OLwYf9UTWP3x1OsgHBD9YV5V2hA%2btjAExs9A%2brj%2b5Tk2lGAGFpK%2bM%2bd3ttbG%2f%2brE2WlbRVHfE3EtatWKJ0g2kh8p2uccF7N5FsRn9PvvRTwgM0pgmw9h5xjcFcG9PfLRrmZ6QXCq5hytHd4B3y7WU1pQUmjtQO8YHaj0wTdZ2NJJtyfuIL78qSwgTqfYiAkg7%2bMDVjs%3d\", \"urlType\": \"web\", \"beacon\": null, \"adInterval\": \"10\", \"advAppId\": \"542781249\", \"storeUrl\": null, \"payout\": \"1.05000\"}";
 
-        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 3);
+        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 3, repositoryHelper);
         dcpMarimediaAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMarimediaAdNetwork.getHttpResponseStatusCode(), 200);
 
@@ -229,7 +272,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
 
         final String response = "{\"code\":0,\"adType\":\"empty\",\"description\":\"\"}";
 
-        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 21);
+        dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 21, repositoryHelper);
         dcpMarimediaAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpMarimediaAdNetwork.getHttpResponseStatusCode(), 200);
 

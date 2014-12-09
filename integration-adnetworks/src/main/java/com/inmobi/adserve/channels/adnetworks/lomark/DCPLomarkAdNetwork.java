@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.lomark;
 
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import io.netty.bootstrap.Bootstrap;
@@ -31,7 +32,6 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
@@ -111,8 +111,9 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             latitude = latlong[0];
             longitude = latlong[1];
         }
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
         }

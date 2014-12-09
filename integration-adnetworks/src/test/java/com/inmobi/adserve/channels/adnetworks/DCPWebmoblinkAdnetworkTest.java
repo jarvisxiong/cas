@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +17,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -44,6 +49,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
     private final String webmoblinkAdvId = "54321";
     private final String webmoblinkMode = "LIVE";
     private final String webmoblinkAdFormat = "ANY";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -83,6 +89,44 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         }), new TestScopeModule())
                 .usingBasePackages("com.inmobi.adserve.channels.server.netty", "com.inmobi.adserve.channels.api.provider")
                 .build().createInjector();
+        final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor1);
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor12);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)12))
+                .andReturn(slotSizeMapEntityFor12).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpWebmoblinkAdNetwork = new DCPWebmoblinkAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -105,7 +149,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15));
+                dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -130,7 +174,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15));
+                dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -157,7 +201,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15));
+                dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -183,7 +227,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
-        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         String actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
         String expectedUrl =
                 "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us";
@@ -213,7 +257,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
-        if (dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15)) {
+        if (dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper)) {
             String actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
             String expectedUrl =
                     "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml";
@@ -239,7 +283,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d, null,
                         null, 32, new Integer[] {0}));
-        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         String response =
                 "<?xml version=\"1.0\"?> <adResponse><status>0</status><clickUrl> http://buschgardens.com/bg/ </clickUrl><imageUrl> http://webmoblink.com/uploadedfiles/buschgarden3021.gif </imageUrl> <adText>Enjoy two parks, any two days</adText><firePixel> http://webmoblink.com/api/tracksystem/2345 </firePixel></adResponse>";
         dcpWebmoblinkAdNetwork.parseResponse(response, HttpResponseStatus.OK);

@@ -3,7 +3,7 @@ package com.inmobi.adserve.channels.adnetworks.ifc;
 import com.google.gson.JsonObject;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -170,8 +170,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("IFC Configure Parameter returning false as mandatory param: SiteName is missing");
             return false;
         }
-        if (null != selectedSlotId && SlotSizeMapping.getDimension(selectedSlotId) != null) {
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
             slotHeight = String.valueOf(dim.getHeight());
             slotWidth = String.valueOf(dim.getWidth());
         } else {

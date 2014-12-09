@@ -4,7 +4,6 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -44,10 +43,10 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
         googleInMobiPubID = config.getString("googleadx.googleAdXPublisherID");
 
         Short adapterSlot = selectedSlotId;
-        if (adapterSlot == null || adapterSlot == 9 || SlotSizeMapping.getDimension(adapterSlot) == null) {
+        if (adapterSlot == null || adapterSlot == 9 || repositoryHelper.querySlotSizeMapRepository(adapterSlot) == null) {
             adapterSlot = 15;
         }
-        final Dimension dim = SlotSizeMapping.getDimension(adapterSlot);
+        final Dimension dim = repositoryHelper.querySlotSizeMapRepository(adapterSlot).getDimension();
         width = (int) Math.ceil(dim.getWidth());
         height = (int) Math.ceil(dim.getHeight());
         LOG.debug("Configure parameters inside GoogleAdX returned true");

@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +18,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -37,6 +42,7 @@ public class DCPMableAdnetworkTest extends TestCase {
     private final String mableAdvId = "mableadv1";
     private final String mableTest = "1";
     private final String mableAuthKey = "335eaf2639079ffa40b5f7d69f3051fb";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -62,6 +68,41 @@ public class DCPMableAdnetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor12);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)12))
+                .andReturn(slotSizeMapEntityFor12).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpMableAdNetwork = new DCPMableAdnetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -85,7 +126,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                                 "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
 
     @Test
@@ -106,7 +147,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -127,7 +168,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -147,7 +188,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE));
+                dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper));
     }
 
     @Test
@@ -172,7 +213,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
 
-        if (dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15)) {
+        if (dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpMableAdNetwork.getRequestUri().toString();
             final String expectedUrl = "http://ad.ipredictive.com/d/ads";
             assertEquals(expectedUrl, actualUrl);
@@ -206,7 +247,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpMableAdNetwork.getRequestUri().toString();
             System.out.println(actualUrl);
             final String expectedUrl = "http://ad.ipredictive.com/d/ads";
@@ -233,7 +274,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
+        dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "<div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div>";
         dcpMableAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -263,7 +304,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
+        dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "<div style='margin:0px; padding:0px;'><a target=\"_top\" href=\"http://ad.ipredictive.com/d/track/click?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fapp.appsflyer.com%2Fid381840917%3Fpid%3Dmable_int%26c%3DMable%26clickid%3Dbde34925-a0da-11e2-851d-f112587bd4c2%253A424%253A58%253A8%253A50%253A55%253Ainmobi_1_0_1_testkey\"><img src=\"http://ad.ipredictive.com/d/img/image?zid=inmobi_1_0_1_testkey&sid=bde34925-a0da-11e2-851d-f112587bd4c2&crid=424&adid=8&oid=55&cid=50&spid=322&pubid=58&ez_p=H4sIAAAAAAAAAKuuBQBDv6ajAgAAAA&rd=http%3A%2F%2Fd299n2tvhpuett.cloudfront.net%2Fimage%2Fmable%2Fmable5.png&rr=43207\" width=\"320\" height=\"50\"></img></a></div>";
         dcpMableAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -313,7 +354,7 @@ public class DCPMableAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpMableAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpMableAdNetwork.getImpressionId());
     }
 

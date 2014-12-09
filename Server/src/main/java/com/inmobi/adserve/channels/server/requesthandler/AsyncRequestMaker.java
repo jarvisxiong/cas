@@ -69,7 +69,7 @@ public class AsyncRequestMaker {
             final AdNetworkInterface network =
                     segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row.getChannelSegmentEntity()
                                     .getChannelId(), adapterConfig, null, null, base, channel, advertiserSet, isRtbEnabled,
-                            sasParams.getDst(), repositoryHelper);
+                            sasParams.getDst());
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;
@@ -118,7 +118,7 @@ public class AsyncRequestMaker {
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
             if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,
-                    beaconUrl, row.getRequestedSlotId())) {
+                    beaconUrl, row.getRequestedSlotId(), repositoryHelper)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner() || network.isIxPartner()) {
