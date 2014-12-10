@@ -3,15 +3,20 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
@@ -31,6 +36,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
     private final String loganStatus = "on";
     private final String loganAdvId = "loganadv1";
     private final String loganTest = "1";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -55,6 +61,35 @@ public class DCPLoganAdnetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository(Short.MAX_VALUE))
+                .andReturn(null).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpLoganAdNetwork = new DCPLoganAdnetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -76,7 +111,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 true);
     }
 
@@ -98,7 +133,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -120,7 +155,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -141,7 +176,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -165,7 +200,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
@@ -192,7 +227,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
@@ -219,7 +254,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE)) {
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70";
@@ -249,7 +284,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl, (short) 15)) {
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&country=US&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
@@ -277,7 +312,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl, (short) 15)) {
+        if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
@@ -305,7 +340,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15);
+        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"img\" : \"http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png\",\"type\": \"image/png\",\"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -333,7 +368,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15);
+        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\", \"track\" : \"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a?redir=http%3A%2F%2Ffalcon828.startdedicated.com%2Foapi%2FgetAd%3Bjsessionid%3DCE95AD7724915C3AF30B6A9251A05F1C.falcon828\", \"content\" : \"<a href=\\\"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\\\" target=\\\"_blank\\\"><img width=\\\"320\\\" height=\\\"50\\\" style=\\\"border-style: none\\\" src=\\\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\\\"/></a><img src=\\\"http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828\\\" width=\\\"1\\\" height=\\\"1\\\" /><img src=\\\"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a\\\" width=\\\"1\\\" height=\\\"1\\\" alt=\\\"\\\"/>\", \"response\" : \"<?xml version=\\\"1.0\\\"?><response xmlns=\\\"http://soma.smaato.com/oapi/\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:schemaLocation=\\\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\\\"><sessionid>CE95AD7724915C3AF30B6A9251A05F1C.falcon828</sessionid><status>success</status><user><id>900</id><ownid>a18145ffe52571ee0b5bf2bbb906f6e6</ownid></user><ads><ad id=\\\"0\\\" type=\\\"RICHMEDIA\\\" width=\\\"320\\\" height=\\\"50\\\"><log-id></log-id><valid start=\\\"0\\\" end=\\\"0\\\" max=\\\"1\\\"/><mediadata><![CDATA[<a href=\\\"http://nym1.mobile.adnxs.com/click?dtZuu9Bcsz8CQ7Fw7Z-tPwisHFpkO98_AkOxcO2frT931m670FyzP9IG4za7jJwsxcyUYtQDuWULzcpSAAAAAHAmGQDYBgAA5gcAAAIAAADmUqIAckUEAAAAAQBVU0QAVVNEAEABMgD9twAAvJ0BAQUCAQIAAIoAOyliMwAAAAA./cnd=%21nQVeMwiKhJcBEOaliQUY8ooRIAA./referrer=www.loganmedia.mobi/clickenc=http%3A%2F%2Fhastrk1.com%2Fserve%3Faction%3Dclick%26publisher_id%3D44840%26site_id%3D15984%26offer_id%3D248966%26odin%3D%26device_id_md5%3D%26device_id_sha1%3D%26ref_id%3Dnym1CMWZ05TG-sDcZRACGNKNjLezl6POLCIPMjAxLjEzOS4xNTQuMTI5KAE.\\\" target=\\\"_blank\\\"><img width=\\\"320\\\" height=\\\"50\\\" style=\\\"border-style: none\\\" src=\\\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\\\"/></a>]]></mediadata><link></link><action target=\\\"\\\" type=\\\"\\\"/><beacons><beacon>http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828</beacon></beacons></ad></ads></response>\" }];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -361,7 +396,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15);
+        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"img\" : \"http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png\",\"type\": \"image/png\",\"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
         dcpLoganAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -390,7 +425,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"text\" : \"Test Campaign for Integration Testing\", \"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
@@ -422,7 +457,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"text\" : \"Test Campaign for Integration Testing\", \"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
@@ -478,7 +513,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals(dcpLoganAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 

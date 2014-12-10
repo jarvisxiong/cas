@@ -3,8 +3,15 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import io.netty.channel.Channel;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -33,10 +40,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.ix.Bid;
 import com.inmobi.casthrift.ix.IXBidResponse;
@@ -56,6 +59,7 @@ public class IXAdNetworkTest extends TestCase {
     private static final String SITE_ID = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private static final long COUNTRY_ID = 94L;
     IXBidResponse bidResponse;
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -103,9 +107,46 @@ public class IXAdNetworkTest extends TestCase {
         final CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
         EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
         EasyMock.replay(currencyConversionEntity);
-        final RepositoryHelper repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
         EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
                 .andReturn(currencyConversionEntity).anyTimes();
+        final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor1);
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor12);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)12))
+                .andReturn(slotSizeMapEntityFor12).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+
         final ResultSet<IXPackageEntity> resultSet = new ResultSet<IXPackageEntity>() {
             @Override
             public Iterator<IXPackageEntity> iterator() {
@@ -152,7 +193,7 @@ public class IXAdNetworkTest extends TestCase {
         EasyMock.replay(repositoryHelper);
 
         ixAdNetwork =
-                new IXAdNetwork(mockConfig, null, base, serverChannel, urlBase, "ix", 200, repositoryHelper, true);
+                new IXAdNetwork(mockConfig, null, base, serverChannel, urlBase, "ix", 200, true);
 
         final Field asyncHttpClientProviderField = IXAdNetwork.class.getDeclaredField("asyncHttpClientProvider");
         asyncHttpClientProviderField.setAccessible(true);
@@ -258,7 +299,7 @@ public class IXAdNetworkTest extends TestCase {
                         0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject(), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15),
+                ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -287,13 +328,13 @@ public class IXAdNetworkTest extends TestCase {
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
         } catch (final JSONException e) {
@@ -326,13 +367,13 @@ public class IXAdNetworkTest extends TestCase {
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
         } catch (final JSONException e) {
@@ -370,7 +411,7 @@ public class IXAdNetworkTest extends TestCase {
 
             // Test case for transparency false
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 1);
@@ -378,7 +419,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
@@ -396,7 +437,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
 
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sasParams.getSiteId());
@@ -408,7 +449,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
@@ -425,7 +466,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
 
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sasParams.getSiteId());
@@ -436,7 +477,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
@@ -476,7 +517,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("wap");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getAq().getSensitivity(), "high");
@@ -484,7 +525,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getAq().getSensitivity(), "high");
@@ -494,7 +535,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("wap");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getAq().getSensitivity(), "low");
@@ -502,7 +543,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getAq().getSensitivity(), "low");
@@ -546,7 +587,7 @@ public class IXAdNetworkTest extends TestCase {
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             List<Integer> apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertNull(apiFrameworkValues); // Will not set any apiFramework values for wap sites.
 
@@ -572,7 +613,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
 
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getApp());
@@ -589,7 +630,7 @@ public class IXAdNetworkTest extends TestCase {
             sasParams.setSource("app");
             sasParams.setSdkVersion("a430");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertEquals(5, apiFrameworkValues.get(0).intValue());
             assertEquals(1001, apiFrameworkValues.get(1).intValue());
@@ -601,7 +642,7 @@ public class IXAdNetworkTest extends TestCase {
 
             sasParams.setSource("app");
             sasParams.setSdkVersion("a350");
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15);
+            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertNull(apiFrameworkValues); // Will not set any api framework values for sdk version < 370
 

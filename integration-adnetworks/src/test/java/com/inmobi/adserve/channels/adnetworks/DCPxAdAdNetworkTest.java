@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +18,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
@@ -33,6 +38,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
     private final String xAdStatus = "on";
     private final String xAdAdvId = "xadadv1";
     private final String xAdTest = "1";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -57,6 +63,35 @@ public class DCPxAdAdNetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository(Short.MAX_VALUE))
+                .andReturn(null).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpxAdAdnetwork = new DCPxAdAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -78,7 +113,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -98,7 +133,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9));
+        assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
     @Test
@@ -118,7 +153,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+        assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -139,7 +174,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+        assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -159,7 +194,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+        assertEquals(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -184,7 +219,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, false,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_IAB8&devid=Mozilla&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=Android_Id%7CMD5&size=320x48&cat=IAB8&os=Android&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
@@ -218,7 +253,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_IAB1&devid=Mozilla&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=IDFA%7CRAW&size=320x48&cat=IAB1&cat=IAB10-2&cat=IAB19-29&cat=IAB20-1&os=iOS&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB21&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB10&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
@@ -250,7 +285,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, false,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_IAB8&devid=iPhone&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=UUID%7CSHA1&size=320x48&cat=IAB8&os=iOS&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
@@ -279,7 +314,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15));
+        assertTrue(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -303,7 +338,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_&devid=Mozilla&lat=11.6&long=-11.87&uid=7a31d90b848f70062e6281b058cc52fc&uid_type=UUID%7CMD5&size=320x50&cat=&os=Android&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
@@ -331,7 +366,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE));
+        assertFalse(dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper));
     }
 
     @Test
@@ -354,7 +389,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4)) {
+        if (dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper)) {
             final String response =
                     "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
             dcpxAdAdnetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -384,7 +419,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -414,7 +449,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -446,7 +481,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "<meta charset=\"utf-8\"/> <meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0;\"/> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/zepto.min.js\"></script> <link rel=\"stylesheet\" media=\"all\" href=\"http://test.xad.com/rest/xadbanner/layout/sb15/_ui/css/main_short.css\"/><script type=\"text/javascript\" src= \"http://test.xad.com/rest/xadbanner/layout/validation/validation.js\"> </script> <div id=\"xad-banner-wrapper_outer\"><div id=\"xad-banner-wrapper\"> <a href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\" style=\"text-decoration:none\"><div id=\"bus-holder\"> <img src=\"http://test.xad.com/rest/xadbanner/layout/sb15/template/map_small.png\" id=\"bus-logo\" alt=\"Gs\"/> </div> <p id=\"xad-banner-description\"> <span class=\"descr descr-height\">Fashionable Eyewear for Men &amp; Women in San Anselmo. Stop by Our Store!... </span> <span class=\"location\"> <span id=\"bus\">Focus Opticians</span> </span> </p> </a> <div id=\"banner-action\"> <a class=\"call-it\" href=\"http://test.xad.com/wap/?l_id=L3rwAq7nP7&appid=Dummy221\">call</a> <sub>xAd</sub></div> </div> <img src=\"http://test.xad.com/rest/notify?t=imp&tid=0&k=X3vZEQ0smjqdLj0sRi49wdtRkUulP9SP&v=1.1&uid=null&l_id=L3rwAq7nP7%7E9AYDW0evP7-0%7E1%7E1%7E1%7E3%7ECA%7Eus%7E9AYDW0evP7%7E1%7E0%7E0%7E%7E0%7E1&type=banner\" width=\"0\" height=\"0\"/> </div> <script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/main.js\"></script><script type=\"text/javascript\" src=\"http://test.xad.com/rest/xadbanner/layout/sb15/js/textSizer.js\"></script><script type=\"text/javascript\">$(window).bind('orientationchange', resizeText);$(window).resize(resizeText)</script>";
@@ -494,7 +529,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpxAdAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals(dcpxAdAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 

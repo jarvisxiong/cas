@@ -8,7 +8,7 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -93,12 +93,13 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         // Check Resolution.
-        if (null == selectedSlotId || null == SlotSizeMapping.getDimension(selectedSlotId)) {
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null == slotSizeMapEntity) {
             LOG.debug("Mandatory parameters missing for Marimedia so exiting adapter");
             LOG.info("Configure parameters inside Marimedia returned false");
             return false;
         } else {
-            final Dimension dim = SlotSizeMapping.getDimension(selectedSlotId);
+            final Dimension dim = slotSizeMapEntity.getDimension();
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
 

@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +17,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
@@ -33,6 +38,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
     private final String httpoolStatus = "on";
     private final String httpoolAdvId = "httpooladv1";
     private final String httpoolTest = "1";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -57,6 +63,36 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor10);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpHttpoolAdNetwork = new DCPHttPoolAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -78,7 +114,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
 
     @Test
@@ -99,7 +135,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
 
     @Test
@@ -120,7 +156,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
 
     @Test
@@ -140,7 +176,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14));
+                dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
 
     @Test
@@ -161,7 +197,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
@@ -188,7 +224,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous&dd_gnd=1";
@@ -217,7 +253,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous&dd_gnd=2";
@@ -246,7 +282,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         null, new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
@@ -275,7 +311,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=Adventure%3BBoard";
@@ -303,7 +339,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
@@ -330,7 +366,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&ct=miscellenous";
@@ -356,7 +392,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15);
+        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "{\"status\":1337,\"ad_type\":\"rich\",\"image_url\":\"http://a.mobile.toboads.com/image?t=rich&aid=0e75e1fd-b715-46be-91df-54a6f12a639d&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890\",\"redirect_url\":\"http://sofialive.bg/mobile\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"}}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -384,7 +420,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15);
+        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "{\"status\": 1337,\"ad_type\": \"tpt\",\"content\": \"<a href=\\\"http://a.mobile.toboads.com/click?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789&url=http://labs.httpool.com\\\"><img src=\\\"http://labs.httpool.com/your_ad_here.png\\\" width=\\\"320\\\" height=\\\"50\\\" /></a>\",\"impression_url\": \"http://a.mobile.toboads.com/impress?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789\",\"extra\": {\"bg_color\": \"#000000\",\"text_color\": \"#FFFFFF\",\"refresh_time\": \"0\",\"transition\": \"0\"}}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -413,7 +449,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"status\":1337,\"ad_type\":\"shop\",\"image_url\":\"http://a.mobile.toboads.com/image?t=text&aid=5f404c6e-8278-436e-838b-5daa39fe2d96&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"redirect_url\":\"http://labs.httpool.com\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"},\"content\":\"Claritas est etiam processus dynamicus, qui sequi.\"}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -444,7 +480,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"status\":1337,\"ad_type\":\"shop\",\"image_url\":\"http://a.mobile.toboads.com/image?t=text&aid=5f404c6e-8278-436e-838b-5daa39fe2d96&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"redirect_url\":\"http://labs.httpool.com\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"},\"content\":\"Claritas est etiam processus dynamicus, qui sequi.\"}";
         dcpHttpoolAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -491,7 +527,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14);
+        dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpHttpoolAdNetwork.getImpressionId());
     }
 

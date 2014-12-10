@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -112,6 +113,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String source;
     protected String blindedSiteId;
     protected Short selectedSlotId;
+    protected RepositoryHelper repositoryHelper;
     protected String format = "UTF-8";
     protected final Channel serverChannel;
 
@@ -455,12 +457,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public boolean configureParameters(final SASRequestParameters param,
-            final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl, final long slotId) {
+                                       final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
+                                       final String clickUrl, final String beaconUrl, final long slotId, final RepositoryHelper repositoryHelper) {
         sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
         externalSiteId = entity.getExternalSiteKey();
         selectedSlotId = (short) slotId;
+        this.repositoryHelper = repositoryHelper;
         this.clickUrl = clickUrl;
         this.beaconUrl = beaconUrl;
         impressionId = param.getImpressionId();
@@ -893,5 +896,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public Short getSelectedSlotId() {
         return selectedSlotId;
+    }
+
+    @Override
+    public RepositoryHelper getRepositoryHelper() {
+        return repositoryHelper;
     }
 }

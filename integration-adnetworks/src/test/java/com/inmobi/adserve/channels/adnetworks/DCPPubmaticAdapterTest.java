@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +17,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -34,6 +39,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
     private final String pubmaticStatus = "on";
     private final String pubmaticAdvId = "pubmaticadv1";
     private final String pubId = "2685";
+    private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -58,6 +64,28 @@ public class DCPPubmaticAdapterTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        EasyMock.replay(slotSizeMapEntityFor15);
+        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.replay(repositoryHelper);
         dcpPubmaticAdnetwork = new DCPPubmaticAdNetwork(mockConfig, null, base, serverChannel);
     }
 
@@ -81,7 +109,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper),
                 true);
     }
 
@@ -104,7 +132,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -127,7 +155,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -149,7 +177,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -171,7 +199,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             dcpPubmaticAdnetwork.makeAsyncRequest();
             final String actualUrl = dcpPubmaticAdnetwork.getRequestUrl();
             assertEquals(pubmaticHost, actualUrl);
@@ -199,7 +227,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=Education%2CEntertainment&kltstamp=";
@@ -230,7 +258,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=Education%2CEntertainment&kltstamp=";
@@ -259,7 +287,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -289,7 +317,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&country=USA&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -316,7 +344,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=50&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -341,7 +369,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -370,7 +398,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -402,7 +430,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -434,7 +462,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -468,7 +496,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4);
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
@@ -516,7 +544,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15);
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals(dcpPubmaticAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 
