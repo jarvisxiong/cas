@@ -1,33 +1,17 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.google.common.collect.Lists;
-import com.googlecode.cqengine.resultset.ResultSet;
-import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.api.config.ServerConfig;
-import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.casthrift.ix.Bid;
-import com.inmobi.casthrift.ix.IXBidResponse;
-import com.inmobi.casthrift.ix.SeatBid;
-import io.netty.channel.Channel;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
-import java.awt.*;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import io.netty.channel.Channel;
+
+import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -38,9 +22,28 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import com.google.common.collect.Lists;
+import com.googlecode.cqengine.resultset.ResultSet;
+import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
+import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.casthrift.ix.Bid;
+import com.inmobi.casthrift.ix.IXBidResponse;
+import com.inmobi.casthrift.ix.SeatBid;
 
 public class IXAdNetworkTest extends TestCase {
 
