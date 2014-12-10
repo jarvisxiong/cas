@@ -254,6 +254,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (sasParams.getWapSiteUACEntity() != null) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
             isWapSiteUACEntity = true;
+        }else{
+            wapSiteUACEntity = null;
+            isWapSiteUACEntity = false;
         }
 
         // Creating site/app Object

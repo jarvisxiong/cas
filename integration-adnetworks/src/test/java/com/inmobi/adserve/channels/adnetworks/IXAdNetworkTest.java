@@ -1,35 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import io.netty.channel.Channel;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Executors;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
 import com.google.common.collect.Lists;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.adpool.ContentType;
@@ -40,10 +10,37 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.casthrift.ix.Bid;
 import com.inmobi.casthrift.ix.IXBidResponse;
 import com.inmobi.casthrift.ix.SeatBid;
+import io.netty.channel.Channel;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import java.awt.*;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Executors;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class IXAdNetworkTest extends TestCase {
@@ -597,7 +594,7 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "TESTSITE");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPage(), "www.testSite.com");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
-                    Lists.newArrayList("blk423", "InMobiPERF", "InMobiSTRATEGIC"));
+                    Lists.newArrayList("blk423", "InMobiPERF"));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
 
             // checking for blocked list if siteType is not PERFORMANCE, also if site is not transparent
@@ -624,7 +621,7 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "Games");
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getPage());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
-                    Lists.newArrayList("blk423", "InMobiFS", "InMobiSTRATEGIC"));
+                    Lists.newArrayList("blk423", "InMobiFS"));
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
 
             sasParams.setSource("app");
