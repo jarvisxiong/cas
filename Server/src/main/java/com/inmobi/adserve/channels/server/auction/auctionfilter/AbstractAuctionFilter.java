@@ -1,6 +1,8 @@
 package com.inmobi.adserve.channels.server.auction.auctionfilter;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
@@ -21,6 +23,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     protected final Provider<Marker> traceMarkerProvider;
     protected Boolean isApplicableRTBD; // Whether the filter is applicable to RTBD
     protected Boolean isApplicableIX; // Whether the filter is applicable to IX
+    protected Boolean isApplicableHosted = false; // Whether the filter is applicable to Hosted
 
     private final String inspectorString;
     private FilterOrder order;
@@ -93,10 +96,15 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     }
 
     @Override
-    public boolean isApplicable(final DemandSourceType dst) {
+    public boolean isApplicable(final AdNetworkInterface adNetworkInterface) {
+        DemandSourceType dst = adNetworkInterface.getDst();
         switch (dst) {
             case RTBD:
-                return isApplicableRTBD;
+                if (adNetworkInterface instanceof HostedAdNetwork) {
+                    return isApplicableHosted;
+                } else {
+                    return isApplicableRTBD;
+                }
             case IX:
                 return isApplicableIX;
             default:

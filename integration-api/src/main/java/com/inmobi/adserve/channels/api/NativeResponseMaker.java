@@ -1,19 +1,5 @@
 package com.inmobi.adserve.channels.api;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import lombok.Data;
-
-import org.apache.commons.codec.Charsets;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -28,6 +14,18 @@ import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
 import com.inmobi.template.interfaces.TemplateConfiguration;
+import lombok.Data;
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class NativeResponseMaker {
 
@@ -48,22 +46,40 @@ public class NativeResponseMaker {
         templateDecorator = tc.getTemplateDecorator();
     }
 
-
-    public String makeResponse(final BidResponse response, final Map<String, String> params,
-            final NativeAdTemplateEntity templateEntity) throws Exception {
-        Preconditions.checkNotNull(response, ERROR_STR, "BidResponse");
+    private void checkPreconditions (final Map<String, String> params,
+                                     final NativeAdTemplateEntity templateEntity) {
         Preconditions.checkNotNull(params, ERROR_STR, "params");
         Preconditions.checkNotNull(params.containsKey("siteId"), ERROR_STR, "siteId");
         Preconditions.checkNotNull(templateEntity, ERROR_STR, "templateEntity");
+    }
+
+    public String makeResponse(final BidResponse response, final Map<String, String> params,
+            final NativeAdTemplateEntity templateEntity) throws Exception {
+        checkPreconditions(params, templateEntity);
+        Preconditions.checkNotNull(response, ERROR_STR, "BidResponse");
 
         final String siteId = params.get("siteId");
-        // TODO: Redudancy: templateParser already has a function that gets the app from adm
-        final App app = gson.fromJson(response.getSeatbid().get(0).getBid().get(0).getAdm(), App.class);
-
-        app.setAdImpressionId(params.get("impressionId"));
+        final App app = createNativeAppObject(response.getSeatbid().get(0).getBid().get(0).getAdm(), params);
         validateResponse(app, templateEntity);
-
         final VelocityContext vc = getVelocityContext(app, response, params);
+
+        return createNativeAd(vc, app, siteId);
+    }
+
+    public String makeHostedResponse(final String adm, final Map<String, String> params,
+                                     final NativeAdTemplateEntity templateEntity) throws Exception {
+        checkPreconditions(params, templateEntity);
+        Preconditions.checkNotNull(adm, ERROR_STR, "AdMarkup");
+
+        final String siteId = params.get("siteId");
+        final App app = createNativeAppObject(adm, params);
+        validateResponse(app, templateEntity);
+        final VelocityContext vc = getVelocityContext(app, null, params);
+
+        return createNativeAd(vc, app, siteId);
+    }
+
+    private String createNativeAd(final VelocityContext vc, final App app, final String siteId) throws Exception{
         final String namespace = Formatter.getNamespace();
         vc.put("NAMESPACE", namespace);
 
@@ -74,6 +90,11 @@ public class NativeResponseMaker {
         return nativeAd(pubContent, contextCode, namespace);
     }
 
+    private App createNativeAppObject(final String adm, final Map<String, String> params) {
+        final App app = gson.fromJson(adm, App.class);
+        app.setAdImpressionId(params.get("impressionId"));
+        return app;
+    }
 
     private void validateResponse(final App app, final NativeAdTemplateEntity templateEntity) throws Exception {
         final String mandatoryKey = templateEntity.getMandatoryKey();
@@ -123,13 +144,14 @@ public class NativeResponseMaker {
     private VelocityContext getVelocityContext(final App app, final BidResponse response,
             final Map<String, String> params) {
         final VelocityContext context = new VelocityContext();
-        final String impId = response.getSeatbid().get(0).getBid().get(0).getImpid();
+        final String impId = app.getAdImpressionId();
+
         context.put("IMP_ID", impId);
         context.put("LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("OLD_LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("TRACKING_CODE", getTrackingCode(response, params, app));
         context.put("BEACON_URL", params.get("beaconUrl"));
-        context.put("CLICK_TRACKER", getClickUrl(response, params, app));
+        context.put("CLICK_TRACKER", getClickUrl(params, app));
         return context;
     }
 
@@ -141,9 +163,11 @@ public class NativeResponseMaker {
         final StringBuilder bcu = new StringBuilder();
         String nUrl = null;
         try {
-            nUrl = response.seatbid.get(0).getBid().get(0).getNurl();
-            if (nUrl != null) {
-                bcu.append(constructBeaconUrl(nUrl));
+            if (null != response) {
+                nUrl = response.seatbid.get(0).getBid().get(0).getNurl();
+                if (nUrl != null) {
+                    bcu.append(constructBeaconUrl(nUrl));
+                }
             }
         } catch (final Exception e) {
             LOG.debug("Exception while parsing response {}", e);
@@ -168,7 +192,7 @@ public class NativeResponseMaker {
         throw new Exception(message);
     }
 
-    private String getClickUrl(final BidResponse response, final Map<String, String> params, final App app) {
+    private String getClickUrl(final Map<String, String> params, final App app) {
         final StringBuilder ct = new StringBuilder();
         final List<String> clickUrls = app.getClickUrls();
         if (clickUrls != null) {
