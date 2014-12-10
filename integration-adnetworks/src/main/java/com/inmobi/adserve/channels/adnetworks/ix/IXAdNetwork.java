@@ -32,8 +32,27 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.ix.*;
+import com.inmobi.casthrift.ix.API_FRAMEWORKS;
+import com.inmobi.casthrift.ix.AdQuality;
+import com.inmobi.casthrift.ix.App;
+import com.inmobi.casthrift.ix.Banner;
+import com.inmobi.casthrift.ix.Bid;
+import com.inmobi.casthrift.ix.Blind;
+import com.inmobi.casthrift.ix.CommonExtension;
+import com.inmobi.casthrift.ix.Device;
+import com.inmobi.casthrift.ix.ExtRubiconTarget;
+import com.inmobi.casthrift.ix.Geo;
+import com.inmobi.casthrift.ix.IXBidRequest;
+import com.inmobi.casthrift.ix.IXBidResponse;
+import com.inmobi.casthrift.ix.Impression;
+import com.inmobi.casthrift.ix.ProxyDemand;
+import com.inmobi.casthrift.ix.Publisher;
+import com.inmobi.casthrift.ix.Regs;
+import com.inmobi.casthrift.ix.RubiconExtension;
+import com.inmobi.casthrift.ix.SeatBid;
+import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
+import com.inmobi.casthrift.ix.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -69,6 +88,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+
 
 
 /**
