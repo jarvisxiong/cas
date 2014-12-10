@@ -208,6 +208,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final RepositoryHelper repositoryHelper;
     private String bidderCurrency = "USD";
     private final List<String> blockedAdvertisers = Lists.newArrayList();
+    private WapSiteUACEntity wapSiteUACEntity;
+    private boolean isWapSiteUACEntity = false;
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -251,6 +253,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available",
                     advertiserName);
             return false;
+        }
+
+        if (sasParams.getWapSiteUACEntity() != null) {
+            wapSiteUACEntity = sasParams.getWapSiteUACEntity();
+            isWapSiteUACEntity = true;
         }
 
         // Creating site/app Object
@@ -571,19 +578,32 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         Site site = null;
         if (siteBlinded) {
             site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
+            String category = null;
+            if (isWapSiteUACEntity
+                    && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+                site.setName(wapSiteUACEntity.getAppType());
+            } else if ((category = getCategories(',', false)) != null) {
+                site.setName(category);
+            }
         } else {
             site = new Site(sasParams.getSiteId());
+            if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+
+                final String siteUrl = wapSiteUACEntity.getSiteUrl();
+                if (StringUtils.isNotEmpty(siteUrl)) {
+                    site.setPage(siteUrl);
+                    site.setDomain(siteUrl);
+                }
+                if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
+                    site.setName(wapSiteUACEntity.getSiteName());
+                }
+            }
+
         }
         if (null != sasParams.getCategories()) {
             site.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
-        String category = null;
-        if (sasParams.getWapSiteUACEntity() != null
-                && StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getAppType())) {
-            site.setName(sasParams.getWapSiteUACEntity().getAppType());
-        } else if ((category = getCategories(',', false)) != null) {
-            site.setName(category);
-        }
+
 
         final Map<String, String> siteExtensions = new HashMap<String, String>();
         String siteRating;
@@ -610,32 +630,31 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
         }
         String category = null;
-        final WapSiteUACEntity entity = sasParams.getWapSiteUACEntity();
 
-        if (entity != null && StringUtils.isNotEmpty(entity.getAppType())) {
-            app.setName(entity.getAppType());
+        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+            app.setName(wapSiteUACEntity.getAppType());
         } else if ((category = getCategories(',', false)) != null) {
             app.setName(category);
         }
-        if (entity != null && isNativeRequest() &&  entity.isTransparencyEnabled()) {
+        if (isWapSiteUACEntity && isNativeRequest() &&  wapSiteUACEntity.isTransparencyEnabled()) {
             setParamsForTransparentApp(app);
         }
         
         // set App Ext fields
-        final AppExt ext = createAppExt(entity);
+        final AppExt ext = createAppExt(wapSiteUACEntity);
         app.setExt(ext);
         return app;
     }
 
 
     private void setParamsForTransparentApp(final App app) {
-        if (StringUtils.isNotEmpty(sasParams.getWapSiteUACEntity().getSiteUrl())) {
-            app.setStoreurl(sasParams.getWapSiteUACEntity().getSiteUrl());
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
+            app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
         
-        String bundleId = sasParams.getWapSiteUACEntity().getBundleId();
-        if (StringUtils.isEmpty(bundleId) && sasParams.getWapSiteUACEntity().isAndroid()) {
-            bundleId = sasParams.getWapSiteUACEntity().getMarketId();
+        String bundleId = wapSiteUACEntity.getBundleId();
+        if (StringUtils.isEmpty(bundleId) && wapSiteUACEntity.isAndroid()) {
+            bundleId = wapSiteUACEntity.getMarketId();
         }
         if (StringUtils.isNotEmpty(bundleId)) {
             app.setBundle(bundleId);
