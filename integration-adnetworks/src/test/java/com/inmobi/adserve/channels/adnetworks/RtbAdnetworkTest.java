@@ -53,6 +53,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 
 
+
 public class RtbAdnetworkTest extends TestCase {
 
     private Configuration mockConfig = null;
@@ -284,22 +285,9 @@ public class RtbAdnetworkTest extends TestCase {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSiteId("some_site_id");
-        sasParams.setSource("wap");
-        WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
-
-        // First UAC Entity Category should be present as Site Name.
-        assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
-
-        // For App, First UAC Entity Category should be present as App Name.
-        sasParams.setSource("app");
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
-        assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sasParams.setSource("app");
@@ -308,15 +296,6 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
         // 15 mean board games. Refer to CategoryList
         assertEquals("Board", rtbAdNetwork.getBidRequest().getApp().getName());
-
-        // If WapSiteUACEntity is not null, then it should set primary category name from uac.
-        sasParams.setSource("app");
-        builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Social");
-        sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
-        // Setting primary category name from uac.
-        assertEquals("Social", rtbAdNetwork.getBidRequest().getApp().getName());
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sasParams.setSource("wap");
@@ -334,6 +313,32 @@ public class RtbAdnetworkTest extends TestCase {
         rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
         assertEquals("miscellenous", rtbAdNetwork.getBidRequest().getSite().getName());
+
+        sasParams.setSource("wap");
+        WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+        builder.setAppType("Games");
+        sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+
+        // First UAC Entity Category should be present as Site Name.
+        assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
+
+        // For App, First UAC Entity Category should be present as App Name.
+        sasParams.setSource("app");
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
+
+
+        // If WapSiteUACEntity is not null, then it should set primary category name from uac.
+        sasParams.setSource("app");
+        builder = WapSiteUACEntity.newBuilder();
+        builder.setAppType("Social");
+        sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        // Setting primary category name from uac.
+        assertEquals("Social", rtbAdNetwork.getBidRequest().getApp().getName());
+
+
     }
 
 

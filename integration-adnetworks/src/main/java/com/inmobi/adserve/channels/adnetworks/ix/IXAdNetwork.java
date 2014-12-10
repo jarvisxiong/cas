@@ -120,7 +120,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
-    private static final String RUBICON_STRATEGIC_BLOCKLIST_ID = "InMobiSTRATEGIC";
+    // private static final String RUBICON_STRATEGIC_BLOCKLIST_ID = "InMobiSTRATEGIC";
+
     private static final String LATLON = "LATLON";
     private static final String BSSID_DERIVED = "BSSID_DERIVED";
     private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
@@ -817,7 +818,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             blockedList.add(RUBICON_FS_BLOCKLIST_ID);
         }
-        blockedList.add(RUBICON_STRATEGIC_BLOCKLIST_ID);
         return blockedList;
     }
 
