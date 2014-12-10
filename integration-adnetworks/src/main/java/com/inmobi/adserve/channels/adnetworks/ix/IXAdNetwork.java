@@ -1,12 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
-import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -20,10 +13,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -46,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -56,6 +51,11 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
@@ -63,9 +63,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.ix.API_FRAMEWORKS;
@@ -92,36 +92,6 @@ import com.inmobi.casthrift.ix.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 
 /**
@@ -151,7 +121,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
     private static final String RUBICON_STRATEGIC_BLOCKLIST_ID = "InMobiSTRATEGIC";
-    private static final String RESPONSE_TEMPLATE = "<script>%s</script>";
     private static final String LATLON = "LATLON";
     private static final String BSSID_DERIVED = "BSSID_DERIVED";
     private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
@@ -159,9 +128,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String WIFI = "WIFI";
     private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     private static final String CELL_TOWER = "CELL_TOWER";
-    private static final String MIME = "mime";
     private static final String MIME_HTML = "text/html";
-    private static final String MIME_VALUE = "html";
     public static final int INMOBI_SDK_VERSION_370 = 370;
     private static final int IX_MRAID_VALUE = 1001;
     private static final List<Integer> MRAID_FRAMEWORK_VALUES =
@@ -169,8 +136,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final short AGE_LIMIT_FOR_COPPA = 8;
-
-    private boolean isResponseHTML = false;
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -525,20 +490,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return impression;
     }
 
-    private void setMimeTypeForBannerExt(final RubiconExtension rp) {
-        final JSONObject additionalParams = entity.getAdditionalParams();
-        try {
-            if (additionalParams != null && additionalParams.has(MIME)
-                    && MIME_VALUE.equals(additionalParams.getString(MIME))) {
-                rp.setMime(MIME_HTML);
-                isResponseHTML = true;
-            }
-        } catch (final JSONException e) {
-            LOG.info("Error reading additional Param in IX");
-        }
-    }
-
-
     public String getZoneId(final JSONObject additionalParams) {
         String categoryZoneId = null;
         boolean isCategorySet = false;
@@ -592,7 +543,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != selectedSlotId) {
             if (SlotSizeMapping.isIXSupportedSlot(selectedSlotId)) {
                 final RubiconExtension rp = new RubiconExtension();
-                setMimeTypeForBannerExt(rp);
+                rp.setMime(MIME_HTML);
                 rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(selectedSlotId));
                 ext.setRp(rp);
             }
@@ -1181,11 +1132,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         final int admAfterMacroSize = admContent.length();
 
-        if (!isResponseHTML) {
-            // RP responds with JS content so surrounding admContent with <script> as being done in Rubicon DCP
-            // response.
-            admContent = String.format(RESPONSE_TEMPLATE, admContent);
-        }
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
             velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
         } else {
