@@ -149,7 +149,7 @@ Cache.CreativeRepository.dataSourceName = jdbc
 
 Cache.Name = NativeAdTemplateRepository
 Cache.NativeAdTemplateRepository.Manager = com.inmobi.adserve.channels.repository.NativeAdTemplateRepository
-Cache.NativeAdTemplateRepository.query = select * from site_native_template_fun('${last_update}')
+Cache.NativeAdTemplateRepository.query = select * from site_native_template_fun_28112014('${last_update}')
 Cache.NativeAdTemplateRepository.initialDelay = 300
 Cache.NativeAdTemplateRepository.refreshTime = 6000
 Cache.NativeAdTemplateRepository.isUpdatable = true
@@ -1448,3 +1448,15 @@ adapter.ix.password=F40GXA978H
 adapter.ix.accountId=11726
 adapter.ix.globalBlind=3522,2666,2179,3038,3107,3420,3002,3320,2853,3158,3560,3600,3542,3614,3101,3676,2893
 adapter.ix.TMAX=110
+
+adapter.EAHosted.isRtb=true
+adapter.EAHosted.status=on
+adapter.EAHosted.templateWinNotification=false
+adapter.EAHosted.isWnRequired=true
+adapter.EAHosted.advertiserId=b3f84a58b98b48a0b51116dc09f773f2
+adapter.EAHosted.host.default=https://mrp.rubiconproject.com/ad_request
+adapter.EAHosted.partnerSegmentNo=1
+adapter.EAHosted.class=com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork
+adapter.EAHosted.userName=inmobi
+adapter.EAHosted.password=h0sted1@#
+adapter.EAHosted.bidToUmpInUSD=10.0

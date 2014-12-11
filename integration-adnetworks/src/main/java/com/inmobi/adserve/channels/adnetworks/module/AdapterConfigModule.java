@@ -1,11 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.module;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.configuration.Configuration;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
@@ -15,11 +9,17 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.api.config.AdapterConfigFactory;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
+import org.apache.commons.configuration.Configuration;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -42,6 +42,7 @@ public class AdapterConfigModule extends AbstractModule {
         requestStaticInjection(BaseAdNetworkImpl.class);
         requestStaticInjection(RtbAdNetwork.class);
         requestStaticInjection(IXAdNetwork.class);
+        requestStaticInjection(HostedAdNetwork.class);
 
         install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
         bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));

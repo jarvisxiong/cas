@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION site_native_template_fun(last_updated timestamp without time zone)
+CREATE OR REPLACE FUNCTION site_native_template_fun_28112014(last_updated timestamp without time zone)
 RETURNS SETOF site_native_template_type AS
 $BODY$
 DECLARE
@@ -9,9 +9,9 @@ BEGIN
 	 sna.site_id,
 	 sna.native_ad_id,
 	 at.binary_template,
-	 at.modified_on from site_native_ad_settings sna, ad_template at WHERE 
+	 at.modified_on from site_native_ad_settings sna, ad_template at WHERE
 	 sna.native_ad_id = at.id
-	 and sna.type = 'native_content_template'
+	 and sna.type in ('native_content_template', 'native_content_unit')
 	 and sna.status = 'active'
 	 and at.modified_on >= last_updated
 LOOP

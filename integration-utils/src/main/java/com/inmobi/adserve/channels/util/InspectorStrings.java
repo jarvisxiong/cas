@@ -110,6 +110,19 @@ public class InspectorStrings {
     public static final String NUMBER_OF_TIMES_WRITE_CALLED = "NumberOfTimesWriteExceptionCalled";
     public static final String NUMBER_OF_TIMES_WRITE_EXECUTED = "NumberOfTimesWriteExceptionExecuted";
 
+    // Hosted Ad Server Specific Stats
+    public static final String TOTAL_HOSTED_REQUESTS = "HostedRequests";
+    public static final String RFM_PLACEMENT_IDENTIFIER_ERROR = "PlacementIdentifierErrors";
+    public static final String HOSTED_RESPONSES = "HostedResponsesReceivedFromRP";
+    public static final String DROPPED_IN_HOSTED_AUCTION_ID_FILTER = "DroppedInHostedAuctionIdFilter";
+    public static final String DESERIALISATION_ERROR = "DeserialisationErrors";
+    public static final String HOSTED_FILLS = "HostedFills";
+    // Hosted Ad Server RFM Error Codes
+    public static final String RFM_INVALID_CREDENTIALS = "HostedInvalidCredentials";
+    public static final String RFM_AD_SELECTION_ERROR = "RFM_AD_SELECTION_ERROR: ";
+    public static final String RFM_ERROR = "RFM_ERROR: ";
+
+
     private InspectorStrings() {
         // dummy private constructor to avoid instantiation from other classes
     }

@@ -392,6 +392,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         String tempBidRequestJson;
         try {
             tempBidRequestJson = serializer.toString(bidRequest);
+            // TODO: Unnecessary check for native in IX
             if (isNativeRequest()) {
                 tempBidRequestJson = tempBidRequestJson.replaceFirst("nativeObject", "native");
             }

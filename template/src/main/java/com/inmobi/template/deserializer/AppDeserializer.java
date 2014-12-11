@@ -34,7 +34,11 @@ public class AppDeserializer implements JsonDeserializer<Context> {
             desc = jsonObj.get("description").getAsString();
         }
 
-        final String actionText = jsonObj.get("actiontext").getAsString();
+        String actionText = null ;
+        if (jsonObj.get("actiontext") != null) {
+            actionText = jsonObj.get("actiontext").getAsString();
+        }
+
         String actionLink = null;
         if (jsonObj.get("actionlink") != null) {
             actionLink = jsonObj.get("actionlink").getAsString();
