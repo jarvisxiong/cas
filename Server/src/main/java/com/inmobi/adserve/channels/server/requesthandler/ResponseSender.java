@@ -439,7 +439,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private byte[] encryptResponseIfRequired(byte[] responseBytes) {
         if (sasParams.getSdkVersion() != null
                 && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
-                && sasParams.getDst() == 2) {
+                && sasParams.getDst() == 2
+                && sasParams.getEncryptionKey() != null) {
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
