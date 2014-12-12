@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.auction;
 
+import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -81,32 +82,32 @@ public class AuctionEngine implements AuctionEngineInterface {
             return null;
         } else if (filteredChannelSegmentList.size() == 1) {
             auctionResponse = filteredChannelSegmentList.get(0);
+            AdNetworkInterface winningAdNetworkInterface = auctionResponse.getAdNetworkInterface();
             // Take minimum of auctionFloor+0.01 and bid as secondBidprice if no. of auction
             // response are 1.
-            if (DemandSourceType.RTBD == auctionResponse.getAdNetworkInterface().getDst()) {
+            if (DemandSourceType.RTBD == winningAdNetworkInterface.getDst()) {
                 // For RTBD
                 secondBidPrice =
-                        Math.min(casInternalRequestParameters.getAuctionBidFloor(), auctionResponse
-                                .getAdNetworkInterface().getBidPriceInUsd());
+                        Math.min(casInternalRequestParameters.getAuctionBidFloor(), winningAdNetworkInterface.getBidPriceInUsd());
+                // For Hosted Ad Server, secondBidPrice at this point is -1
+                // If Hosted Ad Network is the winner then override secondBidPrice
+                if (winningAdNetworkInterface instanceof HostedAdNetwork) {
+                    secondBidPrice = ((HostedAdNetwork) winningAdNetworkInterface).getBidToUmpInUSD();
+                }
+                LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", winningAdNetworkInterface.getName(), secondBidPrice);
             } else {
                 // For IX,
                 // we run a first price auction, but the value is still stored in secondBidPrice
-                secondBidPrice = auctionResponse.getAdNetworkInterface().getBidPriceInUsd();
+                secondBidPrice = winningAdNetworkInterface.getBidPriceInUsd();
+                LOG.debug("Completed auction, winner is {} and firstBidPrice is {}", winningAdNetworkInterface.getName(), secondBidPrice);
             }
-            LOG.debug("Completed auction, winner is {} and firstBidPrice is {}", filteredChannelSegmentList.get(0)
-                    .getAdNetworkInterface().getName(), secondBidPrice);
 
             // Set encrypted bid price.
-            auctionResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
-            auctionResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
+            winningAdNetworkInterface.setEncryptedBid(getEncryptedBid(secondBidPrice));
+            winningAdNetworkInterface.setSecondBidPrice(secondBidPrice);
 
             // Return as there is no need to iterate over the list.
-            return auctionResponse.getAdNetworkInterface();
-        }
-
-        // Multiple IX bids from RP should not be currently possible
-        if (unfilteredChannelSegmentList.get(0).getAdNetworkInterface().getDst() == DemandSourceType.IX) {
-            return null;
+            return winningAdNetworkInterface;
         }
 
         // TODO: Use pre-implemented sort

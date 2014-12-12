@@ -44,4 +44,14 @@ public class ImpressionIdGenerator {
                         .toString();
         return WilburyUUID.setDataCenterId(uuidWithCyclicCounter, dataCenterIdCode).toString();
     }
+
+    public long getUniqueId(final long adId) {
+        final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId).toString();
+        final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, hostIdCode).toString();
+        final String uuidWithCyclicCounter =
+                WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128))
+                        .toString();
+        return WilburyUUID.setDataCenterId(uuidWithCyclicCounter, dataCenterIdCode).getLeastSignificantBits();
+    }
+
 }

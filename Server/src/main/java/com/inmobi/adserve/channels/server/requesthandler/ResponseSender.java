@@ -9,6 +9,7 @@ import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
+import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -33,7 +34,6 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
-
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -43,7 +43,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
-
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -54,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import javax.inject.Inject;
-
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -185,12 +183,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
-        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(), selectedAdNetwork.getRepositoryHelper());
+
+        Boolean isHASAdResponse = false;
+        if (selectedAdNetwork instanceof HostedAdNetwork) {
+            isHASAdResponse = true;
+        }
+
+        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(), selectedAdNetwork.getRepositoryHelper(), isHASAdResponse);
     }
 
     // send Ad Response
 
-    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel, final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
+    private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel,
+        final Short selectedSlotId, final RepositoryHelper repositoryHelper, final Boolean isHASAdResponse) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
@@ -201,7 +206,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
         if (slotSizeMapEntity != null) {
             LOG.debug("slot served is {}", selectedSlotId);
-
 
             if (getResponseFormat() == ResponseFormat.XHTML) {
                 final Dimension dim = slotSizeMapEntity.getDimension();
@@ -222,7 +226,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         if (sasParams.getDst() == DCP.getValue()) {
             sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
-            incrementStatsForFills(sasParams.getDst());
+            incrementStatsForFills(sasParams.getDst(), isHASAdResponse);
         } else {
             final String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
             final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse());
@@ -235,7 +239,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     final byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
                     sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(),
                             serverChannel);
-                    incrementStatsForFills(sasParams.getDst());
+                    incrementStatsForFills(sasParams.getDst(), isHASAdResponse);
                 } catch (final TException e) {
                     LOG.error("Error in serializing the adPool response ", e);
                     sendNoAdResponse(serverChannel);
@@ -244,10 +248,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    private void incrementStatsForFills(final int dst) {
+    private void incrementStatsForFills(final int dst, final Boolean isHASAdResponse) {
         if (dst == DemandSourceType.DCP.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.DCP_FILLS);
         } else if (dst == DemandSourceType.RTBD.getValue()) {
+            if (isHASAdResponse) {
+                InspectorStats.incrementStatCount(InspectorStrings.HOSTED_FILLS);
+            }
             InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_FILLS);
         } else if (dst == DemandSourceType.IX.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.IX_FILLS);
@@ -282,12 +289,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
         adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
-        adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
         adIdChain.setCampaign_guid(channelSegmentEntity.getCampaignId());
         adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
         adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
         adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
         adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
+
+        rtbdAd.setPricingModel(PricingModel.CPM);
 
         // TODO: Create method and write UT
         switch (getRtbResponse().getAdNetworkInterface().getDst()) {
@@ -333,7 +341,17 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 }
                 break;
 
-            default:// For RTBD/DCP, auction type is set to SECOND_PRICE
+            case RTBD:
+                // If Hosted Ad Server response then Auction Type is set to PREFERRED_DEAL
+                if (getRtbResponse().getAdNetworkInterface() instanceof HostedAdNetwork) {
+                    rtbdAd.setPricingModel(PricingModel.CPC);
+                    rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                } else {
+                    // For normal RTBD responses, auction type is set to SECOND_PRICE
+                    rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
+                }
+                break;
+            default: // For DCP, auction type is set to SECOND_PRICE
                 rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
                 break;
         }
@@ -342,7 +360,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         adIdChains.add(adIdChain);
         rtbdAd.setAdIds(adIdChains);
 
-        rtbdAd.setPricingModel(PricingModel.CPM);
         final long bid = (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
         rtbdAd.setPrice(bid);
         rtbdAd.setBid(bid);
@@ -422,7 +439,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private byte[] encryptResponseIfRequired(byte[] responseBytes) {
         if (sasParams.getSdkVersion() != null
                 && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
-                && sasParams.getDst() == 2) {
+                && sasParams.getDst() == 2
+                && sasParams.getEncryptionKey() != null) {
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);

@@ -108,8 +108,6 @@ public class Logging {
             }
         }
 
-
-
         boolean isTerminated = false;
         if (null != terminationReason) {
             isTerminated = true;
@@ -413,10 +411,6 @@ public class Logging {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     *
->>>>>>> 3ea8b2606376fa7b22afbf64cf65b7f21977d0f6
      * @param rankList
      * @param config
      */

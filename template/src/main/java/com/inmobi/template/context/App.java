@@ -1,13 +1,12 @@
 package com.inmobi.template.context;
 
-import java.util.List;
-import java.util.Map;
-
+import com.inmobi.template.interfaces.Context;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import com.inmobi.template.interfaces.Context;
+import java.util.List;
+import java.util.Map;
 
 
 @Getter
