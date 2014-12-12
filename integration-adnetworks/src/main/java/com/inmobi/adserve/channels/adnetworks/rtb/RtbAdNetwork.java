@@ -50,7 +50,6 @@ import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -58,7 +57,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
@@ -79,7 +77,6 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
@@ -331,7 +328,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
             final User user, final Device device) {
-        // nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         bidRequest = new BidRequest(casInternalRequestParameters.getAuctionId(), impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
