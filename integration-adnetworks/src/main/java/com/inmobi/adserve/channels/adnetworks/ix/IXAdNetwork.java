@@ -42,6 +42,7 @@ import com.google.gson.JsonParseException;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -834,6 +835,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
             device.setOsv(sasParams.getOsMajorVersion());
+        }
+
+        if (com.inmobi.adserve.adpool.NetworkType.WIFI == sasParams.getNetworkType()) {
+            device.setConnectiontype(2);
+        } else {
+            device.setConnectiontype(0);
         }
 
         // Setting do not track
