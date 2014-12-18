@@ -42,6 +42,7 @@ import com.google.gson.JsonParseException;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -108,9 +109,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
             "RUB"));
-    @Getter
-    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
-            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
 
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
     private static final String CONTENT_TYPE_VALUE = "application/json";
@@ -209,9 +207,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean isWapSiteUACEntity = false;
     private final List<String> globalBlindFromConfig;
 
-    private final List<String> blockedAdvertisers = Lists.newArrayList();
-
-
     private ChannelSegmentEntity dspChannelSegmentEntity;
 
 
@@ -241,7 +236,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
-        blockedAdvertisers.addAll(blockedAdvertiserList);
         userName = config.getString(advertiserName + ".userName");
         password = config.getString(advertiserName + ".password");
         accountId = config.getInt(advertiserName + ".accountId");
@@ -834,6 +828,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
             device.setOsv(sasParams.getOsMajorVersion());
+        }
+
+        //TODO Add enums in thrift: 0:UNKNOWN,2:WIFI
+        if (com.inmobi.adserve.adpool.NetworkType.WIFI == sasParams.getNetworkType()) {
+            device.setConnectiontype(2);
+        } else {
+            device.setConnectiontype(0);
         }
 
         // Setting do not track
