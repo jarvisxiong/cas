@@ -110,7 +110,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             "RUB"));
 
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
-    private static final String CONTENT_TYPE_VALUE = "application/json";
+    private static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
     private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
     private static final String USD = "USD";
