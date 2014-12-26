@@ -1,5 +1,38 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import lombok.Getter;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -22,8 +55,8 @@ import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
-import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
 import com.inmobi.adserve.channels.repository.SlotSizeMapRepository;
+import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -39,35 +72,6 @@ import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.exception.InitializationException;
 import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
-import io.netty.util.internal.logging.InternalLoggerFactory;
-import io.netty.util.internal.logging.Slf4JLoggerFactory;
-import lombok.Getter;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbcp2.ConnectionFactory;
-import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp2.PoolableConnection;
-import org.apache.commons.dbcp2.PoolableConnectionFactory;
-import org.apache.commons.dbcp2.PoolingDataSource;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Properties;
 
 
 /*
@@ -78,7 +82,7 @@ import java.util.Properties;
  * "/opt/mkhoj/conf/cas/channel-server.properties"
  */
 public class ChannelServer {
-
+    private static int repoLoadRetryCount;
     public static byte dataCenterIdCode;
     public static short hostIdCode;
     public static String dataCentreName;
@@ -106,8 +110,6 @@ public class ChannelServer {
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     @Getter
     private static String configFile;
-    private static int repoLoadRetryCount;
-
 
     public static void main(final String[] args) throws Exception {
         configFile = System.getProperty("configFile", DEFAULT_CONFIG_FILE);
@@ -273,8 +275,8 @@ public class ChannelServer {
 
             final String validationQuery = databaseConfig.getString("validationQuery");
             final int maxActive = databaseConfig.getInt("maxActive", 20);
-            final int maxIdle = databaseConfig.getInt("maxActive", 20);
-            final int maxWait = 60 * 1000; // time in millis - 60 seconds
+            final int maxIdle = databaseConfig.getInt("maxIdle", 20);
+            final int maxWait = databaseConfig.getInt("maxWait", -1);
             final boolean testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true);
 
             final String connectUri =
@@ -291,7 +293,7 @@ public class ChannelServer {
                     new GenericObjectPool<>(poolableConnectionFactory);
             connectionPool.setMaxTotal(maxActive);
             connectionPool.setMaxIdle(maxIdle);
-            connectionPool.setMaxWaitMillis(maxWait);
+            connectionPool.setMaxWaitMillis(maxWait * 1000);
             connectionPool.setTestOnBorrow(testOnBorrow);
 
             poolableConnectionFactory.setPool(connectionPool);
@@ -318,7 +320,8 @@ public class ChannelServer {
             loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config);
             loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config);
             loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, config);
-            loadRepos(channelSegmentFeedbackRepository, ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config);
+            loadRepos(channelSegmentFeedbackRepository,
+                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config);
             loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config);
             loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config);
             loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config);
@@ -337,7 +340,6 @@ public class ChannelServer {
             logger.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                     .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
-
         } catch (final NamingException exception) {
             logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
@@ -350,24 +352,27 @@ public class ChannelServer {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private static void loadRepos(final AbstractStatsMaintainingDBRepository repository, final String repoName,
-                                  final ConfigurationLoader config) throws InitializationException {
+            final ConfigurationLoader config) throws InitializationException {
         int tryCount;
         Exception exp = null;
-        for (tryCount = 0; tryCount < repoLoadRetryCount ; tryCount++) {
+        for (tryCount = 0; tryCount < repoLoadRetryCount; tryCount++) {
             logger.debug("trying to load repo " + repoName + " for " + tryCount + " time");
             try {
                 repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
-            } catch (InitializationException exc) {
+            } catch (final Exception exc) {
                 logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
                 exp = exc;
             }
         }
         if (tryCount >= repoLoadRetryCount) {
-            String msg = String.format("Tried %s times but still could not load repo %s", String.valueOf(repoLoadRetryCount), repoName);
+            final String msg =
+                    String.format("Tried %s times but still could not load repo %s",
+                            String.valueOf(repoLoadRetryCount), repoName);
             logger.error(msg);
-            throw new InitializationException(msg,exp);
+            throw new InitializationException(msg, exp);
         }
         return;
     }
