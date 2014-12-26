@@ -117,9 +117,9 @@ database.validationQuery=select version();
 database.testWhileIdle=true
 database.testOnBorrow=true
 database.maxActive=100
-database.maxIdle=1
+database.maxIdle=100
 database.maxWait=-1
-database.socketTimeout=300
+database.socketTimeout=900
 
 
 
@@ -1368,6 +1368,21 @@ adapter.adchinaRTB.host.hkg1=http://imb.mlt01.com/dspbid.htm?t=26
 adapter.adchinaRTB.host.uh1=NA
 adapter.adchinaRTB.host.default=NA
 adapter.adchinaRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+
+adapter.adSameRTB.isRtb=true
+adapter.adSameRTB.status=on
+adapter.adSameRTB.siteBlinded=true
+adapter.adSameRTB.rtbVer=2.0
+adapter.adSameRTB.advertiserId=4dbcbaf3f23747609527a0452b489302
+adapter.adSameRTB.urlArg=query
+adapter.adSameRTB.rtbMethod=post
+adapter.adSameRTB.isWnRequired=true
+adapter.adSameRTB.host.uj1=NA
+adapter.adSameRTB.host.lhr1=NA
+adapter.adSameRTB.host.hkg1=http://inmobibid.adsame.com:9890/
+adapter.adSameRTB.host.uh1=NA
+adapter.adSameRTB.host.default=NA
+adapter.adSameRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 adapter.ix.isIx=true
 adapter.ix.status=on

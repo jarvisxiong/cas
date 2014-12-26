@@ -42,7 +42,6 @@ import com.google.gson.JsonParseException;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -111,7 +110,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             "RUB"));
 
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
-    private static final String CONTENT_TYPE_VALUE = "application/json";
+    private static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
     private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
     private static final String USD = "USD";
@@ -776,9 +775,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(bundleId)) {
             app.setBundle(bundleId);
         }
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
+
+        // Set either of title or Name, giving priority to title
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
+            app.setName(wapSiteUACEntity.getAppTitle());
+        } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
         }
+        
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         final Blind blindForApp = new Blind();
         blindForApp.setBundle(blindBundle);
