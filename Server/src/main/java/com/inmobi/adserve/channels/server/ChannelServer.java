@@ -21,8 +21,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import lombok.Getter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
@@ -106,9 +104,7 @@ public class ChannelServer {
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     private static GeoZipRepository geoZipRepository;
     private static SlotSizeMapRepository slotSizeMapRepository;
-    @Getter
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
-    @Getter
     private static String configFile;
 
     public static void main(final String[] args) throws Exception {
@@ -229,10 +225,7 @@ public class ChannelServer {
             });
 
             System.out.close();
-            // If client bootstrap is not present throwing exception which will
-            // set
-            // lbStatus as NOT_OK.
-
+            // If client bootstrap is not present throwing exception which will set lbStatus as NOT_OK.
         } catch (final Exception exception) {
             logger.error("Exception in Channel Server " + exception);
             ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
@@ -242,6 +235,17 @@ public class ChannelServer {
                 sendMail(exception.getMessage(), getMyStackTrace(exception));
             }
         }
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public static String getConfigFile() {
+        if (configFile != null) {
+            return configFile;
+        }
+        return DEFAULT_CONFIG_FILE;
     }
 
     public static String getMyStackTrace(final Exception exception) {
@@ -358,7 +362,7 @@ public class ChannelServer {
         int tryCount;
         Exception exp = null;
         for (tryCount = 0; tryCount < repoLoadRetryCount; tryCount++) {
-            logger.debug("trying to load repo " + repoName + " for " + tryCount + " time");
+            logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
             try {
                 repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
