@@ -1,6 +1,6 @@
 
-CREATE OR REPLACE FUNCTION site_filter_repo_fun(last_updated timestamp without time zone)        
-RETURNS SETOF site_filter_repo_type AS                                                                                                                             
+CREATE OR REPLACE FUNCTION site_filter_repo_fun_20141219(last_updated timestamp without time zone)
+RETURNS SETOF site_filter_repo_type AS
 $BODY$
 DECLARE
     row1 site_filter_repo_type%ROWTYPE;
@@ -21,7 +21,7 @@ BEGIN
         -- For rule_type_id 4 (category filters), fetch and return the IAB standard Ids.
         --
         IF row1.rule_type_id = 4 AND row1.filter_data != '{}' THEN
-            select array_agg(iabt.iab_standard_id)
+            SELECT array_agg(distinct iabt.iab_standard_id)
               INTO row1.filter_data
               FROM adgroup_taxonomy agt, iab_taxonomy iabt
              WHERE agt.iab_id = iabt.id
@@ -33,4 +33,4 @@ END;
 $BODY$
 LANGUAGE plpgsql;
 
-ALTER FUNCTION site_filter_repo_fun(timestamp without time zone) OWNER TO postgres;
+ALTER FUNCTION site_filter_repo_fun_20141219(timestamp without time zone) OWNER TO postgres;
