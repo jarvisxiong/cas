@@ -381,7 +381,7 @@ public class ChannelServer {
             throw new InitializationException(msg, exp);
         }
         final long endTime = System.currentTimeMillis();
-        logger.error(String.format("*************** Loaded repo %s, in %s ms", repoName, (startTime - endTime)));
+        logger.error(String.format("*************** Loaded repo %s, in %s ms", repoName, (endTime - startTime)));
         return;
     }
 
