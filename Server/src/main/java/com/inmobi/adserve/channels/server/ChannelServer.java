@@ -236,7 +236,7 @@ public class ChannelServer {
             }
         }
     }
-    
+
     /**
      * 
      * @return
@@ -317,6 +317,7 @@ public class ChannelServer {
             if (repoLoadRetryCount < 1) {
                 repoLoadRetryCount = 1;
             }
+            logger.info(String.format("************** starting repo load with retry count as %s", repoLoadRetryCount));
             loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config);
             loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config);
             loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config);
@@ -359,25 +360,28 @@ public class ChannelServer {
     @SuppressWarnings("rawtypes")
     private static void loadRepos(final AbstractStatsMaintainingDBRepository repository, final String repoName,
             final ConfigurationLoader config) throws InitializationException {
+        final long startTime = System.currentTimeMillis();
+        logger.error(String.format("*************** Started loading repo %s, at %s", repoName, startTime));
         int tryCount;
         Exception exp = null;
         for (tryCount = 0; tryCount < repoLoadRetryCount; tryCount++) {
-            logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
+            logger.error(String.format("trying to load repo %s for %s time", repoName, tryCount));
             try {
                 repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
             } catch (final Exception exc) {
-                logger.error("trying to load repo " + repoName + " for " + tryCount + " time");
+                logger.error("*************** Trying to load repo " + repoName + " for " + tryCount + " time");
                 exp = exc;
             }
         }
         if (tryCount >= repoLoadRetryCount) {
             final String msg =
-                    String.format("Tried %s times but still could not load repo %s",
-                            String.valueOf(repoLoadRetryCount), repoName);
+                    String.format("Tried %s times but still could not load repo %s", repoLoadRetryCount, repoName);
             logger.error(msg);
             throw new InitializationException(msg, exp);
         }
+        final long endTime = System.currentTimeMillis();
+        logger.error(String.format("*************** Loaded repo %s, in %s ms", repoName, (startTime - endTime)));
         return;
     }
 
