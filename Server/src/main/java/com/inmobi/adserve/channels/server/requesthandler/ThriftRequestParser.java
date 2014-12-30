@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.InventoryType;
 
+
 @Singleton
 public class ThriftRequestParser {
 
