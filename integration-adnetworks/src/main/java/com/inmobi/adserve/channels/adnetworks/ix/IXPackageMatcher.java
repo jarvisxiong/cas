@@ -19,6 +19,7 @@ import com.inmobi.segment.impl.SiteId;
 import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
 import com.inmobi.segment.impl.ZipCodePresent;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class IXPackageMatcher {
     public static final int PACKAGE_MAX_LIMIT = 30;
 
     public static List<String> findMatchingPackageIds(final SASRequestParameters sasParams,
-            final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
+                                                      final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
         List<String> matchedPackageIds = new ArrayList<>();
 
         Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
@@ -45,7 +46,8 @@ public class IXPackageMatcher {
 
                 // TODO: 1) Honor scheduledTimeOfDay [Not in the scope of MVP]
                 //Add to matchedPackageIds only if csId's match
-                if (packageEntity.getDmpFilterSegmentExpression().size() > 0 && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity)){
+                if (CollectionUtils.isNotEmpty(packageEntity.getDmpFilterSegmentExpression())
+                        && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity.getDmpFilterSegmentExpression())) {
                     continue;
                 }
                 matchedPackageIds.add(String.valueOf(packageEntity.getId()));
@@ -59,10 +61,15 @@ public class IXPackageMatcher {
         return matchedPackageIds;
     }
 
-    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final IXPackageEntity packageEntity) {
-        for(Set<Integer> smallSet: packageEntity.getDmpFilterSegmentExpression()) {
-            if(Collections.disjoint(smallSet,csiReqTags)) {
-                return false;
+    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
+
+        if (CollectionUtils.isEmpty(csiReqTags)) {
+            return false;
+        } else {
+            for (Set<Integer> smallSet : dmpFilterExpression) {
+                if (Collections.disjoint(smallSet, csiReqTags)) {
+                    return false;
+                }
             }
         }
         return true;

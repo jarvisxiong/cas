@@ -41,7 +41,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Inject
     public HttpRequestHandler(@Nullable final Marker traceMarker, final Servlet servlet,
-            final ResponseSender responseSender) {
+                              final ResponseSender responseSender) {
         this.traceMarker = traceMarker;
         this.servlet = servlet;
         this.responseSender = responseSender;
@@ -64,15 +64,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sendNoAdResponse(ctx.channel());
             final String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
-            if(LOG.isDebugEnabled()) {
+            if (LOG.isDebugEnabled()) {
                 final String message = "stack trace is -> " + getStackTrace(exception);
                 LOG.debug(traceMarker, message);
-                exception.printStackTrace();
-                System.err.println(exception);
-                System.err.println(message);
-                
-                System.out.println(exception);
-                System.out.println(message);
             }
         } finally {
             requestParameterHolder.getHttpRequest().release();
