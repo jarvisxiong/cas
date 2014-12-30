@@ -131,7 +131,7 @@ public class ServletRepoRefreshTest {
     }
 
     private static void prepareMockConfigurationLoader() {
-        String configFile = ChannelServer.getDEFAULT_CONFIG_FILE();
+        String configFile = ChannelServer.getConfigFile();
         mockStatic(ConfigurationLoader.class);
         mockConfigLoader = createMock(ConfigurationLoader.class);
         final Configuration mockServerConfig = createMock(Configuration.class);
