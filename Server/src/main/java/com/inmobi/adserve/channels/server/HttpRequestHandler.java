@@ -1,14 +1,19 @@
 package com.inmobi.adserve.channels.server;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -17,7 +22,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
-
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
 
     public ResponseSender responseSender;
@@ -37,7 +41,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Inject
     public HttpRequestHandler(@Nullable final Marker traceMarker, final Servlet servlet,
-            final ResponseSender responseSender) {
+                              final ResponseSender responseSender) {
         this.traceMarker = traceMarker;
         this.servlet = servlet;
         this.responseSender = responseSender;
@@ -52,9 +56,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sasParams = requestParameterHolder.getSasParams();
             responseSender.casInternalRequestParameters = requestParameterHolder.getCasInternalRequestParameters();
             httpRequest = requestParameterHolder.getHttpRequest();
-
             LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
-
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
         } catch (final Exception exception) {
             responseSender.setTerminationReason(CasConfigUtil.PROCESSING_ERROR);
@@ -62,7 +64,10 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sendNoAdResponse(ctx.channel());
             final String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
-            LOG.info(traceMarker, "stack trace is {}", exception);
+            if (LOG.isDebugEnabled()) {
+                final String message = "stack trace is -> " + getStackTrace(exception);
+                LOG.debug(traceMarker, message);
+            }
         } finally {
             requestParameterHolder.getHttpRequest().release();
         }
@@ -71,11 +76,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     public boolean isRequestFromLocalHost() {
         final String host = CasUtils.getHost(httpRequest);
-
         if (host != null && host.startsWith("localhost")) {
             return true;
         }
-
         return false;
     }
 
@@ -86,4 +89,10 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         return httpRequest;
     }
 
+    private static String getStackTrace(Exception exception) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        exception.printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
 }
