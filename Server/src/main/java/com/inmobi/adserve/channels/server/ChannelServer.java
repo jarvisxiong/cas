@@ -365,12 +365,12 @@ public class ChannelServer {
         int tryCount;
         Exception exp = null;
         for (tryCount = 0; tryCount < repoLoadRetryCount; tryCount++) {
-            logger.error(String.format("trying to load repo %s for %s time", repoName, tryCount));
+            logger.error(String.format("*************** Trying to load repo %s for %s time", repoName, tryCount));
             try {
                 repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
             } catch (final Exception exc) {
-                logger.error("*************** Trying to load repo " + repoName + " for " + tryCount + " time");
+                logger.error("*************** Error in loading repo " + repoName, exc);
                 exp = exc;
             }
         }
