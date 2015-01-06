@@ -5,7 +5,7 @@ prod:
       db_port:
          - 6543 
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.uj1.inmobi.com
       aerospike_port:
@@ -59,7 +59,7 @@ prod:
       db_port:
          - 6543 
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.uh1.inmobi.com
       aerospike_port:
@@ -113,7 +113,7 @@ prod:
       db_port:
          - 6543 
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.lhr1.inmobi.com
       aerospike_port:
@@ -167,7 +167,7 @@ prod:
       db_port:
          - 6543 
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.hkg1.inmobi.com
       aerospike_port:
@@ -222,7 +222,7 @@ pilot:
       db_port:
          - 6543
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.uj1.inmobi.com
       aerospike_port:
@@ -276,7 +276,7 @@ pilot:
       db_port:
          - 6543
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.uh1.inmobi.com
       aerospike_port:
@@ -330,7 +330,7 @@ pilot:
       db_port:
          - 6543 
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.lhr1.inmobi.com
       aerospike_port:
@@ -384,7 +384,7 @@ pilot:
       db_port:
          - 6543 
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.hkg1.inmobi.com
       aerospike_port:
@@ -464,7 +464,7 @@ nonprod:
       db_port:
          - 6543
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.corp.inmobi.com
       aerospike_port:
@@ -517,7 +517,7 @@ nonprod:
       db_port:
          - 6543
       database:
-         - wap_prod_adserve
+         - wap_prod_adserve_cas
       aerospike_host:
          - as.ads.ua2.inmobi.com
       aerospike_port:
