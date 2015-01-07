@@ -1,22 +1,12 @@
 package com.inmobi.adserve.channels.adnetworks.mvp;
 
-import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.NativeResponseMaker;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.casthrift.hosted.HostedBidRequest;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.Setter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -28,11 +18,24 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.NativeResponseMaker;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.hosted.HostedBidRequest;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by ishanbhatnagar on 11/11/14.
@@ -187,7 +190,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     protected boolean isNativeRequest() {
-        return NATIVE_STRING.equals(sasParams.getRFormat());
+        return NATIVE_STRING.equals(sasParams.getRFormat()) && "APP".equalsIgnoreCase(sasParams.getSource());
     }
 
     private boolean createHostedBidRequestObject() {
@@ -404,7 +407,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         } catch (JSONException e) {
             // If AdMarkup is not present then checking whether the response was an Error Code
             try {
-                if (RFM_RESPONSE_ERROR == bidResponseJson.getString("status")) {
+                if (RFM_RESPONSE_ERROR.equalsIgnoreCase(bidResponseJson.getString("status"))) {
                     String errorMsg = bidResponseJson.getString("error_msg");
                     switch (bidResponseJson.getInt("error_code")) {
                         case 1001: InspectorStats.incrementStatCount(getName(),

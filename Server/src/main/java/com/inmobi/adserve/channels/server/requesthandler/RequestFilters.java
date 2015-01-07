@@ -1,14 +1,15 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.DemandSourceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 
 public class RequestFilters {
@@ -25,43 +26,43 @@ public class RequestFilters {
             return true;
         }
 
-        if (null == hrh.responseSender.sasParams) {
+        if (null == hrh.responseSender.getSasParams()) {
             LOG.error("Terminating request as sasParam is null");
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             return true;
         }
 
-        if (null == hrh.responseSender.sasParams.getCategories()) {
+        if (null == hrh.responseSender.getSasParams().getCategories()) {
             LOG.error("Category field is not present in the request so sending noad");
-            hrh.responseSender.sasParams.setCategories(new ArrayList<Long>());
+            hrh.responseSender.getSasParams().setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(InspectorStrings.MISSING_CATEGORY, InspectorStrings.COUNT);
             return true;
         }
 
-        if (null == hrh.responseSender.sasParams.getSiteId()) {
+        if (null == hrh.responseSender.getSasParams().getSiteId()) {
             LOG.error("Terminating request as site id was missing");
             hrh.setTerminationReason(CasConfigUtil.MISSING_SITE_ID);
             InspectorStats.incrementStatCount(InspectorStrings.MISSING_SITE_ID, InspectorStrings.COUNT);
             return true;
         }
 
-        if (!hrh.responseSender.sasParams.getAllowBannerAds()) {
+        if (!hrh.responseSender.getSasParams().getAllowBannerAds()) {
             LOG.error("Request not being served because of banner not allowed.");
             InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER,
                     InspectorStrings.COUNT);
             return true;
         }
 
-        if (hrh.responseSender.sasParams.getSiteContentType() != null
-                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.sasParams.getSiteContentType().name())) {
+        if (hrh.responseSender.getSasParams().getSiteContentType() != null
+                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.getSasParams().getSiteContentType().name())) {
             LOG.error("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;
         }
-        final String tempSdkVersion = hrh.responseSender.sasParams.getSdkVersion();
+        final String tempSdkVersion = hrh.responseSender.getSasParams().getSdkVersion();
 
         if (null != tempSdkVersion) {
             try {
@@ -82,10 +83,10 @@ public class RequestFilters {
 
         }
 
-        if (hrh.responseSender.sasParams.getProcessedMkSlot().isEmpty()) {
-            if (DemandSourceType.IX.getValue() == hrh.responseSender.sasParams.getDst()) {
+        if (hrh.responseSender.getSasParams().getProcessedMkSlot().isEmpty()) {
+            if (DemandSourceType.IX.getValue() == hrh.responseSender.getSasParams().getDst()) {
                 InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_IX_INVALID_SLOT_REQUEST_FILTER);
-            } else if (DemandSourceType.RTBD.getValue() == hrh.responseSender.sasParams.getDst()) {
+            } else if (DemandSourceType.RTBD.getValue() == hrh.responseSender.getSasParams().getDst()) {
                 InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_RTBD_INVALID_SLOT_REQUEST_FILTER);
             } else {
                 InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_DCP_INVALID_SLOT_REQUEST_FILTER);

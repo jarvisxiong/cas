@@ -35,21 +35,24 @@ public class DataDeserializer implements JsonDeserializer<Context> {
 
 
     private void setValue(final int index, final String value, final Builder builder) {
-        switch (index) {
-            case 0:
-                builder.setDownloads(Integer.valueOf(value));
-                break;
-            case 1:
-                builder.setRating(value);
-                break;
-            case 2:
-                builder.setRating_count(Integer.valueOf(value));
-                break;
-            default:
-                throw new IllegalArgumentException("Index " + index + " is not defined");
-
+        try {
+            switch (index) {
+                case 0:
+                    builder.setDownloads(Integer.valueOf(value));
+                    break;
+                case 1:
+                    // Rating should be a double
+                    builder.setRating(value);
+                    break;
+                case 2:
+                    builder.setRating_count(Integer.valueOf(value));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Index " + index + " is not defined");
+            }
+        } catch (NumberFormatException e1) {
+            throw new IllegalArgumentException("Value type mismatch found for Index: " + index);
         }
-
     }
 
 

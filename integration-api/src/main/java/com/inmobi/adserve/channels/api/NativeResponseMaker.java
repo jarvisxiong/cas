@@ -1,20 +1,8 @@
 package com.inmobi.adserve.channels.api;
 
-import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
-import com.inmobi.adserve.channels.repository.NativeConstrains;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.Image;
-import com.inmobi.template.context.App;
-import com.inmobi.template.context.Screenshot;
-import com.inmobi.template.exception.TemplateException;
-import com.inmobi.template.formatter.TemplateDecorator;
-import com.inmobi.template.formatter.TemplateParser;
-import com.inmobi.template.interfaces.TemplateConfiguration;
-import lombok.Data;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -23,17 +11,26 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.channels.repository.NativeConstrains;
+import com.inmobi.casthrift.rtb.BidResponse;
+import com.inmobi.casthrift.rtb.Image;
+import com.inmobi.template.context.App;
+import com.inmobi.template.context.Screenshot;
+import com.inmobi.template.exception.TemplateException;
+import com.inmobi.template.formatter.TemplateDecorator;
+import com.inmobi.template.formatter.TemplateParser;
+import com.inmobi.template.interfaces.TemplateConfiguration;
+
+import lombok.Data;
 
 public class NativeResponseMaker {
 
     private static final Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
     private static final String ERROR_STR = "%s can't be null.";
-
-    @Inject
-    RepositoryHelper repositoryHepler = null;
 
     private final TemplateParser templateParser;
     private final TemplateDecorator templateDecorator;
@@ -79,7 +76,7 @@ public class NativeResponseMaker {
         return createNativeAd(vc, app, siteId);
     }
 
-    private String createNativeAd(final VelocityContext vc, final App app, final String siteId) throws Exception{
+    private String createNativeAd(final VelocityContext vc, final App app, final String siteId) throws Exception {
         final String namespace = Formatter.getNamespace();
         vc.put("NAMESPACE", namespace);
 
@@ -90,7 +87,7 @@ public class NativeResponseMaker {
         return nativeAd(pubContent, contextCode, namespace);
     }
 
-    private App createNativeAppObject(final String adm, final Map<String, String> params) {
+    private App createNativeAppObject(final String adm, final Map<String, String> params) throws Exception {
         final App app = gson.fromJson(adm, App.class);
         app.setAdImpressionId(params.get("impressionId"));
         return app;
@@ -99,8 +96,7 @@ public class NativeResponseMaker {
     private void validateResponse(final App app, final NativeAdTemplateEntity templateEntity) throws Exception {
         final String mandatoryKey = templateEntity.getMandatoryKey();
         final List<Integer> mandatoryList = NativeConstrains.getMandatoryList(mandatoryKey);
-        for (final Iterator<Integer> iterator = mandatoryList.iterator(); iterator.hasNext();) {
-            final Integer integer = iterator.next();
+        for (final Integer integer: mandatoryList) {
             switch (integer) {
                 case NativeConstrains.ICON:
                     if (app.getIcons() == null || app.getIcons().isEmpty()
@@ -133,7 +129,7 @@ public class NativeResponseMaker {
         if (image != null) {
             final Screenshot screenShot = app.getScreenshots().get(0);
             if (!(screenShot.getW() >= image.getMinwidth() && screenShot.getW() <= image.getMaxwidth())) {
-                throwException(String.format("Expected image contraints are %s. But got image attributes : %s ", image,
+                throwException(String.format("Expected image constraints are %s. But got image attributes : %s ", image,
                         screenShot));
             }
         }
@@ -159,12 +155,12 @@ public class NativeResponseMaker {
         return String.format("<img src=\\\"%s\\\" style=\\\"display:none;\\\" />", url);
     }
 
-    private String getTrackingCode(final BidResponse response, final Map<String, String> params, final App app) {
+    protected String getTrackingCode(final BidResponse response, final Map<String, String> params, final App app) {
         final StringBuilder bcu = new StringBuilder();
         String nUrl = null;
         try {
             if (null != response) {
-                nUrl = response.seatbid.get(0).getBid().get(0).getNurl();
+                nUrl = response.getSeatbid().get(0).getBid().get(0).getNurl();
                 if (nUrl != null) {
                     bcu.append(constructBeaconUrl(nUrl));
                 }

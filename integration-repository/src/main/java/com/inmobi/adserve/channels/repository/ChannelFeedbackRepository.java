@@ -29,11 +29,11 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
             final double totalInflow = row.getDouble("total_inflow");
             final double totalBurn = row.getDouble("total_burn");
             final double balance = row.getDouble("balance");
-            final long averageLatency = row.getLong("average_latency");
             final double revenue = row.getDouble("revenue");
-            final int totalImpressions = row.getInt("total_impressions");
-            final int todayImpressions = row.getInt("today_impressions");
-            final int todayRequests = row.getInt("today_requests");
+            final long averageLatency = row.getLong("average_latency");
+            final long totalImpressions = row.getLong("total_impressions");
+            final long todayImpressions = row.getLong("today_impressions");
+            final long todayRequests = row.getInt("today_requests");
 
             final ChannelFeedbackEntity.Builder builder = ChannelFeedbackEntity.newBuilder();
             builder.setAdvertiserId(advertiserId);

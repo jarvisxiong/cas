@@ -9,8 +9,6 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Test;
@@ -28,6 +26,9 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class})
@@ -48,6 +49,7 @@ public class ServletBackFillTest {
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+        expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
@@ -66,7 +68,6 @@ public class ServletBackFillTest {
         // PowerMock.suppress(method(BaseServlet.class, "handleRequest"));
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
-        mockResponseSender.sasParams = null;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletBackFill tested =

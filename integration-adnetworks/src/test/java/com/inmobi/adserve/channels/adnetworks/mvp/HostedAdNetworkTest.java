@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.mvp;
 
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONObject;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,6 +10,24 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.Utils.TestUtils;
+
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ImpressionIdGenerator.class, HostedAdNetwork.class, InspectorStats.class})
@@ -98,6 +100,7 @@ public class HostedAdNetworkTest {
         expect(mockSasParams.getRemoteHostIp()).andReturn(ip).anyTimes();
         expect(mockSasParams.getUserAgent()).andReturn(userAgent).anyTimes();
         expect(mockSasParams.getSiteId()).andReturn(siteId).anyTimes();
+        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
 
         expect(mockCasInternalRequestParams.getLatLong()).andReturn(latLong).anyTimes();
         expect(mockCasInternalRequestParams.getUidADT())
@@ -142,7 +145,7 @@ public class HostedAdNetworkTest {
         expect(mockHttpResponseStatus.code())
                 .andReturn(200).times(2)
                 .andReturn(404).times(1)
-                .andReturn(200).times(4);
+                .andReturn(200).times(6);
 
 
         // Mocking NativeAdMaking() and isNativeRequest() in HostedAdNetwork
@@ -190,7 +193,7 @@ public class HostedAdNetworkTest {
         assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
 
         //Negative Test Case #5: ErrorCode = 1001 (Invalid Credentials)
-        response = "{\"id\":\"\",\"status\":\"FAIL\",\"error_msg\":\"Invalid credentials\",\"error_code\":1001}";
+        response = "{\"id\":\"45\",\"status\":\"FAIL\",\"error_msg\":\"Invalid credentials\",\"error_code\":1001}";
         expectedResponseContent = "";
         expectedResponseStatus = "NO_AD";
         hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);
@@ -198,7 +201,23 @@ public class HostedAdNetworkTest {
         assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
 
         //Negative Test Case #6: ErrorCode = 1002 (NO AD Condition for HAS)
-        response = "{\"id\":\"\",\"status\":\"FAIL\",\"error_msg\":\"No ads available to serve\",\"error_code\":1002}";
+        response = "{\"id\":\"4567876766666\",\"status\":\"FAIL\",\"error_msg\":\"No ads available to serve\",\"error_code\":1002}";
+        expectedResponseContent = "";
+        expectedResponseStatus = "NO_AD";
+        hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);
+        assertThat(hostedAdNetwork.getResponseContent(), is(equalTo(expectedResponseContent)));
+        assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
+
+        //Negative Test Case #7: ErrorCode = 1003 (RFM error in selecting ad)
+        response = "{\"id\":\"456787676666454546\",\"status\":\"FAIL\",\"error_msg\":\"Ad filtered during validation/processing\",\"error_code\":1003}";
+        expectedResponseContent = "";
+        expectedResponseStatus = "NO_AD";
+        hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);
+        assertThat(hostedAdNetwork.getResponseContent(), is(equalTo(expectedResponseContent)));
+        assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
+
+        //Negative Test Case #8: ErrorCode = 2000 (Unknown Errors from RP)
+        response = "{\"id\":\"45678767666465655\",\"status\":\"FAIL\",\"error_msg\":\"Can't serve ad as something broke on our side\",\"error_code\":2000}";
         expectedResponseContent = "";
         expectedResponseStatus = "NO_AD";
         hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);

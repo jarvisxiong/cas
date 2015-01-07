@@ -13,8 +13,6 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 import static org.powermock.api.support.membermodification.MemberMatcher.method;
 import static org.powermock.api.support.membermodification.MemberModifier.suppress;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +49,9 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.DemandSourceType;
 
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class, CasConfigUtil.class, BaseServlet.class})
 public class ServletIXFillTest {
@@ -73,6 +74,7 @@ public class ServletIXFillTest {
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+        expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
@@ -88,7 +90,6 @@ public class ServletIXFillTest {
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
-        mockResponseSender.sasParams = null;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
@@ -129,6 +130,7 @@ public class ServletIXFillTest {
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
+        expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
                 new ArrayList<AdvertiserMatchedSegmentDetail>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
@@ -150,7 +152,6 @@ public class ServletIXFillTest {
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
-        mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
@@ -201,6 +202,7 @@ public class ServletIXFillTest {
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
+        expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
@@ -230,7 +232,6 @@ public class ServletIXFillTest {
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
-        mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
@@ -285,6 +286,7 @@ public class ServletIXFillTest {
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
+        expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
@@ -324,7 +326,6 @@ public class ServletIXFillTest {
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
-        mockResponseSender.sasParams = mockSASRequestParameters;
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =

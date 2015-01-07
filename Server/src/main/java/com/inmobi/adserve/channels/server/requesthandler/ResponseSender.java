@@ -1,5 +1,30 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+import static com.inmobi.casthrift.DemandSourceType.IX;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
+
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
@@ -34,6 +59,7 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -43,28 +69,8 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static com.inmobi.casthrift.DemandSourceType.DCP;
-import static com.inmobi.casthrift.DemandSourceType.IX;
-import static com.inmobi.casthrift.DemandSourceType.RTBD;
+import lombok.Getter;
+import lombok.Setter;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 
@@ -86,10 +92,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
             + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native");
 
-    private static final int PRIVATE_AUCTION = 3;
-    private static final int PREFERRED_DEAL = 4;
+    protected static final int PRIVATE_AUCTION = 3;
+    protected static final int PREFERRED_DEAL = 4;
 
-    public SASRequestParameters sasParams;
+    @Setter
+    @Getter
+    private SASRequestParameters sasParams;
     public CasInternalRequestParameters casInternalRequestParameters;
 
     private long totalTime;
@@ -129,7 +137,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return adResponse;
     }
 
-    public ChannelSegment getRtbResponse() {
+    private ChannelSegment getRtbResponse() {
         return auctionEngine.getAuctionResponse();
     }
 
@@ -189,7 +197,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             isHASAdResponse = true;
         }
 
-        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(), selectedAdNetwork.getRepositoryHelper(), isHASAdResponse);
+        sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(),
+                selectedAdNetwork.getRepositoryHelper(), isHASAdResponse);
     }
 
     // send Ad Response
@@ -413,7 +422,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
         System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
         
-        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "sendResponse_"+getDST(), getTimeElapsed());
+        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ +
+                "sendResponse_"+getDST(), getTimeElapsed());
        
         if(serverChannel.isOpen()){
             if (sasParams.isKeepAlive()) {
@@ -651,18 +661,37 @@ public class ResponseSender extends HttpRequestHandlerBase {
     public void writeLogs() {
         if (null == sasParams) {
             InspectorStats.incrementStatCount(InspectorStrings.NON_AD_REQUESTS);
-            LOG.debug("Not logging anything, either sasParam is null or this is not an ad request");
-            LOG.debug("done with logging");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Done with logging as either sasParam is null or this is not an ad request");
+            }
             return;
         }
-        final List<ChannelSegment> list = new ArrayList<ChannelSegment>();
-        if (null != getRankList()) {
-            list.addAll(getRankList());
+
+        List<ChannelSegment> dcpList = rankList;
+        List<ChannelSegment> rtbList = auctionEngine.getUnfilteredChannelSegmentList(); // Also acts as the ixList
+        final List<ChannelSegment> list = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(dcpList) && CollectionUtils.isNotEmpty(rtbList)) {
+            LOG.debug("Both DCP and RTBD/IX channel segment lists cannot be populated at the same time. "
+                    + "Aborting Logging");
+            return;
+        } else if (CollectionUtils.isNotEmpty(dcpList)) {
+            if (DemandSourceType.DCP.getValue() != sasParams.getDst()) {
+                LOG.debug("DCP channel segment list cannot be populated when dst is not DCP. Aborting Logging");
+                return;
+            }
+            list.addAll(dcpList);
+        } else if (CollectionUtils.isNotEmpty(rtbList)) {
+            if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
+                LOG.debug("RTBD/IX channel segment list cannot be populated when dst is DCP. Aborting Logging");
+                return;
+            }
+            list.addAll(rtbList);
         }
-        if (null != getAuctionEngine().getUnfilteredChannelSegmentList()) {
-            list.addAll(getAuctionEngine().getUnfilteredChannelSegmentList());
-        }
-        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "writeLogs_"+getDST(), getTimeElapsed());
+
+        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "writeLogs_"
+                + getDST(), getTimeElapsed());
+
         long totalTime = getTotalTime();
         if (totalTime > 2000) {
             totalTime = 0;
@@ -672,20 +701,27 @@ public class ResponseSender extends HttpRequestHandlerBase {
             if (null != getRtbResponse()) {
                 adResponseChannelSegment = getRtbResponse();
             } else if (null != getAdResponse()) {
-                adResponseChannelSegment = getRankList().get(getSelectedAdIndex());
+                adResponseChannelSegment = rankList.get(getSelectedAdIndex());
             }
+
             Logging.rrLogging(traceMarker, adResponseChannelSegment, list, sasParams, terminationReason, totalTime);
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
         } catch (final JSONException exception) {
-            LOG.debug("Exception raised in ResponseSender {}", exception);
-            LOG.debug(ChannelServer.getMyStackTrace(exception));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception raised in ResponseSender {}", exception);
+                LOG.debug(ChannelServer.getMyStackTrace(exception));
+            }
         } catch (final TException exception) {
-            LOG.debug("Exception raised in ResponseSender {}", exception);
-            LOG.debug(ChannelServer.getMyStackTrace(exception));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception raised in ResponseSender {}", exception);
+                LOG.debug(ChannelServer.getMyStackTrace(exception));
+            }
         }
-        LOG.debug("done with logging");
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Done with logging");
+        }
     }
 
     private int getRankIndex(final AdNetworkInterface adNetwork) {
@@ -709,10 +745,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return ResponseFormat.JS_AD_CODE;
         } else if (null == responseFormat) {
             return ResponseFormat.HTML;
-        } else if ("axml".equalsIgnoreCase(responseFormat)) {
-            return ResponseFormat.XHTML;
-        } else if ("native".equalsIgnoreCase(responseFormat)) {
-            return ResponseFormat.NATIVE;
         }
         return ResponseFormat.getValue(responseFormat);
     }
@@ -774,7 +806,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         static {
             for (final ResponseFormat responseFormat : ResponseFormat.values()) {
                 for (final String format : responseFormat.formats) {
-                    STRING_TO_FORMAT_MAP.put(format, responseFormat);
+                    STRING_TO_FORMAT_MAP.put(format.toLowerCase(), responseFormat);
                 }
             }
         }
@@ -788,5 +820,4 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
     }
-
 }

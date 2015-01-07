@@ -1,14 +1,14 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
+import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.awt.Dimension;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +24,8 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.easymock.EasyMock;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
@@ -40,6 +38,7 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesInterface;
@@ -52,9 +51,11 @@ import com.inmobi.casthrift.rtb.SeatBid;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
-public class RtbAdnetworkTest extends TestCase {
+public class RtbAdnetworkTest {
 
     private Configuration mockConfig = null;
     private final String debug = "debug";
@@ -93,7 +94,7 @@ public class RtbAdnetworkTest extends TestCase {
         replay(mockConfig);
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);

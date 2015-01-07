@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>4.45-SNAPSHOT</version>
+	<version>4.46-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -28,6 +28,7 @@
 		<segments.version>1.1.4</segments.version>
 		<experimentation.version>1.6.2</experimentation.version>
 		<guava.version>15.0</guava.version>
+		<powermock.version>1.6.0</powermock.version>
     </properties>
 
     <modules>
@@ -173,9 +174,15 @@
 			</dependency>
 			<dependency>
 				<groupId>org.powermock</groupId>
-				<artifactId>powermock-release-with-junit-easymock-dependencies</artifactId>
-				<version>1.4.11</version>
-				<type>zip</type>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>${powermock.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-easymock</artifactId>
+				<version>${powermock.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.thrift</groupId>
@@ -435,7 +442,7 @@
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
                     <forkMode>once</forkMode>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
+                    <argLine>-XX:-UseSplitVerifier -XX:PermSize=64m -XX:MaxPermSize=128m</argLine>
                 </configuration>
             </plugin>
             <plugin>
