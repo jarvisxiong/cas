@@ -57,7 +57,7 @@ public class TemplateParser {
             final Template template = TemplateManager.getInstance().getTemplate(templateName);
             final StringWriter writer = new StringWriter();
             template.merge(velocityContext, writer);
-            /* show the World */
+            /* Show the World! */
             return writer.toString();
         } catch (final Exception e) {
             LOG.error(String.format("Error while fetching template for %s", templateName));

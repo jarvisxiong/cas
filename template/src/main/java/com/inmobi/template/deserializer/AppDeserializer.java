@@ -24,35 +24,17 @@ public class AppDeserializer implements JsonDeserializer<Context> {
     public Context deserialize(final JsonElement json, final Type typeOf, final JsonDeserializationContext context)
             throws JsonParseException {
         final JsonObject jsonObj = json.getAsJsonObject();
-        String title = null;
-        if (jsonObj.get("title") != null) {
-            title = jsonObj.get("title").getAsString();
-        }
-        // String version = jsonObj.get("version").getAsString();
-        String desc = null;
-        if (jsonObj.get("description") != null) {
-            desc = jsonObj.get("description").getAsString();
-        }
 
-        String actionText = null ;
-        if (jsonObj.get("actiontext") != null) {
-            actionText = jsonObj.get("actiontext").getAsString();
-        }
-
-        String actionLink = null;
-        if (jsonObj.get("actionlink") != null) {
-            actionLink = jsonObj.get("actionlink").getAsString();
-        }
-        final JsonElement idElement = jsonObj.get("uid");
-        String id = "";
-        if (idElement != null) {
-            id = idElement.getAsString();
-        }
+        String title = getAttributeAsString("title", jsonObj);
+        String desc = getAttributeAsString("description", jsonObj);
+        String actionText = getAttributeAsString("actiontext", jsonObj);
+        String actionLink = getAttributeAsString("actionlink", jsonObj);
+        String id = getAttributeAsString("uid", jsonObj, "");
 
         final JsonElement imgElement = jsonObj.get("image");
         Screenshot imgs[] = null;
         if (imgElement != null) {
-            imgs = new Screenshot[] {context.deserialize(imgElement, Screenshot.class)};
+            imgs = new Screenshot[] {(Screenshot) context.deserialize(imgElement, Screenshot.class)};
         }
 
         final JsonElement dataElement = jsonObj.get("data");
@@ -70,7 +52,6 @@ public class AppDeserializer implements JsonDeserializer<Context> {
             icon.setW(300);
             icon.setUrl(iconurl);
             icons = new Icon[] {(Icon) icon.build()};
-
         }
 
         final App.Builder app = App.newBuilder();
@@ -78,16 +59,15 @@ public class AppDeserializer implements JsonDeserializer<Context> {
         app.setTitle(title);
         app.setOpeningLandingUrl(actionLink);
         app.setActionText(actionText);
-        if (icons != null) {
-            app.setIcons(Arrays.asList(icons));
-        }
         app.setId(id);
         app.setPixelUrls(getUrls(jsonObj.get("pixelurl")));
         app.setClickUrls(getUrls(jsonObj.get("clickurl")));
+        if (icons != null) {
+            app.setIcons(Arrays.asList(icons));
+        }
         if (imgs != null) {
             app.setScreenshots(Arrays.asList(imgs));
         }
-
         if (dataMap != null) {
             app.setDownloads(dataMap.getDownloads());
             app.setRating(dataMap.getRating());
@@ -95,7 +75,6 @@ public class AppDeserializer implements JsonDeserializer<Context> {
         }
         return app.build();
     }
-
 
     private List<String> getUrls(final JsonElement jsonElement) {
         List<String> urlList = null;
@@ -112,6 +91,16 @@ public class AppDeserializer implements JsonDeserializer<Context> {
             }
         }
         return urlList;
+    }
+
+    private String getAttributeAsString(final String attr, final JsonObject jsonObj) {
+        JsonElement jsonElt = jsonObj.get(attr);
+        return (null != jsonElt) ? jsonElt.getAsString() : null;
+    }
+
+    private String getAttributeAsString(final String attr, final JsonObject jsonObj, final String defaultValue) {
+        JsonElement jsonElt = jsonObj.get(attr);
+        return (null != jsonElt) ? jsonElt.getAsString() : defaultValue;
     }
 
 }

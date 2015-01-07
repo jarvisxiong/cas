@@ -219,31 +219,7 @@ public class ThriftRequestParser {
         if (null == rqFormat) {
             return rFormat;
         }
-        switch (rqFormat) {
-            case HTML:
-                rFormat = "html";
-                break;
-            case XHTML:
-                rFormat = "xhtml";
-                break;
-            case AXML:
-                rFormat = "axml";
-                break;
-            case JSON:
-                rFormat = "json";
-                break;
-            case RTBS:
-                rFormat = "rtbs";
-                break;
-            case IMAI:
-                rFormat = "imai";
-                break;
-            case NATIVE:
-                rFormat = "native";
-                break;
-            default:// Do Nothing
-        }
-        return rFormat;
+        return rqFormat.name().toLowerCase();
     }
 
     private Set<Integer> getAccountSegments(final Set<DemandType> demandTypes) {

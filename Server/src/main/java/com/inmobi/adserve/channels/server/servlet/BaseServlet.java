@@ -1,5 +1,14 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -25,16 +34,9 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public abstract class BaseServlet implements Servlet {
@@ -75,9 +77,9 @@ public abstract class BaseServlet implements Servlet {
         final CasContext casContext = new CasContext();
         final Marker traceMarker = traceMarkerProvider.get();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        final SASRequestParameters sasParams = hrh.responseSender.sasParams;
+        final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
 
-        hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.sasParams;
+        hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.getSasParams();
         final CasInternalRequestParameters casInternalRequestParametersGlobal =
                 hrh.responseSender.casInternalRequestParameters;
 
@@ -105,18 +107,18 @@ public abstract class BaseServlet implements Servlet {
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
         if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
-            if (hrh.responseSender.sasParams.getOsId() == 3) {
+            if (hrh.responseSender.getSasParams().getOsId() == 3) {
                 imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
             } else {
                 imaiBaseUrl = CasConfigUtil.getServerConfig().getString("iPhoneBaseUrl");
             }
         }
-        hrh.responseSender.sasParams.setImaiBaseUrl(imaiBaseUrl);
-        LOG.debug("imai base url is {}", hrh.responseSender.sasParams.getImaiBaseUrl());
+        hrh.responseSender.getSasParams().setImaiBaseUrl(imaiBaseUrl);
+        LOG.debug("imai base url is {}", hrh.responseSender.getSasParams().getImaiBaseUrl());
 
         // getting the selected third party site details
         final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails =
-                matchSegments.matchSegments(hrh.responseSender.sasParams);
+                matchSegments.matchSegments(hrh.responseSender.getSasParams());
 
         if (CollectionUtils.isEmpty(matchedSegmentDetails)) {
             LOG.debug(traceMarker, "No Entities matching the request.");
@@ -143,7 +145,7 @@ public abstract class BaseServlet implements Servlet {
         }
 
         final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
-        final double segmentFloor = casUtils.getRtbFloor(casContext, hrh.responseSender.sasParams);
+        final double segmentFloor = casUtils.getRtbFloor(casContext, hrh.responseSender.getSasParams());
         enrichCasInternalRequestParameters(hrh, filteredSegments,
                 casInternalRequestParametersGlobal.getAuctionBidFloor(), sasParams.getSiteFloor(),
                 sasParams.getSiteIncId(), networkSiteEcpm, segmentFloor);
@@ -158,7 +160,7 @@ public abstract class BaseServlet implements Servlet {
                 asyncRequestMaker.prepareForAsyncRequest(filteredSegments, CasConfigUtil.getServerConfig(),
                         CasConfigUtil.getRtbConfig(), CasConfigUtil.getAdapterConfig(), hrh.responseSender,
                         sasParams.getUAdapters(), serverChannel, CasConfigUtil.repositoryHelper,
-                        hrh.responseSender.sasParams, casInternalRequestParametersGlobal, rtbSegments);
+                        hrh.responseSender.getSasParams(), casInternalRequestParametersGlobal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
         if (CollectionUtils.isEmpty(dcpSegments) && CollectionUtils.isEmpty(rtbSegments)) {
@@ -209,7 +211,7 @@ public abstract class BaseServlet implements Servlet {
         casInternalRequestParametersGlobal.setBlockedAdvertisers(getBlockedAdvertisers(hrh));
         final double minimumRtbFloor = 0.05;
         casInternalRequestParametersGlobal.setAuctionBidFloor(hrh.responseSender.getAuctionEngine()
-                .calculateAuctionFloor(hrh.responseSender.sasParams.getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor,
+                .calculateAuctionFloor(hrh.responseSender.getSasParams().getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor,
                         networkSiteEcpm));
         casInternalRequestParametersGlobal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(siteIncId));
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
@@ -238,9 +240,9 @@ public abstract class BaseServlet implements Servlet {
 
     private List<String> getBlockedIabCategories(final HttpRequestHandler hrh) {
         List<String> blockedCategories = null;
-        if (null != hrh.responseSender.sasParams.getSiteId()) {
+        if (null != hrh.responseSender.getSasParams().getSiteId()) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.sasParams.getSiteId(),
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams().getSiteId(),
                             4);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedIabCategories() != null) {
                 blockedCategories = Arrays.asList(siteFilterEntity.getBlockedIabCategories());
@@ -251,9 +253,9 @@ public abstract class BaseServlet implements Servlet {
 
     private List<String> getBlockedAdvertisers(final HttpRequestHandler hrh) {
         List<String> blockedAdvertisers = null;
-        if (null != hrh.responseSender.sasParams.getSiteId()) {
+        if (null != hrh.responseSender.getSasParams().getSiteId()) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.sasParams.getSiteId(),
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams().getSiteId(),
                             6);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
                 blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());

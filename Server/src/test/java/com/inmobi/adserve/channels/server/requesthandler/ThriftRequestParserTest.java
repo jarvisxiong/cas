@@ -6,19 +6,12 @@ import static org.easymock.EasyMock.replay;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Arrays;
-
-import com.inmobi.adserve.channels.entity.GeoZipEntity;
-import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.GeoZipRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -41,12 +34,20 @@ import com.inmobi.adserve.adpool.SupplyCapability;
 import com.inmobi.adserve.adpool.User;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.repository.GeoZipRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+
+import junit.framework.TestCase;
 
 
 public class ThriftRequestParserTest extends TestCase {
@@ -162,7 +163,7 @@ public class ThriftRequestParserTest extends TestCase {
         carrier.setCarrierId(12345);
 
         final User user = new User();
-        user.setYearOfBirth((short) 1930);
+        user.setYearOfBirth((short)(Calendar.getInstance().get(Calendar.YEAR)-85));
         user.setGender(Gender.MALE);
 
         final Geo geo = new Geo();
@@ -240,7 +241,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getRqMkAdcount(), new Short("1"));
         assertEquals(sasRequestParameters.getTid(), "tid");
         assertEquals(sasRequestParameters.getHandsetInternalId(), 456);
-        assertEquals(sasRequestParameters.getCarrierId(), 12345);
+        assertEquals(sasRequestParameters.getCarrierId(), new Integer(12345));
         assertEquals(sasRequestParameters.getCity(), new Integer(12));
         assertEquals(sasRequestParameters.getState(), new Integer(123));
         assertEquals(sasRequestParameters.getProcessedMkSlot().get(0), new Short("12"));

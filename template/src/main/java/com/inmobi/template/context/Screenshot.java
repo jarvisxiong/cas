@@ -2,26 +2,22 @@ package com.inmobi.template.context;
 
 import java.util.Map;
 
+import com.inmobi.template.interfaces.Context;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import com.inmobi.template.interfaces.Context;
 
 
 @ToString
 @Getter
 public final class Screenshot extends AbstractContext {
-
-
     private final int w;
     private final int h;
     private final int width;
     private final int height;
     private final String ar;
     private final String url;
-
-
 
     private Screenshot(final Builder builder) {
         w = builder.w;
@@ -47,24 +43,16 @@ public final class Screenshot extends AbstractContext {
         return new Builder();
     }
 
-
+    @Setter
     public static class Builder {
-
-        @Setter
         private int w;
-        @Setter
         private int h;
-        @Setter
         private String ar;
-        @Setter
         private String url;
 
         public Context build() {
             return new Screenshot(this);
-
         }
-
     }
-
 
 }

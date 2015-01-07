@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevelFilter {
 
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
-
     private final ServerConfig serverConfiguration;
 
     @Inject
@@ -42,9 +41,8 @@ public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevel
         final boolean isIxPartner = advertiserIdConfigMap.get(advertiserId).isIx();
         boolean result = false;
         if (isRtbPartner || isIxPartner) {
-            result =
-                    channelSegment.getChannelFeedbackEntity().getBalance() < serverConfiguration
-                            .getRtbBalanceFilterAmount();
+            result = channelSegment.getChannelFeedbackEntity().getBalance() <
+                    serverConfiguration.getRtbBalanceFilterAmount();
         }
         return result;
     }

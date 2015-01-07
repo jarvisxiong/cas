@@ -4,8 +4,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +14,8 @@ import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+
+import junit.framework.TestCase;
 
 
 public class RequestParserTest extends TestCase {
@@ -61,7 +61,7 @@ public class RequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getProcessedMkSlot().get(0), new Short("9"));
         assertEquals(sasRequestParameters.getUidParams(),
                 "{\"O1\":\"8d10846582eef7c6f5873883b09a5a63\",\"u-id-s\":\"O1\",\"IX\":\"4fa7!506c!508902de!iPod3,1!8G4!19800\"}");
-        assertEquals(sasRequestParameters.getCarrierId(), 406);
+        assertEquals(sasRequestParameters.getCarrierId(), new Integer(406));
         assertEquals(sasRequestParameters.getCountryId(), new Long(94));
         assertEquals(sasRequestParameters.getCountryCode(), "US");
         assertEquals(sasRequestParameters.getState(), new Integer(31118));

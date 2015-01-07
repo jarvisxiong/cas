@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.inmobi.adserve.channels.server.config.CasConfig;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +17,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.cqengine.resultset.ResultSet;
 import com.google.gson.Gson;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -126,6 +128,15 @@ public class ServletGetSegment implements Servlet {
                     entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY)) {
+                    ResultSet<IXPackageEntity> resultSet =
+                            CasConfigUtil.repositoryHelper.queryIXPackageRepository(Integer.parseInt(id.split("_")[0]),
+                                    id.split("_")[1], Integer.parseInt(id.split("_")[2]), Integer.parseInt(id.split("_")[3]));
+                    List<Long> result = new ArrayList<>();
+                    for (IXPackageEntity packageEntity : resultSet) {
+                        result.add(packageEntity.getId());
+                    }
+                    entity = result;
                 }
             }
             segmentInfo.put(key, entity);

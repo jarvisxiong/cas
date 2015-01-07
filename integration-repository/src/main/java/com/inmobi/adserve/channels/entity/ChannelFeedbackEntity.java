@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.entity;
 
+import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Getter
@@ -15,9 +15,9 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String> {
     private final double totalInflow;
     private final double totalBurn;
     private final double balance;
-    private final int totalImpressions;
-    private final int todayRequests;
-    private final int todayImpressions;
+    private final long totalImpressions;
+    private final long todayRequests;
+    private final long todayImpressions;
     private final double averageLatency;
     private final double revenue;
 
@@ -43,9 +43,9 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String> {
         private double totalInflow;
         private double totalBurn;
         private double balance;
-        private int totalImpressions;
-        private int todayRequests;
-        private int todayImpressions;
+        private long totalImpressions;
+        private long todayRequests;
+        private long todayImpressions;
         private double averageLatency;
         private double revenue;
 

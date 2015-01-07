@@ -8,11 +8,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +17,13 @@ import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
@@ -34,8 +31,12 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.ADCreativeType;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 // TODO: Merge with IXAdNetworkTest.java
-public class IXAdNetworkTest2 {
+public class NewIXAdNetworkTest {
     private static Configuration mockConfig;
     private static final String advertiserName = "ix";
     private static RepositoryHelper repositoryHelper;
@@ -166,6 +167,7 @@ public class IXAdNetworkTest2 {
         expect(mockSasParams.getSdkVersion()).andReturn("SdkVer").times(1);
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException()).anyTimes();
 
         replay(mockStatus, mockHttpRequestHandlerBase, mockChannel, mockRepositoryHelper, mockSasParams,
                 mockChannelSegmentEntity);
@@ -178,7 +180,7 @@ public class IXAdNetworkTest2 {
                         .addMockedMethod("configureParameters", null)
                         .addMockedMethod("updateDSPAccountInfo")
                         .withConstructor(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
-                                advertiserName, 0, mockRepositoryHelper, true).createMock();
+                                advertiserName, 0, true).createMock();
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).times(1);
@@ -187,7 +189,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, repositoryHelper);
+                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -195,7 +197,7 @@ public class IXAdNetworkTest2 {
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
         assertThat(
                 ixAdNetwork.getResponseContent(),
-                is(equalTo("<html><body style=\"margin:0;padding:0;\"><script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p></script><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></body></html>")));
+                is(equalTo("<html><head><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p></div></div><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></body></html>")));
     }
 
     @Test
@@ -241,7 +243,7 @@ public class IXAdNetworkTest2 {
                         .addMockedMethod("getImpressionId")
                         .addMockedMethod("configureParameters", null)
                         .withConstructor(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
-                                advertiserName, 0, mockRepositoryHelper, true).createMock();
+                                advertiserName, 0, true).createMock();
 
         expect(ixAdNetwork.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
         expect(ixAdNetwork.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
@@ -249,7 +251,7 @@ public class IXAdNetworkTest2 {
         replay(ixAdNetwork);
 
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, repositoryHelper);
+                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
         ImpressionIdGenerator.init((short) 123, (byte) 10);
         ClickUrlsRegenerator.init(mockConfig);
 
