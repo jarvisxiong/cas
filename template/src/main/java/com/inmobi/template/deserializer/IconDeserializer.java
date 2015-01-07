@@ -10,6 +10,8 @@ import com.google.gson.JsonParseException;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.interfaces.Context;
 
+// Looks like a relic from a time when icon was an object in the native ad markup
+// No longer used
 public class IconDeserializer implements JsonDeserializer<Context> {
 
     @Override

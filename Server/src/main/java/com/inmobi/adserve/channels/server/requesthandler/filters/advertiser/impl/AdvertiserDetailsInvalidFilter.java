@@ -49,7 +49,6 @@ public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilte
         }
 
         return false;
-
     }
 
 }

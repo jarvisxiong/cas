@@ -20,10 +20,11 @@ public class ImageDeserializer implements JsonDeserializer<Context> {
         final int w = jsonObj.get("w").getAsInt();
         final int h = jsonObj.get("h").getAsInt();
         final String url = jsonObj.get("imageurl").getAsString();
+        final double ar = (double) h / w;
+
         final Screenshot.Builder builder = Screenshot.newBuilder();
         builder.setH(h);
         builder.setW(w);
-        final double ar = (double) h / w;
         builder.setAr(String.valueOf(ar));
         builder.setUrl(url);
         return builder.build();

@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Data;
-
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+
+import lombok.Data;
 
 
 @Data
@@ -54,7 +54,7 @@ public class SASRequestParameters {
     private Short rqMkAdcount;
     private String tid;
     private long handsetInternalId;
-    private int carrierId;
+    private Integer carrierId;
     private Integer city;
     private Integer state;
     private List<Short> rqMkSlot;

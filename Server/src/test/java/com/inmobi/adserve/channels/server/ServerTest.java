@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +24,8 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+
+import junit.framework.TestCase;
 
 
 public class ServerTest extends TestCase {
@@ -181,13 +181,4 @@ public class ServerTest extends TestCase {
                 requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
     }
 
-    /*
-     * @Test public void testRRLogging() throws Exception { JSONObject jObject = prepareParameters(); DebugLogger
-     * logger; Logging.rrLogging(jObject, null, logger, mockConfig, sasParam, "NO"); File fis = new File(rrFile);
-     * assertTrue(fis.length() != 0); fis.delete(); }
-     * 
-     * @Test public void testChannelLogging() throws Exception { JSONObject jObject = prepareParameters(); DebugLogger
-     * logger; Logging.rrLogging(jObject, null, logger, mockConfig, sasParam, "NO"); File fis = new File(rrFile);
-     * assertTrue(fis.length() != 0); fis.delete(); }
-     */
 }
