@@ -275,7 +275,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         return response;
                     }
                     
-                    InspectorStats.updateYammerTimerStats(getName(), latency, true);
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
@@ -289,6 +288,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     }
 
                     if (!isRequestCompleted()) {
+                        InspectorStats.updateYammerTimerStats(getName(), latency, true);
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
                         final String responseStr = response.getResponseBody("UTF-8");
