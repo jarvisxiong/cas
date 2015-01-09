@@ -151,11 +151,7 @@ public class ChannelServer {
                     configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
-            InspectorStats.init(
-                    configurationLoader.getServerConfiguration().getString("graphiteServer.host",
-                            "mon02.ads.uj1.inmobi.com"),
-                    configurationLoader.getServerConfiguration().getInt("graphiteServer.port", 2003),
-                    configurationLoader.getServerConfiguration().getInt("graphiteServer.intervalInMinutes", 1));
+            InspectorStats.init(configurationLoader.getServerConfiguration());
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();

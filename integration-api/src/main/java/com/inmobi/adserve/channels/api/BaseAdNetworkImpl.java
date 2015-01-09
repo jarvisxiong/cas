@@ -270,10 +270,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    latency = System.currentTimeMillis() - startTime;
                     if(!serverChannel.isOpen()){
+                        InspectorStats.updateYammerTimerStats(getName(), latency, false);
                         return response;
                     }
-                    latency = System.currentTimeMillis() - startTime;
+                    
+                    InspectorStats.updateYammerTimerStats(getName(), latency, true);
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
@@ -300,7 +303,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    
+                    latency = System.currentTimeMillis() - startTime;
+                    InspectorStats.updateYammerTimerStats(getName(), latency, false);
                     if (t instanceof java.io.IOException) {
                         InspectorStats.incrementStatCount(InspectorStrings.IO_EXCEPTION);
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
@@ -309,7 +313,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if(isRequestCompleted() || !serverChannel.isOpen()){
                         return;
                     }
-                    latency = System.currentTimeMillis() - startTime;
+                    
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
                     if (isTraceEnabled) {
