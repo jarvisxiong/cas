@@ -215,7 +215,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             LOG.debug("Already cleanedup so returning from process response");
             return;
         }
-        LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
         if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
@@ -613,13 +612,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 for (int i = 0; i < segmentCategories.length; i++) {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
-                            return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
+                            category = getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
                                     seperator);
-
+                        } else {
+                            category = CategoryList.getCategory(cat);
                         }
-                        category = CategoryList.getCategory(cat);
                         appendCategories(sb, category, seperator);
-                        break;
                     }
                 }
                 if (!isAllRequired && null != category) {
