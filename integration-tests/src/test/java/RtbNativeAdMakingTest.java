@@ -8,6 +8,7 @@ import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
+import static org.powermock.api.easymock.PowerMock.resetAll;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -70,7 +71,8 @@ public class RtbNativeAdMakingTest {
 
     // templateGuId = 6435704039925181184
     private static String tangoTemplateContent = "## Subtitle shouldn''t be more than 100 characters.\n"
-            + "#set($subtitle = $tool.jpath($first, \"imNative.creative.description\").get(\"text\").replaceAll(\"\\s+\", \" \"))\n"
+            + "#set($subtitle = $tool.jpath($first, \"imNative.creative.description\")."
+            + "get(\"text\").replaceAll(\"\\s+\", \" \"))\n"
             + "#if ($subtitle.length() > 100)\n"
             + "#set($subtitle = \"$subtitle.substring(0, 97)...\")\n"
             + "#end\n"
@@ -238,6 +240,7 @@ public class RtbNativeAdMakingTest {
 
     @BeforeClass
     public static void setUp() throws Exception{
+        resetAll();
         setUpMocks();
         setUpRtbAdapter();
         setUpMockTemplate();
@@ -264,8 +267,8 @@ public class RtbNativeAdMakingTest {
         NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
 
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository(siteId))
-                .andReturn(mockNativeAdTemplateEntity).times(1)
-                .andReturn(null).times(1);
+                .andReturn(null).times(1)
+                .andReturn(mockNativeAdTemplateEntity).times(1);
 
         replayAll();
         MemberModifier.field(RtbAdNetwork.class, "repositoryHelper").set(rtbAdNetwork, mockRepositoryHelper);

@@ -14,6 +14,8 @@
 
 	<properties>
 		<maven-release-plugin>2.3.2</maven-release-plugin>
+		<maven.install.plugin>2.5.2</maven.install.plugin>
+		<build.helper.maven.plugin>1.9.1</build.helper.maven.plugin>
 		<slf4j.version>1.7.2</slf4j.version>
 		<scribe.version>2.1.0</scribe.version>
 		<logback.version>1.0.10</logback.version>
@@ -28,7 +30,7 @@
 		<segments.version>1.1.4</segments.version>
 		<experimentation.version>1.6.2</experimentation.version>
 		<guava.version>15.0</guava.version>
-		<powermock.version>1.6.0</powermock.version>
+		<powermock.version>1.6.1</powermock.version>
     </properties>
 
     <modules>
@@ -38,6 +40,7 @@
         <module>integration-utils</module>
         <module>integration-api</module>
         <module>template</module>
+        <module>integration-tests</module>
     </modules>
 
 	<dependencyManagement>
@@ -509,4 +512,69 @@
             </plugin>
         </plugins>
     </build>
+
+	<profiles>
+		<profile>
+			<id>whitebox-analysis</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- Used for instrumenting the modules-->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<configuration>
+							<classifier>cobertura</classifier>
+						</configuration>
+						<executions>
+							<execution>
+								<!-- This is called for all modules except integration-tests where it is suppressed-->
+								<id>cobertura-instrument</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>instrument</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<!-- Used for generating the instrumented jars for cobertura -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>generate-test-sources</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<archive>
+										<manifest>
+											<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+											<addClasspath>true</addClasspath>
+										</manifest>
+										<manifestEntries>
+											<Implementation-Build>${buildNumber}/${ciBuildInfo}</Implementation-Build>
+										</manifestEntries>
+									</archive>
+									<classesDirectory>${basedir}/target/generated-classes/cobertura</classesDirectory>
+									<classifier>cobertura</classifier>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<!-- Suppressing the cobertura plugin defined in the parent pom-->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unit-test</id>
+								<phase>none</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
