@@ -136,13 +136,13 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         cFE1 =
                 new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId1, 100.0, 50.0, 50.0, 100, 95,
-                        120, 1.0, 4.0));
+                        120, 1, 4.0));
         cFE2 =
                 new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId2, 100.0, 95.0, 5.0, 100, 55,
-                        120, 2.0, 0.6));
+                        120, 2, 0.6));
         cFE3 =
                 new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId2, 100.0, 50.0, 50.0, 100, 55, 0,
-                        1.0, 4.0));
+                        1, 4.0));
         cSFE1 =
                 new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId1", 0.29,
                         0.1, 0, 0, 0, 0, 200));
@@ -1036,7 +1036,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
     private ChannelFeedbackEntity.Builder getChannelFeedbackEntityBuilder(final String advertiserId,
             final double totalInflow, final double totalBurn, final double balance, final int totalImpressions,
-            final int todayImpressions, final int todayRequests, final double averageLatency, final double revenue) {
+            final int todayImpressions, final int todayRequests, final int averageLatency, final double revenue) {
         final ChannelFeedbackEntity.Builder builder = ChannelFeedbackEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setTotalInflow(totalInflow);

@@ -198,7 +198,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             // map Category
             int category = 12;
             final Long[] segmentCategories = entity.getTags();
-            if (null != segmentCategories && 1 != segmentCategories[0] && null != categoryMap.get(segmentCategories[0])) {
+            if (null != segmentCategories && segmentCategories.length > 0 && 1 != segmentCategories[0] && null != categoryMap.get(segmentCategories[0])) {
                 category = categoryMap.get(segmentCategories[0]);
             } else if (null != sasParams.getCategories()) {
                 for (int i = 0; i < sasParams.getCategories().size(); i++) {

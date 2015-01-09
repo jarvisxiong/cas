@@ -30,7 +30,7 @@ public class ChannelFeedbackRepository extends AbstractStatsMaintainingDBReposit
             final double totalBurn = row.getDouble("total_burn");
             final double balance = row.getDouble("balance");
             final double revenue = row.getDouble("revenue");
-            final long averageLatency = row.getLong("average_latency");
+            final int averageLatency = row.getInt("average_latency");
             final long totalImpressions = row.getLong("total_impressions");
             final long todayImpressions = row.getLong("today_impressions");
             final long todayRequests = row.getInt("today_requests");
