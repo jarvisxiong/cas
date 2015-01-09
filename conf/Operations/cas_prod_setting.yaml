@@ -52,6 +52,8 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'false'
 
    uh1:
       db_host:
@@ -106,6 +108,8 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'false'
 
    lhr1:
       db_host:
@@ -160,6 +164,8 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'false'
 
    hkg1:
       db_host:
@@ -214,6 +220,8 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'false'
 
 pilot:
    uj1:
@@ -269,6 +277,8 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'false'
 
    uh1:
       db_host:
@@ -323,6 +333,8 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'true'
 
    lhr1:
       db_host:
@@ -377,6 +389,8 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'true'
 
    hkg1:
       db_host:
@@ -431,6 +445,8 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
+      graphite_shouldLogAdapterLatencies:
+         - 'true'
 
 nonprod:
    lhr1:

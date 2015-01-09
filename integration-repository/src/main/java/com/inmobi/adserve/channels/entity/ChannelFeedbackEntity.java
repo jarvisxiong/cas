@@ -18,7 +18,7 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String> {
     private final long totalImpressions;
     private final long todayRequests;
     private final long todayImpressions;
-    private final double averageLatency;
+    private final int averageLatency;
     private final double revenue;
 
     public ChannelFeedbackEntity(final Builder builder) {
@@ -46,7 +46,7 @@ public class ChannelFeedbackEntity implements IdentifiableEntity<String> {
         private long totalImpressions;
         private long todayRequests;
         private long todayImpressions;
-        private double averageLatency;
+        private int averageLatency;
         private double revenue;
 
         public ChannelFeedbackEntity build() {

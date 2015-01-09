@@ -215,7 +215,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             LOG.debug("Already cleanedup so returning from process response");
             return;
         }
-        LOG.debug("Inside process Response for the partner: {}", getName());
         getResponseAd();
         isRequestComplete = true;
         if (baseRequestHandler.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
@@ -270,10 +269,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
+                    latency = System.currentTimeMillis() - startTime;
                     if(!serverChannel.isOpen()){
+                        InspectorStats.updateYammerTimerStats(getName(), latency, false);
                         return response;
                     }
-                    latency = System.currentTimeMillis() - startTime;
+                    
+                    InspectorStats.updateYammerTimerStats(getName(), latency, true);
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
@@ -300,7 +302,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                 @Override
                 public void onThrowable(final Throwable t) {
-                    
+                    latency = System.currentTimeMillis() - startTime;
+                    InspectorStats.updateYammerTimerStats(getName(), latency, false);
                     if (t instanceof java.io.IOException) {
                         InspectorStats.incrementStatCount(InspectorStrings.IO_EXCEPTION);
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
@@ -309,7 +312,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if(isRequestCompleted() || !serverChannel.isOpen()){
                         return;
                     }
-                    latency = System.currentTimeMillis() - startTime;
+                    
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
                     if (isTraceEnabled) {
@@ -609,13 +612,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 for (int i = 0; i < segmentCategories.length; i++) {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
-                            return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
+                            category = getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
                                     seperator);
-
+                        } else {
+                            category = CategoryList.getCategory(cat);
                         }
-                        category = CategoryList.getCategory(cat);
                         appendCategories(sb, category, seperator);
-                        break;
                     }
                 }
                 if (!isAllRequired && null != category) {

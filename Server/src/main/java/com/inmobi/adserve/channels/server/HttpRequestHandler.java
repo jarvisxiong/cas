@@ -1,5 +1,10 @@
 package com.inmobi.adserve.channels.server;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -15,11 +20,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
@@ -58,6 +58,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             httpRequest = requestParameterHolder.getHttpRequest();
             LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
+
         } catch (final Exception exception) {
             responseSender.setTerminationReason(CasConfigUtil.PROCESSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.PROCESSING_ERROR, InspectorStrings.COUNT);

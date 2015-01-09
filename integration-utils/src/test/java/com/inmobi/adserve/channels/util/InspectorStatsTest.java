@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration.Configuration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -32,15 +33,24 @@ public class InspectorStatsTest {
 
         mockStatic(InetAddress.class);
         mockStatic(GraphiteReporter.class);
+        
 
         expect(InetAddress.getLocalHost()).andThrow(new UnknownHostException()).times(1);
+        
+
+        Configuration mockConfig = createMock(Configuration.class);
+        expect(mockConfig.getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com")).andReturn(graphiteServer).anyTimes();
+        expect(mockConfig.getInt("graphiteServer.port", 1234)).andReturn(graphitePort).anyTimes();
+        expect(mockConfig.getInt("graphiteServer.intervalInMinutes", 100)).andReturn(graphiteInterval).anyTimes();
+        expect(mockConfig.getBoolean("graphiteServer.shouldLogAdapterLatencies", false)).andReturn(false).anyTimes();
+
         GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort,
-                expectedMetricProducer);
+            expectedMetricProducer);
         expectLastCall().times(1);
 
         replayAll();
 
-        InspectorStats.init(graphiteServer, graphitePort, graphiteInterval);
+        InspectorStats.init(mockConfig);
 
         verifyAll();
     }
@@ -59,14 +69,21 @@ public class InspectorStatsTest {
 
         expect(mockInetAddress.getHostName()).andReturn(hostName).times(1);
         expect(InetAddress.getLocalHost()).andReturn(mockInetAddress).times(1);
+
+        
+        Configuration mockConfig = createMock(Configuration.class);
+        expect(mockConfig.getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com")).andReturn(graphiteServer).anyTimes();
+        expect(mockConfig.getInt("graphiteServer.port", 1234)).andReturn(graphitePort).anyTimes();
+        expect(mockConfig.getInt("graphiteServer.intervalInMinutes", 100)).andReturn(graphiteInterval).anyTimes();
+        expect(mockConfig.getBoolean("graphiteServer.shouldLogAdapterLatencies", false)).andReturn(false).anyTimes();
+        
         GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort,
-                expectedMetricProducer);
+            expectedMetricProducer);
         expectLastCall().times(1);
-
+        
         replayAll();
-
-        InspectorStats.init(graphiteServer, graphitePort, graphiteInterval);
-
+        InspectorStats.init(mockConfig);
+        
         verifyAll();
     }
 
