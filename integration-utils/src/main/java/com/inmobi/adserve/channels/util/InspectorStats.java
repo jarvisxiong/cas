@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,8 +33,19 @@ public class InspectorStats {
 
     private static final String STATS = "stats";
     private static final String WORK_FLOW = "WorkFlow";
+    
+    private static final String GOOD = "GOOD";
+    private static final String BAD = "BAD";
+    
+    private static boolean shouldLog = false;
 
-    public static void init(final String graphiteServer, final int graphitePort, final int graphiteInterval) {
+    public static void init(final Configuration serverConfiguration) {
+        final String graphiteServer = serverConfiguration.getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com");
+        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 1234);
+        final int graphiteInterval = serverConfiguration.getInt("graphiteServer.intervalInMinutes", 100); 
+
+        shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
+        
         String metricProducer;
         try {
             metricProducer = metricsPrefix(InetAddress.getLocalHost().getHostName().toLowerCase());
@@ -43,6 +55,7 @@ public class InspectorStats {
         }
         GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort, metricProducer);
     }
+    
 
     private static String metricsPrefix(String hostname) {
         hostname = StringUtils.removeEnd(hostname, ".inmobi.com");
@@ -123,6 +136,17 @@ public class InspectorStats {
         yammerCounterStats.get(key).get(STATS).get(parameter).inc(value);
     }
 
+    public static void updateYammerTimerStats(final String dst, final long value, final boolean isGood) {
+        if(!shouldLog){
+            return;
+        }
+        if(isGood){
+            updateYammerTimerStats(dst, GOOD, value);
+        }else{
+            updateYammerTimerStats(dst, BAD, value);
+        }
+    }
+    
     public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
         final String fullKey = dst + "." + parameter;
         if (yammerTimerStats.get(dst) == null) {
