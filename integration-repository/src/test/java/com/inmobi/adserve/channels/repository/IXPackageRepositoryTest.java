@@ -5,6 +5,7 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.phoenix.batteries.data.test.NoOpDataSource;
 import com.inmobi.phoenix.batteries.data.test.ResultSetExpectationSetter;
 import com.inmobi.segment.Segment;
+import com.inmobi.segment.impl.City;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
 import com.inmobi.segment.impl.InventoryType;
@@ -14,10 +15,11 @@ import com.inmobi.segment.impl.NetworkType;
 import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteCategoryEnum;
 import com.inmobi.segment.impl.SlotId;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
-import static org.easymock.EasyMock.createNiceMock;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -26,10 +28,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 import static org.powermock.api.easymock.PowerMock.createMock;
 
@@ -65,7 +65,7 @@ public class IXPackageRepositoryTest {
         EasyMock.expect(sitesArray.getArray()).andReturn(siteIds).anyTimes();
 
         Array dealsArray = EasyMock.createNiceMock(Array.class);
-        String[] dealIds = {"1","2"};
+        String[] dealIds = {"1", "2"};
         EasyMock.expect(rs.getArray("deal_ids")).andReturn(dealsArray).anyTimes();
         EasyMock.expect(dealsArray.getArray()).andReturn(dealIds).anyTimes();
 
@@ -73,6 +73,11 @@ public class IXPackageRepositoryTest {
         Integer[] countries = new Integer[] {94, 46};
         EasyMock.expect(rs.getArray("country_ids")).andReturn(countriesArray).anyTimes();
         EasyMock.expect(countriesArray.getArray()).andReturn(countries).anyTimes();
+
+        Array citiesArray = EasyMock.createNiceMock(Array.class);
+        Integer[] cities = new Integer[] {12345, 23456};
+        EasyMock.expect(rs.getArray("city_ids")).andReturn(citiesArray).anyTimes();
+        EasyMock.expect(citiesArray.getArray()).andReturn(cities).anyTimes();
 
         Array slotsArray = EasyMock.createNiceMock(Array.class);
         Integer[] slots = new Integer[] {14, 32};
@@ -151,6 +156,7 @@ public class IXPackageRepositoryTest {
         EasyMock.replay(sitesArray);
         EasyMock.replay(dealsArray);
         EasyMock.replay(countriesArray);
+        EasyMock.replay(citiesArray);
         EasyMock.replay(slotsArray);
         EasyMock.replay(inventoryTypeArray);
         EasyMock.replay(carrierIdArray);
@@ -183,6 +189,9 @@ public class IXPackageRepositoryTest {
         Country e_country = new Country();
         e_country.init(ImmutableSet.copyOf(new Integer[] {94, 46}));
 
+        City e_city = new City();
+        e_city.init(ImmutableSet.copyOf(new Integer[] {12345, 23456}));
+
         DeviceOs e_os = new DeviceOs();
         e_os.init(ImmutableSet.copyOf(new Integer[] {3, 5}));
 
@@ -204,6 +213,7 @@ public class IXPackageRepositoryTest {
         Segment.Builder repoSegmentBuilder = new Segment.Builder();
         Segment e_segment = repoSegmentBuilder
                 .addSegmentParameter(e_country)
+                .addSegmentParameter(e_city)
                 .addSegmentParameter(e_os)
                 .addSegmentParameter(e_slot)
                 .addSegmentParameter(e_inventoryType)

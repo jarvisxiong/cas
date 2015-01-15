@@ -96,21 +96,20 @@ import lombok.Setter;
 
 /**
  * Generic RTB adapter.
- * 
+ *
  * @author Devi Chand(devi.chand@inmobi.com)
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     public static ImpressionCallbackHelper impressionCallbackHelper;
+    public static final List<String> CURRENCIES_SUPPORTED =
+            new ArrayList<>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW", "RUB"));
 
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
 
-    @Getter
-    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
-            "RUB"));
-    @Getter
-    static List<String> blockedAdvertiserList = new ArrayList<String>(Arrays.asList("king.com", "supercell.net",
-            "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+    private static final List<String> BLOCKED_ADVERTISER_LIST =
+            new ArrayList<>(Arrays.asList("king.com", "supercell.net",
+                    "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
 
     private static final Logger LOG = LoggerFactory.getLogger(RtbAdNetwork.class);
     private static final int AUCTION_TYPE = 2;
@@ -215,8 +214,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final boolean templateWinNotification) {
+                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+                        final String advertiserName, final int tmax, final boolean templateWinNotification) {
 
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
@@ -237,7 +236,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         isBannerVideoResponseSupported = config.getBoolean(advertiserName + ".bannerVideoSupported", false);
-        blockedAdvertisers.addAll(blockedAdvertiserList);
+        blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
     }
 
     @Override
@@ -330,7 +329,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-            final User user, final Device device) {
+                                           final User user, final Device device) {
         bidRequest = new BidRequest(casInternalRequestParameters.getAuctionId(), impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
@@ -393,7 +392,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Impression createImpressionObject(final Banner banner, final String displayManager,
-            final String displayManagerVersion) {
+                                              final String displayManagerVersion) {
         // nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
@@ -632,10 +631,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if ((category = getCategories(',', false)) != null) {
             app.setName(category);
         }
-        if (isWapSiteUACEntity && isNativeRequest() &&  wapSiteUACEntity.isTransparencyEnabled()) {
+        if (isWapSiteUACEntity && isNativeRequest() && wapSiteUACEntity.isTransparencyEnabled()) {
             setParamsForTransparentApp(app);
         }
-        
+
         // set App Ext fields
         final AppExt ext = createAppExt(wapSiteUACEntity);
         app.setExt(ext);
@@ -647,7 +646,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
-        
+
         String bundleId = wapSiteUACEntity.getBundleId();
         if (StringUtils.isEmpty(bundleId) && wapSiteUACEntity.isAndroid()) {
             bundleId = wapSiteUACEntity.getMarketId();
@@ -1034,7 +1033,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             responseContent = "";
 
             LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, "
-                            + "exception = {}", sasParams.getSiteId(), advertiserName, e);
+                    + "exception = {}", sasParams.getSiteId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -1079,7 +1078,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     /**
      * Checks if the RTB response is for video and contains a valid VAST response.
-     * 
+     *
      * @return false - When a video response is received and it is NOT valid. true - 1) When the response does not
      *         contain video (banner response) 2) It contains video response which is a valid XML/URL.
      */

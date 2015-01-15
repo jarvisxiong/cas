@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.adnetworks.lomark;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -89,7 +90,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param serverEvent
      */
     public DCPLomarkAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+                              final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
@@ -198,7 +199,8 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             // map Category
             int category = 12;
             final Long[] segmentCategories = entity.getTags();
-            if (null != segmentCategories && segmentCategories.length > 0 && 1 != segmentCategories[0] && null != categoryMap.get(segmentCategories[0])) {
+            if (null != segmentCategories && segmentCategories.length > 0 && 1 != segmentCategories[0]
+                    && null != categoryMap.get(segmentCategories[0])) {
                 category = categoryMap.get(segmentCategories[0]);
             } else if (null != sasParams.getCategories()) {
                 for (int i = 0; i < sasParams.getCategories().size(); i++) {
