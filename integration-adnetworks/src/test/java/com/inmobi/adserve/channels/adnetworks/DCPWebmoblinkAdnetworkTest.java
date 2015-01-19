@@ -263,6 +263,121 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
     }
 
     @Test
+    public void testWebmoblinkRequestUriAndroid() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setCarrierId(365);
+        sasParams.setCountryId(0l);
+        sasParams.setSiteIncId(123456);
+        sasParams.setSource("APP");
+        sasParams.setOsId(3);
+        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setUidMd5("");
+        sasParams.setCountryCode("us");
+        sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
+                + "+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        Long[] cats = {10l, 13l, 30l};
+        sasParams.setCategories(Arrays.asList(cats));
+        String beaconUrl =
+                "http://c2.w.inmobi.com/c"
+                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
+                        + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        String externalSiteKey = "10023";
+        ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        null, null, 32, new Integer[] {0}));
+        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        String actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        String expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=4";
+        assertEquals(expectedUrl, actualUrl);
+
+        casInternalRequestParameters.setUidO1("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=4";
+        assertEquals(expectedUrl, actualUrl);
+
+        casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=4";
+        assertEquals(expectedUrl, actualUrl);
+
+        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setGpid("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=7";
+        assertEquals(expectedUrl, actualUrl);
+    }
+
+    @Test
+    public void testWebmoblinkRequestUriIOS() throws Exception {
+        SASRequestParameters sasParams = new SASRequestParameters();
+        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setCarrierId(365);
+        sasParams.setCountryId(0l);
+        sasParams.setSiteIncId(123456);
+        sasParams.setSource("APP");
+        sasParams.setOsId(5);
+        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setUidMd5("");
+        sasParams.setCountryCode("us");
+        sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
+                + "+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        Long[] cats = {10l, 13l, 30l};
+        sasParams.setCategories(Arrays.asList(cats));
+        String beaconUrl =
+                "http://c2.w.inmobi.com/c"
+                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
+                        + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        String externalSiteKey = "10023";
+        ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        null, null, 32, new Integer[] {0}));
+        casInternalRequestParameters.setUidO1("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        String actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        String expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=6";
+        assertEquals(expectedUrl, actualUrl);
+
+        casInternalRequestParameters.setUidSO1("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=3";
+        assertEquals(expectedUrl, actualUrl);
+
+        casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=3";
+        assertEquals(expectedUrl, actualUrl);
+        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setUidIFA("202cb962ac59075b964b07152d234b70");
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
+        expectedUrl =
+                "http://www.webmoblink-api.mobi/API2/MobileAPI.aspx?aid=123&pid=10023&sid=00000000-0000-0020-0000-00000001e240&mo=LIVE&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&ip=206.29.182.240&format=ANY&result=xml&cc=us&did=202cb962ac59075b964b07152d234b70&didtype=1";
+        assertEquals(expectedUrl, actualUrl);
+
+    }
+
+
+    @Test
     public void testWebmoblinkParseAd() throws Exception {
         SASRequestParameters sasParams = new SASRequestParameters();
         CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -289,4 +404,47 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                 "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a href=' http://buschgardens.com/bg/ ' onclick=\"document.getElementById('click').src='$IMClickUrl';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://webmoblink.com/uploadedfiles/buschgarden3021.gif'  /><br/>Enjoy two parks, any two days</a><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
                 dcpWebmoblinkAdNetwork.getHttpResponseContent());
     }
+
+    @Test
+    public void testDCPMableParseEmptyResponseCode() throws Exception {
+        final String response = "";
+        dcpWebmoblinkAdNetwork.parseResponse(response, HttpResponseStatus.OK);
+        assertEquals(500, dcpWebmoblinkAdNetwork.getHttpResponseStatusCode());
+        assertEquals("", dcpWebmoblinkAdNetwork.getHttpResponseContent());
+    }
+
+    @Test
+    public void testWebmoblinkGetId() throws Exception {
+        assertEquals(webmoblinkAdvId, dcpWebmoblinkAdNetwork.getId());
+    }
+
+    @Test
+    public void testWebmoblinkGetImpressionId() throws Exception {
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        final String clurl =
+                "http://c2.w.inmobi.com/c"
+                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
+                        + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        final String externalKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
+                        null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
+        assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpWebmoblinkAdNetwork.getImpressionId());
+    }
+
+    @Test
+    public void testWebmoblinkGetName() throws Exception {
+        assertEquals("webmoblink", dcpWebmoblinkAdNetwork.getName());
+    }
+
 }

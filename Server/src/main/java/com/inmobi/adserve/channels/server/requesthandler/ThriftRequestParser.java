@@ -30,6 +30,7 @@ import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
+import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.types.InventoryType;
@@ -205,10 +206,12 @@ public class ThriftRequestParser {
     protected String getPostalCode(Set<Integer> postalCodes) {
         final Integer zipId = (null != postalCodes && postalCodes.iterator().hasNext() ? postalCodes
                 .iterator().next() : null);
-        if(zipId != null) {
-            final String probableZipCode = CasConfigUtil.repositoryHelper.queryGeoZipRepository(zipId).getZipCode();
-            if (NumberUtils.isNumber(probableZipCode)) {
-                return probableZipCode;
+        if (zipId != null) {
+            final GeoZipEntity geoZipEntity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(zipId);
+            // There are DUMMY string values in geo_zip.zipcode on wap_prod_adserve.
+            // The below isNumber check is a hack to avoid sending dummy values.
+            if (null != geoZipEntity && NumberUtils.isNumber(geoZipEntity.getZipCode())) {
+                return geoZipEntity.getZipCode();
             }
         }
         return null;

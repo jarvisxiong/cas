@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.rubicon;
 
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -140,7 +141,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
      * @param serverChannel
      */
     public DCPRubiconAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+                               final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         userName = config.getString("rubicon.username");
         password = config.getString("rubicon.password");
@@ -175,8 +176,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         isApp = StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
-                        ? false
-                        : true;
+                ? false
+                : true;
 
         final JSONObject additionalParams = entity.getAdditionalParams();
 

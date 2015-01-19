@@ -100,14 +100,7 @@ import lombok.Setter;
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
 
-    public static ImpressionCallbackHelper impressionCallbackHelper;
-
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
-
-    @Getter
-    static List<String> currenciesSupported = new ArrayList<String>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW",
-            "RUB"));
-
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
     private static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
@@ -125,7 +118,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     private static final String CELL_TOWER = "CELL_TOWER";
     private static final String MIME_HTML = "text/html";
-    public static final int INMOBI_SDK_VERSION_370 = 370;
+    private static final int INMOBI_SDK_VERSION_370 = 370;
     private static final int IX_MRAID_VALUE = 1001;
     private static final List<Integer> MRAID_FRAMEWORK_VALUES =
             Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(), IX_MRAID_VALUE);
@@ -216,8 +209,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final boolean templateWinNotification) {
+                       final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+                       final String advertiserName, final int tmax, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -354,7 +347,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private IXBidRequest createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-            final User user, final Device device, final Regs regs) {
+                                                final User user, final Device device, final Regs regs) {
         final IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
         tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
@@ -422,7 +415,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Impression createImpressionObject(final Banner banner, final String displayManager,
-            final String displayManagerVersion, final ProxyDemand proxyDemand) {
+                                              final String displayManagerVersion, final ProxyDemand proxyDemand) {
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
             /**
@@ -501,7 +494,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     }
                 }
             }
-            if (isCategorySet == false && additionalParams.has("default")) {
+            if (!isCategorySet && additionalParams.has("default")) {
                 categoryZoneId = additionalParams.getString("default");
             }
 
@@ -781,7 +774,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
         }
-        
+
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         final Blind blindForApp = new Blind();
         blindForApp.setBundle(blindBundle);
@@ -873,8 +866,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isEmpty(id = casInternalRequestParameters.getUidIFA())) {
                 //Set to UIDIFA for IOS Device
                 device.setIfa(id);
-            }
-            else if (!StringUtils.isEmpty(id = getGPID())) {
+            } else if (!StringUtils.isEmpty(id = getGPID())) {
                 //Set to GPID for Android Device
                 device.setIfa(id);
             }
@@ -908,10 +900,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                             .getSeat());
         }
         if (isExternalPersonaDeal) {
-            url=url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id="+dealId);
-        }
-        else {
-            url=url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "");
+            url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id=" + dealId);
+        } else {
+            url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "");
         }
 
         if (null == bidRequest) {
@@ -942,7 +933,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final String authStr = userName + ":" + password;
-        final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes()));
+        final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes(CharsetUtil.UTF_8)));
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
 
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
@@ -1018,9 +1009,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.error("Invalid Rubicon DSP id: {}", buyer);
             return false;
         }
-        final String DSPAccountId = ixAccountMapEntity.getInmobiAccountId();
+        final String dspAccountId = ixAccountMapEntity.getInmobiAccountId();
 
-        if (StringUtils.isEmpty(DSPAccountId)) {
+        if (StringUtils.isEmpty(dspAccountId)) {
             LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
             return false;
         }
@@ -1032,12 +1023,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
 
-        final Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(DSPAccountId);
+        final Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(dspAccountId);
 
         if (null == adGroupMap || adGroupMap.isEmpty()) {
             // If collection is empty
             LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}",
-                    buyer, DSPAccountId);
+                    buyer, dspAccountId);
             return false;
         } else {
             // Else picking up the first channel segment entity and assuming that to be the correct entity
@@ -1226,7 +1217,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adm = bid.getAdm();
 
             // TODO: hack for IX beacon discrepancy fix
-            adm = adm.replace("src=\"//beacon","src=\"http://beacon");
+            adm = adm.replace("src=\"//beacon", "src=\"http://beacon");
 
             responseImpressionId = bid.getImpid();
             creativeId = bid.getCrid();
@@ -1274,7 +1265,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
-        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(indexOfDealId) : 0;
+        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId ?
+                matchedPackageEntity.getDealFloors().get(indexOfDealId) :
+                0;
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>4.51-SNAPSHOT</version>
+	<version>4.53-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -27,7 +27,7 @@
 		<guice-assistedinject.version>3.0</guice-assistedinject.version>
 		<commons.pool.version>2.2</commons.pool.version>
 		<phoenix.batteries.version>2.3.31</phoenix.batteries.version>
-		<segments.version>1.1.4</segments.version>
+		<segments.version>1.1.5</segments.version>
 		<experimentation.version>1.6.2</experimentation.version>
 		<guava.version>15.0</guava.version>
 		<powermock.version>1.6.1</powermock.version>
