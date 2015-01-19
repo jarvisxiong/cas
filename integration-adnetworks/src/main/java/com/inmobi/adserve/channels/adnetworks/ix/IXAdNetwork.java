@@ -351,7 +351,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
         tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
-        tempBidRequest.setTmax(tmax);
+        //Disabling it for now, later this will be removed completely
+        //tempBidRequest.setTmax(tmax);
 
         LOG.debug(traceMarker, "INSIDE CREATE BID REQUEST OBJECT");
 

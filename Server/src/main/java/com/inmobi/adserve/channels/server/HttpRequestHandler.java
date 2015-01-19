@@ -65,6 +65,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sendNoAdResponse(ctx.channel());
             final String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
+
             if (LOG.isDebugEnabled()) {
                 final String message = "stack trace is -> " + getStackTrace(exception);
                 LOG.debug(traceMarker, message);
