@@ -19,6 +19,7 @@ import com.inmobi.data.repository.DBReaderDelegate;
 import com.inmobi.data.repository.ScheduledDbReader;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
+import com.inmobi.segment.impl.City;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
 import com.inmobi.segment.impl.InventoryType;
@@ -193,6 +194,7 @@ public class IXPackageRepository {
                 boolean zipCodeOnly = rs.getBoolean("zip_code_only");
                 boolean ifaOnly = rs.getBoolean("ifa_only");
                 Integer[] countryIds = (Integer[]) rs.getArray("country_ids").getArray();
+                Integer[] cityIds = (Integer[]) rs.getArray("city_ids").getArray();
                 String[] inventoryTypes = (String[]) rs.getArray("inventory_types").getArray();
                 Long[] carrierIds = (Long[]) rs.getArray("carrier_ids").getArray();
                 String[] siteCategories = (String[]) rs.getArray("site_categories").getArray();
@@ -260,6 +262,11 @@ public class IXPackageRepository {
                     country.init(ImmutableSet.copyOf(countryIds));
                 }
 
+                City city = null;
+                if (ArrayUtils.isNotEmpty(cityIds)) {
+                    city = new City();
+                    city.init(ImmutableSet.copyOf(cityIds));
+                }
                 InventoryType inventoryType = null;
                 if (ArrayUtils.isNotEmpty(inventoryTypes)) {
                     InventoryTypeEnum[] inventoryTypeEnums = new InventoryTypeEnum[inventoryTypes.length];
@@ -326,6 +333,10 @@ public class IXPackageRepository {
 
                 if (country != null) {
                     repoSegmentBuilder.addSegmentParameter(country);
+                }
+
+                if (city != null) {
+                    repoSegmentBuilder.addSegmentParameter(city);
                 }
 
                 if (inventoryType != null) {

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>4.48-SNAPSHOT</version>
+		<version>4.53-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -146,7 +146,7 @@
 			<artifactId>naming-java</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
 		<dependency>

@@ -8,6 +8,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
+import com.inmobi.segment.impl.City;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
 import com.inmobi.segment.impl.InventoryType;
@@ -19,6 +20,7 @@ import com.inmobi.segment.impl.SiteId;
 import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
 import com.inmobi.segment.impl.ZipCodePresent;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -44,8 +46,7 @@ public class IXPackageMatcher {
         for (IXPackageEntity packageEntity : resultSet) {
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
 
-                // TODO: 1) Honor scheduledTimeOfDay [Not in the scope of MVP]
-                //Add to matchedPackageIds only if csId's match
+                // Add to matchedPackageIds only if csId's match
                 if (CollectionUtils.isNotEmpty(packageEntity.getDmpFilterSegmentExpression())
                         && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity.getDmpFilterSegmentExpression())) {
                     continue;
@@ -62,7 +63,6 @@ public class IXPackageMatcher {
     }
 
     private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
-
         if (CollectionUtils.isEmpty(csiReqTags)) {
             return false;
         } else {
@@ -76,7 +76,6 @@ public class IXPackageMatcher {
     }
 
     private static Segment createRequestSegment(final SASRequestParameters sasParams, final Short selectedSlotId) {
-
         Country reqCountry = new Country();
         DeviceOs reqDeviceOs = new DeviceOs();
         SiteId reqSiteId = new SiteId();
@@ -90,6 +89,7 @@ public class IXPackageMatcher {
         // Below are optional params and requires NULL check.
         NetworkType reqNetworkType = null;
         SiteCategory reqSiteCategory = null;
+        City reqCity = null;
 
         reqCountry.init(Collections.singleton(sasParams.getCountryId().intValue()));
         reqDeviceOs.init(Collections.singleton(sasParams.getOsId()));
@@ -114,6 +114,11 @@ public class IXPackageMatcher {
             reqSiteCategory.init(sasParams.getSiteContentType().name());
         }
 
+        if (sasParams.getCity() != null) {
+            reqCity = new City();
+            reqCity.init(Collections.singleton(sasParams.getCity()));
+        }
+
         Segment.Builder requestSegmentBuilder = new Segment.Builder();
         requestSegmentBuilder
                 .addSegmentParameter(reqCountry)
@@ -131,6 +136,9 @@ public class IXPackageMatcher {
         }
         if (reqSiteCategory != null) {
             requestSegmentBuilder.addSegmentParameter(reqSiteCategory);
+        }
+        if (reqCity != null) {
+            requestSegmentBuilder.addSegmentParameter(reqCity);
         }
 
         Segment requestSegment = requestSegmentBuilder.build();

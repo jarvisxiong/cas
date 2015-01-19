@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.api;
 
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -21,8 +13,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -35,6 +25,7 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
@@ -50,6 +41,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -57,38 +49,17 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Getter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.Marker;
-
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected static Marker traceMarker;
-    protected static String SITE_RATING_PERFORMANCE = "PERFORMANCE";
     protected static final String WAP = "WAP";
     protected static final String UA = "ua";
     protected static final String IP = "ip";
     protected static final String LAT = "lat";
     protected static final String LONG = "long";
-    protected static final String SIZE = "size";
     protected static final String ZIP = "zip";
     protected static final String COUNTRY = "country";
     protected static final String GENDER = "gender";
@@ -270,12 +241,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     latency = System.currentTimeMillis() - startTime;
-                    if(!serverChannel.isOpen()){
+                    if (!serverChannel.isOpen()) {
                         InspectorStats.updateYammerTimerStats(getName(), latency, false);
                         return response;
                     }
-                    
-                    InspectorStats.updateYammerTimerStats(getName(), latency, true);
+
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
@@ -289,6 +259,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     }
 
                     if (!isRequestCompleted()) {
+                        InspectorStats.updateYammerTimerStats(getName(), latency, true);
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
                         final String responseStr = response.getResponseBody("UTF-8");
@@ -308,11 +279,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.incrementStatCount(InspectorStrings.IO_EXCEPTION);
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
                     }
-                    
-                    if(isRequestCompleted() || !serverChannel.isOpen()){
+
+                    if (isRequestCompleted() || !serverChannel.isOpen()) {
                         return;
                     }
-                    
+
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
                     if (isTraceEnabled) {
@@ -353,7 +324,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
                         return;
                     }
-                    
+
                     LOG.debug("{} error latency {}", getName(), latency);
                     adStatus = "TERM";
                     processResponse();
@@ -486,8 +457,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public boolean configureParameters(final SASRequestParameters param,
-            final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-            final String clickUrl, final String beaconUrl, final long slotId, final RepositoryHelper repositoryHelper) {
+                                       final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
+                                       final String clickUrl, final String beaconUrl, final long slotId, final RepositoryHelper repositoryHelper) {
         this.sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
         externalSiteId = entity.getExternalSiteKey();
@@ -637,7 +608,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * function returns the unique device id
-     * 
+     *
      * @return
      */
     protected String getUid() {
@@ -798,17 +769,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName, final int paramValue,
-            final boolean isFirstParam) {
+                                             final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-            final String paramValue, final boolean isFirstParam) {
+                                             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-            final double paramValue, final boolean isFirstParam) {
+                                             final double paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
@@ -876,7 +847,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 || 17 == selectedSlotId /* 800x1280 */
                 || 32 == selectedSlotId // 480x320
                 || 33 == selectedSlotId // 1024x768
-                || 34 == selectedSlotId) /* 1280x800 */{
+                || 34 == selectedSlotId) /* 1280x800 */ {
             return true;
         }
         return false;

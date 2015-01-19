@@ -45,12 +45,14 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             final boolean status = row.getBoolean("status");
             final String pricingModel = row.getString("pricing_model");
             final boolean isTestMode = row.getBoolean("is_test_mode");
-            final Timestamp modified_on = row.getTimestamp("modified_on");
             final Integer[] siteRatings = (Integer[]) row.getArray("site_ratings");
             final Long[] rcList = (Long[]) row.getArray("rc_list");
             final Long[] slotIds = (Long[]) row.getArray("slot_ids");
             final Integer[] creativeTypes = (Integer[]) row.getArray("creative_types");
-            final Long[] tags = null;
+            Long[] tags = null;
+            if (null != row.getArray("tags")) {
+                tags = (Long []) row.getArray("tags");
+            }
             List<Integer> segmentFlags;
             if (null != row.getArray("segment_flags")) {
                 segmentFlags = Arrays.asList((Integer[]) row.getArray("segment_flags"));
@@ -119,7 +121,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setStatus(status);
             builder.setTestMode(isTestMode);
             builder.setExternalSiteKey(externalSiteKey);
-            builder.setModified_on(modified_on);
+            builder.setModified_on(modifyTime);
             builder.setCampaignId(campaignId);
             builder.setSlotIds(slotIds);
             builder.setIncIds(adIncIds);
@@ -129,7 +131,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setOsIds(osIds);
             builder.setUdIdRequired(udIdRequired);
             builder.setLatlongRequired(latlongRequired);
-            builder.setStripZipCode(zipCodeRequired);
+            builder.setZipCodeRequired(zipCodeRequired);
             builder.setRestrictedToRichMediaOnly(richMediaOnly);
             builder.setAppUrlEnabled(appUrlEnabled);
             builder.setInterstitialOnly(interstitialOnly);

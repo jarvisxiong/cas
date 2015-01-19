@@ -1,32 +1,28 @@
 package com.inmobi.adserve.channels.adnetworks.webmoblink;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.net.URI;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import lombok.Data;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.net.URI;
 
 public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPWebmoblinkAdNetwork.class);
@@ -107,10 +103,13 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (isApp) {
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-                // if android : o1,uid,um5
-
-                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
-
+                // if android : o1,uid,um5,gpid
+                String gpid = getGPID();
+                if (null != gpid) {
+                    appendQueryParam(url, DEVICE_ID, gpid, false);
+                    appendQueryParam(url, DID_TYPE, 7, false);
+                }
+                else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                     appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidMd5(), false);
                     appendQueryParam(url, DID_TYPE, 4, false);
                 } else if (casInternalRequestParameters.getUidO1() != null) {
@@ -137,12 +136,6 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                 } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
                     appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidO1(), false);
                     appendQueryParam(url, DID_TYPE, 6, false);
-                } else {
-                    String gpid = getGPID();
-                    if (null != gpid) {
-                        appendQueryParam(url, DEVICE_ID, gpid, false);
-                        appendQueryParam(url, DID_TYPE, 7, false);
-                    }
                 }
             }
 

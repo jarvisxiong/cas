@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.util.Utils;
 
+import java.sql.Timestamp;
+import java.util.TimeZone;
+
 /**
  * Created by ishanbhatnagar on 30/9/14.
  */
@@ -75,6 +78,7 @@ public class TestUtils {
                 + "\"callout\": 0,\"data\": [{\"label\": 0,\"value\": \"3500\",\"seq\": 0}]}";
     }
 
+
     public static class SampleServletQueries {
         public static final String servletRepoRefresh =
                 "http://localhost/repoRefresh?args={\"repoName\":\"ChannelRepository\",\"DBHost\":\"10.14.118.57\",\"DB"
@@ -82,5 +86,12 @@ public class TestUtils {
                         + "\",\"DBPassword\":\"mkhoj123\"}";
         public static final String servletChangeLogLevel =
                 "http://localhost:8800/changeLogLevel?debug=ERROR";
+    }
+
+
+    public static class improvedTimestamp extends Timestamp {
+        public improvedTimestamp(long time) {
+            super(((time / 1000) * 1000) - TimeZone.getDefault().getRawOffset());
+        }
     }
 }
