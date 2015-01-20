@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
@@ -7,9 +10,6 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class CasUtilsTest extends TestCase {
 

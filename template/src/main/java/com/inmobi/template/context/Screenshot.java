@@ -2,11 +2,11 @@ package com.inmobi.template.context;
 
 import java.util.Map;
 
-import com.inmobi.template.interfaces.Context;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import com.inmobi.template.interfaces.Context;
 
 
 @ToString

@@ -1,5 +1,13 @@
 package com.inmobi.adserve.channels.server.auction.auctionfilter;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -8,13 +16,6 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.casthrift.DemandSourceType;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import java.util.Iterator;
-import java.util.List;
 
 public abstract class AbstractAuctionFilter implements AuctionFilter {
 

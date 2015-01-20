@@ -1,12 +1,13 @@
 package com.inmobi.adserve.channels.server.auction;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
-
-import javax.inject.Inject;
-import java.util.List;
 
 @Singleton
 public class AuctionFilterApplier {

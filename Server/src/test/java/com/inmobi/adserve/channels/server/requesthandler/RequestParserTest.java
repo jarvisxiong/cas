@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
@@ -14,8 +15,6 @@ import com.google.inject.Provider;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-
-import junit.framework.TestCase;
 
 
 public class RequestParserTest extends TestCase {

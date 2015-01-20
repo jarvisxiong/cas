@@ -10,9 +10,8 @@ import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
-import com.inmobi.adserve.channels.entity.CreativeEntity;
-import com.inmobi.adserve.channels.query.CreativeQuery;
-import com.inmobi.adserve.channels.types.CreativeExposure;
+import java.sql.Timestamp;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,11 +19,12 @@ import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.channels.entity.CreativeEntity;
+import com.inmobi.adserve.channels.query.CreativeQuery;
+import com.inmobi.adserve.channels.types.CreativeExposure;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.NullAsZeroResultSetRow;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
-
-import java.sql.Timestamp;
 
 /**
  * Created by anshul.soni on 05/01/15.

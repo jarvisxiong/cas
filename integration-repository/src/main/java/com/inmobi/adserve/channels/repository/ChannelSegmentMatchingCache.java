@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.repository;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,6 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.log4j.Logger;
+
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 
 
 public class ChannelSegmentMatchingCache {

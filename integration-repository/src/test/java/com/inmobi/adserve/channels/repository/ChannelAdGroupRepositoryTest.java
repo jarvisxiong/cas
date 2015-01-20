@@ -10,25 +10,25 @@ import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.json.JSONObject;
 
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.NullAsZeroResultSetRow;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by anshul.soni on 07/01/15.

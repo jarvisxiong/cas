@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.awt.Dimension;
+import java.sql.Timestamp;
+
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -10,9 +13,6 @@ import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-
-import java.awt.Dimension;
-import java.sql.Timestamp;
 
 /**
  * Created by anshul.soni on 27/11/14.

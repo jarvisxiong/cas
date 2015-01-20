@@ -1,12 +1,13 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.adserve.channels.query.PricingEngineQuery;
-import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
+import java.util.Map;
+import java.util.Set;
+
 import lombok.Data;
 import lombok.Setter;
 
-import java.util.Map;
-import java.util.Set;
+import com.inmobi.adserve.channels.query.PricingEngineQuery;
+import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Data
