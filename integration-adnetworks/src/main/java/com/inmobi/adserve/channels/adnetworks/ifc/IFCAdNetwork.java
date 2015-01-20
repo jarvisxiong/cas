@@ -1,18 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.ifc;
 
-import com.google.gson.JsonObject;
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.util.CategoryList;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.util.List;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -21,9 +19,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Dimension;
-import java.net.URI;
-import java.util.List;
+import com.google.gson.JsonObject;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.util.CategoryList;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 
 /**
