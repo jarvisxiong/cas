@@ -61,6 +61,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("wapstart.host");
+        host = new StringBuilder(String.format(host, externalSiteId)).toString();
 
         if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
             if(selectedSlotId == 9 || selectedSlotId == 15 || selectedSlotId == 24) {
@@ -101,8 +102,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            final StringBuilder url = new StringBuilder(String.format(host, externalSiteId));
-            return new URI(url.toString());
+            return new URI(host);
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);

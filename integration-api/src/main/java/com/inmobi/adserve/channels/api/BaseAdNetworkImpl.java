@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -50,6 +52,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -104,6 +107,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String requestUrl = "";
     protected ChannelSegmentEntity entity;
     protected String externalSiteId;
+    @Getter
+    @Setter
     protected String host;
     protected String impressionId;
     protected String clickUrl;
@@ -122,6 +127,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean isRtbPartner = false;
     private boolean isIxPartner = false;
     private String adapterName;
+    
+    @Inject
+    protected static IPRepository ipRepository;
+    private boolean isIPResolutionDisabled = true;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -471,9 +480,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        return configureParameters();
+        boolean isConfigured = configureParameters();
+        replaceHostWithIP();
+        return isConfigured;
     }
-
+    
     @Override
     public boolean isBeaconUrlRequired() {
         return true;
@@ -898,9 +909,22 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public Short getSelectedSlotId() {
         return selectedSlotId;
     }
+    
+    @Override
+    public void disableIPResolution(boolean isIPResolutionDisabled){
+        this.isIPResolutionDisabled = isIPResolutionDisabled;
+    }
 
     @Override
     public RepositoryHelper getRepositoryHelper() {
         return repositoryHelper;
     }
+    
+    private void replaceHostWithIP(){
+        if(isIPResolutionDisabled){
+            return;
+        }
+        host = ipRepository.getIPAddress(host, traceMarker);
+    }
+
 }

@@ -155,4 +155,7 @@ public interface AdNetworkInterface {
 
     // Get Demand Source Type
     DemandSourceType getDst();
+    
+    //Disable IP Resolution
+    void disableIPResolution(boolean isIPResolutionDisabled);
 }

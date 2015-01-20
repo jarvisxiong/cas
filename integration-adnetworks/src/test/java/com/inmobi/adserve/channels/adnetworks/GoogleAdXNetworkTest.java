@@ -3,10 +3,12 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
 import io.netty.channel.Channel;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
@@ -18,9 +20,11 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.googleadx.GoogleAdXAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -36,6 +40,7 @@ public class GoogleAdXNetworkTest extends TestCase {
 
     private GoogleAdXAdNetwork googleAdXNetwork;
     private final String googleAdXStatus = "on";
+    private final String googleAdXhost = "http://www.google.com";
     private final String inmobiAdvertiserID = "inmobi_advertiser_id";
     private final String googleAdXPublisherID = "ca-pub-7457767528341420";
     private RepositoryHelper repositoryHelper;
@@ -90,6 +95,14 @@ public class GoogleAdXNetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
         googleAdXNetwork = new GoogleAdXAdNetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        googleAdXNetwork.setHost(googleAdXhost);
     }
 
     @Test

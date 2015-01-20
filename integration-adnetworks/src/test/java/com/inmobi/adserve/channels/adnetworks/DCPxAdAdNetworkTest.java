@@ -3,11 +3,14 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +22,11 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -92,6 +97,14 @@ public class DCPxAdAdNetworkTest extends TestCase {
                 .andReturn(null).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpxAdAdnetwork = new DCPxAdAdNetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpxAdAdnetwork.setHost(xAdHost);
     }
 
     @Test
@@ -222,7 +235,8 @@ public class DCPxAdAdNetworkTest extends TestCase {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_IAB8&devid=Mozilla&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=Android_Id%7CMD5&size=320x48&cat=IAB8&os=Android&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -256,7 +270,8 @@ public class DCPxAdAdNetworkTest extends TestCase {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_IAB1&devid=Mozilla&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=IDFA%7CRAW&size=320x48&cat=IAB1&cat=IAB10-2&cat=IAB19-29&cat=IAB20-1&os=iOS&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB21&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB10&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -288,7 +303,8 @@ public class DCPxAdAdNetworkTest extends TestCase {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_IAB8&devid=iPhone&lat=37.4429&long=-122.1514&uid=202cb962ac59075b964b07152d234b70&uid_type=UUID%7CSHA1&size=320x48&cat=IAB8&os=iOS&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -341,7 +357,8 @@ public class DCPxAdAdNetworkTest extends TestCase {
             final String actualUrl = dcpxAdAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://xad.com/rest/banner?v=1.2&o_fmt=html5&ip=206.29.182.240&k=1324&appid=00000000-0000-0000-0000-000000000000_&devid=Mozilla&lat=11.6&long=-11.87&uid=7a31d90b848f70062e6281b058cc52fc&uid_type=UUID%7CMD5&size=320x50&cat=&os=Android&instl=0&pt=web&bcat=IAB25-5&bcat=IAB25-4&bcat=IAB25-7&bcat=IAB25-1&bcat=IAB25-3&bcat=IAB25-2&bcat=IAB9-9&bcat=IAB7-9&bcat=IAB7-8&bcat=IAB14-1&bcat=IAB14-2&bcat=IAB14-3&bcat=IAB5-2&bcat=IAB7-45&bcat=IAB7-44&bcat=IAB26&bcat=IAB8-5&bcat=IAB7-3&bcat=IAB25&bcat=IAB23-9&bcat=IAB7-2&bcat=IAB7-5&bcat=IAB23-2&bcat=IAB13-5&bcat=IAB7-10&bcat=IAB7-4&bcat=IAB13-7&bcat=IAB7-6&bcat=IAB7-11&bcat=IAB7-12&bcat=IAB6-7&bcat=IAB7-13&bcat=IAB7-14&bcat=IAB7-16&bcat=IAB7-18&bcat=IAB7-19&bcat=IAB7&bcat=IAB12&bcat=IAB7-21&bcat=IAB11&bcat=IAB7-20&bcat=IAB7-28&bcat=IAB7-29&bcat=IAB7-27&bcat=IAB7-24&bcat=IAB7-25&bcat=IAB7-22&bcat=IAB19-3&bcat=IAB17-18&bcat=IAB7-31&bcat=IAB7-30&bcat=IAB7-37&bcat=IAB11-1&bcat=IAB7-38&bcat=IAB11-2&bcat=IAB7-39&bcat=IAB7-34&bcat=IAB7-36&bcat=IAB23-10&bcat=IAB15-5&bcat=IAB12-1&bcat=IAB12-3&bcat=IAB26-3&bcat=IAB12-2&bcat=IAB26-4&bcat=IAB26-1&bcat=IAB26-2&bcat=IAB7-41&bcat=IAB7-40&bcat=IAB11-5&bcat=IAB11-4&bcat=IAB11-3";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 

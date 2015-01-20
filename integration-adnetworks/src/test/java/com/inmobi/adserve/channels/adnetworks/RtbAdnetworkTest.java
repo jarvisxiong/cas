@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -32,9 +32,11 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -147,6 +149,15 @@ public class RtbAdnetworkTest {
 
         rtbAdNetwork =
                 new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", 200, true);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        rtbAdNetwork.setHost("http://localhost:8080");
+        
 
         final Field asyncHttpClientProviderField = RtbAdNetwork.class.getDeclaredField("asyncHttpClientProvider");
         asyncHttpClientProviderField.setAccessible(true);
@@ -210,7 +221,7 @@ public class RtbAdnetworkTest {
     public void testGetRequestUri() throws URISyntaxException {
         final URI uri = new URI("urlBase");
         rtbAdNetwork.setUrlArg("urlArg");
-        rtbAdNetwork.setUrlBase("urlBase");
+        rtbAdNetwork.setHost("urlBase");
         assertEquals(uri, rtbAdNetwork.getRequestUri());
     }
 

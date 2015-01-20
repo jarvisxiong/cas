@@ -8,6 +8,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
@@ -17,9 +19,11 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.logan.DCPLoganAdnetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -90,6 +94,14 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 .andReturn(null).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpLoganAdNetwork = new DCPLoganAdnetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpLoganAdNetwork.setHost(loganHost);
     }
 
     @Test
@@ -203,8 +215,9 @@ public class DCPLoganAdnetworkTest extends TestCase {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
-            assertEquals(actualUrl, expectedUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
+            }
     }
 
     @Test
@@ -230,8 +243,9 @@ public class DCPLoganAdnetworkTest extends TestCase {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
-            assertEquals(actualUrl, expectedUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
+            }
     }
 
     @Test
@@ -257,7 +271,9 @@ public class DCPLoganAdnetworkTest extends TestCase {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70";
-            assertEquals(actualUrl, expectedUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
+
         }
     }
 
@@ -287,8 +303,8 @@ public class DCPLoganAdnetworkTest extends TestCase {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&country=US&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     @Test
@@ -315,7 +331,8 @@ public class DCPLoganAdnetworkTest extends TestCase {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ads.mocean.mobi/ad?track=1&key=6&type=3&over_18=0&ip=206.29.182.240&zone=1324&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+2.2.2%3B+es-us%3B+Movistar+Prime+Build%2FFRF91%29+AppleWebKit%2F533.1+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F533.1&lat=37.4429&long=-122.1514&udid=202cb962ac59075b964b07152d234b70&min_size_x=288&min_size_y=45&size_x=320&size_y=50";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 

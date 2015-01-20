@@ -163,9 +163,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Getter
     @Setter
-    private String urlBase;
-    @Getter
-    @Setter
     private String urlArg;
     @Getter
     @Setter
@@ -215,7 +212,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
                         final String advertiserName, final int tmax, final boolean templateWinNotification) {
 
         super(baseRequestHandler, serverChannel);
@@ -227,7 +224,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
         this.clientBootstrap = clientBootstrap;
-        this.urlBase = urlBase;
+        this.host = host;
         setRtbPartner(true);
         iabCategoriesInterface = new IABCategoriesMap();
         iabCountriesInterface = new IABCountriesMap();
@@ -860,9 +857,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public URI getRequestUri() throws URISyntaxException {
         final StringBuilder url = new StringBuilder();
         if ("get".equalsIgnoreCase(rtbMethod)) {
-            url.append(urlBase).append('?').append(urlArg).append('=');
+            url.append(host).append('?').append(urlArg).append('=');
         } else {
-            url.append(urlBase);
+            url.append(host);
         }
         LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());

@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
+
 import io.netty.channel.Channel;
 
 import java.awt.Dimension;
@@ -28,9 +29,11 @@ import com.google.common.collect.Lists;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -50,6 +53,8 @@ public class IXAdNetworkTest extends TestCase {
     private final String debug = "debug";
     private final String loggerConf = "/tmp/channel-server.properties";
     private IXAdNetwork ixAdNetwork;
+    private final String ixHost = "http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east";
+    
     private final SASRequestParameters sasParams = new SASRequestParameters();
     private final String ixAdvId = "id";
     private static final int OS_ID = 14;
@@ -229,6 +234,14 @@ public class IXAdNetworkTest extends TestCase {
         bidResponse.bidid = "ac1a2c944cff0a176643079625b0cad4a1bbe4a3";
 
         ixAdNetwork.setBidResponse(bidResponse);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        ixAdNetwork.setHost(ixHost);
     }
 
 
@@ -237,7 +250,7 @@ public class IXAdNetworkTest extends TestCase {
     public void testGetRequestUri() throws URISyntaxException {
         final URI uri = new URI("urlBase");
         ixAdNetwork.setUrlArg("urlArg");
-        ixAdNetwork.setUrlBase("urlBase");
+        ixAdNetwork.setHost("urlBase");
         assertEquals(uri, ixAdNetwork.getRequestUri());
     }
 

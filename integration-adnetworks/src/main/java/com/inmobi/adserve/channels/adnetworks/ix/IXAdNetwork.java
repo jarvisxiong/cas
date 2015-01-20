@@ -136,9 +136,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     IXBidRequest bidRequest;
     @Getter
     @Setter
-    private String urlBase;
-    @Getter
-    @Setter
     private String urlArg;
     @Getter
     @Setter
@@ -209,7 +206,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                       final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+                       final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
                        final String advertiserName, final int tmax, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
@@ -218,7 +215,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         ixMethod = config.getString(advertiserName + ".ixMethod");
         wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.clientBootstrap = clientBootstrap;
-        this.urlBase = urlBase;
+        this.host = host;
         setIxPartner(true);
         iabCategoriesInterface = new IABCategoriesMap();
         iabCountriesInterface = new IABCountriesMap();
@@ -948,9 +945,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public URI getRequestUri() throws URISyntaxException {
         final StringBuilder url = new StringBuilder();
         if ("get".equalsIgnoreCase(ixMethod)) {
-            url.append(urlBase).append('?').append(urlArg).append('=');
+            url.append(host).append('?').append(urlArg).append('=');
         } else {
-            url.append(urlBase);
+            url.append(host);
         }
         LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());

@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -10,6 +11,7 @@ import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.resetAll;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -22,7 +24,9 @@ import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -221,6 +225,12 @@ public class RtbNativeAdMakingTest {
     private static void setUpRtbAdapter() throws Exception{
         String beaconUrl = "www.dummyBeacon.inmobi.com";
 
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
         rtbAdNetwork = new RtbAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, false);
         Method[] methodsToSupress = new Method[]{
                 RtbAdNetwork.class.getDeclaredMethod("configureParameters")
@@ -230,6 +240,7 @@ public class RtbNativeAdMakingTest {
         TemplateConfiguration templateConfiguration = getTemplateConfiguration();
         MemberModifier.field(RtbAdNetwork.class, "nativeResponseMaker")
                 .set(rtbAdNetwork, new NativeResponseMaker(new TemplateParser(templateConfiguration), templateConfiguration));
+        rtbAdNetwork.setHost("http://localhost:8800/getBid");
         rtbAdNetwork.configureParameters(mockSASRequestParameters, null, mockChannelSegmentEntity, null, beaconUrl, 0, null);
         rtbAdNetwork.setBidRequest(mockBidRequest);
     }

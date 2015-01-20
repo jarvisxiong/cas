@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.mvp;
 
+
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,6 +13,8 @@ import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.lang.reflect.Field;
+
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
@@ -20,7 +23,9 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -33,6 +38,8 @@ import com.inmobi.adserve.channels.util.Utils.TestUtils;
 public class HostedAdNetworkTest {
     private static Configuration mockConfig;
     private static final String advertiserName = "hosted";
+    
+    private final String hostedHost = "https://mrp.rubiconproject.com/ad_request";
 
     private static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -111,6 +118,14 @@ public class HostedAdNetworkTest {
         replayAll(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity);
 
         HostedAdNetwork hostedAdNetwork = new HostedAdNetwork(mockConfig, null, null, null, urlBase, advertiserName, 0, false);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        hostedAdNetwork.setHost(hostedHost);
 
         // Positive Test Case #1: All mandatory params present
         expectedBidRequestJSON = "{\"id\":10,\"app\":\"997EC9A04C2B01324BD122000B4000BD\",\"clt\":\"INMB_SERVER_NATIVE_1.0.0\",\"rtyp\":\"nativejson\",\"typ\":4,\"lat\":123.45,\"lng\":678.9,\"ltyp\":1,\"ip\":\"127.0.0.1\",\"udid\":\"idfaValue\",\"tud\":3,\"eud\":0}";

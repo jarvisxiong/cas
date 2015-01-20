@@ -9,6 +9,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +26,11 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -107,6 +111,14 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpRubiconAdNetwork.setHost(rubiconHost);
     }
 
     @Test
@@ -299,7 +311,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&app.category=Games%2CBusiness&i.aq_sensitivity=high&app.rating=4+&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
         final String expectedUrl_for_perftype =
@@ -307,7 +320,9 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper);
         final String actualUrl_for_perftype = dcpRubiconAdNetwork.getRequestUri().toString();
 
-        assertEquals(expectedUrl_for_perftype, actualUrl_for_perftype);
+        
+        assertEquals(new URI(expectedUrl_for_perftype).getQuery(), new URI(actualUrl_for_perftype).getQuery());
+        assertEquals(new URI(expectedUrl_for_perftype).getPath(), new URI(actualUrl_for_perftype).getPath());
         dcpRubiconAdNetwork.getNingRequest();
     }
 
@@ -349,7 +364,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
 
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
         // Fallback to casInternalParams RTB Floor.
         sasParams.setSiteEcpmEntity(null);
@@ -358,7 +374,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String actualUrl2 = dcpRubiconAdNetwork.getRequestUri().toString();
         final String expectedUrl2 =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.68&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-        assertEquals(expectedUrl2, actualUrl2);
+        assertEquals(new URI(expectedUrl2).getQuery(), new URI(actualUrl2).getQuery());
+        assertEquals(new URI(expectedUrl2).getPath(), new URI(actualUrl2).getPath());
 
         // Fallback to default minimum ecpm of $0.1 value.
         casInternalRequestParameters.setAuctionBidFloor(0.0);
@@ -366,8 +383,10 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String actualUrl3 = dcpRubiconAdNetwork.getRequestUri().toString();
         final String expectedUrl3 =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-        assertEquals(expectedUrl3, actualUrl3);
 
+        assertEquals(new URI(expectedUrl3).getQuery(), new URI(actualUrl3).getQuery());
+        assertEquals(new URI(expectedUrl3).getPath(), new URI(actualUrl3).getPath());
+        
         dcpRubiconAdNetwork.getNingRequest();
     }
 
@@ -409,7 +428,9 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&accept.apis=5&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.4&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
+
         dcpRubiconAdNetwork.getNingRequest();
     }
 
@@ -450,7 +471,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
         String expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.1387380247996547&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&accept.apis=5&p_block_keys=blk1387380247996547%2CInMobiFS&rp_floor=1.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
         sasParams.setSiteIncId(1397202244813823l);
         sasParams.setCountryId(94l);
@@ -458,7 +480,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
         expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.1397202244813823&app.domain=com.inmobi-exchange&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&accept.apis=5&p_block_keys=blk1397202244813823%2CInMobiFS&rp_floor=1.0&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpidsha1=1234202cb962ac59075b964b07152d234b705432&device.dpid_type=udid&kw=38132";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
         dcpRubiconAdNetwork.getNingRequest();
     }
@@ -493,7 +516,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&accept.apis=3&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpidmd5=202cb962ac59075b964b07152d234b70&device.dpid_type=open-udid&kw=38132";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
     }
 
@@ -529,7 +553,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         final String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://staged-by.rubiconproject.com/a/api/server.js?account_id=11726&rp_pmp_tier=2&zone_id=160212&app.bundle=com.inmobi-exchange.6575868&app.domain=com.inmobi-exchange&ua=Mozilla&ip=206.29.182.240&site_id=38132&device.os=Android&size_id=43&geo.latitude=37.4429&geo.longitude=-122.1514&device.connectiontype=0&i.aq_sensitivity=high&app.rating=4+&accept.apis=3&p_block_keys=blk6575868%2CInMobiFS&rp_floor=0.1&i.category=Business&i.iab=IAB19-15%2CIAB5-15%2CIAB3%2CIAB4&device.dpid=202cb962ac59075b964b07152d234b70&device.dpid_type=gaid&kw=38132";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
     }
 

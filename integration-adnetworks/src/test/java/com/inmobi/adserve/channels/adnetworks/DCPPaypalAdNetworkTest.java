@@ -4,6 +4,12 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+import java.lang.reflect.Field;
+import java.net.URI;
+
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.IPRepository;
+
 /**
  * Created by thushara on 24/12/14.
  */
@@ -92,6 +98,14 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         org.easymock.EasyMock.replay(repositoryHelper);
         dcpPaypalAdnetwork = new com.inmobi.adserve.channels.adnetworks.paypal.DCPPayPalAdNetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpPaypalAdnetwork.setHost(paypalHost);
     }
 
     @org.testng.annotations.Test
@@ -238,7 +252,8 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.where.com/jin/spotlight/ads?v=2.4&channel=mobile&format=html&ip=206.29.182.240&pubid=8a809449013c3c643cad82cb412b5857&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&width=320&placementtype=320x48&lat=37.4429&lng=-122.1514&cat=Entertainment";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -274,7 +289,8 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.where.com/jin/spotlight/ads?v=2.4&channel=mobile&format=html&ip=206.29.182.240&pubid=8a809449013c3c643cad82cb412b5857&site=00000000-0000-ddd5-0000-00000001e240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&width=320&placementtype=320x48&lat=37.4429&lng=-122.1514&cat=Health%2C+Mind+%26+Body";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -307,7 +323,8 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.where.com/jin/spotlight/ads?v=2.4&channel=mobile&format=html&ip=206.29.182.240&pubid=8a809449013c3c643cad82cb412b5857&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&width=320&placementtype=320x48&lat=37.4429&lng=-122.1514&zip=123456&cat=Entertainment";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -340,7 +357,8 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.where.com/jin/spotlight/ads?v=2.4&channel=mobile&format=html&ip=206.29.182.240&pubid=8a809449013c3c643cad82cb412b5857&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&width=320&placementtype=320x48&gender=m&lat=37.4429&lng=-122.1514&cat=Entertainment";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -373,7 +391,8 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.where.com/jin/spotlight/ads?v=2.4&channel=mobile&format=html&ip=206.29.182.240&pubid=8a809449013c3c643cad82cb412b5857&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&width=320&placementtype=320x48&age=30&lat=37.4429&lng=-122.1514&cat=Entertainment";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -405,7 +424,8 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.where.com/jin/spotlight/ads?v=2.4&channel=mobile&format=html&ip=206.29.182.240&pubid=8a809449013c3c643cad82cb412b5857&site=00000000-0000-0000-0000-000000000000&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&width=320&placementtype=320x50&cat=Entertainment";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 

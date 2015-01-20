@@ -9,6 +9,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,9 +22,11 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -35,7 +39,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
     private final String loggerConf = "/tmp/channel-server.properties";
     private final Bootstrap clientBootstrap = null;
     private DCPAjillionAdnetwork dcpAjillionAdNetwork;
-    private final String AjilionHost = "http://ad.AjillionMAX.com/ad/%s/4";
+    private String AjilionHost = "http://ad.AjillionMAX.com/ad/%s/4";
     private final String AjilionStatus = "on";
     private final String defintiAdvId = "Ajilionadv1";
     private final String AjilionTest = "1";
@@ -98,6 +102,15 @@ public class DCPAjillionAdnetworkTest extends TestCase {
 
         dcpAjillionAdNetwork = new DCPAjillionAdnetwork(mockConfig, clientBootstrap, base, serverChannel);
         dcpAjillionAdNetwork.setName("Ajilion");
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        AjilionHost = String.format(AjilionHost, placementId);
+        dcpAjillionAdNetwork.setHost(AjilionHost);
     }
 
     @Test
@@ -210,7 +223,8 @@ public class DCPAjillionAdnetworkTest extends TestCase {
             final String actualUrl = dcpAjillionAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.AjillionMAX.com/ad/240/4?format=json&use_beacon=1&keyword=Food+%26+Drink%2CAdventure%2CWord&pubid=00000000-0000-0000-0000-000000000000&clientip=206.29.182.240&clientua=Mozilla";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -239,7 +253,8 @@ public class DCPAjillionAdnetworkTest extends TestCase {
             final String actualUrl = dcpAjillionAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://ad.AjillionMAX.com/ad/230/4?format=json&use_beacon=1&keyword=Food+%26+Drink%2CAdventure%2CWord&pubid=00000000-0000-0000-0000-000000000000&clientip=206.29.182.240&clientua=Mozilla";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
