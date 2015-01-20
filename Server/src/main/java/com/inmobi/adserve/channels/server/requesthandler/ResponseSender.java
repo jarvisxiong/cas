@@ -3,6 +3,15 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 import static com.inmobi.casthrift.DemandSourceType.IX;
 import static com.inmobi.casthrift.DemandSourceType.RTBD;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -14,6 +23,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
@@ -59,18 +71,6 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
-
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.Setter;
 
 public class ResponseSender extends HttpRequestHandlerBase {
 

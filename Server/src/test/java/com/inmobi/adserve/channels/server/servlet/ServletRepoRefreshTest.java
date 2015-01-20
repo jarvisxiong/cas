@@ -1,47 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
-import com.inmobi.adserve.channels.repository.ChannelRepository;
-import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
-import com.inmobi.adserve.channels.repository.CreativeRepository;
-import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
-import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
-import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
-import com.inmobi.adserve.channels.repository.PricingEngineRepository;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
-import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
-import com.inmobi.adserve.channels.repository.SiteFilterRepository;
-import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
-import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
-import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
-import com.inmobi.adserve.channels.repository.GeoZipRepository;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.ChannelServer;
-import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
-import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.phoenix.exception.RepositoryException;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import org.apache.commons.configuration.Configuration;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +10,49 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.resetAll;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.configuration.Configuration;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
+import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
+import com.inmobi.adserve.channels.repository.ChannelRepository;
+import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
+import com.inmobi.adserve.channels.repository.CreativeRepository;
+import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.GeoZipRepository;
+import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
+import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
+import com.inmobi.adserve.channels.repository.PricingEngineRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
+import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
+import com.inmobi.adserve.channels.repository.SiteFilterRepository;
+import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
+import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
+import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.ChannelServer;
+import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.phoenix.exception.RepositoryException;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,

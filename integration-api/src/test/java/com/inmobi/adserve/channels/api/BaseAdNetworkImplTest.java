@@ -17,6 +17,8 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +27,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import lombok.Getter;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,10 +51,6 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
-
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import lombok.Getter;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InspectorStats.class)

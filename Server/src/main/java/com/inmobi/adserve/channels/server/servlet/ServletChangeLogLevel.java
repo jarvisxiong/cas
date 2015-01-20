@@ -1,20 +1,8 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.turbo.TurboFilter;
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter;
-import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +10,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.turbo.TurboFilter;
+
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter;
+import com.inmobi.adserve.channels.util.Utils.TestUtils;
 
 /**
  * Created by ishanbhatnagar on 31/10/14.

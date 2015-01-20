@@ -10,6 +10,7 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONObject;
@@ -26,8 +27,6 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ImpressionIdGenerator.class, HostedAdNetwork.class, InspectorStats.class})

@@ -1,11 +1,11 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
-import lombok.Data;
+import java.sql.Timestamp;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 /**
  * Created by anshul.soni on 10/11/14.

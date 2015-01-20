@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.api;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Data;
+
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -24,8 +26,6 @@ import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
 import com.inmobi.template.interfaces.TemplateConfiguration;
-
-import lombok.Data;
 
 public class NativeResponseMaker {
 
