@@ -7,8 +7,6 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
@@ -33,6 +31,8 @@ import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+
+import junit.framework.TestCase;
 
 
 public class HttpRequestHandlerTest extends TestCase {
@@ -70,7 +70,6 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(mockConfigLoader.getAdapterConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getServerConfiguration()).andReturn(mockServerConfig).anyTimes();
         expect(mockConfigLoader.getRtbConfiguration()).andReturn(null).anyTimes();
-        expect(mockConfigLoader.getLog4jConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getDatabaseConfiguration()).andReturn(null).anyTimes();
         replay(mockConfigLoader);
 

@@ -6,16 +6,13 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.apache.velocity.runtime.resource.util.StringResourceRepositoryImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
-
-
 public class TemplateManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TemplateManager.class);
+    private static final Logger LOG = Logger.getLogger("repository");
     private static final String STRING_REPO_NAME = "rtb-service-template-test-internal-repo";
 
     private static final String ERROR_STR = "%s can't be null.";

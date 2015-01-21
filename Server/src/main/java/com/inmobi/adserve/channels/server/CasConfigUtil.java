@@ -32,7 +32,6 @@ public class CasConfigUtil {
     private static Configuration rtbConfig;
     private static Configuration adapterConfig;
     private static Configuration loggerConfig;
-    private static Configuration log4jConfig;
     private static Configuration databaseConfig;
     
     @SuppressWarnings("unchecked")
@@ -41,7 +40,6 @@ public class CasConfigUtil {
         CasConfigUtil.loggerConfig = config.getLoggerConfiguration();
         CasConfigUtil.serverConfig = config.getServerConfiguration();
         CasConfigUtil.adapterConfig = config.getAdapterConfiguration();
-        CasConfigUtil.log4jConfig = config.getLog4jConfiguration();
         CasConfigUtil.databaseConfig = config.getDatabaseConfiguration();
         CasConfigUtil.repositoryHelper = repositoryHelper;
         allowedSiteTypes = CasConfigUtil.serverConfig.getList("allowedSiteTypes");
@@ -60,10 +58,6 @@ public class CasConfigUtil {
 
     public static Configuration getLoggerConfig() {
         return loggerConfig;
-    }
-
-    public static Configuration getLog4jConfig() {
-        return log4jConfig;
     }
 
     public static Configuration getDatabaseConfig() {

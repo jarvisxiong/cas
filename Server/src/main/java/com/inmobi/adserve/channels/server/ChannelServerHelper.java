@@ -3,12 +3,12 @@ package com.inmobi.adserve.channels.server;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 public class ChannelServerHelper {
-
-    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ChannelServerHelper.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ChannelServerHelper.class);
 
     public byte getDataCenterId(final String dataCenterIdKey) {
         byte dataCenterIdCode;

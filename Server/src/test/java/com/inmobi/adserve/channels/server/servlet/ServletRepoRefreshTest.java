@@ -10,8 +10,6 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.resetAll;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -53,6 +51,9 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.phoenix.exception.RepositoryException;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,
@@ -142,7 +143,6 @@ public class ServletRepoRefreshTest {
         expect(mockConfigLoader.getLoggerConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getServerConfiguration()).andReturn(mockServerConfig).anyTimes();
         expect(mockConfigLoader.getAdapterConfiguration()).andReturn(null).anyTimes();
-        expect(mockConfigLoader.getLog4jConfiguration()).andReturn(null).anyTimes();
         expect(mockConfigLoader.getDatabaseConfiguration()).andReturn(null).anyTimes();
         expect(mockServerConfig.getInt("percentRollout", 100)).andReturn(100).anyTimes();
         expect(mockServerConfig.getList("allowedSiteTypes")).andReturn(null).anyTimes();

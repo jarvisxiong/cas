@@ -9,11 +9,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -33,7 +28,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
 import com.inmobi.adserve.channels.util.JaxbHelper;
-import com.inmobi.adserve.channels.util.annotations.LoggerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.RtbConfiguration;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.template.module.TemplateModule;
@@ -44,7 +38,6 @@ import com.inmobi.template.module.TemplateModule;
  * 
  */
 public class ServerModule extends AbstractModule {
-    private final Configuration loggerConfiguration;
     private final RepositoryHelper repositoryHelper;
     private final Reflections reflections;
     private final Configuration adapterConfiguration;
@@ -52,7 +45,6 @@ public class ServerModule extends AbstractModule {
     private final Configuration rtbConfiguration;
 
     public ServerModule(final ConfigurationLoader configurationLoader, final RepositoryHelper repositoryHelper) {
-        loggerConfiguration = configurationLoader.getLoggerConfiguration();
         adapterConfiguration = configurationLoader.getAdapterConfiguration();
         serverConfiguration = configurationLoader.getServerConfiguration();
         rtbConfiguration = configurationLoader.getRtbConfiguration();
@@ -62,13 +54,9 @@ public class ServerModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
-        configureApplicationLogger();
-
         bind(RepositoryHelper.class).toInstance(repositoryHelper);
         bind(MatchSegments.class).asEagerSingleton();
         bind(Configuration.class).annotatedWith(ServerConfiguration.class).toInstance(serverConfiguration);
-        bind(Configuration.class).annotatedWith(LoggerConfiguration.class).toInstance(loggerConfiguration);
         bind(Configuration.class).annotatedWith(RtbConfiguration.class).toInstance(rtbConfiguration);
         bind(JaxbHelper.class).asEagerSingleton();
         bind(DocumentBuilderHelper.class).asEagerSingleton();
@@ -101,18 +89,4 @@ public class ServerModule extends AbstractModule {
         }
         return pathToServletMap;
     }
-
-    private void configureApplicationLogger() {
-        final LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        final JoranConfigurator configurator = new JoranConfigurator();
-        configurator.setContext(lc);
-        lc.reset();
-
-        try {
-            configurator.doConfigure(loggerConfiguration.getString("slf4jLoggerConf"));
-        } catch (final JoranException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
