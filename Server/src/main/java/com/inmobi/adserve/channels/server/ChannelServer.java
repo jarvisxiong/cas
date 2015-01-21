@@ -457,7 +457,6 @@ public class ChannelServer {
         } catch (final MessagingException mex) {
             // logger.info("Error while sending mail");
             logger.error("MessagingException raised while sending mail " + mex);
-            // mex.printStackTrace();
         } catch (final UnknownHostException ex) {
             // logger.debug("could not resolve host inside send mail");
             logger.error("UnknownException raised while sending mail " + ex);
