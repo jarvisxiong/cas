@@ -1,9 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
-import org.slf4j.LoggerFactory;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import org.slf4j.LoggerFactory;
 
 
 public class ChannelServerHelper {

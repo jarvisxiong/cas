@@ -1,5 +1,11 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
@@ -18,6 +24,9 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.URIException;
@@ -63,8 +72,8 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
 import com.inmobi.casthrift.rtb.AppStore;
@@ -85,14 +94,6 @@ import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Generic RTB adapter.
@@ -162,9 +163,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Getter
     @Setter
-    private String urlBase;
-    @Getter
-    @Setter
     private String urlArg;
     @Getter
     @Setter
@@ -214,7 +212,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
                         final String advertiserName, final int tmax, final boolean templateWinNotification) {
 
         super(baseRequestHandler, serverChannel);
@@ -226,7 +224,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
         this.clientBootstrap = clientBootstrap;
-        this.urlBase = urlBase;
+        this.host = host;
         setRtbPartner(true);
         iabCategoriesInterface = new IABCategoriesMap();
         iabCountriesInterface = new IABCountriesMap();
@@ -859,9 +857,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public URI getRequestUri() throws URISyntaxException {
         final StringBuilder url = new StringBuilder();
         if ("get".equalsIgnoreCase(rtbMethod)) {
-            url.append(urlBase).append('?').append(urlArg).append('=');
+            url.append(host).append('?').append(urlArg).append('=');
         } else {
-            url.append(urlBase);
+            url.append(host);
         }
         LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());

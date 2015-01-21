@@ -4,13 +4,12 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import junit.framework.TestCase;
@@ -23,10 +22,14 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.ifc.IFCAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 
 public class IFCAdNetworkTest extends TestCase {
@@ -107,6 +110,14 @@ public class IFCAdNetworkTest extends TestCase {
                 .andReturn(null).anyTimes();
         EasyMock.replay(repositoryHelper);
         ifcAdNetwork = new IFCAdNetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        ifcAdNetwork.setHost(ifcHostus);
     }
 
     @Test

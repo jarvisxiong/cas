@@ -1,8 +1,8 @@
 package com.inmobi.adserve.channels.util.Utils;
 
-import com.inmobi.phoenix.batteries.util.WilburyUUID;
-
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 /**
  * Created by ishanbhatnagar on 16/9/14.

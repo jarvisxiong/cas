@@ -1,5 +1,23 @@
 package com.inmobi.adserve.channels.adnetworks.wapstart;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Calendar;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
@@ -12,22 +30,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
 
 
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -59,6 +61,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = config.getString("wapstart.host");
+        host = new StringBuilder(String.format(host, externalSiteId)).toString();
 
         if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
             if(selectedSlotId == 9 || selectedSlotId == 15 || selectedSlotId == 24) {
@@ -99,8 +102,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-            final StringBuilder url = new StringBuilder(String.format(host, externalSiteId));
-            return new URI(url.toString());
+            return new URI(host);
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("{}", exception);

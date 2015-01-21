@@ -1,5 +1,21 @@
 package com.inmobi.adserve.channels.repository;
 
+import static org.powermock.api.easymock.PowerMock.createMock;
+
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.phoenix.batteries.data.test.NoOpDataSource;
@@ -15,23 +31,6 @@ import com.inmobi.segment.impl.NetworkType;
 import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteCategoryEnum;
 import com.inmobi.segment.impl.SlotId;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.log4j.Logger;
-import org.easymock.EasyMock;
-
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Collection;
-import java.util.HashSet;
-
-import static org.powermock.api.easymock.PowerMock.createMock;
 
 public class IXPackageRepositoryTest {
 

@@ -3,14 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,11 +20,15 @@ import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 
 public class DCPHttpoolAdnetworkTest extends TestCase {
@@ -94,6 +97,14 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpHttpoolAdNetwork = new DCPHttPoolAdNetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpHttpoolAdNetwork.setHost(httpoolHost);
     }
 
     @Test
@@ -197,11 +208,13 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
+        if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null,
+                (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -228,8 +241,8 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous&dd_gnd=1";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     @Test
@@ -257,8 +270,8 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous&dd_gnd=2";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     @Test
@@ -286,8 +299,8 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     @Test
@@ -315,8 +328,8 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&geo_lat=37.4429&geo_lng=-122.1514&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=Adventure%3BBoard";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     @Test
@@ -343,8 +356,8 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&type=rich%2Ctpt%2Cshop&uip=206.29.182.240&zid=1324&ua=Mozilla&test=1&did=202cb962ac59075b964b07152d234b70&format=320x50&ct=miscellenous";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     //This case is never valid. Requests will get dropped in Request Filters if no slot has matching is SlotSizeMapping. Even the segments won't get selected in case of empty slot.

@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -46,8 +48,6 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
-
-import junit.framework.TestCase;
 
 
 public class ThriftRequestParserTest extends TestCase {

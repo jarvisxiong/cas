@@ -17,7 +17,6 @@ import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 
 @Singleton

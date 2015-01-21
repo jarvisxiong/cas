@@ -1,11 +1,12 @@
 package com.inmobi.adserve.channels.entity;
 
-import com.inmobi.segment.Segment;
+import java.util.List;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Set;
+import com.inmobi.segment.Segment;
 
 @Getter
 public class IXPackageEntity {

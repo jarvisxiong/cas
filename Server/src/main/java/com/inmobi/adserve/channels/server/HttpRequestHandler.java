@@ -20,6 +20,7 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
@@ -65,8 +66,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sendNoAdResponse(ctx.channel());
             final String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
+
             if (LOG.isDebugEnabled()) {
-                final String message = "stack trace is -> " + getStackTrace(exception);
+                final String message = "stack trace is -> " + ExceptionBlock.getStackTrace(exception);
                 LOG.debug(traceMarker, message);
             }
         } finally {
@@ -90,10 +92,5 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
         return httpRequest;
     }
 
-    private static String getStackTrace(Exception exception) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        exception.printStackTrace(printWriter);
-        return stringWriter.toString();
-    }
+
 }

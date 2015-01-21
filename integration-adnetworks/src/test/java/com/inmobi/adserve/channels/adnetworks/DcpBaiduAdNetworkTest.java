@@ -4,14 +4,14 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,12 +24,16 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.adnetworks.baidu.DCPBaiduAdNetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 
 public class DcpBaiduAdNetworkTest extends TestCase {
@@ -101,6 +105,15 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpBaiduAdNetwork = new DCPBaiduAdNetwork(mockConfig, clientBootstrap, base, serverChannel);
+        
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpBaiduAdNetwork.setHost(baiduHost);
     }
 
     @Test
@@ -224,7 +237,8 @@ public class DcpBaiduAdNetworkTest extends TestCase {
 
             final String expectedUrl =
                     "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&os=android&w=50&h=320&ip=206.29.182.240&impt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fbeacon%3Dtrue&clkt=http%3A%2F%2Fc2.w.inmobi.com%2Fc.asm%2F4%2Fb%2Fbx5%2Fyaz%2F2%2Fb%2Fa5%2Fm%2F0%2F0%2F0%2F202cb962ac59075b964b07152d234b70%2F4f8d98e2-4bbd-40bc-87e5-22da170600f9%2F-1%2F1%2F9cddca11%3Fds%3D1&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -255,8 +269,8 @@ public class DcpBaiduAdNetworkTest extends TestCase {
             final String urlWithOutGeo = actualUrl.substring(0, actualUrl.indexOf("&g="));
             final String expectedUrl =
                     "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&os=android&w=50&h=320&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
-            assertEquals(expectedUrl, urlWithOutGeo);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(urlWithOutGeo).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(urlWithOutGeo).getPath());        }
     }
 
     @Test

@@ -1,6 +1,32 @@
 package com.inmobi.adserve.channels.repository;
 
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.sql.DataSource;
+
+import lombok.Getter;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Preconditions;
@@ -33,29 +59,6 @@ import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
 import com.inmobi.segment.impl.ZipCodePresent;
 import com.inmobi.segmentparameter.SegmentParameter;
-import lombok.Getter;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 public class IXPackageRepository {

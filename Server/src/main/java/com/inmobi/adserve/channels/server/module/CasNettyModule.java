@@ -13,6 +13,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
@@ -55,6 +56,7 @@ public class CasNettyModule extends AbstractModule {
         bind(CasNettyServer.class).asEagerSingleton();
         bind(AsyncHttpClientProvider.class).asEagerSingleton();
         bind(NativeTemplateAttributeFinder.class).asEagerSingleton();
+        bind(IPRepository.class).asEagerSingleton();
 
         // thread pool to be used in AsyncHttpClient
         bind(ExecutorService.class).annotatedWith(WorkerExecutorService.class).toInstance(

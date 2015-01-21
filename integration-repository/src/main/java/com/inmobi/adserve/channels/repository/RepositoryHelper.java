@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.repository;
 
+import static com.googlecode.cqengine.query.QueryFactory.and;
+import static com.googlecode.cqengine.query.QueryFactory.equal;
+import static com.googlecode.cqengine.query.QueryFactory.in;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +17,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
@@ -24,18 +28,13 @@ import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-
-import static com.googlecode.cqengine.query.QueryFactory.and;
-import static com.googlecode.cqengine.query.QueryFactory.in;
-import static com.googlecode.cqengine.query.QueryFactory.equal;
 
 @Getter
 public class RepositoryHelper {

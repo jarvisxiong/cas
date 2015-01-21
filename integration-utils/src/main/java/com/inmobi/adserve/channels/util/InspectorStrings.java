@@ -121,6 +121,10 @@ public class InspectorStrings {
     public static final String RFM_INVALID_CREDENTIALS = "HostedInvalidCredentials";
     public static final String RFM_AD_SELECTION_ERROR = "RFM_AD_SELECTION_ERROR: ";
     public static final String RFM_ERROR = "RFM_ERROR: ";
+    
+    // IP repository Strings
+    public static final String URI_SYNTAX_EXCEPTION = "URISyntaxException";
+    public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
 
 
     private InspectorStrings() {

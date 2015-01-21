@@ -1,5 +1,27 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork;
@@ -7,6 +29,7 @@ import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -16,24 +39,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.netflix.governator.guice.LifecycleInjector;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
 
-import java.awt.Dimension;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DCPPlaceIQAdnetworkTest extends TestCase {
@@ -121,6 +127,14 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpPlaceIQAdNetwork = new DCPPlaceIQAdnetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpPlaceIQAdNetwork.setHost(placeiqHost);
     }
 
     @Test
@@ -281,7 +295,8 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
         final String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fbz%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD";
-        assertEquals(expectedUrl, actualUrl);
+        assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+        assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
     }
 
     @Test
@@ -312,7 +327,8 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             final String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&GR=ABDC-ASDW-EWFJ-FHSA&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -342,7 +358,8 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             final String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x480&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD%2CMRI";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 
@@ -372,7 +389,8 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
             final String actualUrl = dcpPlaceIQAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://test.ads.placeiq.com/2/ad?RT=ss&ST=xml&PT=IMB&AU=PlaceIQ_test_7%2Fuc%2F6456fc%2F0&IP=206.29.182.240&UA=Mozilla&DO=Android&LT=37.4429&LG=-122.1514&SZ=320x50&AM=202cb962ac59075b964b07152d234b70&AP=6575868&AT=STG%2CRMG%2CMRD";
-            assertEquals(expectedUrl, actualUrl);
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 

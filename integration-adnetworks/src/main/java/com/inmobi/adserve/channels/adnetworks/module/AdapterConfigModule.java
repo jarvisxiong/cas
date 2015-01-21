@@ -1,5 +1,11 @@
 package com.inmobi.adserve.channels.adnetworks.module;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
@@ -15,11 +21,6 @@ import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 import com.inmobi.adserve.channels.api.config.AdapterConfigFactory;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
-import org.apache.commons.configuration.Configuration;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 
 /**

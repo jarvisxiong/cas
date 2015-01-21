@@ -17,14 +17,19 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import lombok.Getter;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,10 +52,6 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
-
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import lombok.Getter;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InspectorStats.class)
@@ -101,6 +102,7 @@ public class BaseAdNetworkImplTest {
                 return new URI(serverUrl);
             }
         };
+        
         baseAdNetwork.processResponse();
         assertTrue(baseAdNetwork.isRequestComplete);
         verifyAll();
@@ -214,7 +216,7 @@ public class BaseAdNetworkImplTest {
     /**
      *  This method returns an object of BaseAdNetworkImpl which is used for testing various cases of makeAsyncRequest().
      */
-    private BaseAdNetworkImpl getBaseAdNetworkForTest() {
+    private BaseAdNetworkImpl getBaseAdNetworkForTest() throws Exception {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final AuctionEngineInterface mockAuctionEngine = createMock(AuctionEngineInterface.class);
@@ -238,18 +240,29 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRemoteHostIp()).andReturn("9.9.9.9");
         expect(mockCasInternal.isTraceEnabled()).andReturn(true);
         expect(mockChannel.isOpen()).andReturn(true).times(1);
+        
+
 
         replayAll();
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        String host = serverUrl + "/get";
         final String[] mockedMethods = {"getAsyncHttpClient", "getName"};
         final Object[] constructorArgs = new Object[] {mockHttpRequestHandlerBase, mockChannel};
         final BaseAdNetworkImpl baseAdNetwork =
                 createPartialMock(BaseAdNetworkImpl.class, mockedMethods, constructorArgs);
+        baseAdNetwork.setHost(host);
         baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, "", "", 14L, null);
         return baseAdNetwork;
     }
 
     @Test
-    public void testMakeAsyncRequestJSAdTag() {
+    public void testMakeAsyncRequestJSAdTag() throws Exception {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final AuctionEngineInterface mockAuctionEngine = createMock(AuctionEngineInterface.class);
@@ -271,12 +284,21 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
 
         replayAll();
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
         final String[] mockedMethods = {"getAsyncHttpClient", "getName", "useJsAdTag"};
         final Object[] constructorArgs = new Object[] {mockHttpRequestHandlerBase, mockChannel};
         final BaseAdNetworkImpl baseAdNetwork =
                 createPartialMock(BaseAdNetworkImpl.class, mockedMethods, constructorArgs);
+        String host = serverUrl + "/get";
+        baseAdNetwork.setHost(host);
         baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, "", "", 14L, null);
 
+        
         expect(baseAdNetwork.useJsAdTag()).andReturn(true);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
         replay(baseAdNetwork);
@@ -287,7 +309,7 @@ public class BaseAdNetworkImplTest {
     }
 
     @Test
-    public void testGetCategories() {
+    public void testGetCategories() throws Exception {
         final SASRequestParameters mockSasParam = createMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockEntity = createMock(ChannelSegmentEntity.class);
 
@@ -299,6 +321,12 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getCategoryTaxonomy()).andReturn(new Long[] {31L, 32L, 33L}).times(4);
         expect(mockEntity.isAllTags()).andReturn(true).times(1).andReturn(false).times(3);
         replayAll();
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
 
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
             @Override
@@ -306,6 +334,8 @@ public class BaseAdNetworkImplTest {
                 return null;
             }
         };
+        String host = serverUrl + "/get";
+        baseAdNetwork.setHost(host);
         baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 14L, null);
 
         // Test to get all categories
@@ -351,7 +381,7 @@ public class BaseAdNetworkImplTest {
     }
 
     @Test
-    public void testIsInterstitial() {
+    public void testIsInterstitial() throws Exception {
         final ChannelSegmentEntity mockEntity = createMock(ChannelSegmentEntity.class);
         final SASRequestParameters mockSasParam = createMock(SASRequestParameters.class);
 
@@ -361,12 +391,22 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(2);
 
         replayAll();
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
             @Override
             public URI getRequestUri() throws Exception {
                 return null;
             }
         };
+        String host = serverUrl + "/get";
+        baseAdNetwork.setHost(host);
+        
         baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 14L, null);
         boolean result = baseAdNetwork.isInterstitial();
         assertTrue(result);
@@ -382,7 +422,7 @@ public class BaseAdNetworkImplTest {
      *  This method tests various small methods of BaseAdNetworkImpl.
      */
     @Test
-    public void testMiscMethods() {
+    public void testMiscMethods() throws Exception {
         final ChannelSegmentEntity mockEntity = createMock(ChannelSegmentEntity.class);
         final SASRequestParameters mockSasParam = createMock(SASRequestParameters.class);
 
@@ -396,9 +436,18 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getSource()).andReturn(null).times(1).andReturn("WAP").times(2).andReturn("APP").times(2);
         replayAll();
 
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
         final String[] mockedMethods = {"isNativeRequest"};
         final BaseAdNetworkImpl baseAdNetwork =
                 createPartialMock(BaseAdNetworkImpl.class, mockedMethods);
+        String host = serverUrl + "/get";
+        baseAdNetwork.setHost(host);
+        
         expect(baseAdNetwork.isNativeRequest()).andReturn(true).times(1).andReturn(false).times(2);
 
         baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 14L, null);
@@ -454,7 +503,7 @@ public class BaseAdNetworkImplTest {
     }
 
     @Test
-    public void testGetUid() {
+    public void testGetUid() throws Exception {
         final ChannelSegmentEntity mockEntity = createMock(ChannelSegmentEntity.class);
         final SASRequestParameters mockSasParam = createMock(SASRequestParameters.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
@@ -474,12 +523,21 @@ public class BaseAdNetworkImplTest {
 
         replayAll();
 
+
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
             @Override
             public URI getRequestUri() throws Exception {
                 return null;
             }
         };
+        String host = serverUrl + "/get";
+        baseAdNetwork.setHost(host);
         baseAdNetwork.configureParameters(mockSasParam, mockCasInternalRequestParameters, mockEntity, "", "", 14L, null);
 
         assertEquals("UID00000000000000000000000000000", baseAdNetwork.getUid());

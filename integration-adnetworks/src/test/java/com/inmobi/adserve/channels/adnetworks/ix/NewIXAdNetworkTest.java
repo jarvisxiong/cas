@@ -7,8 +7,12 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -18,8 +22,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
@@ -30,10 +36,6 @@ import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.ADCreativeType;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 // TODO: Merge with IXAdNetworkTest.java
 public class NewIXAdNetworkTest {
@@ -171,7 +173,7 @@ public class NewIXAdNetworkTest {
 
         replay(mockStatus, mockHttpRequestHandlerBase, mockChannel, mockRepositoryHelper, mockSasParams,
                 mockChannelSegmentEntity);
-
+        
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final IXAdNetwork ixAdNetwork =
                 createMockBuilder(IXAdNetwork.class)
@@ -181,6 +183,14 @@ public class NewIXAdNetworkTest {
                         .addMockedMethod("updateDSPAccountInfo")
                         .withConstructor(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
                                 advertiserName, 0, true).createMock();
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        ixAdNetwork.setHost("http://localhost:8080/getIXBid");
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).times(1);
@@ -201,7 +211,7 @@ public class NewIXAdNetworkTest {
     }
 
     @Test
-    public void testUpdateDSPAccountInfo() {
+    public void testUpdateDSPAccountInfo() throws Exception {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
@@ -244,6 +254,14 @@ public class NewIXAdNetworkTest {
                         .addMockedMethod("configureParameters", null)
                         .withConstructor(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
                                 advertiserName, 0, true).createMock();
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        ixAdNetwork.setHost("http://localhost:8080/getIXBid");
 
         expect(ixAdNetwork.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
         expect(ixAdNetwork.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();

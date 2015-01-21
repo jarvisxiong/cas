@@ -1,5 +1,12 @@
 package com.inmobi.adserve.channels.repository;
 
+import java.sql.Timestamp;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.thrift.TDeserializer;
+
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -11,12 +18,6 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 import com.inmobi.template.formatter.TemplateManager;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.thrift.TDeserializer;
-
-import java.sql.Timestamp;
-import java.util.Iterator;
-import java.util.List;
 
 public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, String>
         implements

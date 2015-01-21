@@ -3,14 +3,13 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,9 +29,12 @@ import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.netflix.governator.guice.LifecycleInjector;
@@ -117,6 +119,14 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpMobfoxAdNetwork = new DCPMobFoxAdnetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpMobfoxAdNetwork.setHost(mobfoxHost);
     }
 
     @Test
@@ -211,8 +221,8 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
 
             final String expectedUrl =
                     "http://my.mobfox.com/request.php?rt=api&s=6378ef4a7db50d955c90f7dffb05ee20&u=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&i=178.190.64.146&m=live&c_mraid=1&o_mcmd5=202cb962ac59075b964b07152d234b70&v=2.0&latitude=37.4429&longitude=-122.1514&demo.gender=m&demo.keywords=Business&adspace.width=320&adspace.height=50&demo.age=32&s_subid=00000000-0000-0000-0000-000000000000";
-            assertEquals(expectedUrl, actualUrl);
-        }
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
     }
 
     @Test
@@ -246,8 +256,8 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
             final String actualUrl = dcpMobfoxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://my.mobfox.com/request.php?rt=api&s=01212121&u=Mozilla&i=206.29.182.240&m=live&c_mraid=1&o_mcmd5=202cb962ac59075b964b07152d234b70&v=2.0&latitude=38.5&longitude=-122.1514&demo.keywords=Business%2CBooks+%26+Reference&adspace.width=320&adspace.height=50&s_subid=00000000-0000-0000-0000-000000000000";
-            assertEquals(expectedUrl, actualUrl);
-
+            assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
     }
 

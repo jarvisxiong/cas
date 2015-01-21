@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,9 +37,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
-
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
 
 
 public abstract class BaseServlet implements Servlet {

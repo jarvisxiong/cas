@@ -13,6 +13,8 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 import static org.powermock.api.support.membermodification.MemberMatcher.method;
 import static org.powermock.api.support.membermodification.MemberModifier.suppress;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,9 +50,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.DemandSourceType;
-
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class, CasConfigUtil.class, BaseServlet.class})

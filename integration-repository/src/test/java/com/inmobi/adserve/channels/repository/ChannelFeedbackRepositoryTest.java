@@ -10,6 +10,8 @@ import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
+import java.sql.Timestamp;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +23,6 @@ import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.NullAsZeroResultSetRow;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
-
-import java.sql.Timestamp;
 
 /**
  * Created by anshul.soni on 05/01/15.

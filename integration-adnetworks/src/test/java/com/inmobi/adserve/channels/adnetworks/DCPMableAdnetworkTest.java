@@ -1,17 +1,20 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
-import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.ning.http.client.Request;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.json.JSONException;
@@ -19,15 +22,17 @@ import org.json.JSONObject;
 import org.powermock.reflect.Whitebox;
 import org.testng.annotations.Test;
 
-import java.awt.Dimension;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.IPRepository;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.ning.http.client.Request;
 
 
 public class DCPMableAdnetworkTest extends TestCase {
@@ -103,6 +108,14 @@ public class DCPMableAdnetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
         dcpMableAdNetwork = new DCPMableAdnetwork(mockConfig, null, base, serverChannel);
+        
+        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
+        ipRepositoryField.setAccessible(true);
+        IPRepository ipRepository = new IPRepository();
+        ipRepository.getUpdateTimer().cancel();
+        ipRepositoryField.set(null, ipRepository);
+        
+        dcpMableAdNetwork.setHost(mableHost);
     }
 
     @Test
