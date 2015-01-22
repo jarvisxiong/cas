@@ -45,7 +45,7 @@ public class InspectorStats {
     public static void init(final Configuration serverConfiguration, final String hostName) {
         final String graphiteServer =
                 serverConfiguration.getString("graphiteServer.host", "cas-metrics-relay.uj1.inmobi.com");
-        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 1234);
+        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 2020);
         final int graphiteInterval = serverConfiguration.getInt("graphiteServer.intervalInMinutes", 1);
         final String metricProducer = getMetricProducer(hostName);
         shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
