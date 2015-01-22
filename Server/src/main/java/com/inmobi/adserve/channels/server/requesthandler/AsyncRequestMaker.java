@@ -117,7 +117,7 @@ public class AsyncRequestMaker {
             LOG.debug("Sending request to Channel of advertiserId {}", channelSegmentEntity.getAdvertiserId());
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
-            network.disableIPResolution(config.getBoolean("isIPRepositoryDisabled"));
+            network.disableIPResolution(config.getBoolean("isIPRepositoryDisabled", true));
             if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,
                     beaconUrl, row.getRequestedSlotId(), repositoryHelper)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
