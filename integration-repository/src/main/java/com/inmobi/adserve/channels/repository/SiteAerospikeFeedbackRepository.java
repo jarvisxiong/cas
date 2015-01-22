@@ -38,7 +38,6 @@ import com.inmobi.phoenix.exception.InitializationException;
 // siteId is never null
 
 public class SiteAerospikeFeedbackRepository {
-
     private static final Logger LOG = LoggerFactory.getLogger(SiteAerospikeFeedbackRepository.class);
 
     private AerospikeClient aerospikeClient;

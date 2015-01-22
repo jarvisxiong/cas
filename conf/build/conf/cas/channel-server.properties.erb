@@ -1,32 +1,16 @@
-log4j.appender.advertiser.File=/opt/mkhoj/logs/cas/advertiser/advertiser.log
-log4j.appender.debug.File=/opt/mkhoj/logs/cas/debug/debug.log
-log4j.appender.sampledadvertiser.File=/opt/mkhoj/logs/cas/sampledadvertiser/sampledadvertiser.log
-log4j.appender.repository.File=/opt/mkhoj/logs/cas/repository/repository.log
-
-log4j.logger.app = ERROR, repository
-log4j.additivity.repository.app = false
-log4j.appender.repository=org.apache.log4j.DailyRollingFileAppender
-log4j.appender.repository.layout=org.apache.log4j.PatternLayout
-log4j.appender.repository.DatePattern='.'yyyy-MM-dd-HH
-log4j.appender.repository.layout.ConversionPattern=%d %-5p  - %M - %m%n
-log4j.appender.repository.bufferSize=1048576
-log4j.appender.repository.bufferedIO=true
-log4j.category.repository=ERROR,repository
+logger.advertiser.File=/opt/mkhoj/logs/cas/advertiser/advertiser.log
+logger.debug.File=/opt/mkhoj/logs/cas/debug/debug.log
+logger.sampledadvertiser.File=/opt/mkhoj/logs/cas/sampledadvertiser/sampledadvertiser.log
+logger.repository.File=/opt/mkhoj/logs/cas/repository/repository.log
+logger.trace.File=/opt/mkhoj/logs/cas/trace/trace.log
+logger.sampledadvertisercount=5
+logger.loggerConf = /opt/mkhoj/conf/cas/logger.xml
 
 log4j.appender.scribe=org.apache.log4j.ConsoleAppender
 log4j.logger.com.inmobi.messaging.netty.ScribeTopicPublisher=WARN,scribe
 log4j.logger.com.inmobi.messaging.netty.ScribeHandler=WARN,scribe
 log4j.category.scribe=WARN,scribe
-
 log4j.appender.scribe.EmitterConfig=/opt/mkhoj/conf/cas/emit_mondemand.properties
-
-logger.debug=debug
-logger.advertiser=advertiser
-logger.sampledadvertiser=sampledadvertiser
-logger.repository=repository
-logger.sampledadvertisercount=5
-logger.slf4jLoggerConf = /opt/mkhoj/conf/cas/logger.xml
-logger.log4jLoggerConf = /opt/mkhoj/conf/cas/channel-server.properties
 
 statemitter.filename=/opt/mkhoj/conf/common/statemitter.properties
 server.smtpServer=mail.mkhoj.com

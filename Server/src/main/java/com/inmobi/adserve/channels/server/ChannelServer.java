@@ -1,22 +1,12 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.util.internal.logging.InternalLoggerFactory;
-import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import static com.inmobi.adserve.channels.util.LoggerUtils.checkLogFolders;
+import static com.inmobi.adserve.channels.util.LoggerUtils.configureApplicationLoggers;
+import static com.inmobi.adserve.channels.util.LoggerUtils.sendMail;
+import static com.inmobi.adserve.channels.util.Utils.ExceptionBlock.getStackTrace;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
 import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -29,7 +19,7 @@ import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
@@ -71,9 +61,10 @@ import com.inmobi.phoenix.exception.InitializationException;
 import com.netflix.governator.guice.LifecycleInjector;
 import com.netflix.governator.lifecycle.LifecycleManager;
 
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
-/*
- * 
+/**
  * Run jar:- java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50
  * -DconfigFile=sampleConfigFile -jar cas-server.jar If these are not specified server will pick these values from
  * channel-server.properties config file. If configFile is not specified, it takes the DEFAULT_CONFIG_FILE from location
@@ -85,7 +76,7 @@ public class ChannelServer {
     public static short hostIdCode;
     public static String dataCentreName;
 
-    private static Logger logger;
+    private static org.slf4j.Logger LOG;
     private static ChannelAdGroupRepository channelAdGroupRepository;
     private static ChannelRepository channelRepository;
     private static ChannelFeedbackRepository channelFeedbackRepository;
@@ -108,22 +99,29 @@ public class ChannelServer {
     private static String configFile;
 
     public static void main(final String[] args) throws Exception {
+        // Used to turn off internal logging for ConfigurationLoader
+        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+
         configFile = System.getProperty("configFile", DEFAULT_CONFIG_FILE);
         try {
             final ConfigurationLoader configurationLoader = ConfigurationLoader.getInstance(configFile);
 
-            if (!checkLogFolders(configurationLoader.getLog4jConfiguration())) {
+            if (!checkLogFolders(configurationLoader.getLoggerConfiguration())) {
+                ServerStatusInfo.setStatusCodeAndString(404, "StackTrace is: one or more log folders missing");
                 System.out.println("Log folders are not available so exiting..");
                 return;
             }
             // Set the status code for load balancer status.
             ServerStatusInfo.setStatusCodeAndString(200, "OK");
 
-            Formatter.init();
+            // Used to turn on internal logging for VelocityEngine and Governator/Guice
+            System.clearProperty("org.apache.commons.logging.Log");
 
-            PropertyConfigurator.configure(configurationLoader.getLoggerConfiguration().getString("log4jLoggerConf"));
-            logger = Logger.getLogger("repository");
-            logger.debug("Initializing logger completed");
+            // Initialising all loggers
+            configureApplicationLoggers(configurationLoader.getLoggerConfiguration());
+            LOG = LoggerFactory.getLogger(ChannelServer.class);
+
+            Formatter.init();
 
             // parsing the data center id given in the vm parameters
             final ChannelServerHelper channelServerHelper = new ChannelServerHelper();
@@ -152,6 +150,7 @@ public class ChannelServer {
 
             // Initializing graphite stats
             InspectorStats.init(configurationLoader.getServerConfiguration());
+
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -186,7 +185,6 @@ public class ChannelServer {
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
             repoHelperBuilder.setIxAccountMapRepository(ixAccountMapRepository);
             repoHelperBuilder.setIxPackageRepository(ixPackageRepository);
-
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
@@ -194,7 +192,7 @@ public class ChannelServer {
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
-            instantiateRepository(logger, configurationLoader);
+            instantiateRepository(Logger.getLogger("repository"), configurationLoader);
             CasConfigUtil.init(configurationLoader, repositoryHelper);
 
             // Configure the netty server.
@@ -223,13 +221,16 @@ public class ChannelServer {
             System.out.close();
             // If client bootstrap is not present throwing exception which will set lbStatus as NOT_OK.
         } catch (final Exception exception) {
-            logger.error("Exception in Channel Server " + exception);
-            ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
-            logger.error("stack trace is " + getMyStackTrace(exception));
-            if (logger.isDebugEnabled()) {
-                logger.debug("{}", exception);
-                sendMail(exception.getMessage(), getMyStackTrace(exception));
+            ServerStatusInfo.setStatusCodeAndString(404, getStackTrace(exception));
+            if (null != LOG) {
+                LOG.error("Exception in Channel Server " + exception);
+                LOG.error("Stack trace is " + getStackTrace(exception));
+            } else {
+                System.out.println("Error in loading config file or logger config");
+                System.out.println("Exception in Channel Server " + exception);
+                System.out.println("Stack trace is " + getStackTrace(exception));
             }
+            sendMail(exception.getMessage(), getStackTrace(exception), CasConfigUtil.getServerConfig());
         }
     }
 
@@ -244,17 +245,11 @@ public class ChannelServer {
         return DEFAULT_CONFIG_FILE;
     }
 
-    public static String getMyStackTrace(final Exception exception) {
-        final StringWriter stringWriter = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(stringWriter);
-        exception.printStackTrace(printWriter);
-        return "StackTrace is: " + stringWriter.toString();
-    }
 
     private static void instantiateRepository(final Logger logger, final ConfigurationLoader config)
             throws ClassNotFoundException {
         try {
-            logger.debug("Starting to instantiate repository");
+            logger.debug("Starting to instantiate repositories");
             final Configuration databaseConfig = config.getDatabaseConfiguration();
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
             System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
@@ -313,24 +308,27 @@ public class ChannelServer {
             if (repoLoadRetryCount < 1) {
                 repoLoadRetryCount = 1;
             }
-            logger.info(String.format("************** starting repo load with retry count as %s", repoLoadRetryCount));
-            loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config);
-            loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY, config);
-            loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config);
-            loadRepos(ixAccountMapRepository, ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY, config);
-            loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config);
-            loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config);
-            loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY, config);
+            logger.error(String.format("*************** Starting repo loading with retry count as %s", repoLoadRetryCount));
+            loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config, logger);
+            loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY,
+                    config, logger);
+            loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config, logger);
+            loadRepos(ixAccountMapRepository, ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY, config, logger);
+            loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config, logger);
+            loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config, logger);
+            loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY,
+                    config, logger);
             loadRepos(channelSegmentFeedbackRepository,
-                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config);
-            loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config);
-            loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config);
-            loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config);
-            loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config);
-            loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config);
-            loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY, config);
-            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config);
-            loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config);
+                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config, logger);
+            loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config, logger);
+            loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config, logger);
+            loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config, logger);
+            loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config, logger);
+            loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config, logger);
+            loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY,
+                    config, logger);
+            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config, logger);
+            loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
@@ -339,40 +337,41 @@ public class ChannelServer {
                     getDataCenter());
 
             logger.error("* * * * Instantiating repository completed * * * *");
+            LOG.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
                     .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
         } catch (final NamingException exception) {
-            logger.error("failed to creatre binding for postgresql data source " + exception.getMessage());
-            ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
+            logger.error("failed to create binding for postgresql data source " + exception.getMessage());
+            ServerStatusInfo.setStatusCodeAndString(404, getStackTrace(exception));
         } catch (final InitializationException exception) {
             logger.error("failed to initialize repository " + exception.getMessage());
-            ServerStatusInfo.setStatusCodeAndString(404, getMyStackTrace(exception));
+            ServerStatusInfo.setStatusCodeAndString(404, getStackTrace(exception));
             if (logger.isDebugEnabled()) {
-                logger.debug(ChannelServer.getMyStackTrace(exception));
+                logger.debug(getStackTrace(exception));
             }
         }
     }
 
     @SuppressWarnings("rawtypes")
     private static void loadRepos(final AbstractStatsMaintainingDBRepository repository, final String repoName,
-            final ConfigurationLoader config) throws InitializationException {
+            final ConfigurationLoader config, final Logger logger) throws InitializationException {
         final long startTime = System.currentTimeMillis();
-        logger.error(String.format("*************** Started loading repo %s, at %s", repoName, startTime));
+        logger.error(String.format("*************** Started loading %s, at %s", repoName, startTime));
         int tryCount;
         Exception exp = null;
-        for (tryCount = 0; tryCount < repoLoadRetryCount; tryCount++) {
-            logger.error(String.format("*************** Trying to load repo %s for %s time", repoName, tryCount));
+        for (tryCount = 1; tryCount <= repoLoadRetryCount; tryCount++) {
+            logger.error(String.format("*************** %s, Try %s", repoName, tryCount));
             try {
                 repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
             } catch (final Exception exc) {
-                logger.error("*************** Error in loading repo " + repoName, exc);
+                logger.error("*************** Error in loading " + repoName, exc);
                 exp = exc;
             }
         }
-        if (tryCount >= repoLoadRetryCount) {
+        if (tryCount > repoLoadRetryCount) {
             final String msg =
-                    String.format("Tried %s times but still could not load repo %s", repoLoadRetryCount, repoName);
+                    String.format("Tried %s times but still could not load %s", repoLoadRetryCount, repoName);
             logger.error(msg);
             throw new InitializationException(msg, exp);
         }
@@ -393,74 +392,5 @@ public class ChannelServer {
             colo = DataCenter.HKG1;
         }
         return colo;
-    }
-
-    // check if all log folders exists
-    public static boolean checkLogFolders(final Configuration config) {
-        String debugLogFolder = config.getString("appender.debug.File");
-        String advertiserLogFolder = config.getString("appender.advertiser.File");
-        String sampledAdvertiserLogFolder = config.getString("appender.sampledadvertiser.File");
-        String repositoryLogFolder = config.getString("appender.repository.File");
-        File debugFolder = null;
-        File advertiserFolder = null;
-        File sampledAdvertiserFolder = null;
-        File repositoryFolder = null;
-        if (repositoryLogFolder != null) {
-            repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
-            repositoryFolder = new File(repositoryLogFolder);
-        }
-        if (debugLogFolder != null) {
-            debugLogFolder = debugLogFolder.substring(0, debugLogFolder.lastIndexOf('/') + 1);
-            debugFolder = new File(debugLogFolder);
-        }
-        if (advertiserLogFolder != null) {
-            advertiserLogFolder = advertiserLogFolder.substring(0, advertiserLogFolder.lastIndexOf('/') + 1);
-            advertiserFolder = new File(advertiserLogFolder);
-        }
-        if (sampledAdvertiserLogFolder != null) {
-            sampledAdvertiserLogFolder =
-                    sampledAdvertiserLogFolder.substring(0, sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
-            sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
-        }
-        if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists()) {
-            if (sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null
-                    && repositoryFolder.exists()) {
-                return true;
-            }
-        }
-        ServerStatusInfo.setStatusCodeAndString(404, "StackTrace is: one or more log folders missing");
-        return false;
-    }
-
-    // send Mail if channel server crashes
-    @SuppressWarnings("unchecked")
-    private static void sendMail(final String errorMessage, final String stackTrace) {
-        final Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", CasConfigUtil.getServerConfig().getString("smtpServer"));
-        final Session session = Session.getDefaultInstance(properties);
-        try {
-            final MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(CasConfigUtil.getServerConfig().getString("sender")));
-            final List<String> recipients = CasConfigUtil.getServerConfig().getList("recipients");
-            final javax.mail.internet.InternetAddress[] addressTo =
-                    new javax.mail.internet.InternetAddress[recipients.size()];
-
-            for (int index = 0; index < recipients.size(); index++) {
-                addressTo[index] = new javax.mail.internet.InternetAddress(recipients.get(index));
-            }
-
-            message.setRecipients(Message.RecipientType.TO, addressTo);
-            final InetAddress addr = InetAddress.getLocalHost();
-            message.setSubject("Channel Ad Server Crashed on Host " + addr.getHostName());
-            message.setText(errorMessage + stackTrace);
-            Transport.send(message);
-        } catch (final MessagingException mex) {
-            // logger.info("Error while sending mail");
-            logger.error("MessagingException raised while sending mail " + mex);
-        } catch (final UnknownHostException ex) {
-            // logger.debug("could not resolve host inside send mail");
-            logger.error("UnknownException raised while sending mail " + ex);
-            // ex.printStackTrace();
-        }
     }
 }
