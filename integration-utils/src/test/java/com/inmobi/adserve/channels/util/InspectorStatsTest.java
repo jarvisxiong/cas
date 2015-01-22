@@ -31,7 +31,7 @@ public class InspectorStatsTest {
         final String hostName = "cas1001.ads.uj1.inmobi.com";
         final String expectedMetricProducer = "prod.uj1.cas-1.app.cas1001";
         final String graphiteServer = "graphiteServer";
-        final int graphitePort = 1234;
+        final int graphitePort = 2020;
         final int graphiteInterval = 1;
 
         mockStatic(InetAddress.class);
@@ -41,7 +41,7 @@ public class InspectorStatsTest {
 
         Configuration mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("graphiteServer.host", "cas-metrics-relay.uj1.inmobi.com")).andReturn(graphiteServer).anyTimes();
-        expect(mockConfig.getInt("graphiteServer.port", 1234)).andReturn(graphitePort).anyTimes();
+        expect(mockConfig.getInt("graphiteServer.port", 2020)).andReturn(graphitePort).anyTimes();
         expect(mockConfig.getInt("graphiteServer.intervalInMinutes", 1)).andReturn(graphiteInterval).anyTimes();
         expect(mockConfig.getBoolean("graphiteServer.shouldLogAdapterLatencies", false)).andReturn(false).anyTimes();
 
