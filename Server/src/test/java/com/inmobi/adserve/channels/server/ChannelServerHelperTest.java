@@ -86,7 +86,8 @@ public class ChannelServerHelperTest {
     public void testgetHostDataCenterPositive() {
         System.setProperty("host.name", "web2004.ads.lhr1.inmobi.com");
         final short expected = 2004;
-        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo(expected)));
+        final String hostName = channelServerHelper.getHostName("host.name");
+        assertThat(channelServerHelper.getHostId(hostName), is(equalTo(expected)));
         System.clearProperty("host.name");
     }
 
