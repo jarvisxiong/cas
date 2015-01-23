@@ -35,7 +35,7 @@
 
     <modules>
         <module>Server</module>
-		<module>contracts</module>
+        <module>contracts</module>
         <module>integration-adnetworks</module>
         <module>integration-repository</module>
         <module>integration-utils</module>
