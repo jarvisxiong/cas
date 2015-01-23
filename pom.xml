@@ -35,13 +35,14 @@
 
     <modules>
         <module>Server</module>
+		<module>contracts</module>
         <module>integration-adnetworks</module>
         <module>integration-repository</module>
         <module>integration-utils</module>
         <module>integration-api</module>
         <module>template</module>
         <module>integration-tests</module>
-    </modules>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>
