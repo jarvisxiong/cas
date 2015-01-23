@@ -24,6 +24,6 @@ public final class ChannelServerStringLiterals {
     public static final String DATA_CENTER_ID_KEY = "dc.id";
     public static final String HOST_NAME_KEY = "host.name";
     public static final String DATA_CENTRE_NAME_KEY = "dc.name";
-    
+
     private ChannelServerStringLiterals () { }
 }

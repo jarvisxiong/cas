@@ -3,6 +3,11 @@ logger.debug.File=/opt/mkhoj/logs/cas/debug/debug.log
 logger.sampledadvertiser.File=/opt/mkhoj/logs/cas/sampledadvertiser/sampledadvertiser.log
 logger.repository.File=/opt/mkhoj/logs/cas/repository/repository.log
 logger.trace.File=/opt/mkhoj/logs/cas/trace/trace.log
+
+logger.debug=debug
+logger.advertiser=advertiser
+logger.sampledadvertiser=sampledadvertiser
+logger.repository=repository
 logger.sampledadvertisercount=5
 logger.loggerConf = /opt/mkhoj/conf/cas/logger.xml
 
@@ -75,7 +80,7 @@ server.aerospike.feedbackTimeFrame=11
 server.aerospike.boostTimeFrame=3
 
 server.graphiteServer.host=<%= graphite_host %>
-server.graphiteServer.port=2003
+server.graphiteServer.port=2020
 server.graphiteServer.intervalInMinutes=1
 server.graphiteServer.shouldLogAdapterLatencies=<%= graphite_shouldLogAdapterLatencies %>
 

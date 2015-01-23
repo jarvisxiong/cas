@@ -24,8 +24,7 @@ public class ChannelServerHelper {
         return dataCenterIdCode;
     }
 
-    public short getHostId(final String hostNameKey) {
-        short hostId = 0;
+    public String getHostName(final String hostNameKey) {
         String hostName = System.getProperty(hostNameKey);
         if (hostName == null) {
             InetAddress addr = null;
@@ -36,6 +35,14 @@ public class ChannelServerHelper {
                 LOG.error("UnknownHostException in getHostId, exception raised {}", e1);
             }
         }
+
+        LOG.debug("hostName is {}", hostName);
+        return hostName;
+    }
+
+    public short getHostId(final String hostName) {
+        short hostId = 0;
+
         try {
             if (null != hostName) {
                 hostId = Short.parseShort(hostName.substring(3, 7));

@@ -29,7 +29,7 @@ prod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon02.ads.uj1.inmobi.com'
+         - 'cas-metrics-relay.uj1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       read_timeout:
@@ -85,7 +85,7 @@ prod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon03.ads.uh1.inmobi.com'
+         - 'cas-metrics-relay.uh1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
       read_timeout:
@@ -141,7 +141,7 @@ prod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon02.ads.lhr1.inmobi.com'
+         - 'cas-metrics-relay.lhr1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
       read_timeout:
@@ -197,7 +197,7 @@ prod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon01.ads.hkg1.inmobi.com'
+         - 'cas-metrics-relay.hkg1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       read_timeout:
@@ -254,7 +254,7 @@ pilot:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon02.ads.uj1.inmobi.com'
+         - 'cas-metrics-relay.uj1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       read_timeout:
@@ -310,7 +310,7 @@ pilot:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon03.ads.uh1.inmobi.com'
+         - 'cas-metrics-relay.uh1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
       read_timeout:
@@ -366,7 +366,7 @@ pilot:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon02.ads.lhr1.inmobi.com'
+         - 'cas-metrics-relay.lhr1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
       read_timeout:
@@ -422,7 +422,7 @@ pilot:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon01.ads.hkg1.inmobi.com'
+         - 'cas-metrics-relay.hkg1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       read_timeout:
@@ -504,7 +504,7 @@ nonprod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'mon02.ads.lhr1.inmobi.com'
+         - 'cas-metrics-relay.lhr1.inmobi.com'
       scribe_endpoint1:
          - 'databus.vip.nonprod.inmobi.com'
       read_timeout:
