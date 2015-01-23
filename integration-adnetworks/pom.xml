@@ -68,6 +68,10 @@
 			<artifactId>api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.inmobi.channels</groupId>
+			<artifactId>contracts</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.inmobi.commons</groupId>
 			<artifactId>casthrift</artifactId>
 		</dependency>
