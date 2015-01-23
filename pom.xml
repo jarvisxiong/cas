@@ -42,7 +42,7 @@
         <module>integration-api</module>
         <module>template</module>
         <module>integration-tests</module>
-	</modules>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>

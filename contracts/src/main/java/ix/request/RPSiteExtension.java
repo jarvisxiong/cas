@@ -6,6 +6,6 @@ import lombok.Data;
  * Created by ishanbhatnagar on 23/1/15.
  */
 @Data
-public class RPSiteExtension {
+public final class RPSiteExtension {
     private final Integer site_id;
 }
