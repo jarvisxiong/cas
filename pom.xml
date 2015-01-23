@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>4.55-SNAPSHOT</version>
+	<version>4.58-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -35,6 +35,7 @@
 
     <modules>
         <module>Server</module>
+        <module>contracts</module>
         <module>integration-adnetworks</module>
         <module>integration-repository</module>
         <module>integration-utils</module>

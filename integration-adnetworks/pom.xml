@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.inmobi.channels</groupId>
 		<artifactId>cas</artifactId>
-		<version>4.55-SNAPSHOT</version>
+		<version>4.58-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -66,6 +66,10 @@
 		<dependency>
 			<groupId>com.inmobi.channels</groupId>
 			<artifactId>api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi.channels</groupId>
+			<artifactId>contracts</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.commons</groupId>

@@ -8,7 +8,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.yammer.metrics.core.MetricName;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -33,33 +36,48 @@ public class InspectorStats {
 
     private static final String STATS = "stats";
     private static final String WORK_FLOW = "WorkFlow";
-    
+
     private static final String GOOD = "GOOD";
     private static final String BAD = "BAD";
-    
+
     private static boolean shouldLog = false;
 
-    public static void init(final Configuration serverConfiguration) {
-        final String graphiteServer = serverConfiguration.getString("graphiteServer.host", "mon02.ads.uj1.inmobi.com");
-        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 1234);
-        final int graphiteInterval = serverConfiguration.getInt("graphiteServer.intervalInMinutes", 100); 
-
+    public static void init(final Configuration serverConfiguration, final String hostName) {
+        final String graphiteServer =
+                serverConfiguration.getString("graphiteServer.host", "cas-metrics-relay.uj1.inmobi.com");
+        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 2020);
+        final int graphiteInterval = serverConfiguration.getInt("graphiteServer.intervalInMinutes", 1);
+        final String metricProducer = getMetricProducer(hostName);
         shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
-        
-        String metricProducer;
-        try {
-            metricProducer = metricsPrefix(InetAddress.getLocalHost().getHostName().toLowerCase());
-        } catch (final UnknownHostException e) {
-            metricProducer = "unknown-host";
-            LOG.debug("Metric Producer could not resolve host so setting to unknown host, exception {}", e);
-        }
+
         GraphiteReporter.enable(graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort, metricProducer);
     }
-    
 
-    private static String metricsPrefix(String hostname) {
-        hostname = StringUtils.removeEnd(hostname, ".inmobi.com");
-        return StringUtils.reverseDelimited(hostname, '.');
+    protected static String getMetricProducer(String hostName) {
+        StringBuilder metricProducer = null;
+        String runEnvironment = System.getProperty("run.environment", "test");
+        if (StringUtils.isBlank(hostName)) {
+            hostName = "unknown-host";
+            LOG.error("HostName of box is null while pushing data to graphite");
+        }
+        final String PROD = "prod";
+
+        if (runEnvironment.equalsIgnoreCase(PROD)) {
+            Pattern prodHostPattern = Pattern.compile("(cas\\d{4})\\.ads\\.(lhr1|uh1|uj1|hkg1)\\.inmobi\\.com");
+            Matcher prodHostMatcher = prodHostPattern.matcher(hostName);
+            if (prodHostMatcher.find()) {
+                metricProducer = new StringBuilder(PROD).append(".").append(prodHostMatcher.group(2)).append(".cas-1.app.").append(prodHostMatcher.group(1));
+            } else {
+                runEnvironment = "test";
+                LOG.error("HostName of box is not of format cas<4 digits>.ads.<uh1|uj1|lhr1|hkg1>.inmobi.com");
+            }
+        }
+        if (!runEnvironment.equalsIgnoreCase(PROD)) {
+            final int dotIndex = hostName.indexOf('.');
+            final String boxName = dotIndex > 0 ? hostName.substring(0, dotIndex) : hostName;
+            metricProducer = new StringBuilder("test.cas-1.app.").append(boxName);
+        }
+        return metricProducer.toString();
     }
 
     public static void incrementStatCount(final String parameter, final long value) {
@@ -107,7 +125,6 @@ public class InspectorStats {
     }
 
     public static void incrementYammerCount(final String key, final String parameter, final long value) {
-        final String fullKey = key + "." + parameter;
         if (yammerCounterStats.get(key) == null) {
             synchronized (parameter) {
                 if (yammerCounterStats.get(key) == null) {
@@ -127,8 +144,10 @@ public class InspectorStats {
         if (yammerCounterStats.get(key).get(STATS).get(parameter) == null) {
             synchronized (parameter) {
                 if (yammerCounterStats.get(key).get(STATS).get(parameter) == null) {
+                    //MetricName(group,type,name) to which the group belongs, according to the format specified, type is null
+                    final MetricName metricName = new MetricName(key, "", parameter);
                     yammerCounterStats.get(key).get(STATS)
-                            .put(parameter, Metrics.newCounter(InspectorStats.class, fullKey));
+                            .put(parameter, Metrics.newCounter(metricName));
                 }
             }
         }
@@ -137,18 +156,17 @@ public class InspectorStats {
     }
 
     public static void updateYammerTimerStats(final String dst, final long value, final boolean isGood) {
-        if(!shouldLog){
+        if (!shouldLog) {
             return;
         }
-        if(isGood){
+        if (isGood) {
             updateYammerTimerStats(dst, GOOD, value);
-        }else{
+        } else {
             updateYammerTimerStats(dst, BAD, value);
         }
     }
-    
+
     public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
-        final String fullKey = dst + "." + parameter;
         if (yammerTimerStats.get(dst) == null) {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst) == null) {
@@ -160,7 +178,9 @@ public class InspectorStats {
         if (yammerTimerStats.get(dst).get(parameter) == null) {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst).get(parameter) == null) {
-                    yammerTimerStats.get(dst).put(parameter, Metrics.newHistogram(InspectorStats.class, fullKey, true));
+                    //MetricName(group,type,name) to which the group belongs, according to the format specified, type is null
+                    final MetricName metricName = new MetricName(dst, "", parameter);
+                    yammerTimerStats.get(dst).put(parameter, Metrics.newHistogram(metricName, true));
                 }
             }
         }

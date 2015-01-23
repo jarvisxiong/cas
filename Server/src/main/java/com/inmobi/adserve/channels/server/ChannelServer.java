@@ -126,7 +126,8 @@ public class ChannelServer {
             // parsing the data center id given in the vm parameters
             final ChannelServerHelper channelServerHelper = new ChannelServerHelper();
             dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
-            hostIdCode = channelServerHelper.getHostId(ChannelServerStringLiterals.HOST_NAME_KEY);
+            final String hostName = channelServerHelper.getHostName(ChannelServerStringLiterals.HOST_NAME_KEY);
+            hostIdCode = channelServerHelper.getHostId(hostName);
             dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
 
             // Initialising Internal logger factory for Netty
@@ -149,8 +150,7 @@ public class ChannelServer {
                     configurationLoader.getServerConfiguration());
 
             // Initializing graphite stats
-            InspectorStats.init(configurationLoader.getServerConfiguration());
-
+            InspectorStats.init(configurationLoader.getServerConfiguration(), hostName);
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -365,13 +365,13 @@ public class ChannelServer {
                 repository.init(logger, config.getCacheConfiguration().subset(repoName), repoName);
                 break;
             } catch (final Exception exc) {
-                logger.error("*************** Error in loading " + repoName, exc);
+                logger.error("*************** Error in loading repo " + repoName, exc);
                 exp = exc;
             }
         }
-        if (tryCount > repoLoadRetryCount) {
+        if (tryCount >= repoLoadRetryCount) {
             final String msg =
-                    String.format("Tried %s times but still could not load %s", repoLoadRetryCount, repoName);
+                    String.format("Tried %s times but still could not load repo %s", repoLoadRetryCount, repoName);
             logger.error(msg);
             throw new InitializationException(msg, exp);
         }
