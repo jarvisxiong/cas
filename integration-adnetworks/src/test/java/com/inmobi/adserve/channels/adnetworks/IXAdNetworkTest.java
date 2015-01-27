@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
 import io.netty.channel.Channel;
 
 import java.awt.Dimension;
@@ -23,6 +24,7 @@ import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
@@ -54,7 +56,7 @@ public class IXAdNetworkTest extends TestCase {
     private final String loggerConf = "/tmp/channel-server.properties";
     private IXAdNetwork ixAdNetwork;
     private final String ixHost = "http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east";
-    
+
     private final SASRequestParameters sasParams = new SASRequestParameters();
     private final String ixAdvId = "id";
     private static final int OS_ID = 14;
@@ -149,6 +151,8 @@ public class IXAdNetworkTest extends TestCase {
                 .andReturn(slotSizeMapEntityFor14).anyTimes();
         EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
 
         final ResultSet<IXPackageEntity> resultSet = new ResultSet<IXPackageEntity>() {
             @Override
@@ -234,13 +238,13 @@ public class IXAdNetworkTest extends TestCase {
         bidResponse.bidid = "ac1a2c944cff0a176643079625b0cad4a1bbe4a3";
 
         ixAdNetwork.setBidResponse(bidResponse);
-        
+
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         ixAdNetwork.setHost(ixHost);
     }
 
