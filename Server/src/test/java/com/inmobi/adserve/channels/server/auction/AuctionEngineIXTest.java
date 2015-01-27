@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -40,7 +42,6 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
 
-
 public class AuctionEngineIXTest {
 
     Configuration mockConfig;
@@ -53,7 +54,11 @@ public class AuctionEngineIXTest {
     SASRequestParameters sasParams;
 
     @BeforeMethod
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, IllegalAccessException {
+
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
+
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(config, null);
 
@@ -64,7 +69,6 @@ public class AuctionEngineIXTest {
 
         // this is done, to track the secondBidPrice variable getting set inside the AuctionEngine.
         secondPrice1 = new Capture<Double>();
-
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -107,7 +111,7 @@ public class AuctionEngineIXTest {
     }
 
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-            final String adNetworkName, final Double bidValue, final Long latencyValue) {
+                                     final String adNetworkName, final Double bidValue, final Long latencyValue) {
 
         final Long[] rcList = null;
         final Long[] tags = null;

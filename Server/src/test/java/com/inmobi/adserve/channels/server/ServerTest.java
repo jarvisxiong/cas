@@ -10,11 +10,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.slf4j.Marker;
 import org.testng.annotations.Test;
 
@@ -52,6 +54,10 @@ public class ServerTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
+
+
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
 
         if (count == 0) {
             prepareLogging();

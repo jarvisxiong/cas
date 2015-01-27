@@ -29,7 +29,7 @@ public class InspectorStatsTest {
     @Test
     public void testInit() throws Exception {
         final String hostName = "cas1001.ads.uj1.inmobi.com";
-        final String expectedMetricProducer = "prod.uj1.cas-1.app.cas1001";
+        final String expectedMetricProducer = "prod.uj1.cas-1.app";
         final String graphiteServer = "graphiteServer";
         final int graphitePort = 2020;
         final int graphiteInterval = 1;
@@ -68,16 +68,16 @@ public class InspectorStatsTest {
         final String WrongNullProdUrl = null;
         final String WrongBlankProdUrl = "";
 
-        final String expectedUj1Metric = "prod.uj1.cas-1.app.cas1000";
-        final String expectedUh1Metric = "prod.uh1.cas-1.app.cas1004";
-        final String expectedHkg1Metric = "prod.hkg1.cas-1.app.cas2000";
-        final String expectedLhr1Metric = "prod.lhr1.cas-1.app.cas2002";
-        final String expectedWrongColoMetric = "test.cas-1.app.cas1000";
-        final String expectedWrongBoxMetric = "test.cas-1.app.cas100";
-        final String expectedWrongRandomMetric = "test.cas-1.app.random1";
-        final String expectedWrongNoDotMetric = "test.cas-1.app.random1random2random3";
-        final String expectedWrongNullMetric = "test.cas-1.app.unknown-host";
-        final String expectedWrongBlankMetric = "test.cas-1.app.unknown-host";
+        final String expectedUj1Metric = "prod.uj1.cas-1.app";
+        final String expectedUh1Metric = "prod.uh1.cas-1.app";
+        final String expectedHkg1Metric = "prod.hkg1.cas-1.app";
+        final String expectedLhr1Metric = "prod.lhr1.cas-1.app";
+        final String expectedWrongColoMetric = "test.cas-1.app";
+        final String expectedWrongBoxMetric = "test.cas-1.app";
+        final String expectedWrongRandomMetric = "test.cas-1.app";
+        final String expectedWrongNoDotMetric = "test.cas-1.app";
+        final String expectedWrongNullMetric = "test.cas-1.app";
+        final String expectedWrongBlankMetric = "test.cas-1.app";
 
         mockStatic(System.class);
         expect(System.getProperty("run.environment", "test")).andReturn("prod").anyTimes();

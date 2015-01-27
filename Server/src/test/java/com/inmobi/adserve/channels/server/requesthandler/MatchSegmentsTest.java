@@ -9,9 +9,11 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.annotations.Test;
 
 import com.google.inject.Guice;
@@ -32,12 +34,15 @@ public class MatchSegmentsTest extends TestCase {
     private MatchSegments matchSegments;
 
     @Override
-    public void setUp() throws ClassNotFoundException {
+    public void setUp() throws ClassNotFoundException, IllegalAccessException {
 
         configurationLoder = ConfigurationLoader.getInstance(CHANNEL_SERVER_CONFIG_FILE);
         System.out.println(configurationLoder.getAdapterConfiguration());
 
         final RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
+
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
 
         CasConfigUtil.init(configurationLoder, repositoryHelper);
 

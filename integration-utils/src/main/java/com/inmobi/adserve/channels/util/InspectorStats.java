@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.util;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +34,7 @@ public class InspectorStats {
 
     private static final String STATS = "stats";
     private static final String WORK_FLOW = "WorkFlow";
+    private static String boxName;
 
     private static final String GOOD = "GOOD";
     private static final String BAD = "BAD";
@@ -66,7 +65,9 @@ public class InspectorStats {
             Pattern prodHostPattern = Pattern.compile("(cas\\d{4})\\.ads\\.(lhr1|uh1|uj1|hkg1)\\.inmobi\\.com");
             Matcher prodHostMatcher = prodHostPattern.matcher(hostName);
             if (prodHostMatcher.find()) {
-                metricProducer = new StringBuilder(PROD).append(".").append(prodHostMatcher.group(2)).append(".cas-1.app.").append(prodHostMatcher.group(1));
+                metricProducer =
+                        new StringBuilder(PROD).append(".").append(prodHostMatcher.group(2)).append(".cas-1.app");
+                boxName = prodHostMatcher.group(1);
             } else {
                 runEnvironment = "test";
                 LOG.error("HostName of box is not of format cas<4 digits>.ads.<uh1|uj1|lhr1|hkg1>.inmobi.com");
@@ -74,8 +75,8 @@ public class InspectorStats {
         }
         if (!runEnvironment.equalsIgnoreCase(PROD)) {
             final int dotIndex = hostName.indexOf('.');
-            final String boxName = dotIndex > 0 ? hostName.substring(0, dotIndex) : hostName;
-            metricProducer = new StringBuilder("test.cas-1.app.").append(boxName);
+            boxName = dotIndex > 0 ? hostName.substring(0, dotIndex) : hostName;
+            metricProducer = new StringBuilder("test.cas-1.app");
         }
         return metricProducer.toString();
     }
@@ -145,7 +146,7 @@ public class InspectorStats {
             synchronized (parameter) {
                 if (yammerCounterStats.get(key).get(STATS).get(parameter) == null) {
                     //MetricName(group,type,name) to which the group belongs, according to the format specified, type is null
-                    final MetricName metricName = new MetricName(key, "", parameter);
+                    final MetricName metricName = new MetricName(boxName, key, parameter);
                     yammerCounterStats.get(key).get(STATS)
                             .put(parameter, Metrics.newCounter(metricName));
                 }
@@ -179,7 +180,7 @@ public class InspectorStats {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst).get(parameter) == null) {
                     //MetricName(group,type,name) to which the group belongs, according to the format specified, type is null
-                    final MetricName metricName = new MetricName(dst, "", parameter);
+                    final MetricName metricName = new MetricName(boxName, dst, parameter);
                     yammerTimerStats.get(dst).put(parameter, Metrics.newHistogram(metricName, true));
                 }
             }

@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -52,8 +54,12 @@ public class AuctionEngineTest {
     AuctionEngine auctionEngine;
 
     @BeforeMethod
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, IllegalAccessException {
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
+
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
+
         CasConfigUtil.init(config, null);
 
         ImpressionIdGenerator.init((short) 123, (byte) 10);
@@ -98,7 +104,7 @@ public class AuctionEngineTest {
     }
 
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-            final String adNetworkName, final Double bidValue, final Long latencyValue) {
+                                     final String adNetworkName, final Double bidValue, final Long latencyValue) {
 
         final Long[] rcList = null;
         final Long[] tags = null;
@@ -210,10 +216,10 @@ public class AuctionEngineTest {
 
     @Test(dataProvider = "DataProviderWith3Bidders")
     public void testAuctionEngineWith3BiddersExample(final String useCaseName, final Double floorPrice,
-            final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
-            final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
-            final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
-            final Double expectedWinnerBidValue) {
+                                                     final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
+                                                     final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
+                                                     final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
+                                                     final Double expectedWinnerBidValue) {
 
         final AuctionEngine auctionEngine = new AuctionEngine();
         auctionEngine.sasParams = new SASRequestParameters();
@@ -294,10 +300,10 @@ public class AuctionEngineTest {
 
     @Test(dataProvider = "DataProviderWith4Bidders")
     public void testAuctionEngineWith4BiddersExample(final String useCaseName, final Double floorPrice,
-            final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
-            final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
-            final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
-            final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
+                                                     final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
+                                                     final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
+                                                     final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
+                                                     final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
 
         final AuctionEngine auctionEngine = new AuctionEngine();
         auctionEngine.sasParams = new SASRequestParameters();

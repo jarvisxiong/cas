@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler.filters;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -10,10 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.inmobi.adserve.channels.util.InspectorStats;
 import junit.framework.TestCase;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.json.JSONObject;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
@@ -49,7 +52,6 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-
 
 public class ChannelSegmentFilterApplierTest extends TestCase {
     private ChannelEntity cE1;
@@ -94,6 +96,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
+
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
 
         configurationLoder = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(configurationLoder, null);
@@ -267,13 +272,15 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
 
         final TypeLiteral<List<AdvertiserLevelFilter>> advertiserLevelTypeLiteral =
-                new TypeLiteral<List<AdvertiserLevelFilter>>() {};
+                new TypeLiteral<List<AdvertiserLevelFilter>>() {
+                };
         final Key<List<AdvertiserLevelFilter>> dcpAndRtbdAdvertiserLevelFiltersKey =
                 Key.get(advertiserLevelTypeLiteral, DcpAndRtbdAdvertiserLevelFilters.class);
         dcpAndRtbdAdvertiserLevelFilters = injector.getInstance(dcpAndRtbdAdvertiserLevelFiltersKey);
 
         final TypeLiteral<List<AdGroupLevelFilter>> adGroupLevelTypeLiteral =
-                new TypeLiteral<List<AdGroupLevelFilter>>() {};
+                new TypeLiteral<List<AdGroupLevelFilter>>() {
+                };
         final Key<List<AdGroupLevelFilter>> dcpAndRtbAdGroupLevelFiltersKey =
                 Key.get(adGroupLevelTypeLiteral, DcpAndRtbAdGroupLevelFilters.class);
         dcpAndRtbAdGroupLevelFilters = injector.getInstance(dcpAndRtbAdGroupLevelFiltersKey);
@@ -979,17 +986,17 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     }
 
     public static ChannelSegmentEntity.Builder getChannelSegmentEntityBuilder(final String advertiserId,
-            final String adgroupId, final String adId, final String channelId, final long platformTargeting,
-            final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
-            final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
-            final long incId, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
-            final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
-            final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
-            final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
-            final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
-            final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
-            final Timestamp eCPMBoostDate, final Long[] tod, final boolean siteInclusion, final Set<String> siteIE,
-            final int impressionCeil) {
+                                                                              final String adgroupId, final String adId, final String channelId, final long platformTargeting,
+                                                                              final Long[] rcList, final Long[] tags, final boolean status, final boolean isTestMode,
+                                                                              final String externalSiteKey, final Timestamp modified_on, final String campaignId, final Long[] slotIds,
+                                                                              final long incId, final boolean allTags, final String pricingModel, final Integer[] siteRatings,
+                                                                              final int targetingPlatform, final ArrayList<Integer> osIds, final boolean udIdRequired,
+                                                                              final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
+                                                                              final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
+                                                                              final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
+                                                                              final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
+                                                                              final Timestamp eCPMBoostDate, final Long[] tod, final boolean siteInclusion, final Set<String> siteIE,
+                                                                              final int impressionCeil) {
         final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdvertiserId(advertiserId);
@@ -1035,8 +1042,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     }
 
     private ChannelFeedbackEntity.Builder getChannelFeedbackEntityBuilder(final String advertiserId,
-            final double totalInflow, final double totalBurn, final double balance, final int totalImpressions,
-            final int todayImpressions, final int todayRequests, final int averageLatency, final double revenue) {
+                                                                          final double totalInflow, final double totalBurn, final double balance, final int totalImpressions,
+                                                                          final int todayImpressions, final int todayRequests, final int averageLatency, final double revenue) {
         final ChannelFeedbackEntity.Builder builder = ChannelFeedbackEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setTotalInflow(totalInflow);
@@ -1051,8 +1058,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     }
 
     private ChannelSegmentFeedbackEntity.Builder getChannelSegmentFeedbackBuilder(final String advertiserId,
-            final String adGroupId, final double eCPM, final double fillRatio, final double latency,
-            final int requests, final int beacons, final int clicks, final int todaysImpressions) {
+                                                                                  final String adGroupId, final double eCPM, final double fillRatio, final double latency,
+                                                                                  final int requests, final int beacons, final int clicks, final int todaysImpressions) {
         final ChannelSegmentFeedbackEntity.Builder builder = ChannelSegmentFeedbackEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdGroupId(adGroupId);
