@@ -30,6 +30,10 @@ prod:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.uj1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.uj1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       read_timeout:
@@ -86,6 +90,10 @@ prod:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.uh1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.uh1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
       read_timeout:
@@ -142,6 +150,10 @@ prod:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.lhr1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.lhr1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
       read_timeout:
@@ -198,6 +210,10 @@ prod:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.hkg1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.hkg1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       read_timeout:
@@ -255,6 +271,10 @@ pilot:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.uj1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.uj1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       read_timeout:
@@ -311,6 +331,10 @@ pilot:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.uh1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.uh1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
       read_timeout:
@@ -367,6 +391,10 @@ pilot:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.lhr1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.lhr1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
       read_timeout:
@@ -423,6 +451,10 @@ pilot:
          - 'ERROR'
       graphite_host :
          - 'cas-metrics-relay.hkg1.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.hkg1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       read_timeout:
@@ -504,7 +536,11 @@ nonprod:
       debug_log_type :
          - 'ERROR'
       graphite_host :
-         - 'cas-metrics-relay.lhr1.inmobi.com'
+         - 'cas-metrics-relay.corp.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.corp.cas-1'
       scribe_endpoint1:
          - 'databus.vip.nonprod.inmobi.com'
       read_timeout:
@@ -558,6 +594,10 @@ nonprod:
          - 'ERROR'
       graphite_host :
          - 'mon04.ads.ua2.inmobi.com'
+      graphite_port:
+         - 2020
+      graphite_prefix:
+         - 'prod.ua2.cas-1'
       scribe_endpoint1:
          - 'databus.vip.nnprod.inmobi.com'
       read_timeout:

@@ -17,3 +17,5 @@ feed-cas-prod-meta:
   exec: echo "Sleeping for 30s";sleep 30 ;exec setuidgid inmobi  /usr/bin/pull-feed --name inmobi-feed-cas-prod-meta --config /etc/feeder-servers.conf --age 10d
 feed-sun-java7:
   exec: echo "Sleeping for 30s";sleep 30 ;exec setuidgid inmobi  /usr/bin/pull-feed --name inmobi-feed-sun-java7 --config /etc/feeder-servers.conf --age 10d
+cas-collectd-service:
+  exec: echo "Sleeping for 1s";sleep 1 ;exec setuidgid root /opt/inmobi/adserve/bin/start_collectd.sh

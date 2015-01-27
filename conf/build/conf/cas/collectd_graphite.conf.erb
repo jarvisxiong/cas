@@ -1,0 +1,13 @@
+LoadPlugin write_graphite
+<Plugin write_graphite>
+  <Node "graphite_prod">
+    Host "<%= graphite_host %>"
+    Port "<%= graphite_port %>"
+    Protocol "tcp"
+    LogSendErrors true
+    Prefix "<%= graphite_prefix %>.sys."
+    StoreRates true
+    AlwaysAppendDS false
+    EscapeCharacter "_"
+  </Node>
+</Plugin>
