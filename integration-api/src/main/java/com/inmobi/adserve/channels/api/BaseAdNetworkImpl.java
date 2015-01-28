@@ -1,13 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -21,9 +14,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
@@ -32,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
-import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -53,12 +42,20 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
-    protected static Marker traceMarker;
+    protected Marker traceMarker;
     protected static final String WAP = "WAP";
     protected static final String UA = "ua";
     protected static final String IP = "ip";
@@ -259,15 +256,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("isTraceEnabled {} scope : {}", isTraceEnabled, scope);
 
-                    if (isTraceEnabled) {
-                        scope.enter();
-                        try {
-                            scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
-                        } finally {
-                            scope.exit();
-                        }
-                    }
-
                     if (!isRequestCompleted()) {
                         InspectorStats.updateYammerTimerStats(getName(), latency, true);
                         LOG.debug("Operation complete for channel partner: {}", getName());
@@ -296,15 +284,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
-                    if (isTraceEnabled) {
-                        scope.enter();
-                        try {
-                            scope.seed(Key.get(Marker.class), NettyRequestScope.TRACE_MAKER);
-                        } finally {
-                            scope.exit();
-                        }
-                    }
-
                     LOG.debug("error while fetching response from: {} {}", getName(), t);
 
                     String dst;

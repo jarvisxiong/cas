@@ -113,6 +113,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private final long initialTime;
     private Marker traceMarker;
 
+    @Inject
+    private static Provider<Marker> traceMarkerProvider;
+
     public String getTerminationReason() {
         return terminationReason;
     }
@@ -161,7 +164,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Inject
-    public ResponseSender(final Provider<Marker> traceMarkerProvider) {
+    public ResponseSender() {
         initialTime = System.currentTimeMillis();
         totalTime = 0;
         rankList = null;

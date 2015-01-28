@@ -9,8 +9,6 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
-import lombok.Getter;
-
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +34,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
+import lombok.Getter;
 
 @Singleton
 public class MatchSegments {
@@ -303,7 +302,7 @@ public class MatchSegments {
     }
 
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> result, final Marker traceMarker) {
-        if (LOG.isDebugEnabled() || null != traceMarker) {
+        if (LOG.isDebugEnabled(traceMarker)) {
             for (final AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : result) {
                 for (final ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
                     LOG.debug(traceMarker, "Advertiser :{} , AdGroup : {}", channelSegment.getChannelSegmentEntity()

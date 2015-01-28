@@ -121,7 +121,7 @@ public class Logging {
             final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             final Message msg = new Message(tSerializer.serialize(adRR));
             dataBusPublisher.publish(rrLogKey, msg);
-            if (LOG.isDebugEnabled()) {
+            if (LOG.isDebugEnabled(traceMarker)) {
                 LOG.debug(traceMarker, "ADRR is : {}", adRR);
             }
         }

@@ -7,6 +7,8 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import com.inmobi.adserve.channels.util.InspectorStats;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -36,6 +38,7 @@ import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.ADCreativeType;
+import org.powermock.api.support.membermodification.MemberModifier;
 
 // TODO: Merge with IXAdNetworkTest.java
 public class NewIXAdNetworkTest {
@@ -65,7 +68,7 @@ public class NewIXAdNetworkTest {
     }
 
     @BeforeClass
-    public static void setUp() {
+    public static void setUp() throws IllegalAccessException {
         prepareMockConfig();
         final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
         EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
@@ -83,15 +86,19 @@ public class NewIXAdNetworkTest {
         EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor15);
         repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+
+        MemberModifier.field(InspectorStats.class, "boxName")
+                .set(InspectorStats.class, "randomBox");
+
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 4))
                 .andReturn(slotSizeMapEntityFor4).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 9))
                 .andReturn(slotSizeMapEntityFor9).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 11))
                 .andReturn(slotSizeMapEntityFor11).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 14))
                 .andReturn(slotSizeMapEntityFor14).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
         EasyMock.replay(repositoryHelper);
     }
@@ -105,7 +112,8 @@ public class NewIXAdNetworkTest {
         final String response1 = "";
         final String response2 = "Dummy";
         final String response3 = null;
-        final String response4 = "{\"id\":\"ce3adf2d-0149-1000-e483-3e96d9a8a2c1\",\"bidid\":\"1bc93e72-3c81-4bad-ba35-9458b54e109a\",\"seatbid\":[{\"bid\":[]}],\"statuscode\":10}";
+        final String response4 =
+                "{\"id\":\"ce3adf2d-0149-1000-e483-3e96d9a8a2c1\",\"bidid\":\"1bc93e72-3c81-4bad-ba35-9458b54e109a\",\"seatbid\":[{\"bid\":[]}],\"statuscode\":10}";
         final IXAdNetwork ixAdNetwork =
                 new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, false);
 
@@ -173,7 +181,7 @@ public class NewIXAdNetworkTest {
 
         replay(mockStatus, mockHttpRequestHandlerBase, mockChannel, mockRepositoryHelper, mockSasParams,
                 mockChannelSegmentEntity);
-        
+
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final IXAdNetwork ixAdNetwork =
                 createMockBuilder(IXAdNetwork.class)
@@ -183,13 +191,13 @@ public class NewIXAdNetworkTest {
                         .addMockedMethod("updateDSPAccountInfo")
                         .withConstructor(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
                                 advertiserName, 0, true).createMock();
-        
+
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         ixAdNetwork.setHost("http://localhost:8080/getIXBid");
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
@@ -254,13 +262,13 @@ public class NewIXAdNetworkTest {
                         .addMockedMethod("configureParameters", null)
                         .withConstructor(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
                                 advertiserName, 0, true).createMock();
-        
+
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         ixAdNetwork.setHost("http://localhost:8080/getIXBid");
 
         expect(ixAdNetwork.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
