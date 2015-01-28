@@ -66,7 +66,7 @@ public class ResponseSenderTest {
 
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
 
         responseSender.setSasParams(null);
         assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.HTML)));
@@ -98,7 +98,7 @@ public class ResponseSenderTest {
                 .andReturn(DemandSourceType.IX.getValue()).times(1);
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
         responseSender.setSasParams(null);
         responseSender.writeLogs();
 
@@ -132,7 +132,7 @@ public class ResponseSenderTest {
                 .andReturn(DemandSourceType.DCP.getValue()).times(3);
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
 
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
@@ -187,7 +187,7 @@ public class ResponseSenderTest {
         expect(mockRtbAdNetwork.getCurrency()).andReturn(currency).anyTimes();
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
@@ -262,7 +262,7 @@ public class ResponseSenderTest {
         expect(mockDCPAdNetwork.getCurrency()).andReturn(currency).anyTimes();
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
@@ -338,7 +338,7 @@ public class ResponseSenderTest {
         expect(mockHostedAdNetwork.getCurrency()).andReturn(currency).anyTimes();
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
@@ -429,7 +429,7 @@ public class ResponseSenderTest {
                 .andReturn(null).anyTimes();
         replayAll();
 
-        ResponseSender responseSender = new ResponseSender(null);
+        ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 

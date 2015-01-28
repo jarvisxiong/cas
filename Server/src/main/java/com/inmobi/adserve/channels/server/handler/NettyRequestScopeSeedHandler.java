@@ -54,7 +54,7 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
         scope.enter();
         try {
             scope.seed(Marker.class, traceMarker);
-            scope.seed(ResponseSender.class, new ResponseSender(traceMarkerProvider));
+            scope.seed(ResponseSender.class, new ResponseSender());
 
             final QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri());
             final String path = queryStringDecoder.path();

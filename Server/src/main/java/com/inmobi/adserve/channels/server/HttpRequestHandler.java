@@ -1,20 +1,12 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import com.google.inject.Provider;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
@@ -22,13 +14,19 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
 
     public ResponseSender responseSender;
 
-    private final Marker traceMarker;
+    private Marker traceMarker;
     private final Servlet servlet;
+    private final Provider<Marker> traceMarkerProvider;
 
     private HttpRequest httpRequest;
 
@@ -41,9 +39,12 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Inject
-    public HttpRequestHandler(@Nullable final Marker traceMarker, final Servlet servlet,
+    public HttpRequestHandler(final Provider<Marker> traceMarkerProvider, final Servlet servlet,
                               final ResponseSender responseSender) {
-        this.traceMarker = traceMarker;
+        this.traceMarkerProvider = traceMarkerProvider;
+        if (null != traceMarkerProvider) {
+            this.traceMarker = traceMarkerProvider.get();
+        }
         this.servlet = servlet;
         this.responseSender = responseSender;
     }
@@ -67,7 +68,7 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             final String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
 
-            if (LOG.isDebugEnabled()) {
+            if (LOG.isDebugEnabled(traceMarker)) {
                 final String message = "stack trace is -> " + ExceptionBlock.getStackTrace(exception);
                 LOG.debug(traceMarker, message);
             }

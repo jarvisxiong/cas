@@ -97,7 +97,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testrunRtbSecondPriceAuctionEngine() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -159,7 +159,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testrunRtbSecondPriceAuctionEngineTotalsegmentone() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -200,7 +200,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testrunRtbSecondPriceAuctionEngineTotalsegmentZero() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setAuctionBidFloor(0);
         casInternalRequestParameters.setAuctionId("auctionId");
@@ -215,7 +215,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testrunRtbSecondPriceAuctionEngineTopTwoEqualBid() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -299,7 +299,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testrunRtbSecondPriceAuctionEngineSecondhighestBidAtThirdPlace() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -383,7 +383,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testrunRtbSecondPriceAuctionEngineSecondHighestBidAtSecondPlace() {
-        final ResponseSender rs = new ResponseSender(null);
+        final ResponseSender rs = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -467,7 +467,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testisAllRtbCompleteTrue() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -548,7 +548,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testisAllRtbCompletefalse() {
-        final ResponseSender httpRequestHandler = new ResponseSender(null);
+        final ResponseSender httpRequestHandler = new ResponseSender();
         final AdNetworkInterface adNetworkInterface1 = createMock(RtbAdNetwork.class);
         expect(adNetworkInterface1.getBidPriceInUsd()).andReturn((double) 2).anyTimes();
         expect(adNetworkInterface1.getLatency()).andReturn((long) 2).anyTimes();
@@ -632,7 +632,7 @@ public class HttpRequestHandlerTest extends TestCase {
 
     @Test
     public void testWriteLogsBothListNull() {
-        final ResponseSender responseSender = new ResponseSender(null);
+        final ResponseSender responseSender = new ResponseSender();
         responseSender.writeLogs();
     }
 
@@ -679,7 +679,7 @@ public class HttpRequestHandlerTest extends TestCase {
                 new ChannelSegment(channelSegmentEntity, channelentity, null, null, null, adNetworkInterface1, 0);
         final List<ChannelSegment> list = new ArrayList<ChannelSegment>();
         list.add(channelSegment1);
-        final ResponseSender responseSender = new ResponseSender(null);
+        final ResponseSender responseSender = new ResponseSender();
         responseSender.getAuctionEngine().setUnfilteredChannelSegmentList(list);
         responseSender.writeLogs();
     }

@@ -85,7 +85,7 @@ public class ChannelSegmentFilterApplier {
      * @param channelSegmentList
      */
     private void printSegments(final Marker traceMarker, final List<ChannelSegment> channelSegmentList) {
-        if (LOG.isDebugEnabled() || null != traceMarker) {
+        if (LOG.isDebugEnabled(traceMarker)) {
             for (final ChannelSegment channelSegment : channelSegmentList) {
                 LOG.debug(traceMarker, "Segment with advertiserId {} adGroupId {} Pecpm {}", channelSegment
                         .getChannelSegmentEntity().getAdvertiserId(), channelSegment.getChannelSegmentEntity()
@@ -97,7 +97,7 @@ public class ChannelSegmentFilterApplier {
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails) {
         final Marker traceMarker = traceMarkerProvider.get();
 
-        if (LOG.isDebugEnabled() || null != traceMarker) {
+        if (LOG.isDebugEnabled(traceMarker)) {
             LOG.debug(traceMarker, "Remaining AdGroups are :");
             for (final AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : matchedSegmentDetails) {
                 for (final ChannelSegment channelSegment : advertiserMatchedSegmentDetail.getChannelSegmentList()) {
