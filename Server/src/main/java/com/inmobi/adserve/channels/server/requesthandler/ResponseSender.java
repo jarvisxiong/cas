@@ -113,6 +113,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private final long initialTime;
     private Marker traceMarker;
 
+    @Setter
     @Inject
     private static Provider<Marker> traceMarkerProvider;
 
