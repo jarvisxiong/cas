@@ -10,9 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,8 +24,10 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
+import junit.framework.TestCase;
 
 public class ServerTest extends TestCase {
 
@@ -66,6 +65,8 @@ public class ServerTest extends TestCase {
         }
         prepareConfig();
         CasConfigUtil.init(config, null);
+
+        ResponseSender.setTraceMarkerProvider(null);
         responseSender = new ResponseSender();
 
         final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
