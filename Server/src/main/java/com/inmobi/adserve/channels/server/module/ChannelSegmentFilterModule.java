@@ -26,6 +26,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.Abstrac
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPartnerCountFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
@@ -142,6 +143,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     @Provides
     List<AdGroupLevelFilter> provideIXAdGroupLevelFilters(final Injector injector) {
         final List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
+        adGroupLevelFilterList.add(injector.getInstance(AdGroupSiteExclusionFilter.class));
         adGroupLevelFilterList.add(injector.getInstance(AdGroupPartnerCountFilter.class));
         return adGroupLevelFilterList;
     }
