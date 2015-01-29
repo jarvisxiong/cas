@@ -18,7 +18,6 @@ public class CasInternalRequestParameters {
     private boolean traceEnabled;
 
     private String impressionId;
-    private String impressionIdForVideo;
 
     // Control enrichment params
     private String gpid;

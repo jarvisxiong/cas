@@ -134,11 +134,14 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
 
     private long checkIfSegmentShortlistForVideo(final List<Long> channelSegmentSlotIdList,
             final SASRequestParameters sasRequestParameters) {
-        if (DemandSourceType.RTBD.getValue() == sasRequestParameters.getDst()
-                && sasRequestParameters.isBannerVideoSupported()) {
-            if (channelSegmentSlotIdList.contains(14L)) {
+
+        // If we get multiple slots in the Ad pool request, give preference to video supported slots - 14 & 32.
+        if (DemandSourceType.IX.getValue() == sasRequestParameters.getDst()
+                && sasRequestParameters.isVideoSupported()) {
+            List<Short> processedSlots = sasRequestParameters.getProcessedMkSlot();
+            if (channelSegmentSlotIdList.contains(14L) && processedSlots.contains((short) 14)) {
                 return 14l;
-            } else if (channelSegmentSlotIdList.contains(32L)) {
+            } else if (channelSegmentSlotIdList.contains(32L) && processedSlots.contains((short) 32)) {
                 return 32l;
             }
         }

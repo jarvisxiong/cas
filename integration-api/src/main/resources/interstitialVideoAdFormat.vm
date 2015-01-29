@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
+    <style type="text/css">
+        body {margin: 0; overflow: hidden;}
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="${IMAIBaseUrl}"> </script>
+<div style="display:none; position:absolute;" id="${Namespace}clickTarget"></div>
+<script type="text/javascript">
+    window['${Namespace}clickCallback'] = function() {
+        _im_imai.onUserInteraction();
+        _im_imai.pingInWebView('${IMClickUrl}');
+    };
+	window['${Namespace}impressionCallback'] = function() {
+        _im_imai.pingInWebView('${IMWinUrl}');
+        #if($PartnerBeaconUrl)_im_imai.pingInWebView('${PartnerBeaconUrl}');#end
+    };
+    window['${Namespace}LandingPageEvent'] = function() {
+    };
+    window['${Namespace}recordEvent'] = function(id, params) {
+        var firePixel = function(source, retryTime, times) {
+            if (times <= 0) {
+                return;
+            }
+            var clickTarget = document.getElementById('${Namespace}clickTarget');
+            var img = document.createElement('img');
+            img.setAttribute('src', source);
+            img.setAttribute('height', '0');
+            img.setAttribute('width', '2');
+            if (img['addEventListener'] != undefined) {
+                img.addEventListener('error', function() {
+                    window.setTimeout(function() {
+                        if (retryTime > 300000) {
+                            retryTime = 300000;
+                        }
+                        firePixel(source, retryTime * 2, times - 1);
+                    }, retryTime + Math.random());
+                }, false);
+            }
+            clickTarget.appendChild(img);
+        };
+        var beacon = "${IMBeaconUrl}";
+        beacon += "?m=" + id;
+        if (params) {
+            for (var key in params) {
+                beacon += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+            }
+        }
+        firePixel(beacon, 1000, 5);
+        if (id == 18) {
+            window['${Namespace}impressionCallback']();
+        }
+        if (id == 8) {
+            window['${Namespace}clickCallback'](event);
+        }
+    };
+#if(${SDK450Onwards})
+    window['${Namespace}fireAdReady'] = function() {
+       _im_imai.fireAdReady();
+    };
+    window['${Namespace}fireAdFailed'] = function() {
+       _im_imai.fireAdFailed();
+    };
+    window['${Namespace}fireAutoAdReady'] = true;
+
+    window['${Namespace}disableAutoFireAdReady'] = function() {
+        window['${Namespace}fireAutoAdReady'] = false;
+    };
+    var readyHandler = function(val) {
+       if (window['${Namespace}fireAutoAdReady']) {
+          window['${Namespace}fireAdReady']();
+       }
+    };
+    _im_imai.addEventListener('ready', readyHandler);
+#end
+</script>
+### START: Sprout template for VAST ##
+<script src="mraid.js"></script>
+<div id="${Namespace}sproutAd"></div>
+<script type="text/javascript">
+var _Sprout = _Sprout || {};
+/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */
+_Sprout.impressionTracker = "PUT_IMPRESSION_TRACKER_HERE";
+/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */
+_Sprout.clickTracker = "PUT_CLICK_TRACKER_HERE";
+/* Publisher Label: What you want to call this line-item in Studio reports */
+_Sprout.publisherLabel = "PUT_PUBLISHER_LABEL_HERE";
+/* External variables: parameters for dynamic ads */
+_Sprout.xvars = {
+"fallbackImgUrl" : "http://adtools-a.akamaihd.net/c/uznREOBZcMxoLt6cu/o.jpg",
+"video_muted" : "true",
+"cacheError" : "-1"
+};
+(function(){function t(b){for(var c,a,d=0;d<p.length;d++)c=p[d].replace(x,b),a=new Image,a.src=c;b={action:"vast_error",label:b};c={spid:spCid,src:"sprout"};for(var e in b)b.hasOwnProperty(e)&&(c[e]=b[e]);q&&"function"===typeof q&&q(99,c)}function r(b,c){var a;a=new XMLHttpRequest;try{a.open("GET",b,!1),a.send()}catch(d){if(c)return a=b.replace(/^https?:\/\//,""),a=y+a+"&t="+(new Date).getTime(),a=r(a,!1)}return a.responseText}function m(b){return b.replace(/^ */,"").replace(/ *$/,"")}function u(b){var c=0,a,d,e={success:!1,errorCode:0,xml:""};for(b=b.url?r(b.url,!0):b.xml;c<v;)if(a&&(b=r(a,!0)),b){a=(new DOMParser).parseFromString(b,"text/xml");d=a.getElementsByTagName("parsererror");if(0<d.length){e.errorCode=100;break}d=a.getElementsByTagName("Error");if(0<d.length)for(var h=0;h<d.length;h++)p.push(m(d[h].childNodes[0].nodeValue));var l=a;d=l.getElementsByTagName("Tracking")||[];for(var h=l.getElementsByTagName("ClickTracking")||[],l=l.getElementsByTagName("Impression")||[],n=void 0,k=void 0,g=void 0,g=0;g<d.length;g++)n=d[g].getAttribute("event")||"",k=m(d[g].childNodes[0].nodeValue)||"",n&&k&&(f[n]?f[n].push("'"+k+"'"):f[n]=["'"+k+"'"]);for(g=0;g<h.length;g++)f.clickTracking?f.clickTracking.push("'"+m(h[g].childNodes[0].nodeValue)+"'"):f.clickTracking=["'"+m(h[g].childNodes[0].nodeValue)+"'"];for(g=0;g<l.length;g++)f.start?f.start.push("'"+m(l[g].childNodes[0].nodeValue)+"'"):f.start=["'"+m(l[g].childNodes[0].nodeValue)+"'"];d=a.getElementsByTagName("VASTAdTagURI");if(0<d.length)a=m(d[0].childNodes[0].nodeValue),c++;else{b=a.getElementsByTagName("InLine");0<b.length?(e.success=!0,e.xml=a):e.errorCode=303;break}}else{e.errorCode=900;break}c===v&&!e.success&&(e.errorCode=302);return e}function z(){var b=navigator.userAgent.match(/Android\s+([\d\.]+)/i);return b?b[1]:!1}var q=window["${Namespace}recordEvent"],v=3,f={},p=[],x="ERRORCODE",y="http://feedproxy.sproutbuilder.com/f/",k=$SitePreferencesJson,s=["7F7PmFQPDj7H7N05","HYlocn8AVHl9XjuR"],w=["http://adtools-a.akamaihd.net/c/uznREOBZcMxoLt6cu/o.jpg","http://adtools-a.akamaihd.net/c/K441RFiyOC7cpvrFv/o.jpg"],A=$width,B=$height;window.spCid=s[0];window.prebuffer=!1;switch(A/B){case 320/480:spCid=s[0];_Sprout.xvars.fallbackImgUrl=w[0];break;case 1.5:spCid=s[1],_Sprout.xvars.fallbackImgUrl=w[1]}(function(){var b=document.getElementById("${Namespace}sproutAd"),c='<div id="Sprout_'+spCid+'_div" data-creativeId="'+spCid+'"></div>',a=document.createElement("div");a.innerHTML=c;b.appendChild(a.firstChild)})();(function(){var b=parseFloat(z()),c=$RequestJson,c=c?c.networkType:"",a=k.video?k.video.preBuffer:"DISABLE";if("ALWAYS"==a||"WIFI"==a&&"WIFI"==c)"function"==typeof imraid.saveContent&&(prebuffer=!0);4.4<=b&&prebuffer&&(_im_imai=_im_imai||{},_im_imai.getSdkVersion=function(){return"4.1.0"})})();(function(){var b="$VASTContentJSEsc",c,a;a=/^https?.*/.test(b)?u({url:b}):u({xml:b});b=a.xml;if(a.success){for(var d=b.getElementsByTagName("MediaFile"),e,h,l,n=0;n<d.length;n++)e=d[n],h=e.getAttribute("delivery"),a=e.getAttribute("bitrate"),e.getAttribute("width"),e.getAttribute("height"),l=e.getAttribute("type"),"progressive"===h&&"video/mp4"===l&&(c?1024-a<1024-c.getAttribute("bitrate")&&(c=e):c=e);c?(d=document.getElementById("Sprout_"+spCid),e=c.getAttribute("width"),h=c.getAttribute("height"),a=c.getAttribute("bitrate"),d?(a='{"action" : "setXvar", "sproutID" : "'+spCid+'","params" : {"video_w": "'+e+'","video_h" : "'+h+'","video_br" : "'+bitrate+'"}}',d=d.contentWindow,d.postMessage(a,"*")):(_Sprout.xvars.video_w=e,_Sprout.xvars.video_h=h,_Sprout.xvars.video_br=a),c=m(c.childNodes[0].nodeValue)):(t(403),c="");_Sprout.xvars.videoUrl=c;""!==c&&(b=b.getElementsByTagName("ClickThrough"),f.clickThrough=m(b[0].childNodes[0].nodeValue),_Sprout.xvars.tobeSkipped=k.video?k.video.skippable?1:0:0,_Sprout.xvars.play="["+f.start+"]"||"",_Sprout.xvars.q1="["+f.firstQuartile+"]"||"",_Sprout.xvars.q2="["+f.midpoint+"]"||"",_Sprout.xvars.q3="["+f.thirdQuartile+"]"||"",_Sprout.xvars.complete="["+f.complete+"]"||"",_Sprout.xvars.muted="["+f.mute+"]"||"",_Sprout.xvars.unmuted="["+f.unmute+"]"||"",_Sprout.xvars.paused="["+f.pause+"]"||"",_Sprout.xvars.resume="["+f.resume+"]"||"",_Sprout.xvars.skip="["+f.skip+"]"||"",_Sprout.xvars.ctaClick="["+f.clickTracking+"]"||"",_Sprout.xvars.download=f.clickThrough||"",_Sprout.xvars.video_muted=k.video?!k.video.soundOn+"":"true")}else t(a.errorCode),_Sprout.xvars.videoUrl=""})()})();
+_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};_Sprout[spCid]={querystring:{__im_curl:"${IMBeaconUrl}",__im_sdk:"${IMSDKVersion}",click:"${IMClickUrl}",adFormat:"interstitial",__im_recordEventFun:"${Namespace}recordEvent",__geo_lat:"$GEO_LAT",__geo_lng:"$GEO_LNG",__geo_cc:"$GEO_CC",__geo_zip:"$GEO_ZIP",__js_esc_geo_city:"$JS_ESC_GEO_CITY",openLandingPage:"${Namespace}LandingPageEvent"}};var _sproutReadyEvt=document.createEvent("Event");_sproutReadyEvt.initEvent("sproutReady",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp="/load/"+spCid+".inmobi.html.js", _Sprout_load=function(){var e=document.getElementsByTagName("script"),e=e[e.length-1],t=document.createElement("script");t.async=!0;t.type="text/javascript";('https:'==document.location.protocol?sr="https://inmobistudio-a.akamaihd.net":sr="http://edgy.sproutbuilder.com");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};"0"===window._Sprout[spCid].querystring.__im_sdk||"complete"===document.readyState?_Sprout_load():window.addEventListener("load",_Sprout_load,!1)</script><script type="text/javascript">(function(){var a=window.${Namespace}disableAutoFireAdReady,b=window.${Namespace}fireAdReady,d=document.querySelector("[data-creativeid]").getAttribute("data-creativeid");a&&a();mraid.addEventListener("ready",function(){prebuffer&&_Sprout.xvars.videoUrl?imraid.saveContent("preload"+(new Date).getTime(),_Sprout.xvars.videoUrl,function(a,e){var c='{"action" : "setXvar", "sproutID" : "'+d+'"',f=document.getElementById("Sprout_"+d),c="success"==a?c+(',"params" : {"videoUrl": "'+e.saved_url+'"}}'):c+(',"params" : {"cacheError": "'+e.reason+'"}}');f&&f.contentWindow.postMessage(c,"*");b&&b()}):b&&b()})})();</script>
+### END: Sprout template for VAST ##
+</body>
+</html>

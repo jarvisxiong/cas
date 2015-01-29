@@ -1,49 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.UrlValidator;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.ContentType;
@@ -73,15 +29,11 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
 import com.inmobi.casthrift.rtb.AppStore;
 import com.inmobi.casthrift.rtb.Banner;
-import com.inmobi.casthrift.rtb.BannerExtVideo;
-import com.inmobi.casthrift.rtb.BannerExtensions;
 import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidExtensions;
 import com.inmobi.casthrift.rtb.BidRequest;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.Device;
@@ -94,6 +46,35 @@ import com.inmobi.casthrift.rtb.User;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generic RTB adapter.
@@ -122,21 +103,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static List<Integer> fsBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16);
     private static List<Integer> performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
             13, 14, 15, 16);
-    private static List<Integer> videoBlockedAttributes = Arrays.asList(7, 8, 9, 10, 14);
-    private static List<Integer> videoBlockCreativeType = Arrays.asList(4); // iframe
 
     private static final String FAMILY_SAFE_RATING = "1";
     private static final String PERFORMANCE_RATING = "0";
     private static final String RATING_KEY = "fs";
     private static final String NO_AD = "NO_AD";
     private static final String USD = "USD";
-
-    private static final List<String> VIDEO_MIMES = Arrays.asList("video/mp4");
-    private static final int EXT_VIDEO_LINEARITY = 1; // only linear ads
-    private static final int EXT_VIDEO_MINDURATION = 15; // in secs.
-    private static final int EXT_VIDEO_MAXDURATION = 30; // in secs.
-    private static final List<String> EXT_VIDEO_TYPE = Arrays.asList("VAST 2.0", "VAST 3.0", "VAST 2.0 Wrapper",
-            "VAST 3.0 Wrapper");
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -233,7 +205,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
-        isBannerVideoResponseSupported = config.getBoolean(advertiserName + ".bannerVideoSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
     }
 
@@ -486,36 +457,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else {
             banner.setBattr(fsBlockedAttributes);
         }
-
-        // This request supports in-Banner Video on interstitial slot and this partner supports video.
-        if (null != casInternalRequestParameters.getImpressionIdForVideo() && isBannerVideoResponseSupported) {
-            // Set video specific attributes to the Banner object
-            banner.setBattr(videoBlockedAttributes);
-            banner.setBtype(videoBlockCreativeType);
-            banner.setPos(1); // above the fold
-
-            final List<String> allMimes = new ArrayList<String>(VIDEO_MIMES);
-            allMimes.addAll(image_mimes);
-            banner.setMimes(allMimes);
-
-            final BannerExtensions ext = createBannerExtensionsObject();
-            banner.setExt(ext);
-        }
         return banner;
-    }
-
-    private BannerExtensions createBannerExtensionsObject() {
-        // Create Banner->ext->video Object
-        final BannerExtVideo video = new BannerExtVideo();
-        video.setLinearity(EXT_VIDEO_LINEARITY);
-        video.setMinduration(EXT_VIDEO_MINDURATION);
-        video.setMaxduration(EXT_VIDEO_MAXDURATION);
-        video.setType(EXT_VIDEO_TYPE);
-
-        final BannerExtensions bannerExtensions = new BannerExtensions();
-        bannerExtensions.setVideo(video);
-
-        return bannerExtensions;
     }
 
     private Geo createGeoObject() {
@@ -889,8 +831,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             adStatus = "AD";
             if (isNativeRequest()) {
                 nativeAdBuilding();
-            } else if (isVideoResponseReceived) {
-                bannerVideoAdBuilding();
             } else {
                 bannerAdBuilding();
             }
@@ -940,48 +880,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.BANNER_PARSE_RESPONSE_EXCEPTION);
         }
 
-    }
-
-    private void bannerVideoAdBuilding() {
-        final VelocityContext velocityContext = new VelocityContext();
-
-        final String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getAdMarkUp());
-        velocityContext.put(VelocityTemplateFieldConstants.VAST_CONTENT_JS_ESC, vastContentJSEsc);
-
-        // JS escaped WinUrl for partner.
-        final String partnerWinUrl = getPartnerWinUrl();
-        if (StringUtils.isNotEmpty(partnerWinUrl)) {
-            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL,
-                    StringEscapeUtils.escapeJavaScript(partnerWinUrl));
-        }
-
-        // JS escaped IMWinUrl
-        final String imWinUrl = beaconUrl + "?b=${WIN_BID}";
-        velocityContext.put(VelocityTemplateFieldConstants.IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
-
-        // JS escaped IM beacon and click URLs.
-        velocityContext
-                .put(VelocityTemplateFieldConstants.IM_BEACON_URL, StringEscapeUtils.escapeJavaScript(beaconUrl));
-        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
-
-        // SDK version
-        velocityContext.put(VelocityTemplateFieldConstants.IMSDK_VERSION, sasParams.getSdkVersion());
-
-        // Namespace
-        velocityContext.put(VelocityTemplateFieldConstants.NAMESPACE, Formatter.getNamespace());
-
-        // IMAIBaseUrl
-        velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
-
-        try {
-            responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.RTB_BANNER_VIDEO, velocityContext, sasParams, null);
-        } catch (final Exception e) {
-            adStatus = NO_AD;
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
-                    advertiserName, e);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.VIDEO_PARSE_RESPONSE_EXCEPTION);
-        }
     }
 
     private String getPartnerWinUrl() {
@@ -1061,129 +959,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             creativeAttributes = bid.getAttr();
             responseAuctionId = bidResponse.getId();
 
-            // Check bid response for video
-            if (null != casInternalRequestParameters.getImpressionIdForVideo() && isBannerVideoResponseSupported) {
-                return checkBidResponseForBannerVideo(bid.getExt());
-            }
-
             return true;
         } catch (final NullPointerException e) {
             LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(),
                     e);
-            return false;
-        }
-    }
-
-    /**
-     * Checks if the RTB response is for video and contains a valid VAST response.
-     *
-     * @return false - When a video response is received and it is NOT valid. true - 1) When the response does not
-     *         contain video (banner response) 2) It contains video response which is a valid XML/URL.
-     */
-    private boolean checkBidResponseForBannerVideo(final BidExtensions ext) {
-
-        if (ext != null && ext.getVideo() != null) {
-            LOG.debug(traceMarker, "Received video response of type {}.", ext.getVideo().getType());
-
-            if (!checkRequiredParametersInVideoResponse(ext)) {
-                return false;
-            }
-
-            // A valid video response is received. Set the flag.
-            isVideoResponseReceived = true;
-
-            final String newImpressionId = casInternalRequestParameters.getImpressionIdForVideo();
-            if (StringUtils.isNotEmpty(newImpressionId)) {
-
-                // Update the response impression id so that this doesn't get filtered in AuctionImpressionIdFilter.
-                if (impressionId.equalsIgnoreCase(responseImpressionId)) {
-                    responseImpressionId = newImpressionId;
-                }
-
-                // Update beacon and click URLs to refer to the video Ads.
-                beaconUrl =
-                        ClickUrlsRegenerator.regenerateBeaconUrl(beaconUrl, getImpressionId(), newImpressionId,
-                                sasParams.isRichMedia());
-                clickUrl = ClickUrlsRegenerator.regenerateClickUrl(clickUrl, getImpressionId(), newImpressionId);
-                impressionId = newImpressionId;
-
-                LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
-            }
-        }
-        return true;
-    }
-
-    private boolean checkRequiredParametersInVideoResponse(final BidExtensions ext) {
-        // Validate the adm content for a valid URL/XML.
-        if (!isValidURL(adm) && !isValidXMLFormat(adm)) {
-            LOG.info(traceMarker, "Invalid VAST response adm - {}", adm);
-            return false;
-        }
-
-        // Validate supported VAST type.
-        if (!EXT_VIDEO_TYPE.contains(ext.getVideo().getType())) {
-            LOG.info(traceMarker, "Unsupported VAST type - {}", ext.getVideo().getType());
-            return false;
-        }
-
-        // Validate supported video duration.
-        if (ext.getVideo().duration < EXT_VIDEO_MINDURATION || ext.getVideo().duration > EXT_VIDEO_MAXDURATION) {
-            LOG.info(traceMarker, "VAST response video duration {} should be within {} and {}.", ext.getVideo()
-                    .getDuration(), EXT_VIDEO_MINDURATION, EXT_VIDEO_MAXDURATION);
-            return false;
-        }
-
-        // Validate Linearity
-        if (ext.getVideo().linearity != EXT_VIDEO_LINEARITY) {
-            LOG.info(traceMarker, "Linearity {} is not supported for the VAST response.", ext.getVideo().linearity);
-            return false;
-        }
-        return true;
-    }
-
-
-
-    private boolean isValidURL(final String url) {
-        final UrlValidator urlValidator = new UrlValidator();
-        return urlValidator.isValid(url);
-    }
-
-    private boolean isValidXMLFormat(final String encodedXmlStr) {
-        if (StringUtils.isEmpty(encodedXmlStr)) {
-            return false;
-        }
-
-        /* The XML content is expected to be in encoded format, which can be:
-         * 1) URLEncoded String
-         * 2) JSEscaped String
-         */
-        String xmlStr;
-
-        // If the string doesn't contain any space, consider it to be in URL encoded format.
-        if (!encodedXmlStr.contains(" ")) {
-            try {
-                xmlStr = URIUtil.decode(encodedXmlStr);
-            } catch (final URIException e) {
-                LOG.info(traceMarker, "VAST XML response is NOT properly URL encode. {}", e);
-                return false;
-            }
-        } else {
-            xmlStr = StringEscapeUtils.unescapeJavaScript(encodedXmlStr);
-        }
-
-        // Validate the XML by parsing it.
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        final InputSource source = new InputSource(new StringReader(xmlStr));
-        try {
-            final DocumentBuilder db = factory.newDocumentBuilder();
-            db.setErrorHandler(null);
-            db.parse(source);
-
-            // Initially adm was URL encoded XML string. Replace it with decoded value.
-            adm = xmlStr;
-            return true;
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            LOG.debug(traceMarker, "VAST response is NOT a valid XML - {}", e);
             return false;
         }
     }

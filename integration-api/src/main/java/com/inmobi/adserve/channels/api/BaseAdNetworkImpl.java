@@ -96,8 +96,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
     protected boolean isHTMLResponseSupported = true;
     protected boolean isNativeResponseSupported = false;
-    protected boolean isBannerVideoResponseSupported = false;
-    protected boolean isVideoResponseReceived = false;
+    protected boolean isVideoRequest = false;
     protected SASRequestParameters sasParams;
     protected CasInternalRequestParameters casInternalRequestParameters;
     protected HttpRequestHandlerBase baseRequestHandler = null;
@@ -737,7 +736,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public ADCreativeType getCreativeType() {
         if (isNativeRequest()) {
             return ADCreativeType.NATIVE;
-        } else if (isVideoResponseReceived) {
+        } else if (isVideoRequest) {
             return ADCreativeType.INTERSTITIAL_VIDEO;
         } else {
             return ADCreativeType.BANNER;

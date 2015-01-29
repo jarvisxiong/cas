@@ -20,7 +20,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.SegmentFactory;
-import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
@@ -92,7 +91,7 @@ public class AsyncRequestMaker {
             String beaconUrl = null;
             sasParams.setImpressionId(ImpressionIdGenerator.getInstance().getImpressionId(incId));
             final CasInternalRequestParameters casInternalRequestParameters =
-                    getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal, channelSegmentEntity, row.getRequestedSlotId());
+                    getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal);
 
             controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
             sasParams.setAdIncId(incId);
@@ -134,8 +133,7 @@ public class AsyncRequestMaker {
     }
 
     private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
-                                                                         final CasInternalRequestParameters casInternalRequestParameterGlobal,
-                                                                         final ChannelSegmentEntity channelSegmentEntity, final Long selectedSlotId) {
+                                                                         final CasInternalRequestParameters casInternalRequestParameterGlobal) {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setImpressionId(sasParams.getImpressionId());
         casInternalRequestParameters.setBlockedIabCategories(casInternalRequestParameterGlobal
@@ -162,36 +160,7 @@ public class AsyncRequestMaker {
         casInternalRequestParameters.setTraceEnabled(casInternalRequestParameterGlobal.isTraceEnabled());
         casInternalRequestParameters.setSiteAccountType(casInternalRequestParameterGlobal.getSiteAccountType());
 
-        // Set impressionIdForVideo if banner video is supported on this request.
-        casInternalRequestParameters.setImpressionIdForVideo(getImpressionIdForVideo(sasParams,
-                channelSegmentEntity.getAdFormatIds(), channelSegmentEntity.getIncIds(), selectedSlotId));
-
         return casInternalRequestParameters;
-    }
-
-    private String getImpressionIdForVideo(final SASRequestParameters sasParams, final Integer[] adFormatIds,
-                                           final Long[] adIncIds, final Long selectedSlotId) {
-
-        if (!sasParams.isBannerVideoSupported() || adFormatIds == null || adIncIds == null) {
-            LOG.debug("In-banner video ad is not supported.");
-            return null;
-        }
-
-        // Only slot size 320x480 and 480x320 are supported
-        if (14L != selectedSlotId && 32L != selectedSlotId) {
-            return null;
-        }
-
-        for (int i = 0; i < adFormatIds.length; i++) {
-            // Get impression id for video ad format.
-            if (adFormatIds[i] == AdFormatType.VIDEO.getValue()) {
-                final String impressionId = ImpressionIdGenerator.getInstance().getImpressionId(adIncIds[i]);
-                LOG.debug("impression id for in-banner video ad is {}.", impressionId);
-                return impressionId;
-            }
-        }
-        LOG.debug("Inconsistent data in the database. Could not find a video ad for this ad group.");
-        return null;
     }
 
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,

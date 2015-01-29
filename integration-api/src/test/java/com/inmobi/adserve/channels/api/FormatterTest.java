@@ -40,21 +40,27 @@ public class FormatterTest {
     }
 
     @Test
-    public void testrequestFromSDK360Onwards() {
+    public void testgetSdkVersionNumericValue() {
         final SASRequestParameters sasParams = new SASRequestParameters();
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
+        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
         sasParams.setSdkVersion("i359");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
+        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
         sasParams.setSdkVersion("a350");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
+        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
         sasParams.setSdkVersion("i360");
-        assertEquals(true, Formatter.requestFromSDK360Onwards(sasParams));
-        sasParams.setSdkVersion("a360");
-        assertEquals(true, Formatter.requestFromSDK360Onwards(sasParams));
+        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        sasParams.setSdkVersion("a450");
+        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 450);
+        sasParams.setSdkVersion("i451");
+        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 450);
+        sasParams.setSdkVersion("i360");
+        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        sasParams.setSdkVersion("i360a");
+        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
         sasParams.setSdkVersion("i");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
+        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
         sasParams.setSdkVersion("aaaa");
-        assertEquals(false, Formatter.requestFromSDK360Onwards(sasParams));
+        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
     }
 
     @Test

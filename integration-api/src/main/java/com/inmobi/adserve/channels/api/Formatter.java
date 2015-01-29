@@ -23,7 +23,7 @@ public class Formatter {
     private static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
 
     public enum TemplateType {
-        HTML, PLAIN, RICH, IMAGE, RTB_HTML, RTB_BANNER_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML
+        HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML
     }
 
     private static final String APP = "APP";
@@ -34,7 +34,7 @@ public class Formatter {
     private static Template velocityTemplateImg;
     private static Template velocityTemplateRtb;
     private static Template velocityTemplateIx;
-    private static Template velocityTemplateRtbBannerVideo;
+    private static Template velocityTemplateInterstitialVideo;
     private static Template velocityTemplateJsAdTag;
     private static Template velocityTemplateWapHtmlJsAdTag;
 
@@ -48,7 +48,7 @@ public class Formatter {
         velocityTemplateImg = velocityEngine.getTemplate("ImageAdFormat.vm");
         velocityTemplateRtb = velocityEngine.getTemplate("rtbHtmlAdFormat.vm");
         velocityTemplateIx = velocityEngine.getTemplate("ixHtmlAdFormat.vm");
-        velocityTemplateRtbBannerVideo = velocityEngine.getTemplate("rtbBannerVideoAdFormat.vm");
+        velocityTemplateInterstitialVideo = velocityEngine.getTemplate("interstitialVideoAdFormat.vm");
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
     }
@@ -61,12 +61,14 @@ public class Formatter {
 
         if (isRequestFromSdk(sasParams)) {
             context.put(VelocityTemplateFieldConstants.SDK, true);
-            context.put(VelocityTemplateFieldConstants.SDK360_ONWARDS, requestFromSDK360Onwards(sasParams));
+
+            int sdkVersion = getSdkVersionNumericValue(sasParams);
+            context.put(VelocityTemplateFieldConstants.SDK360_ONWARDS, sdkVersion >= 360);
+            context.put(VelocityTemplateFieldConstants.SDK450_ONWARDS, sdkVersion >= 450);
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 context.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }
         }
-
     }
 
     /**
@@ -76,22 +78,28 @@ public class Formatter {
         return APP.equalsIgnoreCase(sasParams.getSource()) && StringUtils.isNotBlank(sasParams.getSdkVersion());
     }
 
-    static boolean requestFromSDK360Onwards(final SASRequestParameters sasParams) {
+    /**
+     * Gets the numeric value of InMobi SDK version.
+     * @return
+     *  i360    => 360
+     *  a450    => 450
+     *  invalid => -1
+     */
+    static int getSdkVersionNumericValue(final SASRequestParameters sasParams) {
         if (StringUtils.isBlank(sasParams.getSdkVersion())) {
-            return false;
+            return -1;
         }
         try {
             final String os = sasParams.getSdkVersion();
-            if ((os.startsWith("i") || os.startsWith("a"))
-                    && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= 360) {
-                return true;
+            if ((os.startsWith("i") || os.startsWith("a"))) {
+                return Integer.parseInt(sasParams.getSdkVersion().substring(1));
             }
         } catch (final StringIndexOutOfBoundsException e2) {
             LOG.debug("Invalid sdkversion {}", e2);
         } catch (final NumberFormatException e3) {
             LOG.debug("Invalid sdkversion {}", e3);
         }
-        return false;
+        return -1;
     }
 
     public static String getResponseFromTemplate(final TemplateType type, final VelocityContext context,
@@ -118,8 +126,8 @@ public class Formatter {
             case IX_HTML:
                 velocityTemplateIx.merge(context, writer);
                 break;
-            case RTB_BANNER_VIDEO:
-                velocityTemplateRtbBannerVideo.merge(context, writer);
+            case INTERSTITIAL_VIDEO:
+                velocityTemplateInterstitialVideo.merge(context, writer);
                 break;
             case NEXAGE_JS_AD_TAG:
                 velocityTemplateJsAdTag.merge(context, writer);

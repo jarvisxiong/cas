@@ -11,6 +11,7 @@ import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.segment.impl.AdTypeEnum;
 
 
 @Data
@@ -42,6 +43,11 @@ public class SASRequestParameters {
     private Double siteFloor = 0.0d;
     private Boolean allowBannerAds = true;
     private Integer siteSegmentId;
+
+    // Pub Control parameter.
+    private List<AdTypeEnum> pubControlSupportedAdTypes;
+    private String pubControlPreferencesJson;
+
     // Uid parameters
     private String uidParams;
     private Map<String, String> tUidParams;
@@ -84,7 +90,7 @@ public class SASRequestParameters {
     private WapSiteUACEntity wapSiteUACEntity;
     private SiteEcpmEntity siteEcpmEntity;
 
-    private boolean isBannerVideoSupported;
+    private boolean isVideoSupported;
     private String referralUrl;
 
     public SASRequestParameters() {

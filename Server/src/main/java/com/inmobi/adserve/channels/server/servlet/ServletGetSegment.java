@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +25,9 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 
 /**
@@ -128,6 +128,9 @@ public class ServletGetSegment implements Servlet {
                     entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
+                } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryIXVideoTrafficEntity(id.split("_")[0],
+                            Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY)) {
                     ResultSet<IXPackageEntity> resultSet =
                             CasConfigUtil.repositoryHelper.queryIXPackageRepository(Integer.parseInt(id.split("_")[0]),
