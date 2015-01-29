@@ -97,11 +97,11 @@ public abstract class BaseServlet implements Servlet {
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
         sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
 
-        // Setting isBannerVideoSupported based on the Request params. Only supported for RTBD request.
-        if (DemandSourceType.RTBD == DemandSourceType.findByValue(sasParams.getDst())) {
-            final boolean isBannerVideoSupported = casUtils.isBannerVideoSupported(sasParams);
-            LOG.debug("isBannerVideoSupported for this request is {}", isBannerVideoSupported);
-            sasParams.setBannerVideoSupported(isBannerVideoSupported);
+        // Setting isVideoSupported based on the Request params. Only supported for IX request.
+        if (DemandSourceType.IX == DemandSourceType.findByValue(sasParams.getDst())) {
+            final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
+            LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
+            sasParams.setVideoSupported(isVideoSupported);
         }
 
         // Set imai content if r-format is imai

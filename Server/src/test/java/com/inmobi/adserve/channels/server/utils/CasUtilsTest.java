@@ -46,7 +46,7 @@ public class CasUtilsTest extends TestCase {
             sasParams.setOsMajorVersion(data.osVersion);
             sasParams.setProcessedMkSlot(data.rqMkSlot);
 
-            final boolean testResult = casUtils.isBannerVideoSupported(sasParams);
+            final boolean testResult = casUtils.isVideoSupported(sasParams);
             assertEquals(data.expectedResult, testResult);
         }
     }

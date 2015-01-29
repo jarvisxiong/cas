@@ -251,6 +251,15 @@ Cache.SiteEcpmRepository.refreshTime = 1200
 Cache.SiteEcpmRepository.isUpdatable = true
 Cache.SiteEcpmRepository.dataSourceName = jdbc
 
+Cache.Name = IXVideoTrafficRepository
+Cache.IXVideoTrafficRepository.Manager = com.inmobi.adserve.channels.repository.IXVideoTrafficRepository
+Cache.IXVideoTrafficRepository.query = select site_id\, country_id\, traffic_percentage\, is_active\, modified_on from ix_video_traffic_percentage where modified_on >=('${last_update}')
+Cache.IXVideoTrafficRepository.initialDelay = 1
+Cache.IXVideoTrafficRepository.refreshTime = 1200
+Cache.IXVideoTrafficRepository.isUpdatable = true
+Cache.IXVideoTrafficRepository.dataSourceName = jdbc
+
+
 adapter.amoad.advertiserId=0d7eab3ab68c4afab94ad897ec080ef6
 adapter.amoad.status=on
 adapter.amoad.host=http://www.amoad.com

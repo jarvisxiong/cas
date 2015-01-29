@@ -1,46 +1,12 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -62,9 +28,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.ix.API_FRAMEWORKS;
@@ -88,9 +54,53 @@ import com.inmobi.casthrift.ix.SeatBid;
 import com.inmobi.casthrift.ix.Site;
 import com.inmobi.casthrift.ix.Transparency;
 import com.inmobi.casthrift.ix.User;
+import com.inmobi.casthrift.ix.Video;
+import com.inmobi.casthrift.ix.VideoExtension;
+import com.inmobi.segment.impl.AdTypeEnum;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.Dimension;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -125,6 +135,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final short AGE_LIMIT_FOR_COPPA = 8;
+
+    // The following section is related to VIDEO.
+    private static final Integer VIDEO_MIN_DURATION = 0;
+    private static final Integer VIDEO_MAX_DURATION = 30;
+    private static final Integer VIDEO_MAX_BITRATE = 2000;
+    private static final List<Integer> VIDEO_PROTOCOLS = Arrays.asList(5); // VAST 2.0 Wrapper
+    private static final List<String> VIDEO_MIMES = Arrays.asList("video/mp4"); // Supported video mimes
+    private static final List<Short> VIDEO_SUPPORTED_SLOT_IDS = Arrays.asList((short) 14, (short) 32);
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -246,6 +264,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
             isWapSiteUACEntity = true;
         }
+        isVideoRequest = isRequestQualifiedForVideo();
 
         // Creating site/app Object
         App app = null;
@@ -263,8 +282,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Regs regs = createRegsObject();
         // Creating Geo Object for device Object
         final Geo geo = createGeoObject();
-        // Creating Banner object
-        final Banner banner = createBannerObject();
+
+        // Creating Banner OR Video object.
+        final Video video;
+        final Banner banner;
+        if (isVideoRequest) {
+            video = createVideoObject();
+            banner = null;
+        } else {
+            banner = createBannerObject();
+            video = null;
+        }
+
         // Creating Device Object
         final Device device = createDeviceObject(geo);
         // Creating User Object
@@ -283,7 +312,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Only 1 impression object is being generated.
         final Impression impression =
-                createImpressionObject(banner, displayManager, displayManagerVersion, proxyDemand);
+                createImpressionObject(banner, video, displayManager, displayManagerVersion, proxyDemand);
         if (null == impression) {
             LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Impression Obj is null",
                     advertiserName);
@@ -368,7 +397,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return tempBidRequest;
     }
 
-
     private String serializeBidRequest() {
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         String tempBidRequestJson;
@@ -411,8 +439,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return proxyDemand;
     }
 
-
-    private Impression createImpressionObject(final Banner banner, final String displayManager,
+    private Impression createImpressionObject(final Banner banner, final Video video, final String displayManager,
                                               final String displayManagerVersion, final ProxyDemand proxyDemand) {
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
@@ -426,11 +453,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         if (!isNativeRequest()) {
-            impression.setBanner(banner);
+            // Only BANNER or VIDEO object can be set, not both.
+            if (isVideoRequest) {
+                impression.setVideo(video);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
+            } else {
+                impression.setBanner(banner);
+            }
         }
         impression.setProxydemand(proxyDemand);
         // Set interstitial or not
-        if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
+        if ((null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) || video != null) {
             impression.setInstl(1);
         } else {
             impression.setInstl(0);
@@ -453,23 +486,28 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
         }
 
-        final long startTime = System.currentTimeMillis();
-        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
-        final long endTime = System.currentTimeMillis();
-        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
-                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+        /*
+         * Find matching packages for Banner (Non-video) Requests.
+         * NOTE: Packages are not yet supported for video requests.
+         */
+        if (!isVideoRequest) {
+            final long startTime = System.currentTimeMillis();
+            packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
+            final long endTime = System.currentTimeMillis();
+            InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
+                    InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
-        if (!packageIds.isEmpty()) {
-            LOG.debug("No. of matching deal packages - {}", packageIds.size());
-            final RubiconExtension rp = impExt.getRp() == null ? new RubiconExtension() : impExt.getRp();
-            final ExtRubiconTarget target = new ExtRubiconTarget();
-            target.packages = packageIds;
-            impExt.setRp(rp.setTarget(target));
+            if (!packageIds.isEmpty()) {
+                LOG.debug("No. of matching deal packages - {}", packageIds.size());
+                final RubiconExtension rp = impExt.getRp() == null ? new RubiconExtension() : impExt.getRp();
+                final ExtRubiconTarget target = new ExtRubiconTarget();
+                target.packages = packageIds;
+                impExt.setRp(rp.setTarget(target));
 
-            // Update the stats
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
+                // Update the stats
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
+            }
         }
-
         impression.setExt(impExt);
         return impression;
     }
@@ -536,6 +574,76 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return banner;
     }
 
+    private Video createVideoObject() {
+        boolean soundOn = false;
+        boolean isSkippable = true;
+        try {
+            JSONObject siteVideoPreferencesJson = new JSONObject(sasParams.getPubControlPreferencesJson());
+            soundOn = siteVideoPreferencesJson.getJSONObject("video").getBoolean("soundOn");
+            isSkippable = siteVideoPreferencesJson.getJSONObject("video").getBoolean("skippable");
+        } catch (Exception e) {
+            LOG.error("Caught Exception while fetching skippable/soundOn settings for site {}.", sasParams.getSiteId());
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_MEDIA_PREFERENCES_JSON);
+        }
+
+        Video video = new Video();
+
+        List<Integer> playbackMethod = new ArrayList<>(1);
+        playbackMethod.add(soundOn ? 1 : 2);
+        video.setPlaybackmethod(playbackMethod);
+
+        video.setBoxingallowed(0);  // Always set to false
+        video.setMinduration(VIDEO_MIN_DURATION);
+        video.setMaxduration(VIDEO_MAX_DURATION);
+        video.setProtocols(VIDEO_PROTOCOLS);
+        video.setMimes(VIDEO_MIMES);
+        video.setMaxbitrate(VIDEO_MAX_BITRATE);
+
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
+            video.setW((int) dim.getWidth());
+            video.setH((int) dim.getHeight());
+        }
+
+        video.ext = new VideoExtension();
+        video.ext.setSkip(isSkippable ? 1 : 0);
+        video.ext.setSkipdelay(5);  // Default 5 secs.
+
+        return video;
+    }
+
+    /**
+     * Determines whether this request is selected to serve VIDEO Ad.
+     * Video serving capability is determined based on the following:
+     * 1) The VIDEO serving prerequisites (OS, sdk version and slot) are met.
+     * 2) This site support Video as per the SiteControls repository.
+     * 3) Honor the video traffic % as defined in IXVideoTraffic Repository.
+     */
+    private boolean isRequestQualifiedForVideo() {
+        // Check the Video support prerequisites.
+        if (!sasParams.isVideoSupported() || !VIDEO_SUPPORTED_SLOT_IDS.contains(selectedSlotId)) {
+            return false;
+        }
+
+        boolean isQualifiedForVideo = false;
+        List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
+        if (null != supportedAdTypes && supportedAdTypes.contains(AdTypeEnum.VIDEO)) {
+            // If this site supports only Video, qualify this request for video.
+            // No need to further look up in the VideoTraffic Repository.
+            if (supportedAdTypes.size() == 1) {
+                isQualifiedForVideo = true;
+            } else {
+                int videoTrafficPercentage =
+                        repositoryHelper.queryIXVideoTrafficEntity(sasParams.getSiteId(), sasParams.getCountryId().intValue());
+                // Based on the traffic percentage, determine whether this request should be selected for VIDEO or not.
+                if (videoTrafficPercentage > ThreadLocalRandom.current().nextInt(0, 100)) {
+                    isQualifiedForVideo = true;
+                }
+            }
+        }
+        return isQualifiedForVideo;
+    }
 
     private Geo createGeoObject() {
         final Geo geo = new Geo();
@@ -981,8 +1089,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (isNativeRequest()) {
                 // TODO add nativeAdBuilding
                 LOG.debug(traceMarker, "we do not support native request");
+            } else if (isVideoRequest) {
+                videoAdBuilding();
             } else {
-                nonNativeAdBuilding();
+                bannerAdBuilding();
             }
 
         }
@@ -1112,7 +1222,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private void nonNativeAdBuilding() {
+    private void bannerAdBuilding() {
 
         final VelocityContext velocityContext = new VelocityContext();
 
@@ -1135,7 +1245,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         // Checking whether to send win notification
         LOG.debug(traceMarker, "isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
-        createWin(velocityContext);
+        final String winUrl = getWinUrl();
+        if (StringUtils.isNotEmpty(winUrl)) {
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, winUrl);
+        }
 
         if (templateWN || admAfterMacroSize == admSize) {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
@@ -1152,7 +1265,65 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     }
 
-    protected void createWin(final VelocityContext velocityContext) {
+    private void videoAdBuilding() {
+        final VelocityContext velocityContext = new VelocityContext();
+
+        final String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getAdMarkUp());
+        velocityContext.put(VelocityTemplateFieldConstants.VAST_CONTENT_JS_ESC, vastContentJSEsc);
+
+        // JS escaped WinUrl for partner.
+        final String partnerWinUrl = getWinUrl();
+        if (StringUtils.isNotEmpty(partnerWinUrl)) {
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL,
+                    StringEscapeUtils.escapeJavaScript(partnerWinUrl));
+        }
+
+        // JS escaped IMWinUrl
+        final String imWinUrl = beaconUrl + "?b=${WIN_BID}";
+        velocityContext.put(VelocityTemplateFieldConstants.IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
+
+        // JS escaped IM beacon and click URLs.
+        velocityContext
+                .put(VelocityTemplateFieldConstants.IM_BEACON_URL, StringEscapeUtils.escapeJavaScript(beaconUrl));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
+
+        // SDK version
+        velocityContext.put(VelocityTemplateFieldConstants.IMSDK_VERSION, sasParams.getSdkVersion());
+
+        // Namespace
+        velocityContext.put(VelocityTemplateFieldConstants.NAMESPACE, Formatter.getNamespace());
+
+        // IMAIBaseUrl
+        velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+
+        // Sprout related parameters.
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
+            velocityContext.put(VelocityTemplateFieldConstants.WIDTH, (int) dim.getWidth());
+            velocityContext.put(VelocityTemplateFieldConstants.HEIGHT, (int) dim.getHeight());
+        }
+
+        String networkType = (null != sasParams.getNetworkType()) ?
+                sasParams.getNetworkType().name() : NetworkType.NON_WIFI.name();
+        String requestNetworkTypeJson = "{\"networkType\":\"" + networkType + "\"}";
+        // Publisher control settings
+        velocityContext.put(VelocityTemplateFieldConstants.REQUEST_JSON, requestNetworkTypeJson);
+        velocityContext.put(VelocityTemplateFieldConstants.SITE_PREFERENCES_JSON, sasParams.getPubControlPreferencesJson());
+
+        try {
+            responseContent =
+                    Formatter.getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
+        } catch (final Exception e) {
+            adStatus = "NO_AD";
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
+                    advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.VIDEO_PARSE_RESPONSE_EXCEPTION);
+        }
+    }
+
+    private String getWinUrl() {
+        String winUrl = null;
         if (wnRequired) {
             // setCallbackContent();
             // Win notification is required
@@ -1165,19 +1336,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.debug(traceMarker, "nurl is {}", nUrl);
             if (!StringUtils.isEmpty(callbackUrl)) {
                 LOG.debug(traceMarker, "inside wn from config");
-                velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, callbackUrl);
+                winUrl = callbackUrl;
             } else if (!StringUtils.isEmpty(nUrl)) {
                 LOG.debug(traceMarker, "inside wn from nurl");
-                velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, nUrl);
+                winUrl = nUrl;
             }
-
         }
+        return winUrl;
     }
 
     /**
      * Generates blinded site uuid from siteIncId. For a given site Id, the generated blinded SiteId will always be
      * same.
-     *
+     * <p/>
      * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
      */
     private String getBlindedSiteId(final long siteIncId) {
@@ -1230,6 +1401,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
                 setFloorVendorUsedCsids();
             }
+            // For video requests, validate that a valid XML is received.
+            if (isVideoRequest) {
+                if (isAdmValidXML()) {
+                    InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_RESPONSES);
+                } else {
+                    InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_VIDEO_RESPONSE_COUNT);
+                    return false;
+                }
+            }
+
             final boolean result = updateDSPAccountInfo(seatBid.getBuyer());
             if (!result) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_DSP_ID);
@@ -1245,6 +1426,27 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             // Set AdStatus as TERM incase of unexpected errors in deserializing the response.
             adStatus = "TERM";
+            return false;
+        }
+    }
+
+    /**
+     * Validates whether the ADM content is a VALID XML.
+     */
+    private boolean isAdmValidXML() {
+        if (StringUtils.isEmpty(adm)) {
+            return false;
+        }
+        // Validate the XML by parsing it.
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        final InputSource source = new InputSource(new StringReader(getAdMarkUp()));
+        try {
+            final DocumentBuilder db = factory.newDocumentBuilder();
+            db.setErrorHandler(null);
+            db.parse(source);
+            return true;
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            LOG.debug(traceMarker, "VAST response is NOT a valid XML.", e);
             return false;
         }
     }
@@ -1281,7 +1483,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 }
             }
         }
-
         return;
     }
 
@@ -1406,12 +1607,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return USD;
     }
 
-
     @Override
     public String getCreativeId() {
-        return creativeId;
+        /**
+         * NOTE: The "crid" is an optional field in IX and we are using "aqid" instead.
+         * Refer to Jira: PROG-292 for details.
+         */
+        return aqid;
     }
-
 
     @Override
     public String getIUrl() {
@@ -1441,7 +1644,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public void setLogCreative(final boolean logCreative) {
         this.logCreative = logCreative;
     }
-
 
     @Override
     public String getAdMarkUp() {

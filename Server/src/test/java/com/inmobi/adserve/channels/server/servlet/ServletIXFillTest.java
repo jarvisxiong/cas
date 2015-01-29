@@ -118,6 +118,7 @@ public class ServletIXFillTest {
         final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         final Configuration mockConfig = createMock(Configuration.class);
         final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+        final CasUtils mockCasUtils = createMock(CasUtils.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
@@ -133,12 +134,15 @@ public class ServletIXFillTest {
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
                 new ArrayList<AdvertiserMatchedSegmentDetail>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
+        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
         mockCasInternalRequestParameters.setTraceEnabled(true);
         expectLastCall();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
         expectLastCall().times(1);
         mockSASRequestParameters.setImaiBaseUrl(null);
+        expectLastCall().times(1);
+        mockSASRequestParameters.setVideoSupported(false);
         expectLastCall().times(1);
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
@@ -154,7 +158,7 @@ public class ServletIXFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
-                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, null, null,
+                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, mockCasUtils, null,
                         null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
@@ -182,6 +186,7 @@ public class ServletIXFillTest {
         final SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         final Configuration mockConfig = createMock(Configuration.class);
         final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
+        final CasUtils mockCasUtils = createMock(CasUtils.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
                 createMock(ChannelSegmentFilterApplier.class);
@@ -204,6 +209,7 @@ public class ServletIXFillTest {
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).times(1);
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
+        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
         expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
@@ -220,6 +226,8 @@ public class ServletIXFillTest {
         expectLastCall().times(1);
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().times(1);
+        mockSASRequestParameters.setVideoSupported(false);
+        expectLastCall().times(1);
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().times(1);
@@ -235,7 +243,7 @@ public class ServletIXFillTest {
 
         final ServletIXFill tested =
                 new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
-                        mockChannelSegmentFilterApplier, null, null, null, null);
+                        mockChannelSegmentFilterApplier, mockCasUtils, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -297,6 +305,7 @@ public class ServletIXFillTest {
                         null, null)).andReturn(mockChannelSegmentList).times(1);
         expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
         expect(mockCasUtils.getRtbFloor(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
+        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).times(1);
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).times(1);
         expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).times(1);
@@ -309,6 +318,8 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
         expectLastCall().times(1);
         mockSASRequestParameters.setImaiBaseUrl(null);
+        expectLastCall().times(1);
+        mockSASRequestParameters.setVideoSupported(false);
         expectLastCall().times(1);
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);

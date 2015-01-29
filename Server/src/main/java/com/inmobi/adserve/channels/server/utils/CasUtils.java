@@ -78,7 +78,7 @@ public class CasUtils {
         return networkEcpm;
     }
 
-    public boolean isBannerVideoSupported(final SASRequestParameters sasParams) {
+    public boolean isVideoSupported(final SASRequestParameters sasParams) {
         boolean isSupported = false;
 
         if(!(sasParams.getProcessedMkSlot().contains((short)14) || sasParams.getProcessedMkSlot().contains((short)32))) {

@@ -35,6 +35,7 @@ import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
 import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.IXPackageRepository;
+import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -95,6 +96,7 @@ public class ChannelServer {
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     private static GeoZipRepository geoZipRepository;
     private static SlotSizeMapRepository slotSizeMapRepository;
+    private static IXVideoTrafficRepository ixVideoTrafficRepository;
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     private static String configFile;
 
@@ -169,6 +171,7 @@ public class ChannelServer {
             ixPackageRepository = new IXPackageRepository();
             geoZipRepository = new GeoZipRepository();
             slotSizeMapRepository = new SlotSizeMapRepository();
+            ixVideoTrafficRepository = new IXVideoTrafficRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -189,6 +192,7 @@ public class ChannelServer {
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
             repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
+            repoHelperBuilder.setIxVideoTrafficRepository(ixVideoTrafficRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -235,7 +239,7 @@ public class ChannelServer {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static String getConfigFile() {
@@ -329,6 +333,7 @@ public class ChannelServer {
                     config, logger);
             loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config, logger);
             loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config, logger);
+            loadRepos(ixVideoTrafficRepository, ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
@@ -369,7 +374,7 @@ public class ChannelServer {
                 exp = exc;
             }
         }
-        if (tryCount >= repoLoadRetryCount) {
+        if (tryCount > repoLoadRetryCount) {
             final String msg =
                     String.format("Tried %s times but still could not load repo %s", repoLoadRetryCount, repoName);
             logger.error(msg);

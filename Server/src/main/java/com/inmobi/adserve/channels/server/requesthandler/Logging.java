@@ -245,6 +245,7 @@ public class Logging {
         if (null != creativeId) {
             casAdChain.setCreativeId(creativeId);
         }
+        casAdChain.setAd_inc_id(channelSegmentEntity.getIncId(channelSegment.getAdNetworkInterface().getCreativeType()));
         return casAdChain;
     }
 

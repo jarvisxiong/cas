@@ -98,9 +98,13 @@ public class InspectorStrings {
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
     public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
-    
-    
-    
+    public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
+    public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
+    public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
+    public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
+
+
+
     //TestStrings:
     public static final String LATENCY_FOR_READING = "LatencyForReading";
     public static final String LATENCY_FOR_WRITE = "LatencyForWriting";

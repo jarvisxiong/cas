@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.adpool.ResponseFormat;
-import com.inmobi.adserve.adpool.SupplyCapability;
+import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.adserve.adpool.UidParams;
 import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -32,7 +33,9 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.types.AdAttributeType;
 import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.InventoryType;
 
 
@@ -40,6 +43,9 @@ import com.inmobi.types.InventoryType;
 public class ThriftRequestParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
+
+    private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES = "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
+    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES = Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
                                        final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
@@ -58,8 +64,8 @@ public class ThriftRequestParser {
         params.setRFormat(getResponseFormat(tObject.responseFormat));
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.taskId);
-        params.setAllowBannerAds(tObject.isSetSupplyCapabilities()
-                && tObject.supplyCapabilities.contains(SupplyCapability.BANNER));
+        params.setAllowBannerAds(tObject.isSetSupplyAllowedContents()
+                && tObject.supplyAllowedContents.contains(SupplyContentType.BANNER));
         // TODO use segment id in cas as long
         final int segmentId = tObject.isSetSegmentId() ? (int) tObject.segmentId : 0;
         params.setSiteSegmentId(segmentId);
@@ -68,8 +74,8 @@ public class ThriftRequestParser {
         params.setRqAdType(isInterstitial ? "int" : tObject.isSetRequestedAdType()
                 ? tObject.requestedAdType.name()
                 : "");
-        params.setRichMedia(tObject.isSetSupplyCapabilities()
-                && tObject.supplyCapabilities.contains(SupplyCapability.RICH_MEDIA));
+        params.setRichMedia(tObject.isSetSupplyAllowedContents()
+                && tObject.supplyAllowedContents.contains(SupplyContentType.RICH_MEDIA));
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion((int) tObject.ipFileVersion);
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.getValue() : 0);
@@ -117,6 +123,28 @@ public class ThriftRequestParser {
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
             params.setPubId(tObject.site.publisherId);
+
+            // Fill params for Pub Control - Supported Ad Types.
+            List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
+            if (tObject.site.isSetEnrichedSiteAllowedMediaAttributes()) {
+                for (int i : tObject.site.getEnrichedSiteAllowedMediaAttributes()) {
+                    if (i == AdAttributeType.VIDEO.getValue()) {
+                        pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
+                    } else if (i == AdAttributeType.DEFAULT.getValue()) {
+                        pubControlSupportedAdTypes.add(AdTypeEnum.BANNER);
+                    } // Ignore other fields which are not relevant to us.
+                }
+            }
+            // If we don't get any value, set default values.
+            if (pubControlSupportedAdTypes.isEmpty()){
+                pubControlSupportedAdTypes = DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
+            }
+            params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
+
+            // Fill params for pub control - Media preferences json.
+            String mediaPreferencesJson = tObject.site.isSetMediaPreferences() ?
+                    tObject.site.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
+            params.setPubControlPreferencesJson(mediaPreferencesJson);
         }
 
         // Fill params from Device Object

@@ -169,6 +169,7 @@ public class LoggingTest {
         String siteId = "siteId";
         String taskId = "taskId";
         String adId = "adId";
+        Long adIncId = 1234L;
         String adgroupId = "adgroupId";
         String campaignId = "campaignId";
         String advertiserId = "advertiserId";
@@ -212,6 +213,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
         expect(mockAdNetworkInterface.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
+        expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignId()).andReturn(campaignId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignIncId()).andReturn(campaignIncId).anyTimes();
@@ -369,8 +371,10 @@ public class LoggingTest {
         int dst = DemandSourceType.IX.getValue();
         long campaignIncId = 123L;
         long adgroupIncId = 456L;
+        long adIncId = 678L;
         long latency = 789L;
         double bidPriceInUSD = 4.0;
+        ADCreativeType adCreativeType = ADCreativeType.BANNER;
 
         mockStaticNice(InspectorStats.class);
         AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
@@ -384,6 +388,7 @@ public class LoggingTest {
         expect(mockChannelSegmentEntity.getCampaignIncId()).andReturn(campaignIncId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
+        expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
         expect(mockAdNetworkInterface.getResponseStruct()).andReturn(mockThirdPartyAdResponse).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(dst).anyTimes();
         expect(mockAdNetworkInterface.getLatency()).andReturn(latency).anyTimes();
@@ -404,6 +409,9 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getCreativeId())
                 .andReturn(creativeId).times(1)
                 .andReturn(null).anyTimes();
+
+        expect(mockAdNetworkInterface.getCreativeType())
+                .andReturn(adCreativeType).anyTimes();
 
         replayAll();
 
@@ -585,6 +593,7 @@ public class LoggingTest {
         int dst = DemandSourceType.RTBD.getValue();
         Long campaignIncId = 123L;
         Long adgroupIncId = 123L;
+        Long adIncId = 234L;
         Double secondBidPriceInUsd = 4.5;
 
         mockStaticNice(InspectorStats.class);
@@ -602,6 +611,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
+        expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignId()).andReturn(campaignId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignIncId()).andReturn(campaignIncId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
@@ -641,6 +651,7 @@ public class LoggingTest {
         int dst = DemandSourceType.IX.getValue();
         Long campaignIncId = 123L;
         Long adgroupIncId = 123L;
+        Long adIncId = 567L;
         Double secondBidPriceInUsd = -1.0;
         ContentType siteContentType = ContentType.MATURE;
         List<String> packageIdList = Arrays.asList("14", "32", "35");
@@ -661,6 +672,7 @@ public class LoggingTest {
         expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIdList).anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
+        expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignId()).andReturn(campaignId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignIncId()).andReturn(campaignIncId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
@@ -688,6 +700,7 @@ public class LoggingTest {
         int dst = DemandSourceType.RTBD.getValue();
         Long campaignIncId = 123L;
         Long adgroupIncId = 123L;
+        Long adIncId = 567L;
         Double secondBidPriceInUsd = -1.0;
         ContentType siteContentType = ContentType.MATURE;
 
@@ -706,6 +719,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
+        expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignId()).andReturn(campaignId).anyTimes();
         expect(mockChannelSegmentEntity.getCampaignIncId()).andReturn(campaignIncId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();

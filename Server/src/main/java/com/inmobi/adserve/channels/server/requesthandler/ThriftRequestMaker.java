@@ -36,7 +36,7 @@ import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.adpool.ResponseFormat;
 import com.inmobi.adserve.adpool.Site;
-import com.inmobi.adserve.adpool.SupplyCapability;
+import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.InventoryType;
@@ -139,9 +139,9 @@ public class ThriftRequestMaker {
         final List<Short> list = new ArrayList<Short>();
         list.add((short) 9);
         adPoolRequest.setSelectedSlots(list);
-        final List<SupplyCapability> supplyCapabilities = new ArrayList<>();
-        supplyCapabilities.add(SupplyCapability.BANNER);
-        adPoolRequest.setSupplyCapabilities(supplyCapabilities);
+        final List<SupplyContentType> supplyAllowedContents = new ArrayList<>();
+        supplyAllowedContents.add(SupplyContentType.BANNER);
+        adPoolRequest.setSupplyAllowedContents(supplyAllowedContents);
         adPoolRequest.setRequestedAdCount((short) 1);
         return adPoolRequest;
     }

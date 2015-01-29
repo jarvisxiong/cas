@@ -20,6 +20,7 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
@@ -31,6 +32,7 @@ import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
+import com.inmobi.adserve.channels.query.IXVideoTrafficQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
@@ -60,6 +62,7 @@ public class RepositoryHelper {
     private final IXPackageRepository ixPackageRepository;
     private final GeoZipRepository geoZipRepository;
     private final SlotSizeMapRepository slotSizeMapRepository;
+    private final IXVideoTrafficRepository ixVideoTrafficRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -80,6 +83,7 @@ public class RepositoryHelper {
         ixPackageRepository = builder.ixPackageRepository;
         geoZipRepository = builder.geoZipRepository;
         slotSizeMapRepository = builder.slotSizeMapRepository;
+        ixVideoTrafficRepository = builder.ixVideoTrafficRepository;
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
                 .addRepositoryToStats(channelRepository).addRepositoryToStats(channelAdGroupRepository)
@@ -117,6 +121,7 @@ public class RepositoryHelper {
         private IXPackageRepository ixPackageRepository;
         private GeoZipRepository geoZipRepository;
         private SlotSizeMapRepository slotSizeMapRepository;
+        private IXVideoTrafficRepository ixVideoTrafficRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -137,6 +142,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixPackageRepository);
             Preconditions.checkNotNull(geoZipRepository);
             Preconditions.checkNotNull(slotSizeMapRepository);
+            Preconditions.checkNotNull(ixVideoTrafficRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -309,5 +315,31 @@ public class RepositoryHelper {
         //Prepare query for CQEngine repository
         Query query = equal(IXPackageRepository.DEAL_IDS, dealId);
         return ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
+    }
+
+    public short queryIXVideoTrafficEntity(String siteId, Integer countryId) {
+        short trafficPercentage = IXVideoTrafficRepository.DEFAULT_TRAFFIC_PERCENTAGE;
+        try {
+            // Query at site and country both
+            IXVideoTrafficEntity entity = ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId, countryId));
+
+            if (entity == null) {
+                // Query at site level.
+                entity =
+                        ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId, IXVideoTrafficRepository.ALL_COUNTRY));
+                if (entity == null) {
+                    // Query at country level.
+                    entity =
+                            ixVideoTrafficRepository.query(new IXVideoTrafficQuery(IXVideoTrafficRepository.ALL_SITES, countryId));
+                }
+            }
+            if (entity != null) {
+                trafficPercentage = entity.getTrafficPercentage();
+            }
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying IXVideoTraffic Repository, {}", ignored);
+        }
+
+        return trafficPercentage;
     }
 }
