@@ -16,6 +16,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.DcpAndRtbAdGroupLevelFilters;
@@ -24,6 +25,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.IXAdGroupLevelF
 import com.inmobi.adserve.channels.server.requesthandler.filters.IxAdvertiserLevelFilters;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AbstractAdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupAutomationFrameworkFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPartnerCountFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
@@ -121,6 +123,11 @@ public class ChannelSegmentFilterModule extends AbstractModule {
             final AdGroupLevelFilter filter = injector.getInstance(class1);
             if (filter instanceof AdGroupSupplyDemandClassificationFilter) {
                 filter.setOrder(FilterOrder.FIRST);
+            } else if (filter instanceof AdGroupAutomationFrameworkFilter) {
+                filter.setOrder(FilterOrder.THIRD_LAST);
+                if (!CasConfigUtil.getServerConfig().getBoolean("enableAutomationTests", false)) {
+                    continue;
+                }
             } else if (filter instanceof AdGroupMaxSegmentPerRequestFilter) {
                 filter.setOrder(FilterOrder.LAST);
             } else if (filter instanceof AdGroupPartnerCountFilter) {
@@ -144,7 +151,11 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     List<AdGroupLevelFilter> provideIXAdGroupLevelFilters(final Injector injector) {
         final List<AdGroupLevelFilter> adGroupLevelFilterList = Lists.newArrayList();
         adGroupLevelFilterList.add(injector.getInstance(AdGroupSiteExclusionFilter.class));
+        if (CasConfigUtil.getServerConfig().getBoolean("enableAutomationTests", false)) {
+            adGroupLevelFilterList.add(injector.getInstance(AdGroupAutomationFrameworkFilter.class));
+        }
         adGroupLevelFilterList.add(injector.getInstance(AdGroupPartnerCountFilter.class));
+
         return adGroupLevelFilterList;
     }
 }

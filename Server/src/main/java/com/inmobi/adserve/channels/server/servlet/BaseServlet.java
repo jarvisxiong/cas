@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +34,9 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 
 public abstract class BaseServlet implements Servlet {
@@ -142,6 +142,11 @@ public abstract class BaseServlet implements Servlet {
             LOG.debug(traceMarker, "All segments dropped in filters");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
+        }
+
+        // Incrementing Adapter Specific Total Selected Segments Stats
+        for (ChannelSegment channelSegment: filteredSegments) {
+            incrementTotalSelectedSegmentStats(channelSegment);
         }
 
         final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
@@ -270,5 +275,12 @@ public abstract class BaseServlet implements Servlet {
     }
 
     protected abstract Logger getLogger();
+
+    /**
+     * @param channelSegment
+     */
+    private void incrementTotalSelectedSegmentStats(final ChannelSegment channelSegment) {
+        channelSegment.incrementInspectorStats(InspectorStrings.TOTAL_SELECTED_SEGMENTS);
+    }
 
 }

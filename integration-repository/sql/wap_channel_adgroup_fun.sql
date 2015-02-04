@@ -1,8 +1,8 @@
-CREATE OR REPLACE FUNCTION wap_channel_adgroup_fun_11082014(last_updated timestamp without time zone)
-RETURNS SETOF wap_channel_adgroup_type_11082014 AS
+CREATE OR REPLACE FUNCTION wap_channel_adgroup_fun_28012015(last_updated timestamp without time zone)
+RETURNS SETOF wap_channel_adgroup_type_28012015 AS
 $BODY$
 DECLARE
-    row1    wap_channel_adgroup_type_11082014%ROWTYPE;
+    row1    wap_channel_adgroup_type_28012015%ROWTYPE;
 BEGIN
     FOR row1 IN
         SELECT  wap_channel_adgroup.adgroup_id,
@@ -33,7 +33,8 @@ BEGIN
                 wap_channel_adgroup.tod as tod,
                 wap_channel_adgroup.dst as dst,
                 wap_channel_adgroup.campaign_inc_id,
-                adgroup_formats.ad_format_ids
+                adgroup_formats.ad_format_ids,
+                wap_channel_adgroup.automation_test_id as automation_test_id
           FROM  wap_channel_adgroup, dcp_segment_site_inclusion_exclusion,
                 (SELECT ad_group_id,
                         array_agg(id order by is_banner_ad asc) as ad_ids,

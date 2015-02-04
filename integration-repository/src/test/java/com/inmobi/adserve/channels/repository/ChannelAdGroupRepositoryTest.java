@@ -120,6 +120,7 @@ public class ChannelAdGroupRepositoryTest {
         expect(mockNullAsZeroResultSetRow.getInt("dst")).andReturn(dst).times(1);
         expect(mockNullAsZeroResultSetRow.getLong("campaign_inc_id")).andReturn(campaignIncId).times(1);
         expect(mockNullAsZeroResultSetRow.getTimestamp("modified_on")).andReturn(modifyTime).times(1);
+        expect(mockNullAsZeroResultSetRow.getString("automation_test_id")).andReturn(null).times(1);
         expectNew(NullAsZeroResultSetRow.class, new Class[] {ResultSetRow.class}, null).andReturn(
                 mockNullAsZeroResultSetRow).times(1);
 

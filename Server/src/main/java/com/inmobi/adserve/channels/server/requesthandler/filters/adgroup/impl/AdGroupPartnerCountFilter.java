@@ -125,7 +125,6 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
         channelSegment.setRequestedSlotId(slotInSegment);
         selectedSegmentListForAdvertiser.add(channelSegment);
         LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(), advertiserId);
-        incrementTotalSelectedSegmentStats(channelSegment);
         // Removing channel segment since it has already been passed and stored in
         // selectedSegmentListForAdvertiser.
         // We don't want to traverse over it again
@@ -177,13 +176,6 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
 
     private void incrementStats(final String advertiserId, final int value) {
         ChannelSegment.incrementInspectorStats(advertiserId, InspectorStrings.DROPPED_IN_PARTNER_COUNT_FILTER, value);
-    }
-
-    /**
-     * @param channelSegment
-     */
-    private void incrementTotalSelectedSegmentStats(final ChannelSegment channelSegment) {
-        channelSegment.incrementInspectorStats(InspectorStrings.TOTAL_SELECTED_SEGMENTS);
     }
 
     @Override

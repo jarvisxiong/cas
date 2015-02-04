@@ -108,6 +108,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             final Long[] tod = (Long[]) row.getArray("tod");
             final int dst = row.getInt("dst");
             final long campaignIncId = row.getLong("campaign_inc_id");
+            final String automationTestId = row.getString("automation_test_id");
 
             final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
             builder.setAdvertiserId(advertiserId);
@@ -152,6 +153,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setDst(dst);
             builder.setCampaignIncId(campaignIncId);
             builder.setAdFormatIds(creativeTypes);
+            builder.setAutomationTestId(automationTestId);
 
             final ChannelSegmentEntity entity = builder.build();
 

@@ -58,6 +58,8 @@ prod:
          - '80'
       graphite_shouldLogAdapterLatencies:
          - 'false'
+      automation_tests_enabled:
+         - 'false'
 
    uh1:
       db_host:
@@ -117,6 +119,8 @@ prod:
       in_vm_cnxn:
          - '80'
       graphite_shouldLogAdapterLatencies:
+         - 'false'
+      automation_tests_enabled:
          - 'false'
 
    lhr1:
@@ -178,6 +182,8 @@ prod:
          - '80'
       graphite_shouldLogAdapterLatencies:
          - 'false'
+      automation_tests_enabled:
+         - 'false'
 
    hkg1:
       db_host:
@@ -237,6 +243,8 @@ prod:
       in_vm_cnxn:
          - '80'
       graphite_shouldLogAdapterLatencies:
+         - 'false'
+      automation_tests_enabled:
          - 'false'
 
 pilot:
@@ -299,6 +307,8 @@ pilot:
          - '80'
       graphite_shouldLogAdapterLatencies:
          - 'false'
+      automation_tests_enabled:
+         - 'false'
 
    uh1:
       db_host:
@@ -359,6 +369,8 @@ pilot:
          - '80'
       graphite_shouldLogAdapterLatencies:
          - 'true'
+      automation_tests_enabled:
+         - 'false'
 
    lhr1:
       db_host:
@@ -419,6 +431,8 @@ pilot:
          - '80'
       graphite_shouldLogAdapterLatencies:
          - 'true'
+      automation_tests_enabled:
+         - 'false'
 
    hkg1:
       db_host:
@@ -479,6 +493,8 @@ pilot:
          - '80'
       graphite_shouldLogAdapterLatencies:
          - 'true'
+      automation_tests_enabled:
+         - 'false'
 
 nonprod:
    lhr1:
@@ -506,6 +522,8 @@ nonprod:
          - '12555'
       log_type :
          - 'ERROR'
+      automation_tests_enabled:
+         - 'false'
    corp:
       db_host:
          - db.corp.inmobi.com
@@ -563,6 +581,8 @@ nonprod:
          - '150'
       in_vm_cnxn:
          - '80'
+      automation_tests_enabled:
+         - 'false'
    ev1:
       db_host:
          - dbadserve.vip.ua2.inmobi.com
@@ -620,3 +640,5 @@ nonprod:
          - '150'
       in_vm_cnxn:
          - '80'
+      automation_tests_enabled:
+         - 'false'

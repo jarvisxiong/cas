@@ -6,9 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
+
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Getter
@@ -66,6 +66,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final int dst; // Classify rtbd, ix and dcp ad groups
     private final long campaignIncId;
     private final Integer[] adFormatIds;
+    private final String automationTestId;
 
     public ChannelSegmentEntity(final Builder builder) {
         advertiserId = builder.advertiserId;
@@ -117,6 +118,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         dst = builder.dst;
         campaignIncId = builder.campaignIncId;
         adFormatIds = builder.adFormatIds;
+        automationTestId = builder.automationTestId;
     }
 
     public static Builder newBuilder() {
@@ -167,6 +169,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private int dst;
         private long campaignIncId;
         private Integer[] adFormatIds;
+        private String automationTestId;
 
         public ChannelSegmentEntity build() {
             return new ChannelSegmentEntity(this);

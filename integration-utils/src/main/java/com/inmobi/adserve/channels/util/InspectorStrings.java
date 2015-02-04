@@ -58,6 +58,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_ADVERTISER_EXCLUSION_FILTER = "DroppedinAdvertiserExclusionFilter";
     public static final String DROPPED_IN_SITE_EXCLUSION_FILTER = "DroppedinSiteExclusionFilter";
     public static final String DROPPED_IN_HANDSET_TARGETING_FILTER = "DroppedinHandsetTargetingFilter";
+    public static final String DROPPED_IN_AUTOMATION_FRAMEWORK_FILTER = "DroppedinAutomationFrameworkFilter";
     public static final String DROPPED_IN_PRICING_ENGINE_FILTER = "DroppedinPricingEngineFilter";
     public static final String DROPPED_IN_TOD_FILTER = "DroppedInTODFilter";
     public static final String SITE_FEEDBACK_CACHE_HIT = "SiteFeedbackCacheHit";

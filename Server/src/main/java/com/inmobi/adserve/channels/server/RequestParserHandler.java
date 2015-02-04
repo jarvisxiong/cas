@@ -1,15 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +29,16 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 @Sharable
 @Singleton
@@ -84,6 +84,10 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             final Map<String, List<String>> params = queryStringDecoder.parameters();
 
             sasParams.setKeepAlive(HttpHeaders.isKeepAlive(request));
+            String automationTestId = request.headers().get("x-mkhoj-automation");
+            if (StringUtils.isNotEmpty(automationTestId)) {
+                sasParams.setAutomationTestId(automationTestId);
+            }
 
             final Servlet servlet = servletProvider.get();
             final String servletName = servlet.getName();

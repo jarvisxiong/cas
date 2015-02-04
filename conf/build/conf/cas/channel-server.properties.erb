@@ -55,6 +55,8 @@ server.supplyClassFloors=2.916,2.041,1.429,1.0,0.7,0.49,0.343,0.24,0.168
 server.servletChangeLogLevel.timerDelay=15000
 server.repoLoadRetryCount=3
 
+server.enableAutomationTests=<%= automation_tests_enabled %>
+
 server.clickmaker.ipFileVersion = 1
 server.clickmaker.clickURLPrefix = http://c2.w.inmobi.com/c.asm
 server.clickmaker.clickURLHashingSecretKeyVersion = 1
@@ -173,7 +175,7 @@ Cache.IXAccountMapRepository.dataSourceName = jdbc
 
 Cache.Name = ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.Manager = com.inmobi.adserve.channels.repository.ChannelAdGroupRepository
-Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_11082014('${last_update}')
+Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_28012015('${last_update}')
 Cache.ChannelAdGroupRepository.initialDelay = 300
 Cache.ChannelAdGroupRepository.refreshTime = 1200
 Cache.ChannelAdGroupRepository.isUpdatable = true
