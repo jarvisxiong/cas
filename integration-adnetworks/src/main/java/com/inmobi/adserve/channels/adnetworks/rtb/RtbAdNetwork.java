@@ -775,7 +775,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    protected Request getNingRequest() throws Exception {
+    protected RequestBuilder getNingRequestBuilder() throws Exception {
         final byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
 
         URI uri = getRequestUri();
@@ -792,7 +792,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json").setBody(body)
-                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
     @Override

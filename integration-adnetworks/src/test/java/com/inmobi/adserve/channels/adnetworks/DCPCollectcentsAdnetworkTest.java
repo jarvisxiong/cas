@@ -30,6 +30,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
 
 public class DCPCollectcentsAdnetworkTest extends TestCase {
 	private Configuration mockConfig = null;
@@ -304,9 +305,9 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 			final String expectedUrl = "http://ad.ipredictive.com/d/ads";
 
 			assertEquals(expectedUrl, actualUrl);
-			Request request = Whitebox.<Request> invokeMethod(
-					dcpCollectcentsAdNetwork, "getNingRequest");
-			String actualData = request.getStringData();
+			RequestBuilder requestBuilder = Whitebox.<RequestBuilder> invokeMethod(
+					dcpCollectcentsAdNetwork, "getNingRequestBuilder");
+			String actualData = requestBuilder.build().getStringData();
 			String expectedData = "{\"main\":[{\"pubid\":\"0344343\",\"ads\":1,\"adtype\":\"banner\",\"response\":\"HTML\",\"banner\":{\"adsize\":15}}],\"site\":{\"rated\":\"A\",\"category\":\"Business\",\"id\":\"00000000-0000-0000-0000-000000000000\"},\"device\":{\"ip\":\"206.29.182.240\",\"deviceid\":\"202cb962ac59075b964b07152d234b70\",\"ua\":\"Mozilla\",\"geo\":{\"geolat\":\"37.4429\",\"geolong\":\"-122.1514\"}},\"user\":{}}";
 			assertEquals(actualData, expectedData);
 		}

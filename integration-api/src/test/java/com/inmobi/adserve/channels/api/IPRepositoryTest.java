@@ -13,9 +13,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class})
-public class IPRepositoryTest  extends TestCase{
+public class IPRepositoryTest extends TestCase {
     private IPRepository ipRepository;
-    
+    private String advertiserName = "advertiserName";
+
     public void setUp() {
 
         ipRepository = new IPRepository();
@@ -26,25 +27,25 @@ public class IPRepositoryTest  extends TestCase{
     public void testGetter() {
         mockStaticNice(InspectorStats.class);
         replayAll();
-        String actualUrlAddr = ipRepository.getIPAddress("http://localhost:8080/getBid", null);
+        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localhost:8080/getBid", null);
         String expectedUrlAddr = "http://127.0.0.1:8080/getBid";
         assertEquals(expectedUrlAddr, actualUrlAddr);
     }
-    
+
     @Test
     public void testGetterWithSpecialCharacterInUrl() {
         mockStaticNice(InspectorStats.class);
         replayAll();
-        String actualUrlAddr = ipRepository.getIPAddress("http://localhost:8080/%s/getBid", null);
-        String expectedUrlAddr = null;
+        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localhost:8080/%s/getBid", null);
+        String expectedUrlAddr = actualUrlAddr;
         assertEquals(expectedUrlAddr, actualUrlAddr);
     }
-    
+
     @Test
     public void testGetterWithInvalidHost() {
         mockStaticNice(InspectorStats.class);
         replayAll();
-        String actualUrlAddr = ipRepository.getIPAddress("http://localho:8080/getBid", null);
+        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localho:8080/getBid", null);
         String expectedUrlAddr = "http://localho:8080/getBid";;
         assertEquals(expectedUrlAddr, actualUrlAddr);
     }

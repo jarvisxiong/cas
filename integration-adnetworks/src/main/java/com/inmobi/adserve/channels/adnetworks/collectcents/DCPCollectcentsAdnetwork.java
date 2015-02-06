@@ -10,12 +10,14 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmobi.adserve.adpool.ContentType;
@@ -29,7 +31,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -195,14 +196,14 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 	}
 
 	@Override
-	public Request getNingRequest() throws Exception {
+	public RequestBuilder getNingRequestBuilder() throws Exception {
 		URI uri = getRequestUri();
 		if (uri.getPort() == -1) {
 			uri = new URIBuilder(uri).setPort(80).build();
 		}
 
 		String requestParams = getRequestParams();
-		Request ningRequest = new RequestBuilder("POST")
+		RequestBuilder ningRequestBuilder = new RequestBuilder("POST")
 				.setUrl(uri.toString())
 				.setHeader(HttpHeaders.Names.USER_AGENT,
 						sasParams.getUserAgent())
@@ -212,10 +213,10 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 				.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
 				.setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
 				.setHeader(HttpHeaders.Names.HOST, uri.getHost())
-				.setBody(requestParams).build();
-		LOG.debug("Collectcents request: {}", ningRequest);
+				.setBody(requestParams);
+		LOG.debug("Collectcents request: {}", ningRequestBuilder);
 		LOG.debug("Collectcents request Body: {}", requestParams);
-		return ningRequest;
+		return ningRequestBuilder;
 	}
 
 	@Override

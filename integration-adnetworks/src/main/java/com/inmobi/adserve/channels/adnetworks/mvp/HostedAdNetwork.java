@@ -35,7 +35,6 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.hosted.HostedBidRequest;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 /**
@@ -356,7 +355,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    protected Request getNingRequest() throws Exception {
+    protected RequestBuilder getNingRequestBuilder() throws Exception {
         final byte[] body = bidRequestJson.getBytes(CharsetUtil.UTF_8);
 
         URI uri = getRequestUri();
@@ -372,8 +371,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
                 .setHeader(HttpHeaders.Names.AUTHORIZATION, authStr)
                 .setHeader(HttpHeaders.Names.HOST, uri.getHost())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setBody(body)
-                .build();
+                .setBody(body);
     }
 
     @Override

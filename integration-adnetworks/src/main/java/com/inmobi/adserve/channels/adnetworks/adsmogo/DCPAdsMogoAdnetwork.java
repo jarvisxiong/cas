@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -193,7 +192,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
 
     @Override
-    public Request getNingRequest() throws Exception {
+    public RequestBuilder getNingRequestBuilder() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
@@ -205,7 +204,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).setHeader(SIGNATURE_HEADER, authSignature)
-                .setHeader(AUTHKEY_HEADER, authKey).setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader(AUTHKEY_HEADER, authKey).setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
     @Override

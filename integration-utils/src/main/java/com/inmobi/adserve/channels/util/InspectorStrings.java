@@ -106,7 +106,7 @@ public class InspectorStrings {
 
 
 
-    //TestStrings:
+    // TestStrings:
     public static final String LATENCY_FOR_READING = "LatencyForReading";
     public static final String LATENCY_FOR_WRITE = "LatencyForWriting";
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
@@ -126,10 +126,12 @@ public class InspectorStrings {
     public static final String RFM_INVALID_CREDENTIALS = "HostedInvalidCredentials";
     public static final String RFM_AD_SELECTION_ERROR = "RFM_AD_SELECTION_ERROR: ";
     public static final String RFM_ERROR = "RFM_ERROR: ";
-    
+
     // IP repository Strings
     public static final String URI_SYNTAX_EXCEPTION = "URISyntaxException";
     public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
+    public static final String NULL_HOST_NAME = "NullHostName";
+    public static final String NULL_IP_ADDRESS = "NullIPAddress";
 
 
     private InspectorStrings() {

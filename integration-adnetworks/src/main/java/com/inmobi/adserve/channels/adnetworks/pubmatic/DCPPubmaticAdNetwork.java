@@ -1,28 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.pubmatic;
 
-import com.inmobi.adserve.adpool.NetworkType;
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
-import com.inmobi.adserve.channels.util.IABCountriesMap;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -31,6 +19,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.inmobi.adserve.adpool.NetworkType;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.util.IABCountriesInterface;
+import com.inmobi.adserve.channels.util.IABCountriesMap;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.ning.http.client.RequestBuilder;
 
 public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger LOG = LoggerFactory
@@ -196,7 +198,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 	}
 
 	@Override
-	protected Request getNingRequest() throws Exception {
+	protected RequestBuilder getNingRequestBuilder() throws Exception {
 		URI uri = getRequestUri();
 		if (uri.getPort() == -1) {
 			uri = new URIBuilder(uri).setPort(80).build();
@@ -215,8 +217,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 				.setHeader(HttpHeaders.Names.CONTENT_TYPE,
 						"application/x-www-form-urlencoded")
 				.setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body)
-				.setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp())
-				.build();
+				.setHeader("RLNClientIpAddr", sasParams.getRemoteHostIp());
 	}
 
 	@Override

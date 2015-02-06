@@ -281,7 +281,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         
-        final com.ning.http.client.Request request = dcpadsmogoAdNetwork.getNingRequest();
+        final com.ning.http.client.Request request = dcpadsmogoAdNetwork.getNingRequestBuilder().build();
         final String actualMd5Value = request.getHeaders().get("MOGO_API_SIGNATURE").get(0);
 
         // Verifying the expected MD5 for the Query String.

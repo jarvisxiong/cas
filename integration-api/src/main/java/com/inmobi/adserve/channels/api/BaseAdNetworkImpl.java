@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.api;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -34,6 +35,7 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
+import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -123,10 +125,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean isRtbPartner = false;
     private boolean isIxPartner = false;
     private String adapterName;
-    
+
     @Inject
     protected static IPRepository ipRepository;
     private boolean isIPResolutionDisabled = true;
+    private String publicHostName;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -239,7 +242,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
         try {
             requestUrl = getRequestUri().toString();
-            final Request ningRequest = getNingRequest();
+            RequestBuilder ningRequestBuilder = getNingRequestBuilder();
+
+            setVirtualHost(ningRequestBuilder);
+
+            final Request ningRequest = ningRequestBuilder.build();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
             final boolean isTraceEnabled = casInternalRequestParameters.isTraceEnabled();
@@ -259,9 +266,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.updateYammerTimerStats(getName(), latency, true);
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
+
                         final String responseStr = response.getResponseBody("UTF-8");
                         final HttpResponseStatus httpResponseStatus =
                                 HttpResponseStatus.valueOf(response.getStatusCode());
+
+                        LOG.debug(traceMarker, "{} status code is {}", getName(), httpResponseStatus);
                         parseResponse(responseStr, httpResponseStatus);
                         processResponse();
                     }
@@ -329,7 +339,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return asyncHttpClientProvider.getDcpAsyncHttpClient();
     }
 
-    protected Request getNingRequest() throws Exception {
+    protected RequestBuilder getNingRequestBuilder() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
@@ -341,7 +351,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
     // request url of each adapter for logging
@@ -445,8 +455,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public boolean configureParameters(final SASRequestParameters param,
-                                       final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
-                                       final String clickUrl, final String beaconUrl, final long slotId, final RepositoryHelper repositoryHelper) {
+            final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
+            final String clickUrl, final String beaconUrl, final long slotId, final RepositoryHelper repositoryHelper) {
         this.sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
         externalSiteId = entity.getExternalSiteKey();
@@ -462,7 +472,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         replaceHostWithIP();
         return isConfigured;
     }
-    
+
     @Override
     public boolean isBeaconUrlRequired() {
         return true;
@@ -510,7 +520,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     // parsing the response message to get HTTP response code and httpresponse
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {}", response);
+        LOG.debug("response is {} ", response);
         if (StringUtils.isBlank(response) || status.code() != 200 || response.startsWith("<!--")) {
             statusCode = status.code();
             if (200 == statusCode) {
@@ -573,8 +583,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 for (int i = 0; i < segmentCategories.length; i++) {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
-                            category = getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
-                                    seperator);
+                            category =
+                                    getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
+                                            seperator);
                         } else {
                             category = CategoryList.getCategory(cat);
                         }
@@ -598,7 +609,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * function returns the unique device id
-     *
+     * 
      * @return
      */
     protected String getUid() {
@@ -759,17 +770,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName, final int paramValue,
-                                             final boolean isFirstParam) {
+            final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-                                             final String paramValue, final boolean isFirstParam) {
+            final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-                                             final double paramValue, final boolean isFirstParam) {
+            final double paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
@@ -837,7 +848,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 || 17 == selectedSlotId /* 800x1280 */
                 || 32 == selectedSlotId // 480x320
                 || 33 == selectedSlotId // 1024x768
-                || 34 == selectedSlotId) /* 1280x800 */ {
+                || 34 == selectedSlotId) /* 1280x800 */{
             return true;
         }
         return false;
@@ -887,9 +898,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public Short getSelectedSlotId() {
         return selectedSlotId;
     }
-    
+
     @Override
-    public void disableIPResolution(boolean isIPResolutionDisabled){
+    public void disableIPResolution(boolean isIPResolutionDisabled) {
         this.isIPResolutionDisabled = isIPResolutionDisabled;
     }
 
@@ -897,12 +908,33 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public RepositoryHelper getRepositoryHelper() {
         return repositoryHelper;
     }
-    
-    private void replaceHostWithIP(){
-        if(isIPResolutionDisabled){
+
+    private void replaceHostWithIP() {
+        if (isIPResolutionDisabled) {
             return;
         }
-        host = ipRepository.getIPAddress(host, traceMarker);
+        if (host != null) {
+            try {
+                URI uri = new URI(host);
+                publicHostName = uri.getHost();
+                if (uri.getPort() != -1) {
+                    publicHostName = publicHostName + ":" + uri.getPort();
+                }
+            } catch (URISyntaxException e) {
+                if (LOG.isErrorEnabled()) {
+                    LOG.error(traceMarker, "URISyntaxException " + ExceptionBlock.getStackTrace(e), this.getClass()
+                            .getSimpleName());
+                }
+            }
+        }
+        host = ipRepository.getIPAddress(getName(), host, traceMarker);
+    }
+
+    private void setVirtualHost(RequestBuilder ningRequestBuilder) {
+        if (isIPResolutionDisabled) {
+            return;
+        }
+        ningRequestBuilder.setVirtualHost(publicHostName);
     }
 
 }

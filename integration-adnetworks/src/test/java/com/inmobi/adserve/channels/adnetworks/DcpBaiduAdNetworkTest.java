@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -11,7 +10,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -264,7 +262,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
-            final String actualString = dcpBaiduAdNetwork.getNingRequest().getStringData();
+            final String actualString = dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
             final String expectedUrl =
                     "{\"request_id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"version\":{\"major\":4,\"minor\":0},\"carrier\":0,\"device\":{\"udid\":{\"idfa\":\"ISDSDSD2323SDSDSDSDGHFGDDA\"}},\"app\":{\"name\":\"00000000-0000-0000-0000-0000006456fc\",\"id\":\"debug\",\"category\":\"Aggregator\"},\"ad\":{\"size\":{\"width\":320,\"height\":50}},\"network\":{\"ipv6\":\"206.29.182.240\"}}";
             assertEquals(expectedUrl, expectedUrl);

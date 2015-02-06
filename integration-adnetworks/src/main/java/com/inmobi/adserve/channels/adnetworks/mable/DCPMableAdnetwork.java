@@ -28,7 +28,6 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
@@ -147,24 +146,24 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected Request getNingRequest() throws Exception {
+    protected RequestBuilder getNingRequestBuilder() throws Exception {
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
         final String requestParams = getRequestParams();
-        final Request ningRequest =
+        final RequestBuilder ningRequestBuilder =
                 new RequestBuilder("POST").setUrl(uri.toString())
                         .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                         .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                         .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                         .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                        .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
-        LOG.debug("Mable request: {}", ningRequest);
+                        .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams);
+        LOG.debug("Mable request: {}", ningRequestBuilder);
         LOG.debug("Mable request Body: {}", requestParams);
-        return ningRequest;
+        return ningRequestBuilder;
     }
 
     @Override

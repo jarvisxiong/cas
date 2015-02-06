@@ -323,7 +323,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         
         assertEquals(new URI(expectedUrl_for_perftype).getQuery(), new URI(actualUrl_for_perftype).getQuery());
         assertEquals(new URI(expectedUrl_for_perftype).getPath(), new URI(actualUrl_for_perftype).getPath());
-        dcpRubiconAdNetwork.getNingRequest();
+        dcpRubiconAdNetwork.getNingRequestBuilder();
     }
 
     @Test
@@ -387,7 +387,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         assertEquals(new URI(expectedUrl3).getQuery(), new URI(actualUrl3).getQuery());
         assertEquals(new URI(expectedUrl3).getPath(), new URI(actualUrl3).getPath());
         
-        dcpRubiconAdNetwork.getNingRequest();
+        dcpRubiconAdNetwork.getNingRequestBuilder();
     }
 
 
@@ -431,7 +431,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
-        dcpRubiconAdNetwork.getNingRequest();
+        dcpRubiconAdNetwork.getNingRequestBuilder();
     }
 
     @Test
@@ -483,7 +483,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
-        dcpRubiconAdNetwork.getNingRequest();
+        dcpRubiconAdNetwork.getNingRequestBuilder();
     }
 
     @Test

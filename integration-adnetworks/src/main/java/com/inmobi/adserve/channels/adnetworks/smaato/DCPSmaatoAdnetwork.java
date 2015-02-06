@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
@@ -197,7 +196,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected Request getNingRequest() throws Exception {
+    protected RequestBuilder getNingRequestBuilder() throws Exception {
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
@@ -210,7 +209,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
                 .setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.HOST, uri.getHost())
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp()).build();
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
     }
 
     @Override

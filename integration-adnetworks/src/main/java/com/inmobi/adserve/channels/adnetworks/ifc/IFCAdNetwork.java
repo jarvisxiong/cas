@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.CategoryList;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
@@ -218,7 +217,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected Request getNingRequest() throws Exception {
+    protected RequestBuilder getNingRequestBuilder() throws Exception {
 
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
@@ -233,7 +232,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.Names.ACCEPT, "application/json")
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).build();
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body);
     }
 
     // Returns the Channel Id for the TPAN as in our database. This will be

@@ -28,7 +28,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 
 
@@ -203,14 +202,14 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public Request getNingRequest() throws Exception {
+    public RequestBuilder getNingRequestBuilder() throws Exception {
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
         final String requestParams = getRequestParams();
-        final Request ningRequest =
+        final RequestBuilder ningRequestBuilder =
                 new RequestBuilder("POST").setUrl(uri.toString())
                         .setHeader("x-display-metrics", String.format("%sx%s", width, height))
                         .setHeader("xplus1-user-agent", sasParams.getUserAgent())
@@ -221,10 +220,10 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json")
                         .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(requestParams.length()))
                         .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                        .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams).build();
-        LOG.debug("WapStart request: {}", ningRequest);
+                        .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(requestParams);
+        LOG.debug("WapStart request: {}", ningRequestBuilder);
         LOG.debug("WapStart request Body: {}", requestParams);
-        return ningRequest;
+        return ningRequestBuilder;
     }
 
 
