@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.lomark;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URI;
@@ -34,6 +30,10 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -86,7 +86,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPLomarkAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
                               final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {

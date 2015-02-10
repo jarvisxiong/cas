@@ -7,8 +7,6 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -54,6 +52,9 @@ import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class RtbAdnetworkTest {
@@ -529,6 +530,36 @@ public class RtbAdnetworkTest {
                 .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
         responseAdm.append("<img src=\'beacon?b=${WIN_BID}\' height=1 width=1 border=0 />");
         responseAdm.append("</body></html>");
+        final String clickUrl =
+                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        final String beaconUrl = "beacon";
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
+        rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
+        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
+        rtbAdNetwork.setEncryptedBid("0.23");
+        rtbAdNetwork.setSecondBidPrice(0.23);
+        final String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
+        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
+        rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
+        assertEquals("", rtbAdNetwork.getResponseContent());
+    }
+
+    @Test
+    public void testParseResponseSDK450Interstitial() throws TException {
+        final StringBuilder str = new StringBuilder();
+        // Temporarily using ixResponseJSON instead of rtbdResponseJSON
+        str.append(TestUtils.SampleStrings.ixResponseJson);
+        final StringBuilder responseAdm = new StringBuilder();
+        responseAdm.append("<html><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beacon?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
+        sasParams.setSdkVersion("a450");
+        sasParams.setRqAdType("int");
         final String clickUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final String beaconUrl = "beacon";

@@ -40,31 +40,31 @@ public class FormatterTest {
     }
 
     @Test
-    public void testgetSdkVersionNumericValue() {
+    public void testIsRequestFromSdkVersionOnwards() {
         final SASRequestParameters sasParams = new SASRequestParameters();
-        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(false, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("i359");
-        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(false, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("a350");
-        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(false, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("i360");
-        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(true, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("a450");
-        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 450);
+        assertEquals(true, Formatter.isRequestFromSdkVersionOnwards(sasParams, 450));
         sasParams.setSdkVersion("i451");
-        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 450);
+        assertEquals(true, Formatter.isRequestFromSdkVersionOnwards(sasParams, 450));
         sasParams.setSdkVersion("i360");
-        assertEquals(true, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(true, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("i360a");
-        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(false, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("i");
-        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(false, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
         sasParams.setSdkVersion("aaaa");
-        assertEquals(false, Formatter.getSdkVersionNumericValue(sasParams) >= 360);
+        assertEquals(false, Formatter.isRequestFromSdkVersionOnwards(sasParams, 360));
     }
 
     @Test
-    public void testupdateVelocityContextWithNoBeaconUrlAndWapRequest() {
+    public void testUpdateVelocityContextWithNoBeaconUrlAndWapRequest() {
         final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("wap");
         final VelocityContext context = new VelocityContext();
@@ -76,7 +76,7 @@ public class FormatterTest {
     }
 
     @Test
-    public void testupdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI() {
+    public void testUpdateVelocityContextWithBeaconUrlAndAppRequestNonIMAI() {
         final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");
@@ -89,7 +89,7 @@ public class FormatterTest {
     }
 
     @Test
-    public void testupdateVelocityContextWithBeaconUrlAndAppRequestIMAI() {
+    public void testUpdateVelocityContextWithBeaconUrlAndAppRequestIMAI() {
         final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSource("APP");
         sasParams.setSdkVersion("i360");

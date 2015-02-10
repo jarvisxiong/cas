@@ -38,6 +38,7 @@ public class Formatter {
     private static Template velocityTemplateJsAdTag;
     private static Template velocityTemplateWapHtmlJsAdTag;
 
+
     public static void init() throws Exception {
         velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
@@ -61,12 +62,13 @@ public class Formatter {
 
         if (isRequestFromSdk(sasParams)) {
             context.put(VelocityTemplateFieldConstants.SDK, true);
-
-            int sdkVersion = getSdkVersionNumericValue(sasParams);
-            context.put(VelocityTemplateFieldConstants.SDK360_ONWARDS, sdkVersion >= 360);
-            context.put(VelocityTemplateFieldConstants.SDK450_ONWARDS, sdkVersion >= 450);
+            context.put(VelocityTemplateFieldConstants.SDK360_ONWARDS, isRequestFromSdkVersionOnwards(sasParams, 360));
+            context.put(VelocityTemplateFieldConstants.SDK450_ONWARDS, isRequestFromSdkVersionOnwards(sasParams, 450));
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 context.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+            }
+            if ("int".equalsIgnoreCase(sasParams.getRqAdType())) {
+                context.put(VelocityTemplateFieldConstants.IS_INTERSTITIAL, true);
             }
         }
     }
@@ -78,28 +80,22 @@ public class Formatter {
         return APP.equalsIgnoreCase(sasParams.getSource()) && StringUtils.isNotBlank(sasParams.getSdkVersion());
     }
 
-    /**
-     * Gets the numeric value of InMobi SDK version.
-     * @return
-     *  i360    => 360
-     *  a450    => 450
-     *  invalid => -1
-     */
-    static int getSdkVersionNumericValue(final SASRequestParameters sasParams) {
+    static boolean isRequestFromSdkVersionOnwards(final SASRequestParameters sasParams, final int version) {
         if (StringUtils.isBlank(sasParams.getSdkVersion())) {
-            return -1;
+            return false;
         }
         try {
             final String os = sasParams.getSdkVersion();
-            if ((os.startsWith("i") || os.startsWith("a"))) {
-                return Integer.parseInt(sasParams.getSdkVersion().substring(1));
+            if ((os.startsWith("i") || os.startsWith("a"))
+                    && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= version) {
+                return true;
             }
         } catch (final StringIndexOutOfBoundsException e2) {
             LOG.debug("Invalid sdkversion {}", e2);
         } catch (final NumberFormatException e3) {
             LOG.debug("Invalid sdkversion {}", e3);
         }
-        return -1;
+        return false;
     }
 
     public static String getResponseFromTemplate(final TemplateType type, final VelocityContext context,

@@ -3,8 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -12,8 +10,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +29,10 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
 
 
 public class DCPNexageAdNetworkTest extends TestCase {
@@ -1045,7 +1045,41 @@ public class DCPNexageAdNetworkTest extends TestCase {
         dcpNexageAdnetwork.generateJsAdResponse();
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB20-1\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script> var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB20-1\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        assertEquals(expectedResponse, dcpNexageAdnetwork.getHttpResponseContent());
+    }
+
+    @Test
+    public void testDCPNexageGenerateStaticJsAdTagSDK450Interstitial() throws Exception {
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+                .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        sasParams.setSource("app");
+        sasParams.setSdkVersion("a450");
+        sasParams.setRqAdType("int");
+        sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
+        final String externalKey = "19100";
+        final String beaconUrl =
+                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
+        final String clickUrl =
+                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null,
+                        null, 0, new Integer[] {0}));
+        dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
+
+        dcpNexageAdnetwork.generateJsAdResponse();
+        assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
+        final String expectedResponse =
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler); var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB20-1\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpNexageAdnetwork.getHttpResponseContent());
     }
 
@@ -1078,7 +1112,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
         dcpNexageAdnetwork.generateJsAdResponse();
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB19-15\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script> var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB19-15\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpNexageAdnetwork.getHttpResponseContent());
     }
 

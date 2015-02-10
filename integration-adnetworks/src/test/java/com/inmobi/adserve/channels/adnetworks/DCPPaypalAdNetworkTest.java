@@ -528,6 +528,41 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
     }
 
     @org.testng.annotations.Test
+    public void testDCPPayPalParseResponseAdAppIMAISDK450Interstitals() throws Exception {
+        final com.inmobi.adserve.channels.api.SASRequestParameters
+                sasParams = new com.inmobi.adserve.channels.api.SASRequestParameters();
+        final com.inmobi.adserve.channels.api.CasInternalRequestParameters
+                casInternalRequestParameters = new com.inmobi.adserve.channels.api.CasInternalRequestParameters();
+        sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams
+                .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        sasParams.setSource("app");
+        sasParams.setSdkVersion("a450");
+        sasParams.setRqAdType("int");
+        sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
+        final String externalKey = "19100";
+        final String beaconUrl =
+                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
+        final String clickUrl =
+                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
+        final com.inmobi.adserve.channels.entity.ChannelSegmentEntity entity =
+                new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new Integer[] {0}));
+        dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
+
+        final String response =
+                "<!-- AdPlacement : header --><img src=\"http://bos.ads.paypal.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.paypal.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=paypal&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.paypal.com/testads/300x50-paypal-Test-Adv2.gif\" /></a></div>";
+        dcpPaypalAdnetwork.parseResponse(response, io.netty.handler.codec.http.HttpResponseStatus.OK);
+        assertEquals(dcpPaypalAdnetwork.getHttpResponseStatusCode(), 200);
+        final String expectedResponse =
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><!-- AdPlacement : header --><img src=\"http://bos.ads.paypal.com:80/admax/adEvent.do?dcn=8a809449013c3c643cad82cb412b5857&amp;pos=header&amp;nl=1359535663796&amp;pix=1&amp;et=1&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;mode=test&amp;xd=R2FsYXh5IE5leHVzfFNhbXN1bmd8NC4xLjF8QW5kcm9pZA..&amp;xo=V0lGSXxVU0E.\" style=\"display:none;width:1px;height:1px;border:0;\" width=\"1\" height=\"1\" alt=\"\" /><div> <a href=\"http://bos.ads.paypal.com:80/admax/adClick.do?dcn=8a809449013c3c643cad82cb412b5857&amp;n=paypal&amp;id=8a80941f013c3c64abf38aa3eab36ceb&amp;tid=8a808aee3c264c09013c82e8b49e0205&amp;nid=8a808aee32b23b0e013311fe47710e86&amp;pos=header&amp;mode=test&amp;nl=1359535663795\"> <img src=\"http://files.paypal.com/testads/300x50-paypal-Test-Adv2.gif\" /></a></div><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        assertEquals(expectedResponse, dcpPaypalAdnetwork.getHttpResponseContent());
+    }
+
+    @org.testng.annotations.Test
     public void testDCPPayPalParseResponseAdAppIMAI() throws Exception {
         final com.inmobi.adserve.channels.api.SASRequestParameters
                 sasParams = new com.inmobi.adserve.channels.api.SASRequestParameters();
@@ -538,6 +573,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
+
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         final String externalKey = "19100";
         final String beaconUrl =

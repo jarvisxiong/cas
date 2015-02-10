@@ -18,6 +18,7 @@ public class VelocityTemplateFieldConstants {
     public static final String SDK = "SDK";
     public static final String SDK360_ONWARDS = "SDK360Onwards";
     public static final String SDK450_ONWARDS = "SDK450Onwards";
+    public static final String IS_INTERSTITIAL = "isInterstitial";
     public static final String IMSDK_VERSION = "IMSDKVersion";
     public static final String VAST_CONTENT_JS_ESC = "VASTContentJSEsc";
     public static final String NAMESPACE = "Namespace";
