@@ -8,7 +8,7 @@ prod:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.uj1.inmobi.com
@@ -80,7 +80,7 @@ prod:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.uh1.inmobi.com
@@ -152,7 +152,7 @@ prod:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.lhr1.inmobi.com
@@ -224,7 +224,7 @@ prod:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.hkg1.inmobi.com
@@ -297,7 +297,7 @@ pilot:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.uj1.inmobi.com
@@ -369,7 +369,7 @@ pilot:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.uh1.inmobi.com
@@ -441,7 +441,7 @@ pilot:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.lhr1.inmobi.com
@@ -513,7 +513,7 @@ pilot:
          - wap_prod_adserve_cas
       cas_user:
          - cas_read
-      cas_pass
+      cas_pass:
          - sa$c87Te@z
       aerospike_host:
          - as.ads.hkg1.inmobi.com
@@ -610,14 +610,14 @@ nonprod:
          - 'false'
    corp:
       db_host:
-         - ankit
+         - 10.17.100.21
       db_port:
          - 5499
       database:
          - ankit
       cas_user:
          - postgres
-      cas_pass
+      cas_pass:
          - mkhoj123
       aerospike_host:
          - as.corp.inmobi.com
