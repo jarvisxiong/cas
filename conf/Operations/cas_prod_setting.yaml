@@ -6,6 +6,10 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.uj1.inmobi.com
       aerospike_port:
@@ -18,6 +22,10 @@ prod:
          - "ifc1.vip.uj1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -26,8 +34,10 @@ prod:
          - '12555'
       log_type :
          - 'ERROR'
-      debug_log_type :
+      debug_log_type:
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.uj1.inmobi.com'
       graphite_port:
@@ -68,6 +78,10 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.uh1.inmobi.com
       aerospike_port:
@@ -80,6 +94,10 @@ prod:
          - "ifc1.vip.uh1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -90,6 +108,8 @@ prod:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.uh1.inmobi.com'
       graphite_port:
@@ -130,6 +150,10 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.lhr1.inmobi.com
       aerospike_port:
@@ -142,6 +166,10 @@ prod:
          - "ifc1.vip.lhr1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -152,6 +180,8 @@ prod:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.lhr1.inmobi.com'
       graphite_port:
@@ -192,6 +222,10 @@ prod:
          - 6543 
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.hkg1.inmobi.com
       aerospike_port:
@@ -204,6 +238,10 @@ prod:
          - "ifc1.vip.hkg1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -214,6 +252,8 @@ prod:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.hkg1.inmobi.com'
       graphite_port:
@@ -255,6 +295,10 @@ pilot:
          - 6543
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.uj1.inmobi.com
       aerospike_port:
@@ -267,6 +311,10 @@ pilot:
          - "ifc1.vip.uj1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -277,6 +325,8 @@ pilot:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.uj1.inmobi.com'
       graphite_port:
@@ -317,6 +367,10 @@ pilot:
          - 6543
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.uh1.inmobi.com
       aerospike_port:
@@ -329,6 +383,10 @@ pilot:
          - "ifc1.vip.uh1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -339,6 +397,8 @@ pilot:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.uh1.inmobi.com'
       graphite_port:
@@ -379,6 +439,10 @@ pilot:
          - 6543 
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.lhr1.inmobi.com
       aerospike_port:
@@ -391,6 +455,10 @@ pilot:
          - "ifc1.vip.lhr1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -401,6 +469,8 @@ pilot:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.lhr1.inmobi.com'
       graphite_port:
@@ -441,6 +511,10 @@ pilot:
          - 6543 
       database:
          - wap_prod_adserve_cas
+      cas_user:
+         - cas_read
+      cas_pass
+         - sa$c87Te@z
       aerospike_host:
          - as.ads.hkg1.inmobi.com
       aerospike_port:
@@ -453,6 +527,10 @@ pilot:
          - "ifc1.vip.hkg1.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -463,6 +541,8 @@ pilot:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'cas-metrics-relay.hkg1.inmobi.com'
       graphite_port:
@@ -514,6 +594,10 @@ nonprod:
          - "web1012.ads.lhr1.inmobi.com:8082"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'off'
+      ix_default_url:
+         - 'NA'
       nexage_host:
          - 'bos.non_prod'
       mondemand_address:
@@ -526,11 +610,15 @@ nonprod:
          - 'false'
    corp:
       db_host:
-         - db.corp.inmobi.com
+         - ankit
       db_port:
-         - 6543
+         - 5499
       database:
-         - wap_prod_adserve_cas
+         - ankit
+      cas_user:
+         - postgres
+      cas_pass
+         - mkhoj123
       aerospike_host:
          - as.corp.inmobi.com
       aerospike_port:
@@ -543,6 +631,10 @@ nonprod:
          - "ifc1.vip.corp.inmobi.com:8080"
       ifc_status:
          - 'on'
+      rtb2_status:
+         - 'on'
+      ix_default_url:
+          - 'http://staged-by.rubiconproject.com/a/api/exchange.json'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -550,11 +642,15 @@ nonprod:
       mondemand_port:
          - '12555'
       log_type :
-         - 'ERROR'
+         - 'DEBUG'
       debug_log_type :
-         - 'ERROR'
+         - 'DEBUG'
+      flush_debug_log:
+         - 'true'
       graphite_host :
          - 'cas-metrics-relay.corp.inmobi.com'
+      graphite_shouldLogAdapterLatencies:
+         - 'true'
       graphite_port:
          - 2020
       graphite_prefix:
@@ -564,9 +660,9 @@ nonprod:
       read_timeout:
          - 500
       server_timeout:
-         - 600
+         - 60000
       rtb_server_timeout:
-         - 180
+         - 18000
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -612,6 +708,8 @@ nonprod:
          - 'ERROR'
       debug_log_type :
          - 'ERROR'
+      flush_debug_log:
+         - 'false'
       graphite_host :
          - 'mon04.ads.ua2.inmobi.com'
       graphite_port:

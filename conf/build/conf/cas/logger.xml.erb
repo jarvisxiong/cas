@@ -22,7 +22,7 @@
 
 		<encoder>
 			<Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex{6}</Pattern>
-			<immediateFlush>false</immediateFlush>
+			<immediateFlush><%= flush_debug_log %></immediateFlush>
 		</encoder>
 	</appender>
 

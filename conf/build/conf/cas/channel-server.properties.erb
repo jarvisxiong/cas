@@ -105,8 +105,8 @@ audit.enabled=true
 database.host=<%= db_host %>
 database.port=<%= db_port %>
 database.database=<%= database %>
-database.username=cas_read
-database.password=sa$c87Te@z
+database.username=<%= cas_user %>
+database.password=<%= cas_pass %>
 database.validationQuery=select version();
 database.testWhileIdle=true
 database.testOnBorrow=true
@@ -606,7 +606,7 @@ adapter.inmobiRtb1.wnUrlback=http://ec2-23-23-18-252.compute-1.amazonaws.com/cal
 adapter.inmobiRtb1.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 adapter.inmobiRtb2.isRtb=true
-adapter.inmobiRtb2.status=off
+adapter.inmobiRtb2.status=<%= rtb2_status %>
 adapter.inmobiRtb2.siteBlinded=true
 adapter.inmobiRtb2.rtbVer=2.0
 adapter.inmobiRtb2.advertiserId=9ab79acef8764348a36a07b05fc3ee64
@@ -617,8 +617,8 @@ adapter.inmobiRtb2.host.uj1=
 adapter.inmobiRtb2.host.lhr1=NA
 adapter.inmobiRtb2.host.hkg1=NA
 adapter.inmobiRtb2.host.uh1=
-adapter.inmobiRtb2.host.default=http://ec2-23-23-18-252.compute-1.amazonaws.com:8080/getBid
-adapter.inmobiRtb2.wnUrlback=http://ec2-23-23-18-252.compute-1.amazonaws.com:8080/callback/${AUCTION_PRICE}
+adapter.inmobiRtb2.host.default=http://10.14.100.205:8888/getBid
+adapter.inmobiRtb2.wnUrlback=http://10.14.100.205:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.inmobiRtb2.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 
@@ -1415,7 +1415,7 @@ adapter.ix.host.uj1=http://exapi-us-west.rubiconproject.com/a/api/exchange.json?
 adapter.ix.host.lhr1=http://exapi-eu.rubiconproject.com/a/api/exchange.json?tk_sdc=eu
 adapter.ix.host.hkg1=NA
 adapter.ix.host.uh1=http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east
-adapter.ix.host.default=NA
+adapter.ix.host.default=<%= ix_default_url %>
 adapter.ix.partnerSegmentNo=1
 adapter.ix.class=com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork
 adapter.ix.nativeSupported=false
