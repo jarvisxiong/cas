@@ -35,7 +35,7 @@ public class InspectorStrings {
     public static final String TIMER_LATENCY = "timerLatency";
     public static final String TIMEOUT_EXCEPTION = "TimeoutException";
     public static final String IO_EXCEPTION = "IOException";
-    public static final String INCOMPATIBLE_SITE_TYPE = "Termninated_IncompatibleSite";
+    public static final String INCOMPATIBLE_SITE_TYPE = "Terminated_IncompatibleSite";
     public static final String PERCENT_ROLL_OUT = "PercentRollout";
     public static final String NO_MATCH_SEGMENT_LATENCY = "NoMatchSegmentLatency";
     public static final String NO_MATCH_SEGMENT_COUNT = "NoMatchSegmentCount";
@@ -99,6 +99,10 @@ public class InspectorStrings {
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
     public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
+    public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
+    public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
+    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP = "DroppedAsSproutAdsAreNotSupportedOnWap";
+    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370 = "DroppedAsSproutAdsAreNotSupportedOnSDK<370";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";

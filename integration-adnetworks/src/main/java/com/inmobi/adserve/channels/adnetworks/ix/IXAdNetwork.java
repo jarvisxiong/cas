@@ -1,10 +1,16 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LAT;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LNG;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_ZIP;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_BEACON_URL;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_CLICK_URL;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_GEO_CITY;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.OPEN_LP_FUN;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.RECORD_EVENT_FUN;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SPROUT_UNIQUE_STRING;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSION_ID;
 
 import java.awt.Dimension;
 import java.io.IOException;
@@ -25,9 +31,6 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
@@ -73,9 +76,9 @@ import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.ix.API_FRAMEWORKS;
@@ -104,6 +107,14 @@ import com.inmobi.casthrift.ix.VideoExtension;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
 
 
 /**
@@ -177,6 +188,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final boolean wnRequired;
     private int tmax = 200;
     private boolean templateWN = true;
+    protected boolean isSproutSupported = false;
 
     private final String advertiserId;
     private final IABCategoriesInterface iabCategoriesInterface;
@@ -197,7 +209,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String creativeId;
     private Integer pmptier;
     private String aqid;
-    private boolean isCoppaSet = false;
+    protected boolean isCoppaSet = false;
     private String sampleImageUrl;
     private List<String> advertiserDomains;
     private List<Integer> creativeAttributes;
@@ -561,6 +573,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             if (sdkVersion >= INMOBI_SDK_VERSION_370) {
                 banner.setApi(MRAID_FRAMEWORK_VALUES);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_RICH_MEDIA_REQUESTS);
+                isSproutSupported = true;
             }
         }
 
@@ -671,6 +685,37 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         geo.setZip(casInternalRequestParameters.getZipCode());
+
+        return geo;
+    }
+
+    /**
+     * Function used to populate the Geo object for Sprout Macro Replacement
+     * @return
+     */
+    private Geo createSproutGeoObject() {
+        final Geo geo = new Geo();
+
+        if (!isCoppaSet) {
+            try {
+                if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
+                        && 1 == StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",")) {
+                    final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
+                    geo.setLat(Double.parseDouble(latlong[0]));
+                    geo.setLon(Double.parseDouble(latlong[1]));
+                }
+            } catch (NumberFormatException nfe) {
+                // Not possible as type is already checked during deserialisation of AdPoolRequest
+            }
+            String countryCode = sasParams.getCountryCode();
+            if (null != countryCode) {
+                geo.setCountry(countryCode);
+            }
+            String zipCode = casInternalRequestParameters.getZipCode();
+            if (null != zipCode) {
+                geo.setZip(zipCode);
+            }
+        }
 
         return geo;
     }
@@ -1102,6 +1147,68 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response is {}", responseContent);
     }
 
+    private String replaceSproutMacros(String adm) {
+        if (null == adm) {
+            return null;
+        }
+
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VALID_SPROUT_RESPONSES);
+
+        List<String> macros = new ArrayList<>(8);
+        List<String> substitutions = new ArrayList<>(8);
+
+        macros.add(JS_ESC_BEACON_URL);
+        substitutions.add(StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
+
+        macros.add(JS_ESC_CLICK_URL);
+        substitutions.add(StringEscapeUtils.escapeJavaScript(clickUrl));
+
+        macros.add(SDK_VERSION_ID);
+        String sdkVersion = sasParams.getSdkVersion();
+        substitutions.add(null != sdkVersion ? sdkVersion : "");
+
+        // default value for replacement of macros is an empty string
+        Geo geo = createSproutGeoObject();
+        String lat = geo.isSetLat() ? String.valueOf(geo.getLat()) : "";
+        String lng = geo.isSetLon() ? String.valueOf(geo.getLon()) : "";
+        String zip = geo.isSetZip() ? geo.getZip() : "";
+        String cc = geo.isSetCountry() ? geo.getCountry() : "";
+
+        macros.add(GEO_LAT);
+        substitutions.add(lat);
+
+        macros.add(GEO_LNG);
+        substitutions.add(lng);
+
+        macros.add(GEO_ZIP);
+        substitutions.add(zip);
+
+        macros.add(GEO_CC);
+        substitutions.add(cc);
+
+        macros.add(JS_ESC_GEO_CITY);
+        substitutions.add(""); // JS_ESC_GEO_CITY is not currently being set
+
+        macros.add(RECORD_EVENT_FUN);
+        substitutions.add("");  // No function is being provided
+
+        macros.add(OPEN_LP_FUN);
+        substitutions.add("");  // No function is being provided
+
+        String[] macroArray = macros.toArray(new String[macros.size()]);
+        String[] substitutionsArray = substitutions.toArray((new String[substitutions.size()]));
+        return StringUtils.replaceEach(adm, macroArray, substitutionsArray);
+    }
+
+    protected boolean isSproutAd() {
+        String adm = getAdMarkUp();
+        if (null == adm) {
+            return false;
+        } else {
+            return adm.contains(SPROUT_UNIQUE_STRING);
+        }
+    }
+
     public boolean updateDSPAccountInfo(final String buyer) {
         LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
 
@@ -1238,9 +1345,31 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int admAfterMacroSize = admContent.length();
 
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
+            if (isSproutAd()) {
+                LOG.debug(traceMarker, "Sprout Ads not supported on WAP");
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP);
+                responseContent = "";
+                adStatus = "NO_AD";
+                return;
+            }
             velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
         } else {
-            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, MRAID + admContent);
+            if (isSproutAd()) {
+                if (!isSproutSupported) {
+                    LOG.debug(traceMarker, "Sprout Ads not supported on SDK < 370");
+                    InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370);
+                    responseContent = "";
+                    adStatus = "NO_AD";
+                    return;
+                }
+                LOG.debug(traceMarker, "Sprout Ad Received");
+                admContent = replaceSproutMacros(admContent);
+                velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
+                velocityContext.put(VelocityTemplateFieldConstants.SPROUT, true);
+                LOG.debug(traceMarker, "Replaced Sprout Macros");
+            } else {
+                velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, MRAID + admContent);
+            }
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }

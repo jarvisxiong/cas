@@ -24,4 +24,5 @@ public class VelocityTemplateFieldConstants {
     public static final String NAMESPACE = "Namespace";
     public static final String SITE_PREFERENCES_JSON = "SitePreferencesJson";
     public static final String REQUEST_JSON = "RequestJson";
+    public static final String SPROUT = "Sprout";
 }

@@ -45,6 +45,36 @@ public class TestUtils {
                         + "p://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/>"
                         + "</a></p>";
 
+        // Studio macros are prefixed with '#' instead of '$'
+        public static final String ixStudioResponseAdTag = "<script src=\"mraid.js\"></script>"
+                + "<div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div>"
+                + "<script type=\"text/javascript\">"
+                + "var _Sprout = _Sprout || {};"
+                + "/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */"
+                + "_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";"
+                + "/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */"
+                + "_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";"
+                + "/* Publisher Label: What you want to call this line-item in Studio reports */"
+                + "_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";"
+                + "_Sprout._inMobiAdTagTracking="
+                + "{st:new Date().getTime(),rr:0}"
+                + ";Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"#JS_ESC_BEACON_URL\","
+                + "im_sdk:\"#SDK_VERSION_ID\",click:\"#JS_ESC_CLICK_URL\",adFormat:\"interstitial\","
+                + "im_recordEventFun:\"#RECORD_EVENT_FUN\",geo_lat:\"#GEO_LAT\",geo_lng:\"#GEO_LNG\","
+                + "geo_cc:\"#GEO_CC\",geo_zip:\"#GEO_ZIP\",js_esc_geo_city:\"#JS_ESC_GEO_CITY\","
+                + "openLandingPage:\"#OPEN_LP_FUN\"}};var _sproutReadyEvt=document.createEvent(\"Event\");"
+                + "_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);"
+                + "var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", "
+                + "_Sprout_load=function()"
+                + "{var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],"
+                + "t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";"
+                + "(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":"
+                + "sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;"
+                + "e.parentNode.insertBefore(t,e.nextSibling)}"
+                + ";\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||"
+                + "\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)"
+                + "</script>";
+
         public static final String clickUrl =
                 "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-0001"
                         + "2e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3";
