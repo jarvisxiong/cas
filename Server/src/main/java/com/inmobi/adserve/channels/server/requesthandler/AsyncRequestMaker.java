@@ -51,8 +51,6 @@ public class AsyncRequestMaker {
         final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
 
         LOG.debug("Total channels available for sending requests {}", rows.size());
-        final boolean isRtbEnabled = rtbConfig.getBoolean("isRtbEnabled", false);
-        LOG.debug("isRtbEnabled is {} ", isRtbEnabled);
 
         /*
          NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
@@ -66,9 +64,7 @@ public class AsyncRequestMaker {
         for (final ChannelSegment row : rows) {
             final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             final AdNetworkInterface network =
-                    segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), row.getChannelSegmentEntity()
-                                    .getChannelId(), adapterConfig, null, null, base, channel, advertiserSet, isRtbEnabled,
-                            sasParams.getDst());
+                    segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), adapterConfig, null, null, base, channel, advertiserSet);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;

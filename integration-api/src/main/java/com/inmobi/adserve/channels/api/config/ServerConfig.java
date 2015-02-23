@@ -43,10 +43,6 @@ public class ServerConfig implements CasConfig {
                 serverConfiguration.getList("auction.exclude.AuctionIUrlFilter", Lists.newArrayList());
     }
 
-    public boolean isRtbEnabled() {
-        return rtbConfiguration.getBoolean("isRtbEnabled");
-    }
-
     public int getRtbRequestTimeoutInMillis() {
         return rtbConfiguration.getInt("RTBreadtimeoutMillis");
     }

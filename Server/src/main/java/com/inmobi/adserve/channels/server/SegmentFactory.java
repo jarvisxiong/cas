@@ -29,10 +29,9 @@ public class SegmentFactory {
         this.advertiserIdConfigMap = advertiserIdConfigMap;
     }
 
-    public AdNetworkInterface getChannel(final String advertiserId, final String channelId, final Configuration config,
+    public AdNetworkInterface getChannel(final String advertiserId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
-            final Channel channel, final Set<String> advertiserSet, final boolean isRtbEnabled,
-            final int dst) {
+            final Channel channel, final Set<String> advertiserSet) {
 
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
 

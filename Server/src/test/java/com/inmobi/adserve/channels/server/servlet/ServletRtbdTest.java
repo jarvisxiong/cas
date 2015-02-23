@@ -12,6 +12,7 @@ import static org.powermock.api.easymock.PowerMock.verifyAll;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 
+import org.apache.commons.configuration.Configuration;
 import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
@@ -30,7 +32,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({InspectorStats.class})
+@PrepareForTest({InspectorStats.class, CasConfigUtil.class})
 public class ServletRtbdTest {
 
     @Test
@@ -45,6 +47,7 @@ public class ServletRtbdTest {
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
         final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final Configuration mockServerConfig = createMock(Configuration.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
@@ -53,6 +56,7 @@ public class ServletRtbdTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
+        expect(mockServerConfig.getBoolean("isRtbEnabled", true)).andReturn(true).anyTimes();
         mockCasInternalRequestParameters.setTraceEnabled(true);
         expectLastCall();
         InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
@@ -61,8 +65,10 @@ public class ServletRtbdTest {
         expectLastCall().times(1);
         mockResponseSender.sendNoAdResponse(null);
         expectLastCall().times(1);
+        mockStatic(CasConfigUtil.class);
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockServerConfig);
 
-        // Powermock cannot currently suppress super methods
+        // PowerMock cannot currently suppress super methods
         // PowerMock.suppress(method(BaseServlet.class, "handleRequest"));
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;

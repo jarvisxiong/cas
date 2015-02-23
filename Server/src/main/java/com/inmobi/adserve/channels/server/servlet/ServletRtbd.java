@@ -14,6 +14,7 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
@@ -49,6 +50,13 @@ public class ServletRtbd extends BaseServlet {
         final Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside RTBD servlet");
         InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
+
+        // If server.isRtbEnabled=false is set, send NO_AD response.
+        if (!CasConfigUtil.getServerConfig().getBoolean("isRtbEnabled", true)) {
+            LOG.debug("RTBD is disabled via server config. Sending NO_AD response.");
+            hrh.responseSender.sendNoAdResponse(serverChannel);
+            return;
+        }
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 

@@ -70,6 +70,8 @@ prod:
          - 'false'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'false'
 
    uh1:
       db_host:
@@ -142,6 +144,8 @@ prod:
          - 'false'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
 
    lhr1:
       db_host:
@@ -214,6 +218,8 @@ prod:
          - 'false'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
 
    hkg1:
       db_host:
@@ -286,7 +292,8 @@ prod:
          - 'false'
       automation_tests_enabled:
          - 'false'
-
+      rtb_enabled:
+         - 'true'
 pilot:
    uj1:
       db_host:
@@ -359,6 +366,8 @@ pilot:
          - 'false'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'false'
 
    uh1:
       db_host:
@@ -431,6 +440,8 @@ pilot:
          - 'true'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
 
    lhr1:
       db_host:
@@ -503,6 +514,8 @@ pilot:
          - 'true'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
 
    hkg1:
       db_host:
@@ -575,6 +588,8 @@ pilot:
          - 'true'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
 
 nonprod:
    lhr1:
@@ -608,6 +623,9 @@ nonprod:
          - 'ERROR'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
+
    corp:
       db_host:
          - 10.17.100.21
@@ -679,6 +697,9 @@ nonprod:
          - '80'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
+
    ev1:
       db_host:
          - dbadserve.vip.ua2.inmobi.com
@@ -740,3 +761,5 @@ nonprod:
          - '80'
       automation_tests_enabled:
          - 'false'
+      rtb_enabled:
+         - 'true'
