@@ -1,26 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.baidu.DCPBaiduAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -32,6 +11,25 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import java.awt.*;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 
 public class DcpBaiduAdNetworkTest extends TestCase {
@@ -136,7 +134,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
     }
 
     @Test
-    public void testDCPbaiduConfigureParameterSuccess() {
+    public void testDCPbaiduConfigureParameterSuccess()throws org.json.JSONException{
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -153,7 +151,8 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"slot\":\"123\"}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -227,15 +226,16 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"slot\":\"123\"}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 15, repositoryHelper)) {
-            final String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
+        assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 15, repositoryHelper));
+        final String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
 
-            final String expectedUrl =
+        final String expectedUrl =
                     "http://mobads.baidu.com/cpro/ui/mads.php";
-            assertEquals(expectedUrl, actualUrl);
-        }
+        assertEquals(expectedUrl, actualUrl);
+
     }
 
     @Test
@@ -259,14 +259,15 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"slot\":\"123\"}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
-            final String actualString = dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
-            final String expectedUrl =
-                    "{\"request_id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"version\":{\"major\":4,\"minor\":0},\"carrier\":0,\"device\":{\"udid\":{\"idfa\":\"ISDSDSD2323SDSDSDSDGHFGDDA\"}},\"app\":{\"name\":\"00000000-0000-0000-0000-0000006456fc\",\"id\":\"debug\",\"category\":\"Aggregator\"},\"ad\":{\"size\":{\"width\":320,\"height\":50}},\"network\":{\"ipv6\":\"206.29.182.240\"}}";
-            assertEquals(expectedUrl, expectedUrl);
-        }
+        assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper));
+        final String actualString = dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
+        final String expectedUrl =
+                    "{\"request_id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"version\":{\"major\":4,\"minor\":0},\"carrier\":0,\"device\":{\"udid\":{\"idfa\":\"ISDSDSD2323SDSDSDSDGHFGDDA\"}},\"app\":{\"name\":\"00000000-0000-0000-0000-0000006456fc\",\"id\":\"debug\",\"category\":\"Aggregator\"},\"adslots\":{\"id\":\"123\",\"size\":{\"width\":320,\"height\":50}},\"network\":{\"ipv4\":\"206.29.182.240\"}}";
+        assertEquals(expectedUrl, expectedUrl);
+
                   //  "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&os=android&w=50&h=320&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
             
     }
@@ -291,7 +292,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                                "{\"slot\":\"123\"}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response ="{\"request_id\":\"adsg\",\"error_code\":12,\"ads\":{\"html_snippet\":\"<body>sample html</body>\"}}";

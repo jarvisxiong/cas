@@ -20,7 +20,7 @@ public class BaiduRequest {
     private String ua;
     private Device device;
     private App app;
-    private AdSlot ad;
+    private AdSlots adslots;
     private Network network;
     private Vendor vendor;
     private Gps gps;
@@ -77,7 +77,7 @@ class Buyer{
 
 @Data
 @JsonInclude(Include.NON_NULL)
-class AdSlot{
+class AdSlots {
     private String id;
     private Size size;
 }
@@ -85,7 +85,7 @@ class AdSlot{
 @Data
 @JsonInclude(Include.NON_NULL)
 class Network{
-    private String ipv6;
+    private String ipv4;
     private Type type;
 }
 

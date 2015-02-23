@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.baidu;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -27,6 +11,22 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final Logger LOG = LoggerFactory
@@ -36,6 +36,9 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 	private int height;
 	private String size;
 	private String latLong;
+	private String adSlotId=null;
+
+	private static String AD_SLOTID_DB_KEY="slot";
 
 	public DCPBaiduAdNetwork(final Configuration config,
 			final Bootstrap clientBootstrap,
@@ -82,6 +85,19 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 
+		JSONObject additionalParams = entity.getAdditionalParams();
+
+		try {
+            // ad slot id is configured as the additional param in the
+            // segment table
+            adSlotId = entity.getAdditionalParams().getString(AD_SLOTID_DB_KEY);
+		} catch (final JSONException e) {
+        	LOG.debug("slot is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
+                    getName(), e);
+        	LOG.info("Configure parameters inside Baidu returned false");
+        	return false;
+		}
+
 		LOG.info("Configure parameters inside baidu returned true");
 		return true;
 	}
@@ -94,7 +110,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 	@Override
 	public URI getRequestUri() throws Exception {
 		try {
-			return (new URI(host));
+		    return (new URI(host));
 		} catch (URISyntaxException exception) {
 			errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
 			LOG.info("{}", exception);
@@ -122,11 +138,12 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 			app.setCategory(category[0]);
 		}
 
-		AdSlot adslot = new AdSlot();
+		AdSlots adSlots = new AdSlots();
 		Size adSize = new Size();
 		adSize.setHeight(height);
 		adSize.setWidth(width);
-		adslot.setSize(adSize);
+		adSlots.setSize(adSize);
+    	adSlots.setId(adSlotId);
 
 		BaiduRequest request = new BaiduRequest();
 		request.setRequest_id(impressionId);
@@ -136,10 +153,10 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 		request.setVersion(version);
 		request.setApp(app);
 		request.setDevice(device);
-		request.setAd(adslot);
+		request.setAdslots(adSlots);
 
 		Network network = new Network();
-		network.setIpv6(sasParams.getRemoteHostIp());
+		network.setIpv4(sasParams.getRemoteHostIp());
 		request.setNetwork(network);
 
 		if (StringUtils.isNotEmpty(sasParams.getOsMajorVersion())) {
