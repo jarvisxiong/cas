@@ -292,7 +292,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "marimedia";
+        return "marimediaDCP";
     }
 
     @Override

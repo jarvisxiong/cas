@@ -57,7 +57,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "googleadx";
+        return "googleadxDCP";
     }
 
     @Override

@@ -349,7 +349,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
 
     @Test
     public void testDCPbaiduGetName() throws Exception {
-        assertEquals("baidu", dcpBaiduAdNetwork.getName());
+        assertEquals("baiduDCP", dcpBaiduAdNetwork.getName());
     }
 
     @Test

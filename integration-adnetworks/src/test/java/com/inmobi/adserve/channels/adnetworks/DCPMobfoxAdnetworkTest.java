@@ -336,7 +336,7 @@ public class DCPMobfoxAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPMobfoxGetName() throws Exception {
-        assertEquals("mobfox", dcpMobfoxAdNetwork.getName());
+        assertEquals("mobfoxDCP", dcpMobfoxAdNetwork.getName());
     }
 
     @Test

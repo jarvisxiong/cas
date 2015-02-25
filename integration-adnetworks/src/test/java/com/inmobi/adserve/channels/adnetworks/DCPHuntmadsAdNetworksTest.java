@@ -534,7 +534,7 @@ public class DCPHuntmadsAdNetworksTest extends TestCase {
 
     @Test
     public void testDCPHuntmadsGetName() throws Exception {
-        assertEquals(dcpHuntmadsAdNetwork.getName(), "huntmads");
+        assertEquals(dcpHuntmadsAdNetwork.getName(), "huntmadsDCP");
     }
 
     @Test

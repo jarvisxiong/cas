@@ -505,7 +505,7 @@ public class DCPPlaceIQAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPPlaceiqGetName() throws Exception {
-        assertEquals("placeiq", dcpPlaceIQAdNetwork.getName());
+        assertEquals("placeiqDCP", dcpPlaceIQAdNetwork.getName());
     }
 
     @Test

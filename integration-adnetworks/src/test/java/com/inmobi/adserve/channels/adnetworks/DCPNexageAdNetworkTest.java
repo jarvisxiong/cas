@@ -1160,7 +1160,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
 
     @Test
     public void testDCPNexageGetName() throws Exception {
-        assertEquals(dcpNexageAdnetwork.getName(), "nexage");
+        assertEquals(dcpNexageAdnetwork.getName(), "nexageDCP");
     }
 
     @Test

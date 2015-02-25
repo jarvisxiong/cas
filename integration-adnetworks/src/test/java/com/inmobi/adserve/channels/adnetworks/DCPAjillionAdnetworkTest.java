@@ -395,7 +395,7 @@ public class DCPAjillionAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPAjilionGetName() throws Exception {
-        assertEquals(dcpAjillionAdNetwork.getName(), "Ajilion");
+        assertEquals(dcpAjillionAdNetwork.getName(), "AjilionDCP");
     }
 
     @Test

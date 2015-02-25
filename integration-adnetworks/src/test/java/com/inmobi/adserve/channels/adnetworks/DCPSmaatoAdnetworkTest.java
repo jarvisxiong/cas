@@ -364,7 +364,7 @@ public class DCPSmaatoAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPSmaatoGetName() throws Exception {
-        assertEquals("smaato", dcpSmaatoAdNetwork.getName());
+        assertEquals("smaatoDCP", dcpSmaatoAdNetwork.getName());
     }
 
     @Test

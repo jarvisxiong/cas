@@ -260,7 +260,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "ifc";
+        return "ifcDCP";
     }
 
     private String getRequestBody() {

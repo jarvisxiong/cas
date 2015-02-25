@@ -104,7 +104,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getName() {
-		return "baidu";
+		return "baiduDCP";
 	}
 
 	@Override

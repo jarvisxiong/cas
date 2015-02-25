@@ -134,7 +134,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getName() {
-		return "pubmatic";
+		return "pubmaticDCP";
 	}
 
 	public String getRequestParams() {

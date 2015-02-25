@@ -460,7 +460,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
 
     @Test
     public void testWebmoblinkGetName() throws Exception {
-        assertEquals("webmoblink", dcpWebmoblinkAdNetwork.getName());
+        assertEquals("webmoblinkDCP", dcpWebmoblinkAdNetwork.getName());
     }
 
 }

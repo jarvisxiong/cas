@@ -382,7 +382,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPWapstartGetName() throws Exception {
-        assertEquals(dcpWapstartAdNetwork.getName(), "wapstart");
+        assertEquals(dcpWapstartAdNetwork.getName(), "wapstartDCP");
     }
 
     @Test

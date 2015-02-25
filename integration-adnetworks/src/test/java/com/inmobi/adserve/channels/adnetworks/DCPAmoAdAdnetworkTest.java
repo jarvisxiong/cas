@@ -208,7 +208,7 @@ public class DCPAmoAdAdnetworkTest extends junit.framework.TestCase {
 
     @org.testng.annotations.Test
     public void testDCPAmoAdGetName() throws Exception {
-        assertEquals("amoad", dcpAmoAdAdNetwork.getName());
+        assertEquals("amoadDCP", dcpAmoAdAdNetwork.getName());
     }
 
     @org.testng.annotations.Test

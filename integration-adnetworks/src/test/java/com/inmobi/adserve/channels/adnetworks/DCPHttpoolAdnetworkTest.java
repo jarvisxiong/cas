@@ -546,7 +546,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPHttpoolGetName() throws Exception {
-        assertEquals("httpool", dcpHttpoolAdNetwork.getName());
+        assertEquals("httpoolDCP", dcpHttpoolAdNetwork.getName());
     }
 
     @Test

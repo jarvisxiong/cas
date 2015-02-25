@@ -72,6 +72,8 @@ prod:
          - 'false'
       rtb_enabled:
          - 'false'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
    uh1:
       db_host:
@@ -146,6 +148,8 @@ prod:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
    lhr1:
       db_host:
@@ -220,6 +224,8 @@ prod:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
    hkg1:
       db_host:
@@ -294,6 +300,8 @@ prod:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 pilot:
    uj1:
       db_host:
@@ -368,6 +376,8 @@ pilot:
          - 'false'
       rtb_enabled:
          - 'false'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
    uh1:
       db_host:
@@ -442,6 +452,8 @@ pilot:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
    lhr1:
       db_host:
@@ -516,6 +528,8 @@ pilot:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
    hkg1:
       db_host:
@@ -590,6 +604,8 @@ pilot:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - '1b1bdc749bd44a6c9037e513701ee815'
 
 nonprod:
    lhr1:
@@ -625,6 +641,8 @@ nonprod:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - 'f55c9d46d7704f8789015a64153a7012'
 
    corp:
       db_host:
@@ -699,6 +717,8 @@ nonprod:
          - 'false'
       rtb_enabled:
          - 'true'
+      ix_advertise_id:
+         - 'f55c9d46d7704f8789015a64153a7012'
 
    ev1:
       db_host:

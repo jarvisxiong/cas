@@ -13,6 +13,8 @@ import org.apache.commons.configuration.Configuration;
 public abstract class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
 
     protected final Configuration config;
+    
+    protected final String DCP_KEY = "DCP";
 
     protected AbstractDCPAdNetworkImpl(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -20,5 +22,5 @@ public abstract class AbstractDCPAdNetworkImpl extends BaseAdNetworkImpl {
         this.config = config;
         this.clientBootstrap = clientBootstrap;
     }
-
+    
 }

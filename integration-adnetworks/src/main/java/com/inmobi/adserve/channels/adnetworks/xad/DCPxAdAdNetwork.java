@@ -98,7 +98,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "xad";
+        return "xadDCP";
     }
 
     @Override

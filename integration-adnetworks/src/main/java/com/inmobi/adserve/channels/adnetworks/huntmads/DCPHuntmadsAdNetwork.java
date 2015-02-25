@@ -88,7 +88,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "huntmads";
+        return "huntmadsDCP";
     }
 
     @Override

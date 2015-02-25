@@ -58,7 +58,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "openx";
+        return "openxDCP";
     }
 
     @Override

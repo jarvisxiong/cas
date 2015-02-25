@@ -84,7 +84,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "mable";
+        return "mableDCP";
     }
 
     private String getRequestParams() {

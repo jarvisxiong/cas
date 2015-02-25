@@ -106,7 +106,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return name;
+        return name + DCP_KEY;
     }
 
     @Override

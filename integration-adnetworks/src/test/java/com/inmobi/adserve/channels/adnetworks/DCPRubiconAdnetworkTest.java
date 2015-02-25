@@ -664,7 +664,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPrubiconGetName() throws Exception {
-        assertEquals("rubicon", dcpRubiconAdNetwork.getName());
+        assertEquals("rubiconDCP", dcpRubiconAdNetwork.getName());
     }
 
     @Test

@@ -83,7 +83,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "webmoblink";
+        return "webmoblinkDCP";
     }
 
     @Override

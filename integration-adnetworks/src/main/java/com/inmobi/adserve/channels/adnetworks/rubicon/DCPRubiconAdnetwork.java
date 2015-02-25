@@ -198,7 +198,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "rubicon";
+        return "rubiconDCP";
     }
 
     @Override

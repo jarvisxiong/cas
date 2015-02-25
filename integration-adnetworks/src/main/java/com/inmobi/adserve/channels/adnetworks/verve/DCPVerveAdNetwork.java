@@ -131,7 +131,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "verve";
+        return "verveDCP";
     }
 
     @Override

@@ -631,7 +631,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPLomarkGetName() throws Exception {
-        assertEquals("lomark", dcpLomarkAdnetwork.getName());
+        assertEquals("lomarkDCP", dcpLomarkAdnetwork.getName());
     }
 
     @Test

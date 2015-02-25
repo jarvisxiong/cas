@@ -83,7 +83,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "logan";
+        return "loganDCP";
     }
 
     @Override

@@ -535,7 +535,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPLoganGetName() throws Exception {
-        assertEquals(dcpLoganAdNetwork.getName(), "logan");
+        assertEquals(dcpLoganAdNetwork.getName(), "loganDCP");
     }
 
     @Test

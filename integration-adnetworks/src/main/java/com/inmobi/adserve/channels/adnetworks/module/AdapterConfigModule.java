@@ -31,6 +31,7 @@ public class AdapterConfigModule extends AbstractModule {
 
     private final Configuration allAdapterConfiguration;
     private final String dcName;
+    private static final String DCP_NAME = "DCP";
 
     public AdapterConfigModule(final Configuration allAdapterConfiguration, final String dcName) {
         this.allAdapterConfiguration = allAdapterConfiguration;
@@ -109,7 +110,12 @@ public class AdapterConfigModule extends AbstractModule {
         final Map<String, String> advertiserIdToNameMap = Maps.newHashMap();
 
         for (final AdapterConfig adapterConfig : adapterConfigs) {
-            advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName());
+            if(adapterConfig.isIx() || adapterConfig.isRtb()){
+                advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName());    
+            }else{
+                advertiserIdToNameMap.put(adapterConfig.getAdvertiserId(), adapterConfig.getAdapterName() + DCP_NAME);
+            }
+            
         }
 
         return advertiserIdToNameMap;

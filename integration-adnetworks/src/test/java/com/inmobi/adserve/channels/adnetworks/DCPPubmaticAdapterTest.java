@@ -561,7 +561,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
 
     @Test
     public void testDCPPubmaticGetName() throws Exception {
-        assertEquals(dcpPubmaticAdnetwork.getName(), "pubmatic");
+        assertEquals(dcpPubmaticAdnetwork.getName(), "pubmaticDCP");
     }
 
     @Test

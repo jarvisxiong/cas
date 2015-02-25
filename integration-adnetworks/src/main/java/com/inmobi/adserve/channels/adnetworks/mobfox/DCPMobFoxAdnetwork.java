@@ -102,7 +102,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "mobfox";
+        return "mobfoxDCP";
     }
 
     @Override

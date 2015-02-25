@@ -134,7 +134,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "smaato";
+        return "smaatoDCP";
     }
 
     @Override

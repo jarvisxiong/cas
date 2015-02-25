@@ -113,7 +113,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "adsmogo";
+        return "adsmogoDCP";
     }
 
     @Override

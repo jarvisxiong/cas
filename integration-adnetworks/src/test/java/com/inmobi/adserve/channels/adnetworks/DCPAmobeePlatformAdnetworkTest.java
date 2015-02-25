@@ -361,7 +361,7 @@ public class DCPAmobeePlatformAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPDmgGetName() throws Exception {
-        assertEquals("dmg", dcpDmgAdNetwork.getName());
+        assertEquals("dmgDCP", dcpDmgAdNetwork.getName());
     }
 
     @Test

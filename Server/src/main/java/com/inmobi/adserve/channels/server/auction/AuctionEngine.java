@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.server.auction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -17,7 +16,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 import com.inmobi.casthrift.DemandSourceType;
 
 
@@ -28,10 +26,6 @@ import com.inmobi.casthrift.DemandSourceType;
  */
 public class AuctionEngine implements AuctionEngineInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AuctionEngine.class);
-
-    @AdvertiserIdNameMap
-    @Inject
-    private static Map<String, String> advertiserIdNameMap;
 
     @Inject
     private static AuctionFilterApplier auctionFilterApplier;

@@ -172,7 +172,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "placeiq";
+        return "placeiqDCP";
     }
 
     @Override

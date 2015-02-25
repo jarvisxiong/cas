@@ -95,7 +95,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "wapstart";
+        return "wapstartDCP";
     }
 
     @Override

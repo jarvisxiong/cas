@@ -149,7 +149,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "lomark";
+        return "lomarkDCP";
     }
 
     @Override

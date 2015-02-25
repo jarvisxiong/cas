@@ -552,7 +552,7 @@ public class DCPVerveAdapterTest extends TestCase {
 
     @Test
     public void testDCPVerveGetName() throws Exception {
-        assertEquals(dcpVerveAdnetwork.getName(), "verve");
+        assertEquals(dcpVerveAdnetwork.getName(), "verveDCP");
     }
 
     @Test

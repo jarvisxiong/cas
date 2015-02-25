@@ -377,7 +377,7 @@ public class DCPMableAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPMableGetName() throws Exception {
-        assertEquals("mable", dcpMableAdNetwork.getName());
+        assertEquals("mableDCP", dcpMableAdNetwork.getName());
     }
 
     @Test

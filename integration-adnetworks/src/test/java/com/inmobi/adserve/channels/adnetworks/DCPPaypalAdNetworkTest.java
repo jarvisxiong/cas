@@ -643,7 +643,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
 
     @org.testng.annotations.Test
     public void testDCPPayPalGetName() throws Exception {
-        assertEquals(dcpPaypalAdnetwork.getName(), "paypal");
+        assertEquals(dcpPaypalAdnetwork.getName(), "paypalDCP");
     }
 
     @org.testng.annotations.Test

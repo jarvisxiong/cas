@@ -78,7 +78,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "httpool";
+        return "httpoolDCP";
     }
 
     @Override

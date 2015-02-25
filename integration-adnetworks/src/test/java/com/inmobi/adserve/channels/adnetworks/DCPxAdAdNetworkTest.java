@@ -551,7 +551,7 @@ public class DCPxAdAdNetworkTest extends TestCase {
 
     @Test
     public void testDCPxAdGetName() throws Exception {
-        assertEquals(dcpxAdAdnetwork.getName(), "xad");
+        assertEquals(dcpxAdAdnetwork.getName(), "xadDCP");
     }
 
     @Test

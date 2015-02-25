@@ -71,7 +71,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "tapit";
+        return "tapitDCP";
     }
 
     @Override

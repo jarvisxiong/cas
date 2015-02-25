@@ -420,7 +420,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPadsmogoGetName() throws Exception {
-        assertEquals("adsmogo", dcpadsmogoAdNetwork.getName());
+        assertEquals("adsmogoDCP", dcpadsmogoAdNetwork.getName());
     }
 
     @Test

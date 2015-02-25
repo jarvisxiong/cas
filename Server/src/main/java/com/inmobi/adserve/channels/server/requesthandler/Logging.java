@@ -5,10 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
@@ -27,7 +24,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;
@@ -63,10 +59,6 @@ public class Logging {
     private static String umpAdsLogKey;
     private static boolean enableFileLogging;
     private static boolean enableDatabusLogging;
-
-    @AdvertiserIdNameMap
-    @Inject
-    private static Map<String, String> advertiserIdNameMap;
 
     private static int totalCount;
 

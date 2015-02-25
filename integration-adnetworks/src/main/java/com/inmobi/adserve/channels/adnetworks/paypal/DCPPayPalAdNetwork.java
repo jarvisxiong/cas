@@ -83,7 +83,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "paypal";
+        return "paypalDCP";
     }
 
     @Override

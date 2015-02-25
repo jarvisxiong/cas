@@ -108,7 +108,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "nexage";
+        return "nexageDCP";
     }
 
     @Override

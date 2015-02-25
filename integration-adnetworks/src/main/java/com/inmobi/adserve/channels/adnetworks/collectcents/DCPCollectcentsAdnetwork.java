@@ -98,7 +98,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 
 	@Override
 	public String getName() {
-		return "collectcents";
+		return "collectcentsDCP";
 	}
 
 	@Override

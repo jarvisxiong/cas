@@ -580,7 +580,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 
 	@Test
 	public void testDCPcollectcentsGetName() throws Exception {
-		assertEquals("collectcents", dcpCollectcentsAdNetwork.getName());
+		assertEquals("collectcentsDCP", dcpCollectcentsAdNetwork.getName());
 	}
 
 	@Test

@@ -292,7 +292,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
 
     @Test
     public void testDCPAppNexusGetName() throws Exception {
-        assertEquals(dcpAppNexusAdNetwork.getName(), "appnexus");
+        assertEquals(dcpAppNexusAdNetwork.getName(), "appnexusDCP");
     }
 
     @Test
