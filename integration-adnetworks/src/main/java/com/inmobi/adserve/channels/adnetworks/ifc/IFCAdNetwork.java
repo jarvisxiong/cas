@@ -56,14 +56,12 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     private Boolean richMedia;
     private String adcode;
 
-    private final String ifcURL;
-
     private String adGroupID;
 
     public IFCAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
-        ifcURL = config.getString("ifc.host");
+        host = config.getString("ifc.host");
     }
 
     @Override
@@ -382,7 +380,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
      */
     @Override
     public URI getRequestUri() throws Exception {
-        return new URI(ifcURL);
+        return new URI(host);
     }
 
 }

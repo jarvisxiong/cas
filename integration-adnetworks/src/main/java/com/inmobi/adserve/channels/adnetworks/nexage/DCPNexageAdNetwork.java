@@ -102,10 +102,10 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         isApp = StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
                         ? false
                         : true;
-
+        constructURL();
         return true;
     }
-
+    
     @Override
     public String getName() {
         return "nexageDCP";
@@ -115,94 +115,100 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     public String getId() {
         return config.getString("nexage.advertiserId");
     }
+    
+    private void constructURL(){
+        final StringBuilder finalUrlBuilder = new StringBuilder(config.getString("nexage.host"));
+        finalUrlBuilder.append("pos=").append(pos);
 
-    // get URI
-    @Override
-    public URI getRequestUri() throws Exception {
-        final StringBuilder finalUrl = new StringBuilder(config.getString("nexage.host"));
-        finalUrl.append("pos=").append(pos);
         if (height > 0) {
-            finalUrl.append("&p(size)=").append(width).append('x').append(height);
+            finalUrlBuilder.append("&p(size)=").append(width).append('x').append(height);
         }
         if ("test".equals(config.getString("nexage.test"))) {
-            finalUrl.append("&mode=test");
+            finalUrlBuilder.append("&mode=test");
         }
-        finalUrl.append("&dcn=").append(externalSiteId);
-        finalUrl.append("&ip=").append(sasParams.getRemoteHostIp());
-        finalUrl.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
-        finalUrl.append("&p(site)=");
+        finalUrlBuilder.append("&dcn=").append(externalSiteId);
+        finalUrlBuilder.append("&ip=").append(sasParams.getRemoteHostIp());
+        finalUrlBuilder.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
+        finalUrlBuilder.append("&p(site)=");
         if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
-            finalUrl.append('p');
+            finalUrlBuilder.append('p');
         } else {
-            finalUrl.append("fs");
+            finalUrlBuilder.append("fs");
         }
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
-            finalUrl.append("&d(id2)=").append(casInternalRequestParameters.getUidO1());
+            finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidO1());
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
-            finalUrl.append("&d(id2)=").append(casInternalRequestParameters.getUidIDUS1());
+            finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidIDUS1());
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
             if (isApp) {
-                finalUrl.append("&d(id12)=").append(casInternalRequestParameters.getUidMd5());
+                finalUrlBuilder.append("&d(id12)=").append(casInternalRequestParameters.getUidMd5());
             } else {
-                finalUrl.append("&u(id)=").append(casInternalRequestParameters.getUidMd5());
+                finalUrlBuilder.append("&u(id)=").append(casInternalRequestParameters.getUidMd5());
             }
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
             if (isApp) {
-                finalUrl.append("&d(id12)=").append(casInternalRequestParameters.getUid());
+                finalUrlBuilder.append("&d(id12)=").append(casInternalRequestParameters.getUid());
             } else {
-                finalUrl.append("&u(id)=").append(casInternalRequestParameters.getUid());
+                finalUrlBuilder.append("&u(id)=").append(casInternalRequestParameters.getUid());
             }
         } else {
             final String gpid = getGPID();
             if (gpid != null) {
-                finalUrl.append("&d(id12)=").append(getHashedValue(gpid, "MD5"));
+                finalUrlBuilder.append("&d(id12)=").append(getHashedValue(gpid, "MD5"));
             }
         }
         if (isGeo) {
-            finalUrl.append("&req(loc)=").append(getURLEncode(casInternalRequestParameters.getLatLong(), format));
+            finalUrlBuilder.append("&req(loc)=").append(getURLEncode(casInternalRequestParameters.getLatLong(), format));
         }
 
-        finalUrl.append("&cn=").append(getCategories(',', true, true).split(",")[0].trim());
+        finalUrlBuilder.append("&cn=").append(getCategories(',', true, true).split(",")[0].trim());
 
         if (null != sasParams.getAge()) {
-            finalUrl.append("&u(age)=").append(sasParams.getAge());
+            finalUrlBuilder.append("&u(age)=").append(sasParams.getAge());
         }
 
         if (StringUtils.isNotBlank(sasParams.getGender())) {
-            finalUrl.append("&u(gender)=").append(sasParams.getGender());
+            finalUrlBuilder.append("&u(gender)=").append(sasParams.getGender());
         }
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getZipCode())) {
-            finalUrl.append("&req(zip)=").append(casInternalRequestParameters.getZipCode());
+            finalUrlBuilder.append("&req(zip)=").append(casInternalRequestParameters.getZipCode());
         }
 
-        finalUrl.append("&p(blind_id)=").append(blindedSiteId); // send
+        finalUrlBuilder.append("&p(blind_id)=").append(blindedSiteId); // send
         // blindedSiteid
         // instead of
         // url
 
-        finalUrl.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
+        finalUrlBuilder.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
 
         if (null != sasParams.getState()) {
-            finalUrl.append("&u(dma)=").append(sasParams.getState());
+            finalUrlBuilder.append("&u(dma)=").append(sasParams.getState());
         }
 
-        final String[] urlParams = finalUrl.toString().split("&");
-        finalUrl.delete(0, finalUrl.length());
-        finalUrl.append(urlParams[0]);
+        final String[] urlParams = finalUrlBuilder.toString().split("&");
+        finalUrlBuilder.delete(0, finalUrlBuilder.length());
+        finalUrlBuilder.append(urlParams[0]);
 
         // discarding parameters that have null values
         for (int i = 1; i < urlParams.length; i++) {
             final String[] paramValue = urlParams[i].split("=");
             if (paramValue.length == 2 && !"null".equals(paramValue[1]) && !StringUtils.isEmpty(paramValue[1])) {
-                finalUrl.append("&").append(paramValue[0]).append("=").append(paramValue[1]);
+                finalUrlBuilder.append("&").append(paramValue[0]).append("=").append(paramValue[1]);
             }
         }
-        LOG.debug("url inside nexage: {}", finalUrl);
-        try {
-            return new URI(finalUrl.toString());
+        LOG.debug("url inside nexage: {}", finalUrlBuilder);
+  
+        host = finalUrlBuilder.toString();
+    }
+
+    // get URI
+    @Override
+    public URI getRequestUri() throws Exception {
+      try {
+            return new URI(host);
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;
             LOG.info("Error Forming Url inside nexage {}", exception);

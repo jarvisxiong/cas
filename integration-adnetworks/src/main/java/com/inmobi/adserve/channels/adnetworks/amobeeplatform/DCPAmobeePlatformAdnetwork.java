@@ -68,6 +68,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public boolean configureParameters() {
+        host = config.getString(name + ".host");
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for {} so exiting adapter", name);
@@ -113,8 +114,6 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         try {
-
-            final String host = config.getString(name + ".host");
             final StringBuilder url = new StringBuilder(host);
             appendQueryParam(url, EXT_SITE_KEY, externalSiteId, false);
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);

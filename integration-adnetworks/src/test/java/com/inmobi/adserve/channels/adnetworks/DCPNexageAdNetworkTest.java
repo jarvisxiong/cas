@@ -128,6 +128,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -149,6 +152,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         final String burl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -900,6 +906,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("APP");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c"
@@ -931,6 +940,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("wap");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c"
@@ -962,6 +974,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus "
                 + "Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534" + ".30");
         sasParams.setSource("app");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -994,6 +1009,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setSource("app");
         sasParams.setSdkVersion("a370");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         final String externalKey = "19100";
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
@@ -1143,6 +1161,9 @@ public class DCPNexageAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla%2F5" + ".0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534"
                 + ".46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        final List<Long> cat = new ArrayList<Long>();
+        cat.add(13l);
+        sasParams.setCategories(cat);
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         final String blurl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1&event=beacon";

@@ -910,7 +910,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     private void replaceHostWithIP() {
-        if (isIPResolutionDisabled) {
+        if (isIPResolutionDisabled || useJsAdTag()) {
             return;
         }
         if (host != null) {
