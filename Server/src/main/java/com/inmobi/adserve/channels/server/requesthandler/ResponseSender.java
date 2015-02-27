@@ -425,9 +425,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
         System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
-        
-        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ +
-                "sendResponse_"+getDST(), getTimeElapsed());
        
         if(serverChannel.isOpen()){
             if (sasParams.isKeepAlive()) {
@@ -692,9 +689,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
             list.addAll(rtbList);
         }
-
-        InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "writeLogs_"
-                + getDST(), getTimeElapsed());
 
         long totalTime = getTotalTime();
         if (totalTime > 2000) {

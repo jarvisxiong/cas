@@ -70,9 +70,7 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -119,7 +117,7 @@ import lombok.Setter;
 
 /**
  * Generic IX adapter.
- *
+ * 
  * @author Anshul Soni(anshul.soni@inmobi.com)
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
@@ -144,8 +142,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String MIME_HTML = "text/html";
     private static final int INMOBI_SDK_VERSION_370 = 370;
     private static final int IX_MRAID_VALUE = 1001;
-    private static final List<Integer> MRAID_FRAMEWORK_VALUES =
-            Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(), IX_MRAID_VALUE);
+    private static final List<Integer> MRAID_FRAMEWORK_VALUES = Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(),
+            IX_MRAID_VALUE);
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final short AGE_LIMIT_FOR_COPPA = 8;
@@ -186,13 +184,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final String password;
     private final Integer accountId;
     private final boolean wnRequired;
-    private int tmax = 200;
+    // private int tmax = 200;
     private boolean templateWN = true;
     protected boolean isSproutSupported = false;
 
     private final String advertiserId;
-    private final IABCategoriesInterface iabCategoriesInterface;
-    private final IABCountriesInterface iabCountriesInterface;
     private final String advertiserName;
     private double secondBidPriceInUsd = 0;
     private double secondBidPriceInLocal = 0;
@@ -206,7 +202,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Double dataVendorCost;
     private List<String> packageIds;
     private Double adjustbid;
-    private String creativeId;
     private Integer pmptier;
     private String aqid;
     protected boolean isCoppaSet = false;
@@ -222,6 +217,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private boolean isExternalPersonaDeal;
     private Set<Integer> usedCsIds;
+    private List<String> iabCategories;
 
 
     private WapSiteUACEntity wapSiteUACEntity;
@@ -239,8 +235,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                       final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
-                       final String advertiserName, final int tmax, final boolean templateWinNotification) {
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
+            final String advertiserName, final int tmax, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -250,10 +246,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         this.clientBootstrap = clientBootstrap;
         this.host = host;
         setIxPartner(true);
-        iabCategoriesInterface = new IABCategoriesMap();
-        iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
-        this.tmax = tmax;
+        // this.tmax = tmax;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
@@ -280,6 +274,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             isWapSiteUACEntity = true;
         }
         isVideoRequest = isRequestQualifiedForVideo();
+
+        //If UAC is set try fetching IAB Categories based on it, set iabCategories before creating app/site
+        if (isWapSiteUACEntity) {
+            iabCategories = IABCategoriesMap.getIABCategoriesFromUAC(wapSiteUACEntity.getCategories());
+        }
+        // Still if iabCategories is not set try to set it from sasParams
+        if (iabCategories == null || iabCategories.isEmpty()) {
+            iabCategories = IABCategoriesMap.getIABCategories(sasParams.getCategories());
+        }
 
         // Creating site/app Object
         App app = null;
@@ -388,12 +391,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private IXBidRequest createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-                                                final User user, final Device device, final Regs regs) {
+            final User user, final Device device, final Regs regs) {
         final IXBidRequest tempBidRequest = new IXBidRequest(impresssionlist);
 
         tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
-        //Disabling it for now, later this will be removed completely
-        //tempBidRequest.setTmax(tmax);
+        // Disabling it for now, later this will be removed completely
+        // tempBidRequest.setTmax(tmax);
 
         LOG.debug(traceMarker, "INSIDE CREATE BID REQUEST OBJECT");
 
@@ -455,7 +458,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Impression createImpressionObject(final Banner banner, final Video video, final String displayManager,
-                                              final String displayManagerVersion, final ProxyDemand proxyDemand) {
+            final String displayManagerVersion, final ProxyDemand proxyDemand) {
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
             /**
@@ -609,7 +612,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         playbackMethod.add(soundOn ? 1 : 2);
         video.setPlaybackmethod(playbackMethod);
 
-        video.setBoxingallowed(0);  // Always set to false
+        video.setBoxingallowed(0); // Always set to false
         video.setMinduration(VIDEO_MIN_DURATION);
         video.setMaxduration(VIDEO_MAX_DURATION);
         video.setProtocols(VIDEO_PROTOCOLS);
@@ -625,17 +628,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         video.ext = new VideoExtension();
         video.ext.setSkip(isSkippable ? 1 : 0);
-        video.ext.setSkipdelay(5);  // Default 5 secs.
+        video.ext.setSkipdelay(5); // Default 5 secs.
 
         return video;
     }
 
     /**
-     * Determines whether this request is selected to serve VIDEO Ad.
-     * Video serving capability is determined based on the following:
-     * 1) The VIDEO serving prerequisites (OS, sdk version and slot) are met.
-     * 2) This site support Video as per the SiteControls repository.
-     * 3) Honor the video traffic % as defined in IXVideoTraffic Repository.
+     * Determines whether this request is selected to serve VIDEO Ad. Video serving capability is determined based on
+     * the following: 1) The VIDEO serving prerequisites (OS, sdk version and slot) are met. 2) This site support Video
+     * as per the SiteControls repository. 3) Honor the video traffic % as defined in IXVideoTraffic Repository.
      */
     private boolean isRequestQualifiedForVideo() {
         // Check the Video support prerequisites.
@@ -652,7 +653,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 isQualifiedForVideo = true;
             } else {
                 int videoTrafficPercentage =
-                        repositoryHelper.queryIXVideoTrafficEntity(sasParams.getSiteId(), sasParams.getCountryId().intValue());
+                        repositoryHelper.queryIXVideoTrafficEntity(sasParams.getSiteId(), sasParams.getCountryId()
+                                .intValue());
                 // Based on the traffic percentage, determine whether this request should be selected for VIDEO or not.
                 if (videoTrafficPercentage > ThreadLocalRandom.current().nextInt(0, 100)) {
                     isQualifiedForVideo = true;
@@ -681,7 +683,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         if (null != sasParams.getCountryCode()) {
-            geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
+            geo.setCountry(IABCountriesMap.getIabCountry(sasParams.getCountryCode()));
         }
 
         geo.setZip(casInternalRequestParameters.getZipCode());
@@ -691,6 +693,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     /**
      * Function used to populate the Geo object for Sprout Macro Replacement
+     * 
      * @return
      */
     private Geo createSproutGeoObject() {
@@ -746,7 +749,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final CommonExtension ext = new CommonExtension();
 
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
-
             setParamsForTransparentSite(site, ext);
         } else {
             setParamsForBlindSite(site, ext);
@@ -755,8 +757,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final List<String> blockedList = getBlockedList();
         site.setBlocklists(blockedList);
 
-        final List<Long> tempSasCategories = sasParams.getCategories();
-        final Publisher publisher = createPublisher(tempSasCategories);
+        final Publisher publisher = createPublisher();
         site.setPublisher(publisher);
 
         final AdQuality adQuality = createAdQuality();
@@ -794,14 +795,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private void setParamsForBlindSite(final Site site, final CommonExtension ext) {
         final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         site.setId(sasParams.getSiteId());
-        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
-            site.setName(wapSiteUACEntity.getAppType());
-        } else {
-            final String category = getCategories(',', false);
-            if (category != null) {
-                site.setName(category);
-            }
-        }
+        final String category =
+                isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
+                        .getAppType() : getCategories(',', false);
+        site.setName(category);
         final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
         site.setPage(blindDomain);
         site.setDomain(blindDomain);
@@ -811,12 +808,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         ext.setBlind(blindForSite);
     }
 
-    private Publisher createPublisher(final List<Long> tempSasCategories) {
-
+    private Publisher createPublisher() {
         final Publisher publisher = new Publisher();
-        if (null != tempSasCategories) {
-            publisher.setCat(iabCategoriesInterface.getIABCategories(tempSasCategories));
-        }
+        publisher.setCat(iabCategories);
 
         final CommonExtension publisherExtensions = new CommonExtension();
         final RubiconExtension rpForPub = new RubiconExtension();
@@ -839,7 +833,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     private Transparency createTransparency() {
-
         final Transparency transparency = new Transparency();
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             transparency.setBlind(0);
@@ -873,24 +866,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final CommonExtension ext = new CommonExtension();
-
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             setParamsForTransparentApp(app, ext);
         } else {
             setParamsForBlindApp(app, ext);
         }
-        final List<Long> tempSasCategories = sasParams.getCategories();
-
-        if (null != tempSasCategories) {
-            app.setCat(iabCategoriesInterface.getIABCategories(tempSasCategories));
-        }
+        app.setCat(iabCategories);
 
         final List<String> blockedList = getBlockedList();
         app.setBlocklists(blockedList);
 
-
-        final Publisher publisher = createPublisher(tempSasCategories);
-
+        final Publisher publisher = createPublisher();
         app.setPublisher(publisher);
 
         final AdQuality adQuality = createAdQuality();
@@ -938,14 +924,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private void setParamsForBlindApp(final App app, final CommonExtension ext) {
         final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         app.setId(sasParams.getSiteId());
-        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
-            app.setName(wapSiteUACEntity.getAppType());
-        } else {
-            final String category = getCategories(',', false);
-            if (category != null) {
-                app.setName(category);
-            }
-        }
+        final String category =
+                isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
+                        .getAppType() : getCategories(',', false);
+        app.setName(category);
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         app.setBundle(blindBundle);
         final Blind blindForApp = new Blind();
@@ -980,7 +962,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             device.setOsv(sasParams.getOsMajorVersion());
         }
 
-        //TODO Add enums in thrift: 0:UNKNOWN,2:WIFI
+        // TODO Add enums in thrift: 0:UNKNOWN,2:WIFI
         if (com.inmobi.adserve.adpool.NetworkType.WIFI == sasParams.getNetworkType()) {
             device.setConnectiontype(2);
         } else {
@@ -1018,10 +1000,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         String id;
         if (!isCoppaSet) {
             if (!StringUtils.isEmpty(id = casInternalRequestParameters.getUidIFA())) {
-                //Set to UIDIFA for IOS Device
+                // Set to UIDIFA for IOS Device
                 device.setIfa(id);
             } else if (!StringUtils.isEmpty(id = getGPID())) {
-                //Set to GPID for Android Device
+                // Set to GPID for Android Device
                 device.setIfa(id);
             }
         }
@@ -1190,10 +1172,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         substitutions.add(""); // JS_ESC_GEO_CITY is not currently being set
 
         macros.add(RECORD_EVENT_FUN);
-        substitutions.add("");  // No function is being provided
+        substitutions.add(""); // No function is being provided
 
         macros.add(OPEN_LP_FUN);
-        substitutions.add("");  // No function is being provided
+        substitutions.add(""); // No function is being provided
 
         String[] macroArray = macros.toArray(new String[macros.size()]);
         String[] substitutionsArray = substitutions.toArray((new String[substitutions.size()]));
@@ -1347,7 +1329,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if ("wap".equalsIgnoreCase(sasParams.getSource())) {
             if (isSproutAd()) {
                 LOG.debug(traceMarker, "Sprout Ads not supported on WAP");
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP);
+                InspectorStats.incrementStatCount(getName(),
+                        InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP);
                 responseContent = "";
                 adStatus = "NO_AD";
                 return;
@@ -1357,7 +1340,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (isSproutAd()) {
                 if (!isSproutSupported) {
                     LOG.debug(traceMarker, "Sprout Ads not supported on SDK < 370");
-                    InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370);
+                    InspectorStats.incrementStatCount(getName(),
+                            InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370);
                     responseContent = "";
                     adStatus = "NO_AD";
                     return;
@@ -1385,8 +1369,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
         }
         try {
-            responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
+            responseContent = Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
@@ -1435,16 +1418,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.HEIGHT, (int) dim.getHeight());
         }
 
-        String networkType = (null != sasParams.getNetworkType()) ?
-                sasParams.getNetworkType().name() : NetworkType.NON_WIFI.name();
+        String networkType =
+                (null != sasParams.getNetworkType()) ? sasParams.getNetworkType().name() : NetworkType.NON_WIFI.name();
         String requestNetworkTypeJson = "{\"networkType\":\"" + networkType + "\"}";
         // Publisher control settings
         velocityContext.put(VelocityTemplateFieldConstants.REQUEST_JSON, requestNetworkTypeJson);
-        velocityContext.put(VelocityTemplateFieldConstants.SITE_PREFERENCES_JSON, sasParams.getPubControlPreferencesJson());
+        velocityContext.put(VelocityTemplateFieldConstants.SITE_PREFERENCES_JSON,
+                sasParams.getPubControlPreferencesJson());
 
         try {
             responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
+                    Formatter
+                            .getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = "NO_AD";
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
@@ -1520,7 +1505,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adm = adm.replace("src=\"//beacon", "src=\"http://beacon");
 
             responseImpressionId = bid.getImpid();
-            creativeId = bid.getCrid();
             responseAuctionId = bidResponse.getId();
             pmptier = bid.getPmptier();
             // estimated = bid.getEstimated(); //Not used currently
@@ -1596,9 +1580,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
-        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId ?
-                matchedPackageEntity.getDealFloors().get(indexOfDealId) :
-                0;
+        dealFloor =
+                matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
+                        indexOfDealId) : 0;
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;
@@ -1740,10 +1724,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public String getCreativeId() {
-        /**
-         * NOTE: The "crid" is an optional field in IX and we are using "aqid" instead.
-         * Refer to Jira: PROG-292 for details.
-         */
+        // NOTE: crid is an optional field in IX and we are using aqid instead. Refer to Jira: PROG-292
         return aqid;
     }
 

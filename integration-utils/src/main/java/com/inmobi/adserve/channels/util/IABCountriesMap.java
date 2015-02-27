@@ -5,9 +5,10 @@ import java.util.HashMap;
 import org.apache.commons.lang.StringUtils;
 
 
-public class IABCountriesMap implements IABCountriesInterface {
-
+public class IABCountriesMap {
     private static HashMap<String, String> countriesToIABMapping = new HashMap<String, String>();
+
+    private IABCountriesMap() {}
 
     static {
         countriesToIABMapping.put("AF", "AFG");
@@ -261,12 +262,16 @@ public class IABCountriesMap implements IABCountriesInterface {
         countriesToIABMapping.put("ZW", "ZWE");
     }
 
-    @Override
-    public String getIabCountry(final String country) {
+    /**
+     * 
+     * @param country
+     * @return
+     */
+    public static String getIabCountry(final String country) {
         if (null == country) {
             return null;
         }
-        final String iabCountry = countriesToIABMapping.get(country);
+        final String iabCountry = countriesToIABMapping.get(country.toUpperCase());
         return StringUtils.isEmpty(iabCountry) ? countriesToIABMapping.get(country.toUpperCase()) : iabCountry;
     }
 

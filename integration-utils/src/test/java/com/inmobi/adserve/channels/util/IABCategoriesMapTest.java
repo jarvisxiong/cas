@@ -31,18 +31,27 @@ public class IABCategoriesMapTest {
                         "IAB7-31", "IAB7-34", "IAB7-36", "IAB7-37", "IAB7-38", "IAB7-39", "IAB7-4", "IAB7-40",
                         "IAB7-41", "IAB7-44", "IAB7-45", "IAB7-5", "IAB7-6", "IAB7-8", "IAB7-9", "IAB8-5", "IAB9-9",
                         "IAB19-3"}));
-
-        final IABCategoriesMap tested = new IABCategoriesMap();
-        assertThat(tested.getIABCategories(category), is(equalTo(expected)));
+        assertThat(IABCategoriesMap.getIABCategories(category), is(equalTo(expected)));
     }
 
     @Test
     public void testGetIABCategoriesNull() throws Exception {
         final Long category = -1L;
         final List<String> expected = new ArrayList<String>();
+        assertThat(IABCategoriesMap.getIABCategories(category), is(equalTo(expected)));
+    }
 
-        final IABCategoriesMap tested = new IABCategoriesMap();
-        assertThat(tested.getIABCategories(category), is(equalTo(expected)));
+    @Test
+    public void testGetIABUACCategoriesFail() throws Exception {
+        final List<String> expected = new ArrayList<String>();
+        assertThat(IABCategoriesMap.getIABCategoriesFromUAC("xyz"), is(equalTo(expected)));
+        assertThat(IABCategoriesMap.getIABCategoriesFromUAC(expected), is(equalTo(expected)));
+    }
+
+    @Test
+    public void testGetIABUACCategoriesCaseInsensitive() throws Exception {
+        assertThat(IABCategoriesMap.getIABCategoriesFromUAC("games"),
+                is(IABCategoriesMap.getIABCategoriesFromUAC("Games")));
     }
 
     @Test
@@ -50,15 +59,13 @@ public class IABCategoriesMapTest {
         final List<Long> category =
                 Arrays.asList(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES,
                         IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES);
-        final IABCategoriesMap tested = new IABCategoriesMap();
 
         final Set<String> iabCategoriesSet = new HashSet<String>();
         for (int i = 0; i < category.size(); ++i) {
-            iabCategoriesSet.addAll(tested.getIABCategories(category.get(i)));
+            iabCategoriesSet.addAll(IABCategoriesMap.getIABCategories(category.get(i)));
         }
-        final List<String> expected = new ArrayList(iabCategoriesSet);
-
-        assertThat(tested.getIABCategories(category), is(equalTo(expected)));
+        final List<String> expected = new ArrayList<>(iabCategoriesSet);
+        assertThat(IABCategoriesMap.getIABCategories(category), is(equalTo(expected)));
     }
 
 

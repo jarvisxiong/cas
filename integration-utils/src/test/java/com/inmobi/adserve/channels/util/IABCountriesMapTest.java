@@ -13,8 +13,7 @@ public class IABCountriesMapTest {
 
     @Test
     public void testGetIabCountryNull() throws Exception {
-        final IABCountriesMap tested = new IABCountriesMap();
-        assertThat(tested.getIabCountry(null), is(equalTo(null)));
+        assertThat(IABCountriesMap.getIabCountry(null), is(equalTo(null)));
     }
 
     @Test
@@ -22,8 +21,7 @@ public class IABCountriesMapTest {
         final String country = "GS";
         final String expectedIabMapping = "SGS";
 
-        final IABCountriesMap tested = new IABCountriesMap();
-        assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
+        assertThat(IABCountriesMap.getIabCountry(country), is(equalTo(expectedIabMapping)));
     }
 
     @Test
@@ -31,8 +29,7 @@ public class IABCountriesMapTest {
         final String country = "Sealand";
         final String expectedIabMapping = null;
 
-        final IABCountriesMap tested = new IABCountriesMap();
-        assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
+        assertThat(IABCountriesMap.getIabCountry(country), is(equalTo(expectedIabMapping)));
     }
 
     @Test
@@ -40,7 +37,6 @@ public class IABCountriesMapTest {
         final String country = "gs";
         final String expectedIabMapping = "SGS";
 
-        final IABCountriesMap tested = new IABCountriesMap();
-        assertThat(tested.getIabCountry(country), is(equalTo(expectedIabMapping)));
+        assertThat(IABCountriesMap.getIabCountry(country), is(equalTo(expectedIabMapping)));
     }
 }

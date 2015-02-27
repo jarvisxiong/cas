@@ -27,7 +27,6 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -43,7 +42,6 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static String TRACKING_URL = "tracking_url";
 	private static String PUBMATIC_BID = "PubMatic_Bid";
 	private static String ERROR_CODE = "error_code";
-	private static IABCountriesInterface iABCountries;
 	private transient String pubId;
 	private String latlong = null;
 	private int width;
@@ -56,10 +54,6 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 	private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
 	private static final String LATLON = "LATLON";
 	private static final String CELLTOWER = "CELLTOWER";
-
-	static {
-		iABCountries = new IABCountriesMap();
-	}
 
 	public DCPPubmaticAdNetwork(final Configuration config,
 			final Bootstrap clientBootstrap,
@@ -172,7 +166,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
 		if (sasParams.getCountryCode() != null) {
 			params.append("&country=").append(
-					iABCountries.getIabCountry(sasParams.getCountryCode()));
+			    IABCountriesMap.getIabCountry(sasParams.getCountryCode()));
 		}
 		params.append("&nettype=").append(nettype);
 		setDeviceIdandType();

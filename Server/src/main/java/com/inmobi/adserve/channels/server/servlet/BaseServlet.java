@@ -40,13 +40,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 
 
 public abstract class BaseServlet implements Servlet {
-
-    static List<String> nativeSites = new ArrayList<String>(Arrays.asList("69d6ab27d03f407f9f6fa9c5fad77afd",
-            "31588012724c4e8ea477c88d7d2b2e15", "495362deeca64c52bd14e2108d34b4c2", "7a2b63166a0f47bb98e3269c16e76fcd",
-            "55b798bd8f1c4de5b89823fbacf419bc"));
-
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
-
     protected final Provider<Marker> traceMarkerProvider;
 
     private final MatchSegments matchSegments;

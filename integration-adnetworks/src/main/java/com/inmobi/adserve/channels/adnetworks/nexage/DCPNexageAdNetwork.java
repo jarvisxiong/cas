@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.nexage;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,16 +18,17 @@ import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
-    // Updates the request parameters according to the Ad Network. Returns true
-    // on
-    // success.i
+    // Updates the request parameters according to the Ad Network. Returns true on success
     private static final Logger LOG = LoggerFactory.getLogger(DCPNexageAdNetwork.class);
 
     private static final String POS = "pos";
@@ -40,7 +37,6 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String LAT_LONG = "LatLong";
     private static final String CATEGORY = "CATEGORY";
     private static final String BLINDED_SITE_ID = "BlindedSiteId";
-    private static IABCountriesInterface iABCountries;
 
     protected boolean jsAdTag = false;
     private int height = 0;
@@ -48,12 +44,6 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     private String pos;
     private boolean isGeo = false;
     private boolean isApp = false;
-
-
-
-    static {
-        iABCountries = new IABCountriesMap();
-    }
 
     public DCPNexageAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -99,13 +89,14 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             LOG.debug("exception raised while retrieving JS_AD_TAG from additional Params {}", e);
         }
 
-        isApp = StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+        isApp =
+                StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
                         ? false
                         : true;
         constructURL();
         return true;
     }
-    
+
     @Override
     public String getName() {
         return "nexageDCP";
@@ -115,8 +106,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
     public String getId() {
         return config.getString("nexage.advertiserId");
     }
-    
-    private void constructURL(){
+
+    private void constructURL() {
         final StringBuilder finalUrlBuilder = new StringBuilder(config.getString("nexage.host"));
         finalUrlBuilder.append("pos=").append(pos);
 
@@ -160,7 +151,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             }
         }
         if (isGeo) {
-            finalUrlBuilder.append("&req(loc)=").append(getURLEncode(casInternalRequestParameters.getLatLong(), format));
+            finalUrlBuilder.append("&req(loc)=")
+                    .append(getURLEncode(casInternalRequestParameters.getLatLong(), format));
         }
 
         finalUrlBuilder.append("&cn=").append(getCategories(',', true, true).split(",")[0].trim());
@@ -178,11 +170,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         finalUrlBuilder.append("&p(blind_id)=").append(blindedSiteId); // send
-        // blindedSiteid
-        // instead of
-        // url
+        // blindedSiteid instead of url
 
-        finalUrlBuilder.append("&u(country)=").append(iABCountries.getIabCountry(sasParams.getCountryCode()));
+        finalUrlBuilder.append("&u(country)=").append(IABCountriesMap.getIabCountry(sasParams.getCountryCode()));
 
         if (null != sasParams.getState()) {
             finalUrlBuilder.append("&u(dma)=").append(sasParams.getState());
@@ -200,14 +190,14 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             }
         }
         LOG.debug("url inside nexage: {}", finalUrlBuilder);
-  
+
         host = finalUrlBuilder.toString();
     }
 
     // get URI
     @Override
     public URI getRequestUri() throws Exception {
-      try {
+        try {
             return new URI(host);
         } catch (final URISyntaxException exception) {
             errorStatus = ThirdPartyAdResponse.ResponseStatus.MALFORMED_URL;

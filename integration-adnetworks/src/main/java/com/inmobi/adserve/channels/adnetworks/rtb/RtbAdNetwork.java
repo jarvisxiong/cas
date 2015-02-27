@@ -46,9 +46,7 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.IABCountriesInterface;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -158,8 +156,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean templateWN = true;
 
     private final String advertiserId;
-    private final IABCategoriesInterface iabCategoriesInterface;
-    private final IABCountriesInterface iabCountriesInterface;
     private final boolean siteBlinded;
     private final String advertiserName;
     private double secondBidPriceInUsd = 0;
@@ -201,8 +197,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.clientBootstrap = clientBootstrap;
         this.host = host;
         setRtbPartner(true);
-        iabCategoriesInterface = new IABCategoriesMap();
-        iabCountriesInterface = new IABCountriesMap();
         this.advertiserName = advertiserName;
         this.tmax = tmax;
         templateWN = templateWinNotification;
@@ -317,9 +311,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         // Setting blocked categories
         if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
-            bCatSet.addAll(iabCategoriesInterface.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
+            bCatSet.addAll(IABCategoriesMap.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
         } else {
-            bCatSet.addAll(iabCategoriesInterface.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+            bCatSet.addAll(IABCategoriesMap.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
 
         final List<String> bCatList = new ArrayList<String>(bCatSet);
@@ -472,7 +466,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
         }
         if (null != sasParams.getCountryCode()) {
-            geo.setCountry(iabCountriesInterface.getIabCountry(sasParams.getCountryCode()));
+            geo.setCountry(IABCountriesMap.getIabCountry(sasParams.getCountryCode()));
         }
         /*if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
             geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity() + ""));
@@ -539,7 +533,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         }
         if (null != sasParams.getCategories()) {
-            site.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
+            site.setCat(IABCategoriesMap.getIABCategories(sasParams.getCategories()));
         }
 
 
@@ -565,7 +559,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app = new App(sasParams.getSiteId());
         }
         if (null != sasParams.getCategories()) {
-            app.setCat(iabCategoriesInterface.getIABCategories(sasParams.getCategories()));
+            app.setCat(IABCategoriesMap.getIABCategories(sasParams.getCategories()));
         }
         String category = null;
 

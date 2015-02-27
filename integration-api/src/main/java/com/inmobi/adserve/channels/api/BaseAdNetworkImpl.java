@@ -30,7 +30,6 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -74,7 +73,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
     private static final String DEFAULT_EMPTY_STRING = "";
-    private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -102,7 +100,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected SASRequestParameters sasParams;
     protected CasInternalRequestParameters casInternalRequestParameters;
     protected HttpRequestHandlerBase baseRequestHandler = null;
-    protected String requestUrl = "";
+    protected String requestUrl = DEFAULT_EMPTY_STRING;
     protected ChannelSegmentEntity entity;
     protected String externalSiteId;
     @Getter
@@ -118,7 +116,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String format = "UTF-8";
     protected final Channel serverChannel;
 
-    private Map responseHeaders;
+    private Map<?, ?> responseHeaders;
     private long latency;
     private long connectionLatency;
     private ThirdPartyAdResponse responseStruct;
@@ -372,7 +370,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public Map getResponseHeaders() {
+    public Map<?, ?> getResponseHeaders() {
         return responseHeaders;
     }
 
@@ -391,7 +389,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public String getId() {
-        return "";
+        return DEFAULT_EMPTY_STRING;
     }
 
     @Override
@@ -526,7 +524,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             responseContent = response;
@@ -565,7 +563,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (allTags) {
             if (isIABCategory) {
-                return getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(sasParams.getCategories()), seperator);
+                return getValueFromListAsString(IABCategoriesMap.getIABCategories(sasParams.getCategories()), seperator);
 
             } else if (null != sasParams.getCategories()) {
                 for (int index = 0; index < sasParams.getCategories().size(); index++) {
@@ -584,7 +582,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
                             category =
-                                    getValueFromListAsString(IAB_CATEGORY_MAP.getIABCategories(segmentCategories[i]),
+                                    getValueFromListAsString(IABCategoriesMap.getIABCategories(segmentCategories[i]),
                                             seperator);
                         } else {
                             category = CategoryList.getCategory(cat);
@@ -715,7 +713,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected String getValueFromListAsString(final List<String> list, final char seperatar) {
         if (list.isEmpty()) {
-            return "";
+            return DEFAULT_EMPTY_STRING;
         }
         final StringBuilder s = new StringBuilder(list.get(0));
         for (int i = 1; i < list.size(); i++) {
@@ -877,7 +875,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return false;
         } else {
             return true;

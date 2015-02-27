@@ -5,14 +5,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
-public class IABCategoriesMap implements IABCategoriesInterface {
-
+public class IABCategoriesMap {
     public static final Long FAMILY_SAFE_BLOCK_CATEGORIES = 10000L;
     public static final Long PERFORMANCE_BLOCK_CATEGORIES = 10001L;
-    private static HashMap<Long, String[]> categoriesToIABMapping = new HashMap<Long, String[]>();
+    private static Map<Long, String[]> categoriesToIABMapping = new HashMap<>();
+    private static Map<String, String[]> uacCatToIABMapping = new HashMap<>();
+
+    private IABCategoriesMap() {}
 
     static {
         categoriesToIABMapping.put(1L, new String[] {"IAB24"});
@@ -104,10 +107,119 @@ public class IABCategoriesMap implements IABCategoriesInterface {
                 "IAB7-18", "IAB7-19", "IAB7-2", "IAB7-20", "IAB7-21", "IAB7-22", "IAB7-24", "IAB7-25", "IAB7-27",
                 "IAB7-28", "IAB7-29", "IAB7-3", "IAB7-30", "IAB7-31", "IAB7-34", "IAB7-36", "IAB7-37", "IAB7-38",
                 "IAB7-39", "IAB7-40", "IAB7-44", "IAB7-45", "IAB7-5", "IAB7-8", "IAB7-9", "IAB8-5", "IAB19-3"});
+
+
+        // Android
+        uacCatToIABMapping.put("books & reference", new String[] {"IAB1", "IAB1-1"});
+        uacCatToIABMapping.put("business", new String[] {"IAB3"});
+        uacCatToIABMapping.put("comics", new String[] {"IAB9", "IAB9-11"});
+        uacCatToIABMapping.put("communication", new String[] {"IAB24"});
+        uacCatToIABMapping.put("education", new String[] {"IAB5"});
+        uacCatToIABMapping.put("entertainment", new String[] {"IAB1"});
+        uacCatToIABMapping.put("finance", new String[] {"IAB13"});
+        uacCatToIABMapping.put("games", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("health & fitness", new String[] {"IAB7"});
+        uacCatToIABMapping.put("libraries & demo", new String[] {"IAB19"});
+        uacCatToIABMapping.put("lifestyle", new String[] {"IAB14"});
+        uacCatToIABMapping.put("live wallpaper", new String[] {"IAB9"});
+        uacCatToIABMapping.put("media & video", new String[] {"IAB1"});
+        uacCatToIABMapping.put("medical", new String[] {"IAB7"});
+        uacCatToIABMapping.put("music & audio", new String[] {"IAB1"});
+        uacCatToIABMapping.put("news & magazines", new String[] {"IAB12"});
+        uacCatToIABMapping.put("personalization", new String[] {"IAB19"});
+        uacCatToIABMapping.put("photography", new String[] {"IAB9", "IAB9-23"});
+        uacCatToIABMapping.put("productivity", new String[] {"IAB19"});
+        uacCatToIABMapping.put("shopping", new String[] {"IAB22"});
+        uacCatToIABMapping.put("social", new String[] {"IAB24"});
+        uacCatToIABMapping.put("sports", new String[] {"IAB17"});
+        uacCatToIABMapping.put("tools", new String[] {"IAB19"});
+        uacCatToIABMapping.put("transportation", new String[] {"IAB20"});
+        uacCatToIABMapping.put("travel & local", new String[] {"IAB20"});
+        uacCatToIABMapping.put("weather", new String[] {"IAB12"});
+        uacCatToIABMapping.put("widgets", new String[] {"IAB19"});
+
+        // IOS
+        uacCatToIABMapping.put("books", new String[] {"IAB1", "IAB1-1"});
+        uacCatToIABMapping.put("business", new String[] {"IAB3"});
+        uacCatToIABMapping.put("catalogues", new String[] {"IAB22"});
+        uacCatToIABMapping.put("education", new String[] {"IAB5"});
+        uacCatToIABMapping.put("entertainment", new String[] {"IAB1"});
+        uacCatToIABMapping.put("finance", new String[] {"IAB13"});
+        uacCatToIABMapping.put("food & drink", new String[] {"IAB8"});
+        uacCatToIABMapping.put("games", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("health & fitness", new String[] {"IAB7"});
+        uacCatToIABMapping.put("lifestyle", new String[] {"IAB14"});
+        uacCatToIABMapping.put("medical", new String[] {"IAB7"});
+        uacCatToIABMapping.put("music", new String[] {"IAB1"});
+        uacCatToIABMapping.put("navigation", new String[] {"IAB20"});
+        uacCatToIABMapping.put("news", new String[] {"IAB12"});
+        uacCatToIABMapping.put("newstand", new String[] {"IAB12"});
+        uacCatToIABMapping.put("photo & video", new String[] {"IAB9", "IAB9-23"});
+        uacCatToIABMapping.put("productivity", new String[] {"IAB3"});
+        uacCatToIABMapping.put("reference", new String[] {"IAB24"});
+        uacCatToIABMapping.put("social networking", new String[] {"IAB24"});
+        uacCatToIABMapping.put("sports", new String[] {"IAB17"});
+        uacCatToIABMapping.put("travel", new String[] {"IAB20"});
+        uacCatToIABMapping.put("utilities", new String[] {"IAB3"});
+        uacCatToIABMapping.put("weather", new String[] {"IAB15", "IAB15-10"});
+
+        // Game extras
+        uacCatToIABMapping.put("game", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_racing", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_adventure", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_strategy", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_trivia", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_arcade", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_sports", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_board", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_word", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_simulation", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_role_playing", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_casino", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_action", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_family", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_educational", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_casual", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_music", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_puzzle", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("game_card", new String[] {"IAB9", "IAB9-30"});
+        uacCatToIABMapping.put("sports_games", new String[] {"IAB9", "IAB9-30"});
+
+        // Other Extras
+        uacCatToIABMapping.put("music_and_audio", new String[] {"IAB1"});
+        uacCatToIABMapping.put("health_and_fitness", new String[] {"IAB7"});
+        uacCatToIABMapping.put("book", new String[] {"IAB1", "IAB1-1"});
+        uacCatToIABMapping.put("books_and_reference", new String[] {"IAB1", "IAB1-1"});
+        uacCatToIABMapping.put("catalogs", new String[] {"IAB22"});
+        uacCatToIABMapping.put("news_and_magazines", new String[] {"IAB12"});
+        uacCatToIABMapping.put("news & politics", new String[] {"IAB12"});
+        uacCatToIABMapping.put("travel_and_local", new String[] {"IAB20"});
+        uacCatToIABMapping.put("libraries_and_demo", new String[] {"IAB19"});
+        uacCatToIABMapping.put("media_and_video", new String[] {"IAB1"});
+
+        /*
+         * 
+        "APPLICATION";220
+        "Action & Adventure";1
+        "Blues";1
+        "CARDS";453
+        "Developer Tools";1
+        "ARCADE";1345
+        "BRAIN";1517
+        "Graphics & Design";2
+        "RACING";547
+        "CASUAL";1408
+        "apps";11
+         */
     }
 
-    @Override
-    public List<String> getIABCategories(final Long category) {
+    /**
+     * Maps inmobi categories to IAB categories.
+     * 
+     * @param List of new inmobi categories.
+     * @return List of IAB Categories code.
+     */
+    public static List<String> getIABCategories(final Long category) {
         final String[] categories = categoriesToIABMapping.get(category);
         if (null != categories) {
             return new ArrayList<String>(Arrays.asList(categories));
@@ -116,16 +228,60 @@ public class IABCategoriesMap implements IABCategoriesInterface {
         }
     }
 
-    @Override
-    public List<String> getIABCategories(final List<Long> categories) {
-        final Set<String> iabCategoriesSet = new HashSet<String>();
-        for (final Long cat : categories) {
-            if (null != categoriesToIABMapping.get(cat)) {
-                iabCategoriesSet.addAll(Arrays.asList(categoriesToIABMapping.get(cat)));
+    /**
+     * Maps inmobi categories to IAB categories.
+     * 
+     * @param categories
+     * @return
+     */
+    public static List<String> getIABCategories(final List<Long> categories) {
+        final List<String> iabCategoriesList = new ArrayList<String>();
+        if (categories != null) {
+            final Set<String> catSet = new HashSet<>();
+            for (final Long cat : categories) {
+                if (null != categoriesToIABMapping.get(cat)) {
+                    catSet.addAll(Arrays.asList(categoriesToIABMapping.get(cat)));
+                }
+            }
+            iabCategoriesList.addAll(catSet);
+        }
+        return iabCategoriesList;
+    }
+
+    /**
+     * Maps UAC categories to IAB categories.
+     * 
+     * @param uacCategory
+     * @return
+     */
+    public static List<String> getIABCategoriesFromUAC(final String uacCategory) {
+        if (uacCategory != null) {
+            final String[] categories = uacCatToIABMapping.get(uacCategory.toLowerCase());
+            if (null != categories) {
+                return new ArrayList<String>(Arrays.asList(categories));
             }
         }
+        return new ArrayList<String>();
+    }
+
+    /**
+     * Maps UAC categories to IAB categories.
+     * 
+     * @param uacCategories
+     * @return
+     */
+    public static List<String> getIABCategoriesFromUAC(final List<String> uacCategories) {
         final List<String> iabCategoriesList = new ArrayList<String>();
-        iabCategoriesList.addAll(iabCategoriesSet);
+        if (uacCategories != null) {
+            for (final String cat : uacCategories) {
+                if (cat != null) {
+                    final String[] categories = uacCatToIABMapping.get(cat.toLowerCase());
+                    if (null != categories) {
+                        iabCategoriesList.addAll(Arrays.asList(categories));
+                    }
+                }
+            }
+        }
         return iabCategoriesList;
     }
 }

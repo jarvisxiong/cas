@@ -8,6 +8,8 @@ public class CategoryList {
     private static Map<Integer, String> categoryList = new HashMap<Integer, String>();
     private static int FAMILY_SAFE_BLOCK_CATEGORIES = 10000;
     private static int PERFORMANCE_BLOCK_CATEGORIES = 10001;
+    
+    private CategoryList() {}
 
     static {
         categoryList.put(1, "Aggregator");

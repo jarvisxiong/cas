@@ -24,7 +24,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.util.IABCategoriesInterface;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -42,7 +41,6 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String APP = "app";
     private static final String WEB = "web";
 
-    private static final IABCategoriesInterface IAB_CATEGORY_MAP = new IABCategoriesMap();
     private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
 
     private String latitude = null;
@@ -52,7 +50,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private String deviceId;
     private String deviceIdType;
     private String sourceType;
-    private boolean isLocSourceDerived;
+    // private boolean isLocSourceDerived;
 
     public DCPxAdAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -83,7 +81,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
         if (null != casInternalRequestParameters.getLatLong()
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
             if (DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())) {
-                isLocSourceDerived = true;
+                // isLocSourceDerived = true;
             } else {
                 final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
                 latitude = latlong[0];
@@ -162,9 +160,9 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             }
 
             if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
-                bCatSet.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
+                bCatSet.addAll(IABCategoriesMap.getIABCategories(IABCategoriesMap.PERFORMANCE_BLOCK_CATEGORIES));
             } else {
-                bCatSet.addAll(IAB_CATEGORY_MAP.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
+                bCatSet.addAll(IABCategoriesMap.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
             }
 
             for (final String bCategory : bCatSet) {
