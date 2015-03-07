@@ -14,7 +14,7 @@ public final class Site {
     private String id;
     private String name;
     private String domain;
-    private String cat;
+    private List<String> cat;
     private String page;
     private Publisher publisher;
     private Content content;

@@ -1,6 +1,13 @@
 package com.inmobi.adserve.channels.api;
 
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,6 +21,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -43,21 +53,13 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import lombok.Getter;
-import lombok.Setter;
-
 
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected Marker traceMarker;
     protected static final String WAP = "WAP";
+    protected static final String APP = "APP";
     protected static final String UA = "ua";
     protected static final String IP = "ip";
     protected static final String LAT = "lat";
@@ -65,6 +67,18 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String ZIP = "zip";
     protected static final String COUNTRY = "country";
     protected static final String GENDER = "gender";
+    protected static final String DEFAULT_EMPTY_STRING = "";
+    protected static final String NO_AD = "NO_AD";
+    protected static final String NATIVE_STRING = "native";
+    protected static final String AD_STRING ="AD";
+    protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
+    protected static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
+    protected static final String TERM = "TERM";
+    protected static final String LATLON = "LATLON";
+    protected static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
+    protected static final String WIFI = "WIFI";
+    protected static final String CCID = "CCID";
+    
     @Inject
     protected static JaxbHelper jaxbHelper;
 
@@ -72,7 +86,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static DocumentBuilderHelper documentBuilderHelper;
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
-    private static final String DEFAULT_EMPTY_STRING = "";
+    
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -97,6 +111,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean isHTMLResponseSupported = true;
     protected boolean isNativeResponseSupported = false;
     protected boolean isVideoRequest = false;
+    protected boolean isNativeRequest = false;
     protected SASRequestParameters sasParams;
     protected CasInternalRequestParameters casInternalRequestParameters;
     protected HttpRequestHandlerBase baseRequestHandler = null;
@@ -241,9 +256,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         try {
             requestUrl = getRequestUri().toString();
             RequestBuilder ningRequestBuilder = getNingRequestBuilder();
-
             setVirtualHost(ningRequestBuilder);
-
             final Request ningRequest = ningRequestBuilder.build();
             LOG.debug("request : {}", ningRequest);
             startTime = System.currentTimeMillis();
@@ -322,7 +335,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     }
 
                     LOG.debug("{} error latency {}", getName(), latency);
-                    adStatus = "TERM";
+                    adStatus = TERM;
                     processResponse();
                 }
             });
@@ -398,7 +411,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             isRequestComplete = true;
 
             LOG.debug("inside cleanup for channel {}", getId());
-            adStatus = "TERM";
+            adStatus = TERM;
             responseStruct = new ThirdPartyAdResponse();
             responseStruct.setLatency(latency);
             responseStruct.setAdStatus(adStatus);
@@ -447,7 +460,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return false;
     }
 
-    public void setAdStatus(String adStatus) {
+    @Override
+    public void setAdStatus(final String adStatus) {
         this.adStatus = adStatus;
     }
 
@@ -455,7 +469,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public boolean configureParameters(final SASRequestParameters param,
             final CasInternalRequestParameters casInternalRequestParameters, final ChannelSegmentEntity entity,
             final String clickUrl, final String beaconUrl, final long slotId, final RepositoryHelper repositoryHelper) {
-        this.sasParams = param;
+        sasParams = param;
         this.casInternalRequestParameters = casInternalRequestParameters;
         externalSiteId = entity.getExternalSiteKey();
         selectedSlotId = (short) slotId;
@@ -466,7 +480,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        boolean isConfigured = configureParameters();
+        final boolean isConfigured = configureParameters();
         replaceHostWithIP();
         return isConfigured;
     }
@@ -737,8 +751,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     }
 
-    protected boolean isNativeRequest() {
-        return false;
+    public boolean isNativeRequest() {
+        return isNativeRequest;
     }
 
     @Override
@@ -864,7 +878,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (StringUtils.isBlank(sasParams.getSource())) {
             return false;
         } else {
-            return !WAP.equalsIgnoreCase(sasParams.getSource());
+            return APP.equalsIgnoreCase(sasParams.getSource());
         }
     }
 
@@ -934,5 +948,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         ningRequestBuilder.setVirtualHost(publicHostName);
     }
+
 
 }

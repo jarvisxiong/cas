@@ -25,5 +25,9 @@ public class RTBCallbackMacros {
     // InMobi specific macros
     public static final String AUCTION_PRICE_ENCRYPTED_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_PRICE_ENCRYPTED);
     public static final String AUCTION_WIN_URL_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_WIN_URL);
+   
+    public static final String DEAL_ID = "${DEAL_GET_PARAM}";
+    public static final String DEAL_ID_INSENSITIVE = "(?i)" + Pattern.quote(DEAL_ID);
+    
 
 }

@@ -168,7 +168,11 @@ public class Formatter {
         return null;
     }
 
-    public static String getNamespace() {
+    public static String getRTBDNamespace() {
         return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000)) + 10000) + "_";
+    }
+
+    public static String getIXNamespace() {
+        return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000)) + 20000) + "_";
     }
 }

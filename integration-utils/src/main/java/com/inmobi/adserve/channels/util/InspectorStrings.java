@@ -7,6 +7,7 @@ public class InspectorStrings {
     public static final String BACK_FILL_REQUESTS = "BackFillRequests";
     public static final String IX_REQUESTS = "IXRequests";
     public static final String NATIVE_REQUESTS = "NativeRequests";
+    public static final String TOTAL_NATIVE_RESPONSES = "TotalNativeResponses";
     public static final String NON_AD_REQUESTS = "NonAdRequests";
     public static final String TOTAL_INVOCATIONS = "TotalInvocations";
     public static final String SUCCESSFUL_CONFIGURE = "SuccessfulConfigure";
@@ -101,15 +102,30 @@ public class InspectorStrings {
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
     public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
-    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP = "DroppedAsSproutAdsAreNotSupportedOnWap";
-    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370 = "DroppedAsSproutAdsAreNotSupportedOnSDK<370";
+    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP =
+            "DroppedAsSproutAdsAreNotSupportedOnWap";
+    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370 =
+            "DroppedAsSproutAdsAreNotSupportedOnSDK<370";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
 
+    // IX Response Object Status Code Strings
+    public static final String IX_INVALID_REQUEST = "NO_AD:InvalidRequest";
+    public static final String IX_NO_MATCH = "NO_AD:NoAdMatchedCriteria";
+    public static final String IX_REFERRER_NOT_ALLOWED = "NO_AD:ReferrerNotAllowed";
+    public static final String IX_INVENTORY_IDENTIFIER_INVALID = "NO_AD:InvalidInventoryIdentifiers";
+    public static final String IX_SUSPECTED_SPIDER = "NO_AD:SuspectedSpider";
+    public static final String IX_SUSPECTED_BOTNET = "NO_AD:SuspectedBotnet";
+    public static final String IX_REFERRER_BLOCKED = "NO_AD:ReferrerBlocked";
+    public static final String IX_NOT_AUTHORIZED = "NO_AD:NotAuthorized";
+    public static final String IX_PROXY_BID_WINS = "NO_AD:ProxyBidWins";
+    public static final String IX_OTHER_ERRORS = "NO_AD:OtherErrors";
+
     // TestStrings:
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
+    public static final String IX_BEACON_WITHOUT_HTTP = "IXBeaconWithoutHTTP";
 
     // Hosted Ad Server Specific Stats
     public static final String TOTAL_HOSTED_REQUESTS = "HostedRequests";

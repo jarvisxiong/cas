@@ -145,7 +145,7 @@ public class FormatterTest {
 
     @Test
     public void testgetNamespace() {
-        final String namespace = Formatter.getNamespace();
+        final String namespace = Formatter.getRTBDNamespace();
 
         // Verify namespace
         assertTrue(namespace.matches("im_1\\d{4}_"));

@@ -10,9 +10,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 @Data
 public class CurrencyConversionEntity implements IdentifiableEntity<String> {
-
     private static final long serialVersionUID = 1L;
-
     private final Integer id;
     private final String currencyId;
     private final Double conversionRate;

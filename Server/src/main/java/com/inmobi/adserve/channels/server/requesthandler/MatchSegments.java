@@ -104,6 +104,7 @@ public class MatchSegments {
         Integer siteRating = -1;
         if (null == siteRatingEnum || slotIdsFromUmp == null || slotIdsFromUmp.isEmpty()
                 || sasParams.getCategories() == null || sasParams.getCategories().isEmpty()) {
+            LOG.debug(traceMarker, "MatchSegments failed as categories/siteRatingEnum/slotIdsFromUmp was empty/null");
             return null;
         }
         if (ContentType.PERFORMANCE == siteRatingEnum) {
@@ -246,6 +247,9 @@ public class MatchSegments {
 
                 advertiserMatchedSegmentDetail.getChannelSegmentList().add(channelSegment);
 
+            } else {
+                LOG.debug(traceMarker, "No adapter configuration found for adgroup: {} with advertiser_id: {}",
+                        channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getAdvertiserId());
             }
 
         }

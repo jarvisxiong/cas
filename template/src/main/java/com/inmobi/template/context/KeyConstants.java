@@ -19,12 +19,15 @@ public interface KeyConstants {
     public static final String IMNATIVE_CREATIVE_DESC = "imNative.creative.description";
     public static final String IMNATIVE_IMAGE = "imNative.creative.image";
     public static final String IMNATIVE_ACTION = "imNative.creative.action";
+    public static final String IMNATIVE_ACTION_TEXT = "imNative.creative.action.text";
 
     public static final String APP_CREATIVE_ICONS = "imNative.creative.icon";
 
     public static final String APP_CREATIVE_RATING = "imNative.creative.social.appstore.rating";
+    public static final String APP_CREATIVE_RATING_BEAN = "imNative.creative.social.appstore";
 
     public static final String ICON = "icon";
+    public static final String IMAGE = "image";
 
     public static final String WIDTH = "w";
     public static final String HEIGHT = "h";

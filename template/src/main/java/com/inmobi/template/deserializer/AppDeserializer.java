@@ -25,11 +25,11 @@ public class AppDeserializer implements JsonDeserializer<Context> {
             throws JsonParseException {
         final JsonObject jsonObj = json.getAsJsonObject();
 
-        String title = getAttributeAsString("title", jsonObj);
-        String desc = getAttributeAsString("description", jsonObj);
-        String actionText = getAttributeAsString("actiontext", jsonObj);
-        String actionLink = getAttributeAsString("actionlink", jsonObj);
-        String id = getAttributeAsString("uid", jsonObj, "");
+        final String title = getAttributeAsString("title", jsonObj);
+        final String desc = getAttributeAsString("description", jsonObj);
+        final String actionText = getAttributeAsString("actiontext", jsonObj);
+        final String actionLink = getAttributeAsString("actionlink", jsonObj);
+        final String id = getAttributeAsString("uid", jsonObj, "");
 
         final JsonElement imgElement = jsonObj.get("image");
         Screenshot imgs[] = null;
@@ -94,13 +94,13 @@ public class AppDeserializer implements JsonDeserializer<Context> {
     }
 
     private String getAttributeAsString(final String attr, final JsonObject jsonObj) {
-        JsonElement jsonElt = jsonObj.get(attr);
-        return (null != jsonElt) ? jsonElt.getAsString() : null;
+        final JsonElement jsonElt = jsonObj.get(attr);
+        return null != jsonElt ? jsonElt.getAsString() : null;
     }
 
     private String getAttributeAsString(final String attr, final JsonObject jsonObj, final String defaultValue) {
-        JsonElement jsonElt = jsonObj.get(attr);
-        return (null != jsonElt) ? jsonElt.getAsString() : defaultValue;
+        final JsonElement jsonElt = jsonObj.get(attr);
+        return null != jsonElt ? jsonElt.getAsString() : defaultValue;
     }
 
 }

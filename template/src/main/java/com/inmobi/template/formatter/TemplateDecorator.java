@@ -14,13 +14,9 @@ import com.google.inject.name.Named;
 import com.inmobi.template.exception.TemplateException;
 
 public class TemplateDecorator {
-
     private final static Logger LOG = LoggerFactory.getLogger(TemplateDecorator.class);
 
     private String contextCodeFile;
-
-    @Inject
-    public TemplateDecorator() {}
 
     @Inject
     public void addContextFile(@Named("ContextCodeFile") final String contextCodeVm) throws TemplateException {

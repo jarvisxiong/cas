@@ -40,7 +40,6 @@ public class AdapterConfigModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
         requestStaticInjection(BaseAdNetworkImpl.class);
         requestStaticInjection(RtbAdNetwork.class);
         requestStaticInjection(IXAdNetwork.class);

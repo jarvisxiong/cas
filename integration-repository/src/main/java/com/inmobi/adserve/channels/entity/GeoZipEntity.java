@@ -13,6 +13,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 @Getter
 public class GeoZipEntity implements IdentifiableEntity<Integer> {
+    private static final long serialVersionUID = 1L;
     private final Integer zipId;
     private final String zipCode;
     private final Timestamp modifiedOn;
@@ -48,9 +49,7 @@ public class GeoZipEntity implements IdentifiableEntity<Integer> {
 
     @Override
     public String getJSON() {
-        return String
-                .format("{\"zipId\":\"%s\",\"zipCode\":%s,\"modifiedOn\":\"%s\"}",
-                        zipId, zipCode, modifiedOn);
+        return String.format("{\"zipId\":\"%s\",\"zipCode\":%s,\"modifiedOn\":\"%s\"}", zipId, zipCode, modifiedOn);
     }
 
 }

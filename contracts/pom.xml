@@ -37,6 +37,15 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.inmobi.channels</groupId>
+            <artifactId>util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.inmobi.channels</groupId>
+            <artifactId>template</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

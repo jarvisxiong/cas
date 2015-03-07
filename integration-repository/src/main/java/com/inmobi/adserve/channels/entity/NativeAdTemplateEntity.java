@@ -14,6 +14,7 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
     private final long nativeAdId;
     private final String mandatoryKey;
     private final String imageKey;
+    private final String template;
     private final Timestamp modifiedOn;
 
     private NativeAdTemplateEntity(final Builder builder) {
@@ -21,13 +22,15 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
         nativeAdId = builder.nativeAdId;
         imageKey = builder.imageKey;
         mandatoryKey = builder.mandatoryKey;
+        template = builder.template;
         modifiedOn = builder.modifiedOn;
     }
 
     @Override
     public String getJSON() {
-        return String.format("{\"siteId\":\"%s\",\"nativeAdId\":%s,\"mandatoryKey\":\"%s\",\"imageKey\":\"%s\"}",
-                siteId, nativeAdId, mandatoryKey, imageKey);
+        return String
+                .format("{\"siteId\":\"%s\",\"nativeAdId\":%s,\"mandatoryKey\":\"%s\",\"imageKey\":\"%s\",\"template\":\"%s\"}",
+                        siteId, nativeAdId, mandatoryKey, imageKey, template);
     }
 
     @Override
@@ -45,6 +48,7 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
         private long nativeAdId;
         private String mandatoryKey;
         private String imageKey;
+        private String template;
         private Timestamp modifiedOn;
 
         public NativeAdTemplateEntity build() {

@@ -1,5 +1,7 @@
 package com.inmobi.adserve.contracts.ix.request;
 
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -7,5 +9,5 @@ import lombok.Data;
  */
 @Data
 public final class RPTargetingExtension {
-    // TODO: Placeholder
+    private List<String> packages;
 }

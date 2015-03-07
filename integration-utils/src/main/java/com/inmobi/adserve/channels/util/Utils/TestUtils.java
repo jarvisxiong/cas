@@ -39,6 +39,17 @@ public class TestUtils {
                         + "\":\"CRID\",\"h\":320,\"w\":480,\"aqid\":\"Test_AQID\"}],\"buyer\":\"2770\",\"seat\":\"f55c"
                         + "9d46d7704f8789015a64153a7012\"}],\"bidid\":\"a35e38bb-0148-1000-ec1b-000402530000\"}";
 
+        public static final String ixNativeResponseJson =
+                "{\"id\":\"gCDNC0Zv3llJb4d\",\"bidid\":\"7ed12492-dbf8-46e1-8038-05bb22f62669\",\"seatbid\":[{\"buyer\""
+                        + ":\"2770\",\"bid\":[{\"id\":\"11\",\"impid\":\"gCDNC0Zv3llJb4d\",\"price\":1.192731,\"crid\""
+                        + ":\"3702042\",\"aqid\":\"rtb:3320:123456\",\"admobject\":{\"ver\":1,\"link\":{\"url\":\"http"
+                        + ": //i.am.a/URL\",\"fallback\":\"deeplink://deeplink/url/into/app\",\"clicktrackers\":[\"htt"
+                        + "p: //a.com/a\",\"http: //b.com/b\"]},\"imptrackers\":[\"http: //a.com/a\",\"http: //b.com/"
+                        + "b\"],\"assets\":[{\"id\":1,\"title\":{\"text\":\"InstallBOA\"},\"link\":{\"url\":\"http://"
+                        + "i.am.a/URL\"}},{\"id\":2,\"data\":{\"value\":5}},{\"id\":3,\"img\":{\"url\":\"http://cdn.mo"
+                        + "bad.com/ad.png\",\"w\":64,\"h\":64}},{\"id\":4,\"data\":{\"value\":\"Install\"},\"link\":"
+                        + "{\"url\":\"http://i.am.a/URL\"}}]}}]}],\"statuscode\":0}";
+
         public static final String ixResponseADM =
                 "<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.g"
                         + "oogle.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='htt"
@@ -92,7 +103,7 @@ public class TestUtils {
 
         public static final String rtbNativeAdMarkup = "{\"version\": \"1.0\",\"iconurl\": \"www.inmobi.com\","
                 + "\"title\": \"Hello World\",\"description\": \"I am a description\","
-                + "\"image\": {\"imageurl\": \"http://demo.image.com\",\"w\": 320,\"h\": 980},"
+                + "\"image\": {\"imageurl\": \"http://demo.image.com\",\"w\": 480,\"h\": 320},"
                 + "\"actiontext\": \"Action text\",\"actionlink\": \"actionlink.inmobi.com\","
                 + "\"pixelurl\": [\"http://rendered.action1\",\"http://rendered.action2\"],"
                 + "\"clickurl\": [\"http://click.action1\",\"http://click.action2\"],"
@@ -101,7 +112,7 @@ public class TestUtils {
         public static final String rtbNativeAdMarkupWithChineseText = "{\"version\": \"1.0\",\"iconurl\": \"www.inmo"
                 + "bi.com\",\"title\": \"媚三国-即时战斗卡牌\",\"description\": \"指尖推塔，媚将无双！创新性类dota卡牌手"
                 + "游《媚三国》带你战起来！\","
-                + "\"image\": {\"imageurl\": \"http://demo.image.com\",\"w\": 320,\"h\": 980},"
+                + "\"image\": {\"imageurl\": \"http://demo.image.com\",\"w\": 480,\"h\": 320},"
                 + "\"actiontext\": \"Action text\",\"actionlink\": \"actionlink.inmobi.com\","
                 + "\"pixelurl\": [\"http://rendered.action1\",\"http://rendered.action2\"],"
                 + "\"clickurl\": [\"http://click.action1\",\"http://click.action2\"],"
@@ -120,6 +131,8 @@ public class TestUtils {
 
 
     public static class improvedTimestamp extends Timestamp {
+        private static final long serialVersionUID = 1L;
+
         public improvedTimestamp(long time) {
             super(((time / 1000) * 1000) - TimeZone.getDefault().getRawOffset());
         }

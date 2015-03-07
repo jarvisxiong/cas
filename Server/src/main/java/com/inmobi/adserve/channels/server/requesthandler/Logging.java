@@ -140,6 +140,7 @@ public class Logging {
             if (adNetworkInterface.isRtbPartner() && adNetworkInterface.isLogCreative()) {
                 String response = adNetworkInterface.getHttpResponseContent();
                 if (adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE) {
+                    // adm is not populated for Native on IX. Use admobject instead
                     response = adNetworkInterface.getAdMarkUp();
                 }
 

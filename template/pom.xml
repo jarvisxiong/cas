@@ -16,6 +16,10 @@
 			<artifactId>velocity-tools</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.inmobi.channels</groupId>
+			<artifactId>util</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 		</dependency>
@@ -34,6 +38,10 @@
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

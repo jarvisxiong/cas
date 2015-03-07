@@ -2,30 +2,41 @@ package com.inmobi.adserve.contracts.ix.request;
 
 import java.util.List;
 
-import lombok.Data;
+import com.inmobi.template.gson.GsonContract;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Created by ishanbhatnagar on 22/1/15.
  */
-@Data
+// Required parameters are enforced by @NonNull
+@Getter
+@Setter
+@NoArgsConstructor
+@GsonContract
 public final class RubiconExtension {
     private String zone_id;
     private String enc;
-    private Long pmptier = 1L;
-    private Long dpf = 1L;
+    private Integer pmptier = 1;
+    private Integer dpf = 1;
     private ExtRubiconTarget target;
-    private List<String> track;
-    private List<String> rtb;
-    private List<String> nolog;
+    private ExtRubiconTarget track;
+    private ExtRubiconTarget rtb;
+    private ExtRubiconTarget nolog;
     private Integer size_id;
     private List<Integer> alt_size_ids;
     private Companionad companionad;
     private Content content;
-    private Long site_id;
-    private Long account_id;
+    private Integer site_id;
+    private Integer account_id;
     private String xff;
     private String res;
     private Double pixelratio;
     private String mime;
+    // Advertiser Id
     private String advid;
+    private String adtype;
+    private Integer consent = 1;
 }

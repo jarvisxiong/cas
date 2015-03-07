@@ -13,47 +13,45 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
  */
 @Getter
 public class SlotSizeMapEntity implements IdentifiableEntity<Short> {
+    private static final long serialVersionUID = 1L;
+    private final Short slotId;
+    private final Dimension dimension;
+    private final Timestamp modifiedOn;
+
+    public SlotSizeMapEntity(final Builder builder) {
+        slotId = builder.slotId;
+        dimension = builder.dimension;
+        modifiedOn = builder.modifiedOn;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
 
 
-        private final Short slotId;
-        private final Dimension dimension;
-        private final Timestamp modifiedOn;
 
-        public SlotSizeMapEntity(final Builder builder) {
-            slotId = builder.slotId;
-            dimension = builder.dimension;
-            modifiedOn = builder.modifiedOn;
+    @Setter
+    public static class Builder {
+        private Short slotId;
+        private Dimension dimension;
+        private Timestamp modifiedOn;
+
+        public SlotSizeMapEntity build() {
+            return new SlotSizeMapEntity(this);
         }
 
-        public static Builder newBuilder() {
-            return new Builder();
-        }
+    }
 
+    @Override
+    public Short getId() {
+        return slotId;
+    }
 
-
-        @Setter
-        public static class Builder {
-            private Short slotId;
-            private Dimension dimension;
-            private Timestamp modifiedOn;
-
-            public SlotSizeMapEntity build() {
-                return new SlotSizeMapEntity(this);
-            }
-
-        }
-
-        @Override
-        public Short getId() {
-            return slotId;
-        }
-
-        @Override
-        public String getJSON() {
-            return String
-                    .format("{\"slotId\":\"%s\",\"dimension\":%s,\"modifiedOn\":\"%s\"}",
-                            slotId, dimension, modifiedOn);
-        }
+    @Override
+    public String getJSON() {
+        return String.format("{\"slotId\":\"%s\",\"dimension\":%s,\"modifiedOn\":\"%s\"}", slotId, dimension,
+                modifiedOn);
+    }
 
 
 

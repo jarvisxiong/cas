@@ -3,11 +3,11 @@ package com.inmobi.template.context;
 import java.util.List;
 import java.util.Map;
 
+import com.inmobi.template.interfaces.Context;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import com.inmobi.template.interfaces.Context;
 
 
 @Getter
@@ -46,29 +46,34 @@ public final class App extends AbstractContext {
         setValues(params);
     }
 
+    // Supports a superset of
+    // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/NativeAdContentAsset.java
     @Override
     public void setValues(final Map<String, Object> params) {
-        params.put(KeyConstants.APP_DESC, desc);
         params.put(KeyConstants.APP_ICONS, icons);
+        params.put(KeyConstants.APP_DESC, desc);
         params.put(KeyConstants.APP_SCREENSHOTS, screenshots);
         params.put(KeyConstants.APP_ID, id);
         params.put(KeyConstants.APP_TITLE, title);
-
         params.put(KeyConstants.APP_RATING, rating);
         params.put(KeyConstants.APP_RATING_COUNT, rating_count);
         params.put(KeyConstants.APP_DOWNLOADS, downloads);
 
+        params.put(KeyConstants.APP_CREATIVE, this);
+
+        params.put(KeyConstants.ICON, icons);
+        params.put(KeyConstants.APP_CREATIVE_ICONS, icons);
         params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE, new CreativeBean("text", title));
         params.put(KeyConstants.IMNATIVE_CREATIVE_DESC, new CreativeBean("text", desc));
         params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE_TEXT, title);
         params.put(KeyConstants.IMNATIVE_CREATIVE_DESC_TEXT, desc);
 
+        params.put(KeyConstants.IMAGE, screenshots);
         params.put(KeyConstants.IMNATIVE_IMAGE, screenshots);
         params.put(KeyConstants.IMNATIVE_ACTION, new CreativeBean("text", actionText));
-        params.put(KeyConstants.ICON, icons);
-        params.put(KeyConstants.APP_CREATIVE_ICONS, icons);
-        params.put(KeyConstants.APP_CREATIVE, this);
+        params.put(KeyConstants.IMNATIVE_ACTION_TEXT, new CreativeBean("text", actionText));
         params.put(KeyConstants.APP_CREATIVE_RATING, rating);
+        params.put(KeyConstants.APP_CREATIVE_RATING_BEAN, new CreativeBean("rating", rating));
     }
 
 

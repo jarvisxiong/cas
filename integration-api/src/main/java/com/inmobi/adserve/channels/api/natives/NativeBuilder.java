@@ -4,6 +4,16 @@ import com.inmobi.casthrift.rtb.Native;
 
 public interface NativeBuilder {
 
-    public Native build();
+    /**
+     * 
+     * @return
+     */
+    Native build();
+    
+    /**
+     * 
+     * @return
+     */
+    com.inmobi.adserve.contracts.ix.request.nativead.Native buildNativeIX();
 
 }

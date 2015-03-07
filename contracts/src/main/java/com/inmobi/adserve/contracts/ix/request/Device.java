@@ -3,6 +3,7 @@ package com.inmobi.adserve.contracts.ix.request;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Created by ishanbhatnagar on 22/1/15.
@@ -11,7 +12,9 @@ import lombok.Data;
 public final class Device {
     private Integer dnt;
     private Integer lmt;
+    @NonNull
     private final String ua;
+    @NonNull
     private final String ip;
     private Geo geo;
     private String didsha1;

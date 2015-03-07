@@ -3,6 +3,7 @@ package com.inmobi.adserve.contracts.ix.request;
 import java.util.List;
 
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Created by ishanbhatnagar on 22/1/15.
@@ -11,8 +12,11 @@ import lombok.Data;
 public final class Video {
     private Integer w;
     private Integer h;
+    @NonNull
     private final List<String> mimes;
+    @NonNull
     private final Integer minduration;
+    @NonNull
     private final Integer maxduration;
     private Integer protocol;
     private List<Integer> protocols;

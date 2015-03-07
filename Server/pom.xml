@@ -102,6 +102,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.inmobi.channels</groupId>
+			<artifactId>template</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.inmobi.channels</groupId>
 			<artifactId>adnetworks</artifactId>
 			<exclusions>
 				<exclusion>

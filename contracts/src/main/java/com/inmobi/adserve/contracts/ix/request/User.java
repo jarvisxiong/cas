@@ -3,6 +3,7 @@ package com.inmobi.adserve.contracts.ix.request;
 import java.util.List;
 
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
+import com.inmobi.adserve.contracts.ix.request.nativead.Data;
 
 /**
  * Created by ishanbhatnagar on 22/1/15.

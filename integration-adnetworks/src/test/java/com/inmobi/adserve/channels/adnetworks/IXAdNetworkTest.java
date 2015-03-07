@@ -4,9 +4,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
-import io.netty.channel.Channel;
-
 import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
@@ -17,8 +14,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -45,9 +40,16 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.casthrift.ix.Bid;
-import com.inmobi.casthrift.ix.IXBidResponse;
-import com.inmobi.casthrift.ix.SeatBid;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.contracts.ix.response.Bid;
+import com.inmobi.adserve.contracts.ix.response.BidResponse;
+import com.inmobi.adserve.contracts.ix.response.SeatBid;
+import com.inmobi.template.config.DefaultConfiguration;
+import com.inmobi.template.config.DefaultGsonDeserializerConfiguration;
+import com.inmobi.template.gson.GsonManager;
+
+import io.netty.channel.Channel;
+import junit.framework.TestCase;
 
 public class IXAdNetworkTest extends TestCase {
 
@@ -57,13 +59,13 @@ public class IXAdNetworkTest extends TestCase {
     private IXAdNetwork ixAdNetwork;
     private final String ixHost = "http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east";
 
-    private final SASRequestParameters sasParams = new SASRequestParameters();
+    private final SASRequestParameters sas = new SASRequestParameters();
     private final String ixAdvId = "id";
     private static final int OS_ID = 14;
     private static final Short SLOT_ID = 15;
     private static final String SITE_ID = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private static final long COUNTRY_ID = 94L;
-    IXBidResponse bidResponse;
+    BidResponse bidResponse;
     private RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
@@ -78,6 +80,7 @@ public class IXAdNetworkTest extends TestCase {
         expect(mockConfig.getString(advertiserName + ".wnUrlback")).andReturn("").anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".isWnRequired")).andReturn(true).anyTimes();
         expect(mockConfig.getString(advertiserName + ".ixMethod")).andReturn("").anyTimes();
+        expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getString(advertiserName + ".userName")).andReturn("test").anyTimes();
         expect(mockConfig.getString(advertiserName + ".password")).andReturn("api").anyTimes();
         expect(mockConfig.getInt(advertiserName + ".accountId")).andReturn(11726).anyTimes();
@@ -93,6 +96,10 @@ public class IXAdNetworkTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
+        DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+        defaultConfiguration.setGsonManager(new GsonManager(new DefaultGsonDeserializerConfiguration()));
+        MemberModifier.field(IXAdNetwork.class, "templateConfiguration").set(IXAdNetwork.class, defaultConfiguration);
+
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -102,14 +109,16 @@ public class IXAdNetworkTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
-        sasParams.setCountryId(COUNTRY_ID);
-        sasParams.setOsId(OS_ID);
-        sasParams.setSiteId(SITE_ID);
-        sasParams.setSource("app");
-        sasParams.setCarrierId(0);
-        sasParams.setDst(8);
+        sas.setCountryId(COUNTRY_ID);
+        sas.setOsId(OS_ID);
+        sas.setSiteId(SITE_ID);
+        sas.setSource("APP");
+        sas.setCarrierId(0);
+        sas.setDst(8);
+        sas.setRqAdType("");
         final String urlBase = "";
         final CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
+        
         EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
         EasyMock.replay(currencyConversionEntity);
         repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
@@ -215,27 +224,20 @@ public class IXAdNetworkTest extends TestCase {
         asyncHttpClientProvider.setup();
         asyncHttpClientProviderField.set(null, asyncHttpClientProvider);
 
-        final Bid bid2 = new Bid();
-        bid2.id = "ab73dd4868a0bbadf8fd7527d95136b4";
-        bid2.price = 2.4028260707855225;
-        bid2.crid = "CRID";
-        bid2.adm =
-                "<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>";
-        bid2.impid = "impressionId";
-        bid2.estimated = 0;
-        bid2.pmptier = 3;
-        bid2.aqid = "Test_AQID";
+        final Bid bid2 = new Bid("ab73dd4868a0bbadf8fd7527d95136b4", "impressionId", 2.4028260707855225);
+        bid2.setCrid("CRID");
+        bid2.setAdm(
+                "<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
+        bid2.setEstimated(0);
+        bid2.setPmptier(3);
         final List<Bid> bidList = new ArrayList<Bid>();
         bidList.add(bid2);
-        final SeatBid seatBid = new SeatBid();
-        seatBid.seat = "TO-BE-DETERMINED";
-        seatBid.bid = bidList;
+        final SeatBid seatBid = new SeatBid(bidList);
+        seatBid.setSeat("TO-BE-DETERMINED");
         final List<SeatBid> seatBidList = new ArrayList<SeatBid>();
         seatBidList.add(seatBid);
-        bidResponse = new IXBidResponse();
-        bidResponse.setSeatbid(seatBidList);
-        bidResponse.id = "SGu1Jpq1IO";
-        bidResponse.bidid = "ac1a2c944cff0a176643079625b0cad4a1bbe4a3";
+        bidResponse = new BidResponse("SGu1Jpq1IO", seatBidList);
+        bidResponse.setBidid("ac1a2c944cff0a176643079625b0cad4a1bbe4a3");
 
         ixAdNetwork.setBidResponse(bidResponse);
 
@@ -258,49 +260,14 @@ public class IXAdNetworkTest extends TestCase {
         assertEquals(uri, ixAdNetwork.getRequestUri());
     }
 
-    /*
-     * @Test public void testGetHttpRequestBidRequestNull() throws Exception { URI uri = new
-     * URI("http://localhost:8800?urlArg="); HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1,
-     * HttpMethod.POST, uri.toASCIIString()); httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-     * httpRequest.setHeader("x_openrtb_version", "2"); rtbAdNetwork.setUrlArg("urlArg");
-     * rtbAdNetwork.setUrlBase("http://localhost:8800"); assertEquals(null, rtbAdNetwork.getHttpRequest()); }
-     */
-    /*
-     * @Test public void testGetHttpRequestBidRequestNotNull() throws Exception { URI uri = new
-     * URI("http://localhost:8800"); HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1,
-     * HttpMethod.POST, uri.toASCIIString()); httpRequest.setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-     * httpRequest.setHeader("x-openrtb-version", "2.0"); httpRequest.setHeader(HttpHeaders.Names.CONNECTION,
-     * HttpHeaders.Values.CLOSE); httpRequest.setHeader(HttpHeaders.Names.HOST, uri.getHost());
-     * httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, "0"); rtbAdNetwork.setUrlArg("urlArg"); StringBuilder str
-     * = new StringBuilder(); str .append(
-     * "{\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"imp\":[{\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"banner\":{\"w\":120,\"h\":20,\"id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\"},\"bidfloorcur\":\"USD\",\"iframebuster\":[\"None\"]}],\"app\":{\"id\":\"0000000000\",\"cat\":[\"IAB1-1\",\"IAB24\",\"IAB5\"]},\"device\":{\"ua\":\"Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334\",\"ip\":\"206.29.182.240\",\"geo\":{\"lat\":37.442901611328125,\"lon\":-122.15139770507812,\"type\":2},\"connectiontype\":2},\"user\":{\"id\":\"1234\",\"buyerid\":\"1234\",\"yob\":1987,\"gender\":\"Male\"},\"at\":2,\"tmax\":200,\"cur\":[\"USD\"]}"
-     * ); StringBuilder responseAdm = new StringBuilder();
-     * responseAdm.append("<html><body style=\"margin:0;padding:0;\">"); responseAdm .append(
-     * "<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>"
-     * ); responseAdm.append("<img src=\'\' height=1 width=1 border=0 /></body></html>"); String clickUrl =
-     * "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1"
-     * ; String beaconUrl = ""; String externalSiteKey = "f6wqjq1r5v"; ChannelSegmentEntity entity = new
-     * ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0, null, null,
-     * true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false, false, false, false, false,
-     * false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-     * rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
-     * TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-     * rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
-     * assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent); rtbAdNetwork.setSecondBidPrice(0.23);
-     * rtbAdNetwork.setEncryptedBid("abc"); String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-     * assertEquals(afterMacros, rtbAdNetwork.responseContent); rtbAdNetwork.parseResponse(str.toString(),
-     * HttpResponseStatus.NOT_FOUND); assertEquals("", rtbAdNetwork.responseContent);
-     * 
-     * rtbAdNetwork.setBidRequest(new BidRequest()); rtbAdNetwork.setUrlBase("http://localhost:8800");
-     * assertEquals(httpRequest.toString(), rtbAdNetwork.getHttpRequest().toString()); }
-     */
-
     @Test
     public void testConfigureParameters() {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSource("wap");
-        sasParams
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setSource("wap");
+        sas.setRqAdType("");
+        sas
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -314,7 +281,7 @@ public class IXAdNetworkTest extends TestCase {
                         0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject(), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper),
+                ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -332,24 +299,25 @@ public class IXAdNetworkTest extends TestCase {
                             new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId(SITE_ID);
-            sasParams.setSource("wap");
+            sas.setRemoteHostIp("206.29.182.240");
+            sas.setRqAdType("");
+            sas.setSiteId(SITE_ID);
+            sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-            sasParams
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
         } catch (final JSONException e) {
@@ -371,24 +339,25 @@ public class IXAdNetworkTest extends TestCase {
                             new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId(SITE_ID);
-            sasParams.setSource("wap");
+            sas.setRemoteHostIp("206.29.182.240");
+            sas.setRqAdType("");
+            sas.setSiteId(SITE_ID);
+            sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-            sasParams
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertFalse(adapterCreated);
         } catch (final JSONException e) {
@@ -411,34 +380,35 @@ public class IXAdNetworkTest extends TestCase {
                             null, null, 0, new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId(SITE_ID);
-            sasParams.setSource("wap");
+            sas.setRemoteHostIp("206.29.182.240");
+            sas.setRqAdType("");
+            sas.setSiteId(SITE_ID);
+            sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setTransparencyEnabled(false);
             builder.setBundleId("com.play.google.testApp");
             builder.setSiteUrl("http://www.testSite.com");
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-            sasParams
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 
             // Test case for transparency false
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 1);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().getBlind(), (Integer)1);
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain());
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 1);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sas.getSiteId());
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlind(), (Integer)1);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
             assertEquals(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle(), "com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474");
             assertEquals(ixAdNetwork.getBidRequest().getApp().getBundle(), "com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474");
@@ -447,57 +417,57 @@ public class IXAdNetworkTest extends TestCase {
             blindList = new ArrayList<Integer>(Arrays.asList(1, 2));
 
             // Test case when site_blind_list and pub_blind_list are null, should take global blind list, set above.
-            sasParams.setSource("wap");
+            sas.setSource("wap");
             builder.setTransparencyEnabled(true);
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
 
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sasParams.getSiteId());
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 0);
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blindbuyers, blindList);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sas.getSiteId());
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().getBlind(), (Integer)0);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().getBlindbuyers(), blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain(), "http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPage(), "http://www.testSite.com");
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 0);
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blindbuyers, blindList);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sas.getSiteId());
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlind(), (Integer)0);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlindbuyers(), blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
             assertEquals(ixAdNetwork.getBidRequest().getApp().getBundle(), "com.play.google.testApp");
 
             // Test case when site_blind_list or pub_blind_list is present
-            sasParams.setSource("wap");
+            sas.setSource("wap");
             builder.setTransparencyEnabled(true);
             blindList = new ArrayList<Integer>(Arrays.asList(8, 2, 3));
             builder.setBlindList(blindList);
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
 
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sasParams.getSiteId());
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blind, 0);
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().blindbuyers, blindList);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getId(), sas.getSiteId());
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().getBlind(), (Integer)0);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getTransparency().getBlindbuyers(), blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getPage());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getExt().getBlind().getDomain(), "http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474");
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sasParams.getSiteId());
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blind, 0);
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().blindbuyers, blindList);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getId(), sas.getSiteId());
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlind(), (Integer)0);
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlindbuyers(), blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
 
         } catch (final JSONException e) {
@@ -520,45 +490,46 @@ public class IXAdNetworkTest extends TestCase {
                             null, null, 0, new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId(SITE_ID);
+            sas.setRemoteHostIp("206.29.182.240");
+            sas.setRqAdType("");
+            sas.setSiteId(SITE_ID);
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-            sasParams
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 
-            sasParams.setSource("wap");
+            sas.setSource("wap");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getAq().getSensitivity(), "high");
 
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getAq().getSensitivity(), "high");
 
             // if site type is performance
-            sasParams.setSiteContentType(ContentType.PERFORMANCE);
+            sas.setSiteContentType(ContentType.PERFORMANCE);
 
-            sasParams.setSource("wap");
+            sas.setSource("wap");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getSite().getAq().getSensitivity(), "low");
 
 
-            sasParams.setSource("app");
+            sas.setSource("app");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getAq().getSensitivity(), "low");
@@ -586,23 +557,24 @@ public class IXAdNetworkTest extends TestCase {
                             null, null, 0, new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId(SITE_ID);
-            sasParams.setSource("wap");
-            sasParams.setSiteContentType(ContentType.PERFORMANCE);
-            sasParams.setSiteIncId(423);
+            sas.setRemoteHostIp("206.29.182.240");
+            sas.setRqAdType("");
+            sas.setSiteId(SITE_ID);
+            sas.setSource("wap");
+            sas.setSiteContentType(ContentType.PERFORMANCE);
+            sas.setSiteIncId(423);
             builder = WapSiteUACEntity.newBuilder();
             builder.setAppType("Games");
             builder.setSiteName("TESTSITE");
             builder.setSiteUrl("www.testSite.com");
             builder.setTransparencyEnabled(true);
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-            sasParams
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             List<Integer> apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertNull(apiFrameworkValues); // Will not set any apiFramework values for wap sites.
 
@@ -613,22 +585,22 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPage(), "www.testSite.com");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
                     Lists.newArrayList("blk423", "InMobiPERF"));
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), (Integer)11726);
 
             // checking for blocked list if siteType is not PERFORMANCE, also if site is not transparent
 
-            sasParams.setSiteContentType(ContentType.FAMILY_SAFE);
-            sasParams.setSiteIncId(423);
+            sas.setSiteContentType(ContentType.FAMILY_SAFE);
+            sas.setSiteIncId(423);
             builder = WapSiteUACEntity.newBuilder();
             builder.setAppType("Games");
             builder.setSiteName("TESTSITE");
             builder.setSiteUrl("www.testSite.com");
             builder.setTransparencyEnabled(false);
 
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
 
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
 
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getApp());
@@ -640,12 +612,12 @@ public class IXAdNetworkTest extends TestCase {
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getPage());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
                     Lists.newArrayList("blk423", "InMobiFS"));
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), 11726);
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), (Integer)11726);
 
-            sasParams.setSource("app");
-            sasParams.setSdkVersion("a430");
+            sas.setSource("app");
+            sas.setSdkVersion("a430");
             adapterCreated =
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+                    ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertEquals(5, apiFrameworkValues.get(0).intValue());
             assertEquals(1001, apiFrameworkValues.get(1).intValue());
@@ -655,320 +627,15 @@ public class IXAdNetworkTest extends TestCase {
             assertNotNull(ixAdNetwork.getBidRequest().getApp());
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
 
-            sasParams.setSource("app");
-            sasParams.setSdkVersion("a350");
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+            sas.setSource("app");
+            sas.setSdkVersion("a350");
+            ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertNull(apiFrameworkValues); // Will not set any api framework values for sdk version < 370
 
         } catch (final JSONException e) {
             System.out.println("JSON EXCEPtion in creating new channel segment entity");
         }
-
     }
-    /*
-        public void testShouldSetSiteObjectCorrectly() {
-            boolean adapterCreated = false;
-            String externalSiteKey = "f6wqjq1r5v";
-
-            try {
-                ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId,
-                        null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[]{0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(),
-                        0.0d, null, null, 0, new Integer[]{0}));
-
-                CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-                sasParams.setRemoteHostIp("206.29.182.240");
-                sasParams.setSiteId(SITE_ID);
-                sasParams.setSource("wap");
-                WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-                //   builder.setAppType("Games");
-                sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-                sasParams.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-                sasParams.setUserAgent(
-                        "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-                casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
-                adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-
-                assertTrue(adapterCreated);
-
-                assertNotNull(ixAdNetwork.getBidRequest().getSite());
-                assertEquals(ixAdNetwork.getBidRequest().getSite().getId(),SITE_ID);
-                assertEquals(ixAdNetwork.getBidRequest().getSite().getName(),"");
-
-                sasParams.setSource("app");
-                adapterCreated = ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-
-                assertTrue(adapterCreated);
-                assertNull(ixAdNetwork.getBidRequest().getSite());
-                assertNotNull(ixAdNetwork.getBidRequest().getApp());
-
-            }
-            catch (JSONException e){
-                System.out.println("JSON EXCEPtion in creating new channel segment entity");
-            }
-
-        }
-
-    /*
-
-        @Test
-        public void testShouldTestCategorySetForSiteNameOrAppName() {
-            String externalSiteKey = "f6wqjq1r5v";
-            ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId,
-                    null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-            CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSiteId(SITE_ID);
-            sasParams.setSource("wap");
-            WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-            builder.setAppType("Games");
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            sasParams.setUserAgent(
-                    "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-
-            //First UAC Entity Category should be present as Site Name.
-            assertEquals("Games", ixAdNetwork.getBidRequest().getSite().getName());
-
-            //For App, First UAC Entity Category should be present as App Name.
-            sasParams.setSource("app");
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-            assertEquals("Games", ixAdNetwork.getBidRequest().getApp().getName());
-
-            //If WapSiteUACEntity is null, then it should fallback to InMobi categories.
-            sasParams.setSource("app");
-            sasParams.setWapSiteUACEntity(null);
-            sasParams.setCategories(Lists.newArrayList(15L, 12L, 11L));
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-            // 15 mean board games. Refer to CategoryList
-            assertEquals("Board", ixAdNetwork.getBidRequest().getApp().getName());
-
-            //If WapSiteUACEntity is not null, then it should set primary category name from uac.
-            sasParams.setSource("app");
-            builder = WapSiteUACEntity.newBuilder();
-            builder.setAppType("Social");
-            sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-            // Setting primary category name from uac.
-            assertEquals("Social", ixAdNetwork.getBidRequest().getApp().getName());
-
-            //If WapSiteUACEntity is null, then it should fallback to InMobi categories.
-            sasParams.setSource("wap");
-            sasParams.setWapSiteUACEntity(null);
-            sasParams.setCategories(Lists.newArrayList(11L, 12L, 15L));
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-            // 11 mean Games. Refer to CategoryList
-            assertEquals("Games", ixAdNetwork.getBidRequest().getSite().getName());
-
-            //If WapSiteUACEntity and InMobi categories are null.
-            sasParams.setSource("wap");
-            sasParams.setWapSiteUACEntity(null);
-            ArrayList<Long> list = new ArrayList<Long>();
-            sasParams.setCategories(list);
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-
-            assertEquals("miscellenous", ixAdNetwork.getBidRequest().getSite().getName());
-        }
-
-
-        @Test
-        public void testShouldHaveFixedBlockedAdvertisers() {
-            String externalSiteKey = "f6wqjq1r5v";
-            ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId,
-                    null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-            CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSource("wap");
-            sasParams.setUserAgent(
-                    "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-
-            //Expected Blocked Advertisers
-            ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
-            assertNull(casInternalRequestParameters.blockedAdvertisers);
-            assertEquals(6, ixAdNetwork.getBidRequest().getBadv().size());
-            assertTrue(ixAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
-        }
-
-        @Test
-        public void testShouldAddFixedBlockedAdvertisersForExistingBlockedList() {
-            String externalSiteKey = "f6wqjq1r5v";
-            ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
-                    null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-            CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            casInternalRequestParameters.blockedAdvertisers = Lists.newArrayList("abcd.com");
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams.setSource("wap");
-            sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "");
-
-            //Expected Blocked Advertisers
-            ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("abcd.com", "king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
-            assertEquals(1, casInternalRequestParameters.blockedAdvertisers.size());
-            assertEquals(7, ixAdNetwork.getBidRequest().getBadv().size());
-            assertTrue(ixAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
-        }
-
-        @Test
-        public void testConfigureParametersWithAllsasparams() {
-            SASRequestParameters sasParams = new SASRequestParameters();
-            CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-            sasParams.setSiteId("123");
-            sasParams.setSource("app");
-            sasParams.setSlot((short)1);
-            Long[] catLong = new Long[2];
-            catLong[0] = (long) 1;
-            catLong[1] = (long) 2;
-            sasParams.setCategories(Arrays.asList(catLong));
-            sasParams.setLocSrc("wifi");
-            sasParams.setGender("Male");
-            casInternalRequestParameters.uid = "1234";
-            sasParams.setAge((short)26);
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams
-                    .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.latLong = "37.4429,-122.1514";
-            casInternalRequestParameters.impressionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-            casInternalRequestParameters.auctionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-            String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-            String externalSiteKey = "f6wqjq1r5v";
-            String beaconUrl = "";
-            ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
-                    null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-            assertEquals(
-                    ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl),
-                    true);
-        }
-
-        @Test
-        public void testRtbGetName() throws Exception {
-            assertEquals(ixAdNetwork.getName(), "rtb");
-        }
-
-        @Test
-        public void testReplaceMacros() {
-            String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-            String externalSiteKey = "f6wqjq1r5v";
-            String beaconUrl = "";
-            ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId,
-                    null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
-            ixAdNetwork.setCallbackUrl("http://ix:8970/${AUCTION_ID}/${AUCTION_BID_ID}");
-            ixAdNetwork.setCallbackUrl(ixAdNetwork.replaceIXMacros(ixAdNetwork.getCallbackUrl()));
-            assertEquals("http://ix:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3",
-                    ixAdNetwork.getCallbackUrl());
-        }
-
-        @Test
-        public void testReplaceMacrosAllPosibilities() {
-            String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-            String externalSiteKey = "f6wqjq1r5v";
-            String beaconUrl = "";
-            sasParams.setSource("app");
-            sasParams.setRemoteHostIp("206.29.182.240");
-            sasParams
-                    .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-            casInternalRequestParameters.impressionId = "4f8d98e2-4bbd-40bc-8795-22da170700f9";
-            ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId,
-                    null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-            ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
-            ixAdNetwork
-                    .setCallbackUrl("http://ix:8970/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_IMP_ID}/${AUCTION_SEAT_ID}/${AUCTION_AD_ID}/${AUCTION_PRICE}/${AUCTION_CURRENCY}");
-            ixAdNetwork.setEncryptedBid("abc");
-            ixAdNetwork.setCallbackUrl(ixAdNetwork.replaceIXMacros(ixAdNetwork.getCallbackUrl()));
-            assertEquals(
-                    "http://ix:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3/4f8d98e2-4bbd-40bc-8795-22da170700f9/TO-BE-DETERMINED/1335571993285/0.0/USD",
-                    ixAdNetwork.getCallbackUrl());
-        }
-
-        */
-
-
-
-    /*
-    @Test
-    public void testParseResponseWithRMD() throws TException {
-        bidResponse.setCur("RMD");
-        bidResponse.getSeatbid().get(0).getBidIterator().next().setNurl("${AUCTION_PRICE}${AUCTION_CURRENCY}");
-        StringBuilder responseAdm = new StringBuilder();
-        responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
-        responseAdm
-                .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
-        responseAdm
-                .append("<img src=\'?b=${WIN_BID}\' height=1 width=1 border=0 /><img src=\'${AUCTION_PRICE}${AUCTION_CURRENCY}\' height=1 width=1 border=0 />");
-        responseAdm.append("</body></html>");
-        String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        String beaconUrl = "";
-        String externalSiteKey = "f6wqjq1r5v";
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
-                null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[]{0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[]{0}));
-        sasParams.setDst(2);
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
-        TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-        rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.responseContent);
-        rtbAdNetwork.setEncryptedBid("0.23");
-        rtbAdNetwork.setSecondBidPrice(0.23);
-        String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.responseContent);
-    }
-
-    @Test
-    public void testConfigureParametersTransparency() {
-        Long[] catLong = new Long[2];
-        catLong[0] = (long) 1;
-        catLong[1] = (long) 2;
-
-        SASRequestParameters sasParams = new SASRequestParameters();
-        sasParams.setSiteId("4028cba631b705570131d1bd19f201b2"); // Transparency to be included for this site ID.
-        sasParams.setSource("app"); // App object.
-        sasParams.setOsId(3); // Android OS.
-        sasParams.setSlot((short) 1);
-        sasParams.setCategories(Arrays.asList(catLong));
-        sasParams.setLocSrc("wifi");
-        sasParams.setGender("Male");
-        sasParams.setAge((short) 26);
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-
-        CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.uid = "1234";
-        casInternalRequestParameters.latLong = "37.4429,-122.1514";
-        casInternalRequestParameters.impressionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        casInternalRequestParameters.auctionId = ("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-
-        String clickUrl = "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
-        String externalSiteKey = "f6wqjq1r5v";
-        String beaconUrl = "";
-
-        ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId,
-                null, null, null, 0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[]{0}));
-        ixAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl);
-        String ActualBundle = ixAdNetwork.getBidRequest().app.bundle.toString();
-
-        // Compare the bundle value.
-        assertEquals(ActualBundle, "com.dreamstep.wBESTLOVEPOEMS");
-    }
-    */
+  
 }

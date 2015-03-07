@@ -1,18 +1,22 @@
 package com.inmobi.adserve.contracts.ix.request;
 
 import com.google.gson.annotations.SerializedName;
+import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Created by ishanbhatnagar on 22/1/15.
  */
 @Data
 public final class Impression {
+    @NonNull
     private final String id;
     private Banner banner;
     private Video video;
-    @SerializedName("native") private Native nat;
+    @SerializedName("native")
+    private Native nat;
     private String tagid;
     private Double bidfloor = 0.0;
     private ProxyDemand proxydemand;

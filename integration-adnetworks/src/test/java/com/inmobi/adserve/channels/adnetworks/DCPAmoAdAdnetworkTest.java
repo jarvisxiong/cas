@@ -166,7 +166,6 @@ public class DCPAmoAdAdnetworkTest extends junit.framework.TestCase {
                                 "{}"),
                         new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAmoAdAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
-        final String response = "";
         dcpAmoAdAdNetwork.generateJsAdResponse();
         assertEquals(200, dcpAmoAdAdNetwork.getHttpResponseStatusCode());
         final String outputHttpResponseContent =

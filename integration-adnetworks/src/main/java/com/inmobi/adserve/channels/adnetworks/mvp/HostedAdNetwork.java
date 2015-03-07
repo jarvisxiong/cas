@@ -43,9 +43,7 @@ import com.ning.http.client.RequestBuilder;
 
 
 /**
- * Useful Initialisms:
- * HAS : Hosted Ad Server
- * RFM : Rubicon For Mobile
+ * Useful Initialisms: HAS : Hosted Ad Server RFM : Rubicon For Mobile
  */
 
 public class HostedAdNetwork extends BaseAdNetworkImpl {
@@ -53,14 +51,8 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     // Constants used while creating Bid Request
     @Getter
-    private static final String NATIVE_STRING = "native";
-    @Getter
-    private static final String LATLON = "LATLON";
     private static final String BSSID_DERIVED = "BSSID_DERIVED";
     private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
-    private static final String CCID = "CCID";
-    private static final String WIFI = "WIFI";
-    private static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     private static final String CELL_TOWER = "CELL_TOWER";
     private static final String CLT = "INMB_SERVER_NATIVE_1.0.0";
     private static final String RTYP = "nativejson";
@@ -77,14 +69,10 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     private static final short EUD_SHA1 = 2;
 
     // Constants used while creating Request URL
-    private static final String CONTENT_TYPE_VALUE = "application/json";
     private static final String HTTP_POST = "POST";
 
     // Constants used while handling RFM Error Codes
     private static final String RFM_RESPONSE_ERROR = "FAIL";
-
-    // Constants used during Native Ad Building
-    private static final String NO_AD = "NO_AD";
 
     // Used for NativeAdBuilding
     @Inject
@@ -98,24 +86,24 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private final double bidToUmpInUSD;
 
-    // Parameters set during intialisation
+    // Parameters set during initialization
     private String urlBase;
 
     // Redundant Parameters but cannot be removed as they are mandatory
     // Used for BannerAdBuilding
-    private final boolean templateWN;
-    private final boolean wnRequired;
+    // private final boolean templateWN;
+    // private final boolean wnRequired;
 
     // Request specific parameters
     private HostedBidRequest bidRequest;
     @Getter
     private String bidRequestJson;
     @Getter
-    private Long requestId;    // Not the same as requestAuctionId in RTB but it serves the same purpose
+    private Long requestId; // Not the same as requestAuctionId in RTB but it serves the same purpose
 
     // Response specific parameters
     @Getter
-    private Long responseId;    // Not the same as responseAuctionId in RTB but it serves the same purpose
+    private Long responseId; // Not the same as responseAuctionId in RTB but it serves the same purpose
     private String adm;
     @Setter
     private double bidPriceInUsd;
@@ -130,21 +118,19 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     private boolean logCreative = false;
 
     public HostedAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                           final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel,
-                           final String urlBase, final String advertiserName, final int tmax,
-                           final boolean templateWinNotification) {
-
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
+            final String advertiserName, final int tmax, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         setRtbPartner(true);
 
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
-        this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired");   // Redundant but mandatory param
+        // this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired"); // Redundant but mandatory param
         this.bidToUmpInUSD = config.getDouble(advertiserName + ".bidToUmpInUSD");
 
         this.clientBootstrap = clientBootstrap;
         this.urlBase = urlBase;
         this.advertiserName = advertiserName;
-        this.templateWN = templateWinNotification;    // Redundant but mandatory param
+        // this.templateWN = templateWinNotification; // Redundant but mandatory param
 
         this.isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", false);
         this.isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", true);
@@ -152,30 +138,25 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         this.userName = config.getString(advertiserName + ".userName");
         this.password = config.getString(advertiserName + ".password");
 
-        this.clickUrl = null;   // Click Url has been nullified
+        this.clickUrl = null; // Click Url has been nullified
     }
 
     @Override
     protected boolean configureParameters() {
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_HOSTED_REQUESTS);
-
         LOG.debug(traceMarker, "Inside configureParameters of Hosted Ad Server");
-
         if (!checkIfBasicParamsAvailable()) {
             LOG.info(traceMarker, "Configure parameters inside Hosted returned false {}: BasicParams not available.",
                     advertiserName);
             return false;
         }
-
         if (!createHostedBidRequestObject()) {
             return false;
         }
-
         return serializeBidRequest();
     }
 
     private boolean checkIfBasicParamsAvailable() {
-
         if (null == casInternalRequestParameters || null == sasParams) {
             LOG.debug(traceMarker, "casInternalRequestParams or sasParams cannot be null");
             return false;
@@ -190,16 +171,8 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean isRequestFormatSupported() {
-        if (isNativeRequest()) {
-            return isNativeResponseSupported;
-        } else {
-            return isHTMLResponseSupported;
-        }
-    }
-
-    @Override
-    protected boolean isNativeRequest() {
-        return NATIVE_STRING.equals(sasParams.getRFormat()) && "APP".equalsIgnoreCase(sasParams.getSource());
+        isNativeRequest = NATIVE_STRING.equals(sasParams.getRFormat()) && APP.equalsIgnoreCase(sasParams.getSource());
+        return isNativeRequest ? isNativeResponseSupported : isHTMLResponseSupported;
     }
 
     private boolean createHostedBidRequestObject() {
@@ -376,7 +349,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        adStatus = "NO_AD";
+        adStatus = NO_AD;
         LOG.info(traceMarker, "Response is {}", response);
         InspectorStats.incrementStatCount(InspectorStrings.HOSTED_RESPONSES);
         InspectorStats.incrementStatCount(getName(), InspectorStrings.HOSTED_RESPONSES);
@@ -384,14 +357,14 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         if (isValidResponse(response, status)) {
             final boolean parsedResponse = deserializeResponse(response);
             if (!parsedResponse) {
-                adStatus = "NO_AD";
-                responseContent = "";
+                adStatus = NO_AD;
+                responseContent = DEFAULT_EMPTY_STRING;
                 statusCode = 500;
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.DESERIALISATION_ERROR);
                 LOG.info(traceMarker, "Error in parsing Hosted Ad Server response");
                 return;
             }
-            adStatus = "AD";
+            adStatus = AD_STRING;
 
             if (isNativeRequest()) {
                 nativeAdBuilding();
@@ -419,8 +392,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
                     String errorMsg = bidResponseJson.getString("error_msg");
                     switch (bidResponseJson.getInt("error_code")) {
                         case 1001:
-                            InspectorStats.incrementStatCount(getName(),
-                                    InspectorStrings.RFM_INVALID_CREDENTIALS);
+                            InspectorStats.incrementStatCount(getName(), InspectorStrings.RFM_INVALID_CREDENTIALS);
                             InspectorStats.incrementStatCount(InspectorStrings.RFM_INVALID_CREDENTIALS);
                             LOG.info(traceMarker, "Could not parse Hosted Ad Server Response. RFM Error Message was "
                                     + ": {}", errorMsg);
@@ -428,14 +400,13 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
                         case 1002: /* NO_AD */
                             break;
                         case 1003:
-                            InspectorStats.incrementStatCount(getName(),
-                                    InspectorStrings.RFM_AD_SELECTION_ERROR + errorMsg);
+                            InspectorStats.incrementStatCount(getName(), InspectorStrings.RFM_AD_SELECTION_ERROR
+                                    + errorMsg);
                             LOG.info(traceMarker, "Could not parse Hosted Ad Server Response. RFM Error Message was "
                                     + ": {}", errorMsg);
                             break;
                         default:
-                            InspectorStats.incrementStatCount(getName(),
-                                    InspectorStrings.RFM_ERROR + errorMsg);
+                            InspectorStats.incrementStatCount(getName(), InspectorStrings.RFM_ERROR + errorMsg);
                             LOG.info(traceMarker, "Could not parse Hosted Ad Server Response. RFM Error Message was"
                                     + ": {}", errorMsg);
                             break;
@@ -444,8 +415,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
             } catch (JSONException e1) {
                 LOG.info(traceMarker,
                         "Could not parse Hosted Ad Server response as mandatory field Id or Ads is missing; "
-                                + "Or Error Code JSON is incorrect."
-                                + " Exception thrown: ", e);
+                                + "Or Error Code JSON is incorrect." + " Exception thrown: ", e);
             }
             return false;
         } catch (NullPointerException e) {
@@ -477,12 +447,13 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         }
 
         try {
-            responseContent = nativeResponseMaker.makeHostedResponse(
-                    adm, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
+            responseContent =
+                    nativeResponseMaker.makeHostedResponse(adm, params,
+                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
         } catch (final Exception e) {
 
             adStatus = NO_AD;
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, "
                     + "exception = {}", sasParams.getSiteId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
@@ -530,4 +501,3 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     }
 
 }
-

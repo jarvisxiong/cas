@@ -11,7 +11,6 @@ public class NativeModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
         bind(NativeResponseMaker.class).asEagerSingleton();
         install(new FactoryModuleBuilder().implement(NativeBuilder.class, NativeBuilderImpl.class).build(
                 NativeBuilderFactory.class));

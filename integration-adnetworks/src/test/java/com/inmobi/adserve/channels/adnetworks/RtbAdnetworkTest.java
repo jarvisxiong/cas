@@ -60,7 +60,7 @@ public class RtbAdnetworkTest {
     private final String debug = "debug";
     private final String loggerConf = "/tmp/channel-server.properties";
     private RtbAdNetwork rtbAdNetwork;
-    private final SASRequestParameters sasParams = new SASRequestParameters();
+    private final SASRequestParameters sas = new SASRequestParameters();
     private final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     private final String rtbAdvId = "id";
     BidResponse bidResponse;
@@ -104,8 +104,10 @@ public class RtbAdnetworkTest {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
-        sasParams.setSource("app");
-        sasParams.setDst(2);
+        sas.setSource("APP");
+        sas.setRqAdType("");
+        sas.setDst(2);
+
         final String urlBase = "";
         final CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
         EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
@@ -131,31 +133,30 @@ public class RtbAdnetworkTest {
         final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
         EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor15);
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)1))
-                .andReturn(slotSizeMapEntityFor1).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
-                .andReturn(slotSizeMapEntityFor4).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
-                .andReturn(slotSizeMapEntityFor9).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
-                .andReturn(slotSizeMapEntityFor11).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
-                .andReturn(slotSizeMapEntityFor14).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
-                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 1)).andReturn(slotSizeMapEntityFor1)
+                .anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4)
+                .anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9)
+                .anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11)
+                .anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14)
+                .anyTimes();
+        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15)
+                .anyTimes();
         EasyMock.replay(repositoryHelper);
 
-        rtbAdNetwork =
-                new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", 200, true);
-        
+        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", 200, true);
+
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         rtbAdNetwork.setHost("http://localhost:8080");
-        
+
 
         final Field asyncHttpClientProviderField = RtbAdNetwork.class.getDeclaredField("asyncHttpClientProvider");
         asyncHttpClientProviderField.setAccessible(true);
@@ -205,7 +206,8 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
+                repositoryHelper);
         RtbAdNetwork.impressionCallbackHelper = createMock(ImpressionCallbackHelper.class);
         expect(
                 RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(URI.class), isA(Request.class),
@@ -223,14 +225,14 @@ public class RtbAdnetworkTest {
         assertEquals(uri, rtbAdNetwork.getRequestUri());
     }
 
-
     @Test
     public void testConfigureParameters() {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSource("wap");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSource("wap");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String clickUrl =
@@ -242,9 +244,8 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(
-                rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper),
-                false);
+        assertEquals(rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl,
+                (short) 15, repositoryHelper), false);
     }
 
     @Test
@@ -256,58 +257,65 @@ public class RtbAdnetworkTest {
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSiteId("some_site_id");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSiteId("some_site_id");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
-        sasParams.setSource("app");
-        sasParams.setWapSiteUACEntity(null);
-        sasParams.setCategories(Lists.newArrayList(15L, 12L, 11L));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        sas.setSource("app");
+        sas.setWapSiteUACEntity(null);
+        sas.setCategories(Lists.newArrayList(15L, 12L, 11L));
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
         // 15 mean board games. Refer to CategoryList
         assertEquals("Board", rtbAdNetwork.getBidRequest().getApp().getName());
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
-        sasParams.setSource("wap");
-        sasParams.setWapSiteUACEntity(null);
-        sasParams.setCategories(Lists.newArrayList(11L, 12L, 15L));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        sas.setSource("wap");
+        sas.setWapSiteUACEntity(null);
+        sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
 
         // If WapSiteUACEntity and InMobi categories are null.
-        sasParams.setSource("wap");
-        sasParams.setWapSiteUACEntity(null);
+        sas.setSource("wap");
+        sas.setWapSiteUACEntity(null);
         final ArrayList<Long> list = new ArrayList<Long>();
-        sasParams.setCategories(list);
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        sas.setCategories(list);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
 
         assertEquals("miscellenous", rtbAdNetwork.getBidRequest().getSite().getName());
 
-        sasParams.setSource("wap");
+        sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
         builder.setAppType("Games");
-        sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
 
         // First UAC Entity Category should be present as Site Name.
         assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
 
         // For App, First UAC Entity Category should be present as App Name.
-        sasParams.setSource("app");
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        sas.setSource("app");
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
         assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
 
 
         // If WapSiteUACEntity is not null, then it should set primary category name from uac.
-        sasParams.setSource("app");
+        sas.setSource("app");
         builder = WapSiteUACEntity.newBuilder();
         builder.setAppType("Social");
-        sasParams.setWapSiteUACEntity(new WapSiteUACEntity(builder));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
         // Setting primary category name from uac.
         assertEquals("Social", rtbAdNetwork.getBidRequest().getApp().getName());
 
@@ -324,12 +332,13 @@ public class RtbAdnetworkTest {
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSource("wap");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setSource("wap");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
 
         // Expected Blocked Advertisers
         final ArrayList<String> expectedBlockedAdvertisers =
@@ -350,12 +359,13 @@ public class RtbAdnetworkTest {
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setBlockedAdvertisers(Lists.newArrayList("abcd.com"));
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSource("wap");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setSource("wap");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
 
         // Expected Blocked Advertisers
         final ArrayList<String> expectedBlockedAdvertisers =
@@ -375,13 +385,14 @@ public class RtbAdnetworkTest {
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setSource("wap");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setSource("wap");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setBlockedIabCategories(Lists.newArrayList("IAB-1", "IAB-2", "IAB-3"));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
 
         // Expected Blocked Categories
         final List<String> expectedBlockedCategories = Lists.newArrayList("IAB-1", "IAB-2", "IAB-3");
@@ -411,6 +422,7 @@ public class RtbAdnetworkTest {
         casInternalRequestParameters.setUid("1234");
         sasParams.setAge((short) 26);
         sasParams.setRemoteHostIp("206.29.182.240");
+        sasParams.setRqAdType("");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -425,9 +437,8 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(
-                rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 1, repositoryHelper),
-                true);
+        assertEquals(rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
+                beaconUrl, (short) 1, repositoryHelper), true);
     }
 
     @Test
@@ -446,7 +457,8 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
+                repositoryHelper);
         rtbAdNetwork.setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}");
         rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl()));
         assertEquals("http://rtb:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3",
@@ -459,17 +471,18 @@ public class RtbAdnetworkTest {
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final String externalSiteKey = "f6wqjq1r5v";
         final String beaconUrl = "";
-        sasParams.setSource("app");
-        sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setSource("app");
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
+                repositoryHelper);
         rtbAdNetwork
                 .setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_IMP_ID}/${AUCTION_SEAT_ID}/${AUCTION_AD_ID}/${AUCTION_PRICE}/${AUCTION_CURRENCY}");
         rtbAdNetwork.setEncryptedBid("abc");
@@ -499,7 +512,8 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
+                repositoryHelper);
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
@@ -517,9 +531,10 @@ public class RtbAdnetworkTest {
         // Temporarily using ixResponseJSON instead of rtbdResponseJSON
         str.append(TestUtils.SampleStrings.ixResponseJson);
         final StringBuilder responseAdm = new StringBuilder();
-        responseAdm.append("<html><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beacon?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
-        sasParams.setSdkVersion("a450");
-        sasParams.setRqAdType("int");
+        responseAdm
+                .append("<html><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beacon?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
+        sas.setSdkVersion("a450");
+        sas.setRqAdType("int");
         final String clickUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final String beaconUrl = "beacon";
@@ -529,7 +544,8 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
+                repositoryHelper);
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
@@ -561,8 +577,9 @@ public class RtbAdnetworkTest {
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
-        sasParams.setDst(2);
-        rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
+        sas.setDst(2);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
+                repositoryHelper);
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());

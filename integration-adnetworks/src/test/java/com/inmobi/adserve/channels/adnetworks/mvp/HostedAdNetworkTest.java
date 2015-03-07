@@ -82,7 +82,7 @@ public class HostedAdNetworkTest {
         mockStatic(ImpressionIdGenerator.class);
         mockStaticNice(InspectorStats.class);
         ImpressionIdGenerator mockImpressionIdGenerator = createMock(ImpressionIdGenerator.class);
-        RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        // RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
         CasInternalRequestParameters mockCasInternalRequestParams = createMock(CasInternalRequestParameters.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
@@ -98,11 +98,11 @@ public class HostedAdNetworkTest {
 
         expect(mockSasParams.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(siteIncId).anyTimes();
-        expect(mockSasParams.getRFormat()).andReturn(HostedAdNetwork.getNATIVE_STRING()).anyTimes();
+        expect(mockSasParams.getRFormat()).andReturn("native").anyTimes();
         expect(mockSasParams.getLocSrc())
-                .andReturn(HostedAdNetwork.getLATLON()).times(1)
+                .andReturn("LATLON").times(1)
                 .andReturn("NO_TARGETING").times(7)
-                .andReturn(HostedAdNetwork.getLATLON()).times(1);
+                .andReturn("LATLON").times(1);
         expect(mockSasParams.getRemoteHostIp()).andReturn(ip).anyTimes();
         expect(mockSasParams.getUserAgent()).andReturn(userAgent).anyTimes();
         expect(mockSasParams.getSiteId()).andReturn(siteId).anyTimes();
