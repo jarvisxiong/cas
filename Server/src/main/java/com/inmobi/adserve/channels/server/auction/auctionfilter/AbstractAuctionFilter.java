@@ -18,7 +18,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.casthrift.DemandSourceType;
 
 public abstract class AbstractAuctionFilter implements AuctionFilter {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAuctionFilter.class);
 
     protected final Provider<Marker> traceMarkerProvider;
@@ -40,11 +39,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     @Override
     public void filter(final List<ChannelSegment> channelSegments,
             final CasInternalRequestParameters casInternalRequestParameters) {
-        Marker traceMarker = null;
-        if (traceMarkerProvider != null) {
-            traceMarker = traceMarkerProvider.get();
-        }
-
+        Marker traceMarker = null; // traceMarkerProvider.get()
         for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
             final ChannelSegment channelSegment = iterator.next();
 

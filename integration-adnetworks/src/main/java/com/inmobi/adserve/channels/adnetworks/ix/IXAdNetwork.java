@@ -292,9 +292,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
-            InspectorStats.incrementStatCount(InspectorStrings.IX_SENT_AS_TRANSPARENT);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_TRANSPARENT);
         } else {
-            InspectorStats.incrementStatCount(InspectorStrings.IX_SENT_AS_BLIND);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_BLIND);
         }
 
         // Serializing the bidRequest Object
@@ -452,7 +452,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             zoneId = getZoneId(additionalParams);
             if (null == zoneId) {
                 LOG.debug(traceMarker, "zone id not present, will say false");
-                InspectorStats.incrementStatCount(InspectorStrings.IX_ZONE_ID_NOT_PRESENT);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_ZONE_ID_NOT_PRESENT);
                 // zoneID not available so returning NULL
                 return null;
             }
@@ -666,7 +666,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
         } catch (final JSONException e) {
             LOG.debug(traceMarker, "Site Id is not configured, exception thrown {}", e);
-            InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             return null;
         }
         site.setCat(iabCategories);
@@ -781,7 +781,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             rubiconSiteId = Integer.parseInt(additionalParams.getString("site"));
         } catch (final JSONException e) {
             LOG.debug(traceMarker, "Site Id is not configured, exception thrown {}", e);
-            InspectorStats.incrementStatCount(InspectorStrings.IX_SITE_ID_NOT_PRESENT);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SITE_ID_NOT_PRESENT);
             // add trace here
             return null;
         }
