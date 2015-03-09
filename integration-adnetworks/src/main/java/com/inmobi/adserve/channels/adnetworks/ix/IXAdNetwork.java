@@ -190,7 +190,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Double dealFloor;
     private Double dataVendorCost;
     private Double adjustbid;
-    private Integer pmptier;
+    private int pmptier;
     private String aqid;
     private String nurl;
     protected boolean isCoppaSet = false;
@@ -230,7 +230,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.clientBootstrap = clientBootstrap;
         this.host = host;
-        setIxPartner(true);
+        this.isIxPartner = true;
         this.advertiserName = advertiserName;
         // this.tmax = tmax;
         templateWN = templateWinNotification;
@@ -647,6 +647,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         geo.setZip(casInternalRequestParameters.getZipCode());
+        final CommonExtension geoExt = new CommonExtension();
+        final RubiconExtension rpExt = new RubiconExtension();
+        rpExt.setConsent(1);
+        geoExt.setRp(rpExt);
+        geo.setExt(geoExt);
         return geo;
     }
 
@@ -1000,7 +1005,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         adStatus = NO_AD;
-        LOG.info(traceMarker, "response is {}", response);
+        LOG.info(traceMarker, "Original RP response is {}", response);
         if (status.code() != 200 || StringUtils.isBlank(response)) {
             statusCode = status.code();
             if (200 == statusCode) {
@@ -1030,8 +1035,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
 
         }
-        LOG.debug(traceMarker, "response length is {}", responseContent.length());
-        LOG.debug(traceMarker, "response is {}", responseContent);
+        LOG.debug(traceMarker, "response content length is {}", responseContent.length());
+        LOG.debug(traceMarker, "response content is {}", responseContent);
     }
 
 
@@ -1396,7 +1401,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     /**
      * Checks whether the response object also conforms to the following conditions: <br>
      * 1) There is at least one SeatBid object <br>
-     * 2)There is at least one Bid object <br>
+     * 2) There is at least one Bid object <br>
      * 3) Buyer is not empty/null <br>
      * 4) Both adm and admobject are not simultaneously empty/null nor simultaneously set
      * 
@@ -1617,12 +1622,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return;
     }
 
-    @Override
     public double returnAdjustBid() {
         return adjustbid;
     }
 
-    @Override
     public String returnDealId() {
         return dealId;
     }
@@ -1639,12 +1642,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return usedCsIds;
     }
 
-    @Override
-    public Integer returnPmpTier() {
+    public int returnPmpTier() {
         return pmptier;
     }
 
-    @Override
     public String returnAqid() {
         return aqid;
     }

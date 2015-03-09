@@ -241,7 +241,6 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     // writing channel logs
-    @Override
     public JSONObject getLogline() {
         try {
             final JSONObject log = new JSONObject();

@@ -15,6 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 // @GsonContract not required here as there are no required fields/default values to enforce during deserialisation
+// Do not add any default value as same object is used in many places 
 public class CommonExtension {
     private RubiconExtension rp;
     private Blind blind;

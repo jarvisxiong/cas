@@ -357,4 +357,10 @@ public interface AdNetworkInterface {
      * @param isIPResolutionDisabled
      */
     void disableIPResolution(boolean isIPResolutionDisabled);
+
+    /**
+     * 
+     * @return
+     */
+    int getHttpResponseStatusCode();
 }

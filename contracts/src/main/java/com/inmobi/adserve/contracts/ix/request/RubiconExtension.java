@@ -16,11 +16,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @GsonContract
+// Do not add any default value as same object is used in many places
 public final class RubiconExtension {
     private String zone_id;
     private String enc;
-    private Integer pmptier = 1;
-    private Integer dpf = 1;
+    private Integer pmptier;
     private ExtRubiconTarget target;
     private ExtRubiconTarget track;
     private ExtRubiconTarget rtb;
@@ -38,5 +38,5 @@ public final class RubiconExtension {
     // Advertiser Id
     private String advid;
     private String adtype;
-    private Integer consent = 1;
+    private Integer consent;
 }

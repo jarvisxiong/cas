@@ -25,6 +25,6 @@ public final class BidResponse {
     @NonNull @Required private String id;
     @NonNull @Required private List<SeatBid> seatbid;
     private String bidid;
-    private Integer statuscode;
+    private int statuscode;
     private CommonExtension ext;
 }

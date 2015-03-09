@@ -106,12 +106,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Getter
     protected String responseContent;
     @Getter
-    protected String adStatus = "NO_AD";
+    protected String adStatus = NO_AD;
     protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
     protected boolean isHTMLResponseSupported = true;
     protected boolean isNativeResponseSupported = false;
     protected boolean isVideoRequest = false;
     protected boolean isNativeRequest = false;
+    protected boolean isRtbPartner = false;
+    protected boolean isIxPartner = false;
     protected SASRequestParameters sasParams;
     protected CasInternalRequestParameters casInternalRequestParameters;
     protected HttpRequestHandlerBase baseRequestHandler = null;
@@ -135,8 +137,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private long latency;
     private long connectionLatency;
     private ThirdPartyAdResponse responseStruct;
-    private boolean isRtbPartner = false;
-    private boolean isIxPartner = false;
     private String adapterName;
 
     @Inject
@@ -150,27 +150,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (traceMarkerProvider != null) {
             traceMarker = traceMarkerProvider.get();
         }
-    }
-
-    // Overriding these methods in IXAdNetwork
-    public String returnBuyer() {
-        return null;
-    }
-
-    public String returnDealId() {
-        return null;
-    }
-
-    public double returnAdjustBid() {
-        return 0;
-    }
-
-    public Integer returnPmpTier() {
-        return 0;
-    }
-
-    public String returnAqid() {
-        return null;
     }
 
     @Override
@@ -188,17 +167,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return isRtbPartner;
     }
 
-    public void setRtbPartner(final boolean isRtbPartner) {
-        this.isRtbPartner = isRtbPartner;
-    }
-
     @Override
     public boolean isIxPartner() {
         return isIxPartner;
-    }
-
-    public void setIxPartner(final boolean isIxPartner) {
-        this.isIxPartner = isIxPartner;
     }
 
     @Override
@@ -351,7 +322,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected RequestBuilder getNingRequestBuilder() throws Exception {
-
         URI uri = getRequestUri();
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
@@ -372,6 +342,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     // Returns the status code after the request is complete
+    @Override
     public int getHttpResponseStatusCode() {
         return statusCode;
     }
@@ -391,10 +362,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public boolean isRequestCompleted() {
         return isRequestComplete;
-    }
-
-    public JSONObject getLogline() {
-        return null;
     }
 
     @Override

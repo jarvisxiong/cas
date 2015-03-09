@@ -121,8 +121,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
             final String advertiserName, final int tmax, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
-        setRtbPartner(true);
-
+        this.isRtbPartner = true;
         this.advertiserId = config.getString(advertiserName + ".advertiserId");
         // this.wnRequired = config.getBoolean(advertiserName + ".isWnRequired"); // Redundant but mandatory param
         this.bidToUmpInUSD = config.getDouble(advertiserName + ".bidToUmpInUSD");

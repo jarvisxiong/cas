@@ -188,7 +188,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
         this.clientBootstrap = clientBootstrap;
         this.host = host;
-        setRtbPartner(true);
+        this.isRtbPartner = true;
         this.advertiserName = advertiserName;
         this.tmax = tmax;
         templateWN = templateWinNotification;
@@ -196,6 +196,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
     }
+ 
 
     @Override
     protected boolean configureParameters() {

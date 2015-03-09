@@ -6,6 +6,7 @@ import lombok.Data;
  * Created by ishanbhatnagar on 22/1/15.
  */
 @Data
+// Do not add any default value as same object is used in many places
 public final class DtExtensions {
     private String id;
     private Integer preference;

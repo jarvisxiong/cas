@@ -26,16 +26,16 @@ public final class Bid {
     @NonNull @Required private String impid;
     @NonNull @Required private Double price;
     private String aqid;    // Not in official spec - No Need for making this required, since we have AbstractAuctionFilter
-    private Integer estimated;
+    private int estimated;
     private String dealid;
-    private Integer pmptier;
+    private int pmptier;
     private String nurl;
     private String adm;
     private String crid;
     private Native admobject;
     private List<String> adomain;
-    private Integer h;
-    private Integer w;
+    private int h;
+    private int w;
     private double adjustbid;   // Not in official spec
     private CommonExtension ext;
 }
