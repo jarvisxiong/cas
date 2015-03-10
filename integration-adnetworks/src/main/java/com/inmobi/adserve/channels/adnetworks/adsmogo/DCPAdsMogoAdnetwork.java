@@ -1,21 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.adsmogo;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URLDecoder;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -26,6 +10,20 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URLDecoder;
 
 public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
@@ -119,7 +117,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder url = new StringBuilder(host);
-        appendQueryParam(url, APPID, externalSiteId, false);
+        appendQueryParam(url, APPID, blindedSiteId, false);
         appendQueryParam(url, IPADDRESS, sasParams.getRemoteHostIp(), false);
         if (isInterstitial()) {
             appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);

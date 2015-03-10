@@ -1,26 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.powermock.reflect.Whitebox;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.collectcents.DCPCollectcentsAdnetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -29,8 +8,26 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.powermock.reflect.Whitebox;
+import org.testng.annotations.Test;
+
+import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 public class DCPCollectcentsAdnetworkTest extends TestCase {
 	private Configuration mockConfig = null;
@@ -308,7 +305,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 			RequestBuilder requestBuilder = Whitebox.<RequestBuilder> invokeMethod(
 					dcpCollectcentsAdNetwork, "getNingRequestBuilder");
 			String actualData = requestBuilder.build().getStringData();
-			String expectedData = "{\"main\":[{\"pubid\":\"0344343\",\"ads\":1,\"adtype\":\"banner\",\"response\":\"HTML\",\"banner\":{\"adsize\":15}}],\"site\":{\"rated\":\"A\",\"category\":\"Business\",\"id\":\"00000000-0000-0000-0000-000000000000\"},\"device\":{\"ip\":\"206.29.182.240\",\"deviceid\":\"202cb962ac59075b964b07152d234b70\",\"ua\":\"Mozilla\",\"geo\":{\"geolat\":\"37.4429\",\"geolong\":\"-122.1514\"}},\"user\":{}}";
+			String expectedData = "{\"responseformat\":\"HTML\",\"main\":[{\"pubid\":\"0344343\",\"ads\":1,\"adtype\":\"banner\",\"response\":\"HTML\",\"banner\":{\"adsize\":15}}],\"site\":{\"rated\":\"A\",\"category\":\"Business\",\"id\":\"00000000-0000-0000-0000-000000000000\"},\"device\":{\"ip\":\"206.29.182.240\",\"deviceid\":\"202cb962ac59075b964b07152d234b70\",\"ua\":\"Mozilla\",\"geo\":{\"geolat\":\"37.4429\",\"geolong\":\"-122.1514\"},\"type\":\"app\"},\"user\":{}}";
 			assertEquals(actualData, expectedData);
 		}
 	}
@@ -504,7 +501,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 
 	@Test
 	public void testDCPcollectcentsParseNoAd() throws Exception {
-		final String response = "";
+		final String response = "<!-- Collectcent: No advt for this position -->";
 		dcpCollectcentsAdNetwork.parseResponse(response, HttpResponseStatus.OK);
 		assertEquals(500, dcpCollectcentsAdNetwork.getHttpResponseStatusCode());
 	}
