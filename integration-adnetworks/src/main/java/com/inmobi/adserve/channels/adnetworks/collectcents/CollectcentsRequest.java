@@ -1,9 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks.collectcents;
 
-import java.util.List;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.Data;
+
+import java.util.List;
 
 
 @Data
@@ -46,6 +47,7 @@ class Device{
     private String ua;
     private String conntype;
     private Geo geo;
+    private String type;
 }
 
 @Data 
