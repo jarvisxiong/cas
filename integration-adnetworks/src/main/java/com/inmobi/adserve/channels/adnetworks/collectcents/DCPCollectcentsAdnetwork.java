@@ -38,6 +38,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 	private short adSize;
 	private String latitude = null;
 	private String longitude = null;
+	private String pubId;
 
 	private static final String BANNER = "banner";
 	private static final String HTML = "HTML";
@@ -67,7 +68,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 			return false;
 		}
 		host = config.getString("collectcents.host");
-
+		pubId = config.getString("collectcents.pubid");
 		final com.inmobi.adserve.channels.entity.SlotSizeMapEntity slotSizeMapEntity = repositoryHelper
 				.querySlotSizeMapRepository(selectedSlotId);
 		if (null != slotSizeMapEntity) {
@@ -122,7 +123,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 	private String getRequestParams() {
 
 		MainRequest mainReq = new MainRequest();
-		mainReq.setPubid(externalSiteId);
+		mainReq.setPubid(pubId);
 		mainReq.setAds(1);
 		mainReq.setAdtype(BANNER);
 		mainReq.setResponse(HTML);

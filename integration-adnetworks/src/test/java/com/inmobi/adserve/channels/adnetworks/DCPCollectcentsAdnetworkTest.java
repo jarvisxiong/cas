@@ -37,9 +37,9 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 	private DCPCollectcentsAdnetwork dcpCollectcentsAdNetwork;
 	private final String collectcentsHost = "http://ad.ipredictive.com/d/ads";
 	private final String collectcentsStatus = "on";
+	private final String collectcentsPubId = "0344343";
 	private final String collectcentsAdvId = "collectcentsadv1";
 	private final String collectcentsTest = "1";
-	private final String collectcentsAuthKey = "335eaf2639079ffa40b5f7d69f3051fb";
 	private RepositoryHelper repositoryHelper;
 
 	public void prepareMockConfig() {
@@ -52,8 +52,8 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 				collectcentsTest).anyTimes();
 		expect(mockConfig.getString("collectcents.advertiserId")).andReturn(
 				collectcentsAdvId).anyTimes();
-		expect(mockConfig.getString("collectcents.authKey")).andReturn(
-				collectcentsAuthKey).anyTimes();
+		expect(mockConfig.getString("collectcents.pubid")).andReturn(
+				collectcentsPubId).anyTimes();
 		expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
 		expect(mockConfig.getString("slf4jLoggerConf")).andReturn(
 				"/opt/mkhoj/conf/cas/logger.xml");
