@@ -525,9 +525,6 @@
 	<profiles>
 		<profile>
 			<id>casauto</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<modules>
 				<module>casautomation</module>
 			</modules>
