@@ -1,0 +1,733 @@
+---
+# RTBD Test Cases
+TEST2_65_1: 
+ - user_interests: 'someinterestsvalue'
+TEST2_65_2: 
+ - user_interests: 'EMPTY'
+TEST2_65_3: 
+ - user_interests: 'SPACE'
+TEST2_1_1: 
+ - adpool_requestid: anotherreqid
+   r_u_id_params: '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName: category_tax_test_1.1
+   r_os_id: '3'
+   expected_status: '200'
+   r_site_type: PERFORMANCE
+TEST2_41_1:
+ - uidparams_rawuidvalues_um5 : 'somevalue'
+TEST2_63_4: 
+ - user_education : 'NULL'
+# DCP cases
+TEST1_13_2:
+ - testName : platformTargeting_test_13.2
+   expected_status : '200'
+   targeting_platform : '3'
+   r_format : xhtml
+   adpool_responseformat: XHTML
+   site_type : 'PERFORMANCE'
+   site_contentrating: 'PERFORMANCE' #for req
+   site_ratings : '0'
+   new_category : '70,71'
+   carrier_country : '94'
+   os_id : '3'
+   adpool_selectedslots : '2'
+   Empty_r_r_source : 'true'
+   maxCasRequestCounter : '1'
+TEST1_33_1:
+ - testName : 'IMAI_Ad_Response_status'
+   os_id : '3'
+   expected_status : '200'
+   site_type : 'PERFORMANCE'
+   site_ratings : '0,2'
+   targeting_platform : '1'
+   r_format : 'imai'
+   new_category : '70,71'
+   maxCasRequestCounter : '1'
+   adpool_selectedslots : '2'
+TEST1_17_2:
+ - testName : 'siteRatingTargeting_test17.2'
+   expected_status : '200'
+   targeting_platform : '2'
+   site_inventorytype : 'WAP' 
+   r_format : 'xhtml'
+   adpool_responseformat: 'XHTML'
+   site_type : 'PERFORMANCE'
+   site_ratings : '0'
+   new_category : '70,71'
+   carrier_country : '94'
+   os_id : '3'
+   maxCasRequestCounter : '1'
+TEST1_19_2: 
+ - testName : 'siteRatingTargeting_test17.2'
+   expected_status : '200'
+   targeting_platform : '3'
+   site_inventorytype : 'APP' 
+   r_format : 'xhtml'
+   adpool_responseformat: 'XHTML'
+   site_type : 'PERFORMANCE'
+   site_ratings : '0'
+   new_category : '70,71'
+   carrier_country : '94'
+   os_id : '3'
+   r_source : "APP"
+   maxCasRequestCounter : '1'
+TEST1_36_1:
+- testName : 'HTML_Ad_Response_status'
+  os_id : '5'
+  expected_status : '200'
+  site_type : 'PERFORMANCE'
+  site_ratings : '0,2'
+  targeting_platform : 'APP'
+  r_format : 'html'
+  adpool_responseformat : 'HTML'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '2'
+  device_osid : '5'
+TEST1_01:
+- testName: 'googleadx-happy'
+TEST1_02:
+- testName: 'dmg-happy'
+TEST1_03:
+- testName: 'amoad-happy'
+
+# IX Test Cases
+TEST3_1_1:
+ - adpool_requestid : 'anotherreqid'
+   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName : 'SandBox_Test_1'
+   os_id : '3'
+   expected_status : '200'
+   site_type : 'PERFORMANCE'
+   site_ratings : '0,2'
+   targeting_platform : 'APP'
+   r_format : 'html'
+   adpool_responseformat : 'html' 
+   site_sitetaxonomies : '70,71'
+   site_sitetags : '70,71'
+   new_category : '70,71'
+   maxCasRequestCounter  : '1'
+   adpool_selectedslots : '15'
+TEST3_1_2: 
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_2'
+   os_id  : '3'
+   expected_status  : '200'
+   site_type  :  'MATURE'
+   site_contentrating  :  'MATURE'
+   site_contenttype  :  'MATURE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'APP' 
+   site_inventorytype  :  'APP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_1_3: 
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_3'
+   os_id  : '3'
+   expected_status  : '200'
+   site_type  :  'MATURE'
+   site_contentrating  :  'MATURE'
+   site_contenttype  :  'MATURE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'WAP' 
+   site_inventorytype  :  'WAP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_1_4: 
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_4'
+   os_id  : '5'
+   expected_status  : '200'
+   site_type  :  'MATURE'
+   site_contentrating  :  'MATURE'
+   site_contenttype  :  'MATURE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'APP' 
+   site_inventorytype  :  'APP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_1_5: 
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_5'
+   os_id  : '5'
+   expected_status  : '200'
+   site_type  :  'MATURE'
+   site_contentrating  :  'MATURE'
+   site_contenttype  :  'MATURE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'WAP' 
+   site_inventorytype  :  'WAP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_2_1:
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_5'
+   os_id  : '3'
+   device_osid : '3'
+   expected_status  : '200'
+   site_type  :  'PERFORMANCE'
+   site_contentrating  :  'PERFORMANCE'
+   site_contenttype  :  'PERFORMANCE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'APP' 
+   site_inventorytype  :  'APP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_2_2:
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_5'
+   os_id  : '3'
+   device_osid : '3'
+   expected_status  : '200'
+   site_type  :  'PERFORMANCE'
+   site_contentrating  :  'PERFORMANCE'
+   site_contenttype  :  'PERFORMANCE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'WAP' 
+   site_inventorytype  :  'WAP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_2_3:
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_5'
+   os_id  : '5'
+   device_osid : '5'
+   expected_status  : '200'
+   site_type  :  'PERFORMANCE'
+   site_contentrating  :  'PERFORMANCE'
+   site_contenttype  :  'PERFORMANCE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'APP' 
+   site_inventorytype  :  'APP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_2_4:
+ - adpool_requestid  : 'anotherreqid'
+   u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+   testName  :  'SandBox_Test_5'
+   os_id  : '5'
+   device_osid : '5'
+   expected_status  : '200'
+   site_type  :  'PERFORMANCE'
+   site_contentrating  :  'PERFORMANCE'
+   site_contenttype  :  'PERFORMANCE' 
+   site_ratings  :  '0,2'
+   targeting_platform  :  'WAP' 
+   site_inventorytype  :  'WAP' 
+   r_format  :  'html'
+   adpool_responseformat  :  'html' 
+   site_sitetaxonomies  :  '70,71'
+   site_sitetags  :  '70,71'
+   new_category  :  '70,71'
+   maxCasRequestCounter   : '1'
+   adpool_selectedslots  :  '15'
+TEST3_4_1: 
+ - adpool_selectedslots : '2'
+TEST3_4_2: 
+ - adpool_selectedslots : '15'
+TEST3_4_3: 
+ - adpool_selectedslots : '100'
+TEST3_4_4: 
+ - adpool_selectedslots : '1,2,3'
+TEST3_4_5: 
+ - adpool_selectedslots : '2,3,4'
+TEST3_4_6: 
+ - adpool_selectedslots : '100,400,500'
+TEST3_4_7: 
+ - targeting_platform : 'WAP' 
+   site_inventorytype : 'WAP' 
+   adpool_selectedslots : '2'
+TEST3_4_8: 
+ - site_inventorytype : 'WAP' 
+   adpool_selectedslots : '15'
+TEST3_4_9: 
+ - site_inventorytype : 'WAP' 
+   adpool_selectedslots : '100'
+TEST3_4_10: 
+ - site_inventorytype : 'WAP' 
+   adpool_selectedslots : '1,2,3'
+TEST3_4_11: 
+ - site_inventorytype : 'WAP' 
+   adpool_selectedslots : '2,3,4'
+TEST3_4_12: 
+ - site_inventorytype : 'WAP' 
+   adpool_selectedslots : '100,400,500'
+   
+   
+
+# copy paste with regex starts here 
+
+
+TEST3_3_1 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '3' #fordb
+  device_osid : '3' #forreq
+  expected_status : '200'
+  site_type : 'FAMILY_SAFE'
+  site_contentrating : 'FAMILY_SAFE' #forreq(Deprecated)
+  site_contenttype : 'FAMILY_SAFE' #forReq
+  site_ratings : '0,2'
+  targeting_platform : 'APP' #fordb
+  site_inventorytype : 'APP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_3_2 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '3' #fordb
+  device_osid : '3' #forreq
+  site_type : 'FAMILY_SAFE'
+  site_contentrating : 'FAMILY_SAFE' #forreq(Deprecated)
+  site_contenttype : 'FAMILY_SAFE' #forReq
+  site_ratings : '0,2'
+  targeting_platform : 'WAP' #fordb
+  site_inventorytype : 'WAP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_3_3 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '5' #fordb
+  device_osid : '5' #forreq
+  expected_status : '200'
+  site_type : 'FAMILY_SAFE'
+  site_contentrating : 'FAMILY_SAFE' #forreq(Deprecated)
+  site_contenttype : 'FAMILY_SAFE' #forReq
+  site_ratings : '0,2'
+  targeting_platform : 'APP' #fordb
+  site_inventorytype : 'APP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_3_4 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '5' #fordb
+  device_osid : '5' #forreq
+  expected_status : '200'
+  site_type : 'FAMILY_SAFE'
+  site_contentrating : 'FAMILY_SAFE' #forreq(Deprecated)
+  site_contenttype : 'FAMILY_SAFE' #forReq
+  site_ratings : '0,2'
+  targeting_platform : 'WAP' #fordb
+  site_inventorytype : 'WAP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_5_1 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '3' #fordb
+  device_osid : '3' #forreq
+  expected_status : '200'
+  site_type : 'PERFORMANCE'
+  site_contentrating : 'PERFORMANCE' #forreq
+  site_ratings : '0,2'
+  targeting_platform : 'APP' #fordb
+  site_inventorytype : 'APP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_5_2 :
+- adpool_selectedslots : '15'
+  
+TEST3_5_3 :
+- adpool_selectedslots : '15'
+  device_osmajorversion : '4.4'
+  
+TEST3_5_4 :
+- adpool_selectedslots : '15'
+  latlong_latitude : '41.20'
+  latlong_longitude : '68.14'
+  
+TEST3_5_5 :
+- adpool_selectedslots : '15'
+  device_useragent : 'Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36'
+  
+TEST3_5_6 :
+- adpool_selectedslots : '15'
+  
+TEST3_5_7_1 :
+- adpool_selectedslots : '15'
+  adpool_guidanceBid : '2000'
+  
+TEST3_5_7_2 :
+- adpool_selectedslots : '15'
+  adpool_guidanceBid : '14000000'
+  
+TEST3_5_7_3 :
+- adpool_selectedslots : '15'
+  adpool_guidanceBid : '40000'
+  
+TEST3_5_8_1 :
+- adpool_selectedslots : '15'
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '6fb97c64ba0b413390cbf77b9f477d46' #blind
+  
+TEST3_5_8_2 :
+- adpool_selectedslots : '15'
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #trans
+  
+TEST3_5_8_3 :
+- adpool_selectedslots : '15'
+  site_siteid : '42f1578f616747e59a3d623dc125f25c' #trans
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #blind
+  
+TEST3_5_8_4 :
+- adpool_selectedslots : '15'
+  site_siteid : '5f0eb5b2200740b7828cf78f9d5e1c1c' #trans
+  site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
+  
+TEST3_5_15 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  device_osid : '3' #forreq
+  expected_status : '200'
+  site_type : 'PERFORMANCE'
+  site_contentrating : 'PERFORMANCE' #forreq
+  site_ratings : '0,2'
+  site_inventorytype : 'APP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  adpool_selectedslots : '15'
+  
+TEST3_6_1 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '3' #fordb
+  device_osid : '3' #forreq
+  site_type : 'PERFORMANCE'
+  site_contentrating : 'PERFORMANCE' #forreq
+  site_ratings : '0,2'
+  targeting_platform : 'WAP' #fordb
+  site_inventorytype : 'WAP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_6_2 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  
+TEST3_6_3 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  device_osmajorversion : '4.4'
+  
+TEST3_6_4 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  latlong_latitude : '41.20'
+  latlong_longitude : '68.14'
+  
+TEST3_6_5 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  device_useragent : 'Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36'
+  
+TEST3_6_6 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  
+TEST3_6_7_1 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '2000'
+  
+TEST3_6_7_2 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '14000000'
+  
+TEST3_6_7_3 :
+- site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '40000'
+  
+TEST3_6_8_1 :
+- adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '6fb97c64ba0b413390cbf77b9f477d46' #blind
+  
+TEST3_6_8_2 :
+- adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #trans
+  
+TEST3_6_8_3 :
+- adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '42f1578f616747e59a3d623dc125f25c' #trans
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #blind
+  
+TEST3_6_8_4 :
+- adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '5f0eb5b2200740b7828cf78f9d5e1c1c' #trans
+  site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
+  
+TEST3_7_1 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '5' #fordb
+  device_osid : '5' #forreq
+  expected_status : '200'
+  site_type : 'PERFORMANCE'
+  site_contentrating : 'PERFORMANCE' #forreq
+  site_ratings : '0,2'
+  targeting_platform : 'APP' #fordb
+  site_inventorytype : 'APP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_7_2 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  
+TEST3_7_3 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  device_osmajorversion : '6.0'
+  
+TEST3_7_4 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  latlong_latitude : '41.20'
+  latlong_longitude : '68.14'
+  
+TEST3_7_5 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  device_useragent : 'Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36'
+  
+TEST3_7_6 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+
+TEST3_7_7_1 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '2000'
+  
+TEST3_7_7_2 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '14000000'
+  
+TEST3_7_7_3 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '40000'
+  
+TEST3_7_8_1 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '6fb97c64ba0b413390cbf77b9f477d46' #blind
+  
+TEST3_7_8_2 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #trans
+  
+TEST3_7_8_3 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_siteid : '42f1578f616747e59a3d623dc125f25c' #trans
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #blind
+  
+TEST3_7_8_4 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_siteid : '5f0eb5b2200740b7828cf78f9d5e1c1c' #trans
+  site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
+  
+TEST3_8_1 :
+- adpool_requestid : 'anotherreqid'
+  u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
+  TESTName : 'SandBox_TEST_5'
+  os_id : '5' #fordb
+  device_osid : '5' #forreq
+  expected_status : '200'
+  site_type : 'PERFORMANCE'
+  site_contentrating : 'PERFORMANCE' #forreq
+  site_ratings : '0,2'
+  targeting_platform : 'WAP' #fordb
+  site_inventorytype : 'WAP' #forreq
+  r_format : 'html'
+  adpool_responseformat : 'html' #forreq
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '15'
+  
+TEST3_8_2 :
+- device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  
+TEST3_8_3 :
+- device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  device_osmajorversion : '6.0'
+  
+TEST3_8_4 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  latlong_latitude : '41.20'
+  latlong_longitude : '68.14'
+  
+TEST3_8_5 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  device_useragent : 'Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36'
+  
+TEST3_8_6 :
+- device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  
+TEST3_8_7_1 :
+- device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '2000'
+  
+TEST3_8_7_2 :
+- device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '14000000'
+  
+TEST3_8_7_3 :
+- device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  adpool_selectedslots : '15'
+  adpool_guidanceBid : '40000'
+  
+TEST3_8_8_1 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '6fb97c64ba0b413390cbf77b9f477d46' #blind
+  
+TEST3_8_8_2 :
+- device_osid : '5' #forreq
+  adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '37a802196f2d480b971b537315f059c1' #blind
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #trans
+  
+TEST3_8_8_3 :
+- adpool_selectedslots : '15'
+  device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '42f1578f616747e59a3d623dc125f25c' #trans
+  site_publisherid : '0ac470fe5a1f4f4fba108e6126de3b86' #blind
+  
+TEST3_8_8_4 :
+- adpool_selectedslots : '15'
+  device_osid : '5' #forreq
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '5f0eb5b2200740b7828cf78f9d5e1c1c' #trans
+  site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
