@@ -9,12 +9,12 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
  */
 
 public class ImpressionIdGenerator {
-    private static final AtomicInteger COUNTER = new AtomicInteger();
+    protected static final AtomicInteger COUNTER = new AtomicInteger();
     private static ImpressionIdGenerator instance = null;
-    private final short hostIdCode;
-    private final byte dataCenterIdCode;
+    protected final short hostIdCode;
+    protected final byte dataCenterIdCode;
 
-    private ImpressionIdGenerator(final short hostIdCode, final byte dataCenterIdCode) {
+    protected ImpressionIdGenerator(final short hostIdCode, final byte dataCenterIdCode) {
         this.hostIdCode = hostIdCode;
         this.dataCenterIdCode = dataCenterIdCode;
     }
@@ -52,6 +52,16 @@ public class ImpressionIdGenerator {
                 WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128))
                         .toString();
         return WilburyUUID.setDataCenterId(uuidWithCyclicCounter, dataCenterIdCode).getLeastSignificantBits();
+    }
+
+    /**
+     * Takes a existing WilburyUUID String (oldImpressionId) and changes the int key to adId.
+     * @param oldImpressionId
+     * @param adId
+     * @return New ImpressionId which differs from the oldImpressionId only in the int key.
+     */
+    public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
+        return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
     }
 
 }

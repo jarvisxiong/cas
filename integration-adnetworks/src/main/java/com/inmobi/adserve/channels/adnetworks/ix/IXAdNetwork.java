@@ -1100,8 +1100,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.debug(traceMarker, "Old impression id: {}", oldImpressionId);
 
             // Generating new impression id
-            LOG.debug(traceMarker, "Creating new impression id from incId: {}", incId);
-            final String newImpressionId = ImpressionIdGenerator.getInstance().getImpressionId(incId);
+            LOG.debug(traceMarker, "Modifying existing impression id with new int key: incId {}", incId);
+            final String newImpressionId = ImpressionIdGenerator.getInstance()
+                    .resetWilburyIntKey(oldImpressionId, incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 // Update beacon and click URLs

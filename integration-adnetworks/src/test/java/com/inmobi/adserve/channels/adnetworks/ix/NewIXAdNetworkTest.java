@@ -51,6 +51,7 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.template.config.DefaultConfiguration;
 import com.inmobi.template.config.DefaultGsonDeserializerConfiguration;
 import com.inmobi.template.gson.GsonManager;
@@ -627,7 +628,7 @@ public class NewIXAdNetworkTest {
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
-        final String[] methodsToBeMocked = {"getCreativeType", "getImpressionId"};
+        final String[] methodsToBeMocked = {"getCreativeType", "getImpressionId", "getAuctionId"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -635,9 +636,11 @@ public class NewIXAdNetworkTest {
         final IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
+        String auctionId = WilburyUUID.setIntKey(TestUtils.SampleStrings.impressionId, 100).toString();
 
         expect(ixAdNetwork.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
         expect(ixAdNetwork.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
+        expect(ixAdNetwork.getAuctionId()).andReturn(auctionId).anyTimes();
         replayAll();
 
         ixAdNetwork.setHost("http://localhost:8080/getIXBid");
@@ -680,6 +683,13 @@ public class NewIXAdNetworkTest {
         // Positive Test Case
         result = ixAdNetwork.updateDSPAccountInfo("2770");
         assertThat(result, is(true));
+
+        String oldImpressionId = WilburyUUID.setIntKey(TestUtils.SampleStrings.impressionId, 0).toString();
+        String newImpressionId = WilburyUUID.setIntKey(ixAdNetwork.getImpressionId(), 0).toString();
+        auctionId = WilburyUUID.setIntKey(ixAdNetwork.getImpressionId(), 0).toString();
+
+        assertThat(oldImpressionId, is(equalTo(newImpressionId)));
+        assertThat(oldImpressionId, is(equalTo(auctionId)));
     }
 
     @Test

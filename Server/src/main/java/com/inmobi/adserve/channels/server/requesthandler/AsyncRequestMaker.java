@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import io.netty.channel.Channel;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +23,8 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.ADCreativeType;
+
+import io.netty.channel.Channel;
 
 
 @Singleton
@@ -85,7 +85,9 @@ public class AsyncRequestMaker {
 
             String clickUrl = null;
             String beaconUrl = null;
-            sasParams.setImpressionId(ImpressionIdGenerator.getInstance().getImpressionId(incId));
+            // Replacing int key in auction id to generate impression id
+            sasParams.setImpressionId(ImpressionIdGenerator.getInstance()
+                    .resetWilburyIntKey(casInternalRequestParameterGlobal.getAuctionId(), incId));
             final CasInternalRequestParameters casInternalRequestParameters =
                     getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal);
 
