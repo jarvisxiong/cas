@@ -36,11 +36,9 @@ import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.adserve.adpool.User;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
-import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.types.ContentRating;
@@ -58,8 +56,8 @@ public class ThriftRequestParserTest extends TestCase {
     public void setUp() {
         final Configuration mockConfig = createMock(Configuration.class);
         RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        GeoZipRepository mockGeoZipRepository = createMock(GeoZipRepository.class);
-        GeoZipEntity mockGeoZipEntity = createMock(GeoZipEntity.class);
+        // GeoZipRepository mockGeoZipRepository = createMock(GeoZipRepository.class);
+        //GeoZipEntity mockGeoZipEntity = createMock(GeoZipEntity.class);
 
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");

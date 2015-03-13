@@ -54,7 +54,7 @@ public class MatchSegments {
 
     @Inject
     public MatchSegments(final RepositoryHelper repositoryHelper, final Provider<Marker> traceMarkerProvider,
-                         @AdvertiserIdNameMap final Map<String, String> advertiserIdToNameMap) {
+            @AdvertiserIdNameMap final Map<String, String> advertiserIdToNameMap) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.repositoryHelper = repositoryHelper;
         this.advertiserIdToNameMap = advertiserIdToNameMap;
@@ -93,7 +93,7 @@ public class MatchSegments {
 
         final Marker traceMarker = traceMarkerProvider.get();
         final List<Long> slotIdsFromUmp = new ArrayList<Long>();
-        for (Short s : sasParams.getProcessedMkSlot()) {
+        for (final Short s : sasParams.getProcessedMkSlot()) {
             slotIdsFromUmp.add(Long.valueOf(s));
         }
         final Long countryId = sasParams.getCountryId();
@@ -125,8 +125,8 @@ public class MatchSegments {
                 country = countryId;
             }
 
-            return matchSegments(slotIdsFromUmp, getCategories(sasParams), country, targetingPlatform, siteRating, osId,
-                    sasParams, traceMarker);
+            return matchSegments(slotIdsFromUmp, getCategories(sasParams), country, targetingPlatform, siteRating,
+                    osId, sasParams, traceMarker);
         } catch (final NumberFormatException exception) {
             LOG.error(traceMarker, "Error parsing required arguments {}", exception);
             return null;
@@ -161,9 +161,9 @@ public class MatchSegments {
         return categoryList;
     }
 
-    private List<AdvertiserMatchedSegmentDetail> matchSegments(final List<Long> slotIdsFromUmp, final List<Long> categories,
-                                                               final long country, final Integer targetingPlatform, final Integer siteRating, final int osId,
-                                                               final SASRequestParameters sasParams, final Marker traceMarker) {
+    private List<AdvertiserMatchedSegmentDetail> matchSegments(final List<Long> slotIdsFromUmp,
+            final List<Long> categories, final long country, final Integer targetingPlatform, final Integer siteRating,
+            final int osId, final SASRequestParameters sasParams, final Marker traceMarker) {
         final Set<ChannelSegmentEntity> allFilteredEntities = new HashSet<ChannelSegmentEntity>();
 
         // adding -1 for all categories
@@ -207,8 +207,8 @@ public class MatchSegments {
 
     // Loads entities and updates cache if required.
     private Collection<ChannelSegmentEntity> loadEntities(final long slotId, final long category, final long country,
-                                                          final Integer targetingPlatform, final Integer siteRating, final int osId, final Integer dst,
-                                                          final Marker traceMarker) {
+            final Integer targetingPlatform, final Integer siteRating, final int osId, final Integer dst,
+            final Marker traceMarker) {
         LOG.debug(
                 traceMarker,
                 "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {} dst: {}",
@@ -259,7 +259,7 @@ public class MatchSegments {
     }
 
     private ChannelSegment createSegment(final ChannelSegmentEntity channelSegmentEntity,
-                                         final SASRequestParameters sasParams, final Marker traceMarker) {
+            final SASRequestParameters sasParams, final Marker traceMarker) {
         ChannelEntity channelEntity = repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId());
         ChannelFeedbackEntity channelFeedbackEntity =
                 repositoryHelper.queryChannelFeedbackRepository(channelSegmentEntity.getAdvertiserId());

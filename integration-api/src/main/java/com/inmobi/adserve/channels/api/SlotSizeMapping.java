@@ -3,18 +3,14 @@ package com.inmobi.adserve.channels.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.Getter;
-
 
 public class SlotSizeMapping {
-    @Getter
     private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
 
     static {
-       // Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
-
+        // Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
+        IX_SLOT_ID_MAP.put((short) 0, 0);
         IX_SLOT_ID_MAP.put((short) 4, 44);
-        // Mapping 320x48 to 320x50
         IX_SLOT_ID_MAP.put((short) 9, 43);
         IX_SLOT_ID_MAP.put((short) 10, 15);
         IX_SLOT_ID_MAP.put((short) 11, 2);
@@ -30,7 +26,6 @@ public class SlotSizeMapping {
         IX_SLOT_ID_MAP.put((short) 29, 14);
         IX_SLOT_ID_MAP.put((short) 32, 101);
         IX_SLOT_ID_MAP.put((short) 33, 53);
-
     }
 
     public static boolean isIXSupportedSlot(final short inmobiSlot) {

@@ -546,10 +546,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final BannerExtension ext = new BannerExtension();
         if (null != selectedSlotId) {
-            if (SlotSizeMapping.isIXSupportedSlot(selectedSlotId)) {
+            final Integer rpSlot = SlotSizeMapping.getIXMappedSlotId(selectedSlotId);
+            if (rpSlot != null) {
                 final RPBannerExtension rp = new RPBannerExtension();
                 rp.setMime(MIME_HTML);
-                rp.setSize_id(SlotSizeMapping.getIXMappedSlotId(selectedSlotId));
+                rp.setSize_id(rpSlot);
                 ext.setRp(rp);
             }
         }

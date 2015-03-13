@@ -27,7 +27,6 @@ import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -820,7 +819,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected boolean isInterstitial() {
-
         if (10 == selectedSlotId // 300X250
                 || 14 == selectedSlotId // 320X480
                 || 16 == selectedSlotId // 768X1024
@@ -833,15 +831,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return false;
     }
 
-    public boolean isIOS() {
+    protected boolean isIOS() {
         return sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue();
     }
 
-    public boolean isAndroid() {
+    protected boolean isAndroid() {
         return sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue();
     }
 
-    public boolean isApp() {
+    protected boolean isApp() {
         if (StringUtils.isBlank(sasParams.getSource())) {
             return false;
         } else {

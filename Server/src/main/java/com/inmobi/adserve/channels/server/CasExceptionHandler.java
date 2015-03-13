@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.timeout.ReadTimeoutException;
-
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
@@ -21,6 +17,10 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.ReadTimeoutException;
+
 /**
  * @author abhishek.parwal
  * 
@@ -37,16 +37,19 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * Invoked when an exception occurs whenever: 1) channel throws closedchannelexception increment the totalterminate
-     * means channel is closed by party who requested for the ad. 2) When timeoutexception occurs, among the partners
-     * who gave us the ad, we run the auction from here and return it.
+     * Invoked when an exception occurs whenever:<br>
+     * 1) channel throws closedchannelexception increment the totalterminate means channel is closed by party who
+     * requested for the ad.<br>
+     * 2) When timeoutexception occurs, among the partners who gave us the ad, we run the auction from here and return
+     * it.
      */
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        String dst = responseSender.getDST();
+        final String dst = responseSender.getDST();
         MDC.put("requestId", String.format("0x%08x", ctx.channel().hashCode()));
         if (cause instanceof ReadTimeoutException) {
-            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "CasExceptionStart_"+ dst, responseSender.getTimeElapsed());
+            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_
+                    + "CasExceptionStart_" + dst, responseSender.getTimeElapsed());
             // increment the totalTimeout. It means server could not write the response with in the timeout we specified
             LOG.debug(traceMarker, "inside channel idle event handler for Request channel ID: {}", ctx.channel());
             LOG.debug(traceMarker, "server timeout");
@@ -71,13 +74,14 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
                     }
                     channelSegment.getAdNetworkInterface().processResponse();
                 }
-                InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "CasExceptionEnd_"+ dst, responseSender.getTimeElapsed());
+                InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_
+                        + "CasExceptionEnd_" + dst, responseSender.getTimeElapsed());
                 return;
             }
-
             responseSender.sendNoAdResponse(ctx.channel());
         } else {
-            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "channelExceptionStart_"+dst, responseSender.getTimeElapsed());
+            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_
+                    + "channelExceptionStart_" + dst, responseSender.getTimeElapsed());
             final String exceptionString = cause.getClass().getSimpleName();
             InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, exceptionString);
             InspectorStats.incrementStatCount(InspectorStrings.CHANNEL_EXCEPTION, InspectorStrings.COUNT);
@@ -87,7 +91,8 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
             }
             LOG.info(traceMarker, "Getting netty error in HttpRequestHandler: {}", cause);
             responseSender.sendNoAdResponse(ctx.channel());
-            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_ + "channelExceptionEnd_"+dst, responseSender.getTimeElapsed());
+            InspectorStats.updateYammerTimerStats("netty", InspectorStrings.LATENCY_FOR_MEASURING_AT_POINT_
+                    + "channelExceptionEnd_" + dst, responseSender.getTimeElapsed());
         }
 
     }

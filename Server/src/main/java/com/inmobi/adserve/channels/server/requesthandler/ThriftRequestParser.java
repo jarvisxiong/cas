@@ -41,25 +41,26 @@ import com.inmobi.types.InventoryType;
 
 @Singleton
 public class ThriftRequestParser {
-
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
 
-    private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES = "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
-    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES = Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
+    private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
+            "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
+    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES = Arrays.asList(AdTypeEnum.BANNER,
+            AdTypeEnum.VIDEO);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
-                                       final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
+            final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
         LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
-        params.setResponseOnlyFromDcp(2 == dst);
+        params.setResponseOnlyFromDcp(DemandSourceType.DCP.getValue() == dst);
 
 
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
 
         params.setRqMkSlot(tObject.selectedSlots);
-        getSlotList(tObject.selectedSlots, params, dst);
+        params.setProcessedMkSlot(getValidSlotList(tObject.selectedSlots, DemandSourceType.IX.getValue() == dst));
 
         params.setRFormat(getResponseFormat(tObject.responseFormat));
         params.setRqMkAdcount(tObject.requestedAdCount);
@@ -127,7 +128,7 @@ public class ThriftRequestParser {
             // Fill params for Pub Control - Supported Ad Types.
             List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
             if (tObject.site.isSetEnrichedSiteAllowedMediaAttributes()) {
-                for (int i : tObject.site.getEnrichedSiteAllowedMediaAttributes()) {
+                for (final int i : tObject.site.getEnrichedSiteAllowedMediaAttributes()) {
                     if (i == AdAttributeType.VIDEO.getValue()) {
                         pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
                     } else if (i == AdAttributeType.DEFAULT.getValue()) {
@@ -136,14 +137,16 @@ public class ThriftRequestParser {
                 }
             }
             // If we don't get any value, set default values.
-            if (pubControlSupportedAdTypes.isEmpty()){
+            if (pubControlSupportedAdTypes.isEmpty()) {
                 pubControlSupportedAdTypes = DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
             }
             params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
 
             // Fill params for pub control - Media preferences json.
-            String mediaPreferencesJson = tObject.site.isSetMediaPreferences() ?
-                    tObject.site.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
+            final String mediaPreferencesJson =
+                    tObject.site.isSetMediaPreferences()
+                            ? tObject.site.mediaPreferences
+                            : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
             params.setPubControlPreferencesJson(mediaPreferencesJson);
         }
 
@@ -231,9 +234,9 @@ public class ThriftRequestParser {
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
     }
 
-    protected String getPostalCode(Set<Integer> postalCodes) {
-        final Integer zipId = (null != postalCodes && postalCodes.iterator().hasNext() ? postalCodes
-                .iterator().next() : null);
+    protected String getPostalCode(final Set<Integer> postalCodes) {
+        final Integer zipId =
+                null != postalCodes && postalCodes.iterator().hasNext() ? postalCodes.iterator().next() : null;
         if (zipId != null) {
             final GeoZipEntity geoZipEntity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(zipId);
             // There are DUMMY string values in geo_zip.zipcode on wap_prod_adserve.
@@ -246,7 +249,7 @@ public class ThriftRequestParser {
     }
 
     private String getResponseFormat(final ResponseFormat rqFormat) {
-        String rFormat = "html";
+        final String rFormat = "html";
         if (null == rqFormat) {
             return rFormat;
         }
@@ -254,9 +257,7 @@ public class ThriftRequestParser {
     }
 
     private Set<Integer> getAccountSegments(final Set<DemandType> demandTypes) {
-
         LOG.debug("demandTypesAllowed value is: {}", demandTypes);
-
         if (null == demandTypes) {
             return Collections.emptySet();
         }
@@ -375,30 +376,24 @@ public class ThriftRequestParser {
         return null;
     }
 
-    public void getSlotList(final List<Short> selectedSlots, final SASRequestParameters sasRequestParameters,
-                            final int dst) {
-        if (DemandSourceType.IX.getValue() == dst) {
-            // Keep at most 5 slots in the list
-            List<Short> listOfIXSupportedSlots = new ArrayList<Short>();
-            int slotListSize = selectedSlots.size();
-            for (int slotIndex = 0; slotIndex < slotListSize && listOfIXSupportedSlots.size() < 5; slotIndex++) {
-                final Short slotId = selectedSlots.get(slotIndex);
-                if (SlotSizeMapping.getIX_SLOT_ID_MAP().containsKey(slotId)) {// check if Slot present in IXSupportedSlot
-                    listOfIXSupportedSlots.add(slotId);
-                }
-            }
-            sasRequestParameters.setProcessedMkSlot(listOfIXSupportedSlots);
-        } else {
-            List<Short> listOfUmpSlots = new ArrayList<Short>();
-            int slotListSize = selectedSlots.size();
-            for (int slotIndex = 0; slotIndex < slotListSize && listOfUmpSlots.size() < 5; slotIndex++) {
-                final Short slotId = selectedSlots.get(slotIndex);
-                if (null != CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(slotId)) {// check if Slot present in SlotSizeRepo
-                    listOfUmpSlots.add(slotId);
-                }
-            }
-            sasRequestParameters.setProcessedMkSlot(listOfUmpSlots);
+    public List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
+        if (selectedSlots == null) {
+            LOG.warn("Emply selectedSlots !!!");
+            return Collections.emptyList();
         }
-        return;
+        final List<Short> listOfUmpSlots = new ArrayList<Short>();
+        for (final Short slotId : selectedSlots) {
+            if (listOfUmpSlots.size() >= 5) {
+                // Keep at most 5 slots in the list
+                break;
+            }
+            final boolean toAdd =
+                    isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper
+                            .querySlotSizeMapRepository(slotId) != null;
+            if (toAdd) {
+                listOfUmpSlots.add(slotId);
+            }
+        }
+        return listOfUmpSlots;
     }
 }
