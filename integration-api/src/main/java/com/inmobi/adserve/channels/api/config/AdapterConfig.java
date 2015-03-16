@@ -19,7 +19,6 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
  */
 @EqualsAndHashCode
 public class AdapterConfig implements CasConfig {
-
     private final Configuration adapterConfig;
     private final String dcName;
     private final String adapterName;
@@ -34,7 +33,6 @@ public class AdapterConfig implements CasConfig {
         this.adapterName = adapterName;
         this.dcName = dcName;
         this.serverConfig = serverConfig;
-
         try {
             adapterClass = (Class<AdNetworkInterface>) Class.forName(adapterConfig.getString("class"));
         } catch (final ClassNotFoundException e) {
@@ -68,7 +66,6 @@ public class AdapterConfig implements CasConfig {
      */
     public boolean isActive() {
         final String status = adapterConfig.getString("status", "on");
-
         return "on".equalsIgnoreCase(status);
     }
 
@@ -76,9 +73,7 @@ public class AdapterConfig implements CasConfig {
      * @return the adapterHost
      */
     public String getAdapterHost() {
-
         String adapterHost = adapterConfig.getString("host." + dcName);
-
         if (StringUtils.isBlank(adapterHost)) {
             adapterHost = adapterConfig.getString("host.default");
         }
@@ -91,11 +86,10 @@ public class AdapterConfig implements CasConfig {
 
     public boolean isValidHost() {
         final String hostName = getAdapterHost();
-
         return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);
     }
 
-    /*
+    /**
      * @return the adNetworkInterfaceClass
      */
     public Class<AdNetworkInterface> getAdNetworkInterfaceClass() {
@@ -104,10 +98,6 @@ public class AdapterConfig implements CasConfig {
 
     public boolean isRtb() {
         return adapterConfig.getBoolean("isRtb", false);
-    }
-    
-    public int getTMAX() {
-        return adapterConfig.getInt("TMAX", 180);
     }
 
     public boolean isIx() {

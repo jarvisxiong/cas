@@ -119,7 +119,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     public HostedAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
-            final String advertiserName, final int tmax, final boolean templateWinNotification) {
+            final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         this.isRtbPartner = true;
         this.advertiserId = config.getString(advertiserName + ".advertiserId");

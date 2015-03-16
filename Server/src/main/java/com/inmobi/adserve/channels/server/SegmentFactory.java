@@ -32,29 +32,22 @@ public class SegmentFactory {
     public AdNetworkInterface getChannel(final String advertiserId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
             final Channel channel, final Set<String> advertiserSet) {
-
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
-
         if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))) {
             return null;
         }
 
         final Class<AdNetworkInterface> adNetworkInterfaceClass = adapterConfig.getAdNetworkInterfaceClass();
-        
-        final int tmaxForAdapter = adapterConfig.getTMAX();
-
         if (adapterConfig.isRtb() || adapterConfig.isIx()) {
             LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
-
             try {
-
                 LOG.debug("adapterConfig.templateWinNotification() {}", adapterConfig.templateWinNotification());
                 final AdNetworkInterface rtbAdNetwork =
                         adNetworkInterfaceClass.getConstructor(
                                 new Class[] {Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
-                                        Channel.class, String.class, String.class, int.class, boolean.class}).newInstance(config, rtbClientBootstrap, base, channel,
-                                adapterConfig.getAdapterHost(), adapterConfig.getAdapterName(), tmaxForAdapter,
-                                adapterConfig.templateWinNotification());
+                                        Channel.class, String.class, String.class, boolean.class})
+                                .newInstance(config, rtbClientBootstrap, base, channel, adapterConfig.getAdapterHost(),
+                                        adapterConfig.getAdapterName(), adapterConfig.templateWinNotification());
                 rtbAdNetwork.setName(adapterConfig.getAdapterName());
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);
                 return rtbAdNetwork;
@@ -64,7 +57,6 @@ public class SegmentFactory {
             }
 
         } else {
-
             try {
                 final AdNetworkInterface adNetworkInterface =
                         adNetworkInterfaceClass.getConstructor(

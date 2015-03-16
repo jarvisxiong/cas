@@ -177,7 +177,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
                         final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
-                        final String advertiserName, final int tmax, final boolean templateWinNotification) {
+                        final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -190,7 +190,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.host = host;
         this.isRtbPartner = true;
         this.advertiserName = advertiserName;
-        this.tmax = tmax;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);

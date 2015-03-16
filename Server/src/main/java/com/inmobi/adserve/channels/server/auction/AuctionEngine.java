@@ -84,18 +84,21 @@ public class AuctionEngine implements AuctionEngineInterface {
             if (DemandSourceType.RTBD == winningAdNetworkInterface.getDst()) {
                 // For RTBD
                 secondBidPrice =
-                        Math.min(casInternalRequestParameters.getAuctionBidFloor(), winningAdNetworkInterface.getBidPriceInUsd());
+                        Math.min(casInternalRequestParameters.getAuctionBidFloor(),
+                                winningAdNetworkInterface.getBidPriceInUsd());
                 // For Hosted Ad Server, secondBidPrice at this point is -1
                 // If Hosted Ad Network is the winner then override secondBidPrice
                 if (winningAdNetworkInterface instanceof HostedAdNetwork) {
                     secondBidPrice = ((HostedAdNetwork) winningAdNetworkInterface).getBidToUmpInUSD();
                 }
-                LOG.debug("Completed auction, winner is {} and secondBidPrice is {}", winningAdNetworkInterface.getName(), secondBidPrice);
+                LOG.debug("Completed auction, winner is {} and secondBidPrice is {}",
+                        winningAdNetworkInterface.getName(), secondBidPrice);
             } else {
                 // For IX,
                 // we run a first price auction, but the value is still stored in secondBidPrice
                 secondBidPrice = winningAdNetworkInterface.getBidPriceInUsd();
-                LOG.debug("Completed auction, winner is {} and firstBidPrice is {}", winningAdNetworkInterface.getName(), secondBidPrice);
+                LOG.debug("Completed auction, winner is {} and firstBidPrice is {}",
+                        winningAdNetworkInterface.getName(), secondBidPrice);
             }
 
             // Set encrypted bid price.
@@ -217,16 +220,14 @@ public class AuctionEngine implements AuctionEngineInterface {
      * networkSiteEcpm
      * 
      * @param siteFloor
-     * @param highestEcpm
      * @param segmentFloor
      * @param countryFloor
      * @param networkSiteEcpm
      */
-    public double calculateAuctionFloor(final double siteFloor, final double highestEcpm, final double segmentFloor,
-            final double countryFloor, final double networkSiteEcpm) {
+    public double calculateAuctionFloor(final double siteFloor, final double segmentFloor, final double countryFloor,
+            final double networkSiteEcpm) {
         double auctionFloor;
-        auctionFloor = Math.max(siteFloor, highestEcpm);
-        auctionFloor = Math.max(auctionFloor, segmentFloor);
+        auctionFloor = Math.max(siteFloor, segmentFloor);
         auctionFloor = Math.max(auctionFloor, countryFloor);
         auctionFloor = Math.max(auctionFloor, networkSiteEcpm);
         return auctionFloor;

@@ -155,6 +155,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final Integer accountId;
     private final boolean wnRequired;
     private final List<String> globalBlindFromConfig;
+    private final int bidFloorPercent;
     @Setter
     @Getter
     BidResponse bidResponse;
@@ -174,7 +175,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInUsd;
     @Setter
     private double bidPriceInLocal;
-    // private int tmax = 200;
     private boolean templateWN = true;
     protected boolean isSproutSupported = false;
 
@@ -221,7 +221,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
-            final String advertiserName, final int tmax, final boolean templateWinNotification) {
+            final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -232,7 +232,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         this.host = host;
         this.isIxPartner = true;
         this.advertiserName = advertiserName;
-        // this.tmax = tmax;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", true);
@@ -240,6 +239,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         password = config.getString(advertiserName + ".password");
         accountId = config.getInt(advertiserName + ".accountId");
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
+        bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -341,8 +341,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         tempBidRequest.setId(casInternalRequestParameters.getAuctionId());
-        // Disabling it for now, later this will be removed completely
-        // tempBidRequest.setTmax(tmax);
         // Creating Regulations Object
         final Regulations regs = createRegsObject();
         // Creating Geo Object for device Object
@@ -436,7 +434,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Set interstitial or not, but for video int shoud be 1
         impression.setInstl(null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())
                 || isVideoRequest ? 1 : 0);
-        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor());
+        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor() * bidFloorPercent / 100);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         final ImpressionExtension ext = getImpExt();
         impression.setExt(ext);
@@ -1102,8 +1100,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             // Generating new impression id
             LOG.debug(traceMarker, "Modifying existing impression id with new int key: incId {}", incId);
-            final String newImpressionId = ImpressionIdGenerator.getInstance()
-                    .resetWilburyIntKey(oldImpressionId, incId);
+            final String newImpressionId =
+                    ImpressionIdGenerator.getInstance().resetWilburyIntKey(oldImpressionId, incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 // Update beacon and click URLs

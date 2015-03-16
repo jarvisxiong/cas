@@ -147,7 +147,7 @@ public class RtbAdnetworkTest {
                 .anyTimes();
         EasyMock.replay(repositoryHelper);
 
-        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", 200, true);
+        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", true);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);

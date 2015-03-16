@@ -15,6 +15,7 @@ import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.ResponseFormat;
 
+@SuppressWarnings("restriction")
 public class NewPostRequest {
 
     public static ResponseBuilder sendPost(final AdPoolRequest adPoolRequest, final String servletName,

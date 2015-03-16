@@ -21,7 +21,7 @@ public class WapChannelAdGroup {
 
     public static Map<String, String> setWapChannelAdGroup(final WapChannelAdGroupTemplates prop,
         final Map<String, String> wapChannelAdGroup) throws ClassNotFoundException, SQLException {
-        ArrayList<Map> wapGroup = new ArrayList<Map>();
+        ArrayList<Map<String, String>> wapGroup = new ArrayList<Map<String, String>>();
         // prop = prop.toLowerCase();
         switch (prop) {
             case GENERIC_WAP_ADGROUP: {
@@ -42,7 +42,7 @@ public class WapChannelAdGroup {
 
     public static Map<String, String> setWapChannelAdGroup(final Map<String, String> wapChannelAdGroup)
             throws ClassNotFoundException, SQLException {
-        ArrayList<Map> wapGroup = new ArrayList<Map>();
+        ArrayList<Map<String, String>> wapGroup = new ArrayList<Map<String, String>>();
         final String queryToExecute = CasQueryConf.setQuery(Query.SELECT_WAPCHANNEL_ADGROUP_SEGMENT, wapChannelAdGroup);
         wapGroup = QueryManager.executeAndGetColumnsOutput(queryToExecute);
         if (wapGroup.size() != 0) {

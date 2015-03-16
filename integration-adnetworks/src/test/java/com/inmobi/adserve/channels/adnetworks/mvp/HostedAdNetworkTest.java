@@ -28,7 +28,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
@@ -117,7 +116,7 @@ public class HostedAdNetworkTest {
 
         replayAll(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity);
 
-        HostedAdNetwork hostedAdNetwork = new HostedAdNetwork(mockConfig, null, null, null, urlBase, advertiserName, 0, false);
+        HostedAdNetwork hostedAdNetwork = new HostedAdNetwork(mockConfig, null, null, null, urlBase, advertiserName, false);
         
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
@@ -153,7 +152,7 @@ public class HostedAdNetworkTest {
         String urlBase = "urlBase";
 
         mockStaticNice(InspectorStats.class);
-        RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        // RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         HttpResponseStatus mockHttpResponseStatus = createMock(HttpResponseStatus.class);
 
         expect(mockHttpResponseStatus.code())
@@ -163,7 +162,7 @@ public class HostedAdNetworkTest {
 
 
         // Mocking NativeAdMaking() and isNativeRequest() in HostedAdNetwork
-        Object[] constructerArgs = {mockConfig, null, null, null, urlBase, advertiserName, 0, false};
+        Object[] constructerArgs = {mockConfig, null, null, null, urlBase, advertiserName, false};
         String[] methodsToBeMocked = {"nativeAdBuilding", "isNativeRequest"};
         HostedAdNetwork hostedAdNetwork = createPartialMock(HostedAdNetwork.class, methodsToBeMocked, constructerArgs);
 

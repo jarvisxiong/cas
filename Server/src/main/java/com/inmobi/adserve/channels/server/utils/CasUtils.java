@@ -23,13 +23,9 @@ import com.inmobi.adserve.channels.server.beans.CasContext;
  */
 @Singleton
 public class CasUtils {
-
     private static final Logger LOG = LoggerFactory.getLogger(CasUtils.class);
-
     private static final String APP = "APP";
-
     private final RepositoryHelper repositoryHelper;
-
 
     @Inject
     public CasUtils(final RepositoryHelper repositoryHelper) {
@@ -47,7 +43,7 @@ public class CasUtils {
         return null;
     }
 
-    public Double getRtbFloor(final CasContext casContext, final SASRequestParameters sasRequestParameters) {
+    public Double getRtbFloor(final CasContext casContext) {
         final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
         return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
     }

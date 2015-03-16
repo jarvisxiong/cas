@@ -46,7 +46,7 @@ public class ConnectionManager {
         getDBConnection();
         final Statement stmt = connection.createStatement();
         System.out.println(query);
-        final String query2 = "select * from wap_channel_adgroup limit 2";
+        // final String query2 = "select * from wap_channel_adgroup limit 2";
         final ResultSet rs = stmt.executeQuery(query);
         while (rs.next()) {
 
@@ -66,7 +66,7 @@ public class ConnectionManager {
 
     }
 
-    public static ArrayList<Map> executeAndGetColumnsOutput(final Object dbQuery) throws SQLException,
+    public static ArrayList<Map<String, String>> executeAndGetColumnsOutput(final Object dbQuery) throws SQLException,
             ClassNotFoundException {
 
         final String statement = (String) dbQuery;
@@ -77,8 +77,8 @@ public class ConnectionManager {
 
         final int numberOfColumns = rsmd.getColumnCount();
         System.out.println("columns : " + numberOfColumns);
-        final ArrayList<Map> data = new ArrayList<Map>();
-        Map eachLine;
+        final ArrayList<Map<String, String>> data = new ArrayList<Map<String,String>>();
+        Map<String, String> eachLine;
 
         while (rs.next()) { // process results one row at a time
             eachLine = new HashMap<String, String>();

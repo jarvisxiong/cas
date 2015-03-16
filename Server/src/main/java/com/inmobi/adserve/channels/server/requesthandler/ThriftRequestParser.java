@@ -115,12 +115,9 @@ public class ThriftRequestParser {
             final double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
             final double computedBidGuidance = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
-
-            if (tObject.isSetGuidanceBid() && computedBidGuidance > ecpmFloor) {
-                params.setMarketRate(computedBidGuidance);
-            } else {
-                params.setMarketRate(ecpmFloor);
-            }
+            final double marketRate = Math.max(computedBidGuidance, ecpmFloor);
+            params.setMarketRate(marketRate);
+           
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
             params.setPubId(tObject.site.publisherId);

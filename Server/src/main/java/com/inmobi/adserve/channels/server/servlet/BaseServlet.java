@@ -41,6 +41,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 
 public abstract class BaseServlet implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
+    private static final double MIN_RTB_FLOOR = 0.05;
     protected final Provider<Marker> traceMarkerProvider;
 
     private final MatchSegments matchSegments;
@@ -139,15 +140,14 @@ public abstract class BaseServlet implements Servlet {
         }
 
         // Incrementing Adapter Specific Total Selected Segments Stats
-        for (ChannelSegment channelSegment: filteredSegments) {
+        for (ChannelSegment channelSegment : filteredSegments) {
             incrementTotalSelectedSegmentStats(channelSegment);
         }
 
         final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
-        final double segmentFloor = casUtils.getRtbFloor(casContext, hrh.responseSender.getSasParams());
+        final double segmentFloor = casUtils.getRtbFloor(casContext);
         enrichCasInternalRequestParameters(hrh, filteredSegments,
-                casInternalRequestParametersGlobal.getAuctionBidFloor(), sasParams.getSiteFloor(),
-                sasParams.getSiteIncId(), networkSiteEcpm, segmentFloor);
+                casInternalRequestParametersGlobal.getAuctionBidFloor(), networkSiteEcpm, segmentFloor);
         hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
         hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 
@@ -201,17 +201,19 @@ public abstract class BaseServlet implements Servlet {
     }
 
     private void enrichCasInternalRequestParameters(final HttpRequestHandler hrh,
-            final List<ChannelSegment> filteredSegments, final Double rtbdFloor, final Double siteFloor,
-            final long siteIncId, final double networkSiteEcpm, final double segmentFloor) {
+            final List<ChannelSegment> filteredSegments, final Double rtbdFloor, final double networkSiteEcpm,
+            final double segmentFloor) {
         final CasInternalRequestParameters casInternalRequestParametersGlobal =
                 hrh.responseSender.casInternalRequestParameters;
         casInternalRequestParametersGlobal.setHighestEcpm(getHighestEcpm(filteredSegments));
         casInternalRequestParametersGlobal.setBlockedIabCategories(getBlockedIabCategories(hrh));
         casInternalRequestParametersGlobal.setBlockedAdvertisers(getBlockedAdvertisers(hrh));
-        final double minimumRtbFloor = 0.05;
-        casInternalRequestParametersGlobal.setAuctionBidFloor(hrh.responseSender.getAuctionEngine()
-                .calculateAuctionFloor(hrh.responseSender.getSasParams().getSiteFloor(), 0.0, segmentFloor, minimumRtbFloor,
-                        networkSiteEcpm));
+        final double siteFloor = hrh.responseSender.getSasParams().getSiteFloor();
+        final double auctionBidFloor =
+                hrh.responseSender.getAuctionEngine().calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR,
+                        networkSiteEcpm);
+        final long siteIncId = hrh.responseSender.getSasParams().getSiteIncId();
+        casInternalRequestParametersGlobal.setAuctionBidFloor(auctionBidFloor);
         casInternalRequestParametersGlobal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(siteIncId));
         LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
@@ -221,7 +223,7 @@ public abstract class BaseServlet implements Servlet {
         LOG.debug("Site floor is {}", siteFloor);
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
-        LOG.debug("Minimum rtb floor is {}", minimumRtbFloor);
+        LOG.debug("Minimum rtb floor is {}", MIN_RTB_FLOOR);
         LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.getAuctionBidFloor());
         LOG.debug("Auction id generated is {}", casInternalRequestParametersGlobal.getAuctionId());
     }
@@ -241,8 +243,8 @@ public abstract class BaseServlet implements Servlet {
         List<String> blockedCategories = null;
         if (null != hrh.responseSender.getSasParams().getSiteId()) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams().getSiteId(),
-                            4);
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams()
+                            .getSiteId(), 4);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedIabCategories() != null) {
                 blockedCategories = Arrays.asList(siteFilterEntity.getBlockedIabCategories());
             }
@@ -254,8 +256,8 @@ public abstract class BaseServlet implements Servlet {
         List<String> blockedAdvertisers = null;
         if (null != hrh.responseSender.getSasParams().getSiteId()) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams().getSiteId(),
-                            6);
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams()
+                            .getSiteId(), 6);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
                 blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());
             }

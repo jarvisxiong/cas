@@ -85,6 +85,7 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(true).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".accountId")).andReturn(1).anyTimes();
         expect(mockConfig.getList(advertiserName + ".globalBlind")).andReturn(Lists.newArrayList("123")).anyTimes();
+        expect(mockConfig.getInt(advertiserName + ".bidFloorPercent", 100)).andReturn(100).anyTimes();
         expect(mockConfig.getString("key.1.value")).andReturn("Secret Key").anyTimes();
         expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconPrefix").anyTimes();
         expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickPrefix").anyTimes();
@@ -137,7 +138,7 @@ public class NewIXAdNetworkTest {
         final String response3 = null;
         final String response4 =
                 "{\"id\":\"ce3adf2d-0149-1000-e483-3e96d9a8a2c1\",\"bidid\":\"1bc93e72-3c81-4bad-ba35-9458b54e109a\",\"seatbid\":[{\"bid\":[]}],\"statuscode\":10}";
-        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, false);
+        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, null, advertiserName, false);
 
         ixAdNetwork.parseResponse(response1, mockStatus);
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
@@ -208,7 +209,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixResponseJson;
 
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -268,7 +269,7 @@ public class NewIXAdNetworkTest {
 
         final IXAdNetwork ixAdNetwork =
                 new IXAdNetwork(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
-                        advertiserName, 0, true);
+                        advertiserName, true);
 
         final WapSiteUACEntity.Builder wapBuild = new WapSiteUACEntity.Builder();
         wapBuild.setTransparencyEnabled(true);
@@ -324,7 +325,7 @@ public class NewIXAdNetworkTest {
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -385,7 +386,7 @@ public class NewIXAdNetworkTest {
 
         final String response = TestUtils.SampleStrings.ixStudioResponseAdTag;
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -447,7 +448,7 @@ public class NewIXAdNetworkTest {
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -507,7 +508,7 @@ public class NewIXAdNetworkTest {
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -562,7 +563,7 @@ public class NewIXAdNetworkTest {
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -627,7 +628,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
 
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getCreativeType", "getImpressionId", "getAuctionId"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
@@ -727,7 +728,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
 
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo"};
         final IXAdNetwork mockIXAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
         replayAll();
@@ -743,7 +744,7 @@ public class NewIXAdNetworkTest {
     @Test
     public void testDeserialisationFailureResponseDoesNotConformToContract() throws Exception {
         mockStaticNice(InspectorStats.class);
-        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, 0, true);
+        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, true);
         replayAll();
 
         // Renaming fields for which @Required is being tested
@@ -911,7 +912,7 @@ public class NewIXAdNetworkTest {
     @Test
     public void testDeserialisationSuccessfulAsResponseConformsToContract() throws Exception {
         mockStaticNice(InspectorStats.class);
-        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, 0, true);
+        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, true);
         replayAll();
 
         // Renaming fields for which @Required is being tested
@@ -941,7 +942,7 @@ public class NewIXAdNetworkTest {
     @Test
     public void testDeserialisationFailureResponseDoesNotConformToValidBidStructure() throws Exception {
         mockStaticNice(InspectorStats.class);
-        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, 0, true);
+        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, true);
         replayAll();
 
         final String faultyJsons[] =
@@ -984,7 +985,7 @@ public class NewIXAdNetworkTest {
     @Test
     public void testDeserialisationSuccessfulAsResponseConformsToValidBidStructure() throws Exception {
         mockStaticNice(InspectorStats.class);
-        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, 0, true);
+        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, "", advertiserName, true);
         replayAll();
 
         final String jsons[] =
@@ -1035,7 +1036,7 @@ public class NewIXAdNetworkTest {
 
         final String response = TestUtils.SampleStrings.ixNativeResponseJson;
         final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, 0, true};
+                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 

@@ -4,13 +4,9 @@ package com.inmobi.castest.casconfenums.impl;
  * @author santosh.vaidyanathan
  */
 
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
-import com.inmobi.castest.casconfenums.def.CasConf.WapChannelAdGroupTemplates;
 import com.inmobi.castest.casconfenums.def.QueryConf.Query;
-import com.inmobi.castest.utils.common.WapChannelAdGroup;
 
 public class CasQueryConf {
 
@@ -266,7 +262,8 @@ public class CasQueryConf {
                 System.out.println(queryString);
                 break;
             }
-
+            default:
+                break;
         }
         return queryString;
     }

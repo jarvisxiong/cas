@@ -199,7 +199,7 @@ public class RtbNativeAdMakingTest {
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
 
-        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, null, null, null, advertiserName, 0, false);
+        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, null, null, null, advertiserName, false);
         final Method[] methodsToSupress = new Method[] {RtbAdNetwork.class.getDeclaredMethod("configureParameters")};
         MemberModifier.suppress(methodsToSupress);
 

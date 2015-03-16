@@ -37,13 +37,11 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-easymock</artifactId>
-            <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -63,7 +61,6 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>

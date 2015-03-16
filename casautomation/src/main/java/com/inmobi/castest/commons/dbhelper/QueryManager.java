@@ -27,7 +27,7 @@ public class QueryManager {
 
     }
 
-    public static ArrayList<Map> executeAndGetColumnsOutput(final String dbQuery) throws SQLException,
+    public static ArrayList<Map<String, String>> executeAndGetColumnsOutput(final String dbQuery) throws SQLException,
             ClassNotFoundException {
         System.out.println(dbQuery);
         final ConnectionManager connectionManager = new ConnectionManager();
@@ -40,8 +40,8 @@ public class QueryManager {
 
         final int numberOfColumns = rsmd.getColumnCount();
         System.out.println("columns : " + numberOfColumns);
-        final ArrayList<Map> data = new ArrayList<Map>();
-        Map eachLine;
+        final ArrayList<Map<String, String>> data = new ArrayList<Map<String, String>>();
+        Map<String, String> eachLine;
 
         while (rs.next()) { // process results one row at a time
             eachLine = new HashMap<String, String>();

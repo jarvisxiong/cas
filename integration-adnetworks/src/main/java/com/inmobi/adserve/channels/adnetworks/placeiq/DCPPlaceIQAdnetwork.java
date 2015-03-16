@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.placeiq;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.HashMap;
@@ -28,6 +24,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 
 public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
@@ -41,7 +41,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String REQUEST_TYPE = "RT";
     private static final String SIZE = "SZ";
     private static final String ANDROIDMD5 = "AM";
-    private static final String ANDROIDIDSHA1 = "AH";
+    // private static final String ANDROIDIDSHA1 = "AH";
     private static final String IOSSHA1 = "DS";
     private static final String IDFA = "IA";
     private static final String UA = "UA";
@@ -134,8 +134,8 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
         if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
 
             Short slotSize = selectedSlotId;
-            if (slotSize == (short)9) {
-                slotSize = (short)15;
+            if (slotSize == (short) 9) {
+                slotSize = (short) 15;
             }
             final Dimension dim = repositoryHelper.querySlotSizeMapRepository(slotSize).getDimension();
             width = (int) Math.ceil(dim.getWidth());
@@ -145,7 +145,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
-        String udid = getUid();
+        final String udid = getUid();
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
@@ -232,14 +232,14 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
 
         if (isApp) {
-            appendQueryParam(url, APPID, sasParams.getSiteIncId() + "", false);
+            appendQueryParam(url, APPID, String.valueOf(sasParams.getSiteIncId()), false);
             if (isInterstitial()) {
                 appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_INT, format), false);
             } else {
                 appendQueryParam(url, ADTYPE, getURLEncode(APPTYPE_BANNER, format), false);
             }
         } else {
-            appendQueryParam(url, SITEID, sasParams.getSiteIncId() + "", false);
+            appendQueryParam(url, SITEID, String.valueOf(sasParams.getSiteIncId()), false);
             appendQueryParam(url, ADTYPE, getURLEncode(WAPTYPE, format), false);
         }
         LOG.debug("PlaceIQ url is {}", url);
@@ -256,16 +256,16 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            adStatus = "NO_AD";
-            responseContent = "";
+            adStatus = NO_AD;
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             try {
                 final VelocityContext context = new VelocityContext();
                 if (XMLFORMAT.equalsIgnoreCase(responseFormat)) {
                     if (response.contains("<NOAD>")) {
-                        adStatus = "NO_AD";
-                        responseContent = "";
+                        adStatus = NO_AD;
+                        responseContent = DEFAULT_EMPTY_STRING;
                         return;
                     }
                     final Document doc = documentBuilderHelper.parse(response);
@@ -284,9 +284,9 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.code();
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from PlaceIQ: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
@@ -337,5 +337,5 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         return StringUtils.isBlank(category) ? "uc" : category;
     }
-    
+
 }

@@ -306,10 +306,10 @@ public class ServletIXFillTest {
                 mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
                         null, null)).andReturn(mockChannelSegmentList).times(1);
         expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
-        expect(mockCasUtils.getRtbFloor(mockCasContext, mockSASRequestParameters)).andReturn(0.5).times(1);
+        expect(mockCasUtils.getRtbFloor(mockCasContext)).andReturn(0.5).times(1);
         expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
-        expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).times(1);
-        expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).times(1);
+        expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).anyTimes();
+        expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).anyTimes();
         expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).times(1);
         expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).times(1);
         expect(mockSASRequestParameters.getUAdapters()).andReturn(null).times(1);
