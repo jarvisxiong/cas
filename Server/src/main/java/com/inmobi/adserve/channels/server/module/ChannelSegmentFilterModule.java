@@ -31,6 +31,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.Ad
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelThrottler;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AdvertiserLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
@@ -81,6 +82,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
         final Set<Class<? extends AdvertiserLevelFilter>> classes =
                 reflections.getSubTypesOf(AdvertiserLevelFilter.class);
         classes.addAll(reflections.getSubTypesOf(AbstractAdvertiserLevelFilter.class));
+        classes.addAll(reflections.getSubTypesOf(AbstractAdvertiserLevelThrottler.class));
 
         for (final Class<? extends AdvertiserLevelFilter> class1 : classes) {
             final AdvertiserLevelFilter filter = injector.getInstance(class1);
@@ -94,6 +96,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
 
             advertiserLevelFilterList.add(filter);
         }
+        
 
         Collections.sort(advertiserLevelFilterList, FILTER_COMPARATOR);
 

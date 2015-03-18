@@ -41,6 +41,8 @@ public class InspectorStrings {
     public static final String NO_MATCH_SEGMENT_LATENCY = "NoMatchSegmentLatency";
     public static final String NO_MATCH_SEGMENT_COUNT = "NoMatchSegmentCount";
     public static final String DROPPED_IN_IMPRESSION_FILTER = "DroppedInImpressionFilter";
+    public static final String DROPPED_IN_FAILURE_TROTTLER_FILTER = "DroppedInFailureTrottlerFilter";
+    public static final String NUMBER_OF_TIMES_CIRCUIT_OPENED = "NumberOfTimesCircuitOpened";
     public static final String DROPPED_IN_PROPERTY_VIOLATION_FILTER = "DroppedInPropertyViolationFilter";
     public static final String DROPPED_IN_BURN_FILTER = "DroppedInBurnFilter";
     public static final String DROPPED_IN_REQUEST_CAP_FILTER = "DroppedInRequestCapFilter";

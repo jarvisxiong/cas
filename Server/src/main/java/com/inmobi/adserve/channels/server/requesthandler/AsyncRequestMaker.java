@@ -18,6 +18,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.SegmentFactory;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
@@ -196,6 +197,7 @@ public class AsyncRequestMaker {
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
                         .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
+                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(), System.currentTimeMillis());
             } else {
                 itr.remove();
             }
@@ -209,6 +211,7 @@ public class AsyncRequestMaker {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
                         channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
                                 .getChannelId());
+                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(), System.currentTimeMillis());
             } else {
                 rtbItr.remove();
             }

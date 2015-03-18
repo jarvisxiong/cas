@@ -380,6 +380,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             adStatus = TERM;
             responseStruct = new ThirdPartyAdResponse();
             responseStruct.setLatency(latency);
+            responseStruct.setStartTime(startTime);
             responseStruct.setAdStatus(adStatus);
         }
     }
@@ -414,6 +415,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
         }
         responseStruct.setLatency(latency);
+        responseStruct.setStartTime(startTime);
         LOG.debug("getting response ad for channel {}", getId());
         if (isClickUrlRequired()) {
             responseStruct.setClickUrl(getClickUrl());

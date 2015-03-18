@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.api.easymock.PowerMock;
 import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -36,8 +38,11 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.circuitbreaker.CircuitBreakerImpl;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.instrumentation.MovingWindowCounter;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;
@@ -59,7 +64,7 @@ import com.inmobi.casthrift.User;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Logging.class, InspectorStats.class})
+@PrepareForTest({Logging.class, InspectorStats.class, CircuitBreakerImpl.class, AdvertiserFailureThrottler.class})
 public class LoggingTest {
     private static Configuration mockConfig;
     private static int sampledadvertisercount = 5;
@@ -211,6 +216,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getCreativeId()).andReturn(null).anyTimes();
         expect(mockAdNetworkInterface.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdNetworkInterface.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
@@ -344,6 +350,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getAdMarkUp()).andReturn(adMarkup).anyTimes();
         expect(mockAdNetworkInterface.getRequestUrl()).andReturn(requestUrl).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn(name).anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("ID").anyTimes();
         expect(mockAdNetworkInterface.getIUrl()).andReturn(iUrl).anyTimes();
         expect(mockAdNetworkInterface.getAttribute()).andReturn(attributes).anyTimes();
         expect(mockAdNetworkInterface.getADomain()).andReturn(aDomain).anyTimes();
@@ -373,10 +380,13 @@ public class LoggingTest {
         long adgroupIncId = 456L;
         long adIncId = 678L;
         long latency = 789L;
+        long startTime = 723L;
         double bidPriceInUSD = 4.0;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
 
         mockStaticNice(InspectorStats.class);
+        PowerMock.suppress(AdvertiserFailureThrottler.class.getDeclaredMethod("increamentRequestsThrottlerCounter", String.class, long.class));
+        
         AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
@@ -395,7 +405,9 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
         expect(mockAdNetworkInterface.getConnectionLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("ID").anyTimes();
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();
+        expect(mockThirdPartyAdResponse.getStartTime()).andReturn(startTime).anyTimes();
         expect(mockAdNetworkInterface.getAdStatus())
                 .andReturn(adStatus[0]).times(1)
                 .andReturn(adStatus[1]).times(1)
@@ -468,6 +480,7 @@ public class LoggingTest {
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
         expect(mockAdNetworkInterface.getResponseStruct()).andReturn(mockThirdPartyAdResponse).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdNetworkInterface.getHttpResponseContent()).andReturn("HttpResponseContent").anyTimes();
         expect(mockAdNetworkInterface.getRequestUrl()).andReturn("RequestUrl").anyTimes();
         expect(mockThirdPartyAdResponse.getAdStatus()).andReturn("AD").anyTimes();
@@ -498,6 +511,7 @@ public class LoggingTest {
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
         expect(mockAdNetworkInterface.getResponseStruct()).andReturn(mockThirdPartyAdResponse).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdNetworkInterface.getHttpResponseContent()).andReturn("HttpResponseContent").anyTimes();
         expect(mockAdNetworkInterface.getRequestUrl()).andReturn("").anyTimes();
         expect(mockThirdPartyAdResponse.getAdStatus()).andReturn("NO_AD").anyTimes();
@@ -609,6 +623,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getCreativeId()).andReturn(null).anyTimes();
         expect(mockAdNetworkInterface.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
         expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
@@ -669,6 +684,7 @@ public class LoggingTest {
         expect(mockIXAdNetwork.getCreativeId()).andReturn(null).anyTimes();
         expect(mockIXAdNetwork.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockIXAdNetwork.getName()).andReturn("name").anyTimes();
+        expect(mockIXAdNetwork.getId()).andReturn("Id").anyTimes();
         expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIdList).anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
@@ -717,6 +733,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getCreativeId()).andReturn(null).anyTimes();
         expect(mockAdNetworkInterface.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
+        expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
         expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
@@ -966,6 +983,7 @@ public class LoggingTest {
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork1").anyTimes();
+        expect(mockAdnetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
@@ -996,6 +1014,7 @@ public class LoggingTest {
         thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
+        expect(mockAdnetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
@@ -1027,6 +1046,7 @@ public class LoggingTest {
         thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
+        expect(mockAdnetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("").anyTimes();
         expect(mockAdnetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
@@ -1058,6 +1078,7 @@ public class LoggingTest {
         thirdPartyAdResponse.setAdStatus("AD");
         expect(mockAdnetworkInterface.getResponseStruct()).andReturn(thirdPartyAdResponse).anyTimes();
         expect(mockAdnetworkInterface.getName()).andReturn("DummyAdNetwork2").anyTimes();
+        expect(mockAdnetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("response").anyTimes();
         expect(mockAdnetworkInterface.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();

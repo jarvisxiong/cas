@@ -86,6 +86,13 @@ server.graphiteServer.port=2020
 server.graphiteServer.intervalInMinutes=1
 server.graphiteServer.shouldLogAdapterLatencies=<%= graphite_shouldLogAdapterLatencies %>
 
+server.circuitbreaker.disable=true
+server.circuitbreaker.failureThreshold=0.5
+server.circuitbreaker.lengthOfMovingWindowCounterInSeconds=300
+server.circuitbreaker.minimumNumberOfRequests=100
+server.circuitbreaker.numberOfSecondsUnderObservation=10
+server.circuitbreaker.class=com.inmobi.adserve.channels.server.circuitbreaker.CircuitBreakerImpl
+
 server.isIPRepositoryDisabled=false
 server.isRtbEnabled=<%= rtb_enabled %>
 
@@ -1447,6 +1454,7 @@ adapter.ix.userName=inmobi
 adapter.ix.password=F40GXA978H
 adapter.ix.accountId=11726
 adapter.ix.globalBlind=3522,2666,2179,3038,3107,3420,3002,3320,2853,3158,3560,3600,3542,3614,3101,3676,2893
+adapter.ix.excludeCircuitBreaker=true
 adapter.ix.bidFloorPercent=100
 
 adapter.EAHosted.isRtb=true

@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.ADCreativeType;
@@ -214,10 +215,12 @@ public class Logging {
                 case "TIME_OUT":
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
+                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 default:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
+                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
             }
         }
