@@ -33,9 +33,9 @@ public class IXPackageMatcher {
 
     public static final int PACKAGE_MAX_LIMIT = 30;
 
-    public static List<String> findMatchingPackageIds(final SASRequestParameters sasParams,
+    public static List<Integer> findMatchingPackageIds(final SASRequestParameters sasParams,
                                                       final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
-        List<String> matchedPackageIds = new ArrayList<>();
+        List<Integer> matchedPackageIds = new ArrayList<>();
 
         Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
         ResultSet<IXPackageEntity> resultSet =
@@ -51,7 +51,7 @@ public class IXPackageMatcher {
                         && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity.getDmpFilterSegmentExpression())) {
                     continue;
                 }
-                matchedPackageIds.add(String.valueOf(packageEntity.getId()));
+                matchedPackageIds.add(packageEntity.getId());
                 // Break the loop if we reach the threshold.
                 if (++matchedPackagesCount == PACKAGE_MAX_LIMIT) {
                     InspectorStats.incrementStatCount(InspectorStrings.IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT);

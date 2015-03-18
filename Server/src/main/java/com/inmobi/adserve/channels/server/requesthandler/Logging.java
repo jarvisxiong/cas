@@ -3,11 +3,14 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -41,6 +44,7 @@ import com.inmobi.casthrift.Geo;
 import com.inmobi.casthrift.HandsetMeta;
 import com.inmobi.casthrift.Impression;
 import com.inmobi.casthrift.InventoryType;
+import com.inmobi.casthrift.IxAd;
 import com.inmobi.casthrift.PricingModel;
 import com.inmobi.casthrift.Request;
 import com.inmobi.casthrift.User;
@@ -53,6 +57,9 @@ public class Logging {
     public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
             new ConcurrentHashMap<String, String>(2000);
 
+    public static final String AD = "AD";
+    public static final String NO_AD = "NO_AD";
+    public static final String TIME_OUT = "TIME_OUT";
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
@@ -91,9 +98,7 @@ public class Logging {
             final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
             if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
@@ -198,6 +203,15 @@ public class Logging {
             if (bid > 0) {
                 channel.setBid(bid);
             }
+            // Log IX specific fields in ixAdInfo.
+            if (adNetwork instanceof IXAdNetwork) {
+                IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
+
+                // Populate IXAd only if 1) we get an AD response from IX OR 2) forward any package to RP.
+                if (AD.equals(adResponse.getAdStatus()) || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
+                    channel.setIxAds(Arrays.asList(createIxAd(ixAdNetwork)));
+                }
+            }
             channels.add(channel);
 
             // Incrementing inspectors
@@ -206,13 +220,13 @@ public class Logging {
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
                     adNetwork.getConnectionLatency());
             switch (adResponse.getAdStatus()) {
-                case "AD":
+                case AD:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
                     break;
-                case "NO_AD":
+                case NO_AD:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
                     break;
-                case "TIME_OUT":
+                case TIME_OUT:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
                     AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(), adResponse.getStartTime());
@@ -243,6 +257,38 @@ public class Logging {
         }
         casAdChain.setAd_inc_id(channelSegmentEntity.getIncId(channelSegment.getAdNetworkInterface().getCreativeType()));
         return casAdChain;
+    }
+
+    public static IxAd createIxAd(IXAdNetwork ixAdNetwork) {
+        final IxAd ixAd = new IxAd();
+
+        if (StringUtils.isNotEmpty(ixAdNetwork.getDspId())) {
+            ixAd.setDspId(ixAdNetwork.getDspId());
+        }
+        if (StringUtils.isNotEmpty(ixAdNetwork.returnAqid())) {
+            ixAd.setAqId(ixAdNetwork.returnAqid());
+        }
+        if (StringUtils.isNotEmpty(ixAdNetwork.getAdvId())) {
+            ixAd.setAdvId(ixAdNetwork.getAdvId());
+        }
+        if (StringUtils.isNotEmpty(ixAdNetwork.getSeatId())) {
+            ixAd.setSeatId(ixAdNetwork.getSeatId());
+        }
+
+        // Log all the package Ids which were sent to RP.
+        if (CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
+            ixAd.setPackageIds(ixAdNetwork.getPackageIds());
+
+            // Log winning dealId
+            if (StringUtils.isNotEmpty(ixAdNetwork.getDealId())) {
+                ixAd.setWinningDealId(ixAdNetwork.getDealId());
+            }
+            // Log winning PackageId
+            if (null != ixAdNetwork.getWinningPackageId()) {
+                ixAd.setWinningPackageId(ixAdNetwork.getWinningPackageId());
+            }
+        }
+        return ixAd;
     }
 
     protected static AdRR getAdRR(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
@@ -335,14 +381,6 @@ public class Logging {
 
             impression = new Impression(adNetworkInterface.getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
-
-            // For IX, log all the package IDs which were sent to RP.
-            if (adNetworkInterface instanceof IXAdNetwork) {
-                IXAdNetwork ixadNetwork = (IXAdNetwork) adNetworkInterface;
-                if (null != ixadNetwork.getPackageIds()) {
-                    impression.setIxPackageIds(ixadNetwork.getPackageIds());
-                }
-            }
         }
         return impression;
     }
@@ -435,11 +473,11 @@ public class Logging {
     }
 
     public static AdStatus getAdStatus(final String adStatus) {
-        if ("AD".equalsIgnoreCase(adStatus)) {
+        if (AD.equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
-        } else if ("NO_AD".equals(adStatus)) {
+        } else if (NO_AD.equals(adStatus)) {
             return AdStatus.NO_AD;
-        } else if ("TIME_OUT".equals(adStatus)) {
+        } else if (TIME_OUT.equals(adStatus)) {
             return AdStatus.TIME_OUT;
         }
         return AdStatus.DROPPED;
@@ -468,7 +506,7 @@ public class Logging {
             log.append(sep).append(adResponse.getAdStatus());
             String response = "";
             String requestUrl = "";
-            if ("AD".equalsIgnoreCase(adResponse.getAdStatus())) {
+            if (AD.equalsIgnoreCase(adResponse.getAdStatus())) {
                 response = adNetworkInterface.getHttpResponseContent();
                 log.append(sep).append(response);
             }
@@ -518,7 +556,7 @@ public class Logging {
                 response = adNetworkInterface.getAdMarkUp();
             }
 
-            if (!"AD".equalsIgnoreCase(adStatus) || "".equals(requestUrl) || "".equals(response)) {
+            if (!AD.equalsIgnoreCase(adStatus) || "".equals(requestUrl) || "".equals(response)) {
                 continue;
             }
 

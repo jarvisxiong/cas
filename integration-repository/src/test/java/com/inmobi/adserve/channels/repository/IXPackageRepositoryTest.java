@@ -139,7 +139,7 @@ public class IXPackageRepositoryTest {
         EasyMock.expect(placementAdTypeArray.getArray()).andReturn(placementAdTypes).anyTimes();
 
 
-        ResultSetExpectationSetter.setExpectation(rs, "id", 1L, Types.BIGINT);
+        ResultSetExpectationSetter.setExpectation(rs, "id", 1, Types.INTEGER);
         ResultSetExpectationSetter.setExpectation(rs, "lat_long_only", true, Types.BOOLEAN);
         ResultSetExpectationSetter.setExpectation(rs, "zip_code_only", false, Types.BOOLEAN);
         ResultSetExpectationSetter.setExpectation(rs, "ifa_only", false, Types.BOOLEAN);
@@ -179,7 +179,7 @@ public class IXPackageRepositoryTest {
         Assert.assertEquals(packageSet.size(), 1);
         IXPackageEntity packageEntity = (IXPackageEntity) packageSet.toArray()[0];
 
-        Assert.assertEquals(packageEntity.getId(), 1L);
+        Assert.assertEquals(packageEntity.getId(), 1);
         Assert.assertEquals(packageEntity.getDmpId(), 0);
         Assert.assertEquals(packageEntity.getDmpVendorId(), 0);
         Assert.assertEquals(packageEntity.getDmpFilterSegmentExpression(), new HashSet<>());

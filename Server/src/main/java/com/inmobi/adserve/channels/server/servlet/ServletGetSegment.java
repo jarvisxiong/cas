@@ -135,7 +135,7 @@ public class ServletGetSegment implements Servlet {
                     ResultSet<IXPackageEntity> resultSet =
                             CasConfigUtil.repositoryHelper.queryIXPackageRepository(Integer.parseInt(id.split("_")[0]),
                                     id.split("_")[1], Integer.parseInt(id.split("_")[2]), Integer.parseInt(id.split("_")[3]));
-                    List<Long> result = new ArrayList<>();
+                    List<Integer> result = new ArrayList<>();
                     for (IXPackageEntity packageEntity : resultSet) {
                         result.add(packageEntity.getId());
                     }

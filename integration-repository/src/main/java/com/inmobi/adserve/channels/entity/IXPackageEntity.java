@@ -3,15 +3,15 @@ package com.inmobi.adserve.channels.entity;
 import java.util.List;
 import java.util.Set;
 
+import com.inmobi.segment.Segment;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import com.inmobi.segment.Segment;
 
 @Getter
 public class IXPackageEntity {
 
-    private long id;
+    private int id;
     private Segment segment;
 
     private int dmpId;
@@ -40,7 +40,7 @@ public class IXPackageEntity {
 
     @Setter
     public static class Builder {
-        private long id;
+        private int id;
         private Segment segment;
         private int dmpId;
         private int dmpVendorId;

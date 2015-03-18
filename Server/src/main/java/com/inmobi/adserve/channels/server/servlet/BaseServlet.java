@@ -74,6 +74,13 @@ public abstract class BaseServlet implements Servlet {
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
 
+        // Send NO_AD response, if not enabled.
+        if (!isEnabled()) {
+            LOG.debug("Servlet {} is disabled via server config. Sending NO_AD response.", getName());
+            hrh.responseSender.sendNoAdResponse(serverChannel);
+            return;
+        }
+
         hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.getSasParams();
         final CasInternalRequestParameters casInternalRequestParametersGlobal =
                 hrh.responseSender.casInternalRequestParameters;
@@ -117,6 +124,9 @@ public abstract class BaseServlet implements Servlet {
 
         if (CollectionUtils.isEmpty(matchedSegmentDetails)) {
             LOG.debug(traceMarker, "No Entities matching the request.");
+            final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
+            InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+            InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
@@ -271,6 +281,8 @@ public abstract class BaseServlet implements Servlet {
     }
 
     protected abstract Logger getLogger();
+
+    protected abstract boolean isEnabled();
 
     /**
      * @param channelSegment

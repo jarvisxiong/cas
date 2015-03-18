@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,6 +25,9 @@ import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 
 @Singleton
 @Path("/rtbdFill")
@@ -50,13 +50,6 @@ public class ServletRtbd extends BaseServlet {
         final Marker traceMarker = traceMarkerProvider.get();
         LOG.debug(traceMarker, "Inside RTBD servlet");
         InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
-
-        // If server.isRtbEnabled=false is set, send NO_AD response.
-        if (!CasConfigUtil.getServerConfig().getBoolean("isRtbEnabled", true)) {
-            LOG.debug("RTBD is disabled via server config. Sending NO_AD response.");
-            hrh.responseSender.sendNoAdResponse(serverChannel);
-            return;
-        }
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
     }
 
@@ -68,5 +61,10 @@ public class ServletRtbd extends BaseServlet {
     @Override
     protected Logger getLogger() {
         return LOG;
+    }
+
+    @Override
+    protected boolean isEnabled() {
+        return CasConfigUtil.getServerConfig().getBoolean("isRtbEnabled", true);
     }
 }

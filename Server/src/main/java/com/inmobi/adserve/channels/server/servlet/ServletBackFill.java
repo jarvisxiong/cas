@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -26,6 +23,9 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 
 @Singleton
@@ -61,5 +61,10 @@ public class ServletBackFill extends BaseServlet {
     @Override
     protected Logger getLogger() {
         return LOG;
+    }
+
+    @Override
+    protected boolean isEnabled() {
+        return true;
     }
 }

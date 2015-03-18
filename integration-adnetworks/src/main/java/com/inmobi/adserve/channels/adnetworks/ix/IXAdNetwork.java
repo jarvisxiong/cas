@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -186,6 +187,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String encryptedBid;
     private String responseImpressionId;
     private String responseAuctionId;
+    @Getter
+    private String dspId;
+    @Getter
+    private String advId;
+    @Getter
+    private Integer winningPackageId;
+    @Getter
     private String dealId;
     private Double dealFloor;
     private Double dataVendorCost;
@@ -208,7 +216,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean isExternalPersonaDeal;
     private Set<Integer> usedCsIds;
     @Getter
-    private List<String> packageIds;
+    private List<Integer> packageIds;
     private List<String> iabCategories;
 
 
@@ -471,7 +479,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                         impExt.getRp() == null ? new RPImpressionExtension(zoneId) : impExt.getRp();
 
                 final RPTargetingExtension target = new RPTargetingExtension();
-                target.setPackages(packageIds);
+                target.setPackages(Lists.transform(packageIds, Functions.toStringFunction()));
                 rp.setTarget(target);
                 impExt.setRp(rp);
 
@@ -1483,7 +1491,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Configuring of adapter from bid response
         final SeatBid seatBid = bidResponse.getSeatbid().get(0);
         final Bid bid = seatBid.getBid().get(0);
-        final String buyer = seatBid.getBuyer();
+        dspId = seatBid.getBuyer();
 
         responseAuctionId = bidResponse.getId();
         responseBidObjCount = seatBid.getBid().size();
@@ -1511,6 +1519,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adm = admobject.toString();
         }
 
+        // Fetch bid.ext.rp.advid.
+        if (null != bid.getExt() && null != bid.getExt().getRp()) {
+            advId = bid.getExt().getRp().getAdvid();
+        }
+
+
         // For video requests, validate that a valid XML is received.
         if (isVideoRequest) {
             if (IXAdNetworkHelper.isAdmValidXML(getAdMarkUp())) {
@@ -1529,7 +1543,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             Bid->w and Bid->h
         */
 
-        if (updateDSPAccountInfo(buyer)) {
+        if (updateDSPAccountInfo(dspId)) {
             LOG.debug(traceMarker, "Response successfully deserialised");
             return true;
         } else {
@@ -1592,6 +1606,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         try {
             matchedPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
+            winningPackageId = matchedPackageEntity.getId();
         } catch (final NoSuchObjectException exception) {
             LOG.error("Rubicon DealId not stored in ix_package_deals table, {}", dealId);
             return;

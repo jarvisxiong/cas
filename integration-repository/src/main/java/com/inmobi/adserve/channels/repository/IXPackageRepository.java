@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
-import lombok.Getter;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -60,9 +58,11 @@ import com.inmobi.segment.impl.UidPresent;
 import com.inmobi.segment.impl.ZipCodePresent;
 import com.inmobi.segmentparameter.SegmentParameter;
 
+import lombok.Getter;
+
 
 public class IXPackageRepository {
-    private volatile Map<Long, IXPackageEntity> packageSet = Collections.emptyMap();
+    private volatile Map<Integer, IXPackageEntity> packageSet = Collections.emptyMap();
     @Getter
     private IndexedCollection<IXPackageEntity> packageIndex;
     private ScheduledDbReader reader;
@@ -178,7 +178,7 @@ public class IXPackageRepository {
     }
 
     public class IXPackageReaderDelegate implements DBReaderDelegate {
-        private Map<Long, IXPackageEntity> newIXPackageSet;
+        private Map<Integer, IXPackageEntity> newIXPackageSet;
 
         @Override
         public void beforeEachIteration() {
@@ -190,7 +190,7 @@ public class IXPackageRepository {
 
             Timestamp ts;
             try {
-                long id = rs.getLong("id");
+                int id = rs.getInt("id");
                 Integer[] osIds = (Integer[]) rs.getArray("os_ids").getArray();
                 String[] siteIds = (String[]) rs.getArray("site_ids").getArray();
                 boolean latLongOnly = rs.getBoolean("lat_long_only");
