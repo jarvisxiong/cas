@@ -130,7 +130,7 @@ public class ServletIXFillTest {
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).times(1);
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).times(1);
-        expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(2);
+        expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(1);
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).times(1);
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
@@ -147,10 +147,6 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setVideoSupported(false);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-        expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-        expectLastCall().times(1);
-        InspectorStats.incrementStatCount("IX-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);

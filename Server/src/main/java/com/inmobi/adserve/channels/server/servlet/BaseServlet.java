@@ -124,9 +124,6 @@ public abstract class BaseServlet implements Servlet {
 
         if (CollectionUtils.isEmpty(matchedSegmentDetails)) {
             LOG.debug(traceMarker, "No Entities matching the request.");
-            final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-            InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }

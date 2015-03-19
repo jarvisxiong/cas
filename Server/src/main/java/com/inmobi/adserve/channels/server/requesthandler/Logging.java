@@ -98,7 +98,9 @@ public class Logging {
             final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
             if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
