@@ -1050,22 +1050,22 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST3_7_8_4(final String x) throws Exception {
-
-        /* Deriving the parser output to assert for */
-        parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRANS),
-                    LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPP),
-                    LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSIDNAME),
-                    LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSSTOREURL),
-                    LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPPEXTBUNDLE));
-
-        Reporter.log(parserOutput, true);
-        // System.out.println("ParserOutput : " + parserOutput);
-
-        Assert.assertTrue(parserOutput.equals("PASS"));
-    }
+    // @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    // public void TEST3_7_8_4(final String x) throws Exception {
+    //
+    // /* Deriving the parser output to assert for */
+    // parserOutput =
+    // LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRANS),
+    // LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPP),
+    // LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSIDNAME),
+    // LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSSTOREURL),
+    // LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPPEXTBUNDLE));
+    //
+    // Reporter.log(parserOutput, true);
+    // // System.out.println("ParserOutput : " + parserOutput);
+    //
+    // Assert.assertTrue(parserOutput.equals("PASS"));
+    // }
 
     // Request JSON For : --- PERF/iOS/WAP ---
     // ******************************************************************************************************//

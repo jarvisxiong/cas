@@ -66,8 +66,8 @@ public class ConnectionManager {
 
     }
 
-    public static ArrayList<Map<String, String>> executeAndGetColumnsOutput(final Object dbQuery) throws SQLException,
-            ClassNotFoundException {
+    public static ArrayList<Map> executeAndGetColumnsOutput(final Object dbQuery) throws SQLException,
+    ClassNotFoundException {
 
         final String statement = (String) dbQuery;
         new ConnectionManager().getDBConnection();
@@ -77,8 +77,8 @@ public class ConnectionManager {
 
         final int numberOfColumns = rsmd.getColumnCount();
         System.out.println("columns : " + numberOfColumns);
-        final ArrayList<Map<String, String>> data = new ArrayList<Map<String,String>>();
-        Map<String, String> eachLine;
+        final ArrayList<Map> data = new ArrayList<Map>();
+        Map eachLine;
 
         while (rs.next()) { // process results one row at a time
             eachLine = new HashMap<String, String>();

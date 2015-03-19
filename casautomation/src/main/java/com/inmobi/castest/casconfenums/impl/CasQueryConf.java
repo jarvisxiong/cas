@@ -11,15 +11,15 @@ import com.inmobi.castest.casconfenums.def.QueryConf.Query;
 public class CasQueryConf {
 
     public static String setQuery(final Query query, final Map<String, String> adGroup,
-            final String... advertiser_id_list) {
+                                  final String... advertiser_id_list) {
         String queryString = new String();
         switch (query) {
 
             case SELECT_WAPCHANNEL_ADGROUP_SEGMENT: {
                 queryString =
                         "select * from wap_channel_adgroup where advertiser_id = '" + adGroup.get("advertiser_id")
-                                + "' and rc_list!=\'{-1}\' and rc_list!=\'{}\' "
-                                + "and external_site_key not like '% %' order by adgroup_id desc limit 1";
+                        + "' and rc_list!=\'{-1}\' and rc_list!=\'{}\' "
+                        + "and external_site_key not like '% %' order by adgroup_id desc limit 1";
                 System.out.println(queryString);
                 break;
             }
@@ -52,9 +52,9 @@ public class CasQueryConf {
 
                 queryString =
                         "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
-                                + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
-                                + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                                + adGroup.get("adgroup_id") + "',1,now(),2)";
+                        + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
+                        + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                        + adGroup.get("adgroup_id") + "',1,now(),2)";
                 System.out.println(queryString);
                 break;
             }
@@ -76,7 +76,7 @@ public class CasQueryConf {
             case selectEarningsFeedBackQuery: {
                 queryString =
                         "select * from earnings_dcp_feedback where account_id='" + adGroup.get("advertiser_id")
-                                + "' and segment_id='" + adGroup.get("external_site_key") + "'";
+                        + "' and segment_id='" + adGroup.get("external_site_key") + "'";
                 System.out.println(queryString);
                 break;
             }
@@ -140,9 +140,9 @@ public class CasQueryConf {
                                 + adGroup.get("category_taxomony")
                                 + "' , '"
                                 + adGroup.get("segment_flags")
-                                + "' , '"
+                                + "' , "
                                 + adGroup.get("additional_params")
-                                + "' , '"
+                                + " , '"
                                 + adGroup.get("impression_ceil")
                                 + "' , '"
                                 + adGroup.get("ecpm_boost")
@@ -189,8 +189,8 @@ public class CasQueryConf {
 
                 queryString =
                         "update wap_channel set account_id='" + adGroup.get("advertiser_id")
-                                + "' , impression_ceil=1000000, account_segment='" + adGroup.get("account_segment")
-                                + "',priority=2,modified_on=now() where id='" + adGroup.get("channel_id") + "'";
+                        + "' , impression_ceil=1000000, account_segment='" + adGroup.get("account_segment")
+                        + "',priority=2,modified_on=now() where id='" + adGroup.get("channel_id") + "'";
                 System.out.println(queryString);
                 break;
             }
@@ -230,7 +230,7 @@ public class CasQueryConf {
             case insertDCPAdvertiserBurnQuery: {
                 queryString =
                         "insert into dcp_advertiser_burn values ('" + adGroup.get("advertiser_id")
-                                + "',10,10,100000,'Automation',now())";
+                        + "',10,10,100000,'Automation',now())";
                 System.out.println(queryString);
                 break;
             }

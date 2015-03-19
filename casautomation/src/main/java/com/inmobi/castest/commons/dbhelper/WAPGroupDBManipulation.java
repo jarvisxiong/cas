@@ -26,7 +26,7 @@ public class WAPGroupDBManipulation {
          * WAP Channel Ad query
          */
 
-        final ArrayList<Map<String, String>> resultSetOfWapChannelAd =
+        final ArrayList<Map> resultSetOfWapChannelAd =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_WAP_CHANNEL_AD,
                     wapChannelAdgroupObject));
         System.out.println("***RESULT SET 1 SIZE***  : " + resultSetOfWapChannelAd.size());
@@ -41,7 +41,7 @@ public class WAPGroupDBManipulation {
 
         // update wap_channel table
 
-        final ArrayList<Map<String, String>> resultSetOfWapChannel =
+        final ArrayList<Map> resultSetOfWapChannel =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_WAP_CHANNEL,
                     wapChannelAdgroupObject));
 
@@ -60,7 +60,7 @@ public class WAPGroupDBManipulation {
 
         // update realtime_dcp_feedback table
 
-        final ArrayList<Map<String, String>> resultSetOfRealTimeDcpFeedback =
+        final ArrayList<Map> resultSetOfRealTimeDcpFeedback =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectRealTimeDcpFeedback,
                     wapChannelAdgroupObject, advertiser_id_list));
         System.out.println("***RESULT SET 3 SIZE***  : " + resultSetOfRealTimeDcpFeedback.size());
@@ -74,7 +74,7 @@ public class WAPGroupDBManipulation {
         }
 
         // update dcp_advertiser_burn table
-        final ArrayList<Map<String, String>> resultSetOfDcpAdvertiserBurnQuery =
+        final ArrayList<Map> resultSetOfDcpAdvertiserBurnQuery =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectDCPAdvertiserBurnQuery,
                     wapChannelAdgroupObject));
         System.out.println("***RESULT SET 4 SIZE***  : " + resultSetOfDcpAdvertiserBurnQuery.size());
@@ -88,7 +88,7 @@ public class WAPGroupDBManipulation {
         }
 
         // update earnings_dcp_feedback table
-        final ArrayList<Map<String, String>> resultSetOfEarningsFeedbackQuery =
+        final ArrayList<Map> resultSetOfEarningsFeedbackQuery =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectEarningsFeedBackQuery,
                     wapChannelAdgroupObject));
         System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfEarningsFeedbackQuery.size());
@@ -101,7 +101,7 @@ public class WAPGroupDBManipulation {
                 wapChannelAdgroupObject));
         }
 
-        final ArrayList<Map<String, String>> resultSetOfDcpChnSiteIncExc =
+        final ArrayList<Map> resultSetOfDcpChnSiteIncExc =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_DCP_CHN_SITE_INC_EXC,
                     wapChannelAdgroupObject));
         System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfDcpChnSiteIncExc.size());
@@ -114,7 +114,7 @@ public class WAPGroupDBManipulation {
     }
 
     public static void UpdateDemandSupplyData(final Map<String, String> wapChannelAdgroupObject,
-            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+                                              final String advertiser_id_list) throws ClassNotFoundException, SQLException {
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateAllSites, wapChannelAdgroupObject));
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deleteSiteEcpm, wapChannelAdgroupObject));

@@ -32,7 +32,8 @@ public class WAPChannelAdgroupVitals {
 
         if (wapChannelAdGroup.get("dst").equals("8")) {
             wapChannelAdGroup.put("additional_params",
-                    "{\"mime\":\"html\",\"default\": \"160214\",\"site\": \"38132\"}");
+                    "'{\"mime\":\"html\",\"default\": \"160214\",\"site\": \"38132\"}'");
+
         }
 
         return wapChannelAdGroup;

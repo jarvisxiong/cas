@@ -11,7 +11,7 @@ import com.inmobi.castest.casconfenums.def.CasConf.ChannelPartners;
 public class CasPartnerConf {
 
     public static Map<String, String> setPartnerConfig(final ChannelPartners partner,
-            final Map<String, String> wapChannelAdGroup) {
+        final Map<String, String> wapChannelAdGroup) {
 
         switch (partner) {
             case ADELPHIC: {
@@ -42,6 +42,14 @@ public class CasPartnerConf {
                 wapChannelAdGroup.put("account_segment", "7");
                 break;
 
+            }
+            case MOBILECOMMERCE: {
+                wapChannelAdGroup.put("name", "mobilecommerce");
+                wapChannelAdGroup.put("host", "http://ms-api.us.mcproton.com/search/inmobi/banner/v1/service.svc/");
+                wapChannelAdGroup.put("advertiserId", "4028cb1e37361021013750f93b4d03c1");
+                wapChannelAdGroup.put("dst", "2");
+                wapChannelAdGroup.put("account_segment", "7");
+                break;
             }
             case IX: {
 

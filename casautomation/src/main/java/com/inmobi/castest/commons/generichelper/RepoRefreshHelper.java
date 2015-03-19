@@ -40,7 +40,7 @@ public class RepoRefreshHelper {
     }
 
     public static void RefreshRepo(final String repoName) throws InterruptedException, ClientProtocolException,
-            IOException {
+    IOException {
         String repoRefreshUrl = new String();
         final JSONObject jsonParams = new JSONObject();
         jsonParams.put("repoName", repoName);

@@ -34,6 +34,15 @@ public class LogStringConf {
                 break;
             }
 
+            case MSG_DCP_SENDING_NO_AD: {
+                logLine = "Sending No ads";
+                break;
+            }
+            case MSG_DCP_TERMINATE_CONFIG_SEARCH: {
+                logLine = "Terminating request as incompatible content type";
+                break;
+            }
+
             case MSG_IX_ADRRFLAG: {
                 logLine = "dst:IX,";;
                 break;

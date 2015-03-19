@@ -19,7 +19,7 @@ import com.inmobi.adserve.adpool.ResponseFormat;
 public class NewPostRequest {
 
     public static ResponseBuilder sendPost(final AdPoolRequest adPoolRequest, final String servletName,
-            final String testCaseName) throws Exception {
+                                           final String testCaseName) throws Exception {
 
         // backfill
         // rtbdFill
