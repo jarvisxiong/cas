@@ -205,14 +205,9 @@ public class IXPackageRepository {
                 int dataVendorId = rs.getInt("data_vendor_id");
                 Double dataVendorCost = rs.getDouble("data_vendor_cost");
                 int dmpId = rs.getInt("dmp_id");
-                String[] dealIds = null;
-                if (null != rs.getArray("deal_ids")) {
-                    dealIds = (String[]) rs.getArray("deal_ids").getArray();
-                }
-                Double[] dealFloors = null;
-                if (null != rs.getArray("deal_floors")) {
-                    dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
-                }
+
+                String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
+                Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
 
                 Set<Set<Integer>> dmpFilterSegmentExpression;
                 try {

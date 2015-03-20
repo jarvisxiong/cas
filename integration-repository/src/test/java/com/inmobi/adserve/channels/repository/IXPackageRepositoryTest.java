@@ -124,7 +124,7 @@ public class IXPackageRepositoryTest {
         EasyMock.expect(csIdsArray.getArray()).andReturn(csIds).anyTimes();
 
         Array dealFloorsArray = EasyMock.createNiceMock(Array.class);
-        Double[] dealFloors = {};
+        Double[] dealFloors = {0.3, 0.5};
         EasyMock.expect(rs.getArray("deal_floors")).andReturn(dealFloorsArray).anyTimes();
         EasyMock.expect(dealFloorsArray.getArray()).andReturn(dealFloors).anyTimes();
 
@@ -165,6 +165,7 @@ public class IXPackageRepositoryTest {
         EasyMock.replay(sdkVersionArray);
         EasyMock.replay(zipCodesArray);
         EasyMock.replay(csIdsArray);
+        EasyMock.replay(dealFloorsArray);
         EasyMock.replay(todArray);
         EasyMock.replay(placementAdTypeArray);
 
