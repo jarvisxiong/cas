@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +14,9 @@ import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 
 
 @Singleton

@@ -153,9 +153,9 @@ public abstract class BaseServlet implements Servlet {
 
         final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
         final double segmentFloor = casUtils.getRtbFloor(casContext);
-        enrichCasInternalRequestParameters(hrh, filteredSegments,
-                casInternalRequestParametersGlobal.getAuctionBidFloor(), networkSiteEcpm, segmentFloor);
-        hrh.responseSender.casInternalRequestParameters = casInternalRequestParametersGlobal;
+        enrichCasInternalRequestParameters(hrh, filteredSegments, networkSiteEcpm, segmentFloor);
+        sasParams.setMarketRate(Math.max(sasParams.getMarketRate(),
+                casInternalRequestParametersGlobal.getAuctionBidFloor()));
         hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());
@@ -208,7 +208,7 @@ public abstract class BaseServlet implements Servlet {
     }
 
     private void enrichCasInternalRequestParameters(final HttpRequestHandler hrh,
-            final List<ChannelSegment> filteredSegments, final Double rtbdFloor, final double networkSiteEcpm,
+            final List<ChannelSegment> filteredSegments, final double networkSiteEcpm,
             final double segmentFloor) {
         final CasInternalRequestParameters casInternalRequestParametersGlobal =
                 hrh.responseSender.casInternalRequestParameters;
@@ -222,7 +222,6 @@ public abstract class BaseServlet implements Servlet {
         final long siteIncId = hrh.responseSender.getSasParams().getSiteIncId();
         casInternalRequestParametersGlobal.setAuctionBidFloor(auctionBidFloor);
         casInternalRequestParametersGlobal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(siteIncId));
-        LOG.debug("RTB floor from the pricing engine entity is {}", rtbdFloor);
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
         LOG.debug("Highest Ecpm is {}", casInternalRequestParametersGlobal.getHighestEcpm());
         LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.getBlockedIabCategories());

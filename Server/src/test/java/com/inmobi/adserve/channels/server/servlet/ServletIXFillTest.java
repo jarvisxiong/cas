@@ -299,6 +299,9 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).times(1);
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).times(1);
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).times(1);
+        expect(mockSASRequestParameters.getMarketRate()).andReturn(1.5).anyTimes();
+        mockSASRequestParameters.setMarketRate(1.5);
+        expectLastCall().anyTimes();
         expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
                 1);
         expect(

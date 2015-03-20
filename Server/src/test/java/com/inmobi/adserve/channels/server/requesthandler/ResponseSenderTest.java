@@ -28,6 +28,7 @@ import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
@@ -133,6 +134,8 @@ public class ResponseSenderTest {
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();
+        responseSender.casInternalRequestParameters = new CasInternalRequestParameters();
+        responseSender.casInternalRequestParameters.setAuctionBidFloor(1.5);
 
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);

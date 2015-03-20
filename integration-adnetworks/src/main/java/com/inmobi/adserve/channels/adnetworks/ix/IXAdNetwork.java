@@ -155,6 +155,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final Integer accountId;
     private final boolean wnRequired;
     private final List<String> globalBlindFromConfig;
+    @Getter
     private final int bidFloorPercent;
     @Setter
     @Getter
@@ -393,8 +394,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         final ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand
-                .setMarketrate(Math.max(sasParams.getMarketRate(), casInternalRequestParameters.getAuctionBidFloor()));
+        proxyDemand.setMarketrate(sasParams.getMarketRate());
         return proxyDemand;
     }
 
@@ -443,6 +443,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Set interstitial or not, but for video int shoud be 1
         impression.setInstl(null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())
                 || isVideoRequest ? 1 : 0);
+        // note: bidFloorPercent logic has been duplicated in rrLogging
         impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor() * bidFloorPercent / 100);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         final ImpressionExtension ext = getImpExt();
