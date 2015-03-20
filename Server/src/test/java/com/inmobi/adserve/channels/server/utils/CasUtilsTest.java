@@ -22,7 +22,6 @@ public class CasUtilsTest extends TestCase {
 
         final SasParamsTestData[] testData =
                 {new SasParamsTestData("APP", "a370", (short) 14, 3, "4.0", true, Arrays.asList((short) 14)),
-                        new SasParamsTestData("APP", "a369", (short) 14, 3, "4.0", false, Arrays.asList((short) 14, (short) 15)),
                         new SasParamsTestData("APP", "a370", (short) 14, 3, "4.4", true, Arrays.asList((short) 32)),
                         new SasParamsTestData("APP", "a440", (short) 32, 3, "4.4", true, Arrays.asList((short) 14)),
                         new SasParamsTestData("APP", "i370", (short) 14, 5, "6.0", true, Arrays.asList((short) 32)),

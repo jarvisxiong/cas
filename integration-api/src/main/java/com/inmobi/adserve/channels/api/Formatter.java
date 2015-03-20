@@ -80,7 +80,14 @@ public class Formatter {
         return APP.equalsIgnoreCase(sasParams.getSource()) && StringUtils.isNotBlank(sasParams.getSdkVersion());
     }
 
-    static boolean isRequestFromSdkVersionOnwards(final SASRequestParameters sasParams, final int version) {
+    /**
+     * Returns true/false depending on whether the request is from sdk version >= version
+     *
+     * @param sasParams
+     * @param version
+     * @return true if the request is from sdk version >= version
+     */
+    public static boolean isRequestFromSdkVersionOnwards(final SASRequestParameters sasParams, final int version) {
         if (StringUtils.isBlank(sasParams.getSdkVersion())) {
             return false;
         }

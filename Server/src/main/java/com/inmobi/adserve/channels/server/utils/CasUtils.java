@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.utils;
 
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +12,9 @@ import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 
 
 /**
@@ -85,11 +85,8 @@ public class CasUtils {
         if (!APP.equalsIgnoreCase(sasParams.getSource())) {
             return false;
         }
-        // Only requests from SDK 370 onwards are supported
-        if (!requestFromSDK370Onwards(sasParams)) {
-            return false;
-        }
-        //Slot Size check in AsyncRequestMaker since slots would differ for each segment
+        // Slot Size check in AsyncRequestMaker since slots would differ for each segment
+        // Minimum SDK version check is in IXAdNetwork since we cannot access adapter specific configs from this location
 
         String osVersion = sasParams.getOsMajorVersion();
         if (StringUtils.isNotEmpty(osVersion)) {
@@ -112,23 +109,4 @@ public class CasUtils {
         }
         return isSupported;
     }
-
-    private boolean requestFromSDK370Onwards(final SASRequestParameters sasParams) {
-        if (StringUtils.isBlank(sasParams.getSdkVersion())) {
-            return false;
-        }
-        try {
-            final String os = sasParams.getSdkVersion();
-            if ((os.startsWith("i") || os.startsWith("a"))
-                    && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= 370) {
-                return true;
-            }
-        } catch (final StringIndexOutOfBoundsException e1) {
-            LOG.debug("Invalid sdkversion {}", e1);
-        } catch (final NumberFormatException e2) {
-            LOG.debug("Invalid sdkversion {}", e2);
-        }
-        return false;
-    }
-
 }

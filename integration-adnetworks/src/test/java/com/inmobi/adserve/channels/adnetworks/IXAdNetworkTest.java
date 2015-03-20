@@ -87,6 +87,7 @@ public class IXAdNetworkTest extends TestCase {
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(false).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".bidFloorPercent", 100)).andReturn(100).anyTimes();
+        expect(mockConfig.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450)).andReturn(450).anyTimes();
         expect(mockConfig.getStringArray("ix.blockedAdvertisers")).andReturn(
                 new String[] {"king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com",
                         "supercell.com"}).anyTimes();

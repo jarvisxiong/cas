@@ -63,9 +63,9 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
 import com.inmobi.adserve.contracts.ix.request.App;
@@ -107,7 +107,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -218,6 +217,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private List<Integer> packageIds;
     private List<String> iabCategories;
+    private int minimumSdkVerForVAST;
 
 
     private WapSiteUACEntity wapSiteUACEntity;
@@ -248,6 +248,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         accountId = config.getInt(advertiserName + ".accountId");
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
+        minimumSdkVerForVAST = config.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -608,6 +609,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean isRequestQualifiedForVideo() {
         // Check the Video support prerequisites.
         if (!sasParams.isVideoSupported() || !VIDEO_SUPPORTED_SLOT_IDS.contains(selectedSlotId)) {
+            return false;
+        }
+
+        // Check for minimum sdk version
+        if (!Formatter.isRequestFromSdkVersionOnwards(sasParams, minimumSdkVerForVAST)) {
             return false;
         }
 
