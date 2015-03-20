@@ -296,6 +296,7 @@ public class NewIXAdNetworkTest {
         assertThat(bidReq.getImp().get(0).getNat().getAssets().size(), is(6));
     }
 
+    @Test
     public void testParseResponsePassedDeserializationRichMediaBuildingCoppaDisabled() throws Exception {
         mockStaticNice(InspectorStats.class);
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
@@ -356,7 +357,7 @@ public class NewIXAdNetworkTest {
                 is(equalTo("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"http:\\/\\/localhost:8800\\/C\\/t\\/1\\/1\\/1\\/c\\/2\\/m\\/k\\/0\\/0\\/eyJVRElEIjoidWlkdmFsdWUifQ~~\\/c124b6b5-0148-1000-c54a-00012e330000\\/0\\/5l\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/1\\/1\\/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"http:\\/\\/localhost:8800\\/C\\/t\\/1\\/1\\/1\\/c\\/2\\/m\\/k\\/0\\/0\\/eyJVRElEIjoidWlkdmFsdWUifQ~~\\/c124b6b5-0148-1000-c54a-00012e330000\\/0\\/5l\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/1\\/1\\/bc20cfc3\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"123.45\",geo_lng:\"678.9\",geo_cc:\"55\",geo_zip:\"560103\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script></div></div><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></body></html>")));
     }
 
-    // @Test TODO: Revisit and Enable test
+    @Test
     public void testParseResponsePassedDeserializationRichMediaBuildingCoppaSet() throws Exception {
         mockStaticNice(InspectorStats.class);
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
@@ -384,7 +385,7 @@ public class NewIXAdNetworkTest {
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
         expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
 
-        final String response = TestUtils.SampleStrings.ixStudioResponseAdTag;
+        final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
         final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};

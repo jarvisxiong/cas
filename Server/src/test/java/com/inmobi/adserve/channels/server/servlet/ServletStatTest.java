@@ -14,12 +14,12 @@ import java.util.Map;
 
 import org.hamcrest.core.IsEqual;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.JarVersionUtil;
@@ -28,11 +28,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({JarVersionUtil.class, InspectorStats.class})
 public class ServletStatTest {
-    @Ignore
+
     @Test
-    // todo Ishan fix this
     public void testHandleRequest() throws Exception {
         final JSONObject inspectorJson = new JSONObject();
+        final JSONObject connectionData = new JSONObject();
         final JSONObject inspectorJsonWithManifest = new JSONObject();
         inspectorJson.put("workflow", 50);
         inspectorJsonWithManifest.put("workflow", 50);
@@ -41,13 +41,18 @@ public class ServletStatTest {
         manifestData.put("key", "value");
         inspectorJsonWithManifest.put("manifestData", manifestData);
 
+        connectionData.put("key2", "value2");
+        inspectorJsonWithManifest.put("connectionData", connectionData);
+
         mockStatic(InspectorStats.class);
         mockStatic(JarVersionUtil.class);
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
+        final ConnectionLimitHandler mockConnectionLimitHandler = createMock(ConnectionLimitHandler.class);
 
         expect(InspectorStats.getStatsObj()).andReturn(inspectorJson).times(1);
         expect(JarVersionUtil.getManifestData()).andReturn(manifestData).times(1);
+        expect(mockConnectionLimitHandler.getConnectionJson()).andReturn(connectionData).anyTimes();
 
         mockResponseSender.sendResponse(inspectorJsonWithManifest.toString(), null);
         expectLastCall().times(1);
@@ -55,7 +60,7 @@ public class ServletStatTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        final ServletStat tested = new ServletStat(null);
+        final ServletStat tested = new ServletStat(mockConnectionLimitHandler);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();

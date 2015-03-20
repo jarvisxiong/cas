@@ -1,13 +1,10 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import javax.ws.rs.Path;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -17,11 +14,14 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.utils.JarVersionUtil;
 import com.inmobi.adserve.channels.util.InspectorStats;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 
 @Singleton
 @Path("/stat")
-@Slf4j
 public class ServletStat implements Servlet {
+    private static final Logger LOG = LoggerFactory.getLogger(ServletStat.class);
     private final ConnectionLimitHandler connectionLimitHandler;
 
     @Inject
@@ -29,15 +29,15 @@ public class ServletStat implements Servlet {
         this.connectionLimitHandler = connectionLimitHandler;
     }
 
-
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
-        log.debug("Inside stat servlet");
-        final JSONObject inspectorJson = InspectorStats.getStatsObj();
+        LOG.debug("Inside stat servlet");
         final JSONObject manifestJson = new JSONObject(JarVersionUtil.getManifestData());
-        inspectorJson.put("manifestData", manifestJson);
         final JSONObject connectionJson = connectionLimitHandler.getConnectionJson();
+
+        final JSONObject inspectorJson = InspectorStats.getStatsObj();
+        inspectorJson.put("manifestData", manifestJson);
         inspectorJson.put("connectionData", connectionJson);
 
         hrh.responseSender.sendResponse(inspectorJson.toString(), serverChannel);
