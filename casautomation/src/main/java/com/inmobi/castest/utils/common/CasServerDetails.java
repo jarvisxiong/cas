@@ -3,7 +3,7 @@ package com.inmobi.castest.utils.common;
 public class CasServerDetails {
 
     private final static String CAS_SERVER_IP = System.getProperty("cas_end_point") != null ? System
-            .getProperty("cas_end_point") : "10.14.118.66:8800";
+            .getProperty("cas_end_point") : "localhost:8800";
 
             private final static String CAS_SERVER_ENDPOINT = "http://" + CAS_SERVER_IP + "/";// "http://10.14.118.66:8800/";
 

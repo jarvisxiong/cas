@@ -650,7 +650,7 @@ nonprod:
       db_port:
          - 5499
       database:
-         - ankit
+         - brandteam
       cas_user:
          - postgres
       cas_pass:
@@ -678,7 +678,7 @@ nonprod:
       mondemand_port:
          - '12555'
       log_type :
-         - 'DEBUG'
+         - 'ERROR'
       debug_log_type :
          - 'DEBUG'
       flush_debug_log:
@@ -714,7 +714,7 @@ nonprod:
       in_vm_cnxn:
          - '80'
       automation_tests_enabled:
-         - 'false'
+         - 'true'
       rtb_enabled:
          - 'true'
       ix_advertise_id:

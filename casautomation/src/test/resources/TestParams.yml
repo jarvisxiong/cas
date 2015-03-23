@@ -1,32 +1,162 @@
 ---
 # RTBD Test Cases
-TEST2_65_1: 
+
+TEST2_11_1:
+ - site_contenttype : 'PERFORMANCE'
+TEST2_11_2:
+ - site_contentrating : 'FAMILY_SAFE'
+   site_contenttype : 'FAMILY_SAFE'
+TEST2_11_3:
+ - site_contentrating : 'MATURE'
+   site_contenttype : 'MATURE'
+TEST2_11_4:
+ - site_contenttype : 'EMPTY'
+TEST2_11_5:
+ - site_contenttype : 'NULL'
+TEST2_11_6:
+ - site_contenttype : 'SPACE'
+TEST2_12_1:
+ - site_sitetags : '70'
+TEST2_12_2:
+ - site_sitetags : '70,71'
+TEST2_12_3:
+ - site_sitetags : '0'
+TEST2_12_4:
+ - site_sitetags : '10000'
+TEST2_12_5:
+ - site_sitetags : 'EMPTY'
+TEST2_12_7:
+ - site_sitetags : 'NULL'
+TEST2_13_1:
+ - site_sitetaxonomies : '190'
+TEST2_13_3:
+ - site_sitetaxonomies : '0'
+TEST2_13_4:
+ - site_sitetaxonomies : '10000'
+TEST2_13_5:
+ - site_sitetaxonomies : 'EMPTY'
+TEST2_13_7:
+ - site_sitetaxonomies : 'EMPTY'
+TEST2_14_1:
+ - device_useragent : 'EMPTY'
+TEST2_14_2:
+ - device_useragent : 'EMPTY'
+TEST2_14_4:
+ - device_useragent : 'justlikethat'
+TEST2_15_4:
+ - device_modelid : '0'
+TEST2_15_5:
+ - device_modelid : '1199999'
+TEST2_16_4:
+ - device_manufacturerid : '0'
+TEST2_16_5:
+ - device_manufacturerid : '1010199'
+TEST2_17_1:
+ - device_osid : '3'
+TEST2_17_2:
+ - device_osid : '5'
+TEST2_17_6:
+ - device_osid : '101'
+TEST2_18_4:
+ - device_osmajorversion : '0.0'
+TEST2_18_5:
+ - device_osmajorversion : '10.0'
+TEST2_18_6:
+ - device_osmajorversion : '10.02'
+TEST2_19_4:
+ - device_browserid : '0'
+TEST2_19_5:
+ - device_browserid : '1010'
+TEST2_20_4:
+ - device_browsermajorversion : '0.0'
+TEST2_20_5:
+ - device_browsermajorversion : '10.0'
+TEST2_20_6:
+ - device_browsermajorversion : '10.02'
+TEST2_51_1:
+ - uidparams_rawuidvalues_gid : 'somevalue'
+TEST2_51_2:
+ - uidparams_rawuidvalues_gid : 'EMPTY'
+TEST2_51_3:
+ - uidparams_rawuidvalues_gid : 'SPACE'
+TEST2_51_4:
+ - uidparams_rawuidvalues_gid : 'NULL'
+TEST2_52_1:
+ - uidparams_rawuidvalues_wc : 'somevalue'
+TEST2_52_2:
+ - uidparams_rawuidvalues_wc : 'EMPTY'
+TEST2_52_3:
+ - uidparams_rawuidvalues_wc : 'SPACE'
+TEST2_52_4:
+ - uidparams_rawuidvalues_wc : 'NULL'
+TEST2_53_1:
+ - uidparams_rawuidvalues_wc : 'somewcvalue'
+ - uidparams_rawuidvalues_gid : 'somegidvalue'
+TEST2_54_1:
+ - uidparams_udidfromrequest : 'somevalue'
+TEST2_54_2:
+ - uidparams_udidfromrequest : 'EMPTY'
+TEST2_54_3:
+ - uidparams_udidfromrequest : 'SPACE'
+TEST2_54_4:
+ - uidparams_udidfromrequest : 'NULL'
+TEST2_55_1:
+ - uidparams_uuidfromuidcookie : 'somevalue'
+TEST2_55_2:
+ - uidparams_uuidfromuidcookie : 'EMPTY'
+TEST2_55_3:
+ - uidparams_uuidfromuidcookie : 'SPACE'
+TEST2_55_4:
+ - uidparams_uuidfromuidcookie : 'NULL'
+TEST2_56_1:
+ - uidparams_limitiosadtracking : 'true'
+TEST2_56_2:
+ - uidparams_limitiosadtracking : 'false'
+TEST2_57_1:
+ - user_datavendorid : '10011010'
+TEST2_57_5:
+ - user_datavendorid : '1'
+TEST2_58_1:
+ - user_datavendorname : 'somevendorname'
+TEST2_58_2:
+ - user_datavendorname : 'EMPTY'
+TEST2_58_3:
+ - user_datavendorname : 'SPACE'
+TEST2_58_4:
+ - user_datavendorname : 'NULL'
+TEST2_59_1:
+ - user_yearofbirth : '1900'
+TEST2_59_2:
+ - user_yearofbirth : '0'
+TEST2_59_3:
+ - user_yearofbirth : '2015'
+TEST2_60_1:
+ - user_gender : 'MALE'
+TEST2_60_2:
+ - user_gender : 'FEMALE'
+TEST2_60_3:
+ - user_gender : 'UNKNOWN'
+TEST2_60_6:
+ - user_gender : 'NULL'
+TEST2_65_1:
  - user_interests: 'someinterestsvalue'
-TEST2_65_2: 
+TEST2_65_2:
  - user_interests: 'EMPTY'
-TEST2_65_3: 
+TEST2_65_3:
  - user_interests: 'SPACE'
-TEST2_1_1: 
- - adpool_requestid: anotherreqid
-   r_u_id_params: '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
-   testName: category_tax_test_1.1
-   r_os_id: '3'
-   expected_status: '200'
-   r_site_type: PERFORMANCE
 TEST2_41_1:
  - uidparams_rawuidvalues_um5 : 'somevalue'
-TEST2_63_4: 
+TEST2_63_4:
  - user_education : 'NULL'
+
 # DCP cases
 
 TEST1_01:
 - testName: 'googleadx-happy'
 TEST1_02:
 - testName: 'dmg-happy'
-TEST1_03: 
+TEST1_03:
 - testName: 'amoad-happy'
-
-#Regex Starts here 
 
 TEST1_1_1 :
  - u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'

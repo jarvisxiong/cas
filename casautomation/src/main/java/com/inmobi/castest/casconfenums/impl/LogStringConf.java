@@ -12,9 +12,7 @@ public class LogStringConf {
         String logLine = new String();
 
         switch (logString) {
-
             case MSG_RTBD_RESPONSE: {
-
                 logLine = "RTBD response json to RE is AdPoolResponse";
                 System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
                 break;
@@ -24,7 +22,15 @@ public class LogStringConf {
                 logLine = "dst:RTBD,";
                 break;
             }
-
+            case MSG_SENDING_NO_AD: {
+                logLine = "Sending No ads";
+                break;
+            }
+            case MSG_RTB_MANDATE_PARAM_MISSING: {
+                logLine = "mandate parameters missing or request format is not compatible to partner supported response"
+                        + " for dummy so exiting adapter";
+                break;
+            }
             case MSG_DCP_TAPIT_CONFIG_SUCCESS: {
                 logLine = "Configure parameters inside tapit returned true";
                 break;
@@ -44,7 +50,7 @@ public class LogStringConf {
             }
 
             case MSG_IX_ADRRFLAG: {
-                logLine = "dst:IX,";;
+                logLine = "dst:IX,";
                 break;
             }
             case MSG_IX_ADRRFLAG2: {
@@ -65,7 +71,8 @@ public class LogStringConf {
             }
             case MSG_IX_SENDREQ: {
                 logLine =
-                        "POST\theaders:\tContent-Type:application/json; charset=utf-8\tAuthorization:Basic aW5tb2JpOkY0MEdYQTk3OEg=\tHost";
+                        "POST\theaders:\tContent-Type:application/json; charset=utf-8\t"
+                                + "Authorization:Basic aW5tb2JpOkY0MEdYQTk3OEg=\tHost";
                 break;
             }
             case MSG_IX_EXCHANGEREQ: {
@@ -102,7 +109,8 @@ public class LogStringConf {
             }
             case MSG_IX_SLOTFILTER: {
                 logLine =
-                        "Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots";
+                        "Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported "
+                                + "slots";
                 break;
             }
             case MSG_IX_ADRRNOADS: {
@@ -123,7 +131,8 @@ public class LogStringConf {
             }
             case MSG_IX_UA: {
                 logLine =
-                        "\"device\":{\"lmt\":0,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36\"";
+                        "\"device\":{\"lmt\":0,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
+                                + "AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36\"";
                 break;
             }
             case MSG_IX_RPACNTID: {
@@ -192,17 +201,20 @@ public class LogStringConf {
             }
             case MSG_IX_BLINDWAPBUNDLE: {
                 logLine =
-                        "\"domain\":\"http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\",\"page\":\"http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\"";
+                        "\"domain\":\"http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\",\"page\":\""
+                                + "http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\"";
                 break;
             }
             case MSG_IX_BLINDWAPEXTBUNDLE: {
                 logLine =
-                        "\"blind\":{\"domain\":\"http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\",\"page\":\"http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\"}";
+                        "\"blind\":{\"domain\":\"http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\",\"page\":\""
+                                + "http://www.ix.com/84d5c8dd-fb27-31ee-af1a-55c2850d41be\"}";
                 break;
             }
             case MSG_IX_TRANS: {
                 logLine =
-                        "\"transparency\":{\"blind\":0,\"blindbuyers\":[3522,2666,2179,3038,3107,3420,3002,3320,2853,3158,3560,3600,3542,3614,3101,3676,2893]},";
+                        "\"transparency\":{\"blind\":0,\"blindbuyers\":[3522,2666,2179,3038,3107,3420,3002,3320,2853,"
+                                + "3158,3560,3600,3542,3614,3101,3676,2893]},";
                 break;
             }
             case MSG_IX_TRANSAPP: {

@@ -9,7 +9,7 @@ public class CasDBDetails {
                             : "5499";
                     private static final String DB_NAME = System.getProperty("db_name") != null
                             ? System.getProperty("db_name")
-                                    : "ankit";
+                                    : "brandteam";
                             private static final String DB_USERNAME = System.getProperty("db_uname") != null
                                     ? System.getProperty("db_uname")
                                             : "postgres";

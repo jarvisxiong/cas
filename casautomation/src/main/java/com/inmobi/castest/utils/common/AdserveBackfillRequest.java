@@ -52,7 +52,7 @@ public class AdserveBackfillRequest {
         if (reqString == null) {
             finalVal = default_val;
         } else if (reqString.equals(spaceString)) {
-            finalVal = "  ";
+            finalVal = " ";
         } else if (reqString.equals(emptyString)) {
             finalVal = "";
         } else if (reqString.equals(nullString)) {
