@@ -155,7 +155,7 @@
 				<artifactId>maven-protoc-plugin</artifactId>
 				<version>0.1.10</version>
 				<configuration>
-                    			<protocExecutable>/usr/local/bin/protoc</protocExecutable>
+                    			<protocExecutable>/usr/local/bin/protoc-2.6.1</protocExecutable>
 				</configuration>
 				<executions>
 					<execution>

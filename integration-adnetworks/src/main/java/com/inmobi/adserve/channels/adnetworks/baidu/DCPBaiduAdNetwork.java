@@ -207,7 +207,6 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 		builder.addAdslots(adSlotBuilder);
 		builder.setRequestId(impressionId);
 		BidRequest request = builder.build();
-		LOG.debug(request.toString());
 		return request;
 	}
 
@@ -250,7 +249,6 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "NO_AD";
             statusCode = 500;
             BidResponse responses = BidResponse.parseFrom(responseByte);
-            LOG.debug("Response from baidu {}", responses);
             int adCount = responses.getAdsCount();
             final VelocityContext context;
             if(adCount > 0){
