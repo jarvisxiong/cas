@@ -1,24 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-
-import io.netty.channel.Channel;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
 import com.inmobi.adserve.channels.adnetworks.googleadx.GoogleAdXAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -29,6 +10,22 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import io.netty.channel.Channel;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
+import java.awt.*;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 
 /**
  * Created by naresh.kapse on 24/05/14.
@@ -160,14 +157,24 @@ public class GoogleAdXNetworkTest extends TestCase {
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
+
         googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
 
         googleAdXNetwork.generateJsAdResponse();
         assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);
 
-        final String expectedResponse =
+        String expectedResponse =
                 "<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\">google_ad_client = \"ca-pub-7457767528341420\";google_ad_slot = \"8a809449013c3c643cad82cb412b5857\";google_ad_width = 320;google_ad_height = 50;google_page_url = \"http://www.referral.inmobi.com\";</script><script type=\"text/javascript\" src=\"//pagead2.googlesyndication.com/pagead/show_ads.js\"></script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, googleAdXNetwork.getHttpResponseContent());
+
+        sasParams.setReferralUrl("http://www.referral.inmobi.com?param=value");
+        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+        googleAdXNetwork.generateJsAdResponse();
+        assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);
+        expectedResponse =
+                "<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\">google_ad_client = \"ca-pub-7457767528341420\";google_ad_slot = \"8a809449013c3c643cad82cb412b5857\";google_ad_width = 320;google_ad_height = 50;google_page_url = \"http://www.referral.inmobi.com\";</script><script type=\"text/javascript\" src=\"//pagead2.googlesyndication.com/pagead/show_ads.js\"></script><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+        assertEquals(expectedResponse, googleAdXNetwork.getHttpResponseContent());
+
     }
 
     @Test

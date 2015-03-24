@@ -142,6 +142,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static IPRepository ipRepository;
     private boolean isIPResolutionDisabled = true;
     private String publicHostName;
+    protected boolean isByteResponseSupported = false;    
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -253,7 +254,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                                 HttpResponseStatus.valueOf(response.getStatusCode());
 
                         LOG.debug(traceMarker, "{} status code is {}", getName(), httpResponseStatus);
-                        parseResponse(responseStr, httpResponseStatus);
+                        if(isByteResponseSupported) {
+                            byte[] responseBytes = response.getResponseBodyAsBytes();
+                            parseResponse(responseBytes, httpResponseStatus);
+                        }else {
+                            parseResponse(responseStr, httpResponseStatus);
+                        }
                         processResponse();
                     }
                     return response;
@@ -431,6 +437,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public void setAdStatus(final String adStatus) {
         this.adStatus = adStatus;
+    }
+
+    public void parseResponse(final byte[] responseByte, final HttpResponseStatus status) {
     }
 
     @Override
@@ -918,3 +927,4 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
 
 }
+

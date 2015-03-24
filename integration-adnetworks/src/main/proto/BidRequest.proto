@@ -1,0 +1,281 @@
+package baidu;
+
+option java_package = "com.baidu";
+option java_outer_classname = "BaiduBidRequest";
+
+message BidRequest {
+    required string request_id = 1; // required. The access party will customize the request ID that is used for combined test. It is specified hereby that request_id shall meet regular [A-Z][0-9a-zA-Z]{31}; the request_id  shall be generated randomly by the request initiator, and shall be kept with its uniqueness as far as possible.
+    required Version api_version = 2; // required. API version shall be assigned according to the version of API document referenced during current accessing, and will have an impact on all follow-up logics. Version of current API is 4.0
+    required App app = 3; // required. Application information, please refer to 2.2 Application Information for the detailed population specification
+    required Device device = 4; // required. Device information, please refer to 2.3 Device Information for the detailed population specification
+    required Network network = 5; // required. Network environment information; please refer to 2.4 Network Environment Information for the detailed population specification
+    optional Gps gps = 6; // optional. GPS position information, which is used to trigger LBS advertisement in auxiliary. Please refer to 2.5 GPS Position Information for the detailed population specification
+    optional Content content = 7; // optional. Current content information is used to trigger keyword directional advertisement in auxiliary. Please refer to 2.6 Current User Environment Content Information for the detailed population specification
+    optional User user = 8; // optional. User personal attribute is used to trigger crowd directional advertisement in auxiliary. Please refer to 2.7 User Personal Attribute Information for the detailed population specification
+    repeated AdSlot adslots = 9; // required, at least one. Ad position information. It is only supported to request advertisement of an adslot at one time for current version. Please refer to 2.8 Adslot Information for the detailed population specification
+    optional bool is_debug = 10[default = false]; // optional, population of non-test flow is default. Labeling for test flow, which can acquire advertisement, but is not charged, and therefore cannot be used for online request
+
+
+};
+message App {
+    required string id = 1; // required. Application ID, which is distributed by Baidu Union and can only be acquired after completing registration on Union. The acquisition of the ID is the basic condition for development of follow-up joint debugging activities.
+    optional StaticInfo static_info = 2; // optional. The static information fields that are authorized to be used by the access party are the basic information describing current applications. Please refers to 2.2.1 Application Static Information for the detailed population specification
+    optional string channel_id = 3; // optional. Release channel ID, which shall be populated by the channel access party. If cooperating with Baidu Union directly, the fields can be omitted; if cooperating with Baidu Union through the Third Party channel, the channel ID shall be populated hereby. The acquisition of the channel ID can be compared with application ID.
+    optional Version version = 4; // optional. Application version is recommended to be provided and will affect the optimization strategy.
+    repeated UserPermission user_permission = 5; // optional. User status describes the granting of all authorities of the application on current device of users. Please refer to 2.2.2 User Permission Information for the detailed population specification
+
+};
+message StaticInfo {
+    required string bundle_id = 1; // required. Name of application package
+    optional string name = 2; // optional. Application name is recommended to be provided.
+    repeated uint32 categories = 3; // required, at least one. Application classification, the specific application classification mode. If requesting to acquire the classification ID of current application, Union shall provide it.
+    repeated string keywords = 4; // optional. Application keyword is used to describe the basic feature of current application.
+    optional bool is_paid_app = 5; // optional. Whether it is paid or unpaid to download the application.
+    optional bool has_in_app_purchase = 6; // optional. Whether to support internal application procurement
+}
+
+message UserPermission {
+	required Type type = 1; // required. User permission type. Please refer to 2.2.2.1 User Permission Type for the list of option values
+	required Status status = 2; // required. User permission status.  Please refer to 2.2.2.2 User Permission Status for the list of option values
+	enum Type {
+		ACCESS_FINE_LOCATION = 1; // fine location
+		CAMERA = 2; // camera
+		RECORD_AUDIO = 3; // record
+	}
+};
+
+
+enum Status {
+    UNKNOWN = 0; // represent the unknown users
+    ACCEPTED = 1; // accepted
+    REFUSED = 2; // refused
+
+};
+
+message Device {
+    required Type type = 1; // required. Device type. Please refer to 2.3.1 Device Type for the list of option values
+    required Os os = 2; // required. Type of operating systems. Please refer to 2.3.2 Type of Operating Systems for the list of option values
+    required Version os_version = 3; // required. Version of operating systems. Please refer to 2.9 Version of Operating Systems for the list of option values
+    required string vendor = 4; // required. Manufacturer. There may be something wrong with the compatibility of Chinese during testing, so English is recommended
+    required string model = 5; // required. Model. Population reference model of manufacturer and device signal: iPhone5s, which shall be populated as vendor=Apple, model=iPhone5s
+    required UdId udid = 6; // required. Identification of unique device, which shall be filled as required. Please refer to 2.3.3 Identification Information of Unique Device for the detailed population specification
+    optional Orientation orientation = 7; // optional. Device orientation. Please refer to 2.3.4 Type of Device Orientation for the list of option values
+    optional float screen_density = 8; // optional Pixel density of screen
+    optional Size screen_size = 9; // optional. Size of screen, which is necessary for interstitials and full screen advertisement. Please refer to 2.10 Size Information for the detailed population specification.
+    repeated Sensor sensors = 10; // optional. List of sensors owned by current devices. Please refer to 2.3.5 Type of Sensors for the list of option values
+    optional bool is_jailbreaked = 11; // optional. Whether current device is Jailbroken (or Root)
+    enum Type {
+        PHONE = 1; // mobile, including iTouch
+        TABLET = 2; // ipad
+        TV = 3; // smart TV, including STB
+    };
+    enum Orientation {
+        LAND = 1; // landscape
+        PORT = 2; // portrait
+    };
+
+    enum Sensor {
+        ACCELEROMETER = 1; //accelerometer
+        AMBIENT_TEMPERATURE = 13; //ambient temperature sensor
+        GAME_ROTATION_VECTOR = 15; //rotation vector sensor uncalibrated
+        GEOMAGNETIC_ROTATION_VECTOR = 20; //geomagnetic rotation vector sensor
+        GRAVITY = 9; //gravity sensor
+        GYROSCOPE = 4; // gyroscope sensor
+        GYROSCOPE_UNCALIBRATED = 16; // gyroscope sensor uncalibrated
+        LIGHT = 5; // light sensor
+        LINEAR_ACCELERATION = 10; // linear acceleration sensor
+        MAGNETIC_FIELD = 2; //magnetic field sensor
+        MAGNETIC_FIELD_UNCALIBRATED = 14; // magnetic field sensor uncalibrated
+        ORIENTATION = 3; // orientation sensor
+        PRESSURE = 6; // pressure sensor
+        PROXIMITY = 8; // proximity sensor
+        RELATIVE_HUMIDITY = 12; // relative humidity sensor
+        ROTATION_VECTOR = 11; //rotation vector sensor
+        SIGNIFICANT_MOTION = 17; // significant motion triggered sensor
+        STEP_COUNTER = 19; // step counter sensor
+        STEP_DETECTOR = 18; // step detector sensor
+        TEMPERATURE = 7; // temperature sensor
+    };
+    enum Os {
+        ANDROID = 1; // Android
+        IOS = 2; // iOS
+    };
+};
+
+
+message UdId {
+    optional string idfa = 1; // optional. IDFA of iOS device
+    optional string imei = 2; //optional. IMEI of Android device
+    optional string mac = 3; //optional. MAC address of WiFi network card of Android or iOS device
+    optional string idfv = 4; //optional. Used by TC manufacturer.
+};
+
+message Network {
+    optional string ipv4 = 1; // optional. IPv4 address, which is necessary for server docking and general docking.
+    optional string ipv6 = 2; // optional. IPv6 address, which is optional for server docking
+    optional Type type = 3; // optional. Network type, which is used to judge Internet speed. Please refer to 2.4.1 Network Type for the list of option values
+    optional SubType subtype = 4; //optional. Network subtype, which is used to judge Internet speed. Please refer to 2.4.2 Network Subtype for the list of option values
+    optional uint32 operator_id = 5; //optional. Operator ID, viz. MNC+MCC, which is used for operator directional advertisement
+    optional string cellular_id = 6; //optional. Basestation ID, which is used for quick user location
+    repeated WiFiAp wifi_aps = 7; // optional. List of surrounding WiFi hotspots, which is used to refine user location. Please refer to 2.4.3 WiFi Information for the detailed population specification
+    enum Type {
+        BLUETOOTH = 7;
+        DUMMY = 8;
+        MOBILE = 0;
+        MOBILE_DUN = 4;
+        MOBILE_HIPRI = 5;
+        MOBILE_MMS = 2;
+        MOBILE_SUPL = 3;
+        WIFI = 1;
+        WIMAX = 6;
+        NEW_TYPE = 999; // unknown new type
+    };
+
+};
+
+enum SubType {
+        RTT = 7;
+        CDMA = 4;
+        EDGE = 2;
+        EHRPD = 14;
+        EVDO_0 = 5;
+        EVDO_A = 6;
+        EVDO_B = 12;
+        GPRS = 1;
+        HSDPA = 8;
+        HSPA = 10;
+        HSPAP = 15;
+        MOBILE = 9;
+        IDEN = 11;
+        LTE = 13;
+        UMTS = 3;
+        NEW_SUBTYPE = 999; // unknown new subtype
+    };
+
+message WiFiAp {
+    required string mac = 1; // required. MAC address of hotspot
+    required int32 rssi = 2; // required. Hotspot signal strength, negative number usually
+    optional string name = 3; // optional. Name of hotspot, which is allowed not to be transferred; it is recommended to transfer the name of current hotspot accessed to judge the user's location at present
+    optional bool is_connected = 4; // optional. Whether it is the hotspot connected at present, which can be used to identify user's location in cooperation with hotspot name
+};
+
+message Gps {
+	required Type type = 1; // required. Coordinate type. Please refer to 2.5.1 GPS Coordinate Type for the list of option values
+	required double longitude = 2; // required. Longitude
+	required double latitude = 3; // required. Latitude
+	required uint32 timestamp = 4; // required. Timestamp information, with unit of ms.
+
+	enum Type {
+		WGS84 = 1; //coordinate system of GPS
+		GCJ02 = 2; // coordinate system of SBSM
+		BD09 = 3; // coordinate system of Baidu
+	};
+};
+
+message Content {
+	optional string url= 1; // optional. Visit URL for current content
+	optional string referer = 2; // optional. Visit URL for content on last page
+	repeated string keywords = 3; // optional. Keyword of media custom content
+	repeated Meta meta = 4; // optional. Metadata information of media custom content, which is used to describe the features of text environment of current media. Please refer to 2.13 Metadata of Custom Content for the detailed population specification.
+};
+
+message User {
+    optional Gender gender = 1; // optional. Please refer to 2.7.1 Gender Type for the list of gender option values
+    optional uint32 age  = 2; // optional. Age
+    repeated string keywords = 3; // optional. User label and keywords
+    repeated Meta meta = 4; // optional. Metadata information of media custom user, which is used to describe the features of current users. Please refer to 2.13 Metadata of Custom Content for the detailed population specification.
+    enum Gender {
+        MALE = 1; // male
+        FEMAIL = 2; // female
+        THIRD_GENDER = 3; // the third gender
+    };
+};
+
+message AdSlot {
+    required string id = 1; // required. Adslot ID
+
+    optional StaticInfo static_info = 2; // optional. The adslot static information that is authorized to be used by the access party is usually unnecessary to be additionally provided during request. Please refer to 2.8.1 Adslot Static Information for the detailed population specification
+    required Size size = 3; // required. Size of adslot, viz. size of the ads of current request, which will directly affect the image and text ads. Application information, please refer to 2.10 Application Information for the detailed population specification
+    repeated InteractionType accepted_interaction_types = 4; // optional. Interaction type accepted, which can execute various interaction types accepted. Advertising request will be conducted based on the default designated value of the system in case of no designation. Please refer to 2.12 Interaction Type for the list of option values
+    optional uint32 impression_time = 5; // optional. The exposure time of timing exposure adslot, with unit of s.
+
+    message StaticInfo {
+        required Type type = 1; // required. Adslot type. Please refer to 2.8.1.1 Adslot Type for the list of option values
+        repeated CreativeType accepted_creative_types = 2; // optional. Creative type accepted. Please refer to 2.11 Creative Type for the list of option values
+        optional Position position = 3; //  required. Adslot position. Please refer to 2.8.1.2 Adslot Position for the list of option values
+        optional float minimun_cpm = 4; // optional. Minimum CPM
+        repeated Buyer prefered_buyers = 5; // optional. DSP set is preferred. When the set of preferences is in blank, all DSPs are allowed forcibly to participate in the price competition. Please refer to 2.8.1.3 DSP Description Information for the detailed population specification. The field is not recommended to be populated currently.
+        repeated uint32 exclusive_buyers = 6; // optional. Exclude DSP set. The field is not recommended to be populated currently.
+        optional bool allow_all_buyers = 7; // optional. Whether all other DSPs are allowed to participate in the price competition and that after the preferred DSP is affected to give up to participate in the price competition. The field is not recommended to be populated currently.
+        repeated uint32 exclusive_ad_categories = 8; // optional. BES new industry categories are used in the advertising industry that is not allowed for delivery. The field is not recommended to be populated currently.
+        optional bool open_internal_browser = 9; // optional. Whether to open the website with internal browser, open the website with built-in browser.
+        repeated Asset asset=10; //optional. In case of specific requirements for the materials required by current adslot, materials can be designated for required fields through the field. Please refer to 2.8.1.4 Required parameters of advertisement material for list of option values
+        enum Type {
+             BANNER = 1; // banner ad
+             INTERSTITIAL = 2; //interstitials
+             SPLASH = 3; // splash ads (shown immediately upon request)
+             CACHED_SPLASH = 4; // cached splash ads
+             NEWS_FEED = 5; //  news ads
+        };
+        enum Position {
+            TOP = 1; // top
+            BOTTOM = 2; // bottom
+            FLOW = 3; // in information flow
+            MIDDLE = 4; // middle (exclusive for interstitials)
+            FULLSCREEN = 5; // full screen (exclusive for splash ads)
+        };
+        enum Asset {
+            TITLE = 1; // promotion title
+            TEXT = 2; //promotion text
+            ICON_IMAGE = 3; // ad icon
+            MAIN_IMAGE = 4; // ad image
+        }
+
+    };
+};
+
+message Buyer {
+    required uint32 id = 1; // required. ID of DSP selected
+    optional uint32 minimun_cpm = 2; // optional. Minimum CPM accepted
+};
+
+
+
+message Version {
+    required uint32 major = 1; // required. Major version no., such as when API version is 4.0, it is filled as major=4, minor=0
+    optional uint32 minor = 2[default = 0]; // optional.
+    optional uint32 micro = 3[default = 0]; // optional.
+    optional uint32 build = 4[default = 0]; //  optional.
+};
+
+
+message Size {
+    required uint32 width = 1; // required. Width
+    required uint32 height = 2; // required. Height
+};
+
+enum CreativeType {
+    TEXT = 1; // text
+    IMAGE = 2; // image
+    HTML = 3; // HTML
+    VIDEO = 4; // video
+    TEXT_ICON = 5; // text
+};
+
+
+enum InteractionType {
+    NO_INTERACTION = 0; // no interaction, which is used for splash and other special positions and cannot be used for request, but only for response
+    SURFING = 1; // open the website with browser
+    DOWNLOAD = 2; // download application
+    DIALING = 3; // dial number
+    MESSAGE = 4; // send SMS
+    MAIL = 5; // send email
+};
+
+message Meta {
+    required string name = 1; // required. Name of field of custom content
+    required string value  = 2; // required. Value of custom content, such as "sunny" of custom data, name=weather, value=sunny
+}
+
+
+

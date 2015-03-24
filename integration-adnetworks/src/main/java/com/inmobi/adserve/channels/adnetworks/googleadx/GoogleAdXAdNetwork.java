@@ -1,23 +1,21 @@
 package com.inmobi.adserve.channels.adnetworks.googleadx;
 
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import java.awt.Dimension;
-import java.net.URI;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import java.awt.Dimension;
+import java.net.URI;
 
 public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -25,7 +23,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private static final String SCRIPT_END_PART = "<script type=\"text/javascript\" "
             + "src=\"//pagead2.googlesyndication.com/pagead/show_ads.js\"></script>";
-
+   
     private String googleInMobiPubID = null;
     private int width, height;
 
@@ -76,9 +74,12 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
         sb.append("google_ad_width = ").append(width).append(";");
         sb.append("google_ad_height = ").append(height).append(";");
         if (!isApp()) {
+            String referalUrl = sasParams.getReferralUrl();
+            int index=-1;
+            String siteUrl = referalUrl != null ? referalUrl.substring(0,(index = referalUrl.indexOf('?')) == -1 ? referalUrl.length():index) : sasParams.getAppUrl();
             sb.append("google_page_url = \"")
-                    .append(sasParams.getReferralUrl() != null ? sasParams.getReferralUrl() : sasParams.getAppUrl())
-                    .append("\";");
+                .append(siteUrl)
+                        .append("\";");
         }
         sb.append("</script>");
         sb.append(SCRIPT_END_PART);
@@ -96,7 +97,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
             adStatus = "NO_AD";
             LOG.info("Error generating Static Js adtag for GoogleAdX  : {}", exception);
         }
-        LOG.debug("response length is {}", responseContent.length());
+        LOG.debug("response from Zero {} length is {}",responseContent, responseContent.length());
     }
 
     @Override

@@ -11,6 +11,9 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.baidu.BaiduBidResponse.BidResponse;
+import com.baidu.BaiduBidResponse.Ad;
+import com.baidu.BaiduBidRequest.BidRequest;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -18,7 +21,10 @@ import junit.framework.TestCase;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.json.JSONObject;
+import org.powermock.reflect.Whitebox;
 import org.testng.annotations.Test;
+import com.baidu.BaiduBidResponse.MaterialMeta;
+
 
 import java.awt.*;
 import java.io.File;
@@ -246,6 +252,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
+        sasParams.setOsMajorVersion("3.5");
         casInternalRequestParameters.setUidIFA("ISDSDSD2323SDSDSDSDGHFGDDA");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -264,12 +271,10 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
         assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper));
         final String actualString = dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
-        final String expectedUrl =
-                    "{\"request_id\":\"4f8d98e2-4bbd-40bc-8795-22da170700f9\",\"version\":{\"major\":4,\"minor\":0},\"carrier\":0,\"device\":{\"udid\":{\"idfa\":\"ISDSDSD2323SDSDSDSDGHFGDDA\"}},\"app\":{\"name\":\"00000000-0000-0000-0000-0000006456fc\",\"id\":\"debug\",\"category\":\"Aggregator\"},\"adslots\":{\"id\":\"123\",\"size\":{\"width\":320,\"height\":50}},\"network\":{\"ipv4\":\"206.29.182.240\"}}";
-        assertEquals(expectedUrl, expectedUrl);
-
-                  //  "http://mobads.baidu.com/cpro/ui/mads.php?u=default&ie=1&n=1&tm=512&cm=512&md=1&at=3&v=api_inmobi&tpl=2&appid=debug&os=android&w=50&h=320&ip=206.29.182.240&impt=&clkt=&sn=202cb962ac59075b964b07152d234b70&q=debug_cpr&act=LP%2CPH%2CDL%2CMAP%2CSMS%2CMAI%2CVD%2CRM";
-            
+        BidRequest
+                bidRequest =  Whitebox.<BidRequest>invokeMethod(dcpBaiduAdNetwork, "getRequest");
+        assertEquals(bidRequest.getApp().getId(), debug);
+        assertEquals(bidRequest.getAdslots(0).getId(), "123");
     }
 
     @Test
@@ -281,6 +286,8 @@ public class DcpBaiduAdNetworkTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setOsId(HandSetOS.Android.getValue());
+        sasParams.setOsMajorVersion("3.5");
+
         casInternalRequestParameters.setUid("23e2ewq445545saasw232323");
         final String externalKey = "19100";
         final String beaconUrl =
@@ -295,8 +302,16 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                                 "{\"slot\":\"123\"}"),
                         new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
-        final String response ="{\"request_id\":\"adsg\",\"error_code\":12,\"ads\":{\"html_snippet\":\"<body>sample html</body>\"}}";
-        dcpBaiduAdNetwork.parseResponse(response, HttpResponseStatus.OK);
+        BidResponse.Builder responseBuilder = BidResponse.newBuilder();
+        Ad.Builder adBuilder = Ad.newBuilder();
+        adBuilder.setHtmlSnippet("<body>sample html</body>");
+        MaterialMeta.Builder metaBuilder = MaterialMeta.newBuilder();
+        metaBuilder.setCreativeType(MaterialMeta.CreativeType.HTML);
+        metaBuilder.setInteractionType(MaterialMeta.InteractionType.DOWNLOAD);
+        adBuilder.setMaterialMeta(metaBuilder);
+        responseBuilder.setRequestId("sdasasass");
+        responseBuilder.addAds(adBuilder);
+        dcpBaiduAdNetwork.parseResponse(responseBuilder.build().toByteArray(), HttpResponseStatus.OK);
         assertEquals(200, dcpBaiduAdNetwork.getHttpResponseStatusCode());
         assertEquals(
                 "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><body>sample html</body><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
