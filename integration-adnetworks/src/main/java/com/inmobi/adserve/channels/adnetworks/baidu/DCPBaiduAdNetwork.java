@@ -277,10 +277,10 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 }else if(responseMeta.getCreativeType() == MaterialMeta.CreativeType.TEXT || responseMeta.getCreativeType() == MaterialMeta.CreativeType.TEXT_ICON) {
 
                     context.put(VelocityTemplateFieldConstants.AD_TEXT,responseMeta.getTitle());
-                    if(responseMeta.getDescription1() != null) {
+                    if(StringUtils.isNotEmpty(responseMeta.getDescription1())) {
                         context.put(VelocityTemplateFieldConstants.DESCRIPTION, responseMeta.getDescription1());
                     }
-                    if(responseMeta.getIconUrl() != null){
+                    if(StringUtils.isNotEmpty(responseMeta.getIconUrl())){
                         context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseMeta.getIconUrl());
                     }
                     final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
