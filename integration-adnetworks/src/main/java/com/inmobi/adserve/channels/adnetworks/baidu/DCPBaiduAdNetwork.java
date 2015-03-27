@@ -281,7 +281,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                         context.put(VelocityTemplateFieldConstants.DESCRIPTION, responseMeta.getDescription1());
                     }
                     if(responseMeta.getIconUrl() != null){
-                        context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseMeta.getDescription1());
+                        context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseMeta.getIconUrl());
                     }
                     final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                     if (!StringUtils.isEmpty(vmTemplate)) {
