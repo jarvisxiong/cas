@@ -59,11 +59,6 @@ public class ServletBackFill extends BaseServlet {
     }
 
     @Override
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    @Override
     protected boolean isEnabled() {
         return true;
     }

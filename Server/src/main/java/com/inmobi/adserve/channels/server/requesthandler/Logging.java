@@ -53,10 +53,8 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class Logging {
-
     public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
             new ConcurrentHashMap<String, String>(2000);
-
     public static final String AD = "AD";
     public static final String NO_AD = "NO_AD";
     public static final String TIME_OUT = "TIME_OUT";
@@ -67,7 +65,6 @@ public class Logging {
     private static String umpAdsLogKey;
     private static boolean enableFileLogging;
     private static boolean enableDatabusLogging;
-
     private static int totalCount;
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
@@ -75,7 +72,7 @@ public class Logging {
     }
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
-                            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
+            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -87,9 +84,8 @@ public class Logging {
 
     // Writing Request Response Logs
     public static void rrLogging(final Marker traceMarker, final ChannelSegment channelSegment,
-                                 final List<ChannelSegment> rankList, final SASRequestParameters sasParams,
-                                 String terminationReason, final long totalTime, final double auctionBidFloor)
-            throws JSONException, TException {
+            final List<ChannelSegment> rankList, final SASRequestParameters sasParams, final String terminationReason,
+            final long totalTime, final double auctionBidFloor) throws JSONException, TException {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Inside rrLogging");
@@ -136,7 +132,7 @@ public class Logging {
 
     // Writing creatives
     public static void creativeLogging(final List<ChannelSegment> channelSegments,
-                                       final SASRequestParameters sasRequestParameters) {
+            final SASRequestParameters sasRequestParameters) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Inside creativeLogging");
         }
@@ -209,7 +205,7 @@ public class Logging {
             }
             // Log IX specific fields in ixAdInfo.
             if (adNetwork instanceof IXAdNetwork) {
-                IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
+                final IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
 
                 // Populate IXAd only if 1) we get an AD response from IX OR 2) forward any package to RP.
                 if (AD.equals(adResponse.getAdStatus()) || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
@@ -233,12 +229,14 @@ public class Logging {
                 case TIME_OUT:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
-                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(), adResponse.getStartTime());
+                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(),
+                            adResponse.getStartTime());
                     break;
                 default:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
-                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(), adResponse.getStartTime());
+                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(),
+                            adResponse.getStartTime());
                     break;
             }
         }
@@ -255,15 +253,16 @@ public class Logging {
         casAdChain.setExternalSiteKey(channelSegmentEntity.getExternalSiteKey());
         casAdChain.setDst(DemandSourceType.findByValue(channelSegmentEntity.getDst()));
 
-        String creativeId = channelSegment.getAdNetworkInterface().getCreativeId();
+        final String creativeId = channelSegment.getAdNetworkInterface().getCreativeId();
         if (null != creativeId) {
             casAdChain.setCreativeId(creativeId);
         }
-        casAdChain.setAd_inc_id(channelSegmentEntity.getIncId(channelSegment.getAdNetworkInterface().getCreativeType()));
+        casAdChain
+                .setAd_inc_id(channelSegmentEntity.getIncId(channelSegment.getAdNetworkInterface().getCreativeType()));
         return casAdChain;
     }
 
-    public static IxAd createIxAd(IXAdNetwork ixAdNetwork) {
+    public static IxAd createIxAd(final IXAdNetwork ixAdNetwork) {
         final IxAd ixAd = new IxAd();
 
         if (StringUtils.isNotEmpty(ixAdNetwork.getDspId())) {
@@ -296,8 +295,7 @@ public class Logging {
     }
 
     protected static AdRR getAdRR(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
-                                  final SASRequestParameters sasParams, String terminationReason,
-                                  final double auctionBidFloor) {
+            final SASRequestParameters sasParams, String terminationReason, final double auctionBidFloor) {
         AdRR adRR;
 
         boolean isTerminated = false;
@@ -314,7 +312,7 @@ public class Logging {
 
         short adsServed = 0;
         List<Impression> impressions = null;
-        Impression impression = getImpressionObject(channelSegment, sasParams);
+        final Impression impression = getImpressionObject(channelSegment, sasParams);
         if (null != impression) {
             adsServed = 1;
             impressions = new ArrayList<Impression>();
@@ -332,8 +330,8 @@ public class Logging {
         }
 
         final String timestamp = new Date().toString();
-        final Request request = getRequestObject(sasParams, adsServed, requestSlot, slotServed, auctionBidFloor,
-                rankList);
+        final Request request =
+                getRequestObject(sasParams, adsServed, requestSlot, slotServed, auctionBidFloor, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
         adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
@@ -357,12 +355,13 @@ public class Logging {
         return host;
     }
 
-    protected static Impression getImpressionObject(ChannelSegment channelSegment, SASRequestParameters sasParams) {
+    protected static Impression getImpressionObject(final ChannelSegment channelSegment,
+            final SASRequestParameters sasParams) {
         Impression impression = null;
 
         if (null != channelSegment) {
-            ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-            AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
+            final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
+            final AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
 
             if (null == channelSegmentEntity || null == adNetworkInterface) {
                 if (LOG.isDebugEnabled()) {
@@ -372,9 +371,10 @@ public class Logging {
             }
 
             InspectorStats.incrementStatCount(adNetworkInterface.getName(), InspectorStrings.SERVER_IMPRESSION);
-            final AdIdChain adChain = new AdIdChain(channelSegmentEntity.getAdId(adNetworkInterface.getCreativeType()),
-                    channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
-                    channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
+            final AdIdChain adChain =
+                    new AdIdChain(channelSegmentEntity.getAdId(adNetworkInterface.getCreativeType()),
+                            channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
+                            channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             final ContentRating contentRating = getContentRating(sasParams);
             final PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
             final AdMeta adMeta = new AdMeta(contentRating, pricingModel, "BANNER"); // TODO: Check "BANNER" point
@@ -391,14 +391,34 @@ public class Logging {
         return impression;
     }
 
-    protected static Request getRequestObject(SASRequestParameters sasParams, short adsServed, Short requestSlot,
-                                              Short slotServed, final double auctionBidFloor,
-                                              final List<ChannelSegment> rankList) {
+    protected static Request getRequestObject(final SASRequestParameters sasParams, final short adsServed,
+            final Short requestSlot, final Short slotServed, final double auctionBidFloor,
+            final List<ChannelSegment> rankList) {
         final short adRequested = 1;
         Request request;
-
         if (null != sasParams) {
             request = new Request(adRequested, adsServed, sasParams.getSiteId(), sasParams.getTid());
+            request.setBidGuidance(sasParams.getMarketRate());
+            // Hack for getting discounted auction bid floor
+            if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
+                int bidFloorPercent = 100;
+                if (CollectionUtils.isNotEmpty(rankList)) {
+                    final AdNetworkInterface adNetworkInterface = rankList.get(0).getAdNetworkInterface();
+                    if (adNetworkInterface instanceof IXAdNetwork) {
+                        bidFloorPercent = ((IXAdNetwork) adNetworkInterface).getBidFloorPercent();
+                    }
+                }
+                request.setAuctionBidFloor(auctionBidFloor * bidFloorPercent / 100);
+            } else {
+                request.setAuctionBidFloor(auctionBidFloor);
+            }
+
+            final Integer siteSegmentId = sasParams.getSiteSegmentId();
+            if (null != siteSegmentId) {
+                request.setSegmentId(siteSegmentId);
+            }
+            request.setRequestDst(DemandSourceType.findByValue(sasParams.getDst()));
+        
         } else {
             request = new Request(adRequested, adsServed, null, null);
         }
@@ -414,42 +434,17 @@ public class Logging {
         if (null != requestSlot) {
             request.setSlot_requested(requestSlot);
         }
-
-        if (null != sasParams) {
-            request.setBidGuidance(sasParams.getMarketRate());
-
-            // Hack for getting discounted auction bid floor
-            if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
-                int bidFloorPercent = 100;
-                if (CollectionUtils.isNotEmpty(rankList)) {
-                    AdNetworkInterface adNetworkInterface = rankList.get(0).getAdNetworkInterface();
-                    if (adNetworkInterface instanceof IXAdNetwork) {
-                        bidFloorPercent = ((IXAdNetwork)adNetworkInterface).getBidFloorPercent();
-                    }
-                }
-                request.setAuctionBidFloor(auctionBidFloor * bidFloorPercent / 100);
-            } else {
-                request.setAuctionBidFloor(auctionBidFloor);
-            }
-
-            Integer siteSegmentId = sasParams.getSiteSegmentId();
-            if (null != siteSegmentId) {
-                request.setSegmentId(siteSegmentId);
-            }
-            request.setRequestDst(DemandSourceType.findByValue(sasParams.getDst()));
-        }
-
         return request;
     }
 
-    protected static Geo getGeoObject(SASRequestParameters sasParams) {
+    protected static Geo getGeoObject(final SASRequestParameters sasParams) {
         Geo geo = null;
 
         if (null != sasParams) {
-            Long countryId = sasParams.getCountryId();
-            Integer carrierId = sasParams.getCarrierId();
-            Integer state = sasParams.getState();
-            Integer city = sasParams.getCity();
+            final Long countryId = sasParams.getCountryId();
+            final Integer carrierId = sasParams.getCarrierId();
+            final Integer state = sasParams.getState();
+            final Integer city = sasParams.getCity();
 
             if (null != carrierId && null != countryId) {
                 geo = new Geo(carrierId, countryId.shortValue());
@@ -464,11 +459,10 @@ public class Logging {
         return geo;
     }
 
-    protected static User getUserObject(SASRequestParameters sasParams) {
-        User user = new User();
-
+    protected static User getUserObject(final SASRequestParameters sasParams) {
+        final User user = new User();
         if (null != sasParams) {
-            Short age = sasParams.getAge();
+            final Short age = sasParams.getAge();
 
             if (null != age) {
                 user.setAge(age);
@@ -481,11 +475,11 @@ public class Logging {
         return user;
     }
 
-    protected static HandsetMeta getHandsetMetaObject(SASRequestParameters sasParams) {
-        HandsetMeta handsetMeta = new HandsetMeta();
+    protected static HandsetMeta getHandsetMetaObject(final SASRequestParameters sasParams) {
+        final HandsetMeta handsetMeta = new HandsetMeta();
 
         if (null != sasParams) {
-            Long handsetInternalId = sasParams.getHandsetInternalId();
+            final Long handsetInternalId = sasParams.getHandsetInternalId();
             if (null != handsetInternalId) {
                 handsetMeta.setId(handsetInternalId.intValue());
             }
@@ -507,7 +501,7 @@ public class Logging {
         return AdStatus.DROPPED;
     }
 
-    private static Logger getLogger(String logger) {
+    private static Logger getLogger(final String logger) {
         return LoggerFactory.getLogger(logger);
     }
 
@@ -614,7 +608,7 @@ public class Logging {
      * @param casAdvertisementLog
      */
     private static void sendToDatabus(final CasAdvertisementLog casAdvertisementLog,
-                                      final String sampledAdvertisementLogKey) {
+            final String sampledAdvertisementLogKey) {
         Message msg = null;
         try {
             final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
@@ -657,7 +651,7 @@ public class Logging {
         if (sasParams == null || null == sasParams.getSiteContentType()) {
             return null;
         } else {
-            ContentType sasSiteContentType = sasParams.getSiteContentType();
+            final ContentType sasSiteContentType = sasParams.getSiteContentType();
 
             if (ContentType.PERFORMANCE == sasSiteContentType) {
                 return ContentRating.PERFORMANCE;

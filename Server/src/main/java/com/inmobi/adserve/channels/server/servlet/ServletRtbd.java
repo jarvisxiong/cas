@@ -59,11 +59,6 @@ public class ServletRtbd extends BaseServlet {
     }
 
     @Override
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    @Override
     protected boolean isEnabled() {
         return CasConfigUtil.getServerConfig().getBoolean("isRtbEnabled", true);
     }

@@ -21,13 +21,9 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 
 public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestHandler.class);
-
     public ResponseSender responseSender;
-
-    private Marker traceMarker;
     private final Servlet servlet;
-    private final Provider<Marker> traceMarkerProvider;
-
+    private Marker traceMarker;
     private HttpRequest httpRequest;
 
     public String getTerminationReason() {
@@ -40,10 +36,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Inject
     public HttpRequestHandler(final Provider<Marker> traceMarkerProvider, final Servlet servlet,
-                              final ResponseSender responseSender) {
-        this.traceMarkerProvider = traceMarkerProvider;
+            final ResponseSender responseSender) {
         if (null != traceMarkerProvider) {
-            this.traceMarker = traceMarkerProvider.get();
+            traceMarker = traceMarkerProvider.get();
         }
         this.servlet = servlet;
         this.responseSender = responseSender;
@@ -60,7 +55,6 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             httpRequest = requestParameterHolder.getHttpRequest();
             LOG.debug(traceMarker, "Got the servlet {} , uri {}", servlet.getName(), httpRequest.getUri());
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
-
         } catch (final Exception exception) {
             responseSender.setTerminationReason(CasConfigUtil.PROCESSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.PROCESSING_ERROR, InspectorStrings.COUNT);

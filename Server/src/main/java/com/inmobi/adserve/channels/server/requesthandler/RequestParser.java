@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 @Singleton
 public class RequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(RequestParser.class);
+    private static final String UTF_8 = "UTF-8";
     private final Provider<Marker> traceMarkerProvider;
 
     @Inject
@@ -56,7 +58,7 @@ public class RequestParser {
     }
 
     public void parseRequestParameters(final JSONObject jObject, SASRequestParameters params,
-                                       final CasInternalRequestParameters casInternalRequestParameters) {
+            final CasInternalRequestParameters casInternalRequestParameters) {
         final Marker traceMarker = traceMarkerProvider.get();
 
         LOG.debug(traceMarker, "Inside parameter parser");
@@ -75,10 +77,11 @@ public class RequestParser {
         params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);
         params.setRemoteHostIp(stringify(jObject, "w-s-carrier"));
-        params.setUserAgent(stringify(jObject, "rqXInmobiPhoneUseragent"));
-        if (null == params.getUserAgent()) {
-            params.setUserAgent(stringify(jObject, "rqHUserAgent"));
-        }
+        String userAgent = stringify(jObject, "rqXInmobiPhoneUseragent");
+        try {
+            userAgent = userAgent != null ? URLDecoder.decode(userAgent, UTF_8) : stringify(jObject, "rqHUserAgent");
+        } catch (final UnsupportedEncodingException e) {}
+        params.setUserAgent(userAgent);
         params.setLocSrc(stringify(jObject, "loc-src"));
         params.setLatLong(stringify(jObject, "latlong"));
         params.setSiteId(stringify(jObject, "rqMkSiteid"));
@@ -107,7 +110,7 @@ public class RequestParser {
             sdkVersion = null;
         }
         params.setSdkVersion(sdkVersion);
-        String siteType = stringify(jObject, "site-type");
+        final String siteType = stringify(jObject, "site-type");
         if (null != siteType) {
             params.setSiteContentType(ContentType.valueOf(siteType));
         }
@@ -246,17 +249,15 @@ public class RequestParser {
     private SASRequestParameters encodeParams(final SASRequestParameters parameter, final JSONObject userMap)
             throws JSONException {
         final Marker traceMarker = traceMarkerProvider.get();
-        final String utf8 = "UTF-8";
         try {
             if (null != parameter.getAge()) {
-                parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), utf8)));
+                parameter.setAge(Short.valueOf(URLEncoder.encode(String.valueOf(parameter.getAge()), UTF_8)));
             }
             if (null != parameter.getGender()) {
-                parameter.setGender(URLEncoder.encode(parameter.getGender(), utf8));
+                parameter.setGender(URLEncoder.encode(parameter.getGender(), UTF_8));
             }
             if (null != parameter.getPostalCode()) {
-                parameter.setPostalCode(URLEncoder.encode(String.valueOf(parameter.getPostalCode()),
-                        utf8));
+                parameter.setPostalCode(URLEncoder.encode(String.valueOf(parameter.getPostalCode()), UTF_8));
             }
             String[] advertiserList = null;
             if (userMap.get("u-adapter") != null) {

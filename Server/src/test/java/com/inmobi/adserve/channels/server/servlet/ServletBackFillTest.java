@@ -1,7 +1,6 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.easymock.PowerMock.createMock;
@@ -9,15 +8,12 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -29,10 +25,14 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class})
 public class ServletBackFillTest {
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testHandleRequest() throws Exception {
         mockStatic(InspectorStats.class);
@@ -47,9 +47,9 @@ public class ServletBackFillTest {
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
-        expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).times(1);
+        expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
-        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).times(1);
+        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
@@ -82,9 +82,4 @@ public class ServletBackFillTest {
         assertThat(tested.getName(), is(IsEqual.equalTo("BackFill")));
     }
 
-    @Test
-    public void testGetLogger() throws Exception {
-        final ServletBackFill tested = new ServletBackFill(null, null, null, null, null, null, null, null);
-        assertThat(tested.getLogger(), is(equalTo(LoggerFactory.getLogger(ServletBackFill.class))));
-    }
 }

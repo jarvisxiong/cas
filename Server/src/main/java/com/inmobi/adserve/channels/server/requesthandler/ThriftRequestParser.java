@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,7 +118,7 @@ public class ThriftRequestParser {
             params.setSiteFloor(ecpmFloor);
             final double marketRate = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
             params.setMarketRate(marketRate);
-           
+
             params.setSiteIncId(tObject.site.siteIncId);
             params.setAppUrl(tObject.site.siteUrl);
             params.setPubId(tObject.site.publisherId);
@@ -148,8 +150,11 @@ public class ThriftRequestParser {
 
         // Fill params from Device Object
         if (tObject.isSetDevice()) {
-            params.setUserAgent(tObject.device.userAgent);
-            // TODO Change to int in thrift
+            String userAgent = tObject.device.userAgent;
+            try {
+                userAgent = userAgent != null ? URLDecoder.decode(userAgent, "UTF-8") : null;
+            } catch (final UnsupportedEncodingException e) {}
+            params.setUserAgent(userAgent);
             params.setOsId(new Long(tObject.device.osId).intValue());
             params.setModelId(new Long(tObject.device.modelId).intValue());
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
@@ -392,4 +397,5 @@ public class ThriftRequestParser {
         }
         return listOfUmpSlots;
     }
+
 }

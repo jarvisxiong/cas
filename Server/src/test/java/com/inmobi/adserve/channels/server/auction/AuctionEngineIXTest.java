@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.inmobi.adserve.channels.util.InspectorStats;
+
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -109,6 +110,7 @@ public class AuctionEngineIXTest {
 
     }
 
+    @SuppressWarnings("deprecation")
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
                                      final String adNetworkName, final Double bidValue, final Long latencyValue) {
 

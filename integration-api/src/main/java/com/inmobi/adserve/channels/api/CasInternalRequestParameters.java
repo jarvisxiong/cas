@@ -9,7 +9,6 @@ import com.inmobi.adserve.channels.types.AccountType;
 @Data
 public class CasInternalRequestParameters {
     // Rtb Params
-    private double highestEcpm;
     private List<String> blockedIabCategories;
     private List<String> blockedAdvertisers;
     private AccountType siteAccountType; // Whether site account is managed or selfserve

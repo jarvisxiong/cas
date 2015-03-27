@@ -44,15 +44,12 @@ public class AsyncRequestMaker {
      * it to segment list else we drop it
      */
     public List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows, final Configuration config,
-                                                       final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
-                                                       final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
-                                                       final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
-                                                       final List<ChannelSegment> rtbSegments) throws Exception {
-
+            final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
+            final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
+            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
+            final List<ChannelSegment> rtbSegments) throws Exception {
         final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
-
         LOG.debug("Total channels available for sending requests {}", rows.size());
-
         /*
          NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
          interstitial video response will be sent or Banner.
@@ -65,7 +62,8 @@ public class AsyncRequestMaker {
         for (final ChannelSegment row : rows) {
             final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             final AdNetworkInterface network =
-                    segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), adapterConfig, null, null, base, channel, advertiserSet);
+                    segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), adapterConfig, null, null, base,
+                            channel, advertiserSet);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
                 continue;
@@ -87,8 +85,8 @@ public class AsyncRequestMaker {
             String clickUrl = null;
             String beaconUrl = null;
             // Replacing int key in auction id to generate impression id
-            sasParams.setImpressionId(ImpressionIdGenerator.getInstance()
-                    .resetWilburyIntKey(casInternalRequestParameterGlobal.getAuctionId(), incId));
+            sasParams.setImpressionId(ImpressionIdGenerator.getInstance().resetWilburyIntKey(
+                    casInternalRequestParameterGlobal.getAuctionId(), incId));
             final CasInternalRequestParameters casInternalRequestParameters =
                     getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal);
 
@@ -96,8 +94,7 @@ public class AsyncRequestMaker {
             sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
-            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired())
-                    && null != sasParams.getImpressionId()) {
+            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
                 boolean isCpc = false;
                 if (null != channelSegmentEntity.getPricingModel()
                         && "cpc".equalsIgnoreCase(channelSegmentEntity.getPricingModel())) {
@@ -132,38 +129,36 @@ public class AsyncRequestMaker {
     }
 
     private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
-                                                                         final CasInternalRequestParameters casInternalRequestParameterGlobal) {
-        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.setImpressionId(sasParams.getImpressionId());
-        casInternalRequestParameters.setBlockedIabCategories(casInternalRequestParameterGlobal
-                .getBlockedIabCategories());
-        casInternalRequestParameters.setBlockedAdvertisers(casInternalRequestParameterGlobal.getBlockedAdvertisers());
-        casInternalRequestParameters.setHighestEcpm(casInternalRequestParameterGlobal.getHighestEcpm());
-        casInternalRequestParameters.setAuctionBidFloor(casInternalRequestParameterGlobal.getAuctionBidFloor());
-        casInternalRequestParameters.setAuctionId(casInternalRequestParameterGlobal.getAuctionId());
-        casInternalRequestParameters.setUid(casInternalRequestParameterGlobal.getUid());
-        casInternalRequestParameters.setUidO1(casInternalRequestParameterGlobal.getUidO1());
-        casInternalRequestParameters.setUidIFA(casInternalRequestParameterGlobal.getUidIFA());
-        casInternalRequestParameters.setGpid(casInternalRequestParameterGlobal.getGpid());
-        casInternalRequestParameters.setUidIFV(casInternalRequestParameterGlobal.getUidIFV());
-        casInternalRequestParameters.setUidSO1(casInternalRequestParameterGlobal.getUidSO1());
-        casInternalRequestParameters.setUidIDUS1(casInternalRequestParameterGlobal.getUidIDUS1());
-        casInternalRequestParameters.setUidMd5(casInternalRequestParameterGlobal.getUidMd5());
-        casInternalRequestParameters.setUidADT(casInternalRequestParameterGlobal.getUidADT());
-        casInternalRequestParameters.setSiteFloor(sasParams.getSiteFloor());
+            final CasInternalRequestParameters casGlobal) {
+        final CasInternalRequestParameters casInternal = new CasInternalRequestParameters();
+        casInternal.setImpressionId(sasParams.getImpressionId());
+        casInternal.setBlockedIabCategories(casGlobal.getBlockedIabCategories());
+        casInternal.setBlockedAdvertisers(casGlobal.getBlockedAdvertisers());
+        casInternal.setAuctionBidFloor(casGlobal.getAuctionBidFloor());
+        casInternal.setAuctionId(casGlobal.getAuctionId());
+        casInternal.setUid(casGlobal.getUid());
+        casInternal.setUidO1(casGlobal.getUidO1());
+        casInternal.setUidIFA(casGlobal.getUidIFA());
+        casInternal.setGpid(casGlobal.getGpid());
+        casInternal.setUidIFV(casGlobal.getUidIFV());
+        casInternal.setUidSO1(casGlobal.getUidSO1());
+        casInternal.setUidIDUS1(casGlobal.getUidIDUS1());
+        casInternal.setUidMd5(casGlobal.getUidMd5());
+        casInternal.setUidADT(casGlobal.getUidADT());
+        casInternal.setSiteFloor(sasParams.getSiteFloor());
         if (null != sasParams.getPostalCode()) {
-            casInternalRequestParameters.setZipCode(sasParams.getPostalCode());
+            casInternal.setZipCode(sasParams.getPostalCode());
         }
-        casInternalRequestParameters.setLatLong(sasParams.getLatLong());
-        casInternalRequestParameters.setAppUrl(sasParams.getAppUrl());
-        casInternalRequestParameters.setTraceEnabled(casInternalRequestParameterGlobal.isTraceEnabled());
-        casInternalRequestParameters.setSiteAccountType(casInternalRequestParameterGlobal.getSiteAccountType());
+        casInternal.setLatLong(sasParams.getLatLong());
+        casInternal.setAppUrl(sasParams.getAppUrl());
+        casInternal.setTraceEnabled(casGlobal.isTraceEnabled());
+        casInternal.setSiteAccountType(casGlobal.getSiteAccountType());
 
-        return casInternalRequestParameters;
+        return casInternal;
     }
 
     private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
-                                   final ChannelSegmentEntity channelSegmentEntity) {
+            final ChannelSegmentEntity channelSegmentEntity) {
         if (channelSegmentEntity.isStripUdId()) {
             casInternalRequestParameters.setUid(null);
             casInternalRequestParameters.setUidO1(null);
@@ -188,7 +183,7 @@ public class AsyncRequestMaker {
     }
 
     public List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final Channel channel,
-                                                  final List<ChannelSegment> rtbSegments) {
+            final List<ChannelSegment> rtbSegments) {
         final Iterator<ChannelSegment> itr = rankList.iterator();
         while (itr.hasNext()) {
             final ChannelSegment channelSegment = itr.next();
@@ -197,7 +192,8 @@ public class AsyncRequestMaker {
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
                         .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
-                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(), System.currentTimeMillis());
+                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
+                        System.currentTimeMillis());
             } else {
                 itr.remove();
             }
@@ -211,7 +207,8 @@ public class AsyncRequestMaker {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
                         channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
                                 .getChannelId());
-                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(), System.currentTimeMillis());
+                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
+                        System.currentTimeMillis());
             } else {
                 rtbItr.remove();
             }
@@ -220,7 +217,7 @@ public class AsyncRequestMaker {
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
-                                                  final SASRequestParameters sasParams, final Integer dst) {
+            final SASRequestParameters sasParams, final Integer dst) {
         final ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);

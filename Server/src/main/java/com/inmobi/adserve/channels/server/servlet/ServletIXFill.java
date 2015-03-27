@@ -12,6 +12,7 @@ import org.slf4j.Marker;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
@@ -54,13 +55,22 @@ public class ServletIXFill extends BaseServlet {
     }
 
     @Override
-    public String getName() {
-        return "ixFill";
+    protected void specificEnrichment(final HttpRequestHandler hrh, final CasContext casContext) {
+        LOG.debug("enrichDstSpecific IX");
+        // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
+        casInternal.setAuctionBidFloor(sasParams.getSiteFloor());
+        // SasParams marketRate has tObject.guidanceBid * 1.0 / Math.pow(10, 6)
+        sasParams.setMarketRate(Math.max(sasParams.getMarketRate(), casInternal.getAuctionBidFloor()));
+        
+        final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
+        sasParams.setVideoSupported(isVideoSupported);
+        LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
+        LOG.debug("Final rtbFloor is {}", casInternal.getAuctionBidFloor());
     }
 
     @Override
-    protected Logger getLogger() {
-        return LOG;
+    public String getName() {
+        return "ixFill";
     }
 
     @Override

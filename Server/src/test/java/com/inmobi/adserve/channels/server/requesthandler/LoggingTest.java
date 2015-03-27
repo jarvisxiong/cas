@@ -195,7 +195,7 @@ public class LoggingTest {
         Long campaignIncId = 123L;
         Long countryId = 94L;
         Double secondBidPriceInUsd = 4.5;
-        Double bidFloorPercent = 45.5;
+        // Double bidFloorPercent = 45.5;
         Double auctionBidFloor = 455.98;
         Double marketRate = 567.98;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
@@ -788,7 +788,7 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getSiteContentType()).andReturn(siteContentType).anyTimes();
         replayAll();
 
-        Impression impression= Logging.getImpressionObject(mockChannelSegment, mockSASRequestParameters);
+        Logging.getImpressionObject(mockChannelSegment, mockSASRequestParameters);
     }
 
     @Test
@@ -1067,6 +1067,7 @@ public class LoggingTest {
         assertThat(Logging.getGender(mockSASRequestParameters), is(equalTo(Gender.FEMALE)));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testsampledAdvertisingLogging() {
         final Long[] rcList = null;
@@ -1099,6 +1100,7 @@ public class LoggingTest {
         Logging.sampledAdvertiserLogging(rankList, mockConfig);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testsampledAdvertisingLoggingWithResponseAsEmptyString() {
         final Long[] rcList = null;
@@ -1131,6 +1133,7 @@ public class LoggingTest {
         Logging.sampledAdvertiserLogging(rankList, mockConfig);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testsampledAdvertisingLoggingWithRequestUrlAsEmptyString() {
         final Long[] rcList = null;
@@ -1163,6 +1166,7 @@ public class LoggingTest {
         Logging.sampledAdvertiserLogging(rankList, mockConfig);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testsampledAdvertisingLoggingForZeroSampleOnDatabus() {
         final Long[] rcList = null;

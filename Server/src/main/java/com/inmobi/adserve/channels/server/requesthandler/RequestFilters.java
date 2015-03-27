@@ -49,7 +49,7 @@ public class RequestFilters {
         }
 
         if (!hrh.responseSender.getSasParams().getAllowBannerAds()) {
-            LOG.error("Request not being served because of banner not allowed.");
+            LOG.info("Request not being served because of banner not allowed.");
             InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER,
                     InspectorStrings.COUNT);
             return true;
@@ -57,7 +57,7 @@ public class RequestFilters {
 
         if (hrh.responseSender.getSasParams().getSiteContentType() != null
                 && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.getSasParams().getSiteContentType().name())) {
-            LOG.error("Terminating request as incompatible content type");
+            LOG.info("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;
@@ -68,7 +68,7 @@ public class RequestFilters {
             try {
                 if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1)) || "a".equalsIgnoreCase(tempSdkVersion
                         .substring(0, 1))) && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
-                    LOG.error("Terminating request as sdkVersion is less than 3");
+                    LOG.info("Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
                     InspectorStats.incrementStatCount(InspectorStrings.LOW_SDK_VERSION, InspectorStrings.COUNT);
                     return true;

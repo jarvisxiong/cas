@@ -77,7 +77,8 @@ public class CasUtils {
     public boolean isVideoSupported(final SASRequestParameters sasParams) {
         boolean isSupported = false;
 
-        if(!(sasParams.getProcessedMkSlot().contains((short)14) || sasParams.getProcessedMkSlot().contains((short)32))) {
+        if (!(sasParams.getProcessedMkSlot().contains((short) 14) || sasParams.getProcessedMkSlot()
+                .contains((short) 32))) {
             return false;
         }
 
@@ -86,7 +87,8 @@ public class CasUtils {
             return false;
         }
         // Slot Size check in AsyncRequestMaker since slots would differ for each segment
-        // Minimum SDK version check is in IXAdNetwork since we cannot access adapter specific configs from this location
+        // Minimum SDK version check is in IXAdNetwork since we cannot access adapter specific configs from this
+        // location
 
         String osVersion = sasParams.getOsMajorVersion();
         if (StringUtils.isNotEmpty(osVersion)) {

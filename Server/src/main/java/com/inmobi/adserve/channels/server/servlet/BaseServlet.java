@@ -33,7 +33,6 @@ import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.casthrift.DemandSourceType;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -46,13 +45,15 @@ public abstract class BaseServlet implements Servlet {
 
     private final MatchSegments matchSegments;
     private final ChannelSegmentFilterApplier channelSegmentFilterApplier;
-    private final CasUtils casUtils;
     private final RequestFilters requestFilters;
     private final AsyncRequestMaker asyncRequestMaker;
     private final List<AdvertiserLevelFilter> advertiserLevelFilters;
     private final List<AdGroupLevelFilter> adGroupLevelFilters;
+    protected final CasUtils casUtils;
+    protected SASRequestParameters sasParams;
+    protected CasInternalRequestParameters casInternal;
 
-    BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
+    protected BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
             final ChannelSegmentFilterApplier channelSegmentFilterApplier, final CasUtils casUtils,
             final RequestFilters requestFilters, final AsyncRequestMaker asyncRequestMaker,
             final List<AdvertiserLevelFilter> advertiserLevelFilters, final List<AdGroupLevelFilter> adGroupLevelFilters) {
@@ -72,7 +73,9 @@ public abstract class BaseServlet implements Servlet {
         final CasContext casContext = new CasContext();
         final Marker traceMarker = traceMarkerProvider.get();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
+        sasParams = hrh.responseSender.getSasParams();
+        casInternal = hrh.responseSender.casInternalRequestParameters;
+        casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
 
         // Send NO_AD response, if not enabled.
         if (!isEnabled()) {
@@ -81,58 +84,18 @@ public abstract class BaseServlet implements Servlet {
             return;
         }
 
-        hrh.responseSender.getAuctionEngine().sasParams = hrh.responseSender.getSasParams();
-        final CasInternalRequestParameters casInternalRequestParametersGlobal =
-                hrh.responseSender.casInternalRequestParameters;
-
-        casInternalRequestParametersGlobal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers()
-                .get("x-mkhoj-tracer")));
-
         if (requestFilters.isDroppedInRequestFilters(hrh)) {
             LOG.debug("Request is dropped in request filters");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
 
-        // Setting isResponseOnlyFromDCP from config
-        final boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
-        LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
-        sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
-
-        // Setting isVideoSupported based on the Request params. Only supported for IX request.
-        if (DemandSourceType.IX == DemandSourceType.findByValue(sasParams.getDst())) {
-            final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
-            LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
-            sasParams.setVideoSupported(isVideoSupported);
-        }
-
-        // Set imai content if r-format is imai
-        String imaiBaseUrl = null;
-        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
-            if (hrh.responseSender.getSasParams().getOsId() == 3) {
-                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
-            } else {
-                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("iPhoneBaseUrl");
-            }
-        }
-        hrh.responseSender.getSasParams().setImaiBaseUrl(imaiBaseUrl);
-        LOG.debug("imai base url is {}", hrh.responseSender.getSasParams().getImaiBaseUrl());
-
         // getting the selected third party site details
-        final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails =
-                matchSegments.matchSegments(hrh.responseSender.getSasParams());
-
+        final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails = matchSegments.matchSegments(sasParams);
         if (CollectionUtils.isEmpty(matchedSegmentDetails)) {
             LOG.debug(traceMarker, "No Entities matching the request.");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
-        }
-
-        final SiteMetaDataEntity siteMetaDataEntity =
-                matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
-        casInternalRequestParametersGlobal.setSiteAccountType(AccountType.SELF_SERVE);
-        if (null != siteMetaDataEntity) {
-            casInternalRequestParametersGlobal.setSiteAccountType(siteMetaDataEntity.getAccountTypesAllowed());
         }
 
         // applying all the filters
@@ -147,16 +110,12 @@ public abstract class BaseServlet implements Servlet {
         }
 
         // Incrementing Adapter Specific Total Selected Segments Stats
-        for (ChannelSegment channelSegment : filteredSegments) {
-            incrementTotalSelectedSegmentStats(channelSegment);
-        }
+        incrementTotalSelectedSegmentStats(filteredSegments);
 
-        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
-        final double segmentFloor = casUtils.getRtbFloor(casContext);
-        enrichCasInternalRequestParameters(hrh, filteredSegments, networkSiteEcpm, segmentFloor);
-        sasParams.setMarketRate(Math.max(sasParams.getMarketRate(),
-                casInternalRequestParametersGlobal.getAuctionBidFloor()));
-        hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternalRequestParametersGlobal;
+        commonEnrichment(hrh);
+        specificEnrichment(hrh, casContext);
+        hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternal;
+        hrh.responseSender.getAuctionEngine().sasParams = sasParams;
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
@@ -165,8 +124,8 @@ public abstract class BaseServlet implements Servlet {
         dcpSegments =
                 asyncRequestMaker.prepareForAsyncRequest(filteredSegments, CasConfigUtil.getServerConfig(),
                         CasConfigUtil.getRtbConfig(), CasConfigUtil.getAdapterConfig(), hrh.responseSender,
-                        sasParams.getUAdapters(), serverChannel, CasConfigUtil.repositoryHelper,
-                        hrh.responseSender.getSasParams(), casInternalRequestParametersGlobal, rtbSegments);
+                        sasParams.getUAdapters(), serverChannel, CasConfigUtil.repositoryHelper, sasParams,
+                        casInternal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
         if (CollectionUtils.isEmpty(dcpSegments) && CollectionUtils.isEmpty(rtbSegments)) {
@@ -207,50 +166,74 @@ public abstract class BaseServlet implements Servlet {
         }
     }
 
-    private void enrichCasInternalRequestParameters(final HttpRequestHandler hrh,
-            final List<ChannelSegment> filteredSegments, final double networkSiteEcpm,
-            final double segmentFloor) {
-        final CasInternalRequestParameters casInternalRequestParametersGlobal =
-                hrh.responseSender.casInternalRequestParameters;
-        casInternalRequestParametersGlobal.setHighestEcpm(getHighestEcpm(filteredSegments));
-        casInternalRequestParametersGlobal.setBlockedIabCategories(getBlockedIabCategories(hrh));
-        casInternalRequestParametersGlobal.setBlockedAdvertisers(getBlockedAdvertisers(hrh));
-        final double siteFloor = hrh.responseSender.getSasParams().getSiteFloor();
+    /**
+     * Enrichment common for all ad pools
+     * 
+     * @param hrh
+     */
+    protected void commonEnrichment(final HttpRequestHandler hrh) {
+        // Setting isResponseOnlyFromDCP from config
+        final boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
+        LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
+        sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
+
+        // Set imai content if r-format is imai
+        String imaiBaseUrl = null;
+        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
+            if (sasParams.getOsId() == 3) {
+                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
+            } else {
+                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("iPhoneBaseUrl");
+            }
+        }
+        sasParams.setImaiBaseUrl(imaiBaseUrl);
+        LOG.debug("imai base url is {}", imaiBaseUrl);
+
+        final SiteMetaDataEntity siteMetaDataEntity =
+                matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
+        if (null != siteMetaDataEntity) {
+            casInternal.setSiteAccountType(siteMetaDataEntity.getAccountTypesAllowed());
+        }
+
+        casInternal.setSiteAccountType(AccountType.SELF_SERVE);
+        casInternal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(sasParams.getSiteIncId()));
+        LOG.debug("Auction id generated is {}", casInternal.getAuctionId());
+    }
+
+    /**
+     * Applicable for RTBD and DCP. For IX we have overridden method
+     * 
+     * @param hrh
+     * @param casContext
+     */
+    protected void specificEnrichment(final HttpRequestHandler hrh, final CasContext casContext) {
+        LOG.debug("Base class enrichRequest");
+        casInternal.setBlockedIabCategories(getBlockedIabCategories(hrh));
+        casInternal.setBlockedAdvertisers(getBlockedAdvertisers(hrh));
+
+        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
+        final double segmentFloor = casUtils.getRtbFloor(casContext);
+        final double siteFloor = sasParams.getSiteFloor();
         final double auctionBidFloor =
                 hrh.responseSender.getAuctionEngine().calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR,
                         networkSiteEcpm);
-        final long siteIncId = hrh.responseSender.getSasParams().getSiteIncId();
-        casInternalRequestParametersGlobal.setAuctionBidFloor(auctionBidFloor);
-        casInternalRequestParametersGlobal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(siteIncId));
+        casInternal.setAuctionBidFloor(auctionBidFloor);
+
         LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
-        LOG.debug("Highest Ecpm is {}", casInternalRequestParametersGlobal.getHighestEcpm());
-        LOG.debug("BlockedCategories are {}", casInternalRequestParametersGlobal.getBlockedIabCategories());
-        LOG.debug("BlockedAdvertisers are {}", casInternalRequestParametersGlobal.getBlockedAdvertisers());
+        LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
+        LOG.debug("BlockedAdvertisers are {}", casInternal.getBlockedAdvertisers());
         LOG.debug("Site floor is {}", siteFloor);
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
         LOG.debug("Minimum rtb floor is {}", MIN_RTB_FLOOR);
-        LOG.debug("Final rtbFloor is {}", casInternalRequestParametersGlobal.getAuctionBidFloor());
-        LOG.debug("Auction id generated is {}", casInternalRequestParametersGlobal.getAuctionId());
-    }
-
-    private double getHighestEcpm(final List<ChannelSegment> channelSegments) {
-        double highestEcpm = 0;
-        for (final ChannelSegment channelSegment : channelSegments) {
-            if (channelSegment.getChannelSegmentFeedbackEntity().getECPM() < 10.0
-                    && highestEcpm < channelSegment.getChannelSegmentFeedbackEntity().getECPM()) {
-                highestEcpm = channelSegment.getChannelSegmentFeedbackEntity().getECPM();
-            }
-        }
-        return highestEcpm;
+        LOG.debug("Final rtbFloor is {}", casInternal.getAuctionBidFloor());
     }
 
     private List<String> getBlockedIabCategories(final HttpRequestHandler hrh) {
         List<String> blockedCategories = null;
-        if (null != hrh.responseSender.getSasParams().getSiteId()) {
+        if (null != sasParams.getSiteId()) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams()
-                            .getSiteId(), 4);
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(sasParams.getSiteId(), 4);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedIabCategories() != null) {
                 blockedCategories = Arrays.asList(siteFilterEntity.getBlockedIabCategories());
             }
@@ -260,10 +243,9 @@ public abstract class BaseServlet implements Servlet {
 
     private List<String> getBlockedAdvertisers(final HttpRequestHandler hrh) {
         List<String> blockedAdvertisers = null;
-        if (null != hrh.responseSender.getSasParams().getSiteId()) {
+        if (null != sasParams.getSiteId()) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(hrh.responseSender.getSasParams()
-                            .getSiteId(), 6);
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(sasParams.getSiteId(), 6);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
                 blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());
             }
@@ -276,15 +258,15 @@ public abstract class BaseServlet implements Servlet {
         return null;
     }
 
-    protected abstract Logger getLogger();
-
     protected abstract boolean isEnabled();
+
 
     /**
      * @param channelSegment
      */
-    private void incrementTotalSelectedSegmentStats(final ChannelSegment channelSegment) {
-        channelSegment.incrementInspectorStats(InspectorStrings.TOTAL_SELECTED_SEGMENTS);
+    private void incrementTotalSelectedSegmentStats(final List<ChannelSegment> filteredSegments) {
+        for (final ChannelSegment channelSegment : filteredSegments) {
+            channelSegment.incrementInspectorStats(InspectorStrings.TOTAL_SELECTED_SEGMENTS);
+        }
     }
-
 }
