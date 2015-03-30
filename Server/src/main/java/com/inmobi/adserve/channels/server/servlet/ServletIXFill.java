@@ -11,6 +11,8 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
@@ -55,17 +57,19 @@ public class ServletIXFill extends BaseServlet {
     }
 
     @Override
-    protected void specificEnrichment(final HttpRequestHandler hrh, final CasContext casContext) {
+    protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal) {
         LOG.debug("enrichDstSpecific IX");
         // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
         casInternal.setAuctionBidFloor(sasParams.getSiteFloor());
         // SasParams marketRate has tObject.guidanceBid * 1.0 / Math.pow(10, 6)
         sasParams.setMarketRate(Math.max(sasParams.getMarketRate(), casInternal.getAuctionBidFloor()));
-        
+
         final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
         sasParams.setVideoSupported(isVideoSupported);
         LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
-        LOG.debug("Final rtbFloor is {}", casInternal.getAuctionBidFloor());
+        LOG.debug("Final ixFloor is {}", casInternal.getAuctionBidFloor());
+        LOG.debug("Final ixMarketRate is {}", sasParams.getMarketRate());
     }
 
     @Override

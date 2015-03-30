@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 
 @RunWith(PowerMockRunner.class)
@@ -43,18 +42,13 @@ public class ServletBackFillTest {
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
-        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-        expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
-        mockCasInternalRequestParameters.setTraceEnabled(true);
-        expectLastCall();
 
         InspectorStats.incrementStatCount(InspectorStrings.BACK_FILL_REQUESTS);
         expectLastCall().times(1);

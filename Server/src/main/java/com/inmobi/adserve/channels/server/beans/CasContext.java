@@ -11,8 +11,6 @@ import com.inmobi.adserve.channels.entity.PricingEngineEntity;
  */
 @Data
 public class CasContext {
-
     private int sumOfSiteImpressions;
     private PricingEngineEntity pricingEngineEntity;
-
 }

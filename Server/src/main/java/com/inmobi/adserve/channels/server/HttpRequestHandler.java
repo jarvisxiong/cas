@@ -63,7 +63,8 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
 
             if (LOG.isDebugEnabled(traceMarker)) {
-                final String message = "stack trace is -> " + ExceptionBlock.getStackTrace(exception);
+                LOG.debug(traceMarker, "Error caught", exception);
+                final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(exception);
                 LOG.debug(traceMarker, message);
             }
         } finally {

@@ -18,6 +18,7 @@ import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
+import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
@@ -50,9 +51,18 @@ public abstract class BaseServlet implements Servlet {
     private final List<AdvertiserLevelFilter> advertiserLevelFilters;
     private final List<AdGroupLevelFilter> adGroupLevelFilters;
     protected final CasUtils casUtils;
-    protected SASRequestParameters sasParams;
-    protected CasInternalRequestParameters casInternal;
 
+    /**
+     * 
+     * @param matchSegments
+     * @param traceMarkerProvider
+     * @param channelSegmentFilterApplier
+     * @param casUtils
+     * @param requestFilters
+     * @param asyncRequestMaker
+     * @param advertiserLevelFilters
+     * @param adGroupLevelFilters
+     */
     protected BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
             final ChannelSegmentFilterApplier channelSegmentFilterApplier, final CasUtils casUtils,
             final RequestFilters requestFilters, final AsyncRequestMaker asyncRequestMaker,
@@ -67,15 +77,26 @@ public abstract class BaseServlet implements Servlet {
         this.adGroupLevelFilters = adGroupLevelFilters;
     }
 
+    /**
+     * 
+     * @return
+     */
+    protected abstract boolean isEnabled();
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         final CasContext casContext = new CasContext();
         final Marker traceMarker = traceMarkerProvider.get();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        sasParams = hrh.responseSender.getSasParams();
-        casInternal = hrh.responseSender.casInternalRequestParameters;
-        casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
+        final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
+        final AuctionEngine auctionEngine = hrh.responseSender.getAuctionEngine();
+        final CasInternalRequestParameters casInternal = hrh.responseSender.casInternalRequestParameters;
 
         // Send NO_AD response, if not enabled.
         if (!isEnabled()) {
@@ -112,10 +133,10 @@ public abstract class BaseServlet implements Servlet {
         // Incrementing Adapter Specific Total Selected Segments Stats
         incrementTotalSelectedSegmentStats(filteredSegments);
 
-        commonEnrichment(hrh);
-        specificEnrichment(hrh, casContext);
-        hrh.responseSender.getAuctionEngine().casInternalRequestParameters = casInternal;
-        hrh.responseSender.getAuctionEngine().sasParams = sasParams;
+        commonEnrichment(hrh, sasParams, casInternal);
+        specificEnrichment(casContext, sasParams, casInternal);
+        auctionEngine.casInternalRequestParameters = casInternal;
+        auctionEngine.sasParams = sasParams;
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
@@ -138,21 +159,20 @@ public abstract class BaseServlet implements Servlet {
                 asyncRequestMaker.makeAsyncRequests(dcpSegments, serverChannel, rtbSegments);
 
         hrh.responseSender.setRankList(tempRankList);
-        hrh.responseSender.getAuctionEngine().setUnfilteredChannelSegmentList(rtbSegments);
+        auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
         LOG.debug(traceMarker, "Number of tpans whose request was successfully completed {}", hrh.responseSender
                 .getRankList().size());
         LOG.debug(traceMarker, "Number of rtb tpans whose request was successfully completed {}", hrh.responseSender
                 .getAuctionEngine().getUnfilteredChannelSegmentList().size());
         // if none of the async request succeed, we return "NO_AD"
-        if (hrh.responseSender.getRankList().isEmpty()
-                && hrh.responseSender.getAuctionEngine().getUnfilteredChannelSegmentList().isEmpty()) {
+        if (hrh.responseSender.getRankList().isEmpty() && auctionEngine.getUnfilteredChannelSegmentList().isEmpty()) {
             LOG.debug(traceMarker, "No calls");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
 
-        if (hrh.responseSender.getAuctionEngine().areAllChannelSegmentRequestsComplete()) {
-            final AdNetworkInterface highestBid = hrh.responseSender.getAuctionEngine().runAuctionEngine();
+        if (auctionEngine.areAllChannelSegmentRequestsComplete()) {
+            final AdNetworkInterface highestBid = auctionEngine.runAuctionEngine();
             if (null != highestBid) {
                 LOG.debug(traceMarker, "Sending rtb response of {}", highestBid.getName());
                 hrh.responseSender.sendAdResponse(highestBid, serverChannel);
@@ -170,8 +190,14 @@ public abstract class BaseServlet implements Servlet {
      * Enrichment common for all ad pools
      * 
      * @param hrh
+     * @param sasParams
+     * @param sasParams
+     * @param casInternal
+     * @param casInternal
      */
-    protected void commonEnrichment(final HttpRequestHandler hrh) {
+    protected void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal) {
+        casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
         // Setting isResponseOnlyFromDCP from config
         final boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
         LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
@@ -203,37 +229,36 @@ public abstract class BaseServlet implements Servlet {
     /**
      * Applicable for RTBD and DCP. For IX we have overridden method
      * 
-     * @param hrh
      * @param casContext
+     * @param sasParams
+     * @param casInternal
      */
-    protected void specificEnrichment(final HttpRequestHandler hrh, final CasContext casContext) {
+    protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal) {
         LOG.debug("Base class enrichRequest");
-        casInternal.setBlockedIabCategories(getBlockedIabCategories(hrh));
-        casInternal.setBlockedAdvertisers(getBlockedAdvertisers(hrh));
+        casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
+        casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
 
         final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
         final double segmentFloor = casUtils.getRtbFloor(casContext);
         final double siteFloor = sasParams.getSiteFloor();
-        final double auctionBidFloor =
-                hrh.responseSender.getAuctionEngine().calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR,
-                        networkSiteEcpm);
+        final double auctionBidFloor = calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR, networkSiteEcpm);
         casInternal.setAuctionBidFloor(auctionBidFloor);
 
-        LOG.debug("RTB floor from the pricing engine entity is {}", segmentFloor);
         LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
         LOG.debug("BlockedAdvertisers are {}", casInternal.getBlockedAdvertisers());
         LOG.debug("Site floor is {}", siteFloor);
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
         LOG.debug("Minimum rtb floor is {}", MIN_RTB_FLOOR);
-        LOG.debug("Final rtbFloor is {}", casInternal.getAuctionBidFloor());
+        LOG.debug("Final rtbFloor is {}", auctionBidFloor);
     }
 
-    private List<String> getBlockedIabCategories(final HttpRequestHandler hrh) {
+    private List<String> getBlockedIabCategories(final String siteId) {
         List<String> blockedCategories = null;
-        if (null != sasParams.getSiteId()) {
+        if (null != siteId) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(sasParams.getSiteId(), 4);
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(siteId, 4);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedIabCategories() != null) {
                 blockedCategories = Arrays.asList(siteFilterEntity.getBlockedIabCategories());
             }
@@ -241,11 +266,11 @@ public abstract class BaseServlet implements Servlet {
         return blockedCategories;
     }
 
-    private List<String> getBlockedAdvertisers(final HttpRequestHandler hrh) {
+    private List<String> getBlockedAdvertisers(final String siteId) {
         List<String> blockedAdvertisers = null;
-        if (null != sasParams.getSiteId()) {
+        if (null != siteId) {
             final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(sasParams.getSiteId(), 6);
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(siteId, 6);
             if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
                 blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());
             }
@@ -253,12 +278,22 @@ public abstract class BaseServlet implements Servlet {
         return blockedAdvertisers;
     }
 
-    @Override
-    public String getName() {
-        return null;
+    /**
+     * Returns auctionFloor which is the maximum of siteFloor, segmentFloor, countryFloor and networkSiteEcpm
+     * 
+     * @param siteFloor
+     * @param segmentFloor
+     * @param countryFloor
+     * @param networkSiteEcpm
+     */
+    protected double calculateAuctionFloor(final double siteFloor, final double segmentFloor,
+            final double countryFloor, final double networkSiteEcpm) {
+        double auctionFloor;
+        auctionFloor = Math.max(siteFloor, segmentFloor);
+        auctionFloor = Math.max(auctionFloor, countryFloor);
+        auctionFloor = Math.max(auctionFloor, networkSiteEcpm);
+        return auctionFloor;
     }
-
-    protected abstract boolean isEnabled();
 
 
     /**

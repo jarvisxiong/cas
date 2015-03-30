@@ -215,21 +215,4 @@ public class AuctionEngine implements AuctionEngineInterface {
         return ImpressionIdGenerator.getInstance().getImpressionId(winBid);
     }
 
-    /**
-     * Returns auctionFloor which is the maximum of siteFloor, highestEcpm, segmentFloor, countryFloor and
-     * networkSiteEcpm
-     * 
-     * @param siteFloor
-     * @param segmentFloor
-     * @param countryFloor
-     * @param networkSiteEcpm
-     */
-    public double calculateAuctionFloor(final double siteFloor, final double segmentFloor, final double countryFloor,
-            final double networkSiteEcpm) {
-        double auctionFloor;
-        auctionFloor = Math.max(siteFloor, segmentFloor);
-        auctionFloor = Math.max(auctionFloor, countryFloor);
-        auctionFloor = Math.max(auctionFloor, networkSiteEcpm);
-        return auctionFloor;
-    }
 }

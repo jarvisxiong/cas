@@ -81,18 +81,15 @@ public class ServletIXFillTest {
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
-        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();;
-        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();;
-        expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).anyTimes();;
-        mockCasInternalRequestParameters.setTraceEnabled(true);
-        expectLastCall();
+        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
+        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
+        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         mockResponseSender.sendNoAdResponse(null);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
@@ -131,9 +128,8 @@ public class ServletIXFillTest {
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
-        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();;
-        expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();;
+        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
+        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
@@ -141,10 +137,7 @@ public class ServletIXFillTest {
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
                 new ArrayList<AdvertiserMatchedSegmentDetail>());
-        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();;
-        // expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
-        mockCasInternalRequestParameters.setTraceEnabled(true);
-        expectLastCall();
+        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
         expectLastCall().anyTimes();
@@ -153,12 +146,12 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setVideoSupported(false);
         expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
 
         mockResponseSender.sendNoAdResponse(null);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
@@ -202,48 +195,42 @@ public class ServletIXFillTest {
 
         final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
 
-        expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();;
+        expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
-        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();;
-        expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();;
-        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();;
+        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
+        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
         expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
-        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).anyTimes();;
-        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();;
-        // expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
+        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).anyTimes();
+        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
-        expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).anyTimes();;
+        expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).anyTimes();
         expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null)
                 .anyTimes();
         expect(
                 mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
-                        null, null)).andReturn(null).anyTimes();;
-        // mockCasInternalRequestParameters.setSiteAccountType(AccountType.SELF_SERVE);
-        // expectLastCall();
-        mockCasInternalRequestParameters.setTraceEnabled(true);
-        expectLastCall();
+                        null, null)).andReturn(null).anyTimes();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         mockSASRequestParameters.setImaiBaseUrl(null);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
         expectLastCall().anyTimes();
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
 
         mockResponseSender.sendNoAdResponse(null);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
 
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
@@ -290,22 +277,22 @@ public class ServletIXFillTest {
         final List<ChannelSegment> mockChannelSegmentList =
                 Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
 
-        expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();;
+        expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
-        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();;
-        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();;
+        expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
+        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
-        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();;
+        expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
-        expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();;
+        expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
-        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).anyTimes();;
-        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();;
-        expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();;
+        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).anyTimes();
+        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
+        expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).anyTimes();
         expect(mockSASRequestParameters.getMarketRate()).andReturn(1.5).anyTimes();
         mockSASRequestParameters.setMarketRate(1.5);
@@ -314,30 +301,27 @@ public class ServletIXFillTest {
                 1);
         expect(
                 mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
-                        null, null)).andReturn(mockChannelSegmentList).anyTimes();;
+                        null, null)).andReturn(mockChannelSegmentList).anyTimes();
         expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters)).andReturn(0.5).anyTimes();
         expect(mockCasUtils.getRtbFloor(mockCasContext)).andReturn(0.5).anyTimes();
-        // expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false);
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).anyTimes();
-        expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).anyTimes();;
-        expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).anyTimes();;
+        expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).anyTimes();
+        expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).anyTimes();
         expect(mockSASRequestParameters.getUAdapters()).andReturn(null).anyTimes();
         expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).anyTimes();
-        mockCasInternalRequestParameters.setTraceEnabled(true);
-        expectLastCall();
 
         mockSASRequestParameters.setResponseOnlyFromDcp(false);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         mockSASRequestParameters.setImaiBaseUrl(null);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
         expectLastCall().anyTimes();
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().anyTimes();;
+        expectLastCall().anyTimes();
 
         mockResponseSender.sendNoAdResponse(null);
         expectLastCall().anyTimes();
@@ -349,8 +333,8 @@ public class ServletIXFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
 
-        MemberModifier.suppress(ServletIXFill.class.getDeclaredMethod("specificEnrichment", HttpRequestHandler.class,
-                CasContext.class));
+        MemberModifier.suppress(ServletIXFill.class.getDeclaredMethod("specificEnrichment",
+                CasContext.class, SASRequestParameters.class, CasInternalRequestParameters.class));
         MemberModifier.suppress(BaseServlet.class.getDeclaredMethod("incrementTotalSelectedSegmentStats", List.class));
 
         ImpressionIdGenerator.init((short) 123, (byte) 10);

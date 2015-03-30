@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
@@ -27,7 +28,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 
 @RunWith(PowerMockRunner.class)
@@ -38,14 +38,13 @@ public class ServletRtbdTest {
     @Test
     public void testHandleRequest() throws Exception {
         mockStatic(InspectorStats.class);
-        final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
+        final HttpRequestHandler mockHttpRequestHandler = createNiceMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
         final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
-        final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
         final Configuration mockServerConfig = createMock(Configuration.class);
 
@@ -53,12 +52,8 @@ public class ServletRtbdTest {
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
-        expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).times(1);
-        expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
         expect(mockServerConfig.getBoolean("isRtbEnabled", true)).andReturn(true).anyTimes();
-        mockCasInternalRequestParameters.setTraceEnabled(true);
-        expectLastCall();
         InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
