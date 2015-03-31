@@ -19,6 +19,7 @@ public final class ChannelServerStringLiterals {
     public static final String GEO_ZIP_REPOSITORY = "GeoZipRepository";
     public static final String SLOT_SIZE_MAP_REPOSITORY = "SlotSizeMapRepository";
     public static final String IX_VIDEO_TRAFFIC_REPOSITORY = "IXVideoTrafficRepository";
+    public static final String GEO_REGION_FENCE_MAP_REPOSITORY = "GeoRegionFenceMapRepository";
     public static final String AEROSPIKE_FEEDBACK = "aerospike";
     public static final String DATABASE = "database";
     public static final String QUERY = "query";

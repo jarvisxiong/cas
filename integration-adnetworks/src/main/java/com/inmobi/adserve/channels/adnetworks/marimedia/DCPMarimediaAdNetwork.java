@@ -2,11 +2,6 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 // Created by Dhanasekaran K P on 23/9/14.
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 
@@ -18,7 +13,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.adpool.NetworkType;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -29,6 +24,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -111,8 +111,8 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         // Will be set in getRequestUri().
         // No video format supported, either "Interstitial" or "Banner".
 
-        // Find the network type.
-        if (NetworkType.WIFI == sasParams.getNetworkType()) {
+        // Find the connection type.
+        if (ConnectionType.WIFI == sasParams.getConnectionType()) {
             networkType = "wifi";
         } else {
             networkType = "carrier";

@@ -21,6 +21,7 @@ public class IXPackageEntity {
     private List<String> dealIds;
     private List<Double> dealFloors;
     private Double dataVendorCost;
+    private String geoFenceRegion;
 
     public IXPackageEntity(final Builder builder) {
         id = builder.id;
@@ -32,6 +33,7 @@ public class IXPackageEntity {
         dealIds = builder.dealIds;
         dealFloors = builder.dealFloors;
         dataVendorCost = builder.dataVendorCost;
+        geoFenceRegion = builder.geoFenceRegion;
     }
 
     public static Builder newBuilder() {
@@ -49,6 +51,7 @@ public class IXPackageEntity {
         private List<String> dealIds;
         private List<Double> dealFloors;
         private Double dataVendorCost;
+        private String geoFenceRegion;
 
         public IXPackageEntity build() {
             return new IXPackageEntity(this);

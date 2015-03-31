@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -17,12 +18,15 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
+import com.inmobi.segment.impl.ConnectionType;
+import com.inmobi.segment.impl.ConnectionTypeEnum;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
+import com.inmobi.segment.impl.GeoSourceType;
+import com.inmobi.segment.impl.GeoSourceTypeEnum;
 import com.inmobi.segment.impl.InventoryType;
 import com.inmobi.segment.impl.InventoryTypeEnum;
 import com.inmobi.segment.impl.LatlongPresent;
-import com.inmobi.segment.impl.NetworkType;
 import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteId;
 import com.inmobi.segment.impl.SlotId;
@@ -51,6 +55,24 @@ public class IXPackageMatcher {
                         && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity.getDmpFilterSegmentExpression())) {
                     continue;
                 }
+
+                // Add to matchedPackageIds only if at least one fence from the set of request fence ids
+                // is present in the set of fence ids defined in the package.
+                if (StringUtils.isNotEmpty(packageEntity.getGeoFenceRegion())) {
+                    String geoRegionNameCountryCombo = packageEntity.getGeoFenceRegion() + "_"
+                            + sasParams.getCountryId();
+                    GeoRegionFenceMapEntity geoRegionFenceMapEntity = repositoryHelper.
+                            queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(geoRegionNameCountryCombo);
+
+                    if (null == geoRegionFenceMapEntity ||
+                            (null != geoRegionFenceMapEntity.getFenceIdsList() &&
+                                    (null == sasParams.getGeoFenceIds() ||
+                                            !CollectionUtils.containsAny(sasParams.getGeoFenceIds(),
+                                                    geoRegionFenceMapEntity.getFenceIdsList())))) {
+                        continue;
+                    }
+                }
+
                 matchedPackageIds.add(packageEntity.getId());
                 // Break the loop if we reach the threshold.
                 if (++matchedPackagesCount == PACKAGE_MAX_LIMIT) {
@@ -87,9 +109,10 @@ public class IXPackageMatcher {
         InventoryType reqInventoryType = new InventoryType();
 
         // Below are optional params and requires NULL check.
-        NetworkType reqNetworkType = null;
+        ConnectionType reqConnectionType = null;
         SiteCategory reqSiteCategory = null;
         City reqCity = null;
+        GeoSourceType reqGeoSource = null;
 
         reqCountry.init(Collections.singleton(sasParams.getCountryId().intValue()));
         reqDeviceOs.init(Collections.singleton(sasParams.getOsId()));
@@ -104,9 +127,10 @@ public class IXPackageMatcher {
                 "APP".equalsIgnoreCase(sasParams.getSource()) ? InventoryTypeEnum.APP : InventoryTypeEnum.BROWSER;
         reqInventoryType.init(Collections.singleton(reqInventoryEnum));
 
-        if (sasParams.getNetworkType() != null) {
-            reqNetworkType = new NetworkType();
-            reqNetworkType.init(Collections.singleton(sasParams.getNetworkType().getValue()));
+        if (null != sasParams.getConnectionType()) {
+            reqConnectionType = new ConnectionType();
+            ConnectionTypeEnum connectionTypeEnum = ConnectionTypeEnum.valueOf(sasParams.getConnectionType().name());
+            reqConnectionType.init(Collections.singleton(connectionTypeEnum));
         }
 
         if (sasParams.getSiteContentType() != null) {
@@ -117,6 +141,12 @@ public class IXPackageMatcher {
         if (sasParams.getCity() != null) {
             reqCity = new City();
             reqCity.init(Collections.singleton(sasParams.getCity()));
+        }
+
+        if (sasParams.getLocationSource() != null) {
+            reqGeoSource = new GeoSourceType();
+            GeoSourceTypeEnum geoSourceTypeEnum = GeoSourceTypeEnum.valueOf(sasParams.getLocationSource().name());
+            reqGeoSource.init(Collections.singleton(geoSourceTypeEnum));
         }
 
         Segment.Builder requestSegmentBuilder = new Segment.Builder();
@@ -131,14 +161,17 @@ public class IXPackageMatcher {
                 .addSegmentParameter(reqUidPresent)
                 .addSegmentParameter(reqInventoryType);
 
-        if (reqNetworkType != null) {
-            requestSegmentBuilder.addSegmentParameter(reqNetworkType);
+        if (reqConnectionType != null) {
+            requestSegmentBuilder.addSegmentParameter(reqConnectionType);
         }
         if (reqSiteCategory != null) {
             requestSegmentBuilder.addSegmentParameter(reqSiteCategory);
         }
         if (reqCity != null) {
             requestSegmentBuilder.addSegmentParameter(reqCity);
+        }
+        if (reqGeoSource != null) {
+            requestSegmentBuilder.addSegmentParameter(reqGeoSource);
         }
 
         Segment requestSegment = requestSegmentBuilder.build();

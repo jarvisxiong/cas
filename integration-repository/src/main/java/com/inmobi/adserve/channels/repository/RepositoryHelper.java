@@ -3,8 +3,6 @@ package com.inmobi.adserve.channels.repository;
 import static com.googlecode.cqengine.query.QueryFactory.and;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static com.googlecode.cqengine.query.QueryFactory.in;
-import lombok.Getter;
-import lombok.Setter;
 
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +15,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
@@ -37,6 +36,9 @@ import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class RepositoryHelper {
@@ -63,6 +65,7 @@ public class RepositoryHelper {
     private final GeoZipRepository geoZipRepository;
     private final SlotSizeMapRepository slotSizeMapRepository;
     private final IXVideoTrafficRepository ixVideoTrafficRepository;
+    private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -84,6 +87,8 @@ public class RepositoryHelper {
         geoZipRepository = builder.geoZipRepository;
         slotSizeMapRepository = builder.slotSizeMapRepository;
         ixVideoTrafficRepository = builder.ixVideoTrafficRepository;
+        geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
+
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
                 .addRepositoryToStats(channelRepository).addRepositoryToStats(channelAdGroupRepository)
@@ -93,7 +98,8 @@ public class RepositoryHelper {
                 .addRepositoryToStats(siteEcpmRepository).addRepositoryToStats(currencyConversionRepository)
                 .addRepositoryToStats(wapSiteUACRepository).addRepositoryToStats(ixAccountMapRepository)
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
-                .addRepositoryToStats(slotSizeMapRepository);
+                .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(ixVideoTrafficRepository)
+                .addRepositoryToStats(geoRegionFenceMapRepository);
 
     }
 
@@ -122,6 +128,7 @@ public class RepositoryHelper {
         private GeoZipRepository geoZipRepository;
         private SlotSizeMapRepository slotSizeMapRepository;
         private IXVideoTrafficRepository ixVideoTrafficRepository;
+        private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -296,6 +303,15 @@ public class RepositoryHelper {
             return nativeAdTemplateRepository.query(siteId);
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying NativeAdTemplate Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public GeoRegionFenceMapEntity queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(final String geoRegionNameCountryCombo) {
+        try {
+            return geoRegionFenceMapRepository.query(geoRegionNameCountryCombo);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying GeoRegionFenceMap Repository, {}", ignored);
         }
         return null;
     }

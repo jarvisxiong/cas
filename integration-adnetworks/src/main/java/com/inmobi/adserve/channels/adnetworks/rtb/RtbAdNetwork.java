@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -623,7 +623,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
             device.setOsv(sasParams.getOsMajorVersion());
         }
-        if (NetworkType.WIFI == sasParams.getNetworkType()) {
+        if (ConnectionType.WIFI == sasParams.getConnectionType()) {
             device.setConnectiontype(2);
         } else {
             device.setConnectiontype(0);

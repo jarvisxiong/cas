@@ -1,13 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,9 +14,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -52,6 +42,15 @@ import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.Getter;
+import lombok.Setter;
+
 
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
@@ -76,6 +75,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String LATLON = "LATLON";
     protected static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     protected static final String WIFI = "WIFI";
+    protected static final String NON_WIFI = "NON_WIFI";
     protected static final String CCID = "CCID";
     
     @Inject

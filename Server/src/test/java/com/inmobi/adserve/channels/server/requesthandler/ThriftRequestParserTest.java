@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -46,6 +44,8 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+
+import junit.framework.TestCase;
 
 
 public class ThriftRequestParserTest extends TestCase {
@@ -200,7 +200,7 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setSelectedSlots(selectedSlots);
         adPoolRequest.setRequestedAdCount((short) 1);
         adPoolRequest.setTaskId("tid");
-        adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
+        adPoolRequest.setResponseFormatDeprecated(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
         adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
@@ -315,7 +315,7 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setSegmentId(234);
         adPoolRequest.setRequestedAdCount((short) 1);
         adPoolRequest.setTaskId("tid");
-        adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
+        adPoolRequest.setResponseFormatDeprecated(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
         adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);
@@ -429,7 +429,7 @@ public class ThriftRequestParserTest extends TestCase {
         adPoolRequest.setSegmentId(234);
         adPoolRequest.setRequestedAdCount((short) 1);
         adPoolRequest.setTaskId("tid");
-        adPoolRequest.setResponseFormat(ResponseFormat.XHTML);
+        adPoolRequest.setResponseFormatDeprecated(ResponseFormat.XHTML);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setIpFileVersion(3456);
         adPoolRequest.setSupplySource(SupplySource.RTB_EXCHANGE);

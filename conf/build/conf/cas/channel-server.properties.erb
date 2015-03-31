@@ -248,7 +248,7 @@ Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = IXPackageRepository
 Cache.IXPackageRepository.Manager = com.inmobi.adserve.channels.repository.IXPackageRepository
-Cache.IXPackageRepository.query = select * from ix_package_fun()
+Cache.IXPackageRepository.query = select * from ix_package_fun_23032015()
 Cache.IXPackageRepository.initialDelay = 1
 Cache.IXPackageRepository.refreshTime = 1200
 Cache.IXPackageRepository.dataSourceName = jdbc
@@ -268,6 +268,14 @@ Cache.IXVideoTrafficRepository.initialDelay = 1
 Cache.IXVideoTrafficRepository.refreshTime = 1200
 Cache.IXVideoTrafficRepository.isUpdatable = true
 Cache.IXVideoTrafficRepository.dataSourceName = jdbc
+
+Cache.Name = GeoRegionFenceMapRepository
+Cache.GeoRegionFenceMapRepository.Manager = com.inmobi.adserve.channels.repository.GeoRegionFenceMapRepository
+Cache.GeoRegionFenceMapRepository.query = select * from geo_region_fence_map_fun('${last_update}')
+Cache.GeoRegionFenceMapRepository.initialDelay = 300
+Cache.GeoRegionFenceMapRepository.refreshTime = 1200
+Cache.GeoRegionFenceMapRepository.isUpdatable = true
+Cache.GeoRegionFenceMapRepository.dataSourceName = jdbc
 
 
 adapter.amoad.advertiserId=0d7eab3ab68c4afab94ad897ec080ef6

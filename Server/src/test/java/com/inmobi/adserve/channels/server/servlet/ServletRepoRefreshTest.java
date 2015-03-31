@@ -33,6 +33,7 @@ import com.inmobi.adserve.channels.repository.ChannelRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.GeoRegionFenceMapRepository;
 import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
@@ -100,6 +101,8 @@ public class ServletRepoRefreshTest {
     final private static String json14 =
             "{\"repoName\":\"NativeAdTemplateRepository\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
     final private static String json15 =
+            "{\"repoName\":\"GeoRegionFenceMapRepository\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
+    final private static String json16 =
             "{\"repoName\":\"RepositoryThatDoesn'tExist\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
 
     private static Map<String, List<String>> createMapFromString(final String json) {
@@ -123,7 +126,8 @@ public class ServletRepoRefreshTest {
                 .andReturn(createMapFromString(json8)).times(1).andReturn(createMapFromString(json9)).times(1)
                 .andReturn(createMapFromString(json10)).times(1).andReturn(createMapFromString(json11)).times(1)
                 .andReturn(createMapFromString(json12)).times(1).andReturn(createMapFromString(json13)).times(1)
-                .andReturn(createMapFromString(json14)).times(1).andReturn(createMapFromString(json15)).times(1);
+                .andReturn(createMapFromString(json14)).times(1).andReturn(createMapFromString(json15)).times(1)
+                .andReturn(createMapFromString(json16)).times(1);
         replayAll();
     }
 
@@ -176,6 +180,8 @@ public class ServletRepoRefreshTest {
                 .anyTimes();
         expect(mockServerConfig.subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)).andReturn(
                 mockServerConfig).anyTimes();
+        expect(mockServerConfig.subset(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)).andReturn(
+                mockServerConfig).anyTimes();
         expect(mockServerConfig.getString(ChannelServerStringLiterals.QUERY)).andReturn(LAST_UPDATE).anyTimes();
         replayAll();
     }
@@ -224,6 +230,8 @@ public class ServletRepoRefreshTest {
         final CreativeRepository mockCreativeRepository = createMock(CreativeRepository.class);
         final NativeAdTemplateRepository mockNativeAdTemplateRepository = createMock(NativeAdTemplateRepository.class);
         final GeoZipRepository mockGeoZipRepository = createMock(GeoZipRepository.class);
+        final GeoRegionFenceMapRepository mockGeoRegionFenceMapRepository =
+                createMock(GeoRegionFenceMapRepository.class);
 
         expect(mockRepositoryHelper.getChannelRepository()).andReturn(mockChannelRepository).anyTimes();
         expect(mockRepositoryHelper.getChannelAdGroupRepository()).andReturn(mockChannelAdGroupRepository).anyTimes();
@@ -244,6 +252,8 @@ public class ServletRepoRefreshTest {
                 .anyTimes();
         expect(mockRepositoryHelper.getGeoZipRepository()).andReturn(mockGeoZipRepository)
                 .anyTimes();
+        expect(mockRepositoryHelper.getGeoRegionFenceMapRepository()).andReturn(mockGeoRegionFenceMapRepository)
+                .anyTimes();
 
         expect(mockChannelRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockChannelAdGroupRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
@@ -262,6 +272,7 @@ public class ServletRepoRefreshTest {
         expect(mockCreativeRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockNativeAdTemplateRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockGeoZipRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
+        expect(mockGeoRegionFenceMapRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
 
         mockStatic(CasConfigUtil.class);
         CasConfigUtil.repositoryHelper = mockRepositoryHelper;
@@ -287,7 +298,7 @@ public class ServletRepoRefreshTest {
     // Add -XX:-UseSplitVerifier to VM options if running manually
     @Test
     public void testHandleRequest() throws Exception {
-        for (int i = 0; i < 15; ++i) {
+        for (int i = 0; i < 16; ++i) {
             final ServletRepoRefresh servlet = new ServletRepoRefresh();
             servlet.handleRequest(httpRequestHandler, mockQueryStringDecoder, mockChannel);
         }

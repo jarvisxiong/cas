@@ -37,8 +37,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -899,10 +899,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             device.setOsv(sasParams.getOsMajorVersion());
         }
 
-        if (com.inmobi.adserve.adpool.NetworkType.WIFI == sasParams.getNetworkType()) {
-            device.setConnectiontype(2);
+        ConnectionType sasParamConnectionType = sasParams.getConnectionType();
+        if (null != sasParamConnectionType) {
+            device.setConnectiontype(sasParamConnectionType.getValue());
         } else {
-            device.setConnectiontype(0);
+            device.setConnectiontype(ConnectionType.UNKNOWN.getValue());
         }
         // Setting do not track
         if (null != casInternalRequestParameters.getUidADT()) {
@@ -1284,9 +1285,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.HEIGHT, (int) dim.getHeight());
         }
 
-        final String networkType =
-                null != sasParams.getNetworkType() ? sasParams.getNetworkType().name() : NetworkType.NON_WIFI.name();
-        final String requestNetworkTypeJson = "{\"networkType\":\"" + networkType + "\"}";
+        ConnectionType connectionType = sasParams.getConnectionType();
+        String connectionTypeString = (null != connectionType && ConnectionType.WIFI == connectionType) ?
+                WIFI : NON_WIFI;
+
+        String requestNetworkTypeJson = "{\"networkType\":\"" + connectionTypeString + "\"}";
         // Publisher control settings
         velocityContext.put(VelocityTemplateFieldConstants.REQUEST_JSON, requestNetworkTypeJson);
         velocityContext.put(VelocityTemplateFieldConstants.SITE_PREFERENCES_JSON,

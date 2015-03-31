@@ -27,7 +27,7 @@
 		<guice-assistedinject.version>3.0</guice-assistedinject.version>
 		<commons.pool.version>2.2</commons.pool.version>
 		<phoenix.batteries.version>2.3.31</phoenix.batteries.version>
-		<segments.version>1.1.5</segments.version>
+		<segments.version>1.1.7</segments.version>
 		<experimentation.version>1.6.2</experimentation.version>
 		<guava.version>15.0</guava.version>
 		<powermock.version>1.6.1</powermock.version>
@@ -49,7 +49,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>datatypes-java-0.8</artifactId>
-				<version>1.6.14</version>
+				<version>1.6.42</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>

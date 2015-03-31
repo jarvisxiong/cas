@@ -1,4 +1,4 @@
-CREATE OR REPLACE TYPE ix_package_type AS
+CREATE OR REPLACE TYPE ix_package_type_23032015 AS
 (
     id                      INTEGER,
     name                    CHARACTER VARYING(128),
@@ -10,6 +10,8 @@ CREATE OR REPLACE TYPE ix_package_type AS
     carrier_ids             BIGINT[],
     site_categories         CHARACTER VARYING(16)[],
     connection_types        CHARACTER VARYING(16)[],
+    geo_source_types        CHARACTER VARYING(16)[],
+    geo_fence_region        CHARACTER VARYING(255),
     app_store_categories    SMALLINT[],
     sdk_versions            CHARACTER VARYING(16)[],
     lat_long_only           BOOLEAN,
@@ -35,4 +37,4 @@ CREATE OR REPLACE TYPE ix_package_type AS
     deal_ids                CHARACTER VARYING[],
     deal_floors             DOUBLE PRECISION[]
 );
-ALTER TYPE ix_package_type OWNER TO postgres;
+ALTER TYPE ix_package_type_23032015 OWNER TO postgres;

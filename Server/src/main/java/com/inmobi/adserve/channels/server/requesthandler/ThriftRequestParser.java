@@ -21,10 +21,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.AdPoolRequest;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
+import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.adpool.ResponseFormat;
 import com.inmobi.adserve.adpool.SupplyContentType;
@@ -64,7 +66,7 @@ public class ThriftRequestParser {
         params.setRqMkSlot(tObject.selectedSlots);
         params.setProcessedMkSlot(getValidSlotList(tObject.selectedSlots, DemandSourceType.IX.getValue() == dst));
 
-        params.setRFormat(getResponseFormat(tObject.responseFormat));
+        params.setRFormat(getResponseFormat(tObject.responseFormatDeprecated));
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.taskId);
         params.setAllowBannerAds(tObject.isSetSupplyAllowedContents()
@@ -185,6 +187,9 @@ public class ThriftRequestParser {
             params.setState(null != states && states.iterator().hasNext()
                     ? tObject.geo.getStateIds().iterator().next()
                     : null);
+
+            params.setGeoFenceIds(tObject.geo.getFenceIds());
+            params.setLocationSource(tObject.geo.getLocationSource());
         }
 
         // Fill Params from User Object
@@ -229,7 +234,14 @@ public class ThriftRequestParser {
         // Fill params from Carrier Object
         if (tObject.isSetCarrier()) {
             params.setCarrierId((int) tObject.carrier.carrierId);
-            params.setNetworkType(tObject.carrier.networkType);
+            if (tObject.getCarrier().isSetConnectionType()) {
+                params.setConnectionType(tObject.carrier.connectionType);
+            } else if (tObject.getCarrier().isSetNetworkType()) {
+                params.setConnectionType(NetworkType.WIFI == tObject.getCarrier().getNetworkType() ?
+                        ConnectionType.WIFI : ConnectionType.CELLULAR_UNKNOWN);
+            } else {
+                params.setConnectionType(ConnectionType.UNKNOWN);
+            }
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());

@@ -3,8 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -12,15 +10,13 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.util.Modules;
-import com.inmobi.adserve.adpool.NetworkType;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -36,6 +32,10 @@ import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.netflix.governator.guice.LifecycleInjector;
 import com.ning.http.client.Request;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
 
 /**
  * @author thushara
@@ -247,7 +247,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
                 .setUserAgent("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7");
         sasParams.setSiteIncId(23232);
         sasParams.setCountryCode("RU");
-        sasParams.setNetworkType(NetworkType.WIFI);
+        sasParams.setConnectionType(ConnectionType.WIFI);
         sasParams.setGender("F");
         sasParams.setOsId(5);
         sasParams.setLatLong("32.87,76.21");
@@ -281,7 +281,7 @@ public class DCPWapStartAdnetworkTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         sasParams.setSiteIncId(23232);
         sasParams.setCountryCode("CN");
-        sasParams.setNetworkType(NetworkType.WIFI);
+        sasParams.setConnectionType(ConnectionType.WIFI);
         sasParams.setGender("F");
         casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setLatLong(" ,-122.1514");

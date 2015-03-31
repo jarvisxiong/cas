@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
-import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.segment.impl.AdTypeEnum;
+import com.inmobi.types.LocationSource;
 
 import lombok.Data;
 
@@ -30,6 +31,8 @@ public class SASRequestParameters {
     private String latLong;
     private String countryCode; // Country Code like US for USA
     private Long countryId; // Integer value for country
+    private LocationSource locationSource;
+    private Set<Long> geoFenceIds;
     private String impressionId;
     private String clurl;
     private String siteId;
@@ -79,7 +82,7 @@ public class SASRequestParameters {
     private int sst; // 0 for Network
     private String pubId;
     private String osMajorVersion;
-    private NetworkType networkType;
+    private ConnectionType connectionType;
     private double marketRate;
 
     private EncryptionKeys encryptionKey;

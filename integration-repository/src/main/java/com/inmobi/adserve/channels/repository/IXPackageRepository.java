@@ -44,12 +44,15 @@ import com.inmobi.data.repository.ScheduledDbReader;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
+import com.inmobi.segment.impl.ConnectionType;
+import com.inmobi.segment.impl.ConnectionTypeEnum;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
+import com.inmobi.segment.impl.GeoSourceType;
+import com.inmobi.segment.impl.GeoSourceTypeEnum;
 import com.inmobi.segment.impl.InventoryType;
 import com.inmobi.segment.impl.InventoryTypeEnum;
 import com.inmobi.segment.impl.LatlongPresent;
-import com.inmobi.segment.impl.NetworkType;
 import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteCategoryEnum;
 import com.inmobi.segment.impl.SiteId;
@@ -202,6 +205,13 @@ public class IXPackageRepository {
                 Long[] carrierIds = (Long[]) rs.getArray("carrier_ids").getArray();
                 String[] siteCategories = (String[]) rs.getArray("site_categories").getArray();
                 String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
+                String[] geoSourceTypes = null;
+                String geoFenceRegion = rs.getString("geo_fence_region");
+
+                if (null != rs.getArray("geo_source_types")) {
+                    geoSourceTypes = (String[]) rs.getArray("geo_source_types").getArray();
+                }
+
                 int dataVendorId = rs.getInt("data_vendor_id");
                 Double dataVendorCost = rs.getDouble("data_vendor_cost");
                 int dmpId = rs.getInt("dmp_id");
@@ -291,14 +301,24 @@ public class IXPackageRepository {
                     siteCategory.init(ImmutableSet.copyOf(siteCategoryEnums));
                 }
 
-                NetworkType networkType = null;
+                ConnectionType connectionType = null;
                 if (ArrayUtils.isNotEmpty(connectionTypes)) {
-                    Integer[] networkTypeIds = new Integer[connectionTypes.length];
+                    ConnectionTypeEnum[] connectionTypeEnums = new ConnectionTypeEnum[connectionTypes.length];
                     for (int i = 0; i < connectionTypes.length; i++) {
-                        networkTypeIds[i] = connectionTypes[i].equals("WIFI") ? 0 : 1;
+                        connectionTypeEnums[i] = ConnectionTypeEnum.valueOf(connectionTypes[i]);
                     }
-                    networkType = new NetworkType();
-                    networkType.init(ImmutableSet.copyOf(networkTypeIds));
+                    connectionType = new ConnectionType();
+                    connectionType.init(ImmutableSet.copyOf(connectionTypeEnums));
+                }
+
+                GeoSourceType geoSourceType = null;
+                if (ArrayUtils.isNotEmpty(geoSourceTypes)) {
+                    GeoSourceTypeEnum[] geoSourceTypeEnums = new GeoSourceTypeEnum[geoSourceTypes.length];
+                    for (int i = 0; i < geoSourceTypes.length; i++) {
+                        geoSourceTypeEnums[i] = GeoSourceTypeEnum.valueOf(geoSourceTypes[i]);
+                    }
+                    geoSourceType = new GeoSourceType();
+                    geoSourceType.init(ImmutableSet.copyOf(geoSourceTypeEnums));
                 }
 
                 SlotId slotId = null;
@@ -349,13 +369,18 @@ public class IXPackageRepository {
                     repoSegmentBuilder.addSegmentParameter(siteCategory);
                 }
 
-                if (networkType != null) {
-                    repoSegmentBuilder.addSegmentParameter(networkType);
+                if (connectionType != null) {
+                    repoSegmentBuilder.addSegmentParameter(connectionType);
                 }
 
                 if (slotId != null) {
                     repoSegmentBuilder.addSegmentParameter(slotId);
                 }
+
+                if (geoSourceType != null) {
+                    repoSegmentBuilder.addSegmentParameter(geoSourceType);
+                }
+
                 Segment segment = repoSegmentBuilder.build();
 
                 // Entity builder
@@ -371,6 +396,9 @@ public class IXPackageRepository {
                 }
                 if (null != dealFloors) {
                     entityBuilder.setDealFloors(Arrays.asList(dealFloors));
+                }
+                if (null != geoFenceRegion) {
+                    entityBuilder.setGeoFenceRegion(geoFenceRegion);
                 }
                 entityBuilder.setDataVendorCost(dataVendorCost);
 

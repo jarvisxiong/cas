@@ -1,8 +1,5 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -26,6 +23,9 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.phoenix.exception.RepositoryException;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 
 @Singleton
@@ -190,7 +190,16 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getIxVideoTrafficRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)) {
+                final String query =
+                        config.getCacheConfiguration()
+                                .subset(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)
+                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getGeoRegionFenceMapRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            }
+            else {
                 // RepoName could not be matched
                 LOG.debug("RepoName: {} could not be matched", repoName);
                 hrh.responseSender.sendResponse("NOTOK RepoName could not be matched", serverChannel);

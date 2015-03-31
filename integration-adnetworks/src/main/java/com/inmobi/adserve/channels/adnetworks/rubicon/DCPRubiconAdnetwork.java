@@ -1,10 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.rubicon;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -32,6 +27,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
 
@@ -224,7 +224,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, LAT, latitude, false);
             appendQueryParam(url, LONG, longitude, false);
         }
-        if (NetworkType.WIFI == sasParams.getNetworkType()) {
+        if (ConnectionType.WIFI == sasParams.getConnectionType()) {
             appendQueryParam(url, CONNECTION_TYPE, 2, false);
         } else {
             appendQueryParam(url, CONNECTION_TYPE, 0, false);

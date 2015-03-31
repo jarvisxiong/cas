@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -22,12 +23,13 @@ import com.inmobi.phoenix.batteries.data.test.NoOpDataSource;
 import com.inmobi.phoenix.batteries.data.test.ResultSetExpectationSetter;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.City;
+import com.inmobi.segment.impl.ConnectionType;
+import com.inmobi.segment.impl.ConnectionTypeEnum;
 import com.inmobi.segment.impl.Country;
 import com.inmobi.segment.impl.DeviceOs;
 import com.inmobi.segment.impl.InventoryType;
 import com.inmobi.segment.impl.InventoryTypeEnum;
 import com.inmobi.segment.impl.LatlongPresent;
-import com.inmobi.segment.impl.NetworkType;
 import com.inmobi.segment.impl.SiteCategory;
 import com.inmobi.segment.impl.SiteCategoryEnum;
 import com.inmobi.segment.impl.SlotId;
@@ -99,7 +101,7 @@ public class IXPackageRepositoryTest {
         EasyMock.expect(siteCatArray.getArray()).andReturn(siteCats).anyTimes();
 
         Array connTypeArray = EasyMock.createNiceMock(Array.class);
-        String[] connTypes = new String[] {"WIFI", "NON_WIFI"};
+        String[] connTypes = new String[] {"WIFI"};
         EasyMock.expect(rs.getArray("connection_types")).andReturn(connTypeArray).anyTimes();
         EasyMock.expect(connTypeArray.getArray()).andReturn(connTypes).anyTimes();
 
@@ -204,8 +206,8 @@ public class IXPackageRepositoryTest {
         SiteCategory e_siteCategory = new SiteCategory();
         e_siteCategory.init(ImmutableSet.copyOf(new SiteCategoryEnum[] {SiteCategoryEnum.PERFORMANCE, SiteCategoryEnum.FAMILY_SAFE}));
 
-        NetworkType e_networkType = new NetworkType();
-        e_networkType.init(ImmutableSet.copyOf(new Integer[] {0, 1}));
+        ConnectionType e_connectionType = new ConnectionType();
+        e_connectionType.init(Arrays.asList(ConnectionTypeEnum.WIFI));
 
         LatlongPresent e_latLongPresent = new LatlongPresent();
         e_latLongPresent.init(true);
@@ -218,7 +220,7 @@ public class IXPackageRepositoryTest {
                 .addSegmentParameter(e_slot)
                 .addSegmentParameter(e_inventoryType)
                 .addSegmentParameter(e_siteCategory)
-                .addSegmentParameter(e_networkType)
+                .addSegmentParameter(e_connectionType)
                 .addSegmentParameter(e_latLongPresent)
                 .build();
 

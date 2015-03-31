@@ -1,8 +1,9 @@
-CREATE OR REPLACE FUNCTION ix_package_fun()
-RETURNS SETOF ix_package_type AS
+CREATE OR REPLACE FUNCTION ix_package_fun_23032015()
+RETURNS
+    SETOF ix_package_type_23032015 AS
 $BODY$
 DECLARE
-    row1    ix_package_type%ROWTYPE;
+    row1    ix_package_type_23032015%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -17,6 +18,8 @@ SELECT
                 ix_packages.carrier_ids AS carrier_ids,
                 ix_packages.site_categories AS site_categories,
                 ix_packages.connection_types AS connection_types,
+                ix_packages.geo_source_types AS geo_source_types,
+                ix_packages.geo_fence_region AS geo_fence_region,
                 ix_packages.app_store_categories AS app_store_categories,
                 ix_packages.sdk_versions AS sdk_versions,
                 ix_packages.lat_long_only AS lat_long_only,
