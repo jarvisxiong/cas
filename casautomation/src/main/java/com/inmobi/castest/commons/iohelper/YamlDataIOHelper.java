@@ -16,7 +16,12 @@ public class YamlDataIOHelper {
     @SuppressWarnings("unchecked")
     public static HashMap<String, String> readTestIndex() throws FileNotFoundException {
 
-        final InputStream input = new FileInputStream(new File("src/test/resources/TestIndex.yml"));
+        File testParamsYaml = new File("src/test/resources/TestIndex.yml");
+        if (!testParamsYaml.exists()) {
+            testParamsYaml = new File("casautomation/src/test/resources/TestIndex.yml");
+        }
+
+        final InputStream input = new FileInputStream(testParamsYaml);
         final Yaml yml = new Yaml();
         final Object x = yml.load(input);
         System.out.println(x);
@@ -28,7 +33,12 @@ public class YamlDataIOHelper {
 
         testCase = testCase.toUpperCase();
 
-        final InputStream input = new FileInputStream(new File("src/test/resources/TestParams.yml"));
+        File testParamsYaml = new File("src/test/resources/TestParams.yml");
+        if (!testParamsYaml.exists()) {
+            testParamsYaml = new File("casautomation/src/test/resources/TestParams.yml");
+        }
+
+        final InputStream input = new FileInputStream(testParamsYaml);
 
         final Yaml yml = new Yaml();
         final Object x = yml.load(input);

@@ -4,10 +4,13 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
+import com.inmobi.castest.api.LogLines;
 import com.inmobi.castest.casconfenums.def.CasConf.LogStringParams;
+import com.inmobi.castest.casconfenums.def.CasConf.LogLinesRegex;
 import com.inmobi.castest.casconfenums.impl.LogStringConf;
 import com.inmobi.castest.commons.generichelper.LogParserHelper;
 import com.inmobi.castest.dataprovider.FenderDataProvider;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 public class IXTest {
 
@@ -576,7 +579,7 @@ public class IXTest {
 
     // hereddone till here
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_5_7_1(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -590,7 +593,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_5_7_2(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -604,7 +607,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_5_7_3(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -767,9 +770,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    // hereddone till here
-
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_6_7_1(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -783,7 +784,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_6_7_2(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -797,7 +798,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_6_7_3(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -960,7 +961,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_7_7_1(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -974,7 +975,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_7_7_2(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -988,7 +989,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_7_7_3(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -1154,8 +1155,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    // d
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_8_7_1(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -1169,7 +1169,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_8_7_2(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -1183,7 +1183,7 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_8_7_3(final String x) throws Exception {
 
         /* Deriving the parser output to assert for */
@@ -1259,4 +1259,46 @@ public class IXTest {
     //
     // Assert.assertTrue(parserOutput.equals("PASS"));
     // }
+
+    public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
+        return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
+    }
+
+    @Test(testName = "Tests that the auction id can be regenerated from the new impression id", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST3_ImpressionIdChange_PROG382(final String x) throws Exception {
+        parserOutput = "PASS";
+
+        LogLines siteIncIdLog = LogParserHelper.queryForLogs("c.i.a.c.s.r.ThriftRequestParser: Successfully parsed tObject, SAS params are");
+        LogLines oldImpressionIdLog = LogParserHelper.queryForLogs("Old impression id:");
+        LogLines newImpressionIdLog = LogParserHelper.queryForLogs("Replaced impression id to new value");
+        LogLines auctionIdLog = LogParserHelper.queryForLogs("c.i.a.c.server.servlet.BaseServlet: Auction id generated");
+        LogLines beaconUrlLog = LogParserHelper.queryForLogs("c.i.a.c.u.Utils.ClickUrlsRegenerator: New Beacon Url:");
+        LogLines clickUrlLog = LogParserHelper.queryForLogs("c.i.a.c.u.Utils.ClickUrlsRegenerator: New Click Url:");
+
+        String siteIncIdString = siteIncIdLog.applyRegex("siteIncId:[0-9]+,", "[0-9]+");
+        Long siteIncId;
+        try {
+            siteIncId = Long.valueOf(siteIncIdString);
+        } catch (NumberFormatException nfe) {
+            siteIncId = null;
+        }
+        String oldImpressionId = oldImpressionIdLog.applyRegex(LogLinesRegex.UUID.getRegex());
+        String newImpressionId = newImpressionIdLog.applyRegex(LogLinesRegex.UUID.getRegex());
+        String auctionId = auctionIdLog.applyRegex(LogLinesRegex.UUID.getRegex());
+        String impressionFromBeaconUrl = beaconUrlLog.applyRegex(LogLinesRegex.UUID.getRegex());
+        String impressionFromClickUrl = clickUrlLog.applyRegex(LogLinesRegex.UUID.getRegex());
+
+        if (null == siteIncId || null == oldImpressionId || null == newImpressionId || null == auctionId
+                || null == impressionFromBeaconUrl || null == impressionFromClickUrl) {
+            parserOutput = "FAIL";
+        }
+
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertEquals(auctionId, resetWilburyIntKey(oldImpressionId, siteIncId));
+        Assert.assertEquals(auctionId, resetWilburyIntKey(newImpressionId, siteIncId));
+        Assert.assertEquals(auctionId, resetWilburyIntKey(impressionFromBeaconUrl, siteIncId));
+        Assert.assertEquals(auctionId, resetWilburyIntKey(impressionFromClickUrl, siteIncId));
+    }
 }

@@ -1296,3 +1296,6 @@ TEST3_8_8_4 :
   site_inventorytype : 'WAP' #forreq
   site_siteid : '5f0eb5b2200740b7828cf78f9d5e1c1c' #trans
   site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
+
+TEST3_IMPRESSIONIDCHANGE_PROG382 :
+- testName: ImpressionIdChange

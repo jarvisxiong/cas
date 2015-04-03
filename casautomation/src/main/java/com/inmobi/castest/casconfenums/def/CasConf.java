@@ -1,5 +1,7 @@
 package com.inmobi.castest.casconfenums.def;
 
+import lombok.Getter;
+
 /**
  * @author santosh.vaidyanathan
  */
@@ -43,6 +45,17 @@ public class CasConf {
     public enum Repo {
         CHANNEL_AD_GROUP_REPO, CHANNEL_REPO, SITE_META_DATA_REPO, CHANNEL_FEEDBACK_REPO, CHANNEL_SEGMENT_FEEDBACK_REPO,
         PRICING_ENGINE_REPO, SITE_ECPM_REPO
+    }
+
+    public enum LogLinesRegex {
+        UUID ("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+
+        @Getter
+        private String regex;
+
+        LogLinesRegex(String regex) {
+            this.regex = regex;
+        }
     }
 
 }

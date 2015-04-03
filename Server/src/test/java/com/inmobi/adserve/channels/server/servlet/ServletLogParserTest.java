@@ -9,12 +9,11 @@ import static org.powermock.api.easymock.PowerMock.expectNew;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.CharsetUtil;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +30,12 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.util.CharsetUtil;
+
 // TODO: Optimise
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({CasConfigUtil.class, ServletLogParser.class})
@@ -43,7 +48,7 @@ public class ServletLogParserTest {
     }
 
     @Test
-    public void testHandleRequestHttpMethodIsPostExitStatusIs0() throws Exception {
+    public void testHandleRequestHttpMethodIsPost() throws Exception {
         final String targetStrings = "targetStrings";
         final String logFilePath = "logFilePath";
         // TODO: StringBuilder
@@ -55,6 +60,9 @@ public class ServletLogParserTest {
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
         final ByteBuf mockByteBuf = createMock(ByteBuf.class);
+        final InputStream mockInputStream = createMock(InputStream.class);
+        final InputStreamReader mockInputStreamReader = createMock(InputStreamReader.class);
+        final BufferedReader mockBufferedReader = createMock(BufferedReader.class);
 
         final Configuration mockConfig = createMock(Configuration.class);
         final Process mockProcess = createMock(Process.class);
@@ -67,8 +75,17 @@ public class ServletLogParserTest {
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
         expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
         expect(mockProcess.waitFor()).andReturn(0).times(1);
-
-        mockResponseSender.sendResponse("PASS", null);
+        expect(mockProcess.getInputStream()).andReturn(mockInputStream).times(1);
+        expect(mockBufferedReader.readLine())
+                .andReturn("test").times(1)
+                .andReturn(null).times(1);
+        expectNew(BufferedReader.class, new Class[] {Reader.class}, mockInputStreamReader)
+                .andReturn(mockBufferedReader).anyTimes();
+        expectNew(InputStreamReader.class, new Class[]{InputStream.class}, mockInputStream)
+                .andReturn(mockInputStreamReader).anyTimes();
+        mockBufferedReader.close();
+        expectLastCall().times(1);
+        mockResponseSender.sendResponse("test\n", null);
         expectLastCall().times(1);
 
         replayAll();
@@ -87,7 +104,7 @@ public class ServletLogParserTest {
     }
 
     @Test
-    public void testHandleRequestHttpMethodIsGetKeyIsSearchExitStatusIsNot0() throws Exception {
+    public void testHandleRequestHttpMethodIsGetKeyIsSearch() throws Exception {
         final String targetStrings = "targetStrings";
         final String logFilePath = "logFilePath";
         // TODO: StringBuilder
@@ -99,6 +116,9 @@ public class ServletLogParserTest {
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
         final ByteBuf mockByteBuf = createMock(ByteBuf.class);
+        final InputStream mockInputStream = createMock(InputStream.class);
+        final InputStreamReader mockInputStreamReader = createMock(InputStreamReader.class);
+        final BufferedReader mockBufferedReader = createMock(BufferedReader.class);
 
         final Configuration mockConfig = createMock(Configuration.class);
         final Process mockProcess = createMock(Process.class);
@@ -113,7 +133,17 @@ public class ServletLogParserTest {
         expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
         expect(mockProcess.waitFor()).andReturn(-1).times(1);
 
-        mockResponseSender.sendResponse("FAIL", null);
+        expect(mockProcess.getInputStream()).andReturn(mockInputStream).times(1);
+        expect(mockBufferedReader.readLine())
+                .andReturn("test").times(1)
+                .andReturn(null).times(1);
+        expectNew(BufferedReader.class, new Class[] {Reader.class}, mockInputStreamReader)
+                .andReturn(mockBufferedReader).anyTimes();
+        expectNew(InputStreamReader.class, new Class[]{InputStream.class}, mockInputStream)
+                .andReturn(mockInputStreamReader).anyTimes();
+        mockBufferedReader.close();
+        expectLastCall().times(1);
+        mockResponseSender.sendResponse("test\n", null);
         expectLastCall().times(1);
 
         replayAll();
@@ -132,7 +162,7 @@ public class ServletLogParserTest {
     }
 
     @Test
-    public void testHandleRequestHttpMethodIsGetKeyIsLogFilePathExitStatusIsNot0() throws Exception {
+    public void testHandleRequestHttpMethodIsGetKeyIsLogFilePath() throws Exception {
         final String targetStrings = "targetStrings";
         final String logFilePath = "/opt/mkhoj/logs/cas/debug/";
         // TODO: StringBuilder
@@ -144,6 +174,9 @@ public class ServletLogParserTest {
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final FullHttpRequest mockHttpRequest = createMock(FullHttpRequest.class);
         final ByteBuf mockByteBuf = createMock(ByteBuf.class);
+        final InputStream mockInputStream = createMock(InputStream.class);
+        final InputStreamReader mockInputStreamReader = createMock(InputStreamReader.class);
+        final BufferedReader mockBufferedReader = createMock(BufferedReader.class);
 
         final Configuration mockConfig = createMock(Configuration.class);
         final Process mockProcess = createMock(Process.class);
@@ -157,7 +190,17 @@ public class ServletLogParserTest {
         expect(mockConfig.getString("logParserScript")).andReturn("/opt/bin/mkhoj/parser.sh").times(2);
         expect(mockProcess.waitFor()).andReturn(-1).times(1);
 
-        mockResponseSender.sendResponse("FAIL", null);
+        expect(mockProcess.getInputStream()).andReturn(mockInputStream).times(1);
+        expect(mockBufferedReader.readLine())
+                .andReturn("test").times(1)
+                .andReturn(null).times(1);
+        expectNew(BufferedReader.class, new Class[] {Reader.class}, mockInputStreamReader)
+                .andReturn(mockBufferedReader).anyTimes();
+        expectNew(InputStreamReader.class, new Class[]{InputStream.class}, mockInputStream)
+                .andReturn(mockInputStreamReader).anyTimes();
+        mockBufferedReader.close();
+        expectLastCall().times(1);
+        mockResponseSender.sendResponse("test\n", null);
         expectLastCall().times(1);
 
         replayAll();

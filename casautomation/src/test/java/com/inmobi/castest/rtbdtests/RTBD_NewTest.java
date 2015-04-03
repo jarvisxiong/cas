@@ -35,7 +35,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test2_11_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test2_11_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_11_2(final String x) throws Exception {
 
         parserOutput =
@@ -66,7 +66,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test2_11_4", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test2_11_4", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_11_4(final String x) throws Exception {
 
 
@@ -82,7 +82,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test2_11_5", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test2_11_5", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_11_5(final String x) throws Exception {
 
         parserOutput =
@@ -97,7 +97,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test2_11_6", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test2_11_6", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_11_6(final String x) throws Exception {
 
         parserOutput =
@@ -398,7 +398,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test2_17_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test2_17_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_17_2(final String x) throws Exception {
 
         parserOutput =
@@ -413,7 +413,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test2_17_6", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "Test2_17_6", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_17_6(final String x) throws Exception {
 
         parserOutput =
@@ -1083,7 +1083,8 @@ public class RTBD_NewTest {
 
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
-    @Test(testName = "TEST2_60_1", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+
+    @Test(enabled = false, testName = "TEST2_60_1", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_60_1(final String x) throws Exception {
 
         searchStringInLog1 = "gender:MALE,";
@@ -1105,7 +1106,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST2_60_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "TEST2_60_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_60_2(final String x) throws Exception {
 
         searchStringInLog1 = "gender:FEMALE,";
@@ -1127,7 +1128,7 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST2_60_3", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    @Test(enabled = false, testName = "TEST2_60_3", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void Test2_60_3(final String x) throws Exception {
 
         searchStringInLog1 = "gender:UNKNOWN,";

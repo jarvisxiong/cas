@@ -1,12 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.CharsetUtil;
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +9,7 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.Path;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +17,13 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.util.CharsetUtil;
 
 
 @Path("/logParser")
@@ -66,12 +69,18 @@ public class ServletLogParser implements Servlet {
                 new ProcessBuilder(CasConfigUtil.getServerConfig().getString("logParserScript"), "-t", targetStrings,
                         "-l", logFilePath);
         final Process process = pb.start();
-        final int exitStatus = process.waitFor();
-        if (exitStatus == 0) {
-            hrh.responseSender.sendResponse("PASS", serverChannel);
-        } else {
-            hrh.responseSender.sendResponse("FAIL", serverChannel);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line;
+        StringBuilder response = new StringBuilder();
+        while(StringUtils.isNotEmpty(line = bufferedReader.readLine())) {
+            response.append(line + "\n");
         }
+        bufferedReader.close();
+
+        process.waitFor();
+        hrh.responseSender.sendResponse(response.toString(), serverChannel);
+
     }
 
     @Override
