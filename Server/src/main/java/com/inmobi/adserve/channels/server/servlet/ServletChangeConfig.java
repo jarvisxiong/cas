@@ -23,11 +23,16 @@ import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-
+/**
+ * 
+ * @author ritwik.kumar
+ */
 @Singleton
 @Path("/configChange")
 public class ServletChangeConfig implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletChangeConfig.class);
+    private static final String ADAPTER = "adapter.";
+    private static final String SERVER = "server.";
     private final RequestParser requestParser;
 
     @Inject
@@ -38,7 +43,6 @@ public class ServletChangeConfig implements Servlet {
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
-
         final Map<String, List<String>> params = queryStringDecoder.parameters();
         JSONObject jObject = null;
         try {
@@ -64,20 +68,18 @@ public class ServletChangeConfig implements Servlet {
             final Iterator<String> itr = jObject.keys();
             while (itr.hasNext()) {
                 final String configKey = itr.next().toString();
-                if (configKey.startsWith("adapter")
-                        && CasConfigUtil.getAdapterConfig().containsKey(configKey.replace("adapter.", ""))) {
-                    CasConfigUtil.getAdapterConfig().setProperty(configKey.replace("adapter.", ""),
-                            jObject.getString(configKey));
+                String replacedString = null;
+                if (configKey.startsWith(ADAPTER)
+                        && CasConfigUtil.getAdapterConfig()
+                                .containsKey(replacedString = configKey.replace(ADAPTER, ""))) {
+                    CasConfigUtil.getAdapterConfig().setProperty(replacedString, jObject.getString(configKey));
                     updates.append(configKey).append("=")
-                            .append(CasConfigUtil.getAdapterConfig().getString(configKey.replace("adapter.", "")))
-                            .append("\n");
-                } else if (configKey.startsWith("server")
-                        && CasConfigUtil.getServerConfig().containsKey(configKey.replace("server.", ""))) {
-                    CasConfigUtil.getServerConfig().setProperty(configKey.replace("server.", ""),
-                            jObject.getString(configKey));
+                            .append(CasConfigUtil.getAdapterConfig().getString(replacedString)).append("\n");
+                } else if (configKey.startsWith(SERVER)
+                        && CasConfigUtil.getServerConfig().containsKey(replacedString = configKey.replace(SERVER, ""))) {
+                    CasConfigUtil.getServerConfig().setProperty(replacedString, jObject.getString(configKey));
                     updates.append(configKey).append("=")
-                            .append(CasConfigUtil.getServerConfig().getString(configKey.replace("server.", "")))
-                            .append("\n");
+                            .append(CasConfigUtil.getServerConfig().getString(replacedString)).append("\n");
                 } else if (configKey.startsWith("resetTimers")) {
                     InspectorStats.resetTimers();
                 }

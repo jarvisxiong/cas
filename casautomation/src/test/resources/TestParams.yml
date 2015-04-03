@@ -1,6 +1,72 @@
 ---
 # RTBD Test Cases
-
+TEST2_1_1: 
+ - adpool_responseformat : 'imai'
+   adpool_requestid: anotherreqid
+   uidparams_rawuidvalues_o1: '9e74e1b452e07afded40fd15b45aa9e6'
+   device_osid: '3'
+   site_contenttype: 'PERFORMANCE'
+   site_contentrating : '0,2'
+   site_inventorytype : 'APP'
+   site_sitetaxonomies : '70,71'
+   site_sitetags : '70,71'
+   adpool_selectedslots : '2'
+TEST2_2_1:
+ - adpool_requestid : 'EMPTY'
+   site_sitetaxonomies : '70,71'
+   site_sitetags : '70,71'
+TEST2_2_2:
+ - adpool_requestid : 'SPACE'
+TEST2_2_3:
+ - adpool_requestid : 'justlikethat'
+TEST2_3_1:
+ - adpool_remotehostip : 'EMPTY'
+TEST2_3_2:
+ - adpool_remotehostip : 'SPACE'
+TEST2_3_4:
+ - adpool_remotehostip : 'invalid'
+TEST2_4_4:
+ - site_siteincid  : '0'
+TEST2_4_5:
+ - site_siteincid  : '10109910'
+TEST2_5_1: 
+ - site_siteurl : 'EMPTY'
+TEST2_5_3: 
+ - site_siteurl : 'SPACE'
+TEST2_5_4: 
+ - site_siteurl : 'justlikethat'
+TEST2_6_4: 
+ - site_cpcflooor : '2'
+TEST2_6_5: 
+ - site_cpcflooor : '2.02'
+TEST2_7_4: 
+ - site_ecpmflooor : '2'
+TEST2_7_5: 
+ - site_ecpmflooor : '2.02'
+TEST2_8_1:
+ - site_siteid : 'EMPTY'
+TEST2_8_2:
+ - site_siteid : 'NULL'
+TEST2_8_3:
+ - site_siteid : 'SPACE'
+TEST2_8_4:
+ - site_siteid : 'justlikethat'
+TEST2_9_1:
+ - site_publisherid : 'EMPTY'
+TEST2_9_2:
+ - site_publisherid : 'NULL'
+TEST2_9_3:
+ - site_publisherid : 'SPACE'
+TEST2_10_1:
+ - site_inventorytype : 'BROWSER'
+TEST2_10_2:
+ - site_inventorytype : 'APP'
+TEST2_10_3:
+ - site_inventorytype : 'EMPTY'
+TEST2_10_4:
+ - site_inventorytype : 'NULL'
+TEST2_10_5:
+ - site_inventorytype : 'SPACE'
 TEST2_11_1:
  - site_contenttype : 'PERFORMANCE'
 TEST2_11_2:

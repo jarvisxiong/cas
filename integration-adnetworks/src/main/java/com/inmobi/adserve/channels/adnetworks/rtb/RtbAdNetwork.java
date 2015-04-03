@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,6 +73,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -478,17 +478,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             user.setId(casInternalRequestParameters.getUid());
             user.setBuyeruid(casInternalRequestParameters.getUid());
         }
-
-        try {
-            if (sasParams.getAge() != null) {
-                final int age = sasParams.getAge();
-                final int year = Calendar.getInstance().get(Calendar.YEAR);
-                final int yob = year - age;
-                user.setYob(yob);
-            }
-        } catch (final NumberFormatException e) {
-            LOG.debug(traceMarker, "Exception : {}", e);
-        }
+        user.setYob(getYearofBirth());
         return user;
     }
 

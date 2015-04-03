@@ -1,14 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.wapstart;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +23,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -63,7 +62,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         host = new StringBuilder(String.format(host, externalSiteId)).toString();
 
         if (repositoryHelper.querySlotSizeMapRepository(selectedSlotId) != null) {
-            if(selectedSlotId == 9 || selectedSlotId == 15 || selectedSlotId == 24) {
+            if (selectedSlotId == 9 || selectedSlotId == 15 || selectedSlotId == 24) {
                 selectedSlotId = 4;
             }
             final Dimension dim = repositoryHelper.querySlotSizeMapRepository(selectedSlotId).getDimension();
@@ -116,12 +115,12 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             final int gen = "F".equalsIgnoreCase(gender) ? 2 : 1;
             user.setGender(gen);
         }
-        if (sasParams.getAge() != null) {
-            final int age = sasParams.getAge();
-            final int year = Calendar.getInstance().get(Calendar.YEAR);
-            final int yob = year - age;
+
+        final int yob = getYearofBirth();
+        if (yob != -1) {
             user.setYob(yob);
         }
+
 
         final WapstartData data = new WapstartData();
         final Segment segment = new Segment();
@@ -237,7 +236,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         }
         try {
@@ -248,7 +247,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             if (responseJson.has("clink")) {
                 partnerClickUrl = responseJson.getString("clink");
             } else {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 statusCode = 500;
                 return;
             }
@@ -265,7 +264,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 final String imageUrl = textGraphic.getString("name");
                 context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, imageUrl);
                 t = TemplateType.IMAGE;
-            }else if (responseJson.has("text")) {
+            } else if (responseJson.has("text")) {
                 final JSONObject text = responseJson.getJSONObject("text");
                 context.put(VelocityTemplateFieldConstants.AD_TEXT, text.getString("title"));
                 if (text.has("content")) {
@@ -280,15 +279,15 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
             } else {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 statusCode = 500;
                 return;
             }
             responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-            adStatus = "AD";
+            adStatus = AD_STRING;
             statusCode = 200;
         } catch (final Exception exception) {
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             LOG.info("Error parsing response {} from Wapstart: {}", response, exception);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             return;

@@ -68,7 +68,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String DEFAULT_EMPTY_STRING = "";
     protected static final String NO_AD = "NO_AD";
     protected static final String NATIVE_STRING = "native";
-    protected static final String AD_STRING ="AD";
+    protected static final String AD_STRING = "AD";
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     protected static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     protected static final String TERM = "TERM";
@@ -77,7 +77,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String WIFI = "WIFI";
     protected static final String NON_WIFI = "NON_WIFI";
     protected static final String CCID = "CCID";
-    
+
     @Inject
     protected static JaxbHelper jaxbHelper;
 
@@ -85,7 +85,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static DocumentBuilderHelper documentBuilderHelper;
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
-    
+
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -142,7 +142,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static IPRepository ipRepository;
     private boolean isIPResolutionDisabled = true;
     private String publicHostName;
-    protected boolean isByteResponseSupported = false;    
+    protected boolean isByteResponseSupported = false;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -254,10 +254,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                                 HttpResponseStatus.valueOf(response.getStatusCode());
 
                         LOG.debug(traceMarker, "{} status code is {}", getName(), httpResponseStatus);
-                        if(isByteResponseSupported) {
+                        if (isByteResponseSupported) {
                             byte[] responseBytes = response.getResponseBodyAsBytes();
                             parseResponse(responseBytes, httpResponseStatus);
-                        }else {
+                        } else {
                             parseResponse(responseStr, httpResponseStatus);
                         }
                         processResponse();
@@ -439,8 +439,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.adStatus = adStatus;
     }
 
-    public void parseResponse(final byte[] responseByte, final HttpResponseStatus status) {
-    }
+    public void parseResponse(final byte[] responseByte, final HttpResponseStatus status) {}
 
     @Override
     public boolean configureParameters(final SASRequestParameters param,
@@ -644,12 +643,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     // return year of birth
-    protected String getYearofBirth() {
-        if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
-            final Calendar cal = new GregorianCalendar();
-            return Integer.toString(cal.get(Calendar.YEAR) - sasParams.getAge());
-        }
-        return null;
+    protected int getYearofBirth() {
+        try {
+            if (sasParams.getAge() != null && sasParams.getAge().toString().matches("\\d+")) {
+                final Calendar cal = new GregorianCalendar();
+                return cal.get(Calendar.YEAR) - sasParams.getAge();
+            }
+        } catch (Exception e) {}
+        return -1;
     }
 
     @Override
@@ -927,4 +928,3 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
 
 }
-

@@ -477,8 +477,8 @@ public class BaseAdNetworkImplTest {
         assertEquals(res, "special+chars%3A+%3F+%23+%40.");
 
         // Test getYearofBirth()
-        final String yearOfBirth = baseAdNetwork.getYearofBirth();
-        assertEquals(yearOfBirth, Integer.toString(new GregorianCalendar().get(Calendar.YEAR) - 11));
+        final int yearOfBirth = baseAdNetwork.getYearofBirth();
+        assertEquals(yearOfBirth, new GregorianCalendar().get(Calendar.YEAR) - 11);
 
         // Test getDst()
         assertEquals(baseAdNetwork.getDst(), DemandSourceType.DCP);
