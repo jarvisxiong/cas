@@ -1,7 +1,5 @@
 package com.inmobi.castest.casconfenums.def;
 
-import lombok.Getter;
-
 /**
  * @author santosh.vaidyanathan
  */
@@ -50,8 +48,11 @@ public class CasConf {
     public enum LogLinesRegex {
         UUID ("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
-        @Getter
         private String regex;
+
+        public String getRegex() {
+            return regex;
+        }
 
         LogLinesRegex(String regex) {
             this.regex = regex;
