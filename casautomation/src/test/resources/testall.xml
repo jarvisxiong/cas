@@ -2,8 +2,10 @@
 
 <suite name="Suite1" verbose="1">
 	<test name="Regression1">
-		<packages>
-			<package name="src.test.java.*" />
-		</packages>
+		<classes>
+			<class name="com.inmobi.castest.dcptests.DCPTest" />
+			<class name="com.inmobi.castest.rtbdtests.RTBD_NewTest" />
+			<class name="com.inmobi.castest.ixtests.IXTest" />
+		</classes>
 	</test>
 </suite>
