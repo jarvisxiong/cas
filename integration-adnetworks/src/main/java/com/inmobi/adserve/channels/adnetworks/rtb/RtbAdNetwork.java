@@ -79,17 +79,16 @@ import lombok.Setter;
 
 /**
  * Generic RTB adapter.
- *
+ * 
  * @author Devi Chand(devi.chand@inmobi.com)
  * @author ritwik.kumar
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
     public static ImpressionCallbackHelper impressionCallbackHelper;
-    public static final List<String> CURRENCIES_SUPPORTED =
-            new ArrayList<>(Arrays.asList("USD", "CNY", "JPY", "EUR", "KRW", "RUB"));
-    private static final List<String> BLOCKED_ADVERTISER_LIST =
-            new ArrayList<>(Arrays.asList("king.com", "supercell.net",
-                    "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+    public static final List<String> CURRENCIES_SUPPORTED = new ArrayList<>(Arrays.asList("USD", "CNY", "JPY", "EUR",
+            "KRW", "RUB"));
+    private static final List<String> BLOCKED_ADVERTISER_LIST = new ArrayList<>(Arrays.asList("king.com",
+            "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
 
     private static final Logger LOG = LoggerFactory.getLogger(RtbAdNetwork.class);
     private static final int AUCTION_TYPE = 2;
@@ -122,25 +121,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Setter
     BidRequest bidRequest;
 
-    @Getter
     @Setter
     BidResponse bidResponse;
 
-    @Getter
     @Setter
     private String urlArg;
-    @Getter
-    @Setter
     private String rtbMethod;
-    @Getter
-    @Setter
     private String rtbVer;
     @Getter
     @Setter
     private String callbackUrl;
-    @Setter
     private double bidPriceInUsd;
-    @Setter
     private double bidPriceInLocal;
 
     private final boolean wnRequired;
@@ -176,8 +167,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                        final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
-                        final String advertiserName, final boolean templateWinNotification) {
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
+            final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -195,7 +186,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
     }
- 
+
 
     @Override
     protected boolean configureParameters() {
@@ -205,7 +196,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     advertiserName);
             return false;
         }
-        
+
         if (sasParams.getWapSiteUACEntity() != null) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
             isWapSiteUACEntity = true;
@@ -281,7 +272,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-                                           final User user, final Device device) {
+            final User user, final Device device) {
         bidRequest = new BidRequest(casInternalRequestParameters.getAuctionId(), impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
@@ -344,7 +335,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Impression createImpressionObject(final Banner banner, final String displayManager,
-                                              final String displayManagerVersion) {
+            final String displayManagerVersion) {
         // nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
@@ -377,10 +368,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         if (isNativeResponseSupported && isNativeRequest()) {
             final ImpressionExtensions impExt = createNativeExtensionObject();
-
             if (impExt == null) {
                 return null;
             }
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
             impression.setExt(impExt);
         }
         return impression;
@@ -487,8 +478,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (siteBlinded) {
             site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
             String category = null;
-            if (isWapSiteUACEntity
-                    && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+            if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
                 site.setName(wapSiteUACEntity.getAppType());
             } else if ((category = getCategories(',', false)) != null) {
                 site.setName(category);
@@ -755,14 +745,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
-
-        String httpRequestMethod;
-        if ("get".equalsIgnoreCase(rtbMethod)) {
-            httpRequestMethod = "GET";
-        } else {
-            httpRequestMethod = "POST";
-        }
-
+        final String httpRequestMethod = GET.equalsIgnoreCase(rtbMethod) ? GET : POST;
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost());
@@ -770,11 +753,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws URISyntaxException {
-        final StringBuilder url = new StringBuilder();
-        if ("get".equalsIgnoreCase(rtbMethod)) {
-            url.append(host).append('?').append(urlArg).append('=');
-        } else {
-            url.append(host);
+        final StringBuilder url = new StringBuilder(host);
+        if (GET.equalsIgnoreCase(rtbMethod)) {
+            url.append('?').append(urlArg).append('=');
         }
         LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());
@@ -877,6 +858,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     protected void nativeAdBuilding() {
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
             final Map<String, String> params = new HashMap<String, String>();
             params.put("beaconUrl", beaconUrl);
@@ -886,8 +868,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             params.put("siteId", sasParams.getSiteId());
             params.put("nUrl", nurl);
 
-            responseContent = nativeResponseMaker.makeResponse(bidResponse, params,
-                    repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
+            responseContent =
+                    nativeResponseMaker.makeResponse(bidResponse, params,
+                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -899,7 +882,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    public boolean deserializeResponse(final String response) {
+    private boolean deserializeResponse(final String response) {
         final Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
@@ -911,8 +894,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             if (!StringUtils.isEmpty(bidResponse.getCur())) {
                 bidderCurrency = bidResponse.getCur();
             }
-            setBidPriceInLocal(bidResponse.getSeatbid().get(0).getBid().get(0).getPrice());
-            setBidPriceInUsd(calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency));
+            bidPriceInLocal = bidResponse.getSeatbid().get(0).getBid().get(0).getPrice();
+            bidPriceInUsd = calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency);
             responseSeatId = bidResponse.getSeatbid().get(0).getSeat();
             final Bid bid = bidResponse.getSeatbid().get(0).getBid().get(0);
             adm = bid.getAdm();

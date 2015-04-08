@@ -42,6 +42,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 public abstract class BaseServlet implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
     private static final double MIN_RTB_FLOOR = 0.05;
+    private static final double NETWORK_ECPM_FACOR = 0.5;
     protected final Provider<Marker> traceMarkerProvider;
 
     private final MatchSegments matchSegments;
@@ -239,7 +240,7 @@ public abstract class BaseServlet implements Servlet {
         casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
         casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
 
-        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams);
+        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams, NETWORK_ECPM_FACOR);
         final double segmentFloor = casUtils.getRtbFloor(casContext);
         final double siteFloor = sasParams.getSiteFloor();
         final double auctionBidFloor = calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR, networkSiteEcpm);

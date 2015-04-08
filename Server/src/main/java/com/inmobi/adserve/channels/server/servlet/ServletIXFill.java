@@ -36,7 +36,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 public class ServletIXFill extends BaseServlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletIXFill.class);
 
-
     @Inject
     public ServletIXFill(final Provider<Marker> traceMarkerProvider, final MatchSegments matchSegments,
             final RequestFilters requestFilters, final ChannelSegmentFilterApplier channelSegmentFilterApplier,

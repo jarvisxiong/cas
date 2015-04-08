@@ -235,17 +235,15 @@ public class IABCategoriesMap {
      * @return
      */
     public static List<String> getIABCategories(final List<Long> categories) {
-        final List<String> iabCategoriesList = new ArrayList<String>();
+        final Set<String> iabCategoriesSet= new HashSet<>();
         if (categories != null) {
-            final Set<String> catSet = new HashSet<>();
             for (final Long cat : categories) {
                 if (null != categoriesToIABMapping.get(cat)) {
-                    catSet.addAll(Arrays.asList(categoriesToIABMapping.get(cat)));
+                    iabCategoriesSet.addAll(Arrays.asList(categoriesToIABMapping.get(cat)));
                 }
             }
-            iabCategoriesList.addAll(catSet);
         }
-        return iabCategoriesList;
+        return new ArrayList<>(iabCategoriesSet);
     }
 
     /**
@@ -271,17 +269,17 @@ public class IABCategoriesMap {
      * @return
      */
     public static List<String> getIABCategoriesFromUAC(final List<String> uacCategories) {
-        final List<String> iabCategoriesList = new ArrayList<String>();
+        final Set<String> iabCategoriesSet = new HashSet<String>();
         if (uacCategories != null) {
             for (final String cat : uacCategories) {
                 if (cat != null) {
                     final String[] categories = uacCatToIABMapping.get(cat.toLowerCase());
                     if (null != categories) {
-                        iabCategoriesList.addAll(Arrays.asList(categories));
+                        iabCategoriesSet.addAll(Arrays.asList(categories));
                     }
                 }
             }
         }
-        return iabCategoriesList;
+        return new ArrayList<>(iabCategoriesSet);
     }
 }

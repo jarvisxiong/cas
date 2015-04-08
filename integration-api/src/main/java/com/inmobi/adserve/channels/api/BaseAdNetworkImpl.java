@@ -54,7 +54,6 @@ import lombok.Setter;
 
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
-
     protected Marker traceMarker;
     protected static final String WAP = "WAP";
     protected static final String APP = "APP";
@@ -77,6 +76,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String WIFI = "WIFI";
     protected static final String NON_WIFI = "NON_WIFI";
     protected static final String CCID = "CCID";
+    protected static final String GET = "GET";
+    protected static final String POST = "POST";
 
     @Inject
     protected static JaxbHelper jaxbHelper;

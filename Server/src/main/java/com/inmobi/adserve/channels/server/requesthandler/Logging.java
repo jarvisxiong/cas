@@ -102,9 +102,9 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
             if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS);
                 if (rankList == null || rankList.isEmpty()) {
-                    InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NATIVE_REQUESTS + "-"
+                    InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS + "-"
                             + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 }
             }

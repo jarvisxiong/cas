@@ -107,6 +107,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -158,23 +159,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private final int bidFloorPercent;
     @Setter
-    @Getter
     BidResponse bidResponse;
     @Getter
-    @Setter
     private BidRequest bidRequest;
-    @Getter
     @Setter
     private String urlArg;
-    @Getter
-    @Setter
     private String ixMethod;
-    @Getter
-    @Setter
     private String callbackUrl;
-    @Setter
     private double bidPriceInUsd;
-    @Setter
     private double bidPriceInLocal;
     private boolean templateWN = true;
     protected boolean isSproutSupported = false;
@@ -420,7 +412,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final Native nativeIx = createNativeObject();
             impression.setNat(nativeIx);
             if (nativeIx != null) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_REQUESTS);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
                 mandatoryAssetMap = new HashMap<>();
                 nonMandatoryAssetMap = new HashMap<>();
                 for (final Asset asset : nativeIx.getAssets()) {
@@ -492,7 +484,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return impExt;
     }
 
-    public String getZoneId(final JSONObject additionalParams) {
+    private String getZoneId(final JSONObject additionalParams) {
         String categoryZoneId = null;
         boolean isCategorySet = false;
         try {
@@ -875,7 +867,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         ext.setBlind(blindForApp);
     }
 
-    public List<String> getBlockedList() {
+    private List<String> getBlockedList() {
         final List<String> blockedList = Lists.newArrayList();
         LOG.debug(traceMarker, "{}", sasParams.getSiteIncId());
         blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
@@ -949,7 +941,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return device;
     }
 
-    public String replaceIXMacros(String url) {
+    private String replaceIXMacros(String url) {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, USD);
         if (6 != sasParams.getDst()) {
@@ -988,18 +980,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
-
-        String httpRequestMethod;
-        if ("get".equalsIgnoreCase(ixMethod)) {
-            httpRequestMethod = "GET";
-        } else {
-            httpRequestMethod = "POST";
-        }
-
+        final String httpRequestMethod = GET.equalsIgnoreCase(ixMethod) ? GET : POST;
         final String authStr = userName + ":" + password;
         final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes(CharsetUtil.UTF_8)));
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
-
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body)
                 .setHeader("Authorization", "Basic " + authEncoded).setHeader(HttpHeaders.Names.HOST, uri.getHost());
@@ -1007,11 +991,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws URISyntaxException {
-        final StringBuilder url = new StringBuilder();
-        if ("get".equalsIgnoreCase(ixMethod)) {
-            url.append(host).append('?').append(urlArg).append('=');
-        } else {
-            url.append(host);
+        final StringBuilder url = new StringBuilder(host);
+        if (GET.equalsIgnoreCase(ixMethod)) {
+            url.append('?').append(urlArg).append('=');
         }
         LOG.debug(traceMarker, "{} url is {}", getName(), url.toString());
         return URI.create(url.toString());
@@ -1064,7 +1046,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    public boolean updateDSPAccountInfo(final String buyer) {
+    protected boolean updateDSPAccountInfo(final String buyer) {
         LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
         Long buyerId;
         try {
@@ -1286,8 +1268,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         ConnectionType connectionType = sasParams.getConnectionType();
-        String connectionTypeString = (null != connectionType && ConnectionType.WIFI == connectionType) ?
-                WIFI : NON_WIFI;
+        String connectionTypeString =
+                (null != connectionType && ConnectionType.WIFI == connectionType) ? WIFI : NON_WIFI;
 
         String requestNetworkTypeJson = "{\"networkType\":\"" + connectionTypeString + "\"}";
         // Publisher control settings
@@ -1481,7 +1463,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
      * @param response
      * @return
      */
-    protected boolean deserializeResponse(final String response) {
+    private boolean deserializeResponse(final String response) {
         // In-case of unexpected error in deserializeResponse(), the adStatus is set to TERM. Otherwise, it is already
         // set as NO_AD.
         LOG.debug("Started deserialising response from RP");
@@ -1518,8 +1500,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         aqid = bid.getAqid();
         adjustbid = bid.getAdjustbid();
         // bidderCurrency is set to USD by default
-        setBidPriceInLocal(bid.getPrice());
-        setBidPriceInUsd(getBidPriceInLocal());
+        bidPriceInLocal = bid.getPrice();
+        bidPriceInUsd = getBidPriceInLocal();
 
         adm = bid.getAdm();
         admobject = bid.getAdmobject();

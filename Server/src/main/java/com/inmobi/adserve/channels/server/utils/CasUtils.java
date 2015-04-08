@@ -32,7 +32,6 @@ public class CasUtils {
         this.repositoryHelper = repositoryHelper;
     }
 
-    // TODO: move PricingEngineEntity fetching at handler level , when we move request parsing to handler level
     public PricingEngineEntity fetchPricingEngineEntity(final SASRequestParameters sasParams) {
         // Fetching pricing engine entity
         if (null != sasParams.getCountryId()) {
@@ -63,13 +62,14 @@ public class CasUtils {
         return false;
     }
 
-    public Double getNetworkSiteEcpm(final CasContext casContext, final SASRequestParameters sasParams) {
+    public Double getNetworkSiteEcpm(final CasContext casContext, final SASRequestParameters sasParams,
+            final double factor) {
         final SiteEcpmEntity siteEcpmEntity =
                 repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(), sasParams.getCountryId().intValue(),
                         sasParams.getOsId());
         double networkEcpm = 0.0;
         if (null != siteEcpmEntity) {
-            networkEcpm = 0.5 * siteEcpmEntity.getEcpm();
+            networkEcpm = factor * siteEcpmEntity.getEcpm();
         }
         return networkEcpm;
     }

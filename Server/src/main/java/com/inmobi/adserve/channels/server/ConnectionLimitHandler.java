@@ -4,6 +4,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
@@ -21,6 +22,7 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 @Sharable
 @Slf4j
 public class ConnectionLimitHandler extends ChannelDuplexHandler {
+    private static final String SERVER_START_TIME = Calendar.getInstance().getTime().toString();
     @Getter
     private final AtomicInteger activeConnections = new AtomicInteger(0);
     @Getter
@@ -68,6 +70,8 @@ public class ConnectionLimitHandler extends ChannelDuplexHandler {
             connection.put("IncomingDroppedConnections", getDroppedConnections());
             connection.put("IncomingActiveConnections", getActiveConnections());
             connection.put("AvailableProcessors", Runtime.getRuntime().availableProcessors());
+            connection.put("ServerStartTime", SERVER_START_TIME);
+            connection.put("ServerCurrentTime", Calendar.getInstance().getTime().toString());
         } catch (final JSONException exp) {
             log.error("Error in getting getConnectionJson", exp);
         }

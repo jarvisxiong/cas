@@ -6,7 +6,7 @@ public class InspectorStrings {
     public static final String RULE_ENGINE_REQUESTS = "RuleEngineRequests";
     public static final String BACK_FILL_REQUESTS = "BackFillRequests";
     public static final String IX_REQUESTS = "IXRequests";
-    public static final String NATIVE_REQUESTS = "NativeRequests";
+    public static final String TOTAL_NATIVE_REQUESTS = "TotalNativeRequests";
     public static final String TOTAL_NATIVE_RESPONSES = "TotalNativeResponses";
     public static final String NON_AD_REQUESTS = "NonAdRequests";
     public static final String TOTAL_INVOCATIONS = "TotalInvocations";
