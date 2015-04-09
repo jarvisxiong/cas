@@ -274,7 +274,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
 
         final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
         final String expectedUrl =
-                "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=00000000-0000-0000-0000-0000006456fc&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
+                "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=00000000-0000-0000-0000-0000006456fc&ip=206.29.182.240&ast=1&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70&p=2";
 
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
@@ -283,7 +283,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         final String actualMd5Value = request.getHeaders().get("MOGO_API_SIGNATURE").get(0);
 
         // Verifying the expected MD5 for the Query String.
-        assertEquals("8fe282e303e2b673f8246056788bb885", actualMd5Value);
+        assertEquals("5f4437c91873e31c00b17a432c17832a", actualMd5Value);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
         if (dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
             final String expectedUrl =
-                    "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=00000000-0000-0000-0000-0000006456fc&ip=206.29.182.240&ast=banner&ua=Mozilla&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70";
+                    "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=00000000-0000-0000-0000-0000006456fc&ip=206.29.182.240&ast=1&ua=Mozilla&os=Android&lat=37.4429&lon=-122.1514&w=320&h=50&anid=202cb962ac59075b964b07152d234b70&p=2";
             assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
             assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
         }
@@ -340,7 +340,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
         final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
         final String expectedUrl =
-                "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=00000000-0000-0020-0000-000000000000&ip=206.29.182.240&ast=banner&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&os=iOS&lat=37.4429&lon=-122.1514&w=728&h=90&ida=23e2ewq445545";
+                "http://api2.adsmogo.com/ad/?ver=100&fmt=0&mk=H&aid=00000000-0000-0020-0000-000000000000&ip=206.29.182.240&ast=1&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334&os=iOS&lat=37.4429&lon=-122.1514&w=728&h=90&ida=23e2ewq445545&p=1";
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
     }

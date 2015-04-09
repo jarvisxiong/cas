@@ -32,6 +32,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String AUTHKEY_HEADER = "MOGO_API_AUTHKEY";
     private static final String APPID = "aid";
     private static final String ADSPACE_TYPE = "ast";
+    private static final String DEVICE_TYPE = "p";
     private static final String ADSPACE_WIDTH = "w";
     private static final String ADSPACE_HEIGHT = "h";
     private static final String IPADDRESS = "ip";
@@ -46,8 +47,12 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String COUNTRY = "co";
     private static final String USER_GENDER = "GENDER";
     private static final String USER_AGE = "AGE";
-    private static final String INTERSTITIAL = "interstitial";
-    private static final String BANNER = "banner";
+    private static final String IPAD_UA = "ipad";
+    private static final int INTERSTITIAL = 2;
+    private static final int BANNER = 1;
+    private static final int IPHONE = 1;
+    private static final int ANDROID = 2;
+    private static final int IPAD = 3;
 
     private transient String latitude;
     private transient String longitude;
@@ -156,6 +161,11 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                 appendQueryParam(url, IOS_ID, casInternalRequestParameters.getUidMd5(), false);
             }
+            if(sasParams.getUserAgent().toLowerCase().contains(IPAD_UA)){
+                appendQueryParam(url,DEVICE_TYPE,IPAD,false);
+            }else{
+                appendQueryParam(url,DEVICE_TYPE,IPHONE,false);
+            }
         }
 
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
@@ -166,6 +176,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
                 appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
             }
+            appendQueryParam(url,DEVICE_TYPE, ANDROID,false);
         }
         final String gen = sasParams.getGender();
         if (StringUtils.isNotEmpty(gen)) {
