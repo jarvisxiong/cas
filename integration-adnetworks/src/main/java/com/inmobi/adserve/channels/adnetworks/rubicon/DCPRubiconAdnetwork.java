@@ -271,7 +271,8 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, FLOOR_PRICE, ECPM_PERCENTAGE * sasParams.getSiteEcpmEntity().getNetworkEcpm(),
                         false);
             } else if (casInternalRequestParameters.getAuctionBidFloor() > 0) {
-                appendQueryParam(url, FLOOR_PRICE, casInternalRequestParameters.getAuctionBidFloor(), false);
+                this.forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+                appendQueryParam(url, FLOOR_PRICE, this.forwardedBidFloor, false);
             } else {
                 appendQueryParam(url, FLOOR_PRICE, MIN_ECPM, false);
             }

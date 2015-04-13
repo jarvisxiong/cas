@@ -85,7 +85,7 @@ public class Logging {
     // Writing Request Response Logs
     public static void rrLogging(final Marker traceMarker, final ChannelSegment channelSegment,
             final List<ChannelSegment> rankList, final SASRequestParameters sasParams, final String terminationReason,
-            final long totalTime, final double auctionBidFloor) throws JSONException, TException {
+            final long totalTime) throws JSONException, TException {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Inside rrLogging");
@@ -110,7 +110,7 @@ public class Logging {
             }
         }
 
-        final AdRR adRR = getAdRR(channelSegment, rankList, sasParams, terminationReason, auctionBidFloor);
+        final AdRR adRR = getAdRR(channelSegment, rankList, sasParams, terminationReason);
         if (null == adRR) {
             return;
         }
@@ -295,7 +295,7 @@ public class Logging {
     }
 
     protected static AdRR getAdRR(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
-            final SASRequestParameters sasParams, String terminationReason, final double auctionBidFloor) {
+            final SASRequestParameters sasParams, String terminationReason) {
         AdRR adRR;
 
         boolean isTerminated = false;
@@ -331,7 +331,7 @@ public class Logging {
 
         final String timestamp = new Date().toString();
         final Request request =
-                getRequestObject(sasParams, adsServed, requestSlot, slotServed, auctionBidFloor, rankList);
+                getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
         adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
@@ -392,25 +392,20 @@ public class Logging {
     }
 
     protected static Request getRequestObject(final SASRequestParameters sasParams, final short adsServed,
-            final Short requestSlot, final Short slotServed, final double auctionBidFloor,
-            final List<ChannelSegment> rankList) {
+            final Short requestSlot, final Short slotServed, final List<ChannelSegment> rankList) {
         final short adRequested = 1;
         Request request;
         if (null != sasParams) {
             request = new Request(adRequested, adsServed, sasParams.getSiteId(), sasParams.getTid());
-            request.setBidGuidance(sasParams.getMarketRate());
             // Hack for getting discounted auction bid floor
-            if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
-                int bidFloorPercent = 100;
-                if (CollectionUtils.isNotEmpty(rankList)) {
-                    final AdNetworkInterface adNetworkInterface = rankList.get(0).getAdNetworkInterface();
-                    if (adNetworkInterface instanceof IXAdNetwork) {
-                        bidFloorPercent = ((IXAdNetwork) adNetworkInterface).getBidFloorPercent();
-                    }
+            if (CollectionUtils.isNotEmpty(rankList)) {
+                final AdNetworkInterface adNetworkInterface = rankList.get(0).getAdNetworkInterface();
+                if (null != adNetworkInterface.getForwardedBidFloor()) {
+                    request.setAuctionBidFloor(adNetworkInterface.getForwardedBidFloor());
                 }
-                request.setAuctionBidFloor(auctionBidFloor * bidFloorPercent / 100);
-            } else {
-                request.setAuctionBidFloor(auctionBidFloor);
+                if (null != adNetworkInterface.getForwardedBidGuidance()) {
+                    request.setBidGuidance(adNetworkInterface.getForwardedBidGuidance());
+                }
             }
 
             final Integer siteSegmentId = sasParams.getSiteSegmentId();

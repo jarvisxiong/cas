@@ -139,6 +139,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private ThirdPartyAdResponse responseStruct;
     private String adapterName;
 
+    protected Double forwardedBidFloor;
+    protected Double forwardedBidGuidance;
+
     @Inject
     protected static IPRepository ipRepository;
     private boolean isIPResolutionDisabled = true;
@@ -351,6 +354,16 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public int getHttpResponseStatusCode() {
         return statusCode;
+    }
+
+    @Override
+    public Double getForwardedBidFloor() {
+        return forwardedBidFloor;
+    }
+
+    @Override
+    public Double getForwardedBidGuidance() {
+        return forwardedBidGuidance;
     }
 
     // Returns the content of http response.

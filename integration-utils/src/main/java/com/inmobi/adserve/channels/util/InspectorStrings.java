@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InspectorStrings {
 
     public static final String TOTAL_REQUESTS = "TotalRequests";
@@ -127,7 +131,6 @@ public class InspectorStrings {
 
     // TestStrings:
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
-    public static final String IX_BEACON_WITHOUT_HTTP = "IXBeaconWithoutHTTP";
 
     // Hosted Ad Server Specific Stats
     public static final String TOTAL_HOSTED_REQUESTS = "HostedRequests";
@@ -146,9 +149,4 @@ public class InspectorStrings {
     public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public static final String NULL_HOST_NAME = "NullHostName";
     public static final String NULL_IP_ADDRESS = "NullIPAddress";
-
-
-    private InspectorStrings() {
-        // dummy private constructor to avoid instantiation from other classes
-    }
 }

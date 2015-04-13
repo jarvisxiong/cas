@@ -212,7 +212,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<String> iabCategories;
     private int minimumSdkVerForVAST;
 
-
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
     private ChannelSegmentEntity dspChannelSegmentEntity;
@@ -317,7 +316,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 || !isRequestFormatSupported()) {
             LOG.debug(
                     traceMarker,
-                    "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+                    "mandate parameters missing or request format is not compatible to partner supported response for "
+                            + "dummy so exiting adapter");
             return false;
         }
         return true;
@@ -386,7 +386,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         final ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(sasParams.getMarketRate());
+        proxyDemand.setMarketrate(this.forwardedBidGuidance);
         return proxyDemand;
     }
 
@@ -431,12 +431,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
 
+        this.forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor() * bidFloorPercent / 100;
+        this.forwardedBidGuidance = Math.max(sasParams.getMarketRate(), this.forwardedBidFloor);
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
         impression.setInstl(null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())
                 || isVideoRequest ? 1 : 0);
-        // note: bidFloorPercent logic has been duplicated in rrLogging
-        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor() * bidFloorPercent / 100);
+        impression.setBidfloor(this.forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         final ImpressionExtension ext = getImpExt();
         impression.setExt(ext);
@@ -1471,12 +1472,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isEmpty(response)) {
             return false;
         }
-        // Hack for IX beacon discrepancy fix
-        final String replacedResponse = response.replace("src=\"//beacon", "src=\"http://beacon");
-        if (!response.equals(replacedResponse)) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_BEACON_WITHOUT_HTTP);
-        }
-        if (!conformsToContract(replacedResponse) || responseHasNonZeroStatusCode() || !conformsToValidBidStructure()) {
+
+        if (!conformsToContract(response) || responseHasNonZeroStatusCode() || !conformsToValidBidStructure()) {
             return false;
         }
 

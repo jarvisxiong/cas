@@ -363,4 +363,14 @@ public interface AdNetworkInterface {
      * @return
      */
     int getHttpResponseStatusCode();
+
+    /**
+     * Returns the bid floor that was forwarded to the partner. Returns null if no value was forwarded.
+     */
+    Double getForwardedBidFloor();
+
+    /**
+     * Returns the bid guidance that was forwarded to the partner. Returns null if no value was forwarded.
+     */
+    Double getForwardedBidGuidance();
 }

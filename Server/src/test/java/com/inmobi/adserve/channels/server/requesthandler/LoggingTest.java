@@ -34,6 +34,7 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -107,7 +108,7 @@ public class LoggingTest {
         expect(mockInetAddress.getHostName()).andReturn(null).times(1);
         replayAll();
 
-        AdRR adRR = Logging.getAdRR(null, null, null, terminationReason, 0.0);
+        AdRR adRR = Logging.getAdRR(null, null, null, terminationReason);
         assertThat(adRR, is(equalTo(null)));
     }
 
@@ -138,7 +139,7 @@ public class LoggingTest {
 
         replayAll();
 
-        AdRR adRR = Logging.getAdRR(null, null, null, terminationReason, 0.0);
+        AdRR adRR = Logging.getAdRR(null, null, null, terminationReason);
         Request request = adRR.getRequest();
         User user = request.getUser();
         HandsetMeta handsetMeta = request.getHandset();
@@ -195,8 +196,6 @@ public class LoggingTest {
         Long campaignIncId = 123L;
         Long countryId = 94L;
         Double secondBidPriceInUsd = 4.5;
-        // Double bidFloorPercent = 45.5;
-        Double auctionBidFloor = 455.98;
         Double marketRate = 567.98;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
 
@@ -206,7 +205,7 @@ public class LoggingTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
+        BaseAdNetworkImpl mockAdNetworkInterface = createMock(BaseAdNetworkImpl.class);
 
         expect(InetAddress.getLocalHost())
                 .andReturn(mockInetAddress).times(1);
@@ -248,8 +247,7 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getSiteSegmentId()).andReturn(siteSegmentIds).anyTimes();
         replayAll();
 
-        AdRR adRR = Logging.getAdRR(mockChannelSegment, null, mockSASRequestParameters, terminationReason,
-                auctionBidFloor);
+        AdRR adRR = Logging.getAdRR(mockChannelSegment, null, mockSASRequestParameters, terminationReason);
         Request request = adRR.getRequest();
         User user = request.getUser();
         HandsetMeta handsetMeta = request.getHandset();
@@ -280,8 +278,8 @@ public class LoggingTest {
         assertThat(request.getSlot_requested(), is(equalTo(selectedSlot)));
         assertThat(request.getSegmentId(), is(siteSegmentIds));
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
-        assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor)));
-        assertThat(request.getBidGuidance(), is(equalTo(marketRate)));
+        assertThat(request.isSetAuctionBidFloor(), is(false));
+        assertThat(request.isSetBidGuidance(), is(false));
 
         assertThat(geo.getCarrier(), is(carrierId));
         assertThat(geo.getCountry(), is(countryId.shortValue()));
@@ -892,7 +890,6 @@ public class LoggingTest {
         Long handsetInternalId = 123L;
         int osId = 3;
         int dst = DemandSourceType.IX.getValue();
-        int bidFloorPercent = 45;
         Double auctionBidFloor = 455.98;
         Double marketRate = 567.98;
 
@@ -900,7 +897,8 @@ public class LoggingTest {
         IXAdNetwork mockIXAdNetwork = createMock(IXAdNetwork.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockIXAdNetwork).anyTimes();
-        expect(mockIXAdNetwork.getBidFloorPercent()).andReturn(bidFloorPercent).anyTimes();
+        expect(mockIXAdNetwork.getForwardedBidFloor()).andReturn(auctionBidFloor).anyTimes();
+        expect(mockIXAdNetwork.getForwardedBidGuidance()).andReturn(marketRate).anyTimes();
         expect(mockSASRequestParameters.getSiteId()).andReturn(siteId).anyTimes();
         expect(mockSASRequestParameters.getTid()).andReturn(taskId).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(dst).anyTimes();
@@ -924,7 +922,7 @@ public class LoggingTest {
         List<ChannelSegment> rankList = Arrays.asList(mockChannelSegment);
 
         // sasParams are null
-        request = Logging.getRequestObject(null, adsServed, requestSlot, slotServed, auctionBidFloor, rankList);
+        request = Logging.getRequestObject(null, adsServed, requestSlot, slotServed, rankList);
         assertThat(request.isSetSite(), is(false));
         assertThat(request.isSetId(), is(false));
         assertThat(request.getSlot_served(), is(equalTo(slotServed)));
@@ -933,7 +931,7 @@ public class LoggingTest {
         assertThat(request.isSetRequestDst(), is(false));
 
         // sasParams is present, slotServed and requestSlot are null, siteSegment  is null
-        request = Logging.getRequestObject(mockSASRequestParameters, adsServed, null, null, auctionBidFloor, rankList);
+        request = Logging.getRequestObject(mockSASRequestParameters, adsServed, null, null, rankList);
         assertThat(request.getSite(), is(siteId));
         assertThat(request.getId(), is(taskId));
         assertThat(request.isSetSlot_served(), is(false));
@@ -941,12 +939,11 @@ public class LoggingTest {
         assertThat(request.isSetSegmentId(), is(false));
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
-        assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor*bidFloorPercent/100)));
+        assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor)));
         assertThat(request.getBidGuidance(), is(equalTo(marketRate)));
 
         // everything is present
-        request = Logging.getRequestObject(mockSASRequestParameters, adsServed, requestSlot, slotServed,
-                auctionBidFloor, rankList);
+        request = Logging.getRequestObject(mockSASRequestParameters, adsServed, requestSlot, slotServed, rankList);
         assertThat(request.getSite(), is(siteId));
         assertThat(request.getId(), is(taskId));
         assertThat(request.getSlot_served(), is(equalTo(slotServed)));
@@ -954,7 +951,7 @@ public class LoggingTest {
         assertThat(request.getSegmentId(), is(siteSegmentIds));
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
-        assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor*bidFloorPercent/100)));
+        assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor)));
         assertThat(request.getBidGuidance(), is(equalTo(marketRate)));
     }
 

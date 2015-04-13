@@ -356,7 +356,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setInstl(0);
         }
 
-        impression.setBidfloor(casInternalRequestParameters.getAuctionBidFloor());
+        this.forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+        impression.setBidfloor(this.forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
         if (null != displayManager) {
