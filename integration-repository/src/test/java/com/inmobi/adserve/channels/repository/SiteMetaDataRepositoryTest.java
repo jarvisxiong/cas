@@ -137,8 +137,6 @@ public class SiteMetaDataRepositoryTest {
         assertThat(tested.isObjectToBeDeleted(dummy), is(equalTo(false)));
     }
 
-
-
     @Test
     public void testGetHashIndexKeyBuilder() throws Exception {
         final SiteMetaDataRepository tested = new SiteMetaDataRepository();

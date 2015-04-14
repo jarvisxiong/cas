@@ -928,13 +928,13 @@ public class NewIXAdNetworkTest {
                         // Exchange Spec v1.2 Modified Sample Native Response
                         "{\"id\":\"gCDNC0Zv3llJb4d\",\"bidid\":\"7ed12492-dbf8-46e1-8038-05bb22f62669\",\"seatbid\":[{\"buyer\""
                                 + ":\"3320\",\"bid\":[{\"id\":\"11\",\"impid\":\"gCDNC0Zv3llJb4d\",\"price\":1.192731,\"crid\""
-                                + ":\"3702042\",\"aqid\":\"rtb:3320:123456\",\"admobject\":{\"ver\":1,\"link\":{\"url\":\"http"
+                                + ":\"3702042\",\"aqid\":\"rtb:3320:123456\",\"admobject\":{\"native\":{\"ver\":1,\"link\":{\"url\":\"http"
                                 + ": //i.am.a/URL\",\"fallback\":\"deeplink://deeplink/url/into/app\",\"clicktrackers\":[\"htt"
                                 + "p: //a.com/a\",\"http: //b.com/b\"]},\"imptrackers\":[\"http: //a.com/a\",\"http: //b.com/"
                                 + "b\"],\"assets\":[{\"id\":1,\"title\":{\"text\":\"InstallBOA\"},\"link\":{\"url\":\"http://"
                                 + "i.am.a/URL\"}},{\"id\":2,\"data\":{\"value\":5}},{\"id\":3,\"img\":{\"url\":\"http://cdn.mo"
                                 + "bad.com/ad.png\",\"w\":64,\"h\":64}},{\"id\":4,\"data\":{\"value\":\"Install\"},\"link\":"
-                                + "{\"url\":\"http://i.am.a/URL\"}}]}}]}],\"statuscode\":0}"};
+                                + "{\"url\":\"http://i.am.a/URL\"}}]}}}]}],\"statuscode\":0}"};
 
         for (final String json : jsons) {
             assertThat(ixAdNetwork.conformsToContract(json), is(equalTo(true)));

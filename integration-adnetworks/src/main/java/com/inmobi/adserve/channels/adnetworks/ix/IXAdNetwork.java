@@ -199,7 +199,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    private com.inmobi.adserve.contracts.ix.response.nativead.Native admobject;
+    private com.inmobi.adserve.contracts.ix.response.nativead.Native nativeObj;
     @Getter
     private int impressionObjCount;
     @Getter
@@ -1330,13 +1330,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             params.put("nUrl", nurl);
 
             final com.inmobi.template.context.App templateContext =
-                    IXAdNetworkHelper.validateAndBuildTemplateContext(admobject, mandatoryAssetMap,
+                    IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
                             nonMandatoryAssetMap, impressionId);
             if (null == templateContext) {
                 adStatus = TERM;
                 responseContent = DEFAULT_EMPTY_STRING;
-                LOG.debug(traceMarker, "Native Ad Building failed as admobject failed validation");
-                // Raising exception in parse response if native admobject failed validation.
+                LOG.debug(traceMarker, "Native Ad Building failed as native object failed validation");
+                // Raising exception in parse response if native object failed validation.
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
                 return;
             }
@@ -1501,11 +1501,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidPriceInUsd = getBidPriceInLocal();
 
         adm = bid.getAdm();
-        admobject = bid.getAdmobject();
-        if (null != admobject) {
+        if (null != bid.getAdmobject()) {
+            nativeObj = bid.getAdmobject().getNativeObj();
+        }
+        if (null != nativeObj) {
             // TODO: who consumes sampleAdvertiser log data
             // Done to maintain consistency in logging (See sampleAdvertiserLogging)
-            adm = admobject.toString();
+            adm = nativeObj.toString();
         }
 
         // Fetch bid.ext.rp.advid.

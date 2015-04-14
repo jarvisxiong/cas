@@ -9,6 +9,8 @@ import com.inmobi.template.gson.Required;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 
@@ -18,11 +20,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@RequiredArgsConstructor
 @GsonContract
 public final class Native {
     @DefaultValue(1) private Integer ver;
-    @Required  private List<Asset> assets;
-    @Required  private Link link;
+    @NonNull @Required private List<Asset> assets;
+    @NonNull @Required private Link link;
     private List<String> imptrackers;
     private String jstracker;
     private CommonExtension ext;

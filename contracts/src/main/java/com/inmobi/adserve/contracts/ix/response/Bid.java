@@ -3,7 +3,7 @@ package com.inmobi.adserve.contracts.ix.response;
 import java.util.List;
 
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
-import com.inmobi.adserve.contracts.ix.response.nativead.Native;
+import com.inmobi.adserve.contracts.ix.response.nativead.AdmObject;
 import com.inmobi.template.gson.GsonContract;
 import com.inmobi.template.gson.Required;
 
@@ -32,7 +32,7 @@ public final class Bid {
     private String nurl;
     private String adm;
     private String crid;
-    private Native admobject;
+    private AdmObject admobject;
     private List<String> adomain;
     private int h;
     private int w;

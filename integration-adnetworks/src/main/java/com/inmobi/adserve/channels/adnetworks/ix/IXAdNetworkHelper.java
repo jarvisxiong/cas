@@ -266,28 +266,28 @@ public class IXAdNetworkHelper {
     /**
      * Builds the interfacing object between the adapter and the native response maker.
      * 
-     * @param admobject
+     * @param nativeObj
      * @param mandatoryAssetMap
      * @param nonMandatoryAssetMap
      * @param impressionId
      */
-    public static App validateAndBuildTemplateContext(final Native admobject,
+    public static App validateAndBuildTemplateContext(final Native nativeObj,
             final Map<Integer, Asset> mandatoryAssetMap, final Map<Integer, Asset> nonMandatoryAssetMap,
             final String impressionId) {
-        if (null == admobject) {
-            LOG.debug("Dropping native request as admobject was null");
+        if (null == nativeObj) {
+            LOG.debug("Dropping native request as native object was null");
             return null;
         }
 
-        LOG.debug("Starting building NativeResponseMaker interfacing object from response admobject");
+        LOG.debug("Starting building NativeResponseMaker interfacing object from response native object");
         final com.inmobi.template.context.App.Builder contextBuilder = com.inmobi.template.context.App.newBuilder();
 
-        contextBuilder.setOpeningLandingUrl(admobject.getLink().getUrl());
-        contextBuilder.setClickUrls(admobject.getLink().getClicktrackers());
-        contextBuilder.setPixelUrls(admobject.getImptrackers());
+        contextBuilder.setOpeningLandingUrl(nativeObj.getLink().getUrl());
+        contextBuilder.setClickUrls(nativeObj.getLink().getClicktrackers());
+        contextBuilder.setPixelUrls(nativeObj.getImptrackers());
         contextBuilder.setAdImpressionId(impressionId);
 
-        final List<com.inmobi.adserve.contracts.ix.response.nativead.Asset> assetList = admobject.getAssets();
+        final List<com.inmobi.adserve.contracts.ix.response.nativead.Asset> assetList = nativeObj.getAssets();
         for (final com.inmobi.adserve.contracts.ix.response.nativead.Asset asset : assetList) {
             final int assetId = asset.getId();
 
