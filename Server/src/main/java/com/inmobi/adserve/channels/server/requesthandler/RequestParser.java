@@ -70,11 +70,8 @@ public class RequestParser {
         params.setAllParametersJson(jObject.toString());
         final int dst = jObject.optInt("dst", 2);
         final Set<Integer> accountSegments = getAcoountSegments(jObject);
-        final boolean isResponseOnlyFromDcp = jObject.optBoolean("isResponseOnlyFromDcp", false);
-        LOG.debug(traceMarker, "dst type is {} isResponseOnlyFromDcp  {} and account segments are {}", dst,
-                isResponseOnlyFromDcp, accountSegments);
+        LOG.debug(traceMarker, "dst type is {}  and account segments are {}", dst, accountSegments);
         params.setDst(dst);
-        params.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
         params.setAccountSegment(accountSegments);
         params.setRemoteHostIp(stringify(jObject, "w-s-carrier"));
         String userAgent = stringify(jObject, "rqXInmobiPhoneUseragent");

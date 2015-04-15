@@ -57,15 +57,10 @@ public class ThriftRequestParser {
         LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
-        params.setResponseOnlyFromDcp(DemandSourceType.DCP.getValue() == dst);
-
-
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
-
         params.setRqMkSlot(tObject.selectedSlots);
         params.setProcessedMkSlot(getValidSlotList(tObject.selectedSlots, DemandSourceType.IX.getValue() == dst));
-
         params.setRFormat(getResponseFormat(tObject.responseFormatDeprecated));
         params.setRqMkAdcount(tObject.requestedAdCount);
         params.setTid(tObject.taskId);

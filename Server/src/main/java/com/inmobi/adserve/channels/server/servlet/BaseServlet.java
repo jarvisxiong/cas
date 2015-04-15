@@ -42,7 +42,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 public abstract class BaseServlet implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
     private static final double MIN_RTB_FLOOR = 0.05;
-    private static final double NETWORK_ECPM_FACOR = 0.5;
     protected final Provider<Marker> traceMarkerProvider;
 
     private final MatchSegments matchSegments;
@@ -199,11 +198,6 @@ public abstract class BaseServlet implements Servlet {
     protected void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal) {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
-        // Setting isResponseOnlyFromDCP from config
-        final boolean isResponseOnlyFromDcp = CasConfigUtil.getServerConfig().getBoolean("isResponseOnyFromDCP", false);
-        LOG.debug("isResponseOnlyFromDcp from config is {}", isResponseOnlyFromDcp);
-        sasParams.setResponseOnlyFromDcp(isResponseOnlyFromDcp);
-
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
         if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
@@ -239,11 +233,13 @@ public abstract class BaseServlet implements Servlet {
         LOG.debug("Base class enrichRequest");
         casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
         casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
-
-        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams, NETWORK_ECPM_FACOR);
+        final double networkEcpmFactor = CasConfigUtil.getServerConfig().getDouble("rtb.networkEcpmFactor", 0.5);
+        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams, networkEcpmFactor);
         final double segmentFloor = casUtils.getRtbFloor(casContext);
         final double siteFloor = sasParams.getSiteFloor();
-        final double auctionBidFloor = calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR, networkSiteEcpm);
+        double auctionBidFloor = calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR, networkSiteEcpm);
+        final int bidFloorPercent = CasConfigUtil.getServerConfig().getInt("rtb.bidFloorPercent", 100);
+        auctionBidFloor = auctionBidFloor * bidFloorPercent / 100;
         casInternal.setAuctionBidFloor(auctionBidFloor);
 
         LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
@@ -252,6 +248,7 @@ public abstract class BaseServlet implements Servlet {
         LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
         LOG.debug("SegmentFloor is {}", segmentFloor);
         LOG.debug("Minimum rtb floor is {}", MIN_RTB_FLOOR);
+        LOG.debug("rtb.bidFloorPercent is {}", bidFloorPercent);
         LOG.debug("Final rtbFloor is {}", auctionBidFloor);
     }
 

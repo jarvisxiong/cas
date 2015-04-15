@@ -251,7 +251,6 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getModelId(), 234);
         assertEquals(sasRequestParameters.getDst(), 6);
         assertEquals(sasRequestParameters.getAccountSegment(), Collections.<Integer>emptySet());
-        assertEquals(sasRequestParameters.isResponseOnlyFromDcp(), false);
         assertEquals(sasRequestParameters.getSst(), 100);
         assertEquals(sasRequestParameters.getReferralUrl(), "refUrl");
     }

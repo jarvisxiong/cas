@@ -186,6 +186,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
     }
+ 
 
 
     @Override

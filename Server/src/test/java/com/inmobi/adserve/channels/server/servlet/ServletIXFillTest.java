@@ -131,7 +131,6 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
-        expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
@@ -139,8 +138,6 @@ public class ServletIXFillTest {
                 new ArrayList<AdvertiserMatchedSegmentDetail>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
 
-        mockSASRequestParameters.setResponseOnlyFromDcp(false);
-        expectLastCall().anyTimes();
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
@@ -203,7 +200,6 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
-        expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
@@ -217,8 +213,6 @@ public class ServletIXFillTest {
                 mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
                         null, null)).andReturn(null).anyTimes();
 
-        mockSASRequestParameters.setResponseOnlyFromDcp(false);
-        expectLastCall().anyTimes();
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
@@ -285,8 +279,7 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
-        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(2);
-        expect(mockConfig.getBoolean("isResponseOnyFromDCP", false)).andReturn(false).anyTimes();
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
@@ -311,8 +304,6 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getUAdapters()).andReturn(null).anyTimes();
         expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).anyTimes();
 
-        mockSASRequestParameters.setResponseOnlyFromDcp(false);
-        expectLastCall().anyTimes();
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
