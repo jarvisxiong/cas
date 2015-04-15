@@ -1,0 +1,8 @@
+<html><head><title></title><style type="text/css">body {margin: 0px; overflow: hidden;} </style></head><body><script type='text/javascript' src='http://www.googletagservices.com/tag/js/gpt.js'>
+  googletag.pubads().definePassback('/14503685/AdUnitForAdx', [[$width, $height]]).setTargeting('adxtagid', ['$adTagId']).display();
+  googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+        if (!event.isEmpty) {
+            #if($IMBeaconUrl)document.write("<img src='$IMBeaconUrl' height=1 width=1 border=0 style='display:none;'/>");#end
+        }
+    });
+</script></body></html>

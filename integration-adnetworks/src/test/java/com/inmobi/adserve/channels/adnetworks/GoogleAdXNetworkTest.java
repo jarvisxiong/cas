@@ -204,6 +204,38 @@ public class GoogleAdXNetworkTest extends TestCase {
     }
 
     @Test
+    public void testGoogleAdXNetworkResponseForDFP() throws Exception {
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        // Setting slot for 320x50
+        sasParams.setAppUrl("http://www.inmobi.com");
+
+        final String externalKey = "8a809449013c3c643cad82cb412b5857";
+        final String beaconUrl =
+                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
+                        null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
+                        null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
+                        new JSONObject("{\"pos\":\"header\", \"useDFP\":true}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new Integer[] {0}));
+        googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
+
+        googleAdXNetwork.generateJsAdResponse();
+        assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);
+
+        final String expectedResponse =
+                "<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type='text/javascript' src='http://www.googletagservices.com/tag/js/gpt.js'>\n"
+                        + "  googletag.pubads().definePassback('/14503685/AdUnitForAdx', [[320, 50]]).setTargeting('adxtagid', ['8a809449013c3c643cad82cb412b5857']).display();\n"
+                        + "  googletag.pubads().addEventListener('slotRenderEnded', function(event) {\n"
+                        + "        if (!event.isEmpty) {\n"
+                        + "            document.write(\"<img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style='display:none;'/>\");        }\n"
+                        + "    });\n"
+                        + "</script></body></html>";
+        assertEquals(expectedResponse, googleAdXNetwork.getHttpResponseContent());
+    }
+
+    @Test
     public void testGoogleAdXNetworkResponseForAppTraffic() throws Exception {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
