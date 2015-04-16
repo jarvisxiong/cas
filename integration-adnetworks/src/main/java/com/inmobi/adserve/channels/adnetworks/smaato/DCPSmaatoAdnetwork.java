@@ -33,7 +33,6 @@ import com.smaato.soma.oapi.Response.Ads.Ad;
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     protected static final String LATLONG = "gps";
-    protected static final String GENDER = "gender";
     protected static final String KEYWORDS = "kws";
     protected static final String AGE = "age";
 
@@ -221,7 +220,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -230,9 +229,9 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 final Response smaatoResponse = jaxbHelper.unmarshal(response, com.smaato.soma.oapi.Response.class);
 
                 if (!SUCCESS.equalsIgnoreCase(smaatoResponse.getStatus()) || smaatoResponse.getAds().getAd() == null) {
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     statusCode = 500;
-                    responseContent = "";
+                    responseContent = DEFAULT_EMPTY_STRING;
                     return;
                 }
 
@@ -260,10 +259,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
 
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Smaato: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }

@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -86,7 +87,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append(host).append("?format=").append(config.getString("tapit.responseFormat")).append("&ip=");
             url.append(sasParams.getRemoteHostIp()).append("&ua=")
                     .append(getURLEncode(sasParams.getUserAgent(), format));
-            if ("1".equals(config.getString("tapit.test"))) {
+            if (GlobalConstant.ONE.equals(config.getString("tapit.test"))) {
                 url.append("&mode=test");
             }
             url.append("&zone=").append(externalSiteId);
@@ -135,7 +136,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             LOG.debug("beacon url inside mullah media is {}", beaconUrl);
@@ -167,14 +168,14 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final JSONException exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from tapit: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from tapit: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

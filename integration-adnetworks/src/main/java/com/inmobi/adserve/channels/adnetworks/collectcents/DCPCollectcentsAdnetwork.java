@@ -211,7 +211,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 
         final String requestParams = getRequestParams();
         final RequestBuilder ningRequestBuilder =
-                new RequestBuilder("POST").setUrl(uri.toString())
+                new RequestBuilder(POST).setUrl(uri.toString())
                         .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                         .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                         .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)

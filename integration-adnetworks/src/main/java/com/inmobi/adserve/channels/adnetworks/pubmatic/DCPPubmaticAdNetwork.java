@@ -186,7 +186,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
         final byte[] body = getRequestParams().getBytes(CharsetUtil.UTF_8);
 
-        return new RequestBuilder("POST").setUrl(uri.toString())
+        return new RequestBuilder(POST).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)

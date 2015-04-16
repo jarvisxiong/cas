@@ -38,6 +38,7 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.types.AdAttributeType;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.InventoryType;
@@ -73,7 +74,7 @@ public class ThriftRequestParser {
                 tObject.isSetRequestedAdType() && tObject.requestedAdType == RequestedAdType.INTERSTITIAL;
         params.setRqAdType(isInterstitial ? "int" : tObject.isSetRequestedAdType()
                 ? tObject.requestedAdType.name()
-                : "");
+                : StringUtils.EMPTY);
         params.setRichMedia(tObject.isSetSupplyAllowedContents()
                 && tObject.supplyAllowedContents.contains(SupplyContentType.RICH_MEDIA));
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
@@ -98,7 +99,7 @@ public class ThriftRequestParser {
         if (tObject.isSetSite()) {
             params.setSiteId(tObject.site.siteId);
             final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
-            params.setSource(isApp ? "APP" : "WAP");
+            params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
 
             if (CasConfigUtil.repositoryHelper != null) {
                 params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper
@@ -149,7 +150,7 @@ public class ThriftRequestParser {
         if (tObject.isSetDevice()) {
             String userAgent = tObject.device.userAgent;
             try {
-                userAgent = userAgent != null ? URLDecoder.decode(userAgent, "UTF-8") : null;
+                userAgent = userAgent != null ? URLDecoder.decode(userAgent, GlobalConstant.UTF_8) : null;
             } catch (final UnsupportedEncodingException e) {}
             params.setUserAgent(userAgent);
             params.setOsId(new Long(tObject.device.osId).intValue());
@@ -163,9 +164,11 @@ public class ThriftRequestParser {
 
         // Fill params from Geo Object
         if (tObject.isSetGeo()) {
-            params.setLocSrc(tObject.geo.isSetLocationSource() ? tObject.geo.locationSource.name() : "LATLON");
+            params.setLocSrc(tObject.geo.isSetLocationSource()
+                    ? tObject.geo.locationSource.name()
+                    : GlobalConstant.LATLON);
             // TODO Change format in dcp
-            String latLong = "";
+            String latLong = StringUtils.EMPTY;
             if (tObject.geo.latLong != null) {
                 latLong = tObject.geo.latLong.latitude + "," + tObject.geo.latLong.longitude;
             }
@@ -205,10 +208,10 @@ public class ThriftRequestParser {
             if (tObject.user.gender != null) {
                 switch (tObject.user.gender) {
                     case FEMALE:
-                        params.setGender("F");
+                        params.setGender(GlobalConstant.GENDER_FEMALE);
                         break;
                     case MALE:
-                        params.setGender("M");
+                        params.setGender(GlobalConstant.GENDER_MALE);
                         break;
                     default:
                         params.setGender(null);
@@ -232,8 +235,9 @@ public class ThriftRequestParser {
             if (tObject.getCarrier().isSetConnectionType()) {
                 params.setConnectionType(tObject.carrier.connectionType);
             } else if (tObject.getCarrier().isSetNetworkType()) {
-                params.setConnectionType(NetworkType.WIFI == tObject.getCarrier().getNetworkType() ?
-                        ConnectionType.WIFI : ConnectionType.CELLULAR_UNKNOWN);
+                params.setConnectionType(NetworkType.WIFI == tObject.getCarrier().getNetworkType()
+                        ? ConnectionType.WIFI
+                        : ConnectionType.CELLULAR_UNKNOWN);
             } else {
                 params.setConnectionType(ConnectionType.UNKNOWN);
             }
@@ -310,7 +314,7 @@ public class ThriftRequestParser {
 
     private void setUserIdParams(final CasInternalRequestParameters parameter, final UidParams uidParams) {
         final Map<UidType, String> uidMap = uidParams.getRawUidValues();
-        parameter.setUidADT(uidParams.isLimitIOSAdTracking() ? "0" : "1");
+        parameter.setUidADT(uidParams.isLimitIOSAdTracking() ? GlobalConstant.ZERO : GlobalConstant.ONE);
         parameter.setUuidFromUidCookie(uidParams.getUuidFromUidCookie());
 
         for (final Entry<UidType, String> entry : uidMap.entrySet()) {

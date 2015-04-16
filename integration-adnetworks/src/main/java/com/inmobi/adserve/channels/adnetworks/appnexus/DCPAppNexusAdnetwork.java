@@ -181,7 +181,7 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -190,18 +190,18 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 final JSONObject responseJson = new JSONObject(response);
                 final JSONArray responseArray = responseJson.getJSONArray("ads");
                 if (responseArray.length() == 0) {
-                    responseContent = "";
+                    responseContent = DEFAULT_EMPTY_STRING;
                     statusCode = 500;
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     return;
                 }
                 final JSONObject adsJson = responseArray.getJSONObject(0);
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adsJson.getString("content"));
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from {}: {}", response, name, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

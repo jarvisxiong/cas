@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class Formatter {
@@ -26,7 +27,6 @@ public class Formatter {
         HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML
     }
 
-    private static final String APP = "APP";
     private static VelocityEngine velocityEngine;
     private static Template velocityTemplateHtml;
     private static Template velocityTemplatePlainTxt;
@@ -77,7 +77,8 @@ public class Formatter {
      * The request has to come from inmobi sdk residing in the mobile app
      */
     private static boolean isRequestFromSdk(final SASRequestParameters sasParams) {
-        return APP.equalsIgnoreCase(sasParams.getSource()) && StringUtils.isNotBlank(sasParams.getSdkVersion());
+        return GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource())
+                && StringUtils.isNotBlank(sasParams.getSdkVersion());
     }
 
     /**
@@ -148,7 +149,7 @@ public class Formatter {
         if (slot == null) {
             return null;
         }
-        if ("1".equals(slot) || "1.0".equals(slot)) {
+        if (GlobalConstant.ONE.equals(slot) || "1.0".equals(slot)) {
             return "template_120_20";
         }
         if ("2".equals(slot) || "2.0".equals(slot)) {

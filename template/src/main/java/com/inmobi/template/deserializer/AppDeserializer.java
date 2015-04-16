@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -29,7 +31,7 @@ public class AppDeserializer implements JsonDeserializer<Context> {
         final String desc = getAttributeAsString("description", jsonObj);
         final String actionText = getAttributeAsString("actiontext", jsonObj);
         final String actionLink = getAttributeAsString("actionlink", jsonObj);
-        final String id = getAttributeAsString("uid", jsonObj, "");
+        final String id = getAttributeAsString("uid", jsonObj, StringUtils.EMPTY);
 
         final JsonElement imgElement = jsonObj.get("image");
         Screenshot imgs[] = null;

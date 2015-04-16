@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -47,12 +48,11 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private int width;
     private int height;
-    private String size;
     private double latitude;
     private double longitude;
     private String adSlotId=null;
-    private static final String BLANK_VAL ="";
-    private static final String AD_TRACKING_ENABLED="1";
+    private static final String BLANK_VAL =DEFAULT_EMPTY_STRING;
+    private static final String AD_TRACKING_ENABLED = GlobalConstant.ONE;
     private static final String AD_SLOTID_DB_KEY="slot";
 
     public DCPBaiduAdNetwork(final Configuration config,
@@ -103,11 +103,10 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         JSONObject additionalParams = entity.getAdditionalParams();
-
         try {
             // ad slot id is configured as the additional param in the
             // segment table
-            adSlotId = entity.getAdditionalParams().getString(AD_SLOTID_DB_KEY);
+            adSlotId = additionalParams.getString(AD_SLOTID_DB_KEY);
         } catch (final JSONException e) {
             LOG.debug("slot is not configured for the segment:{} {}, exception raised {}", entity.getExternalSiteKey(),
                     getName(), e);
@@ -217,7 +216,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        RequestBuilder ningRequestBuilder = new RequestBuilder("POST")
+        RequestBuilder ningRequestBuilder = new RequestBuilder(POST)
                 .setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT,
                         sasParams.getUserAgent())
@@ -246,7 +245,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public void parseResponse(final byte[] responseByte, final HttpResponseStatus status) {
         try {
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             statusCode = 500;
             BidResponse responses = BidResponse.parseFrom(responseByte);
             int adCount = responses.getAdsCount();
@@ -297,7 +296,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(
                         t, context, sasParams, beaconUrl);
                 LOG.debug("Baidu AD" + responseContent);
-                adStatus = "AD";
+                adStatus = AD_STRING;
                 statusCode = 200;
             } else {
                 return;

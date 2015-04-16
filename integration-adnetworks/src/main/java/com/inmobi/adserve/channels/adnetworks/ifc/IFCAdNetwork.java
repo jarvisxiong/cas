@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.CategoryList;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 
 
@@ -115,7 +116,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
                     LOG.info("IFC Configure Parameter returning false");
                     return false;
                 }
-                /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals("0")) && adcode.equalsIgnoreCase("non-js")) {
+                /*if ((sdkVersion == null || sdkVersion.toLowerCase().equals(GlobalConstant.ZERO)) && adcode.equalsIgnoreCase("non-js")) {
                     return false;
                 }*/
             } catch (final JSONException e) {
@@ -155,9 +156,11 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
 
         final String tempGender = sasParams.getGender();
 
-        if (!isEmpty(tempGender) && ("m".equalsIgnoreCase(tempGender) || "male".equalsIgnoreCase(tempGender))) {
+        if (!isEmpty(tempGender)
+                && (GlobalConstant.GENDER_MALE.equalsIgnoreCase(tempGender) || "male".equalsIgnoreCase(tempGender))) {
             gender = "male";
-        } else if (!isEmpty(tempGender) && ("f".equalsIgnoreCase(tempGender) || "female".equalsIgnoreCase(tempGender))) {
+        } else if (!isEmpty(tempGender)
+                && (GlobalConstant.GENDER_FEMALE.equalsIgnoreCase(tempGender) || "female".equalsIgnoreCase(tempGender))) {
             gender = "female";
         } else {
             gender = tempGender;
@@ -223,7 +226,7 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         final byte[] body = getRequestBody().getBytes(CharsetUtil.UTF_8);
-        return new RequestBuilder("POST").setUrl(uri.toString())
+        return new RequestBuilder(POST).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                 .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                 .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
@@ -286,9 +289,9 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
         jsonObject.addProperty("slotWidth", slotWidth);
         jsonObject.addProperty("uid", casInternalRequestParameters.getUid());
         jsonObject.addProperty("age", sasParams.getAge());
-        jsonObject.addProperty("gender", gender);
+        jsonObject.addProperty(GENDER, gender);
         jsonObject.addProperty("latLong", casInternalRequestParameters.getLatLong());
-        jsonObject.addProperty("country", sasParams.getCountryCode());
+        jsonObject.addProperty(COUNTRY, sasParams.getCountryCode());
         jsonObject.addProperty("siteID", siteID);
         jsonObject.addProperty("adGroupID", adGroupID);
         jsonObject.addProperty("richMedia", richMedia);
@@ -362,12 +365,12 @@ public class IFCAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             responseContent = response;
             statusCode = status.code();
-            adStatus = "AD";
+            adStatus = AD_STRING;
         }
         LOG.debug("response length is {}", responseContent.length());
     }

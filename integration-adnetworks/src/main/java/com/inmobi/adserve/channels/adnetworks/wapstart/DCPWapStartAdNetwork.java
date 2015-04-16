@@ -22,6 +22,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -112,7 +113,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         final User user = new User();
         final String gender = sasParams.getGender();
         if (StringUtils.isNotBlank(gender)) {
-            final int gen = "F".equalsIgnoreCase(gender) ? 2 : 1;
+            final int gen = GlobalConstant.GENDER_FEMALE.equalsIgnoreCase(gender) ? 2 : 1;
             user.setGender(gen);
         }
 
@@ -154,7 +155,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
             device.setAndroid_id(casInternalRequestParameters.getUidO1());
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
-                && "1".equals(casInternalRequestParameters.getUidADT())) {
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
             device.setIfa(casInternalRequestParameters.getUidIFA());
         }
         device.setGeo(geo);
@@ -209,7 +210,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
         final String requestParams = getRequestParams();
         final RequestBuilder ningRequestBuilder =
-                new RequestBuilder("POST").setUrl(uri.toString())
+                new RequestBuilder(POST).setUrl(uri.toString())
                         .setHeader("x-display-metrics", String.format("%sx%s", width, height))
                         .setHeader("xplus1-user-agent", sasParams.getUserAgent())
                         .setHeader("x-plus1-remote-addr", sasParams.getRemoteHostIp())

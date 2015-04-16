@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.powermock.api.support.membermodification.MemberModifier;
@@ -45,8 +46,8 @@ public class ServerTest extends TestCase {
     private final String secretKeyVersion = "1";
     private SASRequestParameters sasParam;
     private RequestParser requestParser;
-    private static String rrFile = "";
-    private static String channelFile = "";
+    private static String rrFile = StringUtils.EMPTY;
+    private static String channelFile = StringUtils.EMPTY;
     private static int count = 0;
     private static int percentRollout = 100;
     private static List<String> siteType = Arrays.asList("FAMILYSAFE", "PERFORMANCE", "MATURE");

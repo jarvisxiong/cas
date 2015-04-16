@@ -80,14 +80,14 @@ public class IXAdNetworkHelper {
 
         macros.add(SDK_VERSION_ID);
         final String sdkVersion = sasParams.getSdkVersion();
-        substitutions.add(null != sdkVersion ? sdkVersion : "");
+        substitutions.add(null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
 
         // default value for replacement of macros is an empty string
         final Geo geo = createSproutGeoObject(casIntenal, sasParams, isCoppaSet);
-        final String lat = null != geo.getLat() ? String.valueOf(geo.getLat()) : "";
-        final String lng = null != geo.getLon() ? String.valueOf(geo.getLon()) : "";
-        final String zip = null != geo.getZip() ? geo.getZip() : "";
-        final String cc = null != geo.getCountry() ? geo.getCountry() : "";
+        final String lat = null != geo.getLat() ? String.valueOf(geo.getLat()) : StringUtils.EMPTY;
+        final String lng = null != geo.getLon() ? String.valueOf(geo.getLon()) : StringUtils.EMPTY;
+        final String zip = null != geo.getZip() ? geo.getZip() : StringUtils.EMPTY;
+        final String cc = null != geo.getCountry() ? geo.getCountry() : StringUtils.EMPTY;
 
         macros.add(GEO_LAT);
         substitutions.add(lat);
@@ -102,13 +102,13 @@ public class IXAdNetworkHelper {
         substitutions.add(cc);
 
         macros.add(JS_ESC_GEO_CITY);
-        substitutions.add(""); // JS_ESC_GEO_CITY is not currently being set
+        substitutions.add(StringUtils.EMPTY); // JS_ESC_GEO_CITY is not currently being set
 
         macros.add(RECORD_EVENT_FUN);
-        substitutions.add(""); // No function is being provided
+        substitutions.add(StringUtils.EMPTY); // No function is being provided
 
         macros.add(OPEN_LP_FUN);
-        substitutions.add(""); // No function is being provided
+        substitutions.add(StringUtils.EMPTY); // No function is being provided
 
         final String[] macroArray = macros.toArray(new String[macros.size()]);
         final String[] substitutionsArray = substitutions.toArray(new String[substitutions.size()]);

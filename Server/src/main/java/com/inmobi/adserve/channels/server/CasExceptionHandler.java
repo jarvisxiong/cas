@@ -16,6 +16,7 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -70,7 +71,7 @@ public class CasExceptionHandler extends ChannelInboundHandlerAdapter {
                 // We need to send one response from this point, so take the best from here and return it.
                 for (final ChannelSegment channelSegment : segmentList) {
                     if (channelSegment.getAdNetworkInterface().isRequestCompleted() == false) {
-                        channelSegment.getAdNetworkInterface().setAdStatus("TIME_OUT");
+                        channelSegment.getAdNetworkInterface().setAdStatus(GlobalConstant.TIME_OUT);
                     }
                     channelSegment.getAdNetworkInterface().processResponse();
                 }

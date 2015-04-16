@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 
 import io.netty.channel.Channel;
@@ -224,7 +226,7 @@ public class AsyncRequestMaker {
         builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
         builder.setLocation(null != sasParams.getState() ? sasParams.getState() : 0);
         builder.setSegmentId(null != sasParams.getSiteSegmentId() ? sasParams.getSiteSegmentId() : 0);
-        builder.setGender(null != sasParams.getGender() ? sasParams.getGender() : "");
+        builder.setGender(null != sasParams.getGender() ? sasParams.getGender() : StringUtils.EMPTY);
         builder.setCPC(pricingModel);
         builder.setCarrierId(sasParams.getCarrierId());
         builder.setHandsetInternalId(sasParams.getHandsetInternalId());
@@ -250,6 +252,6 @@ public class AsyncRequestMaker {
     }
 
     private boolean isNativeRequest(final SASRequestParameters sasParams) {
-        return "native".equalsIgnoreCase(sasParams.getRFormat());
+        return GlobalConstant.NATIVE_STRING.equalsIgnoreCase(sasParams.getRFormat());
     }
 }

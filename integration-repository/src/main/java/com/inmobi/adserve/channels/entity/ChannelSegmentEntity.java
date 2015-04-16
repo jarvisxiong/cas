@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,7 +216,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
      * Get the AdId corresponding to an ad format in the ad_group.
      */
     public String getAdId(final ADCreativeType creativeType) {
-        final String notFound = "";
+        final String notFound = StringUtils.EMPTY;
 
         if (null == getAdFormatIds()) {
             return notFound;

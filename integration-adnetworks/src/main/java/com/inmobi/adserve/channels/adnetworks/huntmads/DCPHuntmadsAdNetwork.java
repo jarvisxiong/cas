@@ -27,6 +27,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -80,7 +81,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        isapp = StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+        isapp = StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
                         ? false : true;
 
         return true;
@@ -103,7 +104,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append(host).append("?ip=").append(sasParams.getRemoteHostIp());
             url.append("&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=").append(externalSiteId);
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
-            if ("1".equals(config.getString("huntmads.test"))) {
+            if (GlobalConstant.ONE.equals(config.getString("huntmads.test"))) {
                 url.append("&test=1");
             }
             if (!StringUtils.isBlank(latitude) && !StringUtils.isBlank(longitude)) {
@@ -143,7 +144,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
 
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                        && "1".equals(casInternalRequestParameters.getUidADT())) {
+                        && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
 
                     appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
                 }
@@ -200,7 +201,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             LOG.debug("beacon url inside huntmads is {}", beaconUrl);
@@ -240,14 +241,14 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final JSONException exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from huntmads: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from huntmads: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

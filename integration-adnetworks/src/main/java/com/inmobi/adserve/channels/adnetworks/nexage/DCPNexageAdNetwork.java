@@ -90,7 +90,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         isApp =
-                StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())
+                StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
                         ? false
                         : true;
         constructURL();
@@ -223,12 +223,12 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from nexage: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             }
-            adStatus = "AD";
+            adStatus = AD_STRING;
         }
         LOG.debug("response length is {}", responseContent.length());
     }
@@ -247,9 +247,9 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             responseContent =
                     Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams, beaconUrl);
-            adStatus = "AD";
+            adStatus = AD_STRING;
         } catch (final Exception exception) {
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             LOG.info("Error generating Static Js adtag for nexage  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());

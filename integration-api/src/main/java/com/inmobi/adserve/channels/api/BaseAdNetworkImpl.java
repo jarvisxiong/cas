@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -48,6 +49,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,8 +57,9 @@ import lombok.Setter;
 // This abstract class have base functionality of TPAN adapters.
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected Marker traceMarker;
-    protected static final String WAP = "WAP";
-    protected static final String APP = "APP";
+    protected static final String USD = GlobalConstant.USD;
+    protected static final String WAP = GlobalConstant.WAP;
+    protected static final String APP = GlobalConstant.APP;
     protected static final String UA = "ua";
     protected static final String IP = "ip";
     protected static final String LAT = "lat";
@@ -64,14 +67,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String ZIP = "zip";
     protected static final String COUNTRY = "country";
     protected static final String GENDER = "gender";
-    protected static final String DEFAULT_EMPTY_STRING = "";
-    protected static final String NO_AD = "NO_AD";
-    protected static final String NATIVE_STRING = "native";
+    protected static final String DEFAULT_EMPTY_STRING = StringUtils.EMPTY;
+    protected static final String NO_AD = GlobalConstant.NO_AD;
+    protected static final String NATIVE_STRING = GlobalConstant.NATIVE_STRING;
     protected static final String AD_STRING = "AD";
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     protected static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     protected static final String TERM = "TERM";
-    protected static final String LATLON = "LATLON";
+    protected static final String LATLON = GlobalConstant.LATLON;
     protected static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
     protected static final String WIFI = "WIFI";
     protected static final String NON_WIFI = "NON_WIFI";
@@ -130,7 +133,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String blindedSiteId;
     protected Short selectedSlotId;
     protected RepositoryHelper repositoryHelper;
-    protected String format = "UTF-8";
+    protected String format = GlobalConstant.UTF_8;
     protected final Channel serverChannel;
 
     private Map<?, ?> responseHeaders;
@@ -253,7 +256,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
 
-                        final String responseStr = response.getResponseBody("UTF-8");
+                        final String responseStr = response.getResponseBody(GlobalConstant.UTF_8);
                         final HttpResponseStatus httpResponseStatus =
                                 HttpResponseStatus.valueOf(response.getStatusCode());
 
@@ -299,7 +302,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
-                        adStatus = "TIME_OUT";
+                        adStatus = GlobalConstant.TIME_OUT;
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.CONNECTION_TIMEOUT);
                         InspectorStats.incrementStatCount(InspectorStrings.CONNECTION_TIMEOUT);
                         processResponse();
@@ -308,7 +311,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         LOG.debug("{} timeout latency {}", getName(), latency);
-                        adStatus = "TIME_OUT";
+                        adStatus = GlobalConstant.TIME_OUT;
                         processResponse();
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
                         return;
@@ -424,12 +427,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         } else if (statusCode >= 300) {
             responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR);
         } else if (statusCode == 200) {
-            if (StringUtils.isBlank(responseContent) || !"AD".equalsIgnoreCase(adStatus)) {
-                adStatus = "NO_AD";
+            if (StringUtils.isBlank(responseContent) || !AD_STRING.equalsIgnoreCase(adStatus)) {
+                adStatus = NO_AD;
                 responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
             } else {
                 responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.SUCCESS);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             }
         } else if (statusCode >= 204) {
             responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
@@ -533,7 +536,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         } else {
             responseContent = response;
             statusCode = status.code();
-            adStatus = "AD";
+            adStatus = AD_STRING;
             responseContent = "<html><body>".concat(responseContent).concat("</body></html>");
         }
         LOG.debug("response length is {}", responseContent.length());
@@ -616,10 +619,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      */
     protected String getUid() {
         if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
-                && "1".equals(casInternalRequestParameters.getUidADT())) {
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
             return casInternalRequestParameters.getUidIFA();
         } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getGpid())
-                && "1".equals(casInternalRequestParameters.getUidADT())) {
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
             return casInternalRequestParameters.getGpid();
         } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
             return casInternalRequestParameters.getUidSO1();
@@ -806,7 +809,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public String getCurrency() {
-        return "USD";
+        return USD;
     }
 
     @Override
@@ -889,7 +892,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected String getGPID() {
         return StringUtils.isNotBlank(casInternalRequestParameters.getGpid())
-                && "1".equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters.getGpid() : null;
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters.getGpid() : null;
     }
 
     @Override

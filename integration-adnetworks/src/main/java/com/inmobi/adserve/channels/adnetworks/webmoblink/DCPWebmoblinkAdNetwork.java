@@ -21,10 +21,12 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 import lombok.Data;
 
 public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -40,8 +42,6 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String OPERATING_MODE = "mo";
     private static final String PUBLISHERID = "pid";
     private static final String SITEID = "sid";
-    private static final String USERAGENT = "ua";
-    private static final String IP = "ip";
     private static final String RESULT = "result";
     private static final String DEVICE_ID = "did";
     private static final String DID_TYPE = "didtype";
@@ -95,7 +95,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, PUBLISHERID, externalSiteId, false);
         appendQueryParam(url, SITEID, blindedSiteId, false);
         appendQueryParam(url, OPERATING_MODE, mode, false);
-        appendQueryParam(url, USERAGENT, getURLEncode(sasParams.getUserAgent(), format), false);
+        appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
         appendQueryParam(url, RESPONSE_FORMAT, adFormat, false);
         appendQueryParam(url, RESULT, resultFormat, false);
@@ -125,7 +125,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
             } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
                 // ios : ifa,so1 and o1 is odin1,idus as already added
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                        && "1".equals(casInternalRequestParameters.getUidADT())) {
+                        && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
                     appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidIFA(), false);
                     appendQueryParam(url, DID_TYPE, 1, false);
 
@@ -157,7 +157,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -167,9 +167,9 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                 if (adResponse.getStatus() != 0) {
                     statusCode = status.code();
                     {
-                        adStatus = "NO_AD";
+                        adStatus = NO_AD;
                         statusCode = 500;
-                        responseContent = "";
+                        responseContent = DEFAULT_EMPTY_STRING;
                         return;
                     }
                 }
@@ -197,9 +197,9 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response from Webmoblink: response: {}", response);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

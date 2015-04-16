@@ -41,7 +41,6 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String APP = "app";
     private static final String WEB = "web";
 
-    private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
 
     private String latitude = null;
     private String longitude = null;
@@ -80,7 +79,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (null != casInternalRequestParameters.getLatLong()
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            if (DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())) {
+            if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
                 // isLocSourceDerived = true;
             } else {
                 final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
@@ -187,7 +186,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -195,9 +194,9 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from XAd: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

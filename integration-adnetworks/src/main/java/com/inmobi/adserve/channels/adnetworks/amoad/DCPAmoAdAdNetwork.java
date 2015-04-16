@@ -68,16 +68,16 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
         final String tag = slotTagMap.get(selectedSlotId);
         if (StringUtils.isEmpty(tag)) {
             LOG.info("Tag is not configured for this slot: {}", selectedSlotId);
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             return;
         }
 
         context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, tag);
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-            adStatus = "AD";
+            adStatus = AD_STRING;
         } catch (final Exception exception) {
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             LOG.info("Error generating Static Js adtag for AmoAd  : {}", exception);
         }
         LOG.debug("response length is {}", responseContent.length());

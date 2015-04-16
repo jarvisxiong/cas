@@ -30,6 +30,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -37,10 +38,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
-
     private static final Logger LOG = LoggerFactory.getLogger(DCPLomarkAdNetwork.class);
-
-    private static final String NO_AD = "NO_AD";
     private static Map<Long, Integer> categoryMap = new HashMap<Long, Integer>();
     private static Map<Integer, Integer> carrierIdMap;
     private transient String key;
@@ -177,7 +175,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 requestMap.put("AdSpaceType", "2");
             } else {
                 url.append("&AdSpaceType=1");
-                requestMap.put("AdSpaceType", "1");
+                requestMap.put("AdSpaceType", GlobalConstant.ONE);
             }
             // map operator
             final Integer carrierId = getCarrierId();
@@ -192,7 +190,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append("&Uuid=").append(uuid);
             requestMap.put("Uuid", uuid);
             url.append("&DeviceType=1");
-            requestMap.put("DeviceType", "1");
+            requestMap.put("DeviceType", GlobalConstant.ONE);
             url.append("&AppName=").append(blindedSiteId);
             requestMap.put("AppName", blindedSiteId);
             // map Category
@@ -241,7 +239,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -310,7 +308,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 } else {
                     type = TemplateType.IMAGE;
-                    adStatus = "AD";
+                    adStatus = AD_STRING;
                 }
                 responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl);
             } catch (final Exception exception) {

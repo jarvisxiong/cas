@@ -63,9 +63,10 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
 import com.inmobi.adserve.contracts.ix.request.App;
@@ -120,7 +121,6 @@ import lombok.Setter;
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
-    private static final String USD = "USD";
     private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
     private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
     private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
@@ -164,8 +164,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private BidRequest bidRequest;
     @Setter
     private String urlArg;
-    private String ixMethod;
-    private String callbackUrl;
+    private final String ixMethod;
+    private final String callbackUrl;
     private double bidPriceInUsd;
     private double bidPriceInLocal;
     private boolean templateWN = true;
@@ -210,7 +210,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private List<Integer> packageIds;
     private List<String> iabCategories;
-    private int minimumSdkVerForVAST;
+    private final int minimumSdkVerForVAST;
 
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
@@ -230,7 +230,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.clientBootstrap = clientBootstrap;
         this.host = host;
-        this.isIxPartner = true;
+        isIxPartner = true;
         this.advertiserName = advertiserName;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
@@ -314,8 +314,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(sasParams.getSiteId()) || StringUtils.isBlank(externalSiteId)
                 || !isRequestFormatSupported()) {
-            LOG.debug(
-                    traceMarker,
+            LOG.debug(traceMarker,
                     "mandate parameters missing or request format is not compatible to partner supported response for "
                             + "dummy so exiting adapter");
             return false;
@@ -386,7 +385,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private ProxyDemand createProxyDemandObject() {
         final ProxyDemand proxyDemand = new ProxyDemand();
-        proxyDemand.setMarketrate(this.forwardedBidGuidance);
+        proxyDemand.setMarketrate(forwardedBidGuidance);
         return proxyDemand;
     }
 
@@ -395,7 +394,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.getImpressionId()) {
             // In order to conform to the rubicon spec, we are passing a unique integer identifier whose value starts
             // with 1, and increments up to n for n impressions.
-            impression = new Impression("1");
+            impression = new Impression(GlobalConstant.ONE);
         } else {
             LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
@@ -431,13 +430,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
 
-        this.forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor() * bidFloorPercent / 100;
-        this.forwardedBidGuidance = Math.max(sasParams.getMarketRate(), this.forwardedBidFloor);
+        forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor() * bidFloorPercent / 100;
+        forwardedBidGuidance = Math.max(sasParams.getMarketRate(), forwardedBidFloor);
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
         impression.setInstl(null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())
                 || isVideoRequest ? 1 : 0);
-        impression.setBidfloor(this.forwardedBidFloor);
+        impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
         final ImpressionExtension ext = getImpExt();
         impression.setExt(ext);
@@ -527,7 +526,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Banner banner = new Banner();
         // Presently only one banner object per impression object is being sent
         // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
-        banner.setId("1");
+        banner.setId(GlobalConstant.ONE);
         final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
         if (null != slotSizeMapEntity) {
             final Dimension dim = slotSizeMapEntity.getDimension();
@@ -746,6 +745,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Publisher createPublisher() {
         final Publisher publisher = new Publisher();
+        publisher.setName("InMobi");
         publisher.setCat(iabCategories);
 
         final CommonExtension publisherExtensions = new CommonExtension();
@@ -892,7 +892,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             device.setOsv(sasParams.getOsMajorVersion());
         }
 
-        ConnectionType sasParamConnectionType = sasParams.getConnectionType();
+        final ConnectionType sasParamConnectionType = sasParams.getConnectionType();
         if (null != sasParamConnectionType) {
             device.setConnectiontype(sasParamConnectionType.getValue());
         } else {
@@ -960,7 +960,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (isExternalPersonaDeal) {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id=" + dealId);
         } else {
-            url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "");
+            url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, StringUtils.EMPTY);
         }
 
         if (null == bidRequest) {
@@ -1268,11 +1268,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.HEIGHT, (int) dim.getHeight());
         }
 
-        ConnectionType connectionType = sasParams.getConnectionType();
-        String connectionTypeString =
-                (null != connectionType && ConnectionType.WIFI == connectionType) ? WIFI : NON_WIFI;
+        final ConnectionType connectionType = sasParams.getConnectionType();
+        final String connectionTypeString =
+                null != connectionType && ConnectionType.WIFI == connectionType ? WIFI : NON_WIFI;
 
-        String requestNetworkTypeJson = "{\"networkType\":\"" + connectionTypeString + "\"}";
+        final String requestNetworkTypeJson = "{\"networkType\":\"" + connectionTypeString + "\"}";
         // Publisher control settings
         velocityContext.put(VelocityTemplateFieldConstants.REQUEST_JSON, requestNetworkTypeJson);
         velocityContext.put(VelocityTemplateFieldConstants.SITE_PREFERENCES_JSON,
@@ -1719,11 +1719,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public double getBidPriceInLocal() {
         return bidPriceInLocal;
-    }
-
-    @Override
-    public String getCurrency() {
-        return USD;
     }
 
     @Override

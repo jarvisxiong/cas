@@ -39,10 +39,10 @@ public class GenericAdapter extends BaseAdNetworkImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAdapter.class);
 
-    private String advertiserName = "";
+    private String advertiserName = DEFAULT_EMPTY_STRING;
     private final Configuration config;
-    private String requestMethod = "";
-    private String responseFormat = "";
+    private String requestMethod = DEFAULT_EMPTY_STRING;
+    private String responseFormat = DEFAULT_EMPTY_STRING;
 
     public GenericAdapter(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String advertiserName) {
@@ -102,7 +102,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        String finalUrl = "";
+        String finalUrl = DEFAULT_EMPTY_STRING;
         if (requestMethod.equals(MacrosAndStrings.GET)) {
             finalUrl = host + "?" + getRequestParams();
         } else {
@@ -149,7 +149,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 if (200 == statusCode) {
                     statusCode = 500;
                 }
-                responseContent = "";
+                responseContent = DEFAULT_EMPTY_STRING;
                 return;
             } else {
                 try {
@@ -157,10 +157,10 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                     if (responseInJson.getString(config.getString(advertiserName + MacrosAndStrings.RESPONSE_STATUS))
                             .equals(config.getString(advertiserName + MacrosAndStrings.STATUS_NO_AD))) {
                         statusCode = 500;
-                        responseContent = "";
+                        responseContent = DEFAULT_EMPTY_STRING;
                     } else {
                         statusCode = status.code();
-                        adStatus = "AD";
+                        adStatus = AD_STRING;
                         final String responseWithoutImpressionUrl =
                                 responseInJson.getString(config.getString(advertiserName + MacrosAndStrings.CONTENT));
                         final String impressionUrl =
@@ -183,11 +183,11 @@ public class GenericAdapter extends BaseAdNetworkImpl {
                 if (200 == statusCode) {
                     statusCode = 500;
                 }
-                responseContent = "";
+                responseContent = DEFAULT_EMPTY_STRING;
                 return;
             } else {
                 statusCode = status.code();
-                adStatus = "AD";
+                adStatus = AD_STRING;
                 final StringBuilder responseBuilder = new StringBuilder();
                 responseBuilder.append(MacrosAndStrings.HTML_STARTING);
                 responseBuilder.append(response);
@@ -197,7 +197,7 @@ public class GenericAdapter extends BaseAdNetworkImpl {
             }
         } else {
             statusCode = 500;
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
         }
         LOG.debug(traceMarker, "response length is {}", responseContent.length());
     }

@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 import javax.ws.rs.Path;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -29,15 +27,14 @@ import io.netty.util.CharsetUtil;
 @Path("/logParser")
 @Singleton
 public class ServletLogParser implements Servlet {
-    private static final Logger LOG = LoggerFactory.getLogger(ServletLogParser.class);
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
         final Map<String, List<String>> params = queryStringDecoder.parameters();
         final HttpRequest request = hrh.getHttpRequest();
-        String targetStrings = "";
-        String logFilePath = "";
+        String targetStrings = StringUtils.EMPTY;
+        String logFilePath = StringUtils.EMPTY;
 
         // Handle POST request
         if (request.getMethod() == HttpMethod.POST) {

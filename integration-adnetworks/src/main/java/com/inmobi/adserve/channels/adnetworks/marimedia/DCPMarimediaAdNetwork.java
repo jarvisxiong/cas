@@ -44,16 +44,14 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID_MD5 = "tt_android_id_md5";
     private static final String ANDROID_ADVERTISING_ID = "tt_advertising_id";
     private static final String BLINDED_SITE_ID = "tt_sub_aff";
+    private static final String LONGITUDE = "lon";
 
     private static final String IDFA = "tt_idfa";
     private static final String UDID = "tt_udid";
     private static final String UDID_MD5 = "tt_udid_md5";
 
-    private static final String LATITUDE = "lat";
-    private static final String LONGITUDE = "lon";
     private static final String NETWORK_TYPE = "nt";
 
-    private static final String GENDER = "gender";
     private static final String AGE = "age";
 
     private int width;
@@ -172,7 +170,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
             final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
 
-            appendQueryParam(url, LATITUDE, getURLEncode(latlong[0], format), false);
+            appendQueryParam(url, LAT, getURLEncode(latlong[0], format), false);
             appendQueryParam(url, LONGITUDE, getURLEncode(latlong[1], format), false);
         }
 
@@ -262,7 +260,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 } else {
                     // Other format.
                     // adType is "video" or "empty".
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     LOG.info("Error parsing response {} from Marimedia", response);
                     return;
                 }
@@ -281,9 +279,9 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 responseContent =
                         Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Marimedia: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }

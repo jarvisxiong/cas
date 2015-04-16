@@ -23,6 +23,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -37,7 +38,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String AGE = "age";
     private static final String IS_BEACON_RQD = "use_beacon";
     private static final String SLOT_FORMAT = "%s.slot_%s_%s";
-    private static final String BEACON_REQUIRED_FLAG = "1";
+    private static final String BEACON_REQUIRED_FLAG = GlobalConstant.ONE;
     private String placementId = null;
     private String name;
 
@@ -116,15 +117,15 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             try {
                 final JSONObject adResponse = new JSONObject(response);
 
                 if (!"true".equals(adResponse.getString("success"))) {
-                    adStatus = "NO_AD";
-                    responseContent = "";
+                    adStatus = NO_AD;
+                    responseContent = DEFAULT_EMPTY_STRING;
                     statusCode = 500;
                     return;
                 }
@@ -144,14 +145,14 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("creative_url"));
                     t = TemplateType.HTML;
                 } else {
-                    adStatus = "NO_AD";
-                    responseContent = "";
+                    adStatus = NO_AD;
+                    responseContent = DEFAULT_EMPTY_STRING;
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from {}  {}", response, name, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

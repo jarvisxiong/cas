@@ -50,6 +50,7 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
 import com.inmobi.casthrift.rtb.AppStore;
@@ -85,7 +86,7 @@ import lombok.Setter;
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
     public static ImpressionCallbackHelper impressionCallbackHelper;
-    public static final List<String> CURRENCIES_SUPPORTED = new ArrayList<>(Arrays.asList("USD", "CNY", "JPY", "EUR",
+    public static final List<String> CURRENCIES_SUPPORTED = new ArrayList<>(Arrays.asList(USD, "CNY", "JPY", "EUR",
             "KRW", "RUB"));
     private static final List<String> BLOCKED_ADVERTISER_LIST = new ArrayList<>(Arrays.asList("king.com",
             "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
@@ -100,10 +101,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static List<Integer> performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
             13, 14, 15, 16);
 
-    private static final String FAMILY_SAFE_RATING = "1";
-    private static final String PERFORMANCE_RATING = "0";
+    private static final String FAMILY_SAFE_RATING = GlobalConstant.ONE;
+    private static final String PERFORMANCE_RATING = GlobalConstant.ZERO;
     private static final String RATING_KEY = "fs";
-    private static final String USD = "USD";
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
@@ -126,8 +126,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     @Setter
     private String urlArg;
-    private String rtbMethod;
-    private String rtbVer;
+    private final String rtbMethod;
+    private final String rtbVer;
     @Getter
     @Setter
     private String callbackUrl;
@@ -135,7 +135,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInLocal;
 
     private final boolean wnRequired;
-    private int tmax = 200;
+    private final int tmax = 200;
     private boolean templateWN = true;
 
     private final String advertiserId;
@@ -156,7 +156,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    private String bidderCurrency = "USD";
+    private String bidderCurrency = USD;
     private final List<String> blockedAdvertisers = Lists.newArrayList();
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
@@ -179,14 +179,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         siteBlinded = config.getBoolean(advertiserName + ".siteBlinded");
         this.clientBootstrap = clientBootstrap;
         this.host = host;
-        this.isRtbPartner = true;
+        isRtbPartner = true;
         this.advertiserName = advertiserName;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
     }
- 
+
 
 
     @Override
@@ -323,7 +323,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             bidRequestJson = serializer.toString(bidRequest);
             if (isNativeRequest()) {
-                bidRequestJson = bidRequestJson.replaceFirst("nativeObject", "native");
+                bidRequestJson = bidRequestJson.replaceFirst("nativeObject", GlobalConstant.NATIVE_STRING);
             }
             LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
         } catch (final TException e) {
@@ -357,8 +357,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setInstl(0);
         }
 
-        this.forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
-        impression.setBidfloor(this.forwardedBidFloor);
+        forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+        impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
         if (null != displayManager) {
@@ -447,9 +447,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(IABCountriesMap.getIabCountry(sasParams.getCountryCode()));
         }
-        /*if (null != iabCitiesInterface.getIABCity(sasParams.getCity() + "")) {
-            geo.setCity(iabCitiesInterface.getIABCity(sasParams.getCity() + ""));
-        }*/
         geo.setZip(casInternalRequestParameters.getZipCode());
         // Setting type of geo data
         if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
@@ -683,7 +680,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
         final Request ningRequest =
-                new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod("POST")
+                new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod(POST)
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
                         .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                         .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();

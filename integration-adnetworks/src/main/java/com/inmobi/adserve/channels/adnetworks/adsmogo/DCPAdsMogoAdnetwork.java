@@ -10,9 +10,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -35,15 +37,12 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String DEVICE_TYPE = "p";
     private static final String ADSPACE_WIDTH = "w";
     private static final String ADSPACE_HEIGHT = "h";
-    private static final String IPADDRESS = "ip";
-    private static final String USER_AGENT = "ua";
     private static final String IOS_OPEN_UDID = "ouid";
     private static final String ANDROID_ID = "anid";
     private static final String IDFA = "ida";
     private static final String IOS_ID = "ouid";
     private static final String DEVICE_OS = "os";
-    private static final String LAT = "lat";
-    private static final String LONG = "lon";
+    private static final String LON = "lon";
     private static final String COUNTRY = "co";
     private static final String USER_GENDER = "GENDER";
     private static final String USER_AGE = "AGE";
@@ -119,17 +118,18 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         return "adsmogoDCP";
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder url = new StringBuilder(host);
         appendQueryParam(url, APPID, blindedSiteId, false);
-        appendQueryParam(url, IPADDRESS, sasParams.getRemoteHostIp(), false);
+        appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
         if (isInterstitial()) {
             appendQueryParam(url, ADSPACE_TYPE, INTERSTITIAL, false);
         } else {
             appendQueryParam(url, ADSPACE_TYPE, BANNER, false);
         }
-        appendQueryParam(url, USER_AGENT, getURLEncode(sasParams.getUserAgent(), format), false);
+        appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         if (StringUtils.isNotEmpty(os)) {
             appendQueryParam(url, DEVICE_OS, os, false);
         }
@@ -140,7 +140,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotEmpty(latitude) && StringUtils.isNotEmpty(longitude)) {
             appendQueryParam(url, LAT, latitude, false);
-            appendQueryParam(url, LONG, longitude, false);
+            appendQueryParam(url, LON, longitude, false);
         }
 
         if (StringUtils.isNotEmpty(sasParams.getCountryCode())) {
@@ -220,17 +220,17 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         if (StringUtils.isBlank(response) || status.code() != 200) {
             statusCode = 500;
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
                 statusCode = 200;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from AdsMogo: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

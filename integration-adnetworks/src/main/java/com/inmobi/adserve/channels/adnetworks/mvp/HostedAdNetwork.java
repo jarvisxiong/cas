@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.hosted.HostedBidRequest;
 import com.ning.http.client.RequestBuilder;
 
@@ -69,7 +70,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     private static final short EUD_SHA1 = 2;
 
     // Constants used while creating Request URL
-    private static final String HTTP_POST = "POST";
+    private static final String HTTP_POST = POST;
 
     // Constants used while handling RFM Error Codes
     private static final String RFM_RESPONSE_ERROR = "FAIL";
@@ -242,7 +243,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         }
 
         // If Limit Ad Tracking Flag is set then no unique device identifiers are passed
-        if ("0".equals(casInternalRequestParameters.getUidADT())) {
+        if (GlobalConstant.ZERO.equals(casInternalRequestParameters.getUidADT())) {
             // If iOS IDFA is available then send that
             if (null != casInternalRequestParameters.getUidIFA()) {
                 bidRequest.setUdid(casInternalRequestParameters.getUidIFA());
@@ -440,7 +441,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         params.put("winUrl", winUrl);
         params.put("impressionId", impressionId);
         params.put("siteId", sasParams.getSiteId());
-        if ("APP".equalsIgnoreCase(sasParams.getSource())) {
+        if (APP.equalsIgnoreCase(sasParams.getSource())) {
             // Does not support Blinded Site Ids neither do they make sense in HAS
             params.put("appId", sasParams.getSiteId());
         }

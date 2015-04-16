@@ -27,12 +27,13 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 @Singleton
 public class RequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(RequestParser.class);
-    private static final String UTF_8 = "UTF-8";
+    private static final String UTF_8 = GlobalConstant.UTF_8;
     private final Provider<Marker> traceMarkerProvider;
 
     @Inject
@@ -116,7 +117,7 @@ public class RequestParser {
         params.setRqIframe(stringify(jObject, "rqIframe"));
         params.setRFormat(stringify(jObject, "r-format"));
         String adCountStr = stringify(jObject, "rqMkAdcount");
-        adCountStr = StringUtils.isEmpty(adCountStr) ? "1" : adCountStr;
+        adCountStr = StringUtils.isEmpty(adCountStr) ? GlobalConstant.ONE : adCountStr;
         params.setRqMkAdcount(Short.parseShort(adCountStr));
         params.setTid(stringify(jObject, "tid"));
 
@@ -157,7 +158,7 @@ public class RequestParser {
 
     public String stringify(final JSONObject jObject, final String field) {
         final Marker traceMarker = traceMarkerProvider.get();
-        String fieldValue = "";
+        String fieldValue = StringUtils.EMPTY;
         try {
             final Object fieldValueObject = jObject.get(field);
             if (null != fieldValueObject) {

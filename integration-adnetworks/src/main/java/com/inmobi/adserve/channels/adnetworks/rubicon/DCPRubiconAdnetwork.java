@@ -26,6 +26,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -42,8 +43,6 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String SITE_ID = "site_id";
     private static final String ZONE_ID = "zone_id";
     private static final String SIZE_ID = "size_id";
-    private static final String UA = "ua";
-    private static final String CLIENT_IP = "ip";
     private static final String DEVICE_OS = "device.os";
     private static final String OS_VERSION = "device.osv";
     private static final String DEVICE_ID = "device.dpid";
@@ -210,7 +209,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, DOMAIN_NAME, DOMAIN, false);
         }
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
-        appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
+        appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
         appendQueryParam(url, SITE_ID, siteId, false);
         final Integer sasParamsOsId = sasParams.getOsId();
         if (sasParamsOsId > 0 && sasParamsOsId < 21) {
@@ -324,7 +323,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -340,9 +339,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
                     }
                     final String htmlContent = ad.has("script") ? ad.getString("script") : null;
                     if (StringUtils.isBlank(htmlContent)) {
-                        adStatus = "NO_AD";
+                        adStatus = NO_AD;
                         statusCode = 204;
-                        responseContent = "";
+                        responseContent = DEFAULT_EMPTY_STRING;
                         return;
                     }
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
@@ -353,13 +352,13 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
                     }
 
                     responseContent = Formatter.getResponseFromTemplate(templateType, context, sasParams, beaconUrl);
-                    adStatus = "AD";
+                    adStatus = AD_STRING;
                 } else {
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     return;
                 }
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Rubicon: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
@@ -414,7 +413,7 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
         // device ID)
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                && "1".equals(casInternalRequestParameters.getUidADT())) {
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
             appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidIFA(), false);
             appendQueryParam(url, DEVICE_ID_TYPE, IDFA, false);
         } else {

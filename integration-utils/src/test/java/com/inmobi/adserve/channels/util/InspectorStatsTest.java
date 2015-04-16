@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -66,7 +67,7 @@ public class InspectorStatsTest {
         final String WrongRandomProdUrl = "random1.random2";
         final String WrongNoDotProdUrl = "random1random2random3";
         final String WrongNullProdUrl = null;
-        final String WrongBlankProdUrl = "";
+        final String WrongBlankProdUrl = StringUtils.EMPTY;
 
         final String expectedUj1Metric = "prod.uj1.cas-1.app";
         final String expectedUh1Metric = "prod.uh1.cas-1.app";

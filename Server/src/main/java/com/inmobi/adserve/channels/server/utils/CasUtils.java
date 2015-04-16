@@ -12,6 +12,7 @@ import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.beans.CasContext;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
@@ -24,7 +25,6 @@ import io.netty.handler.codec.http.HttpRequest;
 @Singleton
 public class CasUtils {
     private static final Logger LOG = LoggerFactory.getLogger(CasUtils.class);
-    private static final String APP = "APP";
     private final RepositoryHelper repositoryHelper;
 
     @Inject
@@ -83,7 +83,7 @@ public class CasUtils {
         }
 
         // Only requests from app are supported
-        if (!APP.equalsIgnoreCase(sasParams.getSource())) {
+        if (!GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource())) {
             return false;
         }
         // Slot Size check in AsyncRequestMaker since slots would differ for each segment

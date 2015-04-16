@@ -111,7 +111,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
         try {
             TemplateType templateType = TemplateType.HTML;
-            if (StringUtils.isBlank(sasParams.getSource()) || "WAP".equalsIgnoreCase(sasParams.getSource())) {
+            if (StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())) {
                 templateType = TemplateType.WAP_HTML_JS_AD_TAG;
             }
 
@@ -124,9 +124,9 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
                 responseContent = Formatter.getResponseFromTemplate(templateType, context, sasParams, beaconUrl);
             }
 
-            adStatus = "AD";
+            adStatus = AD_STRING;
         } catch (final Exception exception) {
-            adStatus = "NO_AD";
+            adStatus = NO_AD;
             LOG.info("Error generating Static Js adtag for GoogleAdX  : {}", exception);
         }
         LOG.debug("response from Zero {} length is {}",responseContent, responseContent.length());

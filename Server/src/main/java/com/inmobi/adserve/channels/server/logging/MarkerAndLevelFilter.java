@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.logging;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Marker;
 
 import ch.qos.logback.classic.Level;
@@ -18,7 +19,7 @@ public class MarkerAndLevelFilter extends TurboFilter {
     private static final Marker TRACE_MARKER = NettyRequestScope.TRACE_MAKER;
 
     private Level levelToEnforce = Level.ERROR; // This value is overwritten when logger.xml is read
-    private String excludedTurboFilteringLogs = ""; // This value is overwritten when logger.xml is read
+    private String excludedTurboFilteringLogs = StringUtils.EMPTY; // This value is overwritten when logger.xml is read
 
     @Override
     public void start() {

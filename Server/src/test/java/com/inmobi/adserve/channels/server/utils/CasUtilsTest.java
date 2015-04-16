@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 public class CasUtilsTest extends TestCase {
 
@@ -21,15 +22,15 @@ public class CasUtilsTest extends TestCase {
     public void testisBannerVideoSupported() {
 
         final SasParamsTestData[] testData =
-                {new SasParamsTestData("APP", "a370", (short) 14, 3, "4.0", true, Arrays.asList((short) 14)),
-                        new SasParamsTestData("APP", "a370", (short) 14, 3, "4.4", true, Arrays.asList((short) 32)),
-                        new SasParamsTestData("APP", "a440", (short) 32, 3, "4.4", true, Arrays.asList((short) 14)),
-                        new SasParamsTestData("APP", "i370", (short) 14, 5, "6.0", true, Arrays.asList((short) 32)),
-                        new SasParamsTestData("APP", "i440", (short) 32, 5, "6.0", true, Arrays.asList((short) 14)),
-                        new SasParamsTestData("APP", "i440", (short) 32, 5, "5.0", false, Arrays.asList((short) 32)), // Unsupported iOS version
-                        new SasParamsTestData("APP", "a370", (short) 14, 3, "3.0", false, Arrays.asList((short) 14)), // Unsupported Android
+                {new SasParamsTestData(GlobalConstant.APP, "a370", (short) 14, 3, "4.0", true, Arrays.asList((short) 14)),
+                        new SasParamsTestData(GlobalConstant.APP, "a370", (short) 14, 3, "4.4", true, Arrays.asList((short) 32)),
+                        new SasParamsTestData(GlobalConstant.APP, "a440", (short) 32, 3, "4.4", true, Arrays.asList((short) 14)),
+                        new SasParamsTestData(GlobalConstant.APP, "i370", (short) 14, 5, "6.0", true, Arrays.asList((short) 32)),
+                        new SasParamsTestData(GlobalConstant.APP, "i440", (short) 32, 5, "6.0", true, Arrays.asList((short) 14)),
+                        new SasParamsTestData(GlobalConstant.APP, "i440", (short) 32, 5, "5.0", false, Arrays.asList((short) 32)), // Unsupported iOS version
+                        new SasParamsTestData(GlobalConstant.APP, "a370", (short) 14, 3, "3.0", false, Arrays.asList((short) 14)), // Unsupported Android
                         // version.
-                        new SasParamsTestData("WAP", "a370", (short) 14, 3, "4.0", false, Arrays.asList((short) 32))}; // Unsupported Source
+                        new SasParamsTestData(GlobalConstant.WAP, "a370", (short) 14, 3, "4.0", false, Arrays.asList((short) 32))}; // Unsupported Source
 
         int i = 1;
         for (final SasParamsTestData data : testData) {

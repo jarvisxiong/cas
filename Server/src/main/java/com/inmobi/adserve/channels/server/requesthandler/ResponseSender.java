@@ -17,6 +17,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -49,6 +50,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.umprr.Csids;
@@ -69,6 +71,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -82,7 +85,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
     private static final String END_TAG = " ]]></Ad></Ads></AdResponse>";
     private static final String AD_IMAI_START_TAG = "<!DOCTYPE html>";
-    private static final String NO_AD_IMAI = "";
+    private static final String NO_AD_IMAI = StringUtils.EMPTY;
     private static final String NO_AD_XHTML = "<AdResponse><Ads></Ads></AdResponse>";
     private static final String NO_AD_HTML = "<!-- mKhoj: No advt for this position -->";
     private static final String NO_AD_JS_ADCODE = "<html><head><title></title><style type=\"text/css\">"
@@ -159,7 +162,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     
     public String getDST(){
         if(sasParams.getDst() == 0){
-            return "";
+            return StringUtils.EMPTY;
         }
         return DemandSourceType.findByValue(sasParams.getDst()).toString();
     }
@@ -386,7 +389,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         adPoolResponse
                 .setMinChargedValue((long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math
                         .pow(10, 6)));
-        if (!"USD".equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
+        if (!GlobalConstant.USD.equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
             rtbdAd.setBidInOriginalCurrency((long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math
                     .pow(10, 6)));
@@ -511,7 +514,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 // status code 200 and empty ad content( i.e. ads:[]) for format =
                 // native
                 httpResponseStatus = HttpResponseStatus.OK;
-                defaultContent = "";
+                defaultContent = StringUtils.EMPTY;
                 break;
             case XHTML:
                 // status code 200 & empty ad content (i.e. adUnit missing) for
@@ -552,7 +555,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 return serializer.serialize(rtbdResponse);
             } catch (final TException e) {
                 LOG.error("Error in serializing the adPool response ", e);
-                return "".getBytes(Charsets.UTF_8);
+                return StringUtils.EMPTY.getBytes(Charsets.UTF_8);
             }
         }
         return defaultResponse.getBytes(Charsets.UTF_8);

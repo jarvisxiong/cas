@@ -106,23 +106,23 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             }
             request.put("slot_size", String.format(SIZE_FORMAT, width, height));
             if (!StringUtils.isEmpty(latitude)) {
-                request.put("lat", latitude);
+                request.put(LAT, latitude);
             }
             if (!StringUtils.isEmpty(longitude)) {
-                request.put("long", longitude);
+                request.put(LONG, longitude);
             }
 
             if (sasParams.getGender() != null) {
-                request.put("gender", sasParams.getGender());
+                request.put(GENDER, sasParams.getGender());
             }
             if (sasParams.getAge() != null) {
                 request.put("age", sasParams.getAge());
             }
             if (sasParams.getCountryCode() != null) {
-                request.put("country", sasParams.getCountryCode());
+                request.put(COUNTRY, sasParams.getCountryCode());
             }
             if (sasParams.getPostalCode() != null) {
-                request.put("zip", sasParams.getPostalCode());
+                request.put(ZIP, sasParams.getPostalCode());
             }
 
         } catch (final JSONException e) {
@@ -154,7 +154,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
 
         final String requestParams = getRequestParams();
         final RequestBuilder ningRequestBuilder =
-                new RequestBuilder("POST").setUrl(uri.toString())
+                new RequestBuilder(POST).setUrl(uri.toString())
                         .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
                         .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
                         .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
@@ -174,16 +174,16 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Mable: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

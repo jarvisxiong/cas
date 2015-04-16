@@ -28,6 +28,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
 import com.inmobi.casthrift.AdIdChain;
@@ -55,10 +56,9 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 public class Logging {
     public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
             new ConcurrentHashMap<String, String>(2000);
-    public static final String AD = "AD";
-    public static final String NO_AD = "NO_AD";
-    public static final String TIME_OUT = "TIME_OUT";
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
+    private static final String BANNER = "BANNER";
+    private static final String NO = "NO";
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
     private static String sampledAdvertisementLogKey;
@@ -101,7 +101,7 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
-            if (null != sasParams.getRFormat() && "native".equalsIgnoreCase(sasParams.getRFormat())) {
+            if (null != sasParams.getRFormat() && GlobalConstant.NATIVE_STRING.equalsIgnoreCase(sasParams.getRFormat())) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS);
                 if (rankList == null || rankList.isEmpty()) {
                     InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS + "-"
@@ -208,7 +208,8 @@ public class Logging {
                 final IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
 
                 // Populate IXAd only if 1) we get an AD response from IX OR 2) forward any package to RP.
-                if (AD.equals(adResponse.getAdStatus()) || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
+                if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
+                        || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
                     channel.setIxAds(Arrays.asList(createIxAd(ixAdNetwork)));
                 }
             }
@@ -220,13 +221,13 @@ public class Logging {
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
                     adNetwork.getConnectionLatency());
             switch (adResponse.getAdStatus()) {
-                case AD:
+                case GlobalConstant.AD_STRING:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
                     break;
-                case NO_AD:
+                case GlobalConstant.NO_AD:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
                     break;
-                case TIME_OUT:
+                case GlobalConstant.TIME_OUT:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
                     AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(),
@@ -302,7 +303,7 @@ public class Logging {
         if (null != terminationReason) {
             isTerminated = true;
         } else {
-            terminationReason = "NO";
+            terminationReason = NO;
         }
 
         final String host = getHost();
@@ -330,8 +331,7 @@ public class Logging {
         }
 
         final String timestamp = new Date().toString();
-        final Request request =
-                getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
+        final Request request = getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
         adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
@@ -377,7 +377,7 @@ public class Logging {
                             channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             final ContentRating contentRating = getContentRating(sasParams);
             final PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
-            final AdMeta adMeta = new AdMeta(contentRating, pricingModel, "BANNER"); // TODO: Check "BANNER" point
+            final AdMeta adMeta = new AdMeta(contentRating, pricingModel, BANNER);
             final Ad ad = new Ad(adChain, adMeta);
 
             final double winBid = adNetworkInterface.getSecondBidPriceInUsd();
@@ -413,7 +413,7 @@ public class Logging {
                 request.setSegmentId(siteSegmentId);
             }
             request.setRequestDst(DemandSourceType.findByValue(sasParams.getDst()));
-        
+
         } else {
             request = new Request(adRequested, adsServed, null, null);
         }
@@ -486,11 +486,11 @@ public class Logging {
     }
 
     public static AdStatus getAdStatus(final String adStatus) {
-        if (AD.equalsIgnoreCase(adStatus)) {
+        if (GlobalConstant.AD_STRING.equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
-        } else if (NO_AD.equals(adStatus)) {
+        } else if (GlobalConstant.NO_AD.equals(adStatus)) {
             return AdStatus.NO_AD;
-        } else if (TIME_OUT.equals(adStatus)) {
+        } else if (GlobalConstant.TIME_OUT.equals(adStatus)) {
             return AdStatus.TIME_OUT;
         }
         return AdStatus.DROPPED;
@@ -517,13 +517,13 @@ public class Logging {
             final String partnerName = adNetworkInterface.getName();
             log.append(partnerName);
             log.append(sep).append(adResponse.getAdStatus());
-            String response = "";
-            String requestUrl = "";
-            if (AD.equalsIgnoreCase(adResponse.getAdStatus())) {
+            String response = StringUtils.EMPTY;
+            String requestUrl = StringUtils.EMPTY;
+            if (GlobalConstant.AD_STRING.equalsIgnoreCase(adResponse.getAdStatus())) {
                 response = adNetworkInterface.getHttpResponseContent();
                 log.append(sep).append(response);
             }
-            if (!"".equals(adNetworkInterface.getRequestUrl())) {
+            if (!StringUtils.EMPTY.equals(adNetworkInterface.getRequestUrl())) {
                 requestUrl = adNetworkInterface.getRequestUrl();
                 log.append(sep).append(requestUrl);
             }
@@ -569,7 +569,8 @@ public class Logging {
                 response = adNetworkInterface.getAdMarkUp();
             }
 
-            if (!AD.equalsIgnoreCase(adStatus) || "".equals(requestUrl) || "".equals(response)) {
+            if (!GlobalConstant.AD_STRING.equalsIgnoreCase(adStatus) || StringUtils.EMPTY.equals(requestUrl)
+                    || StringUtils.EMPTY.equals(response)) {
                 continue;
             }
 
@@ -671,7 +672,8 @@ public class Logging {
     }
 
     public static InventoryType getInventoryType(final SASRequestParameters sasParams) {
-        if (null != sasParams && sasParams.getSdkVersion() != null && "0".equalsIgnoreCase(sasParams.getSdkVersion())) {
+        if (null != sasParams && sasParams.getSdkVersion() != null
+                && GlobalConstant.ZERO.equalsIgnoreCase(sasParams.getSdkVersion())) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
@@ -680,7 +682,7 @@ public class Logging {
     public static Gender getGender(final SASRequestParameters sasParams) {
         if (sasParams == null) {
             return null;
-        } else if ("m".equalsIgnoreCase(sasParams.getGender())) {
+        } else if (GlobalConstant.GENDER_MALE.equalsIgnoreCase(sasParams.getGender())) {
             return Gender.MALE;
         }
         return Gender.FEMALE;

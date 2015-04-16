@@ -133,7 +133,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -142,12 +142,12 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from openx: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             }
-            adStatus = "AD";
+            adStatus = AD_STRING;
         }
         LOG.debug("response length is {}", responseContent.length());
     }

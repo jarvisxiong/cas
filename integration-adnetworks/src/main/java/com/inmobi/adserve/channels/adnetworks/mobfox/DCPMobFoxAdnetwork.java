@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -53,7 +54,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String REQUEST_TYPE = "rt";
 
     private static final String TYPE = "live";
-    private static final String MRAID_TYPE = "1";
+    private static final String MRAID_TYPE = GlobalConstant.ONE;
     private static final String API_VERSION = "2.0";
     private static final String REQUEST_TYPE_VALUE = "api";
 
@@ -169,7 +170,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -178,17 +179,17 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
                 final Request request = jaxbHelper.unmarshal(response, Request.class);
                 final String htmlContent = request.getHtmlString();
                 if (StringUtils.isBlank(htmlContent)) {
-                    adStatus = "NO_AD";
+                    adStatus = NO_AD;
                     statusCode = 500;
-                    responseContent = "";
+                    responseContent = DEFAULT_EMPTY_STRING;
                     return;
                 }
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlContent);
 
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Mobfox: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }

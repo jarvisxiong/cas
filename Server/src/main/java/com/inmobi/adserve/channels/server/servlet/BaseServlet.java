@@ -164,7 +164,7 @@ public abstract class BaseServlet implements Servlet {
                 .getRankList().size());
         LOG.debug(traceMarker, "Number of rtb tpans whose request was successfully completed {}", hrh.responseSender
                 .getAuctionEngine().getUnfilteredChannelSegmentList().size());
-        // if none of the async request succeed, we return "NO_AD"
+        // if none of the async request succeed, we return NO_AD
         if (hrh.responseSender.getRankList().isEmpty() && auctionEngine.getUnfilteredChannelSegmentList().isEmpty()) {
             LOG.debug(traceMarker, "No calls");
             hrh.responseSender.sendNoAdResponse(serverChannel);

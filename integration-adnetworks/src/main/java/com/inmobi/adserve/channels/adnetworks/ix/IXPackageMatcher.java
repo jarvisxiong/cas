@@ -15,6 +15,7 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
@@ -124,7 +125,7 @@ public class IXPackageMatcher {
         reqCarrierId.init(Collections.singleton((long) sasParams.getCarrierId())); // TODO: fix long->int cast in ThriftRequestParser
 
         InventoryTypeEnum reqInventoryEnum =
-                "APP".equalsIgnoreCase(sasParams.getSource()) ? InventoryTypeEnum.APP : InventoryTypeEnum.BROWSER;
+                GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource()) ? InventoryTypeEnum.APP : InventoryTypeEnum.BROWSER;
         reqInventoryType.init(Collections.singleton(reqInventoryEnum));
 
         if (null != sasParams.getConnectionType()) {

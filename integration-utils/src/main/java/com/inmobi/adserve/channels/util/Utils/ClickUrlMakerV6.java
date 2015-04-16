@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 /**
  * 
@@ -30,10 +31,10 @@ public class ClickUrlMakerV6 {
     private static final String URLMARKERCPC = "/t";
     private static final String URLMARKERCPM = "/b";
     private static final String DEFAULTIMSDK = "-1";
-    private static final String CLICK = "1";
-    private static final String BEACON = "0";
-    private static final String IS_TEST = "1";
-    private static final String IS_NOT_TEST = "0";
+    private static final String CLICK = GlobalConstant.ONE;
+    private static final String BEACON = GlobalConstant.ZERO;
+    private static final String IS_TEST = GlobalConstant.ONE;
+    private static final String IS_NOT_TEST = GlobalConstant.ZERO;
     private static final String RTB_SUPPLY = "rtb";
     private static final String NON_RTB_SUPPLY = "nw";
     private static final Long CLICK_URL_HASHING_SECRET_KEY_VERSION = (long) 1;
@@ -126,12 +127,12 @@ public class ClickUrlMakerV6 {
             latlonval = builder.latlonval;
         }
         if (null == builder.creativeId) {
-            creativeId = "0";
+            creativeId = GlobalConstant.ZERO;
         } else {
             creativeId = builder.creativeId;
         }
         if (null == builder.dst) {
-            dst = "1";
+            dst = GlobalConstant.ONE;
         } else {
             dst = builder.dst;
         }
@@ -218,9 +219,9 @@ public class ClickUrlMakerV6 {
         // 11th URL Component: Billable Click
         String billable;
         if (isBillableDemog) {
-            billable = "1";
+            billable = GlobalConstant.ONE;
         } else {
-            billable = "0";
+            billable = GlobalConstant.ZERO;
         }
         adUrlSuffix.append(appendSeparator(billable));
         // 12th URL Component: udid or odin1. Based on PI311

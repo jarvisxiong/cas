@@ -26,6 +26,7 @@ import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -41,12 +42,9 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String IDFA = "ifa";
     private static final String UDID = "udid";
     private static final String ANDROIDID = "androidid";
-    private static final String LATITUDE = "lat";
-    private static final String LONGITUDE = "long";
     private static final String GENDER = "ge";
     private static final String AGE = "age";
     private static final String COUNTRY_CODE = "co";
-    private static final String ZIP_CODE = "zip";
     private static final String NEGATIVE_KEYWORD = "nk";
     private int width;
     private int height;
@@ -128,7 +126,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
 
             if (client == 2) {
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                        && "1".equals(casInternalRequestParameters.getUidADT())) {
+                        && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
                     appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
@@ -145,10 +143,10 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             }
 
             if (!StringUtils.isEmpty(latitude)) {
-                appendQueryParam(url, LATITUDE, latitude, false);
+                appendQueryParam(url, LAT, latitude, false);
             }
             if (!StringUtils.isEmpty(longitude)) {
-                appendQueryParam(url, LONGITUDE, longitude, false);
+                appendQueryParam(url, LONG, longitude, false);
             }
             if (sasParams.getGender() != null) {
                 appendQueryParam(url, GENDER, sasParams.getGender(), false);
@@ -160,7 +158,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, COUNTRY_CODE, sasParams.getCountryCode(), false);
             }
             if (sasParams.getPostalCode() != null) {
-                appendQueryParam(url, ZIP_CODE, sasParams.getPostalCode(), false);
+                appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
             }
             if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
                 appendQueryParam(url, NEGATIVE_KEYWORD,
@@ -188,16 +186,16 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from {}: {}", response, name, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

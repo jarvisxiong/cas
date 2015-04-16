@@ -34,7 +34,6 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_KEYWORD = "anap";
     private static final String WAP_KEYWORD = "ptnr";
     private static final String WAP = "wap";
-    private static final String DERIVED_LAT_LONG = "DERIVED_LAT_LON";
     private static final String TRUE_LAT_LONG_ONLY = "trueLatLongOnly";
     private static final String MMA = "mma";
     private static final String BANNER = "banner";
@@ -74,7 +73,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         if (sendTrueLatLongOnly) {
-            if (DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())) {
+            if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
                 LOG.info("Configure parameters inside verve returned false");
                 return false;
             } else if (casInternalRequestParameters.getLatLong() != null
@@ -90,7 +89,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 LOG.info("Configure parameters inside verve returned false");
                 return false;
             }
-        } else if (!DERIVED_LAT_LONG.equalsIgnoreCase(sasParams.getLocSrc())
+        } else if (!DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())
                 && StringUtils.isNotBlank(sasParams.getLocSrc())) { // request
             // has true
             // lat-long
@@ -214,7 +213,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             statusCode = status.code();
@@ -223,9 +222,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {
                 responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from verve: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;

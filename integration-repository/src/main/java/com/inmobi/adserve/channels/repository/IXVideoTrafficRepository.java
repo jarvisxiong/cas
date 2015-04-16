@@ -14,10 +14,12 @@ import com.inmobi.phoenix.exception.RepositoryException;
 
 import java.sql.Timestamp;
 
+import org.apache.commons.lang.StringUtils;
+
 public class IXVideoTrafficRepository extends AbstractStatsMaintainingDBRepository<IXVideoTrafficEntity, IXVideoTrafficQuery>
         implements Repository, RepositoryManager {
 
-    public static final String ALL_SITES = "";
+    public static final String ALL_SITES = StringUtils.EMPTY;
     public static final int ALL_COUNTRY = -1;
     public static final short DEFAULT_TRAFFIC_PERCENTAGE = 20;  // 20%
 

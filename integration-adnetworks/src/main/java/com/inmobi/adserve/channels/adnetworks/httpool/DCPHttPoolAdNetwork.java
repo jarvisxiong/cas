@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -98,7 +99,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append("&uip=").append(sasParams.getRemoteHostIp());
             url.append("&zid=").append(externalSiteId);
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
-            if ("1".equals(config.getString("httpool.test"))) {
+            if (GlobalConstant.ONE.equals(config.getString("httpool.test"))) {
                 url.append("&test=1");
             }
             if (!StringUtils.isBlank(latitude) && !StringUtils.isBlank(longitude)) {
@@ -120,7 +121,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             final String gender = sasParams.getGender();
             if (StringUtils.isNotBlank(gender)) {
-                url.append("&dd_gnd=").append("f".equalsIgnoreCase(gender) ? 2 : 1);
+                url.append("&dd_gnd=").append(GlobalConstant.GENDER_FEMALE.equalsIgnoreCase(gender) ? 2 : 1);
             }
             LOG.debug("httpool url is {}", url.toString());
 
@@ -141,7 +142,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             if (200 == statusCode) {
                 statusCode = 500;
             }
-            responseContent = "";
+            responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
             LOG.debug("beacon url inside httpool is {}", beaconUrl);
@@ -150,7 +151,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 final JSONObject adResponse = new JSONObject(response);
                 if (adResponse.getInt("status") == 0) {
                     statusCode = 500;
-                    responseContent = "";
+                    responseContent = DEFAULT_EMPTY_STRING;
                     return;
                 }
                 statusCode = status.code();
@@ -172,7 +173,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                         final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
                         if (StringUtils.isEmpty(vmTemplate)) {
                             LOG.info("No template found for the slot");
-                            adStatus = "NO_AD";
+                            adStatus = NO_AD;
                             return;
                         } else {
                             context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
@@ -183,13 +184,13 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
-                adStatus = "AD";
+                adStatus = AD_STRING;
             } catch (final JSONException exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from httpool: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from httpool: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
