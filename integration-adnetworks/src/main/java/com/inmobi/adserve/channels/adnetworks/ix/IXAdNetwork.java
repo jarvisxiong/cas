@@ -1609,7 +1609,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
         dealFloor =
                 matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
-                        indexOfDealId) : 0;
+                        indexOfDealId) : 0.0;
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;

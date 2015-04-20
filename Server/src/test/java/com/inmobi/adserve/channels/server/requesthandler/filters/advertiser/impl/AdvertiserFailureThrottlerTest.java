@@ -12,8 +12,6 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +24,8 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
+
+import junit.framework.TestCase;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class, CasConfigUtil.class, AbstractAdvertiserLevelThrottler.class})
@@ -139,13 +139,13 @@ public class AdvertiserFailureThrottlerTest extends TestCase {
         expect(mockConfig.getLong("circuitbreaker.numberOfSecondsUnderObservation")).andReturn(10000L).once();
         
         replayAll();
-        AdvertiserFailureThrottler.increamentRequestsCounter(advertiserId, System.currentTimeMillis());
 
         AdapterConfig adapterConfig = new AdapterConfig(mockConfig, advertiserName, dcName, null);
         advertiserIdConfigMap = new HashMap<String, AdapterConfig>();
         advertiserIdConfigMap.put(advertiserId, adapterConfig);
-        
+
         AdvertiserFailureThrottler filter = new AdvertiserFailureThrottler(null, advertiserIdConfigMap);
+        AdvertiserFailureThrottler.increamentRequestsCounter(advertiserId, System.currentTimeMillis());
         assertThat(filter.failedInFilter(mockChannelSegment, null), is(equalTo(false)));
     }
 
@@ -167,13 +167,13 @@ public class AdvertiserFailureThrottlerTest extends TestCase {
         expect(System.currentTimeMillis()).andReturn(currentTimeAddedWithTenMinutes).anyTimes();
         replayAll();
         
-        AdvertiserFailureThrottler.increamentRequestsCounter(advertiserId, System.currentTimeMillis());
 
         AdapterConfig adapterConfig = new AdapterConfig(mockConfig, advertiserName, dcName, null);
         advertiserIdConfigMap = new HashMap<String, AdapterConfig>();
         advertiserIdConfigMap.put(advertiserId, adapterConfig);
 
         AdvertiserFailureThrottler filter = new AdvertiserFailureThrottler(null, advertiserIdConfigMap);
+        AdvertiserFailureThrottler.increamentRequestsCounter(advertiserId, System.currentTimeMillis());
         assertThat(filter.failedInFilter(mockChannelSegment, null), is(equalTo(false)));
     }
     

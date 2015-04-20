@@ -16,7 +16,7 @@ if [ $DC_ID > 0 ]
 then
     echo $DC_ID
     echo $DC_NAME
-  exec setuidgid nobody /usr/lib/jvm/java7/bin/java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Duser.timezone=UTC\
+  exec setuidgid nobody /usr/lib/jvm/java8/bin/java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Duser.timezone=UTC\
  -Ddc.id=$DC_ID -Ddc.name=$DC_NAME -Dhost.name=$(hostname) -Drun.environment=prod\
  -Djava.security.properties=/opt/mkhoj/conf/cas/java.security\
  -Djava.net.preferIPv4Stack=true\

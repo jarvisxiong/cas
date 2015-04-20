@@ -40,6 +40,7 @@ import com.inmobi.phoenix.exception.RepositoryException;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 public class RepositoryHelper {
 
@@ -330,7 +331,7 @@ public class RepositoryHelper {
     public IXPackageEntity queryIxPackageByDeal(final String dealId) {
         //Prepare query for CQEngine repository
         Query query = equal(IXPackageRepository.DEAL_IDS, dealId);
-        return ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
+        return (IXPackageEntity)ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
     }
 
     public short queryIXVideoTrafficEntity(String siteId, Integer countryId) {

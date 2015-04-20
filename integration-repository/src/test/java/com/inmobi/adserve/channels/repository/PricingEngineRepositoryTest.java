@@ -47,7 +47,7 @@ public class PricingEngineRepositoryTest {
                 "{'0':['0','1'],'1':['0','1','2'],'2':['0','1','2','3'],'3':['0','1','2','3','4'],'4':['0','1','2','3','4','5'],'5':['0','1','2','3','4','5','6'],'6':['0','1','2','3','4','5','6','7'],'7':['0','1','2','3','4','5','6','7','8'],'8':['0','1','2','3','4','5','6','7','8','9'],'9':['0','1','2','3','4','5','6','7','8','9']}";
         final Timestamp modifiedOn = new Timestamp(1353954600000L);
         final String expectedLogOutput =
-                "Adding pricing entity : PricingEngineEntity(countryId=253, osId=3, rtbFloor=0.15, dcpFloor=0.1, supplyToDemandMap={3=[3, 2, 1, 0, 4], 2=[3, 2, 1, 0], 1=[2, 1, 0], 0=[1, 0], 7=[3, 2, 1, 0, 7, 6, 5, 4, 8], 6=[3, 2, 1, 0, 7, 6, 5, 4], 5=[3, 2, 1, 0, 6, 5, 4], 4=[3, 2, 1, 0, 5, 4], 9=[3, 2, 1, 0, 7, 6, 5, 4, 9, 8], 8=[3, 2, 1, 0, 7, 6, 5, 4, 9, 8]})";
+                "Adding pricing entity : PricingEngineEntity(countryId=253, osId=3, rtbFloor=0.15, dcpFloor=0.1, supplyToDemandMap={0=[0, 1], 1=[0, 1, 2], 2=[0, 1, 2, 3], 3=[0, 1, 2, 3, 4], 4=[0, 1, 2, 3, 4, 5], 5=[0, 1, 2, 3, 4, 5, 6], 6=[0, 1, 2, 3, 4, 5, 6, 7], 7=[0, 1, 2, 3, 4, 5, 6, 7, 8], 8=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 9=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]})";
         final Map<String, Set<String>> supplyToDemandMap = new HashMap<String, Set<String>>();
         supplyToDemandMap.put("0", new HashSet<String>(Arrays.asList("0", "1")));
         supplyToDemandMap.put("1", new HashSet<String>(Arrays.asList("0", "1", "2")));

@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import org.apache.commons.configuration.Configuration;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import com.google.inject.AbstractModule;
@@ -49,7 +50,8 @@ public class ServerModule extends AbstractModule {
         serverConfiguration = configurationLoader.getServerConfiguration();
         rtbConfiguration = configurationLoader.getRtbConfiguration();
         this.repositoryHelper = repositoryHelper;
-        reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner());
+        reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner(),
+                new SubTypesScanner());
     }
 
     @Override
