@@ -1,18 +1,12 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.timeout.ReadTimeoutException;
-
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.servlet.ServletIXFill;
@@ -20,6 +14,13 @@ import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.DemandSourceType;
+
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.timeout.ReadTimeoutException;
 
 /**
  * @author abhishek.parwal
@@ -33,7 +34,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
     private static Map<String, Servlet> pathToServletMap;
 
     static {
-        executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+        executor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors(),
+                new ThreadFactoryBuilder().setNameFormat("cas-timer-%d").build());
     }
 
     private volatile long timeoutInMillis;

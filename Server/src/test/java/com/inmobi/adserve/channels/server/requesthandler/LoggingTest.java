@@ -12,7 +12,6 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verify;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,30 +85,7 @@ public class LoggingTest {
         replayAll();
 
 
-        Logging.init(mockDataBusPublisher, "null", "null", "null", mockConfig);
-    }
-
-    /**
-     * Branches/Conditions followed:
-     *  SasParams is null
-     *  TerminationReason is null => isTerminated is false
-     *  Host returns null
-     */
-    @Test
-    public void testGetAdRR() throws Exception {
-        String terminationReason = null;
-
-        mockStaticNice(InspectorStats.class);
-        mockStaticNice(InetAddress.class);
-        InetAddress mockInetAddress = createMock(InetAddress.class);
-
-        expect(InetAddress.getLocalHost())
-                .andReturn(mockInetAddress).times(1);
-        expect(mockInetAddress.getHostName()).andReturn(null).times(1);
-        replayAll();
-
-        AdRR adRR = Logging.getAdRR(null, null, null, terminationReason);
-        assertThat(adRR, is(equalTo(null)));
+        Logging.init(mockDataBusPublisher, "null", "null", "null", mockConfig, "hostName");
     }
 
     /**
@@ -849,26 +825,6 @@ public class LoggingTest {
         replayAll();
 
         assertThat(Logging.getImpressionObject(null, null), is(equalTo(null)));
-    }
-
-    @Test
-    public void testGetHost() throws Exception {
-        String host = "Host";
-
-        mockStaticNice(InetAddress.class);
-        InetAddress mockInetAddress = createMock(InetAddress.class);
-
-        expect(InetAddress.getLocalHost())
-                .andThrow(new UnknownHostException()).times(1)
-                .andReturn(mockInetAddress).times(2);
-        expect(mockInetAddress.getHostName())
-                .andReturn(null).times(1)
-                .andReturn(host).times(1);
-        replayAll();
-
-        assertThat(Logging.getHost(), is(equalTo(null)));
-        assertThat(Logging.getHost(), is(equalTo(null)));
-        assertThat(Logging.getHost(), is(equalTo(host)));
     }
 
     @Test

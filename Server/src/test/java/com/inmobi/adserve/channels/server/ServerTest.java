@@ -71,7 +71,7 @@ public class ServerTest extends TestCase {
         responseSender = new ResponseSender();
 
         final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig, "hostName");
 
         requestParser = new RequestParser(new Provider<Marker>() {
             @Override

@@ -7,7 +7,6 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.powermock.api.support.membermodification.MemberModifier;
@@ -31,6 +30,7 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
@@ -90,7 +90,7 @@ public class HttpRequestHandlerTest extends TestCase {
                 new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
 
         final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockServerConfig);
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockServerConfig, "hostName");
         aDomains.add("a.com");
         cAttributes.add(1);
     }

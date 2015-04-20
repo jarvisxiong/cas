@@ -1,13 +1,5 @@
 package com.inmobi.adserve.channels.server.netty;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.concurrent.DefaultThreadFactory;
-
 import java.net.InetSocketAddress;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +9,14 @@ import javax.inject.Inject;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 
 /**
@@ -36,9 +36,8 @@ public class CasNettyServer {
     public CasNettyServer(final ChannelServerPipelineFactory serverChannelInitializer,
             final ChannelStatServerPipelineFactory statServerChannelInitializer) {
 
-        bossGroup = new NioEventLoopGroup();
-
-        workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("Inbound netty threads"));
+        bossGroup = new NioEventLoopGroup(2, new DefaultThreadFactory("inbound-netty-boss"));
+        workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("inbound-netty-worker"));
         serverBootstrap = new ServerBootstrap();
         statServerBootstrap = new ServerBootstrap();
         this.serverChannelInitializer = serverChannelInitializer;

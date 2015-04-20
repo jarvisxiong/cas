@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -59,6 +57,7 @@ public class Logging {
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static final String BANNER = "BANNER";
     private static final String NO = "NO";
+    private static String hostName;
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
     private static String sampledAdvertisementLogKey;
@@ -72,7 +71,8 @@ public class Logging {
     }
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
-            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config) {
+            final String advertisementLogKey, final String umpAdsLogKey, final Configuration config,
+            final String hostNameStr) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -80,6 +80,7 @@ public class Logging {
         enableFileLogging = config.getBoolean("enableFileLogging");
         enableDatabusLogging = config.getBoolean("enableDatabusLogging");
         totalCount = config.getInt("sampledadvertisercount");
+        hostName = hostNameStr;
     }
 
     // Writing Request Response Logs
@@ -306,8 +307,8 @@ public class Logging {
             terminationReason = NO;
         }
 
-        final String host = getHost();
-        if (null == host) {
+        if (null == hostName) {
+            LOG.info("Host cant be empty, abandoning rr logging");
             return null;
         }
 
@@ -334,25 +335,11 @@ public class Logging {
         final Request request = getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
-        adRR = new AdRR(host, timestamp, request, impressions, isTerminated, terminationReason);
+        adRR = new AdRR(hostName, timestamp, request, impressions, isTerminated, terminationReason);
         adRR.setTime_stamp(new Date().getTime());
         adRR.setChannels(channels);
 
         return adRR;
-    }
-
-    protected static String getHost() {
-        String host = null;
-        try {
-            final InetAddress addr = InetAddress.getLocalHost();
-            host = addr.getHostName();
-            if (null == host) {
-                LOG.info("Host cant be empty, abandoning rr logging");
-            }
-        } catch (final UnknownHostException ex) {
-            LOG.info("Could not resolve host inside rr logging so abandoning response, raised exception {}", ex);
-        }
-        return host;
     }
 
     protected static Impression getImpressionObject(final ChannelSegment channelSegment,
