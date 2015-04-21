@@ -14,7 +14,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Data
 public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
-    // private static final long IOS_SITE_TYPE = 21;
+    private static final long IOS_SITE_TYPE = 21;
     public static final long ANDROID_SITE_TYPE = 22;
 
     private final String id;
@@ -64,6 +64,10 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     
     public boolean isAndroid() {
         return ANDROID_SITE_TYPE == siteTypeId;
+    }
+    
+    public boolean isIOS() {
+        return IOS_SITE_TYPE == siteTypeId;
     }
 
     public static Builder newBuilder() {
