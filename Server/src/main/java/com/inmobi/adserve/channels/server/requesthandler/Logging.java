@@ -20,6 +20,7 @@ import org.slf4j.Marker;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -33,6 +34,7 @@ import com.inmobi.casthrift.AdIdChain;
 import com.inmobi.casthrift.AdMeta;
 import com.inmobi.casthrift.AdRR;
 import com.inmobi.casthrift.AdStatus;
+import com.inmobi.casthrift.AuctionInfo;
 import com.inmobi.casthrift.CasAdChain;
 import com.inmobi.casthrift.CasAdvertisementLog;
 import com.inmobi.casthrift.Channel;
@@ -45,6 +47,7 @@ import com.inmobi.casthrift.Impression;
 import com.inmobi.casthrift.InventoryType;
 import com.inmobi.casthrift.IxAd;
 import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.RTBDAuctionInfo;
 import com.inmobi.casthrift.Request;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.Message;
@@ -85,7 +88,8 @@ public class Logging {
 
     // Writing Request Response Logs
     public static void rrLogging(final Marker traceMarker, final ChannelSegment channelSegment,
-            final List<ChannelSegment> rankList, final SASRequestParameters sasParams, final String terminationReason,
+            final List<ChannelSegment> rankList, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternalRequestParameters, final String terminationReason,
             final long totalTime) throws JSONException, TException {
 
         if (LOG.isDebugEnabled()) {
@@ -111,7 +115,7 @@ public class Logging {
             }
         }
 
-        final AdRR adRR = getAdRR(channelSegment, rankList, sasParams, terminationReason);
+        final AdRR adRR = getAdRR(channelSegment, rankList, sasParams, casInternalRequestParameters, terminationReason);
         if (null == adRR) {
             return;
         }
@@ -297,7 +301,9 @@ public class Logging {
     }
 
     protected static AdRR getAdRR(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
-            final SASRequestParameters sasParams, String terminationReason) {
+            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameters,
+            String terminationReason) {
+
         AdRR adRR;
 
         boolean isTerminated = false;
@@ -317,7 +323,7 @@ public class Logging {
         final Impression impression = getImpressionObject(channelSegment, sasParams);
         if (null != impression) {
             adsServed = 1;
-            impressions = new ArrayList<Impression>();
+            impressions = new ArrayList<>();
             impressions.add(impression);
         }
 
@@ -336,10 +342,30 @@ public class Logging {
         final List<Channel> channels = createChannelsLog(rankList);
 
         adRR = new AdRR(hostName, timestamp, request, impressions, isTerminated, terminationReason);
+        adRR.setAuction_info(getAuctionInfo(sasParams, casInternalRequestParameters));
         adRR.setTime_stamp(new Date().getTime());
         adRR.setChannels(channels);
 
         return adRR;
+    }
+
+    protected static AuctionInfo getAuctionInfo(final SASRequestParameters sasParams,
+                                                final CasInternalRequestParameters casParams) {
+        AuctionInfo auctionInfo = null;
+        if (null != sasParams && DemandSourceType.RTBD.getValue() == sasParams.getDst()) {
+            final double bidGuidance = sasParams.getMarketRate();
+
+            if (0 != bidGuidance) {
+                RTBDAuctionInfo rtbdAuctionInfo = new RTBDAuctionInfo(
+                        casParams.getDemandDensity()/bidGuidance,
+                        casParams.getLongTermRevenue()/bidGuidance,
+                        casParams.getPublisherYield());
+                auctionInfo = new AuctionInfo();
+                auctionInfo.setRtbd_auction_info(rtbdAuctionInfo);
+            }
+        }
+
+        return auctionInfo;
     }
 
     protected static Impression getImpressionObject(final ChannelSegment channelSegment,

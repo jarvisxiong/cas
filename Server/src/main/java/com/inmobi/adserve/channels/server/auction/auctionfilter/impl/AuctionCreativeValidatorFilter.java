@@ -32,7 +32,7 @@ public class AuctionCreativeValidatorFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         final CreativeEntity creativeEntity =
                 repositoryHelper.queryCreativeRepository(rtbSegment.getChannelEntity().getAccountId(), rtbSegment
                         .getAdNetworkInterface().getCreativeId());

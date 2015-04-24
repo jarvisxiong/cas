@@ -25,7 +25,7 @@ public class AuctionCreativeAttributeFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         if (null == rtbSegment.getAdNetworkInterface().getAttribute()
                 || rtbSegment.getAdNetworkInterface().getAttribute().isEmpty()) {
             return true;

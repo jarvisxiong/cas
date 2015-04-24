@@ -279,6 +279,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (t instanceof java.io.IOException) {
                         InspectorStats.incrementStatCount(InspectorStrings.IO_EXCEPTION);
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
+                    } else {
+                        InspectorStats.incrementStatCount(InspectorStrings.UNCAUGHT_EXCEPTIONS,
+                                t.getClass().getSimpleName());
                     }
 
                     if (isRequestCompleted() || !serverChannel.isOpen()) {

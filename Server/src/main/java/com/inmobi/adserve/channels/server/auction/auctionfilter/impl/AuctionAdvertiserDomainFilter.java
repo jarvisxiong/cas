@@ -25,7 +25,7 @@ public class AuctionAdvertiserDomainFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         return null == rtbSegment.getAdNetworkInterface().getADomain()
                 || rtbSegment.getAdNetworkInterface().getADomain().isEmpty();
     }

@@ -32,7 +32,7 @@ public class AuctionIXImpressionIdFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
             final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
             try {

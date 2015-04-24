@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -47,6 +48,7 @@ import com.inmobi.casthrift.AdIdChain;
 import com.inmobi.casthrift.AdMeta;
 import com.inmobi.casthrift.AdRR;
 import com.inmobi.casthrift.AdStatus;
+import com.inmobi.casthrift.AuctionInfo;
 import com.inmobi.casthrift.CasAdChain;
 import com.inmobi.casthrift.Channel;
 import com.inmobi.casthrift.ContentRating;
@@ -58,6 +60,7 @@ import com.inmobi.casthrift.Impression;
 import com.inmobi.casthrift.InventoryType;
 import com.inmobi.casthrift.IxAd;
 import com.inmobi.casthrift.PricingModel;
+import com.inmobi.casthrift.RTBDAuctionInfo;
 import com.inmobi.casthrift.Request;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -115,7 +118,7 @@ public class LoggingTest {
 
         replayAll();
 
-        AdRR adRR = Logging.getAdRR(null, null, null, terminationReason);
+        AdRR adRR = Logging.getAdRR(null, null, null, null, terminationReason);
         Request request = adRR.getRequest();
         User user = request.getUser();
         HandsetMeta handsetMeta = request.getHandset();
@@ -161,6 +164,9 @@ public class LoggingTest {
         int osId = 3;
         int dst = DemandSourceType.RTBD.getValue();
         long adgroupIncId = 456L;
+        double demandDensity = 15.0;
+        double longTermRevenue = 30.0;
+        int publisherYield = 13;
 
         Short age = 11;
         Short selectedSlot = 11;
@@ -180,6 +186,7 @@ public class LoggingTest {
         InetAddress mockInetAddress = createMock(InetAddress.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        CasInternalRequestParameters mockCasInternalRequestParameters = createMock(CasInternalRequestParameters.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         BaseAdNetworkImpl mockAdNetworkInterface = createMock(BaseAdNetworkImpl.class);
 
@@ -221,10 +228,15 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getOsId()).andReturn(osId).anyTimes();
         expect(mockSASRequestParameters.getSdkVersion()).andReturn("0").anyTimes();
         expect(mockSASRequestParameters.getSiteSegmentId()).andReturn(siteSegmentIds).anyTimes();
+        expect(mockCasInternalRequestParameters.getDemandDensity()).andReturn(demandDensity).anyTimes();
+        expect(mockCasInternalRequestParameters.getLongTermRevenue()).andReturn(longTermRevenue).anyTimes();
+        expect(mockCasInternalRequestParameters.getPublisherYield()).andReturn(publisherYield).anyTimes();
         replayAll();
 
-        AdRR adRR = Logging.getAdRR(mockChannelSegment, null, mockSASRequestParameters, terminationReason);
+        AdRR adRR = Logging.getAdRR(mockChannelSegment, null, mockSASRequestParameters,
+                mockCasInternalRequestParameters, terminationReason);
         Request request = adRR.getRequest();
+        AuctionInfo auctionInfo = adRR.getAuction_info();
         User user = request.getUser();
         HandsetMeta handsetMeta = request.getHandset();
         Impression impression = adRR.getImpressions().get(0);
@@ -232,6 +244,7 @@ public class LoggingTest {
         AdMeta adMeta = ad.getMeta();
         AdIdChain adIdChain = ad.getId();
         Geo geo = request.getIP();
+        RTBDAuctionInfo rtbdAuctionInfo = auctionInfo.getRtbd_auction_info();
 
         assertThat(adRR.getTermination_reason(), is(equalTo("NO")));
         assertThat(adRR.isIs_terminated(), is(equalTo(false)));
@@ -245,6 +258,10 @@ public class LoggingTest {
         assertThat(adIdChain.getCampaign(), is(equalTo(campaignId)));
         assertThat(adIdChain.getExternal_site(), is(equalTo(externalSiteKey)));
         assertThat(adIdChain.getGroup(), is(equalTo(adgroupId)));
+
+        assertThat(rtbdAuctionInfo.getDemand_density(), is(equalTo(demandDensity/marketRate)));
+        assertThat(rtbdAuctionInfo.getInmobi_ltr(), is(equalTo(longTermRevenue/marketRate)));
+        assertThat(rtbdAuctionInfo.getPublisher_yield(), is(equalTo(publisherYield)));
 
         assertThat(request.getSite(), is(equalTo(siteId)));
         assertThat(request.getId(), is(equalTo(taskId)));

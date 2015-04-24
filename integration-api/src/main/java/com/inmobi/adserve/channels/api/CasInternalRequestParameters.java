@@ -2,9 +2,9 @@ package com.inmobi.adserve.channels.api;
 
 import java.util.List;
 
-import lombok.Data;
-
 import com.inmobi.adserve.channels.types.AccountType;
+
+import lombok.Data;
 
 @Data
 public class CasInternalRequestParameters {
@@ -15,6 +15,11 @@ public class CasInternalRequestParameters {
     private double auctionBidFloor;
     private String auctionId;
     private boolean traceEnabled;
+
+    // Auction Clearing Price Mechanics
+    private double demandDensity;   // Equivalent to Alpha*Omega
+    private double longTermRevenue; // Equivalent to Beta*Omega
+    private int publisherYield;     // Equivalent to Gamma
 
     private String impressionId;
 

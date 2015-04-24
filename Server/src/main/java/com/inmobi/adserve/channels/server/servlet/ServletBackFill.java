@@ -11,7 +11,10 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
@@ -51,6 +54,19 @@ public class ServletBackFill extends BaseServlet {
         LOG.debug(traceMarker, "Inside Servlet {}", this.getClass().getSimpleName());
         InspectorStats.incrementStatCount(InspectorStrings.BACK_FILL_REQUESTS);
         super.handleRequest(hrh, queryStringDecoder, serverChannel);
+    }
+
+    @Override
+    protected void specificEnrichment(CasContext casContext, SASRequestParameters sasParams,
+                                      CasInternalRequestParameters casInternal) {
+        LOG.debug("enrichDstSpecific DCP");
+        casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
+        // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
+        // This is currently only being used by DCPRubicon
+        double auctionBidFloor = sasParams.getSiteFloor();
+        casInternal.setAuctionBidFloor(auctionBidFloor);
+        LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
+        LOG.debug("AuctionBidFloor is {}", auctionBidFloor);
     }
 
     @Override

@@ -14,7 +14,7 @@ public interface AuctionFilter extends ChannelSegmentFilter {
      * @param casInternalRequestParameters
      */
     void filter(final List<ChannelSegment> channelSegments,
-            final CasInternalRequestParameters casInternalRequestParameters);
+                final CasInternalRequestParameters casInternalRequestParameters);
 
     boolean isApplicable(final String advertiserId);
 

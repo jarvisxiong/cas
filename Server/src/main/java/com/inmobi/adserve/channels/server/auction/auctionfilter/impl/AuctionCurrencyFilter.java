@@ -25,7 +25,7 @@ public class AuctionCurrencyFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         if (RtbAdNetwork.CURRENCIES_SUPPORTED.contains(rtbSegment.getAdNetworkInterface().getCurrency())) {
             return false;
         }

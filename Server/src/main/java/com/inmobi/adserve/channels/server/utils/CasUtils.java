@@ -42,6 +42,7 @@ public class CasUtils {
         return null;
     }
 
+    // No longer being used
     public Double getRtbFloor(final CasContext casContext) {
         final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
         return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
@@ -62,6 +63,7 @@ public class CasUtils {
         return false;
     }
 
+    // No longer being used
     public Double getNetworkSiteEcpm(final CasContext casContext, final SASRequestParameters sasParams,
             final double factor) {
         final SiteEcpmEntity siteEcpmEntity =

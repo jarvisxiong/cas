@@ -358,6 +358,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+        forwardedBidGuidance = sasParams.getMarketRate();
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 

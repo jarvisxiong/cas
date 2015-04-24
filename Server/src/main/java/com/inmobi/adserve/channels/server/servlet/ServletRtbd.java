@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,8 +12,12 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
@@ -54,6 +59,54 @@ public class ServletRtbd extends BaseServlet {
     }
 
     @Override
+    protected void specificEnrichment(CasContext casContext, SASRequestParameters sasParams, CasInternalRequestParameters casInternal) {
+        LOG.debug("enrichDstSpecific RTBD");
+        casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
+        casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
+
+        final int bidFloorPercent = CasConfigUtil.getServerConfig().getInt("rtb.bidFloorPercent", 100);
+        // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
+        double auctionBidFloor = sasParams.getSiteFloor();
+        auctionBidFloor = (auctionBidFloor * bidFloorPercent) / 100;
+        sasParams.setMarketRate(Math.max(sasParams.getMarketRate(), auctionBidFloor));
+        casInternal.setAuctionBidFloor(auctionBidFloor);
+
+        double tempDemandDensity = CasConfigUtil.getServerConfig().getDouble("rtb.demandDensity");
+        double tempLongTermRevenue = CasConfigUtil.getServerConfig().getDouble("rtb.longTermRevenue");
+
+        /*
+            Setting auction clearing price mechanics.
+            Here demandDensity & longTermRevenue are equivalent to demandDensity*bidGuidance &
+            longTermRevenue*bidGuidance respectively
+         */
+        casInternal.setDemandDensity(tempDemandDensity * sasParams.getMarketRate());
+        casInternal.setLongTermRevenue(tempLongTermRevenue * sasParams.getMarketRate());
+        casInternal.setPublisherYield(CasConfigUtil.getServerConfig().getInt("rtb.publisherYield"));
+
+        /*
+            demandDensity must always be <= longTermRevenue and publisherYield >= 1
+            Capping
+                demandDensity to longTermRevenue if demandDensity > longTermRevenue and
+                publisherYield to 1 if publisherYield < 1
+            as these parameters are adjustable via servlet
+         */
+        if (casInternal.getDemandDensity() > casInternal.getLongTermRevenue()) {
+            casInternal.setDemandDensity(casInternal.getLongTermRevenue());
+        }
+        if (casInternal.getPublisherYield() < 1) {
+            casInternal.setPublisherYield(1);
+        }
+
+        LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
+        LOG.debug("BlockedAdvertisers are {}", casInternal.getBlockedAdvertisers());
+        LOG.debug("rtb.bidFloorPercent is {}", bidFloorPercent);
+        LOG.debug("rtb.demandDensity is {}", tempDemandDensity);
+        LOG.debug("rtb.longTermRevenue is {}", tempLongTermRevenue);
+        LOG.debug("rtb.publisherYield is {}", casInternal.getPublisherYield());
+        LOG.debug("AuctionBidFloor is {}", auctionBidFloor);
+    }
+
+    @Override
     public String getName() {
         return "rtbdFill";
     }
@@ -62,4 +115,17 @@ public class ServletRtbd extends BaseServlet {
     protected boolean isEnabled() {
         return CasConfigUtil.getServerConfig().getBoolean("isRtbEnabled", true);
     }
+
+    private static List<String> getBlockedAdvertisers(final String siteId) {
+        List<String> blockedAdvertisers = null;
+        if (null != siteId) {
+            final SiteFilterEntity siteFilterEntity =
+                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(siteId, 6);
+            if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
+                blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());
+            }
+        }
+        return blockedAdvertisers;
+    }
+
 }

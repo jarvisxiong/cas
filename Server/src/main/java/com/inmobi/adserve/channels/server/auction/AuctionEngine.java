@@ -1,7 +1,10 @@
 package com.inmobi.adserve.channels.server.auction;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_AUCTION;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -15,14 +18,17 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
 
 
 /***
- * Auction Engine to run different types of auctions in rtbd and ix.
+ * Auction Engine to run different types of auctions in rtbd, ix and hosted.
  * 
- * @author Devi Chand(devi.chand@inmobi.com)
+ * @author Devi Chand
+ * @author Ishan Bhatnagar
  */
 public class AuctionEngine implements AuctionEngineInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AuctionEngine.class);
@@ -37,29 +43,23 @@ public class AuctionEngine implements AuctionEngineInterface {
     private ChannelSegment auctionResponse;
     private double secondBidPrice;
     private List<ChannelSegment> unfilteredChannelSegmentList;
+    private static Random random = new Random();
 
-    /***
-     * RunRtbSecondPriceAuctionEngine returns the adnetwork selected after auctioning If no of rtb segments selected
-     * after filtering is zero it returns the null If no of rtb segments selected after filtering is one it returns the
-     * rtb adapter for the segment BidFloor is maximum of lowestEcpm and siteFloor If only 2 rtb are selected, highest
-     * bid will win and would be charged the secondHighest price If only 1 rtb is selected, it will be selected for
-     * sending response and will be charged the highest of secondHighest price or 90% of bidFloor
-     * 
-     * Runs a second price auction for RTBD and a first price auction for IX.
+    /**
+     * Runs the auction for RTBD (Second Price), IX (First Price) & Hosted (Trump)
      */
-
     @Override
     public synchronized AdNetworkInterface runAuctionEngine() {
-        // Do not run auction 2 times.
-
+        // Do not run the auction twice.
         if (auctionComplete) {
             return auctionResponse == null ? null : auctionResponse.getAdNetworkInterface();
         }
         auctionComplete = true;
-        List<ChannelSegment> filteredChannelSegmentList;
 
+        List<ChannelSegment> filteredChannelSegmentList;
         if (!unfilteredChannelSegmentList.isEmpty()) {
             LOG.debug("Inside {} auction engine", DemandSourceType.findByValue(sasParams.getDst()).toString());
+
             // Apply filtration only when we have at least 1 channelSegment
             filteredChannelSegmentList =
                     auctionFilterApplier.applyFilters(new ArrayList<>(unfilteredChannelSegmentList),
@@ -74,86 +74,94 @@ public class AuctionEngine implements AuctionEngineInterface {
         // Send auction response as null in case of 0 rtb/ix responses.
         if (filteredChannelSegmentList.isEmpty()) {
             auctionResponse = null;
-            LOG.debug("Returning from auction engine , winner is none");
+            LOG.debug("Returning from auction engine, all segments were dropped. No winner.");
             return null;
-        } else if (filteredChannelSegmentList.size() == 1) {
-            auctionResponse = filteredChannelSegmentList.get(0);
-            AdNetworkInterface winningAdNetworkInterface = auctionResponse.getAdNetworkInterface();
-            // Take minimum of auctionFloor+0.01 and bid as secondBidprice if no. of auction
-            // response are 1.
-            if (DemandSourceType.RTBD == winningAdNetworkInterface.getDst()) {
-                // For RTBD
-                secondBidPrice =
-                        Math.min(casInternalRequestParameters.getAuctionBidFloor(),
-                                winningAdNetworkInterface.getBidPriceInUsd());
-                // For Hosted Ad Server, secondBidPrice at this point is -1
-                // If Hosted Ad Network is the winner then override secondBidPrice
-                if (winningAdNetworkInterface instanceof HostedAdNetwork) {
-                    secondBidPrice = ((HostedAdNetwork) winningAdNetworkInterface).getBidToUmpInUSD();
+        }
+
+        int winnerIndex = 0;
+        final AdNetworkInterface firstAdNetwork = filteredChannelSegmentList.get(0).getAdNetworkInterface();
+        double highestBid = firstAdNetwork.getBidPriceInUsd();
+        double lowestLatency = firstAdNetwork.getLatency();
+        double secondHighestDistinctBid = casInternalRequestParameters.getAuctionBidFloor(); // Acts as the default secondBidPrice
+
+        /*
+            Iterate over all the channel segments, and find the channel segment with the highest bid (if there are
+            any conflicts, then the one with the lowest latency is chosen).
+
+            SecondBidPrice is set to the second highest distinct bid (defaulting to the auctionBidFloor if all the bids
+            are the same.
+         */
+        for (int index = 1; index < filteredChannelSegmentList.size(); ++index) {
+            final AdNetworkInterface adNetworkInterface = filteredChannelSegmentList.get(index).getAdNetworkInterface();
+            final double bid = adNetworkInterface.getBidPriceInUsd();
+            final double latency = adNetworkInterface.getLatency();
+
+            if (bid < highestBid) {
+                secondHighestDistinctBid = Math.max(secondHighestDistinctBid, bid);
+            } else if (bid > highestBid) {
+                winnerIndex = index;
+                lowestLatency = latency;
+                secondHighestDistinctBid = highestBid;
+                highestBid = bid;
+            } else if (latency < lowestLatency) {
+                // If bid == highestBid, then choose the one with the lowest latency
+                winnerIndex = index;
+                lowestLatency = latency;
+            }
+        }
+
+        if (DemandSourceType.RTBD.getValue() == sasParams.getDst()) {
+            // Hack for Hosted
+            if (filteredChannelSegmentList.get(0).getAdNetworkInterface() instanceof HostedAdNetwork) {
+                if (filteredChannelSegmentList.size() > 1) {
+                    auctionResponse = null;
+                    InspectorStats.incrementStatCount(
+                            filteredChannelSegmentList.get(0).getAdNetworkInterface().getName(), INVALID_AUCTION);
+                    LOG.debug("Returning from auction engine, as more than one segment was selected for hosted. "
+                            + "No winner.");
+                    return null;
+                } else {
+                    secondBidPrice = ((HostedAdNetwork) filteredChannelSegmentList.get(0).getAdNetworkInterface())
+                            .getBidToUmpInUSD();
                 }
-                LOG.debug("Completed auction, winner is {} and secondBidPrice is {}",
-                        winningAdNetworkInterface.getName(), secondBidPrice);
             } else {
-                // For IX,
-                // we run a first price auction, but the value is still stored in secondBidPrice
-                secondBidPrice = winningAdNetworkInterface.getBidPriceInUsd();
-                LOG.debug("Completed auction, winner is {} and firstBidPrice is {}",
-                        winningAdNetworkInterface.getName(), secondBidPrice);
-            }
+                Double clearingPrice = getClearingPrice(highestBid, casInternalRequestParameters);
+                LOG.debug("Clearing Price: " + clearingPrice);
+                clearingPrice = clearingPrice * (0.98+random.nextDouble()*0.02);
+                LOG.debug("Clearing Price +  Random(0.98, 1.00): " + clearingPrice);
 
-            // Set encrypted bid price.
-            winningAdNetworkInterface.setEncryptedBid(getEncryptedBid(secondBidPrice));
-            winningAdNetworkInterface.setSecondBidPrice(secondBidPrice);
-
-            // Return as there is no need to iterate over the list.
-            return winningAdNetworkInterface;
-        }
-
-        // TODO: Use pre-implemented sort
-        // Sort the list by their bid prices.
-        for (int i = 0; i < filteredChannelSegmentList.size(); i++) {
-            for (int j = i + 1; j < filteredChannelSegmentList.size(); j++) {
-                if (filteredChannelSegmentList.get(i).getAdNetworkInterface().getBidPriceInUsd() < filteredChannelSegmentList
-                        .get(j).getAdNetworkInterface().getBidPriceInUsd()) {
-                    final ChannelSegment channelSegment = filteredChannelSegmentList.get(i);
-                    filteredChannelSegmentList.set(i, filteredChannelSegmentList.get(j));
-                    filteredChannelSegmentList.set(j, channelSegment);
+                if (clearingPrice >= secondHighestDistinctBid) {
+                    secondBidPrice = clearingPrice;
+                    InspectorStats.incrementStatCount(InspectorStrings.CLEARING_PRICE_WON);
+                } else {
+                    secondBidPrice = secondHighestDistinctBid;
                 }
             }
-        }
-
-        // Calculates the max price of all auction responses.
-        final double maxPrice = filteredChannelSegmentList.get(0).getAdNetworkInterface().getBidPriceInUsd();
-        int secondHighestBid = 1;// Keep secondHighestBidPrice number from auction response list.
-        int lowestLatencyBid = 0;// Keep winner number from auction response list.
-        for (int i = 1; i < filteredChannelSegmentList.size(); i++) {
-            if (filteredChannelSegmentList.get(i).getAdNetworkInterface().getBidPriceInUsd() < maxPrice) {
-                secondHighestBid = i;
-                break;
-            } else if (filteredChannelSegmentList.get(i).getAdNetworkInterface().getLatency() < filteredChannelSegmentList
-                    .get(lowestLatencyBid).getAdNetworkInterface().getLatency()) {
-                lowestLatencyBid = i;
+        } else if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
+            if (filteredChannelSegmentList.size() > 1) {
+                auctionResponse = null;
+                InspectorStats.incrementStatCount(
+                        filteredChannelSegmentList.get(0).getAdNetworkInterface().getName(), INVALID_AUCTION);
+                LOG.debug("Returning from auction engine, as more than one segment was selected for ix. No winner.");
+                return null;
+            } else {
+                secondBidPrice = highestBid;
             }
+
+        } else {
+            // Unhandled DST
+            auctionResponse = null;
+            LOG.debug("Returning from auction engine, as unhandled DST was encountered. No winner.");
+            return null;
         }
 
-        // Set auction response for the auction run.
-        auctionResponse = filteredChannelSegmentList.get(lowestLatencyBid);
+        auctionResponse = filteredChannelSegmentList.get(winnerIndex);
+        AdNetworkInterface winningAdNetwork = filteredChannelSegmentList.get(winnerIndex).getAdNetworkInterface();
+        winningAdNetwork.setEncryptedBid(getEncryptedBid(secondBidPrice));
+        winningAdNetwork.setSecondBidPrice(secondBidPrice);
 
-        // Calculates the secondHighestBidPrice if no of auction responses are more than 1.
-        secondBidPrice = filteredChannelSegmentList.get(secondHighestBid).getAdNetworkInterface().getBidPriceInUsd();
-        final double winnerBid =
-                filteredChannelSegmentList.get(lowestLatencyBid).getAdNetworkInterface().getBidPriceInUsd();
-        if (winnerBid == secondBidPrice) {
-            secondBidPrice = casInternalRequestParameters.getAuctionBidFloor();
-        }
-
-        // Ensure secondHighestBidPrice never crosses response bid.
-        secondBidPrice = Math.min(secondBidPrice, auctionResponse.getAdNetworkInterface().getBidPriceInUsd());
-        auctionResponse.getAdNetworkInterface().setEncryptedBid(getEncryptedBid(secondBidPrice));
-        auctionResponse.getAdNetworkInterface().setSecondBidPrice(secondBidPrice);
-        LOG.debug("Completed auction, winner is {} and secondBidPrice is {}",
-                filteredChannelSegmentList.get(lowestLatencyBid).getAdNetworkInterface().getName(), secondBidPrice);
-        return filteredChannelSegmentList.get(lowestLatencyBid).getAdNetworkInterface();
+        LOG.debug("Auction complete, winner is {}, secondBidPrice is {}", winningAdNetwork.getName(), secondBidPrice);
+        return winningAdNetwork;
     }
 
     @Override
@@ -189,6 +197,7 @@ public class AuctionEngine implements AuctionEngineInterface {
         if (unfilteredChannelSegmentList.isEmpty()) {
             return true;
         }
+        // TODO: For loop can be replaced with counter
         for (final ChannelSegment channelSegment : unfilteredChannelSegmentList) {
             if (!channelSegment.getAdNetworkInterface().isRequestCompleted()) {
                 return false;
@@ -215,4 +224,46 @@ public class AuctionEngine implements AuctionEngineInterface {
         return ImpressionIdGenerator.getInstance().getImpressionId(winBid);
     }
 
+    /**
+     * Computes the clearing price for the auction.
+     *
+     * Assumptions:
+     *  highestBid >= demandDensity (alpha*omega)   [This is enforced in the Auction Bid Filter]
+     *  InmobiLongTermRevenue >= demandDensity      [Enforced while initialising]
+     *
+     * Ask Price Range = [demandDensity, InmobiLongTermRevenue]       (equivalent to [alpha*omega, beta*omega])
+     *
+     * The ask price range is divided into publisherYield(gamma) intervals, with the clearing price being the highest
+     * ask price <= highest bid.
+     *
+     * Calculation Logic:
+     *
+     * Difference = (InmobiLongTermRevenue-demandDensity)/publisherYield       (equivalent to omega*(beta-alpha)/gamma)
+     *
+     * If Difference != 0,
+     *  index = min(Floor((HighestBid-demandDensity)/difference), publisherYield)
+     *  (index is always >= 0 as highestBid >= demandDensity)
+     *  Clearing Price = difference*index + demandDensity
+     * Else
+     *  Clearing Price = demandDensity
+     *
+     * @param highestBid
+     * @param casParams
+     * @return The clearing price for the auction.
+     */
+    protected static double getClearingPrice(final double highestBid, final CasInternalRequestParameters casParams) {
+
+        final double demandDensity = casParams.getDemandDensity();
+        final double longTermRevenue = casParams.getLongTermRevenue();
+        final int publisherYield = casParams.getPublisherYield()>=1?casParams.getPublisherYield():1;    // Sanity
+
+        final double diff = (longTermRevenue-demandDensity)/publisherYield;
+
+        if (0 != diff) {
+            final int index = Math.min((int)((highestBid-demandDensity)/diff), publisherYield);
+            return diff*index + demandDensity;
+        } else {
+            return demandDensity;
+        }
+    }
 }

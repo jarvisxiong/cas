@@ -24,7 +24,7 @@ public class AuctionSeatIdFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         if (rtbSegment.getChannelEntity().getAccountId()
                 .equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getSeatId())) {
             return false;

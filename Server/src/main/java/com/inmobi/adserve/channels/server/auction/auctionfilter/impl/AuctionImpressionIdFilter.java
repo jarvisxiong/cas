@@ -25,7 +25,7 @@ public class AuctionImpressionIdFilter extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
         if (rtbSegment.getAdNetworkInterface().getImpressionId()
                 .equalsIgnoreCase(rtbSegment.getAdNetworkInterface().getRtbImpressionId())) {
             return false;

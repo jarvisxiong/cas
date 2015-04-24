@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
-
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -40,6 +38,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
 
@@ -47,7 +46,6 @@ import com.inmobi.casthrift.DemandSourceType;
 public class AuctionEngineTest {
 
     Configuration mockConfig;
-    Configuration mockAdapterConfig;
     Capture<String> encryptedBid1;
     Capture<Double> secondPrice1;
     CasInternalRequestParameters casInternalRequestParameters;
@@ -461,5 +459,37 @@ public class AuctionEngineTest {
 
         Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
 
+    }
+
+    /**
+     * Assumptions:
+     *  demandDensity <= longTermRevenue
+     *  demandDensity <= highestBid
+     *  publisherYield >= 1
+     * @return
+     */
+    @DataProvider(name = "DataProviderForClearingPrice")
+    public Object[][] paramDataProviderForClearingPrice() {
+        return new Object[][] {
+                {"testClearingPriceUpperBoundLowerThanHighestBid", 1.5, 0.0, 1.0, 10, 1.0},
+                {"testPublisherYieldIsLargeAndUpperBoundIsLowerThanHighestBid", 1.5, 0.0, 1.0, 1000000, 1.0},
+                {"testPublisherYieldIsLarge", 1.5, 0.0, 2.0, 1000000, 1.5},
+                {"testClearingPriceLowerBoundIsEqualToHighestBid", 1.5, 1.5, 2.0, 10, 1.5},
+                {"testClearingPriceUpperBoundIsEqualToHighestBid", 1.5, 0.0, 1.5, 10, 1.5},
+                {"testClearingPriceLowerBoundIsEqualToUpperBound", 1.5, 1.0, 1.0, 100, 1.0},
+                {"testClearingPriceStandardCase", 1.5, 0.0, 2.0, 101, 1.4851485148514851}
+        };
+    }
+
+    @Test(dataProvider = "DataProviderForClearingPrice")
+    public void testGetClearingPrice(final String useCaseName, final double highestBid, final double demandDensity,
+                                     final double longTermRevenue, final int publisherYield,
+                                     final double expectedClearingPrice) throws Exception {
+        CasInternalRequestParameters casParams = new CasInternalRequestParameters();
+        casParams.setDemandDensity(demandDensity);
+        casParams.setLongTermRevenue(longTermRevenue);
+        casParams.setPublisherYield(publisherYield);
+
+        Assert.assertEquals(AuctionEngine.getClearingPrice(highestBid, casParams), expectedClearingPrice);
     }
 }

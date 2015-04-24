@@ -705,7 +705,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 adResponseChannelSegment = rankList.get(getSelectedAdIndex());
             }
 
-            Logging.rrLogging(traceMarker, adResponseChannelSegment, list, sasParams, terminationReason, totalTime);
+            Logging.rrLogging(traceMarker, adResponseChannelSegment, list, sasParams, casInternalRequestParameters,
+                    terminationReason, totalTime);
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);

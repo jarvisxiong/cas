@@ -116,6 +116,12 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
+    public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
+    public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
+
+    // More than one segments were present during the IX/Hosted auctions
+    // (This will never be incremented as extra segments will be dropped in partner count filter)
+    public static final String INVALID_AUCTION = "InvalidAuction";
 
     // IX Response Object Status Code Strings
     public static final String IX_INVALID_REQUEST = "NO_AD:InvalidRequest";

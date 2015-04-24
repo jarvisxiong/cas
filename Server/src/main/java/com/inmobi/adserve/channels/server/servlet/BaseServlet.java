@@ -41,7 +41,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 
 public abstract class BaseServlet implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
-    private static final double MIN_RTB_FLOOR = 0.05;
     protected final Provider<Marker> traceMarkerProvider;
 
     private final MatchSegments matchSegments;
@@ -195,7 +194,7 @@ public abstract class BaseServlet implements Servlet {
      * @param casInternal
      * @param casInternal
      */
-    protected void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
+    protected final void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal) {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
         // Set imai content if r-format is imai
@@ -222,37 +221,16 @@ public abstract class BaseServlet implements Servlet {
     }
 
     /**
-     * Applicable for RTBD and DCP. For IX we have overridden method
+     * Specific Enrichment for all ad pools
      * 
      * @param casContext
      * @param sasParams
      * @param casInternal
      */
-    protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternal) {
-        LOG.debug("Base class enrichRequest");
-        casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
-        casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
-        final double networkEcpmFactor = CasConfigUtil.getServerConfig().getDouble("rtb.networkEcpmFactor", 0.5);
-        final double networkSiteEcpm = casUtils.getNetworkSiteEcpm(casContext, sasParams, networkEcpmFactor);
-        final double segmentFloor = casUtils.getRtbFloor(casContext);
-        final double siteFloor = sasParams.getSiteFloor();
-        double auctionBidFloor = calculateAuctionFloor(siteFloor, segmentFloor, MIN_RTB_FLOOR, networkSiteEcpm);
-        final int bidFloorPercent = CasConfigUtil.getServerConfig().getInt("rtb.bidFloorPercent", 100);
-        auctionBidFloor = auctionBidFloor * bidFloorPercent / 100;
-        casInternal.setAuctionBidFloor(auctionBidFloor);
+    protected abstract void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal);
 
-        LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
-        LOG.debug("BlockedAdvertisers are {}", casInternal.getBlockedAdvertisers());
-        LOG.debug("Site floor is {}", siteFloor);
-        LOG.debug("NetworkSiteEcpm is {}", networkSiteEcpm);
-        LOG.debug("SegmentFloor is {}", segmentFloor);
-        LOG.debug("Minimum rtb floor is {}", MIN_RTB_FLOOR);
-        LOG.debug("rtb.bidFloorPercent is {}", bidFloorPercent);
-        LOG.debug("Final rtbFloor is {}", auctionBidFloor);
-    }
-
-    private List<String> getBlockedIabCategories(final String siteId) {
+    protected static List<String> getBlockedIabCategories(final String siteId) {
         List<String> blockedCategories = null;
         if (null != siteId) {
             final SiteFilterEntity siteFilterEntity =
@@ -264,38 +242,8 @@ public abstract class BaseServlet implements Servlet {
         return blockedCategories;
     }
 
-    private List<String> getBlockedAdvertisers(final String siteId) {
-        List<String> blockedAdvertisers = null;
-        if (null != siteId) {
-            final SiteFilterEntity siteFilterEntity =
-                    CasConfigUtil.repositoryHelper.querySiteFilterRepository(siteId, 6);
-            if (null != siteFilterEntity && siteFilterEntity.getBlockedAdvertisers() != null) {
-                blockedAdvertisers = Arrays.asList(siteFilterEntity.getBlockedAdvertisers());
-            }
-        }
-        return blockedAdvertisers;
-    }
-
     /**
-     * Returns auctionFloor which is the maximum of siteFloor, segmentFloor, countryFloor and networkSiteEcpm
-     * 
-     * @param siteFloor
-     * @param segmentFloor
-     * @param countryFloor
-     * @param networkSiteEcpm
-     */
-    protected double calculateAuctionFloor(final double siteFloor, final double segmentFloor,
-            final double countryFloor, final double networkSiteEcpm) {
-        double auctionFloor;
-        auctionFloor = Math.max(siteFloor, segmentFloor);
-        auctionFloor = Math.max(auctionFloor, countryFloor);
-        auctionFloor = Math.max(auctionFloor, networkSiteEcpm);
-        return auctionFloor;
-    }
-
-
-    /**
-     * @param channelSegment
+     * @param filteredSegments
      */
     private void incrementTotalSelectedSegmentStats(final List<ChannelSegment> filteredSegments) {
         for (final ChannelSegment channelSegment : filteredSegments) {

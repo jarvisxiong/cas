@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
@@ -22,10 +23,28 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
         isApplicableIX = true;
     }
 
+    /**
+     * This filter fails channelSegments which have bid lower than the effective auction bid floor.
+     * For RTBD (excluding Hosted), the effective auction bid floor is set to
+     *     max(casInternalRequestParameters.getAuctionBidFloor(), demandDensity (=alpha*omega))
+     * otherwise, it is set to
+     *     casInternalRequestParameters.getAuctionBidFloor()
+     *
+     * @param rtbSegment
+     * @param casInternalRequestParameters
+     * @return
+     */
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-            final CasInternalRequestParameters casInternalRequestParameters) {
-        if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < casInternalRequestParameters.getAuctionBidFloor()) {
+                                     final CasInternalRequestParameters casInternalRequestParameters) {
+
+        double effectiveAuctionBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+        if (rtbSegment.getAdNetworkInterface() instanceof RtbAdNetwork) {
+            effectiveAuctionBidFloor = Math.max(effectiveAuctionBidFloor,
+                    casInternalRequestParameters.getDemandDensity());
+        }
+
+        if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < effectiveAuctionBidFloor) {
             return true;
         }
         return false;
