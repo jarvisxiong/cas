@@ -38,6 +38,8 @@ import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.types.AdAttributeType;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -115,6 +117,14 @@ public class ThriftRequestParser {
             final double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
             params.setSiteFloor(ecpmFloor);
             final double marketRate = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
+            if (0.0 == marketRate) {
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                        DemandSourceType.findByValue(dst) + InspectorStrings.BID_GUIDANCE_ABSENT);
+            }
+            if (marketRate == ecpmFloor) {
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                        DemandSourceType.findByValue(dst) + InspectorStrings.BID_GUIDANCE_EQUAL_TO_UMP_FLOOR);
+            }
             params.setMarketRate(marketRate);
 
             params.setSiteIncId(tObject.site.siteIncId);

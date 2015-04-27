@@ -116,8 +116,13 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
-    public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
+
+    // Auction Level Stats
+    public static final String AUCTION_STATS = "AuctionStats";
+    public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
+    public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
+    public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloorInAdPoolRequest";
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)

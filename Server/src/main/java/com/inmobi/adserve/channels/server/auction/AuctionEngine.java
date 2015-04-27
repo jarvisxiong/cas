@@ -132,7 +132,8 @@ public class AuctionEngine implements AuctionEngineInterface {
 
                 if (clearingPrice >= secondHighestDistinctBid) {
                     secondBidPrice = clearingPrice;
-                    InspectorStats.incrementStatCount(InspectorStrings.CLEARING_PRICE_WON);
+                    InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                            InspectorStrings.CLEARING_PRICE_WON);
                 } else {
                     secondBidPrice = secondHighestDistinctBid;
                 }
