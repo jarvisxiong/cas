@@ -414,7 +414,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
                 mandatoryAssetMap = new HashMap<>();
                 nonMandatoryAssetMap = new HashMap<>();
-                for (final Asset asset : nativeIx.getAssets()) {
+                for (final Asset asset : nativeIx.getRequestobj().getAssets()) {
                     if (1 == asset.getRequired()) {
                         mandatoryAssetMap.put(asset.getId(), asset);
                     } else {

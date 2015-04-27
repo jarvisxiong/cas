@@ -222,24 +222,26 @@ public class IXAdNetworkHelper {
                 contextBuilder.setTitle(responseAsset.getTitle().getText());
                 break;
             case IMAGE:
+                final com.inmobi.adserve.contracts.ix.response.nativead.Image img = responseAsset.getImg();
+                final Integer width = img.getW() == null ? requestAsset.getImg().getWmin() : img.getW();
+                final Integer height = img.getH() == null ? requestAsset.getImg().getHmin() : img.getH();
                 if (Image.ImageAssetType.ICON.getId() == requestAsset.getImg().getType()) {
                     final Icon.Builder iconbuilder = Icon.newBuilder();
-                    iconbuilder.setUrl(responseAsset.getImg().getUrl());
-                    iconbuilder.setW(responseAsset.getImg().getW()); // Should this be hardcoded to 300?
-                    iconbuilder.setH(responseAsset.getImg().getH()); // Should this be hardcoded to 300?
+                    iconbuilder.setUrl(img.getUrl());
+                    iconbuilder.setW(width);
+                    iconbuilder.setH(height);
                     contextBuilder.setIcons(Arrays.asList(new Icon[] {(Icon) iconbuilder.build()}));
                 } else if (Image.ImageAssetType.MAIN.getId() == requestAsset.getImg().getType()) {
                     final Screenshot.Builder screenshotBuilder = Screenshot.newBuilder();
-                    screenshotBuilder.setUrl(responseAsset.getImg().getUrl());
-                    if (responseAsset.getImg().getW() < requestAsset.getImg().getWmin()
-                            || responseAsset.getImg().getH() < requestAsset.getImg().getHmin()) {
+                    screenshotBuilder.setUrl(img.getUrl());
+                    if (width < requestAsset.getImg().getWmin()
+                            || height < requestAsset.getImg().getHmin()) {
                         LOG.debug("Image Constraints not met.");
                         return false;
                     }
-                    screenshotBuilder.setW(responseAsset.getImg().getW());
-                    screenshotBuilder.setH(responseAsset.getImg().getH());
-                    Double ar = (double) responseAsset.getImg().getH();
-                    ar /= responseAsset.getImg().getW();
+                    screenshotBuilder.setW(width);
+                    screenshotBuilder.setH(height);
+                    final Double ar = (double)  width/ height;
                     screenshotBuilder.setAr(String.valueOf(ar));
                     contextBuilder.setScreenshots(Arrays.asList(new Screenshot[] {(Screenshot) screenshotBuilder
                             .build()}));

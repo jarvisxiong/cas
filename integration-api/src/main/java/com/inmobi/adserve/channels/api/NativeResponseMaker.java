@@ -90,8 +90,10 @@ public class NativeResponseMaker {
         final String namespace = (String) vc.get("NAMESPACE");
         final String pubContent = templateParser.format(app, siteId);
         final String contextCode = templateDecorator.getContextCode(vc);
-
         LOG.debug("Making response for siteId : {} ", siteId);
+        LOG.debug("namespace : {}", namespace);
+        LOG.debug("pubContent : {}", pubContent);
+        LOG.debug("contextCode : {}", contextCode);
         return makeNativeAd(pubContent, contextCode, namespace);
     }
 

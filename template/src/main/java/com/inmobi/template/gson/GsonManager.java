@@ -29,8 +29,7 @@ public class GsonManager {
         for (Class gsonContract : gsonContracts) {
             gsonBuilder.registerTypeAdapter(gsonContract, new GsonContractDeserialiser());
         }
-        // gson = gsonBuilder.disableHtmlEscaping().create();
-        gson = gsonBuilder.create();
+        gson = gsonBuilder.disableHtmlEscaping().create();
     }
 
     public Gson getGsonInstance() {

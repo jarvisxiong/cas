@@ -10,20 +10,20 @@ import com.inmobi.adserve.channels.repository.NativeConstraints.Mandatory;
 import com.inmobi.adserve.contracts.ix.request.nativead.Data;
 import com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image.ImageAssetType;
+import com.inmobi.adserve.contracts.ix.request.nativead.NativeReqObj;
 import com.inmobi.adserve.contracts.ix.request.nativead.Title;
 import com.inmobi.casthrift.rtb.Native;
 
 public class NativeBuilderImpl implements NativeBuilder {
     private final NativeAdTemplateEntity templateEntity;
     private final Native nativeObj;
-    private final com.inmobi.adserve.contracts.ix.request.nativead.Native nativeIx;
+    private final NativeReqObj nativeReqObj;
 
     @Inject
     public NativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
         nativeObj = new Native();
-        nativeIx = new com.inmobi.adserve.contracts.ix.request.nativead.Native();
+        nativeReqObj = new NativeReqObj(1);
         this.templateEntity = templateEntity;
-
     }
 
     @Override
@@ -37,7 +37,7 @@ public class NativeBuilderImpl implements NativeBuilder {
     public com.inmobi.adserve.contracts.ix.request.nativead.Native buildNativeIX() {
         buildMandatory();
         buildNonMandatory();
-        return nativeIx;
+        return new com.inmobi.adserve.contracts.ix.request.nativead.Native(nativeReqObj);
     }
 
     private void buildMandatory() {
@@ -45,7 +45,7 @@ public class NativeBuilderImpl implements NativeBuilder {
         for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case TITLE:
-                    nativeIx.addAsset(true, new Title(100));
+                    nativeReqObj.addAsset(true, new Title(100));
                     break;
                 case ICON:
                     final com.inmobi.adserve.contracts.ix.request.nativead.Image icon =
@@ -53,24 +53,24 @@ public class NativeBuilderImpl implements NativeBuilder {
                     icon.setType(ImageAssetType.ICON);
                     icon.setWmin(300);
                     icon.setHmin(300);
-                    nativeIx.addAsset(true, icon);
+                    nativeReqObj.addAsset(true, icon);
                     break;
                 case DESCRIPTION:
-                    nativeIx.addAsset(true, new Data(DataAssetType.DESC));
+                    nativeReqObj.addAsset(true, new Data(DataAssetType.DESC));
                     break;
                 case SCREEN_SHOT:
                     final com.inmobi.adserve.contracts.ix.request.nativead.Image screen =
                             NativeConstraints.getIXImage(templateEntity.getImageKey());
-                    nativeIx.addAsset(true, screen);
+                    nativeReqObj.addAsset(true, screen);
                     break;
             }
         }
-        nativeIx.addAsset(true, new Data(DataAssetType.CTA_TEXT));
+        nativeReqObj.addAsset(true, new Data(DataAssetType.CTA_TEXT));
     }
 
     private void buildNonMandatory() {
-        nativeIx.addAsset(false, new Data(DataAssetType.DOWNLOADS));
-        nativeIx.addAsset(false, new Data(DataAssetType.RATING));
+        nativeReqObj.addAsset(false, new Data(DataAssetType.DOWNLOADS));
+        nativeReqObj.addAsset(false, new Data(DataAssetType.RATING));
     }
 
 

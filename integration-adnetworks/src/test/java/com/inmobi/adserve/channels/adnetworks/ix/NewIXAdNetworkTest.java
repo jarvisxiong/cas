@@ -293,8 +293,8 @@ public class NewIXAdNetworkTest {
         final BidRequest bidReq = ixAdNetwork.getBidRequest();
 
         assertThat(ixAdNetwork.isNativeRequest(), is(true));
-        assertThat(bidReq.getImp().get(0).getNat().getAssets().isEmpty(), is(false));
-        assertThat(bidReq.getImp().get(0).getNat().getAssets().size(), is(6));
+        assertThat(bidReq.getImp().get(0).getNat().getRequestobj().getAssets().isEmpty(), is(false));
+        assertThat(bidReq.getImp().get(0).getNat().getRequestobj().getAssets().size(), is(6));
     }
 
     @Test
