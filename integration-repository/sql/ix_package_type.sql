@@ -1,4 +1,4 @@
-CREATE OR REPLACE TYPE ix_package_type_23032015 AS
+CREATE TYPE ix_package_type_09042015 AS
 (
     id                      INTEGER,
     name                    CHARACTER VARYING(128),
@@ -34,7 +34,10 @@ CREATE OR REPLACE TYPE ix_package_type_23032015 AS
     data_vendor_cost        DOUBLE PRECISION,
     city_ids                INTEGER[],
     modified_by             CHARACTER VARYING(100),
+    access_types            CHARACTER VARYING(32)[],
     deal_ids                CHARACTER VARYING[],
     deal_floors             DOUBLE PRECISION[]
 );
-ALTER TYPE ix_package_type_23032015 OWNER TO postgres;
+ALTER TYPE ix_package_type_09042015 OWNER TO postgres;
+
+

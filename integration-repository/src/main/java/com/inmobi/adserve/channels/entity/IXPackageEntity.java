@@ -19,6 +19,7 @@ public class IXPackageEntity {
     private Set<Set<Integer>> dmpFilterSegmentExpression;
     private Integer[][] scheduledTimeOfDays;
     private List<String> dealIds;
+    private List<String> accessTypes;
     private List<Double> dealFloors;
     private Double dataVendorCost;
     private String geoFenceRegion;
@@ -34,6 +35,7 @@ public class IXPackageEntity {
         dealFloors = builder.dealFloors;
         dataVendorCost = builder.dataVendorCost;
         geoFenceRegion = builder.geoFenceRegion;
+        accessTypes = builder.accessTypes;
     }
 
     public static Builder newBuilder() {
@@ -50,6 +52,7 @@ public class IXPackageEntity {
         private Integer[][] scheduledTimeOfDays;
         private List<String> dealIds;
         private List<Double> dealFloors;
+        private List<String> accessTypes;
         private Double dataVendorCost;
         private String geoFenceRegion;
 

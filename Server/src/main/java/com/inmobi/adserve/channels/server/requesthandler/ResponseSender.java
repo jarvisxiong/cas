@@ -30,6 +30,8 @@ import org.slf4j.Marker;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.Provider;
+import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
@@ -44,6 +46,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -95,8 +98,23 @@ public class ResponseSender extends HttpRequestHandlerBase {
             + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
     private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native");
 
-    protected static final int PRIVATE_AUCTION = 3;
-    protected static final int PREFERRED_DEAL = 4;
+    /**
+     * At IX-Rubicon, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then the return
+     * ad from IX will alse be absent.
+     */
+    protected static final String PRIVATE_AUCTION_DEAL = "PRIVATE_AUCTION_DEAL";
+
+    /**
+     * At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then
+     * the bid is considered from the remaining DSP's.
+     */
+    protected static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
+
+    /**
+     * At IX-Rubicon, bid will be taken by open auction from all DSP's, but the with DSP who have this deal, they will
+     * get additional info like geo, bidLandScaping etc
+     */
+    protected static final String PREFERRED_DEAL = "PREFERRED_DEAL";
 
     @Setter
     @Getter
@@ -211,7 +229,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // send Ad Response
 
     private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel,
-        final Short selectedSlotId, final RepositoryHelper repositoryHelper, final Boolean isHASAdResponse) {
+            final Short selectedSlotId, final RepositoryHelper repositoryHelper, final Boolean isHASAdResponse) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
@@ -245,7 +263,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             incrementStatsForFills(sasParams.getDst(), isHASAdResponse);
         } else {
             final String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
-            final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse());
+            final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse(), repositoryHelper);
             LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
             if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(serverChannel);
@@ -294,7 +312,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    protected AdPoolResponse createThriftResponse(final String finalResponse) {
+    protected AdPoolResponse createThriftResponse(final String finalResponse, final RepositoryHelper repositoryHelper) {
         final AdPoolResponse adPoolResponse = new AdPoolResponse();
         final AdInfo rtbdAd = new AdInfo();
         final AdIdChain adIdChain = new AdIdChain();
@@ -322,12 +340,24 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
                     final String dealId = ixAdNetwork.returnDealId();
                     final long highestBid = (long) (ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
-                    final int pmpTier = ixAdNetwork.returnPmpTier();
 
+                    IXPackageEntity dealIXPackageEntity = null;
                     // Checking whether a dealId was provided in the bid response
-                    if (null != dealId) {
-                        // If dealId is present, then auction type is set to PREFERRED_DEAL
-                        // and dealId is set
+                    if (dealId != null) {
+                        try {
+                            dealIXPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
+                        } catch (final NoSuchObjectException exception) {
+                            LOG.error("For the dealId, we dont have entry in our system {}", dealId);
+                            InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
+                        } catch (final NonUniqueObjectException exception) {
+                            LOG.error("For the dealId, we dont have entry in our system {}", dealId);
+                            InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
+                        }
+                    }
+
+
+                    if (null != dealIXPackageEntity) {
+
                         if (ixAdNetwork.isExternalPersonaDeal()) {
                             csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
                             TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
@@ -335,20 +365,24 @@ public class ResponseSender extends HttpRequestHandlerBase {
                                 adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
                             } catch (TException exc) {
                                 LOG.error("Could not send csId to UMP, thrift exception {}", exc);
+
                             }
                         }
+
+                        final int indexOfDealId = dealIXPackageEntity.getDealIds().indexOf(dealId);
+
+                        final String dealType =
+                                dealIXPackageEntity.getAccessTypes().size() > indexOfDealId ? dealIXPackageEntity
+                                        .getAccessTypes().get(indexOfDealId) : "RIGHT_TO_FIRST_REFUSAL_DEAL";
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
-                        if (PRIVATE_AUCTION == pmpTier) {
-                            // If private marketplace tier is 3 then the deal is a private auction
-                            rtbdAd.setAuctionType(AuctionType.PRIVATE_AUCTION);
-                        } else if (PREFERRED_DEAL == pmpTier) {
-                            // If private marketplace tier is 4 then the deal is a preferred deal
-                            rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
-                        } else {
-                            // When pmpTier is 0 (default value), auction is an open auction
-                            // Other values are reserved for future use
-                            rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
+
+                        if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
+                            // At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if
+                            // the bid is absent, then
+                            // get additional info like geo, bidLandScaping etc
+                            rtbdAd.setAuctionType(AuctionType.TRUMP);
                         }
                     } else {
                         // otherwise auction type is set to FIRST_PRICE
@@ -361,7 +395,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 // If Hosted Ad Server response then Auction Type is set to PREFERRED_DEAL
                 if (getRtbResponse().getAdNetworkInterface() instanceof HostedAdNetwork) {
                     rtbdAd.setPricingModel(PricingModel.CPC);
-                    rtbdAd.setAuctionType(AuctionType.PREFERRED_DEAL);
+                    rtbdAd.setAuctionType(AuctionType.TRUMP);
                 } else {
                     // For normal RTBD responses, auction type is set to SECOND_PRICE
                     rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);

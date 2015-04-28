@@ -469,7 +469,7 @@ public class LoggingTest {
         long latency = 789L;
         double bidPriceInUSD = 4.0;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
-
+        
         mockStaticNice(InspectorStats.class);
         IXAdNetwork mockIXAdNetwork = createMock(IXAdNetwork.class);
         AdNetworkInterface mockAdNetworkInterface = mockIXAdNetwork;
@@ -496,6 +496,7 @@ public class LoggingTest {
         expect(mockIXAdNetwork.returnAqid()).andReturn(aqId).times(2);
         expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIds).times(2);
         expect(mockIXAdNetwork.getWinningPackageId()).andReturn(winningPackageId).times(2);
+        expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.8).times(2);
         expect(mockIXAdNetwork.getDealId()).andReturn(dealId).times(2);
 
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();

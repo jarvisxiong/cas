@@ -1,9 +1,10 @@
-CREATE OR REPLACE FUNCTION ix_package_fun_23032015()
+
+CREATE FUNCTION ix_package_fun_09042015()
 RETURNS
-    SETOF ix_package_type_23032015 AS
+    SETOF ix_package_type_09042015 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_23032015%ROWTYPE;
+    row1    ix_package_type_09042015%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -42,10 +43,11 @@ SELECT
                 ix_packages.data_vendor_cost AS data_vendor_cost,
                 ix_packages.city_ids AS city_ids,
                 ix_packages.modified_by AS modified_by,
+                deals.access_types as access_types,
                 deals.deal_ids AS deal_ids,
                 deals.deal_floors AS deal_floors
                 from ix_packages JOIN (
-                    select makeList(rp_deal_id) AS deal_ids,makeList(deal_floor) AS deal_floors,package_id
+                    select makeList(rp_deal_id) AS deal_ids,makeList(deal_floor) AS deal_floors, makeList(access_type) as access_types,package_id
                     from ix_package_deals
                     where (start_date is null or start_date <= now()+interval '1 minute')
                     and (end_date is null or end_date >= now())
@@ -61,3 +63,5 @@ LOOP
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE;
+
+

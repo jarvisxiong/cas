@@ -11,15 +11,18 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
@@ -31,6 +34,8 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
@@ -48,22 +53,13 @@ public class ResponseSenderTest {
     public void testGetResponseFormat() throws Exception {
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
 
-        expect(mockSASRequestParameters.getRFormat())
-                .andReturn(null).times(2)
-                .andReturn("axml").times(1)
-                .andReturn("xhtml").times(1)
-                .andReturn("html").times(1)
-                .andReturn("imai").times(1)
-                .andReturn("native").times(1)
-                .andReturn("jsAdCode").times(1);
+        expect(mockSASRequestParameters.getRFormat()).andReturn(null).times(2).andReturn("axml").times(1)
+                .andReturn("xhtml").times(1).andReturn("html").times(1).andReturn("imai").times(1).andReturn("native")
+                .times(1).andReturn("jsAdCode").times(1);
 
-        expect(mockSASRequestParameters.getAdcode())
-                .andReturn("JS").times(1)
-                .andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getAdcode()).andReturn("JS").times(1).andReturn(null).anyTimes();
 
-        expect(mockSASRequestParameters.getRqIframe())
-                .andReturn("<Iframe Code>").times(1)
-                .andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getRqIframe()).andReturn("<Iframe Code>").times(1).andReturn(null).anyTimes();
 
         replayAll();
 
@@ -91,11 +87,8 @@ public class ResponseSenderTest {
         AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
 
         List<ChannelSegment> list = new ArrayList<ChannelSegment>();
-        expect(mockAuctionEngine.getUnfilteredChannelSegmentList())
-                .andReturn(list).times(2)
-                .andReturn(null).times(1);
-        expect(mockSASRequestParameters.getDst())
-                .andReturn(DemandSourceType.DCP.getValue()).times(1)
+        expect(mockAuctionEngine.getUnfilteredChannelSegmentList()).andReturn(list).times(2).andReturn(null).times(1);
+        expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.DCP.getValue()).times(1)
                 .andReturn(DemandSourceType.IX.getValue()).times(1);
         replayAll();
 
@@ -122,14 +115,11 @@ public class ResponseSenderTest {
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
 
-        expect(mockAuctionEngine.getUnfilteredChannelSegmentList())
-                .andReturn(new ArrayList<ChannelSegment>()).times(1)
+        expect(mockAuctionEngine.getUnfilteredChannelSegmentList()).andReturn(new ArrayList<ChannelSegment>()).times(1)
                 .andReturn(null).times(1);
-        expect(mockAuctionEngine.getAuctionResponse())
-                .andReturn(getDummyChannelSegment()).times(2)
-                .andReturn(null).times(1);
-        expect(mockSASRequestParameters.getDst())
-                .andReturn(DemandSourceType.IX.getValue()).times(3)
+        expect(mockAuctionEngine.getAuctionResponse()).andReturn(getDummyChannelSegment()).times(2).andReturn(null)
+                .times(1);
+        expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).times(3)
                 .andReturn(DemandSourceType.DCP.getValue()).times(3);
         replayAll();
 
@@ -170,6 +160,7 @@ public class ResponseSenderTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         RtbAdNetwork mockRtbAdNetwork = createMock(RtbAdNetwork.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
 
         expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
@@ -188,18 +179,21 @@ public class ResponseSenderTest {
         expect(mockRtbAdNetwork.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
         expect(mockRtbAdNetwork.getSecondBidPriceInUsd()).andReturn(secondBidPriceInUSD).anyTimes();
         expect(mockRtbAdNetwork.getCurrency()).andReturn(currency).anyTimes();
+        expect(mockRtbAdNetwork.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
+
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
-        long bid = (long)(bidPriceInUSD * Math.pow(10, 6));
-        long minBid = (long)(secondBidPriceInUSD * Math.pow(10, 6));
+        long bid = (long) (bidPriceInUSD * Math.pow(10, 6));
+        long minBid = (long) (secondBidPriceInUSD * Math.pow(10, 6));
         UUID uuid = UUID.fromString(impressionId);
         GUID impression = new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
 
-        AdPoolResponse adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        AdPoolResponse adPoolResponse =
+                responseSender.createThriftResponse(adMarkup, mockRtbAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
         AdIdChain adIdChain = adInfo.adIds.get(0);
@@ -244,6 +238,7 @@ public class ResponseSenderTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         AdNetworkInterface mockDCPAdNetwork = createMock(AdNetworkInterface.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
 
         expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
@@ -263,19 +258,21 @@ public class ResponseSenderTest {
         expect(mockDCPAdNetwork.getSecondBidPriceInUsd()).andReturn(secondBidPriceInUSD).anyTimes();
         expect(mockDCPAdNetwork.getBidPriceInLocal()).andReturn(bidPriceInLocal).anyTimes();
         expect(mockDCPAdNetwork.getCurrency()).andReturn(currency).anyTimes();
+        expect(mockDCPAdNetwork.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
-        long bid = (long)(bidPriceInUSD * Math.pow(10, 6));
-        long localBid = (long)(bidPriceInLocal * Math.pow(10, 6));
-        long minBid = (long)(secondBidPriceInUSD * Math.pow(10, 6));
+        long bid = (long) (bidPriceInUSD * Math.pow(10, 6));
+        long localBid = (long) (bidPriceInLocal * Math.pow(10, 6));
+        long minBid = (long) (secondBidPriceInUSD * Math.pow(10, 6));
         UUID uuid = UUID.fromString(impressionId);
         GUID impression = new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
 
-        AdPoolResponse adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        AdPoolResponse adPoolResponse =
+                responseSender.createThriftResponse(adMarkup, mockDCPAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
         AdIdChain adIdChain = adInfo.adIds.get(0);
@@ -321,6 +318,7 @@ public class ResponseSenderTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         HostedAdNetwork mockHostedAdNetwork = createMock(HostedAdNetwork.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
 
         expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
@@ -339,18 +337,21 @@ public class ResponseSenderTest {
         expect(mockHostedAdNetwork.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
         expect(mockHostedAdNetwork.getSecondBidPriceInUsd()).andReturn(secondBidPriceInUSD).anyTimes();
         expect(mockHostedAdNetwork.getCurrency()).andReturn(currency).anyTimes();
+        expect(mockHostedAdNetwork.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
+
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
-        long bid = (long)(bidPriceInUSD * Math.pow(10, 6));
-        long minBid = (long)(secondBidPriceInUSD * Math.pow(10, 6));
+        long bid = (long) (bidPriceInUSD * Math.pow(10, 6));
+        long minBid = (long) (secondBidPriceInUSD * Math.pow(10, 6));
         UUID uuid = UUID.fromString(impressionId);
         GUID impression = new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
 
-        AdPoolResponse adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        AdPoolResponse adPoolResponse =
+                responseSender.createThriftResponse(adMarkup, mockHostedAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
         AdIdChain adIdChain = adInfo.adIds.get(0);
@@ -363,7 +364,7 @@ public class ResponseSenderTest {
         assertThat(adIdChain.campaign, is(equalTo(campaignIncId)));
         assertThat(adIdChain.advertiser_guid, is(equalTo(advertiserId)));
         assertThat(adInfo.pricingModel, is(equalTo(PricingModel.CPC)));
-        assertThat(adInfo.auctionType, is(equalTo(AuctionType.PREFERRED_DEAL)));
+        assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.bid, is(equalTo(bid)));
         assertThat(adInfo.price, is(equalTo(bid)));
         assertThat(adInfo.impressionId, is(equalTo(impression)));
@@ -390,12 +391,23 @@ public class ResponseSenderTest {
         short selectedSlot = 5;
         ADCreativeType creativeType = ADCreativeType.BANNER;
         DemandSourceType dst = DemandSourceType.IX;
+        IXPackageEntity.Builder builder = new IXPackageEntity.Builder();
+        List<String> accessTypes = new ArrayList<String>(); 
+        accessTypes.add(ResponseSender.RIGHT_TO_FIRST_REFUSAL_DEAL);
+        builder.setAccessTypes(accessTypes);
+        List<String> dealIds = new ArrayList<String>();
+        dealIds.add("dealId");
+        builder.setDealIds(dealIds);
+        IXPackageEntity ixPackageEntity = new IXPackageEntity(builder);
 
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         IXAdNetwork mockIXAdNetwork = createMock(IXAdNetwork.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        mockStaticNice(InspectorStats.class);
+        expect(mockRepositoryHelper.queryIxPackageByDeal("dealId")).andReturn(ixPackageEntity).anyTimes();
 
         expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
@@ -415,34 +427,27 @@ public class ResponseSenderTest {
         expect(mockIXAdNetwork.getSecondBidPriceInUsd()).andReturn(secondBidPriceInUSD).anyTimes();
         expect(mockIXAdNetwork.getCurrency()).andReturn(currency).anyTimes();
         expect(mockIXAdNetwork.returnAdjustBid()).andReturn(adjustBidPrice).anyTimes();
-        expect(mockIXAdNetwork.returnPmpTier())
-                .andReturn(ResponseSender.PRIVATE_AUCTION).times(2)
-                .andReturn(ResponseSender.PREFERRED_DEAL).times(1)
-                .andReturn(1).anyTimes();
-        expect(mockIXAdNetwork.isExternalPersonaDeal())
-                .andReturn(false).times(2)
-                .andReturn(true).anyTimes();
-        expect(mockIXAdNetwork.returnDealId())
-                .andReturn(null).times(1)
-                .andReturn(dealId).anyTimes();
+        expect(mockIXAdNetwork.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
+
+        expect(mockIXAdNetwork.isExternalPersonaDeal()).andReturn(false).times(2).andReturn(true).anyTimes();
+        expect(mockIXAdNetwork.returnDealId()).andReturn(null).times(1).andReturn(dealId).anyTimes();
         HashSet<Integer> temp = new HashSet<Integer>();
         temp.add(1);
-        expect(mockIXAdNetwork.returnUsedCsids())
-                .andReturn(temp).times(1)
-                .andReturn(null).anyTimes();
+        expect(mockIXAdNetwork.returnUsedCsids()).andReturn(temp).times(1).andReturn(null).anyTimes();
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();
         MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
         responseSender.setSasParams(mockSASRequestParameters);
 
-        long bid = (long)(bidPriceInUSD * Math.pow(10, 6));
-        long minBid = (long)(secondBidPriceInUSD * Math.pow(10, 6));
-        long adjustBid = (long)(adjustBidPrice * Math.pow(10, 6));
+        long bid = (long) (bidPriceInUSD * Math.pow(10, 6));
+        long minBid = (long) (secondBidPriceInUSD * Math.pow(10, 6));
+        long adjustBid = (long) (adjustBidPrice * Math.pow(10, 6));
         UUID uuid = UUID.fromString(impressionId);
         GUID impression = new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
 
-        AdPoolResponse adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        AdPoolResponse adPoolResponse =
+                responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
         AdIdChain adIdChain = adInfo.adIds.get(0);
@@ -462,29 +467,30 @@ public class ResponseSenderTest {
         assertThat(adPoolResponse.minChargedValue, is(equalTo(minBid)));
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.FIRST_PRICE)));
 
-        adPoolResponse = responseSender.createThriftResponse(adMarkup);
+
+        adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         adInfo = adPoolResponse.getAds().get(0);
 
-        assertThat(adInfo.auctionType, is(equalTo(AuctionType.PRIVATE_AUCTION)));
+        assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.dealId, is(equalTo(dealId)));
         assertThat(adInfo.highestBid, is(equalTo(adjustBid)));
 
-        adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         adInfo = adPoolResponse.getAds().get(0);
 
-        assertThat(adInfo.auctionType, is(equalTo(AuctionType.PREFERRED_DEAL)));
+        assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.dealId, is(equalTo(dealId)));
         assertThat(adInfo.highestBid, is(equalTo(adjustBid)));
 
-        adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         adInfo = adPoolResponse.getAds().get(0);
 
-        assertThat(adInfo.auctionType, is(equalTo(AuctionType.PREFERRED_DEAL)));
+        assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.dealId, is(equalTo(dealId)));
         assertThat(adInfo.highestBid, is(equalTo(adjustBid)));
         assertThat(adPoolResponse.isSetRequestPoolSpecificInfo(), is(equalTo(true)));
 
-        adPoolResponse = responseSender.createThriftResponse(adMarkup);
+        adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         assertThat(adPoolResponse.isSetRequestPoolSpecificInfo(), is(equalTo(false)));
     }
 

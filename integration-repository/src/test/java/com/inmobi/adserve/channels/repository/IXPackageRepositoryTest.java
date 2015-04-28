@@ -129,6 +129,11 @@ public class IXPackageRepositoryTest {
         Double[] dealFloors = {0.3, 0.5};
         EasyMock.expect(rs.getArray("deal_floors")).andReturn(dealFloorsArray).anyTimes();
         EasyMock.expect(dealFloorsArray.getArray()).andReturn(dealFloors).anyTimes();
+        
+        Array accessTypesArray = EasyMock.createNiceMock(Array.class);
+        String[] accessTypes = {"RIGHT_TO_FIRST_REFUSAL_DEAL", "PREFERRED_DEAL"};
+        EasyMock.expect(rs.getArray("access_types")).andReturn(accessTypesArray).anyTimes();
+        EasyMock.expect(accessTypesArray.getArray()).andReturn(accessTypes).anyTimes();
 
         Array todArray = EasyMock.createNiceMock(Array.class);
         Integer[] tods = {};

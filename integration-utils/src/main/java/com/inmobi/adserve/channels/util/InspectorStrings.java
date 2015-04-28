@@ -104,6 +104,7 @@ public class InspectorStrings {
     public static final String INVALID_DSP_ID = "DroppedDueToInvalidDspId";
     public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
+    public static final String IX_DEAL_NON_EXISTING = "IxDealNonExisting";
     public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";

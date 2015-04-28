@@ -190,7 +190,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Double dealFloor;
     private Double dataVendorCost;
     private Double adjustbid;
-    private int pmptier;
     private String aqid;
     private String nurl;
     protected boolean isCoppaSet = false;
@@ -1491,7 +1490,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
             setFloorVendorUsedCsids();
         }
-        pmptier = bid.getPmptier();
         nurl = bid.getNurl();
         // creativeId = bid.getCrid(); // Replaced with aqid
         aqid = bid.getAqid();
@@ -1628,7 +1626,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return;
     }
 
-    public double returnAdjustBid() {
+    public Double returnAdjustBid() {
         return adjustbid;
     }
 
@@ -1646,10 +1644,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     public Set<Integer> returnUsedCsids() {
         return usedCsIds;
-    }
-
-    public int returnPmpTier() {
-        return pmptier;
     }
 
     public String returnAqid() {

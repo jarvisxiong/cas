@@ -217,6 +217,7 @@ public class IXPackageRepository {
                 int dmpId = rs.getInt("dmp_id");
 
                 String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
+                String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
                 Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
 
                 Set<Set<Integer>> dmpFilterSegmentExpression;
@@ -380,7 +381,7 @@ public class IXPackageRepository {
                 if (geoSourceType != null) {
                     repoSegmentBuilder.addSegmentParameter(geoSourceType);
                 }
-
+                
                 Segment segment = repoSegmentBuilder.build();
 
                 // Entity builder
@@ -396,6 +397,9 @@ public class IXPackageRepository {
                 }
                 if (null != dealFloors) {
                     entityBuilder.setDealFloors(Arrays.asList(dealFloors));
+                }
+                if(null != accessTypes){
+                    entityBuilder.setAccessTypes(Arrays.asList(accessTypes));
                 }
                 if (null != geoFenceRegion) {
                     entityBuilder.setGeoFenceRegion(geoFenceRegion);

@@ -296,6 +296,12 @@ public class Logging {
             if (null != ixAdNetwork.getWinningPackageId()) {
                 ixAd.setWinningPackageId(ixAdNetwork.getWinningPackageId());
             }
+
+            // Set higest Bid
+            if (null != ixAdNetwork.returnAdjustBid()) {
+                ixAd.setHighestBid(ixAdNetwork.returnAdjustBid());    
+            }
+            
         }
         return ixAd;
     }
