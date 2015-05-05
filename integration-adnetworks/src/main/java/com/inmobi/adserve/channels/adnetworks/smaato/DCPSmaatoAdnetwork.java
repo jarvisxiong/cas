@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.smaato;
 
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -45,6 +46,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final String IFA = "iosadid";
     private static final String IFA_TRACKING = "iosadtracking";
+    private static final String GPID = "googleadid";
+    private static final String GPID_TRACKING = "googlednt";
     private static final String OPEN_UDID = "openudid";
     private static final String ANDROID_ID = "androidid";
     private static final String ODIN1 = "odin";
@@ -61,7 +64,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String TEXT_TYPE = "TXT";
 
     private static final String RESPONSE_FORMAT = "all";
-    private static final String STRICT_FIELD = "true";
+    private static final String TRUE = "true";
+    private static final String FALSE = "false";
     private static final String LAT_LONG_FORMAT = "%s,%s";
     private static Map<Integer, String> slotIdMap;
 
@@ -148,7 +152,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, FORMAT, RESPONSE_FORMAT, false);
         // appendQueryParam(url, FORMAT_STRICT, strictField, false);
         appendQueryParam(url, DIMENSION, dimension, false);
-        appendQueryParam(url, DIMENSION_STRICT, STRICT_FIELD, false);
+        appendQueryParam(url, DIMENSION_STRICT, TRUE, false);
 
         // TODO map the udids
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
@@ -167,6 +171,15 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidSO1(), false);
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
             appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidO1(), false);
+        }
+
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getGpid())) {
+            appendQueryParam(url, GPID, casInternalRequestParameters.getGpid(), false);
+            if(GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())){
+                appendQueryParam(url,GPID_TRACKING,FALSE,false);
+            }else{
+                appendQueryParam(url,GPID_TRACKING,TRUE,false);
+            }
         }
 
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
