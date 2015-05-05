@@ -1217,6 +1217,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int admAfterMacroSize = admContent.length();
         if (templateWN || admAfterMacroSize == admSize) {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
+            velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
         }
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
