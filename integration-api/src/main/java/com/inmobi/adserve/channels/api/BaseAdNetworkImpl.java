@@ -282,6 +282,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     } else if (!(t instanceof java.util.concurrent.TimeoutException)) {
                         InspectorStats.incrementStatCount(InspectorStrings.UNCAUGHT_EXCEPTIONS, t.getClass()
                                 .getSimpleName());
+                        InspectorStats.incrementStatCount(getName(), t.getClass().getSimpleName());
                         if (LOG.isDebugEnabled()) {
                             final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(t);
                             LOG.debug(traceMarker, message);
