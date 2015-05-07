@@ -1346,7 +1346,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             responseContent = DEFAULT_EMPTY_STRING;
             LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, "
                     + "exception = {}", sasParams.getSiteId(), advertiserName, e);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
     }
 

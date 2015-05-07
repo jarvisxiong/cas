@@ -14,9 +14,8 @@ import lombok.NonNull;
 @lombok.Data
 public final class Native {
     @NonNull
-    private final Integer ver = 1;
-    @NonNull
     private final NativeReqObj requestobj;
+    private final String ver = "1";
     private List<Integer> api;
     private CommonExtension ext;
 }

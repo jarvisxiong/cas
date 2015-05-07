@@ -8,5 +8,6 @@ import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 @lombok.Data
 public final class Regulations {
     private Integer coppa;
+    private Integer s25580;
     private CommonExtension ext;
 }

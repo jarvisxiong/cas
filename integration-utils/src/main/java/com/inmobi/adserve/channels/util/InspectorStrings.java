@@ -33,6 +33,7 @@ public class InspectorStrings {
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
     public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
     public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";
+    public static final String NATIVE_VM_TEMPLATE_ERROR = "NativeVMTemplateError";
     public static final String PROCESSING_ERROR = "Terminated_ServerError";
     public static final String MISSING_SITE_ID = "Terminated_NoSite";
     public static final String CLIENT_TIMER_LATENCY = "ClientTimerLatency";

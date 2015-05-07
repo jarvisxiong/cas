@@ -10,7 +10,7 @@ import com.inmobi.adserve.contracts.ix.request.nativead.Image.ImageAssetType;
 import com.inmobi.casthrift.rtb.Image;
 
 /**
- * 
+ *
  * @author ritwik.kumar
  */
 public class NativeConstraints {
@@ -40,11 +40,11 @@ public class NativeConstraints {
     private static final String LAYOUT_STREAM = "layoutConstraint.3"; // In-Stream
 
     private static final List<Mandatory> MAND_ICON = Lists.newArrayList(Mandatory.ICON, Mandatory.TITLE,
-            Mandatory.DESCRIPTION);
+        Mandatory.DESCRIPTION);
     private static final List<Mandatory> MAND_FEED = Lists.newArrayList(Mandatory.ICON, Mandatory.TITLE,
-            Mandatory.DESCRIPTION);
+        Mandatory.DESCRIPTION);
     private static final List<Mandatory> MAND_STREAM = Lists.newArrayList(Mandatory.ICON, Mandatory.TITLE,
-            Mandatory.DESCRIPTION, Mandatory.SCREEN_SHOT);
+        Mandatory.DESCRIPTION, Mandatory.SCREEN_SHOT);
 
 
     // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/SCREENSHOT.java
@@ -59,7 +59,7 @@ public class NativeConstraints {
     private static final String[] INM_TAG_A64 = new String[] {"inmTag.a64", "6.4", "320", "320", "50", "50"};
     private static final String[] INM_TAG_A808 = new String[] {"inmTag.a808", "12", "728", "728", "90", "90"};
     private static final String[][] IMAGE_ARR_KEYS = new String[][] {INM_TAG_A083, INM_TAG_A067, INM_TAG_A056,
-            INM_TAG_A12, INM_TAG_A15, INM_TAG_A177, INM_TAG_A191, INM_TAG_A64, INM_TAG_A808};
+                                                                     INM_TAG_A12, INM_TAG_A15, INM_TAG_A177, INM_TAG_A191, INM_TAG_A64, INM_TAG_A808};
 
     private static final Map<String, List<Integer>> RTB_MANDATORY = new HashMap<>();
     private static final Map<String, List<Mandatory>> IX_MANDATORY = new HashMap<>();
@@ -89,13 +89,13 @@ public class NativeConstraints {
     }
 
     /**
-     * 
+     *
      * @param mandList
      * @return
      */
-    private static List<Integer> getIndexList(List<Mandatory> mandList) {
+    private static List<Integer> getIndexList(final List<Mandatory> mandList) {
         final List<Integer> intList = new ArrayList<>();
-        for (Mandatory mand : mandList) {
+        for (final Mandatory mand : mandList) {
             intList.add(mand.getIndex());
         }
         return intList;
@@ -104,7 +104,7 @@ public class NativeConstraints {
 
     /**
      * Get RTB Image
-     * 
+     *
      * @param ar
      * @param minW
      * @param maxW
@@ -119,7 +119,7 @@ public class NativeConstraints {
     }
 
     /**
-     * 
+     *
      * @param wMin
      * @param hMin
      * @return
@@ -154,7 +154,7 @@ public class NativeConstraints {
     }
 
     /**
-     * 
+     *
      * @param key
      * @return
      */
@@ -167,7 +167,7 @@ public class NativeConstraints {
     }
 
     /**
-     * 
+     *
      * @param key
      * @return
      */

@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 public final class Transparency {
-    private Integer blind;
+    private Integer blind = 0;
     private List<Integer> buyers;
     private List<Integer> blindbuyers;
 }

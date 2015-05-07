@@ -22,7 +22,7 @@ public class NativeBuilderImpl implements NativeBuilder {
     @Inject
     public NativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
         nativeObj = new Native();
-        nativeReqObj = new NativeReqObj(1);
+        nativeReqObj = new NativeReqObj(3);
         this.templateEntity = templateEntity;
     }
 
@@ -65,12 +65,12 @@ public class NativeBuilderImpl implements NativeBuilder {
                     break;
             }
         }
-        nativeReqObj.addAsset(true, new Data(DataAssetType.CTA_TEXT));
     }
 
     private void buildNonMandatory() {
         nativeReqObj.addAsset(false, new Data(DataAssetType.DOWNLOADS));
         nativeReqObj.addAsset(false, new Data(DataAssetType.RATING));
+        nativeReqObj.addAsset(false, new Data(DataAssetType.CTA_TEXT));
     }
 
 

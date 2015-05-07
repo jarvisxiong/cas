@@ -39,10 +39,6 @@
         </dependency>
         <dependency>
             <groupId>com.inmobi.channels</groupId>
-            <artifactId>util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.inmobi.channels</groupId>
             <artifactId>template</artifactId>
         </dependency>
 

@@ -13,7 +13,7 @@ public final class Banner {
     private String id;
     private Integer w;
     private Integer h;
-    private Long pos;
+    private Integer pos;
     private List<Integer> expdir;
     private List<Integer> api;
     private BannerExtension ext;

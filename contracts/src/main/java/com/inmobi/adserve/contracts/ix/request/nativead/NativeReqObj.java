@@ -19,7 +19,7 @@ import lombok.NonNull;
 public class NativeReqObj {
     @NonNull
     private final Integer layout;
-    private Integer ver;
+    private String ver;
     private Integer adunit;
     private Integer plcmtcnt = 1;
     private Integer seq = 0;
