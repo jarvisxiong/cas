@@ -38,6 +38,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID_MD5 = "Android_Id|MD5";
     private static final String ANDROID_ID_SHA1 = "Android_Id|SHA1";
     private static final String IDFA_PLAIN = "IDFA|RAW";
+    private static final String GPID_PLAIN = "GIDFA|RAW";
     private static final String APP = "app";
     private static final String WEB = "web";
 
@@ -230,6 +231,13 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
 
         } else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
+            String gpid = getGPID();
+            if (StringUtils.isNotBlank(gpid)) {
+                deviceId = gpid;
+                deviceIdType = GPID_PLAIN;
+                return;
+            }
+
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                 deviceId = casInternalRequestParameters.getUidMd5();
                 deviceIdType = ANDROID_ID_MD5;

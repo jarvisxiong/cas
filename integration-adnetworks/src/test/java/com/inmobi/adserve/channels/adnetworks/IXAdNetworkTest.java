@@ -622,7 +622,9 @@ public class IXAdNetworkTest extends TestCase {
                     ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15, repositoryHelper);
             apiFrameworkValues = ixAdNetwork.getBidRequest().getImp().get(0).getBanner().getApi();
             assertEquals(5, apiFrameworkValues.get(0).intValue());
-            assertEquals(1001, apiFrameworkValues.get(1).intValue());
+            assertEquals(3, apiFrameworkValues.get(1).intValue());
+            assertEquals(1001, apiFrameworkValues.get(2).intValue());
+            assertEquals(1000, apiFrameworkValues.get(3).intValue());
 
             assertTrue(adapterCreated);
             assertNull(ixAdNetwork.getBidRequest().getSite());

@@ -129,9 +129,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final String CELL_TOWER = "CELL_TOWER";
     private static final String MIME_HTML = "text/html";
     private static final int INMOBI_SDK_VERSION_370 = 370;
-    private static final int IX_MRAID_VALUE = 1001;
-    private static final List<Integer> MRAID_FRAMEWORK_VALUES = Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(),
-            IX_MRAID_VALUE);
+    private static final int IX_MRAID2_VALUE = 1001;
+    private static final int IX_MRAID1_VALUE = 1000;
+
+    private static final List<Integer> MRAID_FRAMEWORK_VALUES = Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(),API_FRAMEWORKS.MRAID_1.getValue(),
+            IX_MRAID2_VALUE,IX_MRAID1_VALUE);
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final short AGE_LIMIT_FOR_COPPA = 8;

@@ -127,8 +127,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrlBuilder.append("fs");
         }
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
-            finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidO1());
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+            finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidSO1());
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
             finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidIDUS1());
         }

@@ -1,4 +1,4 @@
-package com.inmobi.adserve.channels.adnetworks.huntmads;
+package com.inmobi.adserve.channels.adnetworks.mocean;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -29,9 +29,9 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
-public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
+public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DCPHuntmadsAdNetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMoceanAdNetwork.class);
     private static final String IDFA = "idfa";
     private static final String ANDROID_ID = "androidid";
     private static final String SITEID = "pubsiteid";
@@ -40,6 +40,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     private int width;
     private int height;
     private boolean isapp;
+    private String name;
 
     /**
      * @param config
@@ -47,7 +48,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
      * @param baseRequestHandler
      * @param serverChannel
      */
-    public DCPHuntmadsAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+    public DCPMoceanAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
@@ -56,16 +57,16 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
-            LOG.debug("mandatory parameters missing for huntmads so exiting adapter");
-            LOG.info("Configure parameters inside huntmads returned false");
+            LOG.debug("mandatory parameters missing for {} so exiting adapter",name);
+            LOG.info("Configure parameters inside {} returned false",name);
             return false;
         }
-        host = config.getString("huntmads.host");
+        host = config.getString(name + ".host");
 
         // blocking opera traffic
         if (sasParams.getUserAgent().toUpperCase().contains("OPERA")) {
             LOG.debug("Opera user agent found. So exiting the adapter");
-            LOG.info("Configure parameters inside huntmads returned false");
+            LOG.info("Configure parameters inside {} returned false",name);
             return false;
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
@@ -89,7 +90,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "huntmadsDCP";
+        return name + DCP_KEY;
     }
 
     @Override
@@ -104,7 +105,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             url.append(host).append("?ip=").append(sasParams.getRemoteHostIp());
             url.append("&track=1&timeout=500&rmtype=none&key=6&type=3&over_18=0&zone=").append(externalSiteId);
             url.append("&ua=").append(getURLEncode(sasParams.getUserAgent(), format));
-            if (GlobalConstant.ONE.equals(config.getString("huntmads.test"))) {
+            if (GlobalConstant.ONE.equals(config.getString("mocean.test"))) {
                 url.append("&test=1");
             }
             if (!StringUtils.isBlank(latitude) && !StringUtils.isBlank(longitude)) {
@@ -181,7 +182,7 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
             }
             url.append("&keywords=").append(getURLEncode(getCategories(','), format));
-            LOG.debug("Huntmads url is {}", url);
+            LOG.debug("{} url is {}",name, url);
 
             return new URI(url.toString());
         } catch (final URISyntaxException exception) {
@@ -204,8 +205,6 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
             responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
-            LOG.debug("beacon url inside huntmads is {}", beaconUrl);
-
             try {
                 final JSONArray jArray = new JSONArray(response);
                 final JSONObject adResponse = jArray.getJSONObject(0);
@@ -244,22 +243,27 @@ public class DCPHuntmadsAdNetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {
                 adStatus = NO_AD;
-                LOG.info("Error parsing response {} from huntmads: {}", response, exception);
+                LOG.info("Error parsing response {} from {}: {}", response, name, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
-                LOG.info("Error parsing response {} from huntmads: {}", response, exception);
+                LOG.info("Error parsing response {} from {}: {}", response, name, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
                 return;
             }
         }
 
-        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
+        LOG.debug("response length is {} responseContent is {} {}", responseContent.length(), responseContent, name);
+    }
+
+    @Override
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
     public String getId() {
-        return config.getString("huntmads.advertiserId");
+        return config.getString(name + ".advertiserId");
     }
 }
