@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -557,6 +558,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      */
     protected static String getBlindedSiteId(final long siteIncId, final long adGroupIncId) {
         return new UUID(adGroupIncId, siteIncId).toString();
+    }
+
+    /**
+     * Generates blinded site uuid from siteIncId. For a given site Id, the generated blinded SiteId will always be
+     * same.
+     * <p/>
+     * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
+     */
+    protected static String getBlindedSiteId(final long siteIncId) {
+        final byte[] byteArr = ByteBuffer.allocate(8).putLong(siteIncId).array();
+        return UUID.nameUUIDFromBytes(byteArr).toString();
     }
 
     protected String getCategories(final char seperator) {

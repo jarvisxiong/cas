@@ -105,6 +105,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String PERFORMANCE_RATING = GlobalConstant.ZERO;
     private static final String RATING_KEY = "fs";
 
+    private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
+    private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
+    private static final String BLIND_STORE_URL_FORMAT = "http://www.ix.com/%s";
+    
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
 
@@ -137,15 +141,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final boolean wnRequired;
     private final int tmax = 200;
     private boolean templateWN = true;
-
     private final String advertiserId;
-    private final boolean siteBlinded;
     private final String advertiserName;
     private double secondBidPriceInUsd = 0;
     private double secondBidPriceInLocal = 0;
     private String bidRequestJson = DEFAULT_EMPTY_STRING;
     private String encryptedBid;
-
+    private boolean siteBlinded;
     private String responseSeatId;
     private String responseImpressionId;
     private String responseAuctionId;
@@ -474,29 +476,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Site createSiteObject() {
-        Site site = null;
-        if (siteBlinded) {
-            site = new Site(getBlindedSiteId(sasParams.getSiteIncId(), entity.getIncId(getCreativeType())));
-            String category = null;
-            if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
-                site.setName(wapSiteUACEntity.getAppType());
-            } else if ((category = getCategories(',', false)) != null) {
-                site.setName(category);
-            }
+        Site site = new Site();
+        if (isRequestBlinded()) {
+            setParamsForBlindSite(site);
         } else {
-            site = new Site(sasParams.getSiteId());
-            if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
-
-                final String siteUrl = wapSiteUACEntity.getSiteUrl();
-                if (StringUtils.isNotEmpty(siteUrl)) {
-                    site.setPage(siteUrl);
-                    site.setDomain(siteUrl);
-                }
-                if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
-                    site.setName(wapSiteUACEntity.getSiteName());
-                }
-            }
-
+            setParamsForTransparentSite(site);
         }
         if (null != sasParams.getCategories()) {
             site.setCat(IABCategoriesMap.getIABCategories(sasParams.getCategories()));
@@ -517,12 +501,42 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return site;
     }
 
+    private void setParamsForTransparentSite(final Site site) {
+        site.setId(sasParams.getSiteId());
+
+        final String siteUrl = wapSiteUACEntity.getSiteUrl();
+        if (StringUtils.isNotEmpty(siteUrl)) {
+            site.setPage(siteUrl);
+            site.setDomain(siteUrl);
+        }
+
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
+            site.setName(wapSiteUACEntity.getSiteName());
+        }
+    }
+
+    private void setParamsForBlindSite(final Site site) {
+        String category = null;
+        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+            site.setName(wapSiteUACEntity.getAppType());
+        } else if ((category = getCategories(',', false)) != null) {
+            site.setName(category);
+        }
+
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        site.setId(blindId);
+
+        final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
+        site.setPage(blindDomain);
+        site.setDomain(blindDomain);
+    }
+
     private App createAppObject() {
-        App app = null;
-        if (siteBlinded) {
-            app = new App(getBlindedSiteId(sasParams.getSiteIncId(), entity.getAdgroupIncId()));
+        App app = new App();
+        if (isRequestBlinded()) {
+            setParamsForBlindApp(app);
         } else {
-            app = new App(sasParams.getSiteId());
+            setParamsForTransparentApp(app);
         }
         if (null != sasParams.getCategories()) {
             app.setCat(IABCategoriesMap.getIABCategories(sasParams.getCategories()));
@@ -534,18 +548,30 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if ((category = getCategories(',', false)) != null) {
             app.setName(category);
         }
-        if (isWapSiteUACEntity && isNativeRequest() && wapSiteUACEntity.isTransparencyEnabled()) {
-            setParamsForTransparentApp(app);
-        }
 
         // set App Ext fields
         final AppExt ext = createAppExt(wapSiteUACEntity);
         app.setExt(ext);
         return app;
     }
+    
+    private boolean isRequestBlinded() {
+        if (siteBlinded) {
+            return true;
+        }
+
+        boolean isRequestBlind = true;
+
+        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+            isRequestBlind = false;
+        }
+
+        return isRequestBlind;
+    }
 
 
     private void setParamsForTransparentApp(final App app) {
+        app.setId(sasParams.getSiteId());
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
@@ -557,6 +583,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(bundleId)) {
             app.setBundle(bundleId);
         }
+    }
+
+    private void setParamsForBlindApp(final App app) {
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        app.setId(blindId);
+
+        final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
+        app.setBundle(blindBundle);
+        final String storeUrl = String.format(BLIND_STORE_URL_FORMAT, blindId);
+        app.setStoreurl(storeUrl);
     }
 
 
@@ -1043,6 +1079,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getAdMarkUp() {
         return adm;
+    }
+    
+    public void setSiteBlinded(boolean value){
+        siteBlinded = value;
     }
 
 }

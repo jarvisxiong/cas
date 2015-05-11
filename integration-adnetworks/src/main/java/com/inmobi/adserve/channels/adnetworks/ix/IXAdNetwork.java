@@ -5,7 +5,6 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SPROUT_UN
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
@@ -1309,16 +1307,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return winUrl;
     }
 
-    /**
-     * Generates blinded site uuid from siteIncId. For a given site Id, the generated blinded SiteId will always be
-     * same.
-     * <p/>
-     * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
-     */
-    private String getBlindedSiteId(final long siteIncId) {
-        final byte[] byteArr = ByteBuffer.allocate(8).putLong(siteIncId).array();
-        return UUID.nameUUIDFromBytes(byteArr).toString();
-    }
+
 
     protected void nativeAdBuilding() {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);

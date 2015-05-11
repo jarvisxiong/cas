@@ -348,7 +348,7 @@ public class RtbAdnetworkTest {
         assertEquals(6, rtbAdNetwork.getBidRequest().getBadv().size());
         assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
     }
-
+    
     @Test
     public void testShouldAddFixedBlockedAdvertisersForExistingBlockedList() {
         final String externalSiteKey = "f6wqjq1r5v";
@@ -587,5 +587,176 @@ public class RtbAdnetworkTest {
         rtbAdNetwork.setSecondBidPrice(0.23);
         final String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
         assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
+    }
+    
+    @Test
+    public void testWapWithTransparency() {
+
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSiteId("some_site_id");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+
+
+        // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+        sas.setSource("wap");
+        WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+        builder.setAppType("Games");
+        builder.setTransparencyEnabled(true);
+        builder.setSiteUrl("www.inmobi.com");
+        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
+        rtbAdNetwork.setSiteBlinded(false);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
+        // 11 mean Games. Refer to CategoryList
+        assertEquals(null, rtbAdNetwork.getBidRequest().getSite().getName());
+        assertEquals("www.inmobi.com", rtbAdNetwork.getBidRequest().getSite().getDomain());
+        assertEquals("some_site_id", rtbAdNetwork.getBidRequest().getSite().getId());
+
+    }
+
+    @Test
+    public void testWapWithBlind() {
+
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSiteId("some_site_id");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+
+
+        // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+        sas.setSource("wap");
+        WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+        builder.setAppType("Games");
+        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
+        rtbAdNetwork.setSiteBlinded(false);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
+        // 11 mean Games. Refer to CategoryList
+        assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
+        assertEquals("http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite()
+                .getDomain());
+        assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite().getId());
+    }
+
+    @Test
+    public void testWapWithBlindWithoutWapSiteUACEntity() {
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSiteId("some_site_id");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+
+
+        // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+        sas.setSource("wap");
+        sas.setWapSiteUACEntity(null);
+        sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
+        rtbAdNetwork.setSiteBlinded(false);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
+        // 11 mean Games. Refer to CategoryList
+        assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
+        assertEquals("http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite()
+                .getDomain());
+        assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite().getId());
+    }
+
+    @Test
+    public void testAppWithTransparency() {
+
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSiteId("some_site_id");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+
+
+        // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+        sas.setSource("app");
+        WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+        builder.setAppType("Games");
+        builder.setTransparencyEnabled(true);
+        builder.setSiteUrl("www.inmobi.com");
+        builder.setBundleId("com.android.app");
+        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
+        rtbAdNetwork.setSiteBlinded(false);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
+        // 11 mean Games. Refer to CategoryList
+        assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
+        assertEquals("com.android.app", rtbAdNetwork.getBidRequest().getApp().getBundle());
+        assertEquals("some_site_id", rtbAdNetwork.getBidRequest().getApp().getId());
+
+    }
+
+    @Test
+    public void testAppWithBlind() {
+
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        sas.setRemoteHostIp("206.29.182.240");
+        sas.setRqAdType("");
+        sas.setRqAdType("");
+        sas.setSiteId("some_site_id");
+        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+
+
+        // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
+        sas.setSource("app");
+        WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+        builder.setAppType("Games");
+        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
+        rtbAdNetwork.setSiteBlinded(false);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, "", "", (short) 15,
+                repositoryHelper);
+        // 11 mean Games. Refer to CategoryList
+        assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
+        assertEquals("com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getBundle());
+        assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getId());
     }
 }
