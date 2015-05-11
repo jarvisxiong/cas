@@ -24,7 +24,7 @@ then
  -Dcom.sun.management.jmxremote.authenticate=false\
  -Dcom.sun.management.jmxremote.ssl=false\
  -Djava.rmi.server.hostname=$(hostname)\
- -Dio.netty.noResourceLeakDetection -server -Xms$JMX_MEM -Xmx$JMX_MEM -XX:CMSInitiatingOccupancyFraction=65 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseConcMarkSweepGC -XX:NewRatio=4 -XX:SurvivorRatio=6\
+ -Dio.netty.noResourceLeakDetection -server -Xms$JMX_MEM -Xmx$JMX_MEM -XX:CMSInitiatingOccupancyFraction=65 -XX:-OmitStackTraceInFastThrow -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseConcMarkSweepGC -XX:NewRatio=4 -XX:SurvivorRatio=6\
  -jar /opt/inmobi/cas/webapps/cas.jar
 else
      echo "Invalid dc_id"

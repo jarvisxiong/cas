@@ -49,8 +49,7 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         pipeline.addLast("decoderEncoder", new HttpServerCodec());
         // 1 MB max request size
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));
-        pipeline.addLast("casTimeoutHandler", new CasTimeoutHandler(serverConfig.getServerTimeoutInMillisForRTB(),
-                serverConfig.getServerTimeoutInMillisForDCP()));
+        pipeline.addLast("casTimeoutHandler", new CasTimeoutHandler(serverConfig));
         pipeline.addLast("requestIdHandler", requestIdHandler);
         pipeline.addLast("nettyRequestScopeSeedHandler", nettyRequestScopeSeedHandler);
         pipeline.addLast("requestParserHandler", requestParserHandler);

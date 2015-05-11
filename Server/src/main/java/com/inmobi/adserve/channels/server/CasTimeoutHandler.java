@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.servlet.ServletIXFill;
 import com.inmobi.adserve.channels.server.servlet.ServletRtbd;
@@ -38,9 +39,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
                 new ThreadFactoryBuilder().setNameFormat("cas-timer-%d").build());
     }
 
+    private final ServerConfig serverConfig;
     private volatile long timeoutInMillis;
-    private final long timeoutMillisForRTB;
-    private final long timeoutMillisForDCP;
     private volatile long lastReadTime;
     private volatile ScheduledFuture<?> timeout;
 
@@ -51,9 +51,8 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
 
 
 
-    public CasTimeoutHandler(final int timeoutMillisForRTB, final int timeoutMillisForDCP) {
-        this.timeoutMillisForRTB = timeoutMillisForRTB;
-        this.timeoutMillisForDCP = timeoutMillisForDCP;
+    public CasTimeoutHandler(final ServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
     }
 
     @Override
@@ -70,13 +69,13 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
         final Servlet servlet = pathToServletMap.get(path);
 
         if (servlet instanceof ServletRtbd) {
-            timeoutInMillis = timeoutMillisForRTB;
+            timeoutInMillis = serverConfig.getServerTimeoutInMillisForRTB();
             dst = DemandSourceType.RTBD.getValue();
         } else if (servlet instanceof ServletIXFill) {
-            timeoutInMillis = timeoutMillisForRTB;
+            timeoutInMillis = serverConfig.getServerTimeoutInMillisForRTB();
             dst = DemandSourceType.IX.getValue();
         } else {
-            timeoutInMillis = timeoutMillisForDCP;
+            timeoutInMillis = serverConfig.getServerTimeoutInMillisForDCP();
             dst = DemandSourceType.DCP.getValue();
         }
 
