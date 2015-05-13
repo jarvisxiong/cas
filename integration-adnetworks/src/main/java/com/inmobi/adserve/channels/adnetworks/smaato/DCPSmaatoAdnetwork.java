@@ -268,7 +268,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                         t = TemplateType.RICH;
                     }
                 } else {
-                    adStatus = "NO_   AD";
+                    adStatus = NO_AD;
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);

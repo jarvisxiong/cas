@@ -184,6 +184,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {
                 adStatus = NO_AD;
@@ -196,7 +197,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             }
         }
 
-        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
+
     }
 
     @Override

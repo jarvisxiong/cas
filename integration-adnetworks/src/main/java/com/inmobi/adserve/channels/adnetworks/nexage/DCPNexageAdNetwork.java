@@ -247,12 +247,13 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         try {
             responseContent =
                     Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams, beaconUrl);
+            LOG.debug("response length is {}", responseContent.length());
             adStatus = AD_STRING;
         } catch (final Exception exception) {
             adStatus = NO_AD;
             LOG.info("Error generating Static Js adtag for nexage  : {}", exception);
         }
-        LOG.debug("response length is {}", responseContent.length());
+
     }
 
     @Override

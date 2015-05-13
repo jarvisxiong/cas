@@ -79,6 +79,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
         } catch (final Exception exception) {
             adStatus = NO_AD;
             LOG.info("Error generating Static Js adtag for AmoAd  : {}", exception);
+            return;
         }
         LOG.debug("response length is {}", responseContent.length());
     }

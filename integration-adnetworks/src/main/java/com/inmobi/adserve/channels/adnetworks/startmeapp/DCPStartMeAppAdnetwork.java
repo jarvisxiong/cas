@@ -133,6 +133,7 @@ public class DCPStartMeAppAdnetwork extends AbstractDCPAdNetworkImpl {
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("adm"));
                 adStatus = AD_STRING;
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
             } catch (final JSONException exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Startmeappdcp: {}", response, exception);
@@ -143,6 +144,6 @@ public class DCPStartMeAppAdnetwork extends AbstractDCPAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
         }
-        LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
+
     }
 }

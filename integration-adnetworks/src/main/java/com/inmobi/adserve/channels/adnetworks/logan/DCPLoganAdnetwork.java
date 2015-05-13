@@ -198,6 +198,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                     t = TemplateType.HTML;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {
                 adStatus = NO_AD;
@@ -211,7 +212,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
         }
 
-        LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
+
     }
 
     @Override
