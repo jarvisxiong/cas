@@ -118,7 +118,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
      * ; sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9"); String externalKey = "f6wqjq1r5v";
      * ChannelSegmentEntity entity = new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(
      * defintiAdvId, null, null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-     * null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+     * null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d,
      * null, null, 32, new Integer[] {0})); assertTrue(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters,
      * entity, clurl, null)); }
      */
@@ -140,7 +140,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null, (short) 4, repositoryHelper));
     }
@@ -162,7 +162,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null, (short) 4, repositoryHelper));
     }
@@ -183,7 +183,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null, (short) 4, repositoryHelper));
     }
@@ -206,7 +206,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper)) {
             final String actualUrl = dcpAppNexusAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -234,7 +234,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 4, repositoryHelper);
         //final String response =
         //        "{ \"status\": \"ok\", \"ads\": [{\"type\":\"banner\", \"width\":300, \"height\":50, \"content\": \"<script type=\"text/javascript\">document.write('<a href=\"http://sin1.g.adnxs.com/click?AAAAAAAA4D8fhetRuB7dPwAAAAAAAPA_H4XrUbge3T8AAAAAAADgP5D-cuXdwZBvebWPt1919EczVUxSAAAAAHHIGwB2AgAAzgIAAAIAAAA_nHoASi8EAAYAAQBVU0QAVVNEACwBMgAgCAAAK4kABQUCAQIAAAAA1h2OcAAAAAA./cnd=%21mwarOwje030Qv7jqAxjK3hAgAA../clickenc=http%3A%2F%2Fcnct.tlvmedia.com%2Fckl.php%3Fs%3D1%26c%3Dsin1CPnqvrz7q536RxACGJD9y6veu7DIbyIOMjA2LjI5LjE4Mi4yNDAoAQ..%26mx%3Danx%26t%3D1%26d%3D93478%26r%3Dhttp%253A%252F%252Ftracking1.aleadpay.com%252FAdTag%252FClick%252FY21waWQ9MTc2NTEmdHNpZD01ODAg%253Fdp%253D%2524CLICKID%2524\" target=\"_blank\"><img width=\"300\" height=\"50\" style=\"border-style: none\" src=\"http://cdn.adnxs.com/p/01/db/74/d1/01db74d156327ffbb20463fcd3bda52c.gif\"/></a>');</script>\"}] }";
@@ -285,7 +285,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper);
         assertEquals(dcpAppNexusAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

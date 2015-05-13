@@ -129,7 +129,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -152,7 +152,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -176,7 +176,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -198,7 +198,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11 ,repositoryHelper));
     }
@@ -219,7 +219,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
@@ -239,7 +239,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
@@ -268,7 +268,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper);
 
@@ -306,7 +306,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -335,7 +335,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(adsmogoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
         final String actualUrl = dcpadsmogoAdNetwork.getRequestUri().toString();
@@ -366,7 +366,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         
         dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
@@ -411,7 +411,7 @@ public class DCPAdsMogoAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpadsmogoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpadsmogoAdNetwork.getImpressionId());
     }

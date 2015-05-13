@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.testng.annotations.Test;
+
 import com.inmobi.adserve.channels.adnetworks.googleadx.GoogleAdXAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -10,22 +25,9 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
 import io.netty.channel.Channel;
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.testng.annotations.Test;
-
-import java.awt.*;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
 
 /**
  * Created by naresh.kapse on 24/05/14.
@@ -111,7 +113,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         assertTrue(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper));
 
@@ -122,7 +124,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
 
         assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper));
@@ -134,7 +136,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
 
         assertFalse(googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper));
@@ -155,7 +157,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
 
         googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
@@ -191,7 +193,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
 
@@ -217,7 +219,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\", \"useDFP\":true}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\", \"useDFP\":true}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
 
@@ -250,7 +252,7 @@ public class GoogleAdXNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         googleAdXNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
 

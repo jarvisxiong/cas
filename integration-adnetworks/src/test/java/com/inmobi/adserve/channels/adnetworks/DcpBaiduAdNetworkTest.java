@@ -135,7 +135,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
 
@@ -159,7 +159,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"slot\":\"123\"}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
 
@@ -179,7 +179,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -199,7 +199,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(baiduAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -234,7 +234,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"slot\":\"123\"}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, beaconUrl, (short) 15, repositoryHelper));
         final String actualUrl = dcpBaiduAdNetwork.getRequestUri().toString();
 
@@ -268,7 +268,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"slot\":\"123\"}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper));
         final String actualString = dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
         BidRequest
@@ -300,7 +300,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"slot\":\"123\"}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         BidResponse.Builder responseBuilder = BidResponse.newBuilder();
         Ad.Builder adBuilder = Ad.newBuilder();
@@ -357,7 +357,7 @@ public class DcpBaiduAdNetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpBaiduAdNetwork.getImpressionId());
     }

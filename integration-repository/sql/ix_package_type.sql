@@ -1,4 +1,4 @@
-CREATE TYPE ix_package_type_09042015 AS
+CREATE TYPE ix_package_type_04052015 AS
 (
     id                      INTEGER,
     name                    CHARACTER VARYING(128),
@@ -7,6 +7,8 @@ CREATE TYPE ix_package_type_09042015 AS
     country_ids             INTEGER[],
     inventory_types         CHARACTER VARYING(16)[],
     os_ids                  SMALLINT[],
+    os_version_targeting    TEXT,
+    manuf_model_targeting   TEXT,
     carrier_ids             BIGINT[],
     site_categories         CHARACTER VARYING(16)[],
     connection_types        CHARACTER VARYING(16)[],
@@ -38,6 +40,6 @@ CREATE TYPE ix_package_type_09042015 AS
     deal_ids                CHARACTER VARYING[],
     deal_floors             DOUBLE PRECISION[]
 );
-ALTER TYPE ix_package_type_09042015 OWNER TO postgres;
+ALTER TYPE ix_package_type_04052015 OWNER TO postgres;
 
 

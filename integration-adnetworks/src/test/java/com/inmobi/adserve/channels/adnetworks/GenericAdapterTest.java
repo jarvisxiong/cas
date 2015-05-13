@@ -137,7 +137,7 @@ public class GenericAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvertiserId, null, null,
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9, repositoryHelper),
                 true);
@@ -156,7 +156,7 @@ public class GenericAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvertiserId, null, null,
                         null, 0, null, null, true, true, null, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper),
                 false);
     }
@@ -175,7 +175,7 @@ public class GenericAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvertiserId, null, null,
                         null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (genericAdapter.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 9, repositoryHelper)) {
             final String actualUrl = genericAdapter.getRequestUri().toString();
             final String expectedUrl =

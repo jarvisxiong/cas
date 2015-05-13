@@ -139,7 +139,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper));
     }
@@ -163,7 +163,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         assertTrue(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper));
     }
@@ -185,7 +185,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new JSONObject("{}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper));
     }
 
@@ -205,7 +205,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15, repositoryHelper));
     }
 
@@ -225,7 +225,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15, repositoryHelper));
     }
 
@@ -244,7 +244,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15, repositoryHelper));
     }
 
@@ -271,7 +271,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, categories, true, true, externalKey, null, null, null, new Long[] {0L}, false, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject(new JSONObject("{\"pos\":\"header\"}")), new ArrayList<Integer>(), 0.0d, null,
+                        new JSONObject(new JSONObject("{\"pos\":\"header\"}")), new ArrayList<>(), 0.0d, null,
                         null, 32, new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -301,7 +301,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -334,7 +334,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -366,7 +366,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"leader\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"leader\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -399,7 +399,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {56789L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 56789,
+                        new JSONObject("{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 56789,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -430,7 +430,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -461,7 +461,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -492,7 +492,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -522,7 +522,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -553,7 +553,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -583,7 +583,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -614,7 +614,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -644,7 +644,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -675,7 +675,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -705,7 +705,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -736,7 +736,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -766,7 +766,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -797,7 +797,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -828,7 +828,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -858,7 +858,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -888,7 +888,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
@@ -919,7 +919,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -953,7 +953,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -986,7 +986,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -1021,7 +1021,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -1056,7 +1056,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null,
+                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<>(), 0.0d, null,
                         null, 0, new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -1090,7 +1090,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null,
+                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<>(), 0.0d, null,
                         null, 0, new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -1123,7 +1123,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<Integer>(), 0.0d, null,
+                                "{\"pos\":\"header\",\"jsAdTag\":\"true\"}}"), new ArrayList<>(), 0.0d, null,
                         null, 0, new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -1173,7 +1173,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(NexageAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"pos\":\"header\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl, (short) 15, repositoryHelper);
         assertEquals(dcpNexageAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");

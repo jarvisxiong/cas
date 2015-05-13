@@ -127,7 +127,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         assertTrue(dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper));
     }
@@ -150,7 +150,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         assertTrue(dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper));
     }
@@ -173,7 +173,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15, repositoryHelper));
     }
 
@@ -195,7 +195,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15, repositoryHelper));
     }
 
@@ -216,7 +216,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 15, repositoryHelper));
     }
 
@@ -246,7 +246,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
@@ -283,7 +283,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {56789L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new org.json.JSONObject("{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 56789,
+                        new org.json.JSONObject("{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 56789,
                         new Integer[] {0}));
         if (dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
@@ -317,7 +317,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
@@ -351,7 +351,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
@@ -385,7 +385,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, burl, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
@@ -418,7 +418,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 0,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpPaypalAdnetwork.getRequestUri().toString();
@@ -449,7 +449,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -482,7 +482,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -514,7 +514,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -549,7 +549,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -584,7 +584,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -635,7 +635,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(paypalAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
-                                "{\"pos\":\"header\"}"), new java.util.ArrayList<Integer>(), 0.0d, null, null, 32,
+                                "{\"pos\":\"header\"}"), new java.util.ArrayList<>(), 0.0d, null, null, 32,
                         new Integer[] {0}));
         dcpPaypalAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, blurl, (short) 15, repositoryHelper);
         assertEquals(dcpPaypalAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");

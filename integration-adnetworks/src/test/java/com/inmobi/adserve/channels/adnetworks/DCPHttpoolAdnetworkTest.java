@@ -3,8 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -12,8 +10,6 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -29,6 +25,10 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
 
 
 public class DCPHttpoolAdnetworkTest extends TestCase {
@@ -123,7 +123,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
@@ -144,7 +144,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
@@ -165,7 +165,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
@@ -185,7 +185,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
     }
@@ -207,7 +207,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null,
                 (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
@@ -236,7 +236,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -265,7 +265,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -294,7 +294,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        null, new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        null, new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -323,7 +323,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -351,7 +351,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -378,7 +378,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpHttpoolAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -404,7 +404,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "{\"status\":1337,\"ad_type\":\"rich\",\"image_url\":\"http://a.mobile.toboads.com/image?t=rich&aid=0e75e1fd-b715-46be-91df-54a6f12a639d&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=7001b459-0268-4bcc-9907-da11289e592d&add=H89xkxbwcmVD-bcL-Xg5shKWiaC_yATHamJQWPRpOF1tjuLb5TADYnVNQGPqfudt4G33Q4QK38Y.&did=nodeviceid-1234567890\",\"redirect_url\":\"http://sofialive.bg/mobile\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"}}";
@@ -432,7 +432,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "{\"status\": 1337,\"ad_type\": \"tpt\",\"content\": \"<a href=\\\"http://a.mobile.toboads.com/click?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789&url=http://labs.httpool.com\\\"><img src=\\\"http://labs.httpool.com/your_ad_here.png\\\" width=\\\"320\\\" height=\\\"50\\\" /></a>\",\"impression_url\": \"http://a.mobile.toboads.com/impress?adh=dd992e3a-192b-429a-9c22-709efca656e1&add=RegibO8TU8mLvGbkwfKZzdOMhDa--dmGlIFZIELVZ5gP1DZXyAiG8N8xDOKctXZ44G33Q4QK38Y.&test=1&did=123456789\",\"extra\": {\"bg_color\": \"#000000\",\"text_color\": \"#FFFFFF\",\"refresh_time\": \"0\",\"transition\": \"0\"}}";
@@ -461,7 +461,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"status\":1337,\"ad_type\":\"shop\",\"image_url\":\"http://a.mobile.toboads.com/image?t=text&aid=5f404c6e-8278-436e-838b-5daa39fe2d96&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"redirect_url\":\"http://labs.httpool.com\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"},\"content\":\"Claritas est etiam processus dynamicus, qui sequi.\"}";
@@ -492,7 +492,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"status\":1337,\"ad_type\":\"shop\",\"image_url\":\"http://a.mobile.toboads.com/image?t=text&aid=5f404c6e-8278-436e-838b-5daa39fe2d96&format=320x50\",\"impression_url\":\"http://a.mobile.toboads.com/impress?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"click_url\":\"http://a.mobile.toboads.com/click?adh=1475ad9d-66cf-43ac-9c59-026b3ab39593&add=NwgHspu71tCynGXEHCsy95jvkB4B4dLEBTIPESU3ODEIaudDRPK4998xDOKctXZ44G33Q4QK38Y.&test=1&did=202cb962ac59075b964b07152d234b70\",\"redirect_url\":\"http://labs.httpool.com\",\"extra\":{\"bg_color\":\"#000000\",\"text_color\":\"#FFFFFF\",\"refresh_time\":\"0\",\"transition\":\"0\"},\"content\":\"Claritas est etiam processus dynamicus, qui sequi.\"}";
@@ -539,7 +539,7 @@ public class DCPHttpoolAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(httpoolAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpHttpoolAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpHttpoolAdNetwork.getImpressionId());
     }

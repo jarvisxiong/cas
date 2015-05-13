@@ -119,7 +119,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                                "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper),
                 true);
@@ -142,7 +142,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                                "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
@@ -165,7 +165,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                                "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
@@ -187,7 +187,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
@@ -210,7 +210,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"1231\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                                "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             dcpPubmaticAdnetwork.makeAsyncRequest();
             final String actualUrl = dcpPubmaticAdnetwork.getRequestUrl();
@@ -238,7 +238,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                        new JSONObject("{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
@@ -269,7 +269,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                        new JSONObject("{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
@@ -301,7 +301,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                                "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
@@ -331,7 +331,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                                "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
@@ -357,7 +357,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
                                 true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                        "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                        "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
@@ -383,7 +383,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"9\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                                "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
@@ -411,7 +411,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
                                 true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                        "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                        "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -443,7 +443,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
                                 true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                        "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                        "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -475,7 +475,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
                                 true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                        "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                        "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -509,7 +509,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
                                 true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                        "{\"4\":\"36844\"}"), new ArrayList<Integer>(), 0.0d, null, null, 32,
+                                        "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
@@ -558,7 +558,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals(dcpPubmaticAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

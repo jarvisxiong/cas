@@ -163,7 +163,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 						false, new JSONObject(
 								"{\"spot\":54235,\"pubId\":\"inmobi_1\","
 										+ "\"site\":1234}"),
-						new ArrayList<Integer>(), 0.0d, null, null, 32,
+						new ArrayList<>(), 0.0d, null, null, 32,
 						new Integer[] { 0 }));
 		assertEquals(true, dcpCollectcentsAdNetwork.configureParameters(
 				sasParams, casInternalRequestParameters, entity, clurl, null,
@@ -187,7 +187,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 						true, true, externalKey, null, null, null,
 						new Long[] { 0L }, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
-						false, null, new ArrayList<Integer>(), 0.0d, null,
+						false, null, new ArrayList<>(), 0.0d, null,
 						null, 32, new Integer[] { 0 }));
 		assertEquals(false, dcpCollectcentsAdNetwork.configureParameters(
 				sasParams, casInternalRequestParameters, entity, clurl, null,
@@ -211,7 +211,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 						true, true, externalKey, null, null, null,
 						new Long[] { 0L }, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
-						false, null, new ArrayList<Integer>(), 0.0d, null,
+						false, null, new ArrayList<>(), 0.0d, null,
 						null, 32, new Integer[] { 0 }));
 		assertEquals(false, dcpCollectcentsAdNetwork.configureParameters(
 				sasParams, casInternalRequestParameters, entity, clurl, null,
@@ -234,7 +234,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 						true, true, externalKey, null, null, null,
 						new Long[] { 0L }, true, null, null, 0, null, false,
 						false, false, false, false, false, false, false, false,
-						false, null, new ArrayList<Integer>(), 0.0d, null,
+						false, null, new ArrayList<>(), 0.0d, null,
 						null, 32, new Integer[] { 0 }));
 		assertEquals(false, dcpCollectcentsAdNetwork.configureParameters(
 				sasParams, casInternalRequestParameters, entity, clurl, null,
@@ -291,7 +291,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 								false,
 								new JSONObject(
 										"{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-								new ArrayList<Integer>(), 0.0d, null, null, 0,
+								new ArrayList<>(), 0.0d, null, null, 0,
 								new Integer[] { 0 }));
 
 		if (dcpCollectcentsAdNetwork.configureParameters(sasParams,
@@ -365,7 +365,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 								false,
 								new JSONObject(
 										"{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-								new ArrayList<Integer>(), 0.0d, null, null, 0,
+								new ArrayList<>(), 0.0d, null, null, 0,
 								new Integer[] { 0 }));
 		if (dcpCollectcentsAdNetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null, (short) 15,
@@ -425,7 +425,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 								false,
 								new JSONObject(
 										"{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-								new ArrayList<Integer>(), 0.0d, null, null, 32,
+								new ArrayList<>(), 0.0d, null, null, 32,
 								new Integer[] { 0 }));
 		dcpCollectcentsAdNetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, null, beaconUrl,
@@ -486,7 +486,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 								false,
 								new JSONObject(
 										"{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-								new ArrayList<Integer>(), 0.0d, null, null, 32,
+								new ArrayList<>(), 0.0d, null, null, 32,
 								new Integer[] { 0 }));
 		dcpCollectcentsAdNetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, null, beaconUrl,
@@ -566,7 +566,7 @@ public class DCPCollectcentsAdnetworkTest extends TestCase {
 								false,
 								new JSONObject(
 										"{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-								new ArrayList<Integer>(), 0.0d, null, null, 32,
+								new ArrayList<>(), 0.0d, null, null, 32,
 								new Integer[] { 0 }));
 		dcpCollectcentsAdNetwork.configureParameters(sasParams,
 				casInternalRequestParameters, entity, clurl, null, (short) 15,

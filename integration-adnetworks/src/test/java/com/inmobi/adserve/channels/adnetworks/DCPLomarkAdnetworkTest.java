@@ -143,7 +143,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
@@ -165,7 +165,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
@@ -189,7 +189,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper));
     }
 
@@ -213,7 +213,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
@@ -240,7 +240,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
@@ -264,7 +264,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpLomarkAdnetwork
                 .configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
     }
@@ -291,7 +291,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {12121212L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 12121212, new Integer[] {0}));
         if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
@@ -355,7 +355,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {12121212L},
                         true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
-                        false, null, new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
+                        false, null, new ArrayList<>(), 0.0d, null, null, 12121212, new Integer[] {0}));
         if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
@@ -422,7 +422,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {12121212L},
                         true, null, null, 0, null, false, false, false, false, false, false, false, false, false,
-                        false, null, new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
+                        false, null, new ArrayList<>(), 0.0d, null, null, 12121212, new Integer[] {0}));
         if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
@@ -488,7 +488,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {12121212L}, true, null,
                         null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 12121212, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 12121212, new Integer[] {0}));
         if (dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLomarkAdnetwork.getRequestUri().toString();
             final HashMap<String, String> requestMap = new HashMap<String, String>();
@@ -543,7 +543,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -574,7 +574,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -624,7 +624,7 @@ public class DCPLomarkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(lomarkAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLomarkAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpLomarkAdnetwork.getImpressionId());
     }

@@ -114,7 +114,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         dcpMoceanAdNetwork.setHost(moceanHost);
     }
 
@@ -134,7 +134,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper),
                 true);
@@ -156,7 +156,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper),
                 false);
@@ -178,7 +178,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper),
                 false);
@@ -199,7 +199,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper),
                 false);
@@ -224,7 +224,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpMoceanAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -252,7 +252,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 12, repositoryHelper)) {
             final String actualUrl = dcpMoceanAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -286,7 +286,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpMoceanAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -316,7 +316,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpMoceanAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -342,7 +342,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 14, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.com/4/redir/1b2c8f91-fbf5-11e1-bd3e-a0369f06db33/0/139494\",\"img\" : \"http://img.ads.mocean.com/img/4f6/345/c8115c2/image_320x50.gif\",\"type\": \"image/gif\",\"track\" : \"null\"}];";
@@ -372,7 +372,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 14, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.com/4/redir/1b2c8f91-fbf5-11e1-bd3e-a0369f06db33/0/139494\",\"img\" : \"http://img.ads.mocean.com/img/4f6/345/c8115c2/image_320x50.gif\",\"type\": \"image/gif\",\"track\" : \"null\"}];";
@@ -403,7 +403,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -436,7 +436,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -469,7 +469,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -528,7 +528,7 @@ public class DCPMoceanAdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(moceanAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpMoceanAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper);
         assertEquals(dcpMoceanAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

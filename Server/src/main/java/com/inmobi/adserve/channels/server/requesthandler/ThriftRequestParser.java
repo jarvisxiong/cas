@@ -164,7 +164,8 @@ public class ThriftRequestParser {
             } catch (final UnsupportedEncodingException e) {}
             params.setUserAgent(userAgent);
             params.setOsId(new Long(tObject.device.osId).intValue());
-            params.setModelId(new Long(tObject.device.modelId).intValue());
+            params.setModelId(tObject.device.modelId);
+            params.setManufacturerId(tObject.device.manufacturerId);
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
             params.setOsMajorVersion(tObject.device.getOsMajorVersion());
             if (tObject.device.getDeviceType() != null) {

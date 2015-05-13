@@ -1,10 +1,10 @@
 
-CREATE FUNCTION ix_package_fun_09042015()
+CREATE FUNCTION ix_package_fun_04052015()
 RETURNS
-    SETOF ix_package_type_09042015 AS
+    SETOF ix_package_type_04052015 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_09042015%ROWTYPE;
+    row1    ix_package_type_04052015%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -16,6 +16,8 @@ SELECT
                 ix_packages.country_ids AS country_ids,
                 ix_packages.inventory_types AS inventory_types,
                 ix_packages.os_ids AS os_ids,
+                ix_packages.os_version_targeting AS os_version_targeting,
+                ix_packages.manuf_model_targeting AS manuf_model_targeting,
                 ix_packages.carrier_ids AS carrier_ids,
                 ix_packages.site_categories AS site_categories,
                 ix_packages.connection_types AS connection_types,

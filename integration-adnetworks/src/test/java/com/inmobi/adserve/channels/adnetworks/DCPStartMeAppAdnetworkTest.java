@@ -124,7 +124,7 @@ public class DCPStartMeAppAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(StartMeappAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertTrue(dcpStartMeAppAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null, (short) 4, repositoryHelper));
     }
@@ -143,7 +143,7 @@ public class DCPStartMeAppAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(StartMeappAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpStartMeAppAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null, (short) 4, repositoryHelper));
     }
@@ -163,7 +163,7 @@ public class DCPStartMeAppAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(StartMeappAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertFalse(dcpStartMeAppAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
                 null, (short) 4, repositoryHelper));
     }
@@ -188,7 +188,7 @@ public class DCPStartMeAppAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(StartMeappAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpStartMeAppAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper)) {
             final String actualUrl = dcpStartMeAppAdnetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -220,7 +220,7 @@ public class DCPStartMeAppAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(StartMeappAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpStartMeAppAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 4, repositoryHelper);
         final String response =
                 "{\"adm\":\"<img src=\\\"http:\\/\\/pixcount.rtb.startmeapp.net\\/resource\\/AAAAAhQFEQR1dWlkESRmNDE1ZjgxNS01NGIyLTRkNzUtODA5OS0yN2Q4NTEzZTJiMTYRBG1vZGUGAREFY2xhc3MRBVRyYWNrEQZtZXRob2QRCW5vdGlmeVdpbhEEZGF0YRQBEQlyZXBvcnRpbmcUFBELcHVibGlzaGVySWQRBzEyMzQ1NjcRD3B1Ymxpc2hlclN0YXR1cwARCGJpZGRlcklkBl4RBGlzbzIRA1VTQRELbW9iaWxlQnJhbmQRB0dlbmVyaWMRBm9zTmFtZREHQW5kcm9pZBELaWRPc1ZlcnNpb24RAzQuNBENbW9iaWxlQnJvd3NlchEOQW5kcm9pZCBXZWJraXQRCG1ha2VOYW1lDhARCW1vZGVsTmFtZRESQW5kcm9pZCA0LjQgVGFibGV0EQZoZWlnaHQIAUARBXdpZHRoCAHgEQdyZXZlbnVlDD-yLQ5WBBiTEQhjbGlja1VybAARBXRhZ2lkABEEbnVybBHvaHR0cDovL3VzcHJpY2V2Mi5tZHNwLmF2YXp1dHJhY2tpbmcubmV0L3ByaWNlL3N0YXJ0bWVhcHA_cnFpZD00ZmNhZTY4Ni0xMmExLTQzODMtYjk5MS03NTlmYzIzZjhlODUmYmlkaWQ9MzY0MDY3Njk2NzYyNTY2NDA5NiZhY2NpZD04NDUmcHJpY2U9MC4wNzEmYWRpZD0xMjU3MV83NjQzOCZ1aWQ9JmltcGlkPTc1MzA5MzQwLTVjOGUtNGNiZi1hZTZmLTBmMzU1N2FiYWEzNyZhZmNhcD1kNTAuMTIxLjg0LjIzNSZjZmNhcD0RCnJlc29sdXRpb24GABENZHNwTW9kdWxlbmFtZREFQXZhenURCmNhbXBhaWduSWQRBTEyNTcxEQpjcmVhdGl2ZUlkEQU3NjQzOA\\\" width=\\\"1\\\" height=\\\"1\\\" border=\\\"0\\\" \\/> <a href=\\\"http:\\/\\/mdsp.avazutracking.net\\/tracking\\/redirect.php?bid_id=3640676967625664096&ids=ZODQ1fjEyNTcxfjc2NDM4fjEwMTJ-LTF-MX4xfjB-MH5VU35hbmRyb2lkfi0xfmdlbmVyaWN-NC40fjExNjE4OH4tMX51cw&_m=%07creative_id%0676438%07os_version%064.4%07exchange%06startmeapp%07source_name%06&ext=\\\" target=\\\"_blank\\\"><img src=\\\"http:\\/\\/cdn.avazutracking.net\\/images\\/201503\\/010\\/6d0996de118c803eabb3af26db139dfd_320x480.gif\\\" \\/> <\\/a><img src=\\\"http:\\/\\/mdsp.avazutracking.net\\/tracking\\/impression?bid_id=3640676967625664096&ids=ZODQ1fjEyNTcxfjc2NDM4fjEwMTJ-LTF-MX4xfjB-MH5VU35hbmRyb2lkfi0xfmdlbmVyaWN-NC40fjExNjE4OH4tMX51cw&ext=\\\" width=\\\"1\\\" height=\\\"1\\\" style=\\\"display:none;\\\" \\/> <script type=\\\"text\\/javascript\\\">generateTracker=function(ad){var tracker=document.createElement(\\\"img\\\");tracker.setAttribute(\\\"src\\\",\\\"http:\\/\\/resources.rtb.startmeapp.net\\/resource\\/AAAAAhQFEQR1dWlkESQ1ODlmYzBkYi1hZWI5LTRhZWUtYTk0My0yMDhhMzg3NTM4MGURBG1vZGUGAREFY2xhc3MRBVRyYWNrEQZtZXRob2QRBWF1ZGl0EQRkYXRhFAERCXJlcG9ydGluZxQUEQtwdWJsaXNoZXJJZBEHMTIzNDU2NxEPcHVibGlzaGVyU3RhdHVzABEIYmlkZGVySWQGXhEEaXNvMhEDVVNBEQttb2JpbGVCcmFuZBEHR2VuZXJpYxEGb3NOYW1lEQdBbmRyb2lkEQtpZE9zVmVyc2lvbhEDNC40EQ1tb2JpbGVCcm93c2VyEQ5BbmRyb2lkIFdlYmtpdBEIbWFrZU5hbWUOEBEJbW9kZWxOYW1lERJBbmRyb2lkIDQuNCBUYWJsZXQRBmhlaWdodAgBQBEFd2lkdGgIAeARB3JldmVudWUMP7ItDlYEGJMRCGNsaWNrVXJsABEFdGFnaWQAEQRudXJsEe9odHRwOi8vdXNwcmljZXYyLm1kc3AuYXZhenV0cmFja2luZy5uZXQvcHJpY2Uvc3RhcnRtZWFwcD9ycWlkPTRmY2FlNjg2LTEyYTEtNDM4My1iOTkxLTc1OWZjMjNmOGU4NSZiaWRpZD0zNjQwNjc2OTY3NjI1NjY0MDk2JmFjY2lkPTg0NSZwcmljZT0wLjA3MSZhZGlkPTEyNTcxXzc2NDM4JnVpZD0maW1waWQ9NzUzMDkzNDAtNWM4ZS00Y2JmLWFlNmYtMGYzNTU3YWJhYTM3JmFmY2FwPWQ1MC4xMjEuODQuMjM1JmNmY2FwPREKcmVzb2x1dGlvbgYAEQ1kc3BNb2R1bGVuYW1lEQVBdmF6dREKY2FtcGFpZ25JZBEFMTI1NzERCmNyZWF0aXZlSWQRBTc2NDM4\\\");document.body.appendChild(tracker);};register=function(){try {audit=document.getElementsByTagName(\\\"a\\\")[0];audit.addEventListener(\\\"click\\\",function(e){generateTracker(this);},true);}catch(err) {console.log(err.message);}};setTimeout(register,1500);<\\/script>\"}";

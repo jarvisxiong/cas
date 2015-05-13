@@ -72,7 +72,7 @@ public class ChannelAdGroupRepositoryTest {
         final long impressionCeil = 100000000L;
         final String manufModelTargeting = "{manuf:[{id:16,modelIds:[3],incl:true},{id:5,modelIds:[1],incl:true}]}";
 
-        final List<Integer> manufModelTargetingResult = new ArrayList<Integer>(Arrays.asList(3, 1));
+        final List<Long> manufModelTargetingResult = new ArrayList<>(Arrays.asList(3L, 1L));
         final double ecpmBoost = 0.0;
         final Long ecmpBoostTimeInMilli = 1385503110L;
         final Timestamp eCPMBoostDate = new Timestamp(ecmpBoostTimeInMilli);
@@ -218,7 +218,7 @@ public class ChannelAdGroupRepositoryTest {
     public void testParseManufacturingIds() throws Exception {
         final ChannelAdGroupRepository tested = new ChannelAdGroupRepository();
         final String manufModelTargeting = "{manuf:[{id:16,modelIds:[3],incl:true},{id:5,modelIds:[1],incl:true}]}";
-        final List<Integer> manufModelTargetingResult = new ArrayList<Integer>(Arrays.asList(3, 1));
+        final List<Long> manufModelTargetingResult = new ArrayList<>(Arrays.asList(3L, 1L));
         assertThat(tested.parseManufacturingIds(manufModelTargeting), is(equalTo(manufModelTargetingResult)));
     }
 }

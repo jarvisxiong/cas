@@ -59,6 +59,8 @@ public class SASRequestParameters {
     private String rFormat;
 
     private String deviceType;
+    private long modelId;
+    private long manufacturerId;
     private int osId;
     private Short rqMkAdcount;
     private String tid;
@@ -73,7 +75,6 @@ public class SASRequestParameters {
     private String rqAdType;
     private String imaiBaseUrl;
     private String appUrl;
-    private int modelId;
     private Set<String> uAdapters;
 
     private int dst; // This will describe the type of request dcp, rtbd or ix

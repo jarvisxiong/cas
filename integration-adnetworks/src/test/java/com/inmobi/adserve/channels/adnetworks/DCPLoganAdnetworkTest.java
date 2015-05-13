@@ -3,16 +3,12 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -28,6 +24,10 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
 
 
 public class DCPLoganAdnetworkTest extends TestCase {
@@ -120,7 +120,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 true);
@@ -142,7 +142,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
@@ -164,7 +164,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
@@ -185,7 +185,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
                 false);
@@ -210,7 +210,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -238,7 +238,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -266,7 +266,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -298,7 +298,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -326,7 +326,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, clurl, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpLoganAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -355,7 +355,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"img\" : \"http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png\",\"type\": \"image/png\",\"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
@@ -383,7 +383,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\", \"track\" : \"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a?redir=http%3A%2F%2Ffalcon828.startdedicated.com%2Foapi%2FgetAd%3Bjsessionid%3DCE95AD7724915C3AF30B6A9251A05F1C.falcon828\", \"content\" : \"<a href=\\\"http://ads.mocean.mobi/8/redir/0beda220-76e8-11e3-9ca3-b8ca3a685e3a/0/413716\\\" target=\\\"_blank\\\"><img width=\\\"320\\\" height=\\\"50\\\" style=\\\"border-style: none\\\" src=\\\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\\\"/></a><img src=\\\"http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828\\\" width=\\\"1\\\" height=\\\"1\\\" /><img src=\\\"http://ads.mocean.mobi/8/img/0beda220-76e8-11e3-9ca3-b8ca3a685e3a\\\" width=\\\"1\\\" height=\\\"1\\\" alt=\\\"\\\"/>\", \"response\" : \"<?xml version=\\\"1.0\\\"?><response xmlns=\\\"http://soma.smaato.com/oapi/\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:schemaLocation=\\\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\\\"><sessionid>CE95AD7724915C3AF30B6A9251A05F1C.falcon828</sessionid><status>success</status><user><id>900</id><ownid>a18145ffe52571ee0b5bf2bbb906f6e6</ownid></user><ads><ad id=\\\"0\\\" type=\\\"RICHMEDIA\\\" width=\\\"320\\\" height=\\\"50\\\"><log-id></log-id><valid start=\\\"0\\\" end=\\\"0\\\" max=\\\"1\\\"/><mediadata><![CDATA[<a href=\\\"http://nym1.mobile.adnxs.com/click?dtZuu9Bcsz8CQ7Fw7Z-tPwisHFpkO98_AkOxcO2frT931m670FyzP9IG4za7jJwsxcyUYtQDuWULzcpSAAAAAHAmGQDYBgAA5gcAAAIAAADmUqIAckUEAAAAAQBVU0QAVVNEAEABMgD9twAAvJ0BAQUCAQIAAIoAOyliMwAAAAA./cnd=%21nQVeMwiKhJcBEOaliQUY8ooRIAA./referrer=www.loganmedia.mobi/clickenc=http%3A%2F%2Fhastrk1.com%2Fserve%3Faction%3Dclick%26publisher_id%3D44840%26site_id%3D15984%26offer_id%3D248966%26odin%3D%26device_id_md5%3D%26device_id_sha1%3D%26ref_id%3Dnym1CMWZ05TG-sDcZRACGNKNjLezl6POLCIPMjAxLjEzOS4xNTQuMTI5KAE.\\\" target=\\\"_blank\\\"><img width=\\\"320\\\" height=\\\"50\\\" style=\\\"border-style: none\\\" src=\\\"http://cdn.adnxs.com/p/ac/e3/11/39/ace3113973d0b2f42bb7fafc21f1303c.png\\\"/></a>]]></mediadata><link></link><action target=\\\"\\\" type=\\\"\\\"/><beacons><beacon>http://falcon828.startdedicated.com/oapi/getAd;jsessionid=CE95AD7724915C3AF30B6A9251A05F1C.falcon828</beacon></beacons></ad></ads></response>\" }];";
@@ -411,7 +411,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
                 "[{\"url\" : \"http://ads.mocean.mobi/2/redir/0eea1b23-c13f-11e2-aeff-a0369f167751/0/425387\",\"img\" : \"http://img.ads.mocean.mobi/img/31/fd/0d/image_7a2b3ca79ed4eda26487061a0f_728x90.png\",\"type\": \"image/png\",\"track\" : \"http://ads.mocean.mobi/2/img/0eea1b23-c13f-11e2-aeff-a0369f167751\"}];";
@@ -440,7 +440,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -472,7 +472,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
 
         final String response =
@@ -528,7 +528,7 @@ public class DCPLoganAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(loganAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpLoganAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals(dcpLoganAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }

@@ -3,9 +3,6 @@ package com.inmobi.adserve.channels.adnetworks;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -14,8 +11,6 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -34,6 +29,11 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import junit.framework.TestCase;
 
 
 public class AdNetworksTest extends TestCase {
@@ -128,7 +128,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
@@ -149,7 +149,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
@@ -170,7 +170,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
@@ -191,7 +191,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
@@ -211,7 +211,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 14, repositoryHelper));
@@ -236,7 +236,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 14, repositoryHelper)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -263,7 +263,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 14, repositoryHelper)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -288,7 +288,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, new JSONObject(),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 14, repositoryHelper)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
@@ -316,7 +316,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
@@ -346,7 +346,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
@@ -375,7 +375,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
@@ -406,7 +406,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {32L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, Short.MAX_VALUE, repositoryHelper)) {
             final String actualUrl = dcpTapitAdNetwork.getRequestUri().toString();
@@ -434,7 +434,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper);
 
@@ -465,7 +465,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper);
 
@@ -496,7 +496,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper);
 
@@ -529,7 +529,7 @@ public class AdNetworksTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(openxAdvertiserId, null, null, null, 0, null,
                         null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
                         false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
 
         openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper);
 
@@ -557,7 +557,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper)) {
             final String response =
@@ -585,7 +585,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper)) {
             final String response =
@@ -613,7 +613,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper)) {
             final String response =
@@ -643,7 +643,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 14, repositoryHelper)) {
             final String response =
@@ -671,7 +671,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper)) {
             final String response =
@@ -701,7 +701,7 @@ public class AdNetworksTest extends TestCase {
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(tapitAdvId, null, null, null, 0, null, null,
                         true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
-                        false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(),
+                        false, false, false, false, false, false, false, false, false, null, new ArrayList<>(),
                         0.0d, null, null, 32, new Integer[] {0}));
         if (dcpTapitAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper)) {
             final String response =
@@ -723,7 +723,7 @@ public class AdNetworksTest extends TestCase {
                                                                               final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
                                                                               final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
                                                                               final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
-                                                                              final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
+                                                                              final JSONObject additionalParams, final List<Long> manufModelTargetingList, final double ecpmBoost,
                                                                               final Timestamp eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
         final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);

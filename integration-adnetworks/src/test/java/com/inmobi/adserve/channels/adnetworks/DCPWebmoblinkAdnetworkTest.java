@@ -147,7 +147,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper));
@@ -172,7 +172,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper));
@@ -199,7 +199,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper));
@@ -226,7 +226,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         String actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
@@ -258,7 +258,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         if (dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper)) {
             String actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
@@ -294,7 +294,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
@@ -355,7 +355,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
         ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0, null,
-                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d,
+                        false, false, false, false, false, false, false, false, false, false, null, new ArrayList<Long>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         casInternalRequestParameters.setUidO1("202cb962ac59075b964b07152d234b70");
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
@@ -409,7 +409,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(webmoblinkAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0, null, false,
                         false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Integer>(), 0.0d, null,
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<Long>(), 0.0d, null,
                         null, 32, new Integer[] {0}));
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         String response =
@@ -453,7 +453,7 @@ public class DCPWebmoblinkAdnetworkTest extends TestCase {
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<Long>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpWebmoblinkAdNetwork.getImpressionId());
     }

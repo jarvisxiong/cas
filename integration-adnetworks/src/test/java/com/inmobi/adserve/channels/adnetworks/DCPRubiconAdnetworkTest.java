@@ -139,7 +139,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         assertEquals(false,
                 dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
@@ -166,7 +166,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         assertEquals(true,
                 dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
@@ -195,7 +195,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         assertEquals(true,
                 dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
@@ -221,7 +221,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         assertEquals(true,
                 dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
@@ -243,7 +243,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         assertEquals(false,
                 dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
@@ -264,7 +264,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"191002\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         assertEquals(false,
                 dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper));
@@ -303,7 +303,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null,
                         0, new Integer[] {0}));
 
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper);
@@ -355,7 +355,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null,
                         0, new Integer[] {0}));
 
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper);
@@ -421,7 +421,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null,
                         0, new Integer[] {0}));
 
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper);
@@ -464,7 +464,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null,
                         0, new Integer[] {0}));
 
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper);
@@ -510,7 +510,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null,
                         0, new Integer[] {0}));
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper);
         final String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
@@ -547,7 +547,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null,
                         0, new Integer[] {0}));
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper);
         final String actualUrl = dcpRubiconAdNetwork.getRequestUri().toString();
@@ -579,7 +579,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"19100\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"19100\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
@@ -612,7 +612,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rubiconAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"3\":\"160212\",\"site\":\"19100\"}"), new ArrayList<Integer>(), 0.0d, null, null,
+                                "{\"3\":\"160212\",\"site\":\"19100\"}"), new ArrayList<>(), 0.0d, null, null,
                         32, new Integer[] {0}));
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         final String response =
@@ -657,7 +657,7 @@ public class DCPRubiconAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpRubiconAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpRubiconAdNetwork.getImpressionId());
     }

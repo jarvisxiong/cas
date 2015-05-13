@@ -21,15 +21,19 @@ import javax.sql.DataSource;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Range;
 import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.googlecode.cqengine.CQEngine;
@@ -77,7 +81,8 @@ public class IXPackageRepository {
     public static final Integer ALL_OS_ID = -1;
     public static final Integer ALL_SLOT_ID = -1;
 
-    public static final Attribute<IXPackageEntity, String> DEAL_IDS = new MultiValueNullableAttribute<IXPackageEntity, String>("deal_ids", false) {
+    public static final Attribute<IXPackageEntity, String> DEAL_IDS =
+            new MultiValueNullableAttribute<IXPackageEntity, String>("deal_ids", false) {
         @Override
         public List<String> getNullableValues(IXPackageEntity entity) {
             List<String> dealIds = entity.getDealIds();
@@ -225,6 +230,24 @@ public class IXPackageRepository {
                     dmpFilterSegmentExpression = extractDmpFilterExpression(rs.getString("dmp_filter_expression"));
                 } catch (JSONException e) {
                     logger.error("Invalid dmpFilterExpressionJson in IXPackageRepository for id " + id, e);
+                    // Skip this record.
+                    return rs.getTimestamp("last_modified");
+                }
+
+                Map<Integer, Range<Double>> osVersionTargeting;
+                try {
+                    osVersionTargeting = extractOsVersionTargeting(rs.getString("os_version_targeting"));
+                } catch (JSONException e) {
+                    logger.error("Invalid OsVersionTargeting Json in IXPackageRepository for id " + id, e);
+                    // Skip this record.
+                    return rs.getTimestamp("last_modified");
+                }
+
+                Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
+                try {
+                    manufModelTargeting = extractManufModelTargeting(rs.getString("manuf_model_targeting"));
+                } catch (JSONException e) {
+                    logger.error("Invalid ManufModelTargeting Json in IXPackageRepository for id " + id, e);
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
                 }
@@ -381,30 +404,33 @@ public class IXPackageRepository {
                 if (geoSourceType != null) {
                     repoSegmentBuilder.addSegmentParameter(geoSourceType);
                 }
-                
+
                 Segment segment = repoSegmentBuilder.build();
 
                 // Entity builder
                 IXPackageEntity.Builder entityBuilder = IXPackageEntity.newBuilder();
-                entityBuilder.setId(id);
-                entityBuilder.setSegment(segment);
-                entityBuilder.setDmpId(dmpId);
-                entityBuilder.setDmpVendorId(dataVendorId);
-                entityBuilder.setDmpFilterSegmentExpression(dmpFilterSegmentExpression);
-                entityBuilder.setScheduledTimeOfDays(scheduleTimeOfDays);
+                entityBuilder.id(id);
+                entityBuilder.segment(segment);
+                entityBuilder.dmpId(dmpId);
+                entityBuilder.dmpVendorId(dataVendorId);
+                entityBuilder.dmpFilterSegmentExpression(dmpFilterSegmentExpression);
+                entityBuilder.osVersionTargeting(osVersionTargeting);
+                entityBuilder.manufModelTargeting(manufModelTargeting);
+                entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
+
                 if (null != dealIds) {
-                    entityBuilder.setDealIds(Arrays.asList(dealIds));
+                    entityBuilder.dealIds(Arrays.asList(dealIds));
                 }
                 if (null != dealFloors) {
-                    entityBuilder.setDealFloors(Arrays.asList(dealFloors));
+                    entityBuilder.dealFloors(Arrays.asList(dealFloors));
                 }
                 if(null != accessTypes){
-                    entityBuilder.setAccessTypes(Arrays.asList(accessTypes));
+                    entityBuilder.accessTypes(Arrays.asList(accessTypes));
                 }
                 if (null != geoFenceRegion) {
-                    entityBuilder.setGeoFenceRegion(geoFenceRegion);
+                    entityBuilder.geoFenceRegion(geoFenceRegion);
                 }
-                entityBuilder.setDataVendorCost(dataVendorCost);
+                entityBuilder.dataVendorCost(dataVendorCost);
 
                 IXPackageEntity entity = entityBuilder.build();
 
@@ -466,9 +492,10 @@ public class IXPackageRepository {
         return Scheduler.newFixedRateSchedule(initialDelay, refreshTime, TimeUnit.SECONDS);
     }
 
-    private Set<Set<Integer>> extractDmpFilterExpression(String dmpFilterExpressionJson) throws JSONException {
+    private static Set<Set<Integer>> extractDmpFilterExpression(String dmpFilterExpressionJson) throws JSONException {
         Set<Set<Integer>> dmpFilterSegmentExpression = new HashSet<>();
-        if (!(StringUtils.isEmpty(dmpFilterExpressionJson))) {
+
+        if (StringUtils.isNotEmpty(dmpFilterExpressionJson)) {
             JSONArray dmpSegmentsJsonArray = new JSONArray(dmpFilterExpressionJson);
             for (int andSetIdx = 0; andSetIdx < dmpSegmentsJsonArray.length(); andSetIdx++) {
                 JSONArray andJsonArr = (JSONArray) dmpSegmentsJsonArray.get(andSetIdx);
@@ -479,7 +506,95 @@ public class IXPackageRepository {
                 dmpFilterSegmentExpression.add(orSet);
             }
         }
+
         return dmpFilterSegmentExpression;
     }
 
+    /**
+     * This function extracts the os version targeting meta data.
+     * Meta Data consists of a map that maps the os id to a Closed Range
+     *
+     * note: osId in the adPoolRequest is a long, osId in CAS is an int and osId in the ix_packages table is a short
+     * @param osVersionTargetingJson
+     * @return
+     * @throws JSONException
+     */
+    protected static Map<Integer, Range<Double>> extractOsVersionTargeting(String osVersionTargetingJson)
+            throws JSONException {
+        ImmutableMap.Builder<Integer, Range<Double>>  osVersionTargeting = new ImmutableMap.Builder<>();
+
+        if (StringUtils.isNotEmpty(osVersionTargetingJson)) {
+            JSONArray jsonArray = new JSONArray(osVersionTargetingJson);
+
+            // Iterate over all os ids
+            for (int index = 0; index < jsonArray.length(); ++index) {
+                JSONObject osEntry = (JSONObject) jsonArray.get(index);
+                JSONArray osVersionRangeJsonArray = osEntry.getJSONArray("range");
+                Range<Double> osVersionRange;
+
+                // Sanity for malformed ranges
+                if (osVersionRangeJsonArray.length() != 2) {
+                    osVersionRange = Range.all();
+                } else {
+                    double minVer = osVersionRangeJsonArray.getDouble(0);
+                    double maxVer = osVersionRangeJsonArray.getDouble(1);
+                    // Sanity for range: minVer must always be <= maxVer
+                    if (minVer > maxVer) {
+                        double temp = minVer;
+                        minVer = maxVer;
+                        maxVer = temp;
+                    }
+
+                    osVersionRange = Range.closed(minVer, maxVer);
+                }
+
+                osVersionTargeting.put(osEntry.getInt("osId"), osVersionRange);
+            }
+        }
+
+        return osVersionTargeting.build();
+    }
+
+    /**
+     * This function extracts the device manufacturer and device model targeting meta data.
+     * Meta Data consists of a map that maps the device manufacturer id (Long) to the inclusion boolean (Boolean)
+     * to the set of device model ids.
+     *
+     * @param manufModelTargetingJson
+     * @return Map as described above
+     * @throws JSONException
+     */
+    protected static Map<Long, Pair<Boolean, Set<Long>>> extractManufModelTargeting(String manufModelTargetingJson)
+            throws JSONException {
+        ImmutableMap.Builder<Long, Pair<Boolean, Set<Long>>> manufModelTargeting = new ImmutableMap.Builder<>();
+
+        if (StringUtils.isNotEmpty(manufModelTargetingJson)) {
+            JSONArray jsonArray = new JSONArray(manufModelTargetingJson);
+
+            // Iterate over all device manufacturer ids
+            for (int manufIndex = 0; manufIndex < jsonArray.length(); ++manufIndex) {
+                JSONObject manufEntry = (JSONObject) jsonArray.get(manufIndex);
+
+                ImmutableSet.Builder<Long> modelIds = new ImmutableSet.Builder();
+                JSONArray modelIdsJsonArray = manufEntry.getJSONArray("modelIds");
+
+                // Iterate over all the device model ids and add them to the modelIds Set
+                for (int modelIndex = 0; modelIndex < modelIdsJsonArray.length(); ++ modelIndex) {
+                    modelIds.add(modelIdsJsonArray.getLong(modelIndex));
+                }
+
+                // Determine whether the modelIds Set is an inclusion or an exclusion Set
+                Boolean incl = manufEntry.getBoolean("incl");
+
+                // Sanity: If modelIds Set is empty and incl is false, then skip manufacturer
+                if (0 == modelIdsJsonArray.length() && !incl) {
+                    continue;
+                }
+
+                manufModelTargeting.put(manufEntry.getLong("manufId"), ImmutablePair.of(incl, modelIds.build()));
+            }
+        }
+
+        return manufModelTargeting.build();
+    }
 }

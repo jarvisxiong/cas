@@ -107,7 +107,7 @@ public class DCPAmoAdAdnetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(amoAdAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpAmoAdAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper));
     }
@@ -135,7 +135,7 @@ public class DCPAmoAdAdnetworkTest extends junit.framework.TestCase {
                 new com.inmobi.adserve.channels.entity.ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(amoAdAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         dcpAmoAdAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper);
         assertNull(dcpAmoAdAdNetwork.getRequestUri());
     }
@@ -164,7 +164,7 @@ public class DCPAmoAdAdnetworkTest extends junit.framework.TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
                                 "{}"),
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAmoAdAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 15, repositoryHelper);
         dcpAmoAdAdNetwork.generateJsAdResponse();
         assertEquals(200, dcpAmoAdAdNetwork.getHttpResponseStatusCode());
@@ -200,7 +200,7 @@ public class DCPAmoAdAdnetworkTest extends junit.framework.TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new org.json.JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new java.util.ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new java.util.ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpAmoAdAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 11, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpAmoAdAdNetwork.getImpressionId());
     }

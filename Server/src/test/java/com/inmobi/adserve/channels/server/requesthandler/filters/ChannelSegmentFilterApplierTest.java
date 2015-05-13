@@ -175,37 +175,37 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId1", "adId",
                         "channelId1", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
                         slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, true,
+                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, true,
                         emptySet, 100));
         channelSegmentEntity2 =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId2", "adId",
                         "channelId1", 0, rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId",
                         slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false,
                         emptySet, 0));
         channelSegmentEntity3 =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId3", "adId",
                         "channelId1", 1, rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId",
                         slotIds, 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false,
                         emptySet, 0));
         channelSegmentEntity4 =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId2, "adgroupId4", "adId",
                         "channelId2", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
                         slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false,
                         emptySet, 100));
         channelSegmentEntity5 =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId2, "adgroupId5", "adId",
                         "channelId2", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
                         slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false,
                         emptySet, 0));
         channelSegmentEntity6 =
                 new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId3, "adgroupId5", "adId",
                         "channelId3", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
                         slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<Integer>(), 0.0d, null, null, false,
+                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false,
                         emptySet, 0));
 
         final ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity =
@@ -994,7 +994,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
                                                                               final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
                                                                               final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
                                                                               final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
-                                                                              final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
+                                                                              final JSONObject additionalParams, final List<Long> manufModelTargetingList, final double ecpmBoost,
                                                                               final Timestamp eCPMBoostDate, final Long[] tod, final boolean siteInclusion, final Set<String> siteIE,
                                                                               final int impressionCeil) {
         final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();

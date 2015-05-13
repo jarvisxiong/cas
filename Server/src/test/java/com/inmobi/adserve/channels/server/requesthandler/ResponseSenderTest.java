@@ -11,18 +11,15 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
@@ -391,14 +388,14 @@ public class ResponseSenderTest {
         short selectedSlot = 5;
         ADCreativeType creativeType = ADCreativeType.BANNER;
         DemandSourceType dst = DemandSourceType.IX;
-        IXPackageEntity.Builder builder = new IXPackageEntity.Builder();
+        IXPackageEntity.Builder builder = IXPackageEntity.newBuilder();
         List<String> accessTypes = new ArrayList<String>(); 
         accessTypes.add(ResponseSender.RIGHT_TO_FIRST_REFUSAL_DEAL);
-        builder.setAccessTypes(accessTypes);
+        builder.accessTypes(accessTypes);
         List<String> dealIds = new ArrayList<String>();
         dealIds.add("dealId");
-        builder.setDealIds(dealIds);
-        IXPackageEntity ixPackageEntity = new IXPackageEntity(builder);
+        builder.dealIds(dealIds);
+        IXPackageEntity ixPackageEntity = builder.build();
 
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);

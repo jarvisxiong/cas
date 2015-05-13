@@ -281,7 +281,7 @@ public class IXAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject(), new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new JSONObject(), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
                 ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15, repositoryHelper),
                 false);
@@ -297,7 +297,7 @@ public class IXAdNetworkTest extends TestCase {
                     new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null,
                             0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null,
                             null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                            new JSONObject("{\"3\":\"160212\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                            new JSONObject("{\"3\":\"160212\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                             new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -337,7 +337,7 @@ public class IXAdNetworkTest extends TestCase {
                     new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null,
                             0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null,
                             null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                            new JSONObject("{\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d, null, null, 0,
+                            new JSONObject("{\"site\":\"38132\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                             new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -378,7 +378,7 @@ public class IXAdNetworkTest extends TestCase {
                     new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null,
                             0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null,
                             null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                            new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d,
+                            new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d,
                             null, null, 0, new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -488,7 +488,7 @@ public class IXAdNetworkTest extends TestCase {
                     new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null,
                             0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null,
                             null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                            new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d,
+                            new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d,
                             null, null, 0, new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -555,7 +555,7 @@ public class IXAdNetworkTest extends TestCase {
                     new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(ixAdvId, null, null, null,
                             0, null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null,
                             null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                            new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<Integer>(), 0.0d,
+                            new JSONObject("{\"3\":\"160212\",\"site\":\"38132\"}"), new ArrayList<>(), 0.0d,
                             null, null, 0, new Integer[] {0}));
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();

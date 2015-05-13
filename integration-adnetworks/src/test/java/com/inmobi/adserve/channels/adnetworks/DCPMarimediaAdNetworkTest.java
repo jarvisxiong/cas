@@ -134,7 +134,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(marimediaAdvId, "adgroupid",
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        null, new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         assertTrue(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
                 null, (short) 3, repositoryHelper));
@@ -159,7 +159,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(marimediaAdvId, "adgroupid",
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        null, new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         assertFalse(dcpMarimediaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null,
                 null, (short) 3, repositoryHelper));
@@ -192,7 +192,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(marimediaAdvId, "adgroupid",
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        null, new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -231,7 +231,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(marimediaAdvId, "adgroupid",
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        null, new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
@@ -274,7 +274,7 @@ public class DCPMarimediaAdNetworkTest extends TestCase {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(marimediaAdvId, "adgroupid",
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {1L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
-                        null, new ArrayList<Integer>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        null, new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
         final String beaconUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"

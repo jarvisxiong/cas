@@ -103,7 +103,6 @@ public class InspectorStrings {
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
     public static final String INVALID_DSP_ID = "DroppedDueToInvalidDspId";
-    public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
     public static final String IX_DEAL_NON_EXISTING = "IxDealNonExisting";
     public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
@@ -125,6 +124,15 @@ public class InspectorStrings {
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
     public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloorInAdPoolRequest";
+
+    // Package Filter Level Stats
+    public static final String PACKAGE_FILTER_STATS = "PackageFilterStats";
+    public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
+    public static final String DROPPED_IN_PACKAGE_DMP_FILTER = "DroppedInPackageDMPFilter";
+    public static final String DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER = "DroppedInPackageManufModelTargetingFilter";
+    public static final String DROPPED_IN_PACKAGE_OS_VERSION_FILTER = "DroppedInPackageOSVersionTargetingFilter";
+    public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";
+    public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)

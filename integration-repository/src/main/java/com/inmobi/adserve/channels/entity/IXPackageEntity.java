@@ -1,14 +1,19 @@
 package com.inmobi.adserve.channels.entity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.collect.Range;
 import com.inmobi.segment.Segment;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
+@Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class IXPackageEntity {
 
     private int id;
@@ -21,43 +26,8 @@ public class IXPackageEntity {
     private List<String> dealIds;
     private List<String> accessTypes;
     private List<Double> dealFloors;
+    private Map<Integer, Range<Double>> osVersionTargeting;
+    private Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
     private Double dataVendorCost;
     private String geoFenceRegion;
-
-    public IXPackageEntity(final Builder builder) {
-        id = builder.id;
-        segment = builder.segment;
-        dmpId = builder.dmpId;
-        dmpVendorId = builder.dmpVendorId;
-        dmpFilterSegmentExpression = builder.dmpFilterSegmentExpression;
-        scheduledTimeOfDays = builder.scheduledTimeOfDays;
-        dealIds = builder.dealIds;
-        dealFloors = builder.dealFloors;
-        dataVendorCost = builder.dataVendorCost;
-        geoFenceRegion = builder.geoFenceRegion;
-        accessTypes = builder.accessTypes;
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    @Setter
-    public static class Builder {
-        private int id;
-        private Segment segment;
-        private int dmpId;
-        private int dmpVendorId;
-        private Set<Set<Integer>> dmpFilterSegmentExpression;
-        private Integer[][] scheduledTimeOfDays;
-        private List<String> dealIds;
-        private List<Double> dealFloors;
-        private List<String> accessTypes;
-        private Double dataVendorCost;
-        private String geoFenceRegion;
-
-        public IXPackageEntity build() {
-            return new IXPackageEntity(this);
-        }
-    }
 }

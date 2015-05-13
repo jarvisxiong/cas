@@ -422,7 +422,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // api type is always mraid
         if (!StringUtils.isEmpty(sasParams.getSdkVersion()) && sasParams.getSdkVersion().length() > 1) {
-            final List<Integer> apis = new ArrayList<Integer>();
+            final List<Integer> apis = new ArrayList<>();
             apis.add(3);
             banner.setApi(apis);
         }

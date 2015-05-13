@@ -97,7 +97,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
                 impressionCeil = Integer.MAX_VALUE;
             }
             final String manufModelTargeting = row.getString("manuf_model_targeting");
-            final ArrayList<Integer> manufModelTargetingList = parseManufacturingIds(manufModelTargeting);
+            final ArrayList<Long> manufModelTargetingList = parseManufacturingIds(manufModelTargeting);
             final double ecpmBoost = row.getDouble("ecpm_boost");
             final Timestamp eCPMBoostDate = row.getTimestamp("boost_date");
             final long millisInDay = 24 * 60 * 60 * 1000;
@@ -195,16 +195,16 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     // Made protected for testing visibility.
-    public ArrayList<Integer> parseManufacturingIds(final String manufModelTargeting) {
-        ArrayList<Integer> modelIds = null;
+    public ArrayList<Long> parseManufacturingIds(final String manufModelTargeting) {
+        ArrayList<Long> modelIds = null;
         try {
             if (manufModelTargeting != null) {
                 final JSONArray modelIdsJson = new JSONObject(manufModelTargeting).getJSONArray("manuf");
-                modelIds = new ArrayList<Integer>(modelIdsJson.length());
+                modelIds = new ArrayList<>(modelIdsJson.length());
                 for (int index = 0; index < modelIdsJson.length(); ++index) {
                     final JSONArray jsonArray = modelIdsJson.getJSONObject(index).getJSONArray("modelIds");
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        modelIds.add(jsonArray.getInt(i));
+                        modelIds.add(jsonArray.getLong(i));
                     }
                 }
             }

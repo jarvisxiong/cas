@@ -60,7 +60,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final Set<String> sitesIE;
     private final boolean isSiteInclusion;
     private final long impressionCeil;
-    private final List<Integer> manufModelTargetingList;
+    private final List<Long> manufModelTargetingList;
     private final double ecpmBoost;
     private final Date ecpmBoostExpiryDate;
     private final Long[] tod;
@@ -163,7 +163,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private Set<String> sitesIE;
         private boolean isSiteInclusion;
         private long impressionCeil;
-        private List<Integer> manufModelTargetingList;
+        private List<Long> manufModelTargetingList;
         private double ecpmBoost;
         private Date ecpmBoostExpiryDate;
         private Long[] tod;

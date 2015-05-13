@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.repository;
 
+import static com.inmobi.adserve.channels.repository.IXPackageRepository.extractManufModelTargeting;
+import static com.inmobi.adserve.channels.repository.IXPackageRepository.extractOsVersionTargeting;
 import static org.powermock.api.easymock.PowerMock.createMock;
 
 import java.sql.Array;
@@ -9,15 +11,22 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Range;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.phoenix.batteries.data.test.NoOpDataSource;
 import com.inmobi.phoenix.batteries.data.test.ResultSetExpectationSetter;
@@ -230,5 +239,82 @@ public class IXPackageRepositoryTest {
                 .build();
 
         Assert.assertTrue(e_segment.isEqualTo(packageEntity.getSegment()));
+    }
+
+    @DataProvider(name = "OS Version Targeting JSONs")
+    public Object[][] paramDataProviderForOsVersionTargeting() {
+
+        Map<Integer, Range<Double>> mapWithSingleEntryWithNoTargeting = new HashMap<>();
+        Map<Integer, Range<Double>> mapWithSingleEntryWithTargeting = new HashMap<>();
+        Map<Integer, Range<Double>> mapWithSingleEntryWithTargetingIntegerRange = new HashMap<>();
+        Map<Integer, Range<Double>> mapWithSingleEntryWithTargetingReversedRange = new HashMap<>();
+        Map<Integer, Range<Double>> mapWithMultipleEntriesWithSingleTargeting = new HashMap<>();
+        Map<Integer, Range<Double>> mapWithMultipleEntriesWithBothTargeting = new HashMap<>();
+
+        mapWithSingleEntryWithNoTargeting.put(3, Range.all());
+        mapWithSingleEntryWithTargeting.put(3, Range.closed(4.0, 5.0));
+        mapWithSingleEntryWithTargetingIntegerRange.put(3, Range.closed(4.0, 5.0));
+        mapWithSingleEntryWithTargetingReversedRange.put(3, Range.closed(4.0, 5.0));
+
+        mapWithMultipleEntriesWithSingleTargeting.put(3, Range.closed(4.0, 5.0));
+        mapWithMultipleEntriesWithSingleTargeting.put(5, Range.all());
+
+        mapWithMultipleEntriesWithBothTargeting.put(3, Range.closed(4.0, 5.0));
+        mapWithMultipleEntriesWithBothTargeting.put(5, Range.closed(7.0, 8.1));
+
+        return new Object[][] {
+                {"testNull", null, new HashMap<Short, Range<Double>>()},
+                {"testEmpty", "", new HashMap<Short, Range<Double>>()},
+                {"testEmptyJsonArray", "[]", new HashMap<Short, Range<Double>>()},
+                {"testJsonArrayWithSingleEntryWithNoTargeting", "[{\"osId\":3, \"range\":[]}]", mapWithSingleEntryWithNoTargeting},
+                {"testJsonArrayWithSingleEntryWithTargeting", "[{\"osId\":3, \"range\":[4.0, 5.0]}]", mapWithSingleEntryWithTargeting},
+                {"testJsonArrayWithSingleEntryWithTargetingIntegerRange", "[{\"osId\":3, \"range\":[4, 5]}]", mapWithSingleEntryWithTargetingIntegerRange},
+                {"testJsonArrayWithSingleEntryWithTargetingReversedRange", "[{\"osId\":3, \"range\":[5.0, 4.0]}]", mapWithSingleEntryWithTargetingReversedRange},
+                {"testJsonArrayWithTwoEntriesWithSingleTargeting", "[{\"osId\":3, \"range\":[4.0, 5.0]}, {\"osId\":5, \"range\":[]}]", mapWithMultipleEntriesWithSingleTargeting},
+                {"testJsonArrayWithTwoEntriesWithBothTargeting", "[{\"osId\":3, \"range\":[4.0, 5.0]}, {\"osId\":5, \"range\":[7.0, 8.1]}]", mapWithMultipleEntriesWithBothTargeting}
+        };
+    }
+
+    @Test(dataProvider = "OS Version Targeting JSONs")
+    public void testExtractOsVersionTargeting(final String useCaseName, String osVersionTargetingJson,
+                                              final Map<Short, Range<Double>> metaData) throws Exception {
+        Assert.assertTrue(metaData.equals(extractOsVersionTargeting(osVersionTargetingJson)));
+    }
+
+    @DataProvider(name = "Manuf Model Targeting JSONs")
+    public Object[][] paramDataProviderForManufModelTargeting() {
+
+        Map<Long, Pair<Boolean, Set<Long>>> mapWithSingleEntryWithNoTargetingInclusionIsTrue = new HashMap<>();
+        Map<Long, Pair<Boolean, Set<Long>>> mapWithSingleEntryWithTargetingInclusionIsTrue = new HashMap<>();
+        Map<Long, Pair<Boolean, Set<Long>>> mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne = new HashMap<>();
+        Map<Long, Pair<Boolean, Set<Long>>> mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne = new HashMap<>();
+        Set<Long> emptySet = (new ImmutableSet.Builder<Long>()).build();
+
+        mapWithSingleEntryWithNoTargetingInclusionIsTrue.put(32L, ImmutablePair.of(true, emptySet));
+        mapWithSingleEntryWithTargetingInclusionIsTrue.put(32L, ImmutablePair.of(true, ImmutableSet.of(129L ,169L)));
+
+        mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne.put(32L, ImmutablePair.of(true, ImmutableSet.of(129L ,169L)));
+        mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne.put(7L, ImmutablePair.of(false, ImmutableSet.of(64L)));
+
+        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(32L, ImmutablePair.of(true, ImmutableSet.of(64L)));
+        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(7L, ImmutablePair.of(true, emptySet));
+        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(75L, ImmutablePair.of(false, ImmutableSet.of(129L, 169L)));
+
+        return new Object[][] {
+                {"testNull", null, new HashMap<Short, Range<Double>>()},
+                {"testEmpty", "", new HashMap<Short, Range<Double>>()},
+                {"testEmptyJsonArray", "[]", new HashMap<Short, Range<Double>>()},
+                {"testJsonArrayWithSingleEntryWithNoTargetingInclusionIsTrue", "[{\"manufId\":32, \"modelIds\":[], \"incl\":\"true\"}]", mapWithSingleEntryWithNoTargetingInclusionIsTrue},
+                {"testJsonArrayWithSingleEntryWithNoTargetingInclusionIsFalse", "[{\"manufId\":32, \"modelIds\":[], \"incl\":\"false\"}]", new HashMap<Short, Range<Double>>()},
+                {"testJsonArrayWithSingleEntryWithTargetingInclusionIsTrue", "[{\"manufId\":32, \"modelIds\":[129, 169], \"incl\":\"true\"}]", mapWithSingleEntryWithTargetingInclusionIsTrue},
+                {"testJsonArrayWithTwoEntriesWithTargetingSetForTwoAndInclusionSetForOne", "[{\"manufId\":32, \"modelIds\":[129, 169], \"incl\":\"true\"}, {\"manufId\":7, \"modelIds\":[64], \"incl\":\"false\"}]", mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne},
+                {"testJsonArrayWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne", "[{\"manufId\":32, \"modelIds\":[64], \"incl\":\"true\"}, {\"manufId\":7, \"modelIds\":[], \"incl\":\"true\"}, {\"manufId\":75, \"modelIds\":[129,169], \"incl\":\"false\"}]", mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne}
+        };
+    }
+
+    @Test(dataProvider = "Manuf Model Targeting JSONs")
+    public void testExtractManufModelTargeting(final String useCaseName, String manufModelTargetingJson,
+                                               final Map<Long, Map<Boolean, Set<Long>>> metaData) throws Exception {
+        Assert.assertTrue(metaData.equals(extractManufModelTargeting(manufModelTargetingJson)));
     }
 }

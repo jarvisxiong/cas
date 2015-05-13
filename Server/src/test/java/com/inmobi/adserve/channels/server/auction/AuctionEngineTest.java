@@ -147,7 +147,7 @@ public class AuctionEngineTest {
         final List<String> adomains = new ArrayList<String>();
         adomains.add("a.com");
         expect(mockAdnetworkInterface.getADomain()).andReturn(adomains).anyTimes();
-        final List<Integer> cAttributes = new ArrayList<Integer>();
+        final List<Integer> cAttributes = new ArrayList<>();
         cAttributes.add(1);
         expect(mockAdnetworkInterface.getAttribute()).andReturn(cAttributes).anyTimes();
         expect(mockAdnetworkInterface.getIUrl()).andReturn("iurl").anyTimes();

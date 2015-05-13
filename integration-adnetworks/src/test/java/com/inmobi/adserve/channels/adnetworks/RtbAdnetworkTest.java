@@ -205,7 +205,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
                 repositoryHelper);
         RtbAdNetwork.impressionCallbackHelper = createMock(ImpressionCallbackHelper.class);
@@ -243,7 +243,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl,
                 (short) 15, repositoryHelper), false);
     }
@@ -255,7 +255,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -330,7 +330,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -356,7 +356,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setBlockedAdvertisers(Lists.newArrayList("abcd.com"));
         sas.setRemoteHostIp("206.29.182.240");
@@ -383,7 +383,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -436,7 +436,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl,
                 beaconUrl, (short) 1, repositoryHelper), true);
     }
@@ -456,7 +456,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
                 repositoryHelper);
         rtbAdNetwork.setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}");
@@ -480,7 +480,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
                 repositoryHelper);
         rtbAdNetwork
@@ -511,7 +511,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
                 repositoryHelper);
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
@@ -543,7 +543,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
                 repositoryHelper);
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
@@ -576,7 +576,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         sas.setDst(2);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 15,
                 repositoryHelper);

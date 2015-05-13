@@ -29,7 +29,7 @@ public class ChannelSegmentEntityTest {
             final boolean zipCodeRequired, final boolean latlongRequired, final boolean richMediaOnly,
             final boolean appUrlEnabled, final boolean interstitialOnly, final boolean nonInterstitialOnly,
             final boolean stripUdId, final boolean stripZipCode, final boolean stripLatlong,
-            final JSONObject additionalParams, final List<Integer> manufModelTargetingList, final double ecpmBoost,
+            final JSONObject additionalParams, final List<Long> manufModelTargetingList, final double ecpmBoost,
             final Date eCPMBoostDate, final Long[] tod, final long adGroupIncId, final Integer[] AdFormatIds) {
         final ChannelSegmentEntity.Builder builder = ChannelSegmentEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
@@ -106,7 +106,7 @@ public class ChannelSegmentEntityTest {
         final boolean stripZipCode = true;
         final boolean stripLatlong = false;
         final JSONObject additionalParams = null;
-        final List<Integer> manufModelTargetingList = Arrays.asList(4, 5);
+        final List<Long> manufModelTargetingList = Arrays.asList(4L, 5L);
         final double ecpmBoost = 0.5;
         final Date eCPMBoostDate = new Date();
         final Long[] tod = {11L, 12L};
