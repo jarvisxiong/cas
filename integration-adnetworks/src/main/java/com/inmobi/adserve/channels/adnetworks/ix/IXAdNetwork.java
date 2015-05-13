@@ -47,6 +47,7 @@ import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -147,6 +148,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
     @Inject
+    @IxNativeBuilderFactory
     private static NativeBuilderFactory nativeBuilderfactory;
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
@@ -518,7 +520,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        return nb.buildNativeIX();
+        return (Native)nb.buildNative();
     }
 
     private Banner createBannerObject() {

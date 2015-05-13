@@ -35,9 +35,9 @@ public class NativeConstraints {
 
     // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/ICON.java
     // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/NativeDemandLayout.java
-    private static final String LAYOUT_ICON = "layoutConstraint.1"; // Icon
-    private static final String LAYOUT_FEED = "layoutConstraint.2"; // Feed
-    private static final String LAYOUT_STREAM = "layoutConstraint.3"; // In-Stream
+    public static final String LAYOUT_ICON = "layoutConstraint.1"; // Icon
+    public static final String LAYOUT_FEED = "layoutConstraint.2"; // Feed
+    public static final String LAYOUT_STREAM = "layoutConstraint.3"; // In-Stream
 
     private static final List<Mandatory> MAND_ICON = Lists.newArrayList(Mandatory.ICON, Mandatory.TITLE,
         Mandatory.DESCRIPTION);
@@ -45,7 +45,6 @@ public class NativeConstraints {
         Mandatory.DESCRIPTION);
     private static final List<Mandatory> MAND_STREAM = Lists.newArrayList(Mandatory.ICON, Mandatory.TITLE,
         Mandatory.DESCRIPTION, Mandatory.SCREEN_SHOT);
-
 
     // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/SCREENSHOT.java
     // key, aspect ratio, minW, maxW, minH, maxH

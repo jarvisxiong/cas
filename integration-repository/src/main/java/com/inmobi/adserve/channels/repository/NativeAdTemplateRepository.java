@@ -7,7 +7,11 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.thrift.TDeserializer;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
+import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.adtemplate.platform.AdTemplate;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
@@ -24,6 +28,8 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
         implements
             RepositoryManager {
 
+    private final static Gson gson = new Gson();
+
     @Override
     public DBEntity<NativeAdTemplateEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
@@ -33,6 +39,9 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
 
         try {
             final long nativeAdId = row.getLong("native_ad_id");
+            final Short uiLayoutId = ((Integer)row.getObject("ui_layout_id")).shortValue();
+            final String contentJson = row.getString("content_json");
+
             final String encodedTemplate = row.getString("binary_template");
             final byte[] binaryTemplate = Base64.decodeBase64(encodedTemplate);
 
@@ -41,9 +50,23 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
             deserializer.deserialize(adTemplate, binaryTemplate);
 
             final NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
-            builder.setSiteId(siteId);
-            builder.setModifiedOn(modifiedOn);
-            builder.setNativeAdId(nativeAdId);
+            builder.siteId(siteId);
+            builder.modifiedOn(modifiedOn);
+            builder.nativeAdId(nativeAdId);
+
+            if (null != uiLayoutId) {
+                try {
+                    builder.nativeUILayout(NativeAdContentUILayoutType.findByValue(uiLayoutId));
+                } catch (IllegalArgumentException ignored) {
+                    // Ignored
+                }
+            }
+
+            try {
+                builder.contentJson(gson.fromJson(contentJson, NativeContentJsonObject.class));
+            } catch (final JsonParseException jpe) {
+                // Ignored
+            }
 
             final List<String> keys = adTemplate.getDemandConstraints().getJsonPath();
             if (keys == null) {
@@ -54,14 +77,14 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
             while (itr.hasNext()) {
                 final String key = itr.next();
                 if (NativeConstraints.isImageKey(key)) {
-                    builder.setImageKey(key);
+                    builder.imageKey(key);
                 } else if (NativeConstraints.isMandatoryKey(key)) {
-                    builder.setMandatoryKey(key);
+                    builder.mandatoryKey(key);
                 }
             }
             // Add template Content
             final String templateContent = adTemplate.getDetails().getContent();
-            builder.setTemplate(templateContent);
+            builder.template(templateContent);
 
             final NativeAdTemplateEntity templateEntity = builder.build();
             if (templateEntity.getMandatoryKey() != null) {

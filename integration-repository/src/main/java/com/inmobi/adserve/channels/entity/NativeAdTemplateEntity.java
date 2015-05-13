@@ -2,29 +2,25 @@ package com.inmobi.adserve.channels.entity;
 
 import java.sql.Timestamp;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
+import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
+import lombok.Builder;
+import lombok.Getter;
+
 @Getter
+@Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public final class NativeAdTemplateEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = -648051414378424341L;
     private final String siteId;
     private final long nativeAdId;
     private final String mandatoryKey;
     private final String imageKey;
+    private NativeAdContentUILayoutType nativeUILayout;
+    private NativeContentJsonObject contentJson;
     private final String template;
     private final Timestamp modifiedOn;
-
-    private NativeAdTemplateEntity(final Builder builder) {
-        siteId = builder.siteId;
-        nativeAdId = builder.nativeAdId;
-        imageKey = builder.imageKey;
-        mandatoryKey = builder.mandatoryKey;
-        template = builder.template;
-        modifiedOn = builder.modifiedOn;
-    }
 
     @Override
     public String getJSON() {
@@ -37,23 +33,4 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
     public String getId() {
         return siteId;
     }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    @Setter
-    public static class Builder {
-        private String siteId;
-        private long nativeAdId;
-        private String mandatoryKey;
-        private String imageKey;
-        private String template;
-        private Timestamp modifiedOn;
-
-        public NativeAdTemplateEntity build() {
-            return new NativeAdTemplateEntity(this);
-        }
-    }
-
 }

@@ -35,8 +35,8 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.natives.IxNativeBuilderImpl;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
-import com.inmobi.adserve.channels.api.natives.NativeBuilderImpl;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
@@ -249,8 +249,8 @@ public class NewIXAdNetworkTest {
         final NativeBuilderFactory mockNativeBuilderfactory = createMock(NativeBuilderFactory.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
 
-        final NativeAdTemplateEntity.Builder builder = new NativeAdTemplateEntity.Builder();
-        builder.setMandatoryKey("layoutConstraint.1");
+        final NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
+        builder.mandatoryKey("layoutConstraint.1");
         final NativeAdTemplateEntity entity = builder.build();
 
         final JSONObject additionalParams = new JSONObject();
@@ -260,7 +260,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getAdditionalParams()).andReturn(additionalParams).anyTimes();
-        expect(mockNativeBuilderfactory.create(entity)).andReturn(new NativeBuilderImpl(entity));
+        expect(mockNativeBuilderfactory.create(entity)).andReturn(new IxNativeBuilderImpl(entity));
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository("siteId")).andReturn(entity);
         replayAll();
 

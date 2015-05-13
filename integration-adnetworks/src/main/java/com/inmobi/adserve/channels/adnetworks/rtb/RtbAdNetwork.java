@@ -39,6 +39,7 @@ import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
 import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
+import com.inmobi.adserve.channels.api.natives.RtbdNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
@@ -74,7 +75,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -116,6 +116,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
 
     @Inject
+    @RtbdNativeBuilderFactory
     private static NativeBuilderFactory nativeBuilderfactory;
 
     @Inject
@@ -395,7 +396,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        final Native nat = nb.build();
+        final Native nat = (Native)nb.buildNative();
         // TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
         // if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
         // nat.api.add(3);

@@ -217,6 +217,7 @@ public class IXAdNetworkHelper {
             return false;
         }
 
+        // note: Current implementation doesn't support multiple assets of the same type
         switch (requestObject) {
             case TITLE:
                 contextBuilder.setTitle(responseAsset.getTitle().getText());

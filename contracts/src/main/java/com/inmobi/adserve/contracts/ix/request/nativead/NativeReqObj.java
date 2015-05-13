@@ -6,16 +6,20 @@ package com.inmobi.adserve.contracts.ix.request.nativead;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.Video;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * @author ritwik.kumar
  *
  */
-@lombok.Data
+@Getter
+@Setter
 public class NativeReqObj {
     @NonNull
     private final Integer layout;
@@ -25,6 +29,10 @@ public class NativeReqObj {
     private Integer seq = 0;
     private List<Asset> assets;
     private CommonExtension ext;
+
+    public NativeReqObj(NativeLayoutId layout) {
+        this.layout = layout.getKey();
+    }
 
     /**
      * @param asset
