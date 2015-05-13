@@ -45,7 +45,6 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
@@ -87,6 +86,8 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getList(advertiserName + ".globalBlind")).andReturn(Lists.newArrayList("123")).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".bidFloorPercent", 100)).andReturn(100).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450)).andReturn(450).anyTimes();
+        expect(mockConfig.getString(advertiserName + ".sprout.uniqueIdentifierRegex", ".*data-creative[iI]d.*"))
+                .andReturn(".*data-creative[iI]d.*").anyTimes();
         expect(mockConfig.getString("key.1.value")).andReturn("Secret Key").anyTimes();
         expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconPrefix").anyTimes();
         expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickPrefix").anyTimes();
@@ -739,7 +740,11 @@ public class NewIXAdNetworkTest {
         assertThat(mockIXAdNetwork.isSproutAd(), is(false));
 
         MemberMatcher.field(IXAdNetwork.class, "adm")
-                .set(mockIXAdNetwork, SproutTemplateConstants.SPROUT_UNIQUE_STRING);
+                .set(mockIXAdNetwork, "data-creativeId");
+        assertThat(mockIXAdNetwork.isSproutAd(), is(true));
+
+        MemberMatcher.field(IXAdNetwork.class, "adm")
+                .set(mockIXAdNetwork, "data-creativeid");
         assertThat(mockIXAdNetwork.isSproutAd(), is(true));
     }
 

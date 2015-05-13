@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SPROUT_UNIQUE_STRING;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,9 +60,9 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
@@ -107,7 +105,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -212,6 +209,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> packageIds;
     private List<String> iabCategories;
     private final int minimumSdkVerForVAST;
+    private final String sproutUniqueIdentifierRegex;
 
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
@@ -242,6 +240,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         minimumSdkVerForVAST = config.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450);
+        sproutUniqueIdentifierRegex = config.getString(advertiserName + ".sprout.uniqueIdentifierRegex",
+                ".*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -1041,11 +1041,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     protected boolean isSproutAd() {
         final String adm = getAdMarkUp();
-        if (null == adm) {
-            return false;
-        } else {
-            return adm.contains(SPROUT_UNIQUE_STRING);
+        boolean isSproutAd = false;
+        if (null != adm)  {
+            try {
+                isSproutAd = adm.matches(sproutUniqueIdentifierRegex);
+            } catch (Exception ignored) {
+                isSproutAd = false;
+            }
         }
+        return isSproutAd;
     }
 
     protected boolean updateDSPAccountInfo(final String buyer) {

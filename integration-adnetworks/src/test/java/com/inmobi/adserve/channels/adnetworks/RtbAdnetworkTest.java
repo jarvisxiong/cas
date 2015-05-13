@@ -597,7 +597,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -633,7 +633,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -666,7 +666,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -698,7 +698,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");
@@ -735,7 +735,7 @@ public class RtbAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
                         null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
                         0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<Integer>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setRqAdType("");

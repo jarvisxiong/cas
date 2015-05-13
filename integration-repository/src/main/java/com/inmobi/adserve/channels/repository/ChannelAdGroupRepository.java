@@ -58,7 +58,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             if (null != row.getArray("segment_flags")) {
                 segmentFlags = Arrays.asList((Integer[]) row.getArray("segment_flags"));
             } else {
-                segmentFlags = new ArrayList<Integer>();
+                segmentFlags = new ArrayList<>();
             }
             final HashSet<Integer> segmentFlagSet = new HashSet<Integer>();
             segmentFlagSet.addAll(segmentFlags);

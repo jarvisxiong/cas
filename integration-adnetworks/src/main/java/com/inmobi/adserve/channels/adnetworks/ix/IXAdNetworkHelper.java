@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
 
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image;
@@ -50,9 +51,13 @@ import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * @author ritwik.kumar
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class IXAdNetworkHelper {
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetworkHelper.class);
 
@@ -72,15 +77,15 @@ public class IXAdNetworkHelper {
         final List<String> macros = new ArrayList<>(8);
         final List<String> substitutions = new ArrayList<>(8);
 
-        macros.add(JS_ESC_BEACON_URL);
-        substitutions.add(StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
+        addSproutMacroToList(macros, substitutions,
+                JS_ESC_BEACON_URL, StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
 
-        macros.add(JS_ESC_CLICK_URL);
-        substitutions.add(StringEscapeUtils.escapeJavaScript(clickUrl));
+        addSproutMacroToList(macros, substitutions,
+                JS_ESC_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
 
-        macros.add(SDK_VERSION_ID);
         final String sdkVersion = sasParams.getSdkVersion();
-        substitutions.add(null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
+        addSproutMacroToList(macros, substitutions,
+                SDK_VERSION_ID, null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
 
         // default value for replacement of macros is an empty string
         final Geo geo = createSproutGeoObject(casIntenal, sasParams, isCoppaSet);
@@ -89,32 +94,37 @@ public class IXAdNetworkHelper {
         final String zip = null != geo.getZip() ? geo.getZip() : StringUtils.EMPTY;
         final String cc = null != geo.getCountry() ? geo.getCountry() : StringUtils.EMPTY;
 
-        macros.add(GEO_LAT);
-        substitutions.add(lat);
+        addSproutMacroToList(macros, substitutions, GEO_LAT, lat);
+        addSproutMacroToList(macros, substitutions, GEO_LNG, lng);
+        addSproutMacroToList(macros, substitutions, GEO_ZIP, zip);
+        addSproutMacroToList(macros, substitutions, GEO_CC, cc);
 
-        macros.add(GEO_LNG);
-        substitutions.add(lng);
-
-        macros.add(GEO_ZIP);
-        substitutions.add(zip);
-
-        macros.add(GEO_CC);
-        substitutions.add(cc);
-
-        macros.add(JS_ESC_GEO_CITY);
-        substitutions.add(StringUtils.EMPTY); // JS_ESC_GEO_CITY is not currently being set
-
-        macros.add(RECORD_EVENT_FUN);
-        substitutions.add(StringUtils.EMPTY); // No function is being provided
-
-        macros.add(OPEN_LP_FUN);
-        substitutions.add(StringUtils.EMPTY); // No function is being provided
+        // JS_ESC_GEO_CITY is not currently being set
+        addSproutMacroToList(macros, substitutions, JS_ESC_GEO_CITY, StringUtils.EMPTY);
+        // No function is being provided
+        addSproutMacroToList(macros, substitutions, RECORD_EVENT_FUN, StringUtils.EMPTY);
+        // No function is being provided
+        addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
 
         final String[] macroArray = macros.toArray(new String[macros.size()]);
         final String[] substitutionsArray = substitutions.toArray(new String[substitutions.size()]);
         return StringUtils.replaceEach(adm, macroArray, substitutionsArray);
     }
 
+    /**
+     * Helper function to populate macro and substitution lists
+     * @param macros
+     * @param substitutions
+     * @param macro
+     * @param substitution
+     */
+    private static void addSproutMacroToList(final List<String> macros, final List<String> substitutions,
+                                              final String macro, final String substitution) {
+        for (Character character : SproutTemplateConstants.escapeCharacterList) {
+            macros.add(character + macro);
+            substitutions.add(substitution);
+        }
+    }
 
     /**
      * Function used to populate the Geo object for Sprout Macro Replacement
