@@ -228,6 +228,7 @@ public class GoogleAdXNetworkTest extends TestCase {
 
         final String expectedResponse =
                 "<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type='text/javascript' src='http://www.googletagservices.com/tag/js/gpt.js'>\n"
+                        + "  googletag.pubads().set(\"page_url\", \"http://www.inmobi.com\");\n"
                         + "  googletag.pubads().definePassback('/14503685/AdUnitForAdx', [[320, 50]]).setTargeting('adxtagid', ['8a809449013c3c643cad82cb412b5857']).display();\n"
                         + "  googletag.pubads().addEventListener('slotRenderEnded', function(event) {\n"
                         + "        if (!event.isEmpty) {\n"
