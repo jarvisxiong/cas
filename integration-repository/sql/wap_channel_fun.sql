@@ -15,7 +15,7 @@ BEGIN
                 wap_channel.burst_qps,
                 wap_channel.is_active,
                 wap_channel.is_test_mode,
-                least (wap_channel.modified_on, dcp_channel_site_inclusion_exclusion.modified_on) as modified_on,
+                GREATEST (wap_channel.modified_on, dcp_channel_site_inclusion_exclusion.modified_on) as modified_on,
                 wap_channel.impression_ceil,
                 wap_channel.priority,
                 wap_channel.demand_source_type_id,

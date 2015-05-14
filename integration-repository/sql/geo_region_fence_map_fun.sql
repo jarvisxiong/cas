@@ -8,7 +8,7 @@ BEGIN
         SELECT gcr.name as geo_region_name,
                gtd.country_id as country_id,
                gtd.lat_long_id_list as fence_id_list,
-               least(gcr.modified_on, gtd.modified_on) as modified_on
+               GREATEST(gcr.modified_on, gtd.modified_on) as modified_on
         FROM geo_custom_region as gcr, geo_targeting_detail as gtd
         WHERE ARRAY[gtd.id] <@ gcr.targeting_ids
           AND gcr.is_active = 't'

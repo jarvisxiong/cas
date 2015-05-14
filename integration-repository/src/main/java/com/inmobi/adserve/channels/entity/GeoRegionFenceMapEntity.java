@@ -13,6 +13,7 @@ import lombok.Setter;
  */
 @Getter
 public class GeoRegionFenceMapEntity implements IdentifiableEntity<String> {
+    private static final long serialVersionUID = 1L;
     private final String geoRegionName;
     private final Long countryId;
     private final List<Long> fenceIdsList;

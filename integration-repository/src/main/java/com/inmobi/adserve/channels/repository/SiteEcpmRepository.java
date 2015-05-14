@@ -9,6 +9,7 @@ import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
+import com.inmobi.phoenix.batteries.data.EntityError;
 import com.inmobi.phoenix.batteries.data.HashIndexKeyBuilder;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.NullAsZeroResultSetRow;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
@@ -16,7 +17,6 @@ import com.inmobi.phoenix.data.Repository;
 import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
-
 
 public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<SiteEcpmEntity, SiteEcpmQuery>
         implements
@@ -30,19 +30,27 @@ public class SiteEcpmRepository extends AbstractStatsMaintainingDBRepository<Sit
         final String siteId = row.getString("site_id");
         final Integer countryId = row.getInt("country_id");
         final Integer osId = row.getInt("os_id");
-        final double ecpm = row.getDouble("ecpm");
-        final double networkEcpm = row.getDouble("network_ecpm");
-        final Timestamp modified_on = row.getTimestamp("modified_on");
+        final Timestamp modifiedOn = row.getTimestamp("modified_on");
 
-        final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
-        builder.setSiteId(siteId);
-        builder.setCountryId(countryId);
-        builder.setOsId(osId);
-        builder.setEcpm(ecpm);
-        builder.setNetworkEcpm(networkEcpm);
-        builder.setModifiedOn(modified_on);
-        final SiteEcpmEntity entity = builder.build();
-        return new DBEntity<SiteEcpmEntity, SiteEcpmQuery>(entity, modified_on);
+        try {
+            final double ecpm = row.getDouble("ecpm");
+            final double networkEcpm = row.getDouble("network_ecpm");
+
+
+            final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+            builder.siteId(siteId);
+            builder.countryId(countryId);
+            builder.osId(osId);
+            builder.ecpm(ecpm);
+            builder.networkEcpm(networkEcpm);
+            builder.modifiedOn(modifiedOn);
+            final SiteEcpmEntity entity = builder.build();
+            return new DBEntity<SiteEcpmEntity, SiteEcpmQuery>(entity, modifiedOn);
+        } catch (final Exception exp) {
+            logger.error("Error in resultset row", exp);
+            return new DBEntity<SiteEcpmEntity, SiteEcpmQuery>(new EntityError<SiteEcpmQuery>(new SiteEcpmQuery(siteId,
+                    countryId, osId), "ERROR_IN_LOADING_SITE_ECPM"), modifiedOn);
+        }
     }
 
     @Override

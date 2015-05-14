@@ -12,7 +12,7 @@ BEGIN
                 wap_channel_adgroup.external_site_key,
                 wap_channel_adgroup.platform_targeting_int,
                 wap_channel_adgroup.rc_list, tags, wap_channel_adgroup.status, is_test_mode,
-                least (wap_channel_adgroup.modified_on, dcp_segment_site_inclusion_exclusion.modified_on) as modified_on,
+                GREATEST (wap_channel_adgroup.modified_on, dcp_segment_site_inclusion_exclusion.modified_on) as modified_on,
                 wap_channel_adgroup.campaign_id,
                 wap_channel_adgroup.slot_ids,
                 adgroup_formats.ad_inc_ids as ad_inc_ids,

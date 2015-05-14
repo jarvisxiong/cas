@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.server.requesthandler.filters;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
 import junit.framework.TestCase;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -52,6 +50,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
 
 public class ChannelSegmentFilterApplierTest extends TestCase {
     private ChannelEntity cE1;
@@ -905,11 +904,11 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     @Test
     public void testIsDemandAcceptedBySupplyPass() {
         final SiteEcpmEntity.Builder builder1 = SiteEcpmEntity.newBuilder();
-        builder1.setSiteId("siteid");
-        builder1.setCountryId(1);
-        builder1.setOsId(1);
-        builder1.setEcpm(3.0);
-        builder1.setNetworkEcpm(1.0);
+        builder1.siteId("siteid");
+        builder1.countryId(1);
+        builder1.osId(1);
+        builder1.ecpm(3.0);
+        builder1.networkEcpm(1.0);
         final SiteEcpmEntity siteEcpmEntity = builder1.build();
 
         final PricingEngineEntity.Builder builder2 = PricingEngineEntity.newBuilder();
@@ -947,11 +946,11 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     @Test
     public void testIsDemandAcceptedBySupplyFail() {
         final SiteEcpmEntity.Builder builder1 = SiteEcpmEntity.newBuilder();
-        builder1.setSiteId("siteid");
-        builder1.setCountryId(1);
-        builder1.setOsId(1);
-        builder1.setEcpm(3.0);
-        builder1.setNetworkEcpm(1.0);
+        builder1.siteId("siteid");
+        builder1.countryId(1);
+        builder1.osId(1);
+        builder1.ecpm(3.0);
+        builder1.networkEcpm(1.0);
         final SiteEcpmEntity siteEcpmEntity = builder1.build();
 
         final PricingEngineEntity.Builder builder2 = PricingEngineEntity.newBuilder();

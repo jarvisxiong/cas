@@ -23,7 +23,7 @@ SELECT
     			ws.site_name AS site_name,
     			wsu.title AS title,
     			wsu.bundle_id AS bundle_id,
-    			LEAST(wsu.modified_on, ws.modified_on, wpix.modified_on) AS modified_on
+    			GREATEST(wsu.modified_on, ws.modified_on, wpix.modified_on) AS modified_on
     			from wap_site AS ws LEFT OUTER JOIN wap_site_uac AS wsu ON (ws.id=wsu.id),wap_publisher_ix wpix
     		    where
     		    ( wsu.modified_on >= last_updated or ws.modified_on >= last_updated or wpix.modified_on >= last_updated)

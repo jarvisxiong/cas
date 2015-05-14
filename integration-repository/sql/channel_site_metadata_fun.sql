@@ -9,7 +9,7 @@ BEGIN
                 a.pub_id,
                 serve_tp_ads,
                 allow_self_serve,
-                least(a.modified_on, b.modified_on, c.modified_on),
+                GREATEST(a.modified_on, b.modified_on, c.modified_on),
                 b.advertiser_incl_list as site_advertiser_incl_list,
                 c.advertiser_incl_list as pub_advertiser_incl_list
         FROM    (

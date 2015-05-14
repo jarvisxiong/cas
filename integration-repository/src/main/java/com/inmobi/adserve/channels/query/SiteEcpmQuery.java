@@ -13,9 +13,7 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 @NoArgsConstructor
 @ToString
 public class SiteEcpmQuery implements RepositoryQuery {
-
     private String siteId;
     private Integer countryId;
     private Integer osId;
-
 }

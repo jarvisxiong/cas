@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Getter
 @ToString
 public class IXVideoTrafficEntity implements IdentifiableEntity<IXVideoTrafficQuery> {
-
+    private static final long serialVersionUID = 1L;
     private String siteId;
     private Integer countryId;
     private Short trafficPercentage;
