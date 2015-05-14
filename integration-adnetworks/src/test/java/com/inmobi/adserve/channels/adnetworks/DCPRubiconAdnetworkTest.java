@@ -346,8 +346,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         casInternalRequestParameters.setUidIDUS1("1234202cb962ac59075b964b07152d234b705432");
         sasParams.setSiteIncId(6575868);
 
-        final SiteEcpmEntity.Builder builder = new SiteEcpmEntity.Builder();
-        builder.setEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
+        final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+        builder.ecpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
         sasParams.setSiteEcpmEntity(builder.build());
         sasParams.setOsId(HandSetOS.Android.getValue());
         final String externalKey = "38132";
@@ -411,8 +411,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         casInternalRequestParameters.setUidIDUS1("1234202cb962ac59075b964b07152d234b705432");
         sasParams.setSiteIncId(6575868);
 
-        final SiteEcpmEntity.Builder builder = new SiteEcpmEntity.Builder();
-        builder.setEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
+        final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+        builder.ecpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
         sasParams.setSiteEcpmEntity(builder.build());
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams.setSdkVersion("i400");
@@ -454,8 +454,8 @@ public class DCPRubiconAdnetworkTest extends TestCase {
         casInternalRequestParameters.setUidIDUS1("1234202cb962ac59075b964b07152d234b705432");
         sasParams.setSiteIncId(1387380247996547l);
         sasParams.setCountryId(94l);
-        final SiteEcpmEntity.Builder builder = new SiteEcpmEntity.Builder();
-        builder.setEcpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
+        final SiteEcpmEntity.Builder builder = SiteEcpmEntity.newBuilder();
+        builder.ecpm(0.50); // THE URL should have 0.4 (80% of network ECPM)
         sasParams.setSiteEcpmEntity(builder.build());
         sasParams.setOsId(HandSetOS.Android.getValue());
         sasParams.setSdkVersion("i400");
