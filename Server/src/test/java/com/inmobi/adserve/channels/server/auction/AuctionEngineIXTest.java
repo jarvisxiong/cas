@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
-
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -40,7 +38,9 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 
 public class AuctionEngineIXTest {
@@ -106,13 +106,12 @@ public class AuctionEngineIXTest {
                         new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
         auctionFilterApplier = injector.getInstance(AuctionFilterApplier.class);
         auctionEngine = injector.getInstance(AuctionEngine.class);
-
-
     }
 
     @SuppressWarnings("deprecation")
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-                                     final String adNetworkName, final Double bidValue, final Long latencyValue) {
+                                     final String adNetworkName, final Double bidValue, final Long latencyValue,
+                                     final ADCreativeType adCreativeType) {
 
         final Long[] rcList = null;
         final Long[] tags = null;
@@ -152,6 +151,7 @@ public class AuctionEngineIXTest {
         expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.IX).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getResponseBidObjCount()).andReturn(1).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
+        expect(mockAdnetworkInterface.getCreativeType()).andReturn(adCreativeType).anyTimes();
         // responseBidObjCount
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
         mockAdnetworkInterface.setEncryptedBid(EasyMock.capture(encryptedBid1));
@@ -161,10 +161,16 @@ public class AuctionEngineIXTest {
         mockAdnetworkInterface.setSecondBidPrice(EasyMock.capture(secondPrice1));
         EasyMock.expectLastCall().anyTimes();
 
+        // Only for video ads, setLogCreative() should be set to true.
+        if (adCreativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
+            expect(((IXAdNetwork) mockAdnetworkInterface).getDspChannelSegmentEntity()).andReturn(channelSegmentEntity1)
+                    .times(1);
+            mockAdnetworkInterface.setLogCreative(true);
+            EasyMock.expectLastCall().times(1);
+        }
         replay(mockAdnetworkInterface);
 
         return new ChannelSegment(channelSegmentEntity1, channelEntity, null, null, null, mockAdnetworkInterface, 0);
-
     }
 
     @Test
@@ -181,7 +187,8 @@ public class AuctionEngineIXTest {
         auctionEngine.sasParams = sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
+                ADCreativeType.BANNER));
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
         casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
@@ -192,7 +199,6 @@ public class AuctionEngineIXTest {
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
         Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
-
     }
 
     @Test
@@ -209,7 +215,8 @@ public class AuctionEngineIXTest {
         auctionEngine.sasParams = this.sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
+                ADCreativeType.BANNER));
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
@@ -221,7 +228,6 @@ public class AuctionEngineIXTest {
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
         Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
-
     }
 
     @Test
@@ -238,7 +244,8 @@ public class AuctionEngineIXTest {
         auctionEngine.sasParams = this.sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1));
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
+                ADCreativeType.BANNER));
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
@@ -255,7 +262,6 @@ public class AuctionEngineIXTest {
         }
 
         Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
-
     }
 
     @Test
@@ -276,5 +282,32 @@ public class AuctionEngineIXTest {
 
         final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
         Assert.assertEquals(auctionEngineResponse, expectedAuctionEngineResponse);
+    }
+
+    @Test
+    // 5. IX video Ad
+    public void testOneVideoBidShouldLogCreative() {
+        final Double bidFloorInput = .70d;
+        final Double bidInputVal1 = 1d;
+        final Long latencyInputVal1 = 100l;
+        final Double expectedSecondPriceVal = 1d;
+        final String expectedRTBAdNetworkName = "A";
+
+        final AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = sasParams;
+        final List<ChannelSegment> rtbSegments = new ArrayList<>();
+
+        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
+                ADCreativeType.INTERSTITIAL_VIDEO));
+        auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
+
+        casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
+        auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
+
+        final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
+
+        Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
+        Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
     }
 }

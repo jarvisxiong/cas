@@ -213,6 +213,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
+    @Getter
     private ChannelSegmentEntity dspChannelSegmentEntity;
     private Map<Integer, Asset> mandatoryAssetMap;
     private Map<Integer, Asset> nonMandatoryAssetMap;

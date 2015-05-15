@@ -87,7 +87,6 @@ public class LoggingTest {
         expect(mockConfig.getInt("sampledadvertisercount")).andReturn(sampledadvertisercount).anyTimes();
         replayAll();
 
-
         Logging.init(mockDataBusPublisher, "null", "null", "null", mockConfig, "hostName");
     }
 
@@ -302,6 +301,8 @@ public class LoggingTest {
                 .andReturn(true).times(1)
                 .andReturn(false).times(1)
                 .andReturn(false).times(1);
+
+        expect(mockAdNetworkInterface.isIxPartner()).andReturn(false).anyTimes();
         expect(mockAdNetworkInterface.isLogCreative())
                 .andReturn(false).times(1)
                 .andReturn(true).times(1)
@@ -363,6 +364,57 @@ public class LoggingTest {
         Logging.creativeLogging(Arrays.asList(mockChannelSegment), mockSASRequestParameters);
     }
 
+    @Test
+    public void testIXCreativeLogging() throws Exception {
+        String advertiserId = "advertiserId";
+        String externalSiteKey = null;
+        String httpResponseContent = "httpResponseContent";
+        String adMarkup = "adMarkup";
+        String requestUrl = "requestUrl";
+        String name = "IX Partner";
+        String adStatus = "AD";
+        String iUrl = null;
+        String creativeId = "rtb:1234:5678";
+        List<Integer> attributes = Arrays.asList(4, 6);
+        List<String> aDomain = Arrays.asList("Domain1", "Domain2");
+        Long countryId = 94L;
+
+        AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
+        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
+        ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
+        ThirdPartyAdResponse mockThirdPartyAdResponse = createMock(ThirdPartyAdResponse.class);
+
+        expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
+        expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
+        expect(mockAdNetworkInterface.getResponseStruct()).andReturn(mockThirdPartyAdResponse).anyTimes();
+        expect(mockAdNetworkInterface.isRtbPartner()).andReturn(false).anyTimes();
+        expect(mockAdNetworkInterface.isIxPartner()).andReturn(true).times(3);
+        expect(mockAdNetworkInterface.isLogCreative()).andReturn(true).times(1).andReturn(false).anyTimes();
+        expect(mockAdNetworkInterface.getHttpResponseContent()).andReturn(httpResponseContent).anyTimes();
+        expect(mockAdNetworkInterface.getCreativeType())
+                .andReturn(ADCreativeType.INTERSTITIAL_VIDEO).times(2)
+                .andReturn(ADCreativeType.NATIVE).times(2)
+                .andReturn(ADCreativeType.BANNER).times(2);
+        expect(mockAdNetworkInterface.getAdMarkUp()).andReturn(adMarkup).times(1);
+        expect(mockAdNetworkInterface.getRequestUrl()).andReturn(requestUrl).times(1);
+        expect(mockAdNetworkInterface.getName()).andReturn(name).times(1);
+        expect(mockAdNetworkInterface.getId()).andReturn("ID").times(1);
+        expect(mockAdNetworkInterface.getIUrl()).andReturn(iUrl).times(1);
+        expect(mockAdNetworkInterface.getAttribute()).andReturn(attributes).times(1);
+        expect(mockAdNetworkInterface.getADomain()).andReturn(aDomain).times(1);
+        expect(mockAdNetworkInterface.getCreativeId()).andReturn(creativeId).times(1);
+        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).times(1);
+        expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn(advertiserId).times(1);
+        expect(mockThirdPartyAdResponse.getAdStatus()).andReturn(adStatus).times(1);
+        expect(mockSASRequestParameters.getCountryId()).andReturn(countryId).times(1);
+
+        replayAll();
+
+        Logging.creativeLogging(Arrays.asList(mockChannelSegment), mockSASRequestParameters);
+        Logging.creativeLogging(Arrays.asList(mockChannelSegment), mockSASRequestParameters);
+        Logging.creativeLogging(Arrays.asList(mockChannelSegment), mockSASRequestParameters);
+    }
 
     @Test
     public void testCreateChannelsLog() throws Exception {

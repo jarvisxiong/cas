@@ -141,14 +141,16 @@ public class Logging {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Inside creativeLogging");
         }
-        if (null == channelSegments || channelSegments.isEmpty() || null == sasRequestParameters) {
+        if (CollectionUtils.isEmpty(channelSegments) || null == sasRequestParameters) {
             return;
         }
 
         for (final ChannelSegment channelSegment : channelSegments) {
             final AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
-            // TODO: Check whether something is needed for IX or VAST here
-            if (adNetworkInterface.isRtbPartner() && adNetworkInterface.isLogCreative()) {
+
+            // Log every new RTB or IX video ad creative.
+            if ((adNetworkInterface.isRtbPartner() || adNetworkInterface.isIxPartner()) &&
+                    adNetworkInterface.isLogCreative()) {
                 String response = adNetworkInterface.getHttpResponseContent();
                 if (adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE) {
                     // adm is not populated for Native on IX. Use admobject instead
