@@ -223,7 +223,7 @@ prod:
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
-         - 'true'
+         - 'false'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
 
@@ -527,7 +527,7 @@ pilot:
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
-         - 'true'
+         - 'false'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
 
