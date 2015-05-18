@@ -18,10 +18,6 @@ prod:
          - "ads01.ifd.vip.uj1.inmobi.com"
       ifd_status:
          - "on"
-      ifc_host:
-         - "ifc1.vip.uj1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -94,10 +90,6 @@ prod:
          - "ads01.ifd.vip.uh1.inmobi.com"
       ifd_status:
          - "on"
-      ifc_host:
-         - "ifc1.vip.uh1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -170,10 +162,6 @@ prod:
          - "ads01.ifd.vip.lhr1.inmobi.com"
       ifd_status:
          - "off"
-      ifc_host:
-         - "ifc1.vip.lhr1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -246,10 +234,6 @@ prod:
          - "ads01.ifd.vip.hkg1.inmobi.com"
       ifd_status:
          - "off"
-      ifc_host:
-         - "ifc1.vip.hkg1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -322,10 +306,6 @@ pilot:
          - "ads01.ifd.vip.uj1.inmobi.com"
       ifd_status:
          - "on"
-      ifc_host:
-         - "ifc1.vip.uj1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -398,10 +378,6 @@ pilot:
          - "ads01.ifd.vip.uh1.inmobi.com"
       ifd_status:
          - "on"
-      ifc_host:
-         - "ifc1.vip.uh1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -474,10 +450,6 @@ pilot:
          - "ads01.ifd.vip.lhr1.inmobi.com"
       ifd_status:
          - "off"
-      ifc_host:
-         - "ifc1.vip.lhr1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -550,10 +522,6 @@ pilot:
          - "ads01.ifd.vip.hkg1.inmobi.com"
       ifd_status:
          - "off"
-      ifc_host:
-         - "ifc1.vip.hkg1.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -621,10 +589,6 @@ nonprod:
          - "web1012.ads.lhr1.inmobi.com"
       ifd_status:
          - "off"
-      ifc_host:
-         - "web1012.ads.lhr1.inmobi.com:8082"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'off'
       ix_default_url:
@@ -663,10 +627,6 @@ nonprod:
          - ads01.ifd.corp.inmobi.com
       ifd_status:
          - "off"
-      ifc_host:
-         - "ifc1.vip.corp.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       rtb2_status:
          - 'on'
       ix_default_url:
@@ -735,10 +695,6 @@ nonprod:
          - ads01.ifd.vip.ua2.inmobi.com 
       ifd_status:
          - "off"
-      ifc_host:
-         - "ifc1.vip.ua2.inmobi.com:8080"
-      ifc_status:
-         - 'on'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
