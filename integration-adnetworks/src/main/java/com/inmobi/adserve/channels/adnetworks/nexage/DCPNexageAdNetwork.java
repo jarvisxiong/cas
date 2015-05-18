@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -127,7 +128,10 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrlBuilder.append("fs");
         }
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
+            finalUrlBuilder.append("&d(id2)=").append(getHashedValue(casInternalRequestParameters.getUidIFA(), "SHA-1"));
+        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
             finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidSO1());
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
             finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidIDUS1());
