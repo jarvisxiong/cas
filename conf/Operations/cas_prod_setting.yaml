@@ -42,12 +42,14 @@ prod:
          - 'prod.uj1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 180
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -70,6 +72,12 @@ prod:
          - 'false'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    uh1:
       db_host:
@@ -114,12 +122,14 @@ prod:
          - 'prod.uh1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 180
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -142,6 +152,12 @@ prod:
          - 'true'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    lhr1:
       db_host:
@@ -186,12 +202,14 @@ prod:
          - 'prod.lhr1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 180
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -214,6 +232,12 @@ prod:
          - 'false'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    hkg1:
       db_host:
@@ -258,12 +282,14 @@ prod:
          - 'prod.hkg1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 180
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -286,6 +312,13 @@ prod:
          - 'true'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
+
 pilot:
    uj1:
       db_host:
@@ -330,12 +363,14 @@ pilot:
          - 'prod.uj1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 160
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -358,6 +393,12 @@ pilot:
          - 'false'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    uh1:
       db_host:
@@ -402,12 +443,14 @@ pilot:
          - 'prod.uh1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 160
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -430,6 +473,12 @@ pilot:
          - 'true'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    lhr1:
       db_host:
@@ -474,12 +523,14 @@ pilot:
          - 'prod.lhr1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 160
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -502,6 +553,12 @@ pilot:
          - 'false'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    hkg1:
       db_host:
@@ -546,12 +603,14 @@ pilot:
          - 'prod.hkg1.cas-1'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 160
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -574,6 +633,12 @@ pilot:
          - 'true'
       ix_advertise_id:
          - '1b1bdc749bd44a6c9037e513701ee815'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
 nonprod:
    lhr1:
@@ -593,6 +658,14 @@ nonprod:
          - 'off'
       ix_default_url:
          - 'NA'
+      ning_timeout_dcp:
+         - 600
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       nexage_host:
          - 'bos.non_prod'
       mondemand_address:
@@ -607,6 +680,12 @@ nonprod:
          - 'true'
       ix_advertise_id:
          - 'f55c9d46d7704f8789015a64153a7012'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'
 
    corp:
       db_host:
@@ -653,12 +732,14 @@ nonprod:
          - 'prod.corp.cas-1'
       scribe_endpoint1:
          - 'databus.vip.nonprod.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
-         - 60000
-      rtb_server_timeout:
-         - 18000
+      ning_timeout_dcp:
+         - 5000
+      cas_timer_handler_timeout_dcp:
+         - 5000
+      ning_timeout_rtbd:
+         - 5000
+      cas_timer_handler_timeout_rtbd:
+         - 5000
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -679,6 +760,12 @@ nonprod:
          - 'true'
       ix_advertise_id:
          - 'f55c9d46d7704f8789015a64153a7012'
+      rtbd_demand_density:
+         - '0'
+      rtbd_long_term_revenue:
+         - '0'
+      rtbd_publisher_yield:
+         - '12'
 
    ev1:
       db_host:
@@ -715,12 +802,14 @@ nonprod:
          - 'prod.ua2.cas-1'
       scribe_endpoint1:
          - 'databus.vip.nnprod.inmobi.com'
-      read_timeout:
-         - 500
-      server_timeout:
+      ning_timeout_dcp:
          - 600
-      rtb_server_timeout:
-         - 180
+      cas_timer_handler_timeout_dcp:
+         - 600
+      ning_timeout_rtbd:
+         - 500
+      cas_timer_handler_timeout_rtbd:
+         - 190
       t_segmentno:
          - '-1'
       out_bm_rtb_cnxn:
@@ -739,3 +828,9 @@ nonprod:
          - 'false'
       rtb_enabled:
          - 'true'
+      rtbd_demand_density:
+         - '1'
+      rtbd_long_term_revenue:
+         - '1.3'
+      rtbd_publisher_yield:
+         - '12'

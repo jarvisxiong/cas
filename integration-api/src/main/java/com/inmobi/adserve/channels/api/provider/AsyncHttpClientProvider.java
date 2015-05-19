@@ -36,8 +36,8 @@ public class AsyncHttpClientProvider {
     public void setup() {
         final AsyncHttpClientConfig.Builder cfRtbd =
                 new AsyncHttpClientConfig.Builder()
-                        .setRequestTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
-                        .setConnectionTimeoutInMs(serverConfig.getRtbRequestTimeoutInMillis())
+                        .setRequestTimeoutInMs(serverConfig.getNingTimeoutInMillisForRTB())
+                        .setConnectionTimeoutInMs(serverConfig.getNingTimeoutInMillisForRTB())
                         .setMaximumConnectionsTotal(
                                 serverConfig.getMaxRtbOutGoingConnections()
                                         * Runtime.getRuntime().availableProcessors())
@@ -51,8 +51,8 @@ public class AsyncHttpClientProvider {
 
         final AsyncHttpClientConfig.Builder cfDcp =
                 new AsyncHttpClientConfig.Builder()
-                        .setRequestTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
-                        .setConnectionTimeoutInMs(serverConfig.getDcpRequestTimeoutInMillis())
+                        .setRequestTimeoutInMs(serverConfig.getNingTimeoutInMillisForDCP())
+                        .setConnectionTimeoutInMs(serverConfig.getNingTimeoutInMillisForDCP())
                         .setMaximumConnectionsTotal(
                                 serverConfig.getMaxDcpOutGoingConnections()
                                         * Runtime.getRuntime().availableProcessors())

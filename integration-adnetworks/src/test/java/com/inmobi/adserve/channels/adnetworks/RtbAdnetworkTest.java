@@ -165,8 +165,8 @@ public class RtbAdnetworkTest {
         final Field asyncHttpClientProviderField = RtbAdNetwork.class.getDeclaredField("asyncHttpClientProvider");
         asyncHttpClientProviderField.setAccessible(true);
         final ServerConfig serverConfig = createMock(ServerConfig.class);
-        expect(serverConfig.getDcpRequestTimeoutInMillis()).andReturn(800).anyTimes();
-        expect(serverConfig.getRtbRequestTimeoutInMillis()).andReturn(200).anyTimes();
+        expect(serverConfig.getNingTimeoutInMillisForDCP()).andReturn(800).anyTimes();
+        expect(serverConfig.getNingTimeoutInMillisForRTB()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxDcpOutGoingConnections()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxRtbOutGoingConnections()).andReturn(200).anyTimes();
         replay(serverConfig);

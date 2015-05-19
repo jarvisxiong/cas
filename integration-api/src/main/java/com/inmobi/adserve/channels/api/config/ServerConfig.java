@@ -43,10 +43,6 @@ public class ServerConfig implements CasConfig {
                 serverConfiguration.getList("auction.exclude.AuctionIUrlFilter", Lists.newArrayList());
     }
 
-    public int getRtbRequestTimeoutInMillis() {
-        return rtbConfiguration.getInt("RTBreadtimeoutMillis");
-    }
-
     public double getRevenueWindow() {
         return serverConfiguration.getDouble("revenueWindow", 0.33);
     }
@@ -75,10 +71,6 @@ public class ServerConfig implements CasConfig {
         return serverConfiguration.getByte("defaultDemandClass", (byte) 0);
     }
 
-    public int getDcpRequestTimeoutInMillis() {
-        return serverConfiguration.getInt("readtimeoutMillis");
-    }
-
     public List<Double> getSupplyClassFloors() {
         final String[] supplyClassFloorStringArray = serverConfiguration.getStringArray("supplyClassFloors");
 
@@ -102,12 +94,20 @@ public class ServerConfig implements CasConfig {
         return serverConfiguration.getInt("incomingMaxConnections", 500);
     }
 
-    public int getServerTimeoutInMillisForRTB() {
-        return serverConfiguration.getInt("serverTimeoutMillisForRTB", 170);
+    public int getNingTimeoutInMillisForRTB() {
+        return serverConfiguration.getInt("ning.timeoutMillisForRTB", 180);
     }
 
-    public int getServerTimeoutInMillisForDCP() {
-        return serverConfiguration.getInt("serverTimeoutMillisForDCP", 600);
+    public int getNingTimeoutInMillisForDCP() {
+        return serverConfiguration.getInt("ning.timeoutMillisForDCP", 600);
+    }
+
+    public int getCasTimeoutHandlerTimeoutInMillisForRTB() {
+        return serverConfiguration.getInt("casTimeoutHandler.timeoutMillisForRTB", 180);
+    }
+
+    public int getCasTimeoutHandlerTimeoutInMillisForDCP() {
+        return serverConfiguration.getInt("casTimeoutHandler.timeoutMillisForDCP", 600);
     }
 
     public List getExcludedAdvertisers(final String filter) {

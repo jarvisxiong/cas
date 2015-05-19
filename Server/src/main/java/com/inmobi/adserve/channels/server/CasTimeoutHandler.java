@@ -58,7 +58,7 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
 
-        // if rtbd we are going with timeout of 175ms
+        // if rtbd we are going with timeout of 190ms
         // else if dcp we are going with timeout of 600 ms
 
         final HttpRequest httpRequest = (HttpRequest) msg;
@@ -69,13 +69,13 @@ public class CasTimeoutHandler extends ChannelDuplexHandler {
         final Servlet servlet = pathToServletMap.get(path);
 
         if (servlet instanceof ServletRtbd) {
-            timeoutInMillis = serverConfig.getServerTimeoutInMillisForRTB();
+            timeoutInMillis = serverConfig.getCasTimeoutHandlerTimeoutInMillisForRTB();
             dst = DemandSourceType.RTBD.getValue();
         } else if (servlet instanceof ServletIXFill) {
-            timeoutInMillis = serverConfig.getServerTimeoutInMillisForRTB();
+            timeoutInMillis = serverConfig.getCasTimeoutHandlerTimeoutInMillisForRTB();
             dst = DemandSourceType.IX.getValue();
         } else {
-            timeoutInMillis = serverConfig.getServerTimeoutInMillisForDCP();
+            timeoutInMillis = serverConfig.getCasTimeoutHandlerTimeoutInMillisForDCP();
             dst = DemandSourceType.DCP.getValue();
         }
 
