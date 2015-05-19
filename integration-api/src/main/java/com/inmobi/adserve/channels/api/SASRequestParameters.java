@@ -10,6 +10,7 @@ import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.segment.impl.AdTypeEnum;
+import com.inmobi.types.DeviceType;
 import com.inmobi.types.LocationSource;
 
 import lombok.Data;
@@ -58,9 +59,11 @@ public class SASRequestParameters {
     private String rqIframe;
     private String rFormat;
 
-    private String deviceType;
+    private DeviceType deviceType;
     private long modelId;
     private long manufacturerId;
+    private String deviceMake;
+    private String deviceModel;
     private int osId;
     private Short rqMkAdcount;
     private String tid;

@@ -188,6 +188,14 @@ Cache.ChannelAdGroupRepository.isUpdatable = true
 Cache.ChannelAdGroupRepository.dataSourceName = jdbc
 Cache.ChannelAdGroupRepository.ecpmBoostDuration = 3
 
+Cache.Name = CcidMapRepository
+Cache.CcidMapRepository.Manager = com.inmobi.adserve.channels.repository.CcidMapRepository
+Cache.CcidMapRepository.query = select * from ccid_map_fun('${last_update}')
+Cache.CcidMapRepository.initialDelay = 300
+Cache.CcidMapRepository.refreshTime = 86413
+Cache.CcidMapRepository.isUpdatable = true
+Cache.CcidMapRepository.dataSourceName = jdbc
+
 Cache.Name = ChannelRepository
 Cache.ChannelRepository.Manager = com.inmobi.adserve.channels.repository.ChannelRepository
 Cache.ChannelRepository.query = select * from wap_channel_fun_05102013('${last_update}')

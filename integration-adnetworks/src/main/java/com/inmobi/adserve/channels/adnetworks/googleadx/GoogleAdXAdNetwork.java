@@ -1,26 +1,29 @@
 package com.inmobi.adserve.channels.adnetworks.googleadx;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.Formatter.TemplateType;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import java.awt.Dimension;
+import java.io.StringWriter;
+import java.net.URI;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.Template;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Dimension;
-import java.io.StringWriter;
-import java.net.URI;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.types.DeviceType;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -29,6 +32,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     private static Template velocityDFPTemplate;
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleAdXAdNetwork.class);
+    private static final String OPERA_MINI = "opera mini";
 
     private String googleInMobiPubID = null;
     private int width, height;
@@ -49,8 +53,8 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public boolean configureParameters() {
 
-        if (sasParams.getUserAgent() != null && sasParams.getUserAgent().toLowerCase().contains("opera mini")
-                || sasParams.getDeviceType() != null && "FEATURE_PHONE".equals(sasParams.getDeviceType())) {
+        if (sasParams.getUserAgent() != null && sasParams.getUserAgent().toLowerCase().contains(OPERA_MINI)
+                || sasParams.getDeviceType() != null && DeviceType.FEATURE_PHONE == sasParams.getDeviceType()) {
             return false;
         }
 

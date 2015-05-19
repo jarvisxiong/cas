@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.channels.repository.CcidMapRepository;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -103,6 +104,8 @@ public class ServletRepoRefreshTest {
     final private static String json15 =
             "{\"repoName\":\"GeoRegionFenceMapRepository\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
     final private static String json16 =
+            "{\"repoName\":\"CcidMapRepository\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
+    final private static String json100 =
             "{\"repoName\":\"RepositoryThatDoesn'tExist\",\"DBHost\":\"10.14.118.57\",\"DBPort\":\"5499\",\"DBSnapshot\":\"pratap_dcp_jenkins_dont_delete\",\"DBUser\":\"postgres\",\"DBPassword\":\"mkhoj123\"}";
 
     private static Map<String, List<String>> createMapFromString(final String json) {
@@ -127,7 +130,7 @@ public class ServletRepoRefreshTest {
                 .andReturn(createMapFromString(json10)).times(1).andReturn(createMapFromString(json11)).times(1)
                 .andReturn(createMapFromString(json12)).times(1).andReturn(createMapFromString(json13)).times(1)
                 .andReturn(createMapFromString(json14)).times(1).andReturn(createMapFromString(json15)).times(1)
-                .andReturn(createMapFromString(json16)).times(1);
+                .andReturn(createMapFromString(json16)).times(1).andReturn(createMapFromString(json100)).times(1);
         replayAll();
     }
 
@@ -182,6 +185,8 @@ public class ServletRepoRefreshTest {
                 mockServerConfig).anyTimes();
         expect(mockServerConfig.subset(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)).andReturn(
                 mockServerConfig).anyTimes();
+        expect(mockServerConfig.subset(ChannelServerStringLiterals.CCID_MAP_REPOSITORY)).andReturn(
+                mockServerConfig).anyTimes();
         expect(mockServerConfig.getString(ChannelServerStringLiterals.QUERY)).andReturn(LAST_UPDATE).anyTimes();
         replayAll();
     }
@@ -232,6 +237,7 @@ public class ServletRepoRefreshTest {
         final GeoZipRepository mockGeoZipRepository = createMock(GeoZipRepository.class);
         final GeoRegionFenceMapRepository mockGeoRegionFenceMapRepository =
                 createMock(GeoRegionFenceMapRepository.class);
+        final CcidMapRepository mockCcidMapRepository = createMock(CcidMapRepository.class);
 
         expect(mockRepositoryHelper.getChannelRepository()).andReturn(mockChannelRepository).anyTimes();
         expect(mockRepositoryHelper.getChannelAdGroupRepository()).andReturn(mockChannelAdGroupRepository).anyTimes();
@@ -254,6 +260,8 @@ public class ServletRepoRefreshTest {
                 .anyTimes();
         expect(mockRepositoryHelper.getGeoRegionFenceMapRepository()).andReturn(mockGeoRegionFenceMapRepository)
                 .anyTimes();
+        expect(mockRepositoryHelper.getCcidMapRepository()).andReturn(mockCcidMapRepository)
+                .anyTimes();
 
         expect(mockChannelRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockChannelAdGroupRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
@@ -273,6 +281,7 @@ public class ServletRepoRefreshTest {
         expect(mockNativeAdTemplateRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockGeoZipRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
         expect(mockGeoRegionFenceMapRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
+        expect(mockCcidMapRepository.newUpdateFromResultSetToOptimizeUpdate(null)).andReturn(null).anyTimes();
 
         mockStatic(CasConfigUtil.class);
         CasConfigUtil.repositoryHelper = mockRepositoryHelper;
@@ -298,7 +307,7 @@ public class ServletRepoRefreshTest {
     // Add -XX:-UseSplitVerifier to VM options if running manually
     @Test
     public void testHandleRequest() throws Exception {
-        for (int i = 0; i < 16; ++i) {
+        for (int i = 0; i < 17; ++i) {
             final ServletRepoRefresh servlet = new ServletRepoRefresh();
             servlet.handleRequest(httpRequestHandler, mockQueryStringDecoder, mockChannel);
         }

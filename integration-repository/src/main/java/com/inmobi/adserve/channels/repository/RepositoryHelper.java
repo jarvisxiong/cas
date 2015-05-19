@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.resultset.ResultSet;
+import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -67,6 +68,7 @@ public class RepositoryHelper {
     private final SlotSizeMapRepository slotSizeMapRepository;
     private final IXVideoTrafficRepository ixVideoTrafficRepository;
     private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
+    private final CcidMapRepository ccidMapRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -89,6 +91,7 @@ public class RepositoryHelper {
         slotSizeMapRepository = builder.slotSizeMapRepository;
         ixVideoTrafficRepository = builder.ixVideoTrafficRepository;
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
+        ccidMapRepository = builder.ccidMapRepository;
 
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
@@ -100,7 +103,7 @@ public class RepositoryHelper {
                 .addRepositoryToStats(wapSiteUACRepository).addRepositoryToStats(ixAccountMapRepository)
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
                 .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(ixVideoTrafficRepository)
-                .addRepositoryToStats(geoRegionFenceMapRepository);
+                .addRepositoryToStats(geoRegionFenceMapRepository).addRepositoryToStats(ccidMapRepository);
 
     }
 
@@ -130,6 +133,7 @@ public class RepositoryHelper {
         private SlotSizeMapRepository slotSizeMapRepository;
         private IXVideoTrafficRepository ixVideoTrafficRepository;
         private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
+        private CcidMapRepository ccidMapRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -151,6 +155,8 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(geoZipRepository);
             Preconditions.checkNotNull(slotSizeMapRepository);
             Preconditions.checkNotNull(ixVideoTrafficRepository);
+            Preconditions.checkNotNull(geoRegionFenceMapRepository);
+            Preconditions.checkNotNull(ccidMapRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -313,6 +319,17 @@ public class RepositoryHelper {
             return geoRegionFenceMapRepository.query(geoRegionNameCountryCombo);
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying GeoRegionFenceMap Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public CcidMapEntity queryCcidMapRepository(final Integer ccid) {
+        if (null != ccid) {
+            try {
+                return ccidMapRepository.query(ccid);
+            } catch (final RepositoryException ignored) {
+                LOG.debug("Exception while querying Ccid Map Repository, {}", ignored);
+            }
         }
         return null;
     }

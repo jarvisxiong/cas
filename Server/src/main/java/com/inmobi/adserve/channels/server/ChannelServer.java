@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.repository.CcidMapRepository;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelRepository;
@@ -99,6 +100,7 @@ public class ChannelServer {
     private static SlotSizeMapRepository slotSizeMapRepository;
     private static IXVideoTrafficRepository ixVideoTrafficRepository;
     private static GeoRegionFenceMapRepository geoRegionFenceMapRepository;
+    private static CcidMapRepository ccidMapRepository;
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     private static String configFile;
 
@@ -175,6 +177,7 @@ public class ChannelServer {
             slotSizeMapRepository = new SlotSizeMapRepository();
             ixVideoTrafficRepository = new IXVideoTrafficRepository();
             geoRegionFenceMapRepository = new GeoRegionFenceMapRepository();
+            ccidMapRepository = new CcidMapRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -197,6 +200,7 @@ public class ChannelServer {
             repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
             repoHelperBuilder.setIxVideoTrafficRepository(ixVideoTrafficRepository);
             repoHelperBuilder.setGeoRegionFenceMapRepository(geoRegionFenceMapRepository);
+            repoHelperBuilder.setCcidMapRepository(ccidMapRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -339,6 +343,7 @@ public class ChannelServer {
             loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config, logger);
             loadRepos(ixVideoTrafficRepository, ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY, config, logger);
             loadRepos(geoRegionFenceMapRepository, ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
+            loadRepos(ccidMapRepository, ChannelServerStringLiterals.CCID_MAP_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds,
                     config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
                     ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);

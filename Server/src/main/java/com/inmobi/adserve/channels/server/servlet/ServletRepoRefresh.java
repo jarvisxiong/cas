@@ -198,8 +198,15 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getGeoRegionFenceMapRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            }
-            else {
+            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CCID_MAP_REPOSITORY)) {
+                final String query =
+                        config.getCacheConfiguration()
+                                .subset(ChannelServerStringLiterals.CCID_MAP_REPOSITORY)
+                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getCcidMapRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else {
                 // RepoName could not be matched
                 LOG.debug("RepoName: {} could not be matched", repoName);
                 hrh.responseSender.sendResponse("NOTOK RepoName could not be matched", serverChannel);

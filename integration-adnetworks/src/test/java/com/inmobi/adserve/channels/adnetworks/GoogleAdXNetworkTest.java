@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.types.DeviceType;
 
 import io.netty.channel.Channel;
 import junit.framework.TestCase;
@@ -119,7 +120,7 @@ public class GoogleAdXNetworkTest extends TestCase {
 
 
         // If we know the request is from FeaturePhones Or Opera then return false
-        sasParams.setDeviceType("FEATURE_PHONE");
+        sasParams.setDeviceType(DeviceType.FEATURE_PHONE);
         entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(googleAdXPublisherID, null,
                         null, null, 0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true,

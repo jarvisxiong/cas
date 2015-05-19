@@ -168,8 +168,14 @@ public class ThriftRequestParser {
             params.setManufacturerId(tObject.device.manufacturerId);
             params.setHandsetInternalId(tObject.device.getHandsetInternalId());
             params.setOsMajorVersion(tObject.device.getOsMajorVersion());
-            if (tObject.device.getDeviceType() != null) {
-                params.setDeviceType(tObject.device.getDeviceType().toString()); // FEATURE_PHONE, SMARTPHONE, TABLET
+            if (tObject.device.isSetDeviceType()) {
+                params.setDeviceType(tObject.device.getDeviceType());
+            }
+            if (tObject.device.isSetModelName()) {
+                params.setDeviceModel(tObject.device.getModelName());
+            }
+            if (tObject.device.isSetManufacturerName()) {
+                params.setDeviceMake(tObject.device.getManufacturerName());
             }
         }
 

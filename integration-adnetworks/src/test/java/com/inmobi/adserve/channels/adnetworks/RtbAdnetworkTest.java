@@ -145,6 +145,10 @@ public class RtbAdnetworkTest {
                 .anyTimes();
         EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15)
                 .anyTimes();
+        EasyMock.expect(repositoryHelper.queryCcidMapRepository(null)).andReturn(null)
+                .anyTimes();
+
+
         EasyMock.replay(repositoryHelper);
 
         rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", true);

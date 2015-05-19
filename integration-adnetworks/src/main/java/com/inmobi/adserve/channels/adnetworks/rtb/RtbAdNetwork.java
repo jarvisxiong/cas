@@ -42,6 +42,7 @@ import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.RtbdNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
+import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -66,6 +67,7 @@ import com.inmobi.casthrift.rtb.ImpressionExtensions;
 import com.inmobi.casthrift.rtb.Native;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
+import com.inmobi.types.DeviceType;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -96,6 +98,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String X_OPENRTB_VERSION = "x-openrtb-version";
     private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
     private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+    private static final int DEVICE_TYPE_PHONE = 4;
+    private static final int DEVICE_TYPE_TABLET = 5;
     private static List<String> image_mimes = Arrays.asList("image/jpeg", "image/gif", "image/png");
     private static List<Integer> fsBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16);
     private static List<Integer> performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
@@ -628,10 +632,23 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Device createDeviceObject(final Geo geo) {
         final Device device = new Device();
-        device.setDevicetype(1);// Tablets and Mobiles
+
+        if (DeviceType.TABLET == sasParams.getDeviceType()) {
+            device.setDevicetype(DEVICE_TYPE_TABLET);
+        } else {
+            device.setDevicetype(DEVICE_TYPE_PHONE);    // SmartPhones and FeaturePhones
+        }
+        device.setModel(sasParams.getDeviceModel());
+        device.setMake(sasParams.getDeviceMake());
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
         device.setGeo(geo);
+
+        final CcidMapEntity ccidMapEntity = repositoryHelper.queryCcidMapRepository(sasParams.getCarrierId());
+        if (null != ccidMapEntity) {
+            device.setCarrier(ccidMapEntity.getCarrier());
+        }
+
         final Integer sasParamsOsId = sasParams.getOsId();
         if (sasParamsOsId > 0 && sasParamsOsId < 21) {
             device.setOs(HandSetOS.values()[sasParamsOsId - 1].toString());
@@ -672,28 +689,31 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
+        final Map<String, String> deviceExtensions = getDeviceExt(device);
+
         // Setting Extension for idfa
         if (!StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
-            final Map<String, String> deviceExtensions = getDeviceExt(device);
             deviceExtensions.put("idfa", casInternalRequestParameters.getUidIFA());
             deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.getUidIFA(), "SHA-1"));
             deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.getUidIFA(), "MD5"));
         }
 
         if (!StringUtils.isEmpty(casInternalRequestParameters.getGpid())) {
-            final Map<String, String> deviceExtensions = getDeviceExt(device);
             deviceExtensions.put("gpid", casInternalRequestParameters.getGpid());
         }
         return device;
     }
 
     private Map<String, String> getDeviceExt(final Device device) {
-        Map<String, String> deviceExtensions = device.getExt();
+        Map<String, String> deviceExtensions = new HashMap<>();
 
-        if (null == deviceExtensions) {
-            deviceExtensions = new HashMap<String, String>();
-            device.setExt(deviceExtensions);
+        if (null != sasParams.getAge()) {
+            deviceExtensions.put("age", sasParams.getAge().toString());
         }
+        if (null != sasParams.getGender()) {
+            deviceExtensions.put("gender", sasParams.getGender().toString());
+        }
+        device.setExt(deviceExtensions);
 
         return deviceExtensions;
     }
