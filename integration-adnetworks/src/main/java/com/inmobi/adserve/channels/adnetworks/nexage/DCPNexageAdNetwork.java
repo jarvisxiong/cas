@@ -128,10 +128,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrlBuilder.append("fs");
         }
 
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
-            finalUrlBuilder.append("&d(id2)=").append(getHashedValue(casInternalRequestParameters.getUidIFA(), "SHA-1"));
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
             finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidSO1());
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
             finalUrlBuilder.append("&d(id2)=").append(casInternalRequestParameters.getUidIDUS1());
@@ -148,12 +145,17 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             } else {
                 finalUrlBuilder.append("&u(id)=").append(casInternalRequestParameters.getUid());
             }
-        } else {
-            final String gpid = getGPID();
-            if (gpid != null) {
-                finalUrlBuilder.append("&d(id12)=").append(getHashedValue(gpid, "MD5"));
-            }
         }
+        String gpid = getGPID();
+        if (gpid != null) {
+            finalUrlBuilder.append("&d(id24)=").append(gpid);
+        }
+
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
+            finalUrlBuilder.append("&d(id24)=").append(casInternalRequestParameters.getUidIFA());
+        }
+
         if (isGeo) {
             finalUrlBuilder.append("&req(loc)=")
                     .append(getURLEncode(casInternalRequestParameters.getLatLong(), format));
