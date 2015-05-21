@@ -7,6 +7,7 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.beans.CasContext;
@@ -55,13 +56,15 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
             return true;
         }
 
-        final String rqAdType = sasParams.getRqAdType();
+        final RequestedAdType requestedAdType = sasParams.getRequestedAdType();
 
-        if (channelSegmentEntity.isInterstitialOnly() && (rqAdType == null || !"int".equals(rqAdType))) {
+        if (channelSegmentEntity.isInterstitialOnly() &&
+                (null == requestedAdType || RequestedAdType.INTERSTITIAL != requestedAdType)) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);
             return true;
         }
-        if (channelSegmentEntity.isNonInterstitialOnly() && rqAdType != null && "int".equals(rqAdType)) {
+        if (channelSegmentEntity.isNonInterstitialOnly() && null != requestedAdType &&
+                RequestedAdType.INTERSTITIAL == requestedAdType) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_NON_INTERSTITIAL_FILTER);
             return true;
         }

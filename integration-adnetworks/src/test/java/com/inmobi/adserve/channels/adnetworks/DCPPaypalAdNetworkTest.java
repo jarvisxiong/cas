@@ -7,6 +7,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import java.lang.reflect.Field;
 import java.net.URI;
 
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.IPRepository;
 
@@ -538,7 +539,7 @@ public class DCPPaypalAdNetworkTest extends junit.framework.TestCase {
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("app");
         sasParams.setSdkVersion("a450");
-        sasParams.setRqAdType("int");
+        sasParams.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         final String externalKey = "19100";
         final String beaconUrl =

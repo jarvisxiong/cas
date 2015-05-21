@@ -119,7 +119,6 @@ public class IXAdNetworkTest extends TestCase {
         sas.setSource("APP");
         sas.setCarrierId(0);
         sas.setDst(8);
-        sas.setRqAdType("");
         final String urlBase = "";
         final CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
         
@@ -268,9 +267,7 @@ public class IXAdNetworkTest extends TestCase {
     public void testConfigureParameters() {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
         sas.setSource("wap");
-        sas.setRqAdType("");
         sas
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -304,7 +301,6 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sas.setRemoteHostIp("206.29.182.240");
-            sas.setRqAdType("");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
@@ -344,7 +340,6 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sas.setRemoteHostIp("206.29.182.240");
-            sas.setRqAdType("");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
@@ -385,7 +380,6 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sas.setRemoteHostIp("206.29.182.240");
-            sas.setRqAdType("");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
@@ -496,7 +490,6 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sas.setRemoteHostIp("206.29.182.240");
-            sas.setRqAdType("");
             sas.setSiteId(SITE_ID);
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
@@ -563,7 +556,6 @@ public class IXAdNetworkTest extends TestCase {
 
             final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
             sas.setRemoteHostIp("206.29.182.240");
-            sas.setRqAdType("");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
             sas.setSiteContentType(ContentType.PERFORMANCE);

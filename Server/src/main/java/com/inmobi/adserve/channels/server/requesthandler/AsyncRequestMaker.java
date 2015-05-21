@@ -50,6 +50,7 @@ public class AsyncRequestMaker {
             final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
             final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalGlobal,
             final List<ChannelSegment> rtbSegments) throws Exception {
+
         final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
         LOG.debug("Total channels available for sending requests {}", rows.size());
         /*
@@ -95,7 +96,8 @@ public class AsyncRequestMaker {
             sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
-            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired()) && null != sasParams.getImpressionId()) {
+            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired())
+                    && null != sasParams.getImpressionId()) {
                 boolean isCpc = false;
                 if (null != channelSegmentEntity.getPricingModel()
                         && "cpc".equalsIgnoreCase(channelSegmentEntity.getPricingModel())) {
@@ -220,7 +222,7 @@ public class AsyncRequestMaker {
     }
 
     private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
-            final SASRequestParameters sasParams, final Integer dst) {
+                                                  final SASRequestParameters sasParams, final Integer dst) {
         final ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setImpressionId(sasParams.getImpressionId());
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
@@ -249,6 +251,11 @@ public class AsyncRequestMaker {
         builder.setRtbSite(sasParams.getSst() != 0); // TODO:- Change this according to thrift enums
         builder.setDst(dst.toString());
         builder.setBudgetBucketId("101"); // Default Value
+        builder.setPlacementId(sasParams.getPlacementId());
+        builder.setIntegrationDetails(sasParams.getIntegrationDetails());
+        builder.setAppBundleId(sasParams.getAppBundleId());
+        builder.setNormalizedUserId(sasParams.getNormalizedUserId());
+        builder.setRequestedAdType(sasParams.getRequestedAdType());
         return new ClickUrlMakerV6(builder);
     }
 

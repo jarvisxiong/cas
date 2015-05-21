@@ -27,6 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -348,7 +349,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         impression.setBidfloorcur(USD);
         // Set interstitial or not
-        if (null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())) {
+        if (null != sasParams.getRequestedAdType() && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
             impression.setInstl(1);
         } else {
             impression.setInstl(0);

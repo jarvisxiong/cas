@@ -27,7 +27,6 @@ import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
-import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.adpool.ResponseFormat;
 import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.adserve.adpool.UidParams;
@@ -72,11 +71,7 @@ public class ThriftRequestParser {
         // TODO use segment id in cas as long
         final int segmentId = tObject.isSetSegmentId() ? (int) tObject.segmentId : 0;
         params.setSiteSegmentId(segmentId);
-        final boolean isInterstitial =
-                tObject.isSetRequestedAdType() && tObject.requestedAdType == RequestedAdType.INTERSTITIAL;
-        params.setRqAdType(isInterstitial ? "int" : tObject.isSetRequestedAdType()
-                ? tObject.requestedAdType.name()
-                : StringUtils.EMPTY);
+        params.setRequestedAdType(tObject.getRequestedAdType());
         params.setRichMedia(tObject.isSetSupplyAllowedContents()
                 && tObject.supplyAllowedContents.contains(SupplyContentType.RICH_MEDIA));
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
@@ -258,6 +253,16 @@ public class ThriftRequestParser {
             } else {
                 params.setConnectionType(ConnectionType.UNKNOWN);
             }
+        }
+        
+        params.setPlacementId(tObject.placementId);
+        params.setIntegrationDetails(tObject.getIntegrationDetails());
+        params.setAppBundleId(tObject.getAppBundleId());
+        
+        if(tObject.isSetUser() && tObject.getUser().isSetUserProfile() &&
+                tObject.getUser().getUserProfile().isSetNormalizedUserId()){
+            String normalizedUserId = tObject.getUser().getUserProfile().getNormalizedUserId();
+            params.setNormalizedUserId(normalizedUserId);
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());

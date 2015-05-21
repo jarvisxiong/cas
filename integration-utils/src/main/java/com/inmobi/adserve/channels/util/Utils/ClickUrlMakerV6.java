@@ -2,24 +2,28 @@ package com.inmobi.adserve.channels.util.Utils;
 
 import java.util.Map;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TCompactProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.types.eventserver.ImpressionInfo;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 
  * @author devi.chand@inmobi.com
  */
 
-@ToString
 public class ClickUrlMakerV6 {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClickUrlMakerV6.class);
@@ -43,6 +47,10 @@ public class ClickUrlMakerV6 {
     private static final Long CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION = (long) 2;
     private static final String CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36 =
             getIdBase36(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION);
+
+    private static final String DEFAULT_UNUSED_PARAMETER = "-1";
+    private static final String DEFAULT_BUNDLE_ID = "x";
+
     @Getter
     private String beaconUrl;
     @Getter
@@ -78,6 +86,11 @@ public class ClickUrlMakerV6 {
     private final String creativeId;
     private final String budgetBucketId;
     private final String dst;
+    private final Long placementId;
+    private IntegrationDetails integrationDetails;
+    private String appBundleId;
+    private String normalizedUserId;
+    private RequestedAdType requestedAdType;
 
     public ClickUrlMakerV6(final Builder builder) {
         udIdVal = builder.udIdVal;
@@ -101,6 +114,12 @@ public class ClickUrlMakerV6 {
         isBeaconEnabledOnSite = builder.isBeaconEnabledOnSite;
         imageBeaconFlag = builder.imageBeaconFlag;
         budgetBucketId = builder.budgetBucketId;
+        placementId = builder.placementId;
+        integrationDetails = builder.integrationDetails;
+        appBundleId = builder.appBundleId;
+        normalizedUserId = builder.normalizedUserId;
+        requestedAdType = builder.requestedAdType;
+
         if (StringUtils.isEmpty(builder.gender)) {
             gender = "u";
         } else {
@@ -138,6 +157,7 @@ public class ClickUrlMakerV6 {
         }
         isTestRequest = builder.isTestRequest;
         isRtbSite = builder.isRtbSite;
+
     }
 
     public static Builder newBuilder() {
@@ -176,6 +196,11 @@ public class ClickUrlMakerV6 {
         private String creativeId;
         private String budgetBucketId;
         private String dst;
+        private Long placementId;
+        private IntegrationDetails integrationDetails;
+        private String appBundleId;
+        private String normalizedUserId;
+        private RequestedAdType requestedAdType;
     }
 
     public void createClickUrls() {
@@ -293,7 +318,65 @@ public class ClickUrlMakerV6 {
         adUrlSuffix.append(appendSeparator(dst));
         beaconUrlSuffix.append(appendSeparator(dst));
 
-        // 24th and 25th URL Component: hash key version and url hash
+        // 24nd URL Component: integrationMethod -- not using it, hence setting it default value
+        String integrationMethod = DEFAULT_UNUSED_PARAMETER;
+        if (null != integrationDetails && integrationDetails.isSetIntegrationMethod()) {
+            integrationMethod = integrationDetails.getIntegrationMethod().toString().toLowerCase()
+                    .replace("_", StringUtils.EMPTY);
+        }
+        adUrlSuffix.append(appendSeparator(integrationMethod));
+        beaconUrlSuffix.append(appendSeparator(integrationMethod));
+
+        // 25nd URL Component: integrationVersion
+        String integrationVersion = DEFAULT_UNUSED_PARAMETER;
+        if (null != integrationDetails && integrationDetails.isSetIntegrationVersion()) {
+            integrationVersion = String.valueOf(getIntegrationVersionStr(
+                    integrationDetails.getIntegrationVersion()));
+        }
+        adUrlSuffix.append(appendSeparator(integrationVersion));
+        beaconUrlSuffix.append(appendSeparator(integrationVersion));
+
+        // 26nd URL Component: tpName
+        String tpName = DEFAULT_UNUSED_PARAMETER;
+        if (null != integrationDetails && integrationDetails.isSetIntegrationThirdPartyName()) {
+            tpName = StringUtils.substring(integrationDetails.getIntegrationThirdPartyName(), 0, 10);
+        }
+        adUrlSuffix.append(appendSeparator(tpName));
+        beaconUrlSuffix.append(appendSeparator(tpName));
+
+        // 27th URL Component: bundle id
+        String bundleId = appBundleId;
+        if (StringUtils.isBlank(bundleId)) {
+            bundleId = DEFAULT_BUNDLE_ID;
+        }
+        String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes()));
+        String finalBundleId = encodedBundleId.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
+        adUrlSuffix.append(appendSeparator(finalBundleId));
+        beaconUrlSuffix.append(appendSeparator(finalBundleId));
+
+        // 28th URL Component: encoded thrift serialized object with placementID, normalizedUserID and requestedAdType
+        ImpressionInfo impInfo = new ImpressionInfo();
+        impInfo.setPlacementId(placementId);
+        impInfo.setNormalizedUserId(normalizedUserId);
+
+        if (null != requestedAdType) {
+            impInfo.setRequestedAdType(requestedAdType.toString());
+        }
+
+        TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
+        String encodedString = StringUtils.EMPTY;
+        try {
+            byte[] bytes = serializer.serialize(impInfo);
+            encodedString = new String(Base64.encodeBase64URLSafe(bytes));
+        } catch (TException e) {
+            LOG.error("Error while serializing impressionInfo object", e);
+        }
+
+
+        adUrlSuffix.append(appendSeparator(encodedString));
+        beaconUrlSuffix.append(appendSeparator(encodedString));
+
+        // 29th and 30th URL Component: hash key version and url hash
         CryptoHashGenerator cryptoHashGenerator;
         if (testMode) {
             adUrlSuffix.append(appendSeparator(ClickUrlMakerV6.CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
@@ -348,5 +431,17 @@ public class ClickUrlMakerV6 {
 
     private String appendSeparator(final String parameter) {
         return URLPATHSEP + parameter;
+    }
+
+    private static String getIntegrationVersionStr(int integrationVersion) {
+        String ver = String.valueOf(integrationVersion);
+        String integrationVersionStr = StringUtils.EMPTY;
+        if (StringUtils.isNotEmpty(ver)) {
+            integrationVersionStr += ver.charAt(0);
+            for (int i = 1; i < ver.length(); i++) {
+                integrationVersionStr += "." + ver.charAt(i);
+            }
+        }
+        return integrationVersionStr;
     }
 }

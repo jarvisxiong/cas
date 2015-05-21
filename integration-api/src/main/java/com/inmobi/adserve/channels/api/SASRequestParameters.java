@@ -7,6 +7,8 @@ import java.util.Set;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
+import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -14,8 +16,10 @@ import com.inmobi.types.DeviceType;
 import com.inmobi.types.LocationSource;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
+@NoArgsConstructor
 @Data
 public class SASRequestParameters {
 
@@ -75,7 +79,6 @@ public class SASRequestParameters {
     private List<Short> processedMkSlot;
     private Integer ipFileVersion;
     private boolean isRichMedia;
-    private String rqAdType;
     private String imaiBaseUrl;
     private String appUrl;
     private Set<String> uAdapters;
@@ -87,6 +90,11 @@ public class SASRequestParameters {
     private String osMajorVersion;
     private ConnectionType connectionType;
     private double marketRate;
+    private long placementId;
+    private IntegrationDetails integrationDetails;
+    private String appBundleId;
+    private String normalizedUserId;
+    private RequestedAdType requestedAdType;
 
     private EncryptionKeys encryptionKey;
     private boolean isKeepAlive;
@@ -100,10 +108,6 @@ public class SASRequestParameters {
     private String referralUrl;
 
     private String automationTestId;
-
-    public SASRequestParameters() {
-        // Do Nothing.
-    }
 
     public enum HandSetOS {
         OTHERS(1), Linux_Smartphone_OS(2), Android(3), Nokia_OS(4), iOS(5), RIM_OS(6), MTK_Nucleus_OS(7), Symbian_OS(8), Windows_Mobile_OS(

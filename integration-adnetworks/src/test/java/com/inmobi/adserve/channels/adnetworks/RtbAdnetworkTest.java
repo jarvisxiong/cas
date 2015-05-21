@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -105,7 +106,6 @@ public class RtbAdnetworkTest {
         prepareMockConfig();
         Formatter.init();
         sas.setSource("APP");
-        sas.setRqAdType("");
         sas.setDst(2);
 
         final String urlBase = "";
@@ -233,8 +233,6 @@ public class RtbAdnetworkTest {
     public void testConfigureParameters() {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSource("wap");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -262,8 +260,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSiteId("some_site_id");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -337,7 +333,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
         sas.setSource("wap");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -364,7 +359,6 @@ public class RtbAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setBlockedAdvertisers(Lists.newArrayList("abcd.com"));
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
         sas.setSource("wap");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -390,7 +384,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
         sas.setSource("wap");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -426,7 +419,6 @@ public class RtbAdnetworkTest {
         casInternalRequestParameters.setUid("1234");
         sasParams.setAge((short) 26);
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams.setRqAdType("");
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -477,7 +469,6 @@ public class RtbAdnetworkTest {
         final String beaconUrl = "";
         sas.setSource("app");
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final ChannelSegmentEntity entity =
@@ -538,7 +529,7 @@ public class RtbAdnetworkTest {
         responseAdm
                 .append("<html><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beacon?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
         sas.setSdkVersion("a450");
-        sas.setRqAdType("int");
+        sas.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         final String clickUrl =
                 "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final String beaconUrl = "beacon";
@@ -604,8 +595,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSiteId("some_site_id");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -640,8 +629,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSiteId("some_site_id");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -673,8 +660,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSiteId("some_site_id");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -705,8 +690,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSiteId("some_site_id");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -743,8 +726,6 @@ public class RtbAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
-        sas.setRqAdType("");
-        sas.setRqAdType("");
         sas.setSiteId("some_site_id");
         sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");

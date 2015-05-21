@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.json.JSONObject;
 import org.powermock.api.support.membermodification.MemberModifier;
@@ -25,6 +23,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Modules;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -51,6 +50,8 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
+
+import junit.framework.TestCase;
 
 public class ChannelSegmentFilterApplierTest extends TestCase {
     private ChannelEntity cE1;
@@ -261,7 +262,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setPostalCode("110051");
         sasParams.setLatLong("11.35&12.56");
         sasParams.setRichMedia(true);
-        sasParams.setRqAdType("int");
+        sasParams.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         sasParams.setSiteId("siteid");
 
         injector =
@@ -458,7 +459,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
         assertEquals(true, channelSegments.contains(channelSegment));
 
-        sasParams.setRqAdType(null);
+        sasParams.setRequestedAdType(null);
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
 
         assertEquals(false, channelSegments.contains(channelSegment));
@@ -485,7 +486,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
         assertEquals(false, channelSegments.contains(channelSegment));
 
-        sasParams.setRqAdType(null);
+        sasParams.setRequestedAdType(null);
         channelSegments = Lists.newArrayList(channelSegment);
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
         assertEquals(true, channelSegments.contains(channelSegment));

@@ -25,6 +25,7 @@ import org.slf4j.Marker;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
@@ -151,7 +152,8 @@ public class RequestParser {
         }
         params.setOsId(jObject.optInt("os-id", -1));
         params.setRichMedia(jObject.optBoolean("rich-media", false));
-        params.setRqAdType(stringify(jObject, "rqAdtype"));
+        params.setRequestedAdType(("int".equalsIgnoreCase(stringify(jObject, "rqAdtype"))) ?
+                RequestedAdType.INTERSTITIAL: null);
         params.setAppUrl(stringify(jObject, "site-url"));
         LOG.debug(traceMarker, "successfully parsed params : {}", params);
     }

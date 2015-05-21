@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.nexage.DCPNexageAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -1078,7 +1079,7 @@ public class DCPNexageAdNetworkTest extends TestCase {
                 .setUserAgent("Mozilla/5.0 (Linux; U; Android 4.1.1; en-us; Galaxy Nexus Build/JRO03O) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
         sasParams.setSource("app");
         sasParams.setSdkVersion("a450");
-        sasParams.setRqAdType("int");
+        sasParams.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         final List<Long> cat = new ArrayList<Long>();
         cat.add(13l);

@@ -29,6 +29,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.Lists;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -316,7 +317,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").anyTimes();
         expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
         expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
-        expect(mockSasParams.getRqAdType()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
@@ -377,7 +378,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").anyTimes();
         expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
         expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
-        expect(mockSasParams.getRqAdType()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
@@ -439,7 +440,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").anyTimes();
         expect(mockSasParams.getSdkVersion()).andReturn("a350").anyTimes();
         expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
-        expect(mockSasParams.getRqAdType()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
@@ -499,7 +500,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").anyTimes();
         expect(mockSasParams.getSdkVersion()).andReturn("a350").anyTimes();
         expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
-        expect(mockSasParams.getRqAdType()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
@@ -558,7 +559,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRqAdType()).andReturn("int").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
@@ -1035,7 +1036,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRqAdType()).andReturn("int").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())

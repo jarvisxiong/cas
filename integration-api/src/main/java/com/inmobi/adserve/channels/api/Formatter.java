@@ -15,6 +15,7 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
@@ -67,7 +68,8 @@ public class Formatter {
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 context.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }
-            if ("int".equalsIgnoreCase(sasParams.getRqAdType())) {
+            if (null != sasParams.getRequestedAdType() &&
+                    RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
                 context.put(VelocityTemplateFieldConstants.IS_INTERSTITIAL, true);
             }
         }

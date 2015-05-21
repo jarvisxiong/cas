@@ -35,6 +35,7 @@ import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -437,7 +438,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         forwardedBidGuidance = Math.max(sasParams.getMarketRate(), forwardedBidFloor);
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
-        impression.setInstl(null != sasParams.getRqAdType() && "int".equalsIgnoreCase(sasParams.getRqAdType())
+        impression.setInstl(null != sasParams.getRequestedAdType() &&
+                RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()
                 || isVideoRequest ? 1 : 0);
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
