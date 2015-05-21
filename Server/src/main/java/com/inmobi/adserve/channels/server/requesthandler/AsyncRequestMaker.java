@@ -48,7 +48,7 @@ public class AsyncRequestMaker {
     public List<ChannelSegment> prepareForAsyncRequest(final List<ChannelSegment> rows, final Configuration config,
             final Configuration rtbConfig, final Configuration adapterConfig, final HttpRequestHandlerBase base,
             final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
-            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameterGlobal,
+            final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalGlobal,
             final List<ChannelSegment> rtbSegments) throws Exception {
         final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
         LOG.debug("Total channels available for sending requests {}", rows.size());
@@ -88,11 +88,10 @@ public class AsyncRequestMaker {
             String beaconUrl = null;
             // Replacing int key in auction id to generate impression id
             sasParams.setImpressionId(ImpressionIdGenerator.getInstance().resetWilburyIntKey(
-                    casInternalRequestParameterGlobal.getAuctionId(), incId));
-            final CasInternalRequestParameters casInternalRequestParameters =
-                    getCasInternalRequestParameters(sasParams, casInternalRequestParameterGlobal);
+                    casInternalGlobal.getAuctionId(), incId));
+            final CasInternalRequestParameters casInternal = getLocalCasInternal(sasParams, casInternalGlobal);
 
-            controlEnrichment(casInternalRequestParameters, channelSegmentEntity);
+            controlEnrichment(casInternal, channelSegmentEntity);
             sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
@@ -115,8 +114,8 @@ public class AsyncRequestMaker {
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
             network.disableIPResolution(config.getBoolean("isIPRepositoryDisabled", true));
-            if (network.configureParameters(sasParams, casInternalRequestParameters, channelSegmentEntity, clickUrl,
-                    beaconUrl, row.getRequestedSlotId(), repositoryHelper)) {
+            if (network.configureParameters(sasParams, casInternal, channelSegmentEntity, clickUrl, beaconUrl,
+                    row.getRequestedSlotId(), repositoryHelper)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner() || network.isIxPartner()) {
@@ -130,7 +129,7 @@ public class AsyncRequestMaker {
         return segments;
     }
 
-    private CasInternalRequestParameters getCasInternalRequestParameters(final SASRequestParameters sasParams,
+    private CasInternalRequestParameters getLocalCasInternal(final SASRequestParameters sasParams,
             final CasInternalRequestParameters casGlobal) {
         final CasInternalRequestParameters casInternal = new CasInternalRequestParameters();
         casInternal.setImpressionId(sasParams.getImpressionId());
@@ -148,40 +147,42 @@ public class AsyncRequestMaker {
         casInternal.setUidMd5(casGlobal.getUidMd5());
         casInternal.setUidADT(casGlobal.getUidADT());
         casInternal.setSiteFloor(sasParams.getSiteFloor());
-        if (null != sasParams.getPostalCode()) {
-            casInternal.setZipCode(sasParams.getPostalCode());
-        }
+        casInternal.setZipCode(sasParams.getPostalCode());
         casInternal.setLatLong(sasParams.getLatLong());
         casInternal.setAppUrl(sasParams.getAppUrl());
         casInternal.setTraceEnabled(casGlobal.isTraceEnabled());
         casInternal.setSiteAccountType(casGlobal.getSiteAccountType());
-
         return casInternal;
     }
 
-    private void controlEnrichment(final CasInternalRequestParameters casInternalRequestParameters,
-            final ChannelSegmentEntity channelSegmentEntity) {
-        if (channelSegmentEntity.isStripUdId()) {
-            casInternalRequestParameters.setUid(null);
-            casInternalRequestParameters.setUidO1(null);
-            casInternalRequestParameters.setUidMd5(null);
-            casInternalRequestParameters.setUidIFA(null);
-            casInternalRequestParameters.setGpid(null);
-            casInternalRequestParameters.setUidIFV(null);
-            casInternalRequestParameters.setUidIDUS1(null);
-            casInternalRequestParameters.setUidSO1(null);
-            casInternalRequestParameters.setUidADT(null);
+    private void controlEnrichment(final CasInternalRequestParameters casInternal,
+            final ChannelSegmentEntity csEntity) {
+        LOG.debug("In controlEnrichment AdGroup Id = {}, Advertiser Id = {}", csEntity.getAdgroupId(),
+                csEntity.getAdvertiserId());
+        if (csEntity.isStripUdId()) {
+            LOG.debug("Stripping all UIDs");
+            casInternal.setUid(null);
+            casInternal.setUidO1(null);
+            casInternal.setUidMd5(null);
+            casInternal.setUidIFA(null);
+            casInternal.setGpid(null);
+            casInternal.setUidIFV(null);
+            casInternal.setUidIDUS1(null);
+            casInternal.setUidSO1(null);
+            casInternal.setUidADT(null);
         }
-        if (channelSegmentEntity.isStripZipCode()) {
-            casInternalRequestParameters.setZipCode(null);
+        if (csEntity.isStripZipCode()) {
+            LOG.debug("Stripping ZIP Codes");
+            casInternal.setZipCode(null);
         }
-        if (channelSegmentEntity.isStripLatlong()) {
-            casInternalRequestParameters.setLatLong(null);
+        if (csEntity.isStripLatlong()) {
+            LOG.debug("Stripping LatLong");
+            casInternal.setLatLong(null);
         }
-        if (!channelSegmentEntity.isAppUrlEnabled()) {
-            casInternalRequestParameters.setAppUrl(null);
+        if (!csEntity.isAppUrlEnabled()) {
+            LOG.debug("Stripping App URL");
+            casInternal.setAppUrl(null);
         }
-
     }
 
     public List<ChannelSegment> makeAsyncRequests(final List<ChannelSegment> rankList, final Channel channel,

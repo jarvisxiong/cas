@@ -718,7 +718,8 @@ public class RtbAdnetworkTest {
         builder.setAppType("Games");
         builder.setTransparencyEnabled(true);
         builder.setSiteUrl("www.inmobi.com");
-        builder.setBundleId("com.android.app");
+        builder.setBundleId("com.android.app.bundleId");
+        builder.setMarketId("com.android.app.marketId");
         sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
@@ -726,7 +727,7 @@ public class RtbAdnetworkTest {
                 repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
-        assertEquals("com.android.app", rtbAdNetwork.getBidRequest().getApp().getBundle());
+        assertEquals("com.android.app.marketId", rtbAdNetwork.getBidRequest().getApp().getBundle());
         assertEquals("some_site_id", rtbAdNetwork.getBidRequest().getApp().getId());
 
     }

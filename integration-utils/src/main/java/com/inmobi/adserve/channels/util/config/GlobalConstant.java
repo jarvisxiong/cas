@@ -18,5 +18,6 @@ public class GlobalConstant {
     public static final String ONE = "1";
     public static final String GENDER_MALE = "M";
     public static final String GENDER_FEMALE = "F";
-
+    public static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
+    public static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
 }

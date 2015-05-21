@@ -390,7 +390,8 @@ public class IXAdNetworkTest extends TestCase {
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             builder.setTransparencyEnabled(false);
-            builder.setBundleId("com.play.google.testApp");
+            builder.setBundleId("com.play.google.testApp.bundleId");
+            builder.setMarketId("com.play.google.testApp.marketId");
             builder.setSiteUrl("http://www.testSite.com");
             sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
@@ -445,7 +446,7 @@ public class IXAdNetworkTest extends TestCase {
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlind(), (Integer)0);
             assertEquals(ixAdNetwork.getBidRequest().getApp().getTransparency().getBlindbuyers(), blindList);
             assertNotNull(ixAdNetwork.getBidRequest().getApp().getExt().getBlind().getBundle());
-            assertEquals(ixAdNetwork.getBidRequest().getApp().getBundle(), "com.play.google.testApp");
+            assertEquals(ixAdNetwork.getBidRequest().getApp().getBundle(), "com.play.google.testApp.marketId");
 
             // Test case when site_blind_list or pub_blind_list is present
             sas.setSource("wap");

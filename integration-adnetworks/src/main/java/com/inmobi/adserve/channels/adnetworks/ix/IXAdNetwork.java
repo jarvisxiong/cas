@@ -60,9 +60,9 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
@@ -105,13 +105,14 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
 
 /**
  * Generic IX adapter.
- * 
+ *
  * @author Anshul Soni(anshul.soni@inmobi.com)
  * @author ritwik.kumar
  */
@@ -128,8 +129,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final int IX_MRAID2_VALUE = 1001;
     private static final int IX_MRAID1_VALUE = 1000;
 
-    private static final List<Integer> MRAID_FRAMEWORK_VALUES = Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(),API_FRAMEWORKS.MRAID_1.getValue(),
-            IX_MRAID2_VALUE,IX_MRAID1_VALUE);
+    private static final List<Integer> MRAID_FRAMEWORK_VALUES = Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(),
+            API_FRAMEWORKS.MRAID_1.getValue(), IX_MRAID2_VALUE, IX_MRAID1_VALUE);
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final short AGE_LIMIT_FOR_COPPA = 8;
@@ -241,8 +242,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         minimumSdkVerForVAST = config.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450);
-        sproutUniqueIdentifierRegex = config.getString(advertiserName + ".sprout.uniqueIdentifierRegex",
-                ".*data-creative[iI]d.*");
+        sproutUniqueIdentifierRegex =
+                config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", ".*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -440,6 +441,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 || isVideoRequest ? 1 : 0);
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
+
+        if (null != sasParams.getSdkVersion()) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
+            impression.setDisplaymanagerver(sasParams.getSdkVersion());
+        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
+        }
+
         final ImpressionExtension ext = getImpExt();
         impression.setExt(ext);
         // If ext is null, that means zone id is missing so do not proceed
@@ -521,7 +530,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        return (Native)nb.buildNative();
+        return (Native) nb.buildNative();
     }
 
     private Banner createBannerObject() {
@@ -712,7 +721,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void setParamsForTransparentSite(final Site site, final CommonExtension ext) {
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         site.setId(sasParams.getSiteId());
         final String tempSiteUrl = wapSiteUACEntity.getSiteUrl();
         if (StringUtils.isNotEmpty(tempSiteUrl)) {
@@ -722,7 +730,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             site.setName(wapSiteUACEntity.getSiteName());
         }
+
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
+
         final Blind blindForSite = new Blind();
         blindForSite.setPage(blindDomain);
         blindForSite.setDomain(blindDomain);
@@ -736,9 +747,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
                         .getAppType() : getCategories(',', false);
         site.setName(category);
+
         final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
         site.setPage(blindDomain);
         site.setDomain(blindDomain);
+
         final Blind blindForSite = new Blind();
         blindForSite.setPage(blindDomain);
         blindForSite.setDomain(blindDomain);
@@ -835,12 +848,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
-        String bundleId = wapSiteUACEntity.getBundleId();
-        if (StringUtils.isEmpty(bundleId) && wapSiteUACEntity.isAndroid()) {
-            bundleId = wapSiteUACEntity.getMarketId();
-        }
-        if (StringUtils.isNotEmpty(bundleId)) {
-            app.setBundle(bundleId);
+
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getMarketId())) {
+            app.setBundle(wapSiteUACEntity.getMarketId());
         }
 
         // Set either of title or Name, giving priority to title
@@ -865,6 +875,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         app.setName(category);
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         app.setBundle(blindBundle);
+
         final Blind blindForApp = new Blind();
         blindForApp.setBundle(blindBundle);
         ext.setBlind(blindForApp);
@@ -901,13 +912,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             device.setConnectiontype(ConnectionType.UNKNOWN.getValue());
         }
         // Setting do not track
-        if (null != casInternalRequestParameters.getUidADT()) {
-            try {
-                device.setLmt(Integer.parseInt(casInternalRequestParameters.getUidADT()) == 0 ? 1 : 0);
-            } catch (final NumberFormatException e) {
-                LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
-            }
-        }
+        device.setLmt(GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? 1 : 0);
+
         // Setting platform id sha1 hashed
         if (null != casInternalRequestParameters.getUidSO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidSO1());
@@ -1043,10 +1049,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     protected boolean isSproutAd() {
         final String adm = getAdMarkUp();
         boolean isSproutAd = false;
-        if (null != adm)  {
+        if (null != adm) {
             try {
                 isSproutAd = adm.matches(sproutUniqueIdentifierRegex);
-            } catch (Exception ignored) {
+            } catch (final Exception ignored) {
                 isSproutAd = false;
             }
         }
@@ -1201,6 +1207,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     return;
                 }
                 LOG.debug(traceMarker, "Sprout Ad Received");
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VALID_SPROUT_RESPONSES);
                 admContent =
                         IXAdNetworkHelper.replaceSproutMacros(admContent, casInternalRequestParameters, sasParams,
                                 isCoppaSet, clickUrl, beaconUrl);
@@ -1351,7 +1358,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     /**
      * Checks whether the response string structurally conforms to the response contract. This is enforced by
      * GsonContractDeserialiser
-     * 
+     *
      * @param response Response string received from partner
      * @return true if response string conforms to the response contract
      */
@@ -1381,7 +1388,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     /**
      * Checks whether the response object has a non zero status code and logs it.
-     * 
+     *
      * @return true if response object has a non-zero status code
      */
     private boolean responseHasNonZeroStatusCode() {
@@ -1403,7 +1410,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
      * 2) There is at least one Bid object <br>
      * 3) Buyer is not empty/null <br>
      * 4) Both adm and admobject are not simultaneously empty/null nor simultaneously set
-     * 
+     *
      * @return true if the above conditions are met
      */
     protected boolean conformsToValidBidStructure() {
@@ -1458,7 +1465,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     /**
      * Deserialises and validates the bid response object and configures the adapter
-     * 
+     *
      * @param response
      * @return
      */
@@ -1529,7 +1536,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             Bid->estimated
             Bid->adomain
             Bid->w and Bid->h
-        */
+         */
 
         if (updateDSPAccountInfo(dspId)) {
             LOG.debug(traceMarker, "Response successfully deserialised");

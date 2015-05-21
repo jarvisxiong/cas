@@ -77,12 +77,13 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Generic RTB adapter.
- * 
+ *
  * @author Devi Chand(devi.chand@inmobi.com)
  * @author ritwik.kumar
  */
@@ -96,8 +97,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RtbAdNetwork.class);
     private static final int AUCTION_TYPE = 2;
     private static final String X_OPENRTB_VERSION = "x-openrtb-version";
-    private static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
-    private static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
     private static final int DEVICE_TYPE_PHONE = 4;
     private static final int DEVICE_TYPE_TABLET = 5;
     private static List<String> image_mimes = Arrays.asList("image/jpeg", "image/gif", "image/png");
@@ -112,7 +111,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final String BLIND_STORE_URL_FORMAT = "http://www.ix.com/%s";
-    
+
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
 
@@ -233,15 +232,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final User user = createUserObject();
         // Creating Impression Object
         final List<Impression> impresssionlist = new ArrayList<Impression>();
-        String displayManager = null;
-        String displayManagerVersion = null;
-        if (null != sasParams.getSdkVersion()) {
-            displayManager = DISPLAY_MANAGER_INMOBI_SDK;
-            displayManagerVersion = sasParams.getSdkVersion();
-        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
-            displayManager = DISPLAY_MANAGER_INMOBI_JS;
-        }
-        final Impression impression = createImpressionObject(banner, displayManager, displayManagerVersion);
+        final Impression impression = createImpressionObject(banner);
         if (null == impression) {
             LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
                     advertiserName);
@@ -342,8 +333,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return true;
     }
 
-    private Impression createImpressionObject(final Banner banner, final String displayManager,
-            final String displayManagerVersion) {
+    private Impression createImpressionObject(final Banner banner) {
         // nullcheck for casInternalRequestParams and sasParams done while configuring adapter
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
@@ -369,11 +359,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
-        if (null != displayManager) {
-            impression.setDisplaymanager(displayManager);
-        }
-        if (null != displayManagerVersion) {
-            impression.setDisplaymanagerver(displayManagerVersion);
+        if (null != sasParams.getSdkVersion()) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
+            impression.setDisplaymanagerver(sasParams.getSdkVersion());
+        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
         }
 
         if (isNativeResponseSupported && isNativeRequest()) {
@@ -400,7 +390,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        final Native nat = (Native)nb.buildNative();
+        final Native nat = (Native) nb.buildNative();
         // TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
         // if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
         // nat.api.add(3);
@@ -481,7 +471,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Site createSiteObject() {
-        Site site = new Site();
+        final Site site = new Site();
         if (isRequestBlinded()) {
             setParamsForBlindSite(site);
         } else {
@@ -537,7 +527,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private App createAppObject() {
-        App app = new App();
+        final App app = new App();
         if (isRequestBlinded()) {
             setParamsForBlindApp(app);
         } else {
@@ -559,18 +549,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         app.setExt(ext);
         return app;
     }
-    
+
     private boolean isRequestBlinded() {
         if (siteBlinded) {
             return true;
         }
-
         boolean isRequestBlind = true;
-
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
             isRequestBlind = false;
         }
-
         return isRequestBlind;
     }
 
@@ -581,12 +568,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
 
-        String bundleId = wapSiteUACEntity.getBundleId();
-        if (StringUtils.isEmpty(bundleId) && wapSiteUACEntity.isAndroid()) {
-            bundleId = wapSiteUACEntity.getMarketId();
-        }
-        if (StringUtils.isNotEmpty(bundleId)) {
-            app.setBundle(bundleId);
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getMarketId())) {
+            app.setBundle(wapSiteUACEntity.getMarketId());
         }
     }
 
@@ -636,7 +619,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (DeviceType.TABLET == sasParams.getDeviceType()) {
             device.setDevicetype(DEVICE_TYPE_TABLET);
         } else {
-            device.setDevicetype(DEVICE_TYPE_PHONE);    // SmartPhones and FeaturePhones
+            device.setDevicetype(DEVICE_TYPE_PHONE); // SmartPhones and FeaturePhones
         }
         device.setModel(sasParams.getDeviceModel());
         device.setMake(sasParams.getDeviceMake());
@@ -705,7 +688,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Map<String, String> getDeviceExt(final Device device) {
-        Map<String, String> deviceExtensions = new HashMap<>();
+        final Map<String, String> deviceExtensions = new HashMap<>();
 
         if (null != sasParams.getAge()) {
             deviceExtensions.put("age", sasParams.getAge().toString());
@@ -1101,8 +1084,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public String getAdMarkUp() {
         return adm;
     }
-    
-    public void setSiteBlinded(boolean value){
+
+    public void setSiteBlinded(final boolean value) {
         siteBlinded = value;
     }
 

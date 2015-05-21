@@ -573,7 +573,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected String getCategories(final char seperator) {
         return getCategories(seperator, true);
-
     }
 
     protected String getCategories(final char seperator, final boolean isAllRequired) {
@@ -912,7 +911,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected String getGPID() {
         return StringUtils.isNotBlank(casInternalRequestParameters.getGpid())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters.getGpid() : null;
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters
+                .getGpid() : null;
     }
 
     @Override

@@ -23,4 +23,7 @@ public final class Impression {
     private Integer instl = 0;
     private Integer secure = 0;
     private ImpressionExtension ext;
+    // https://jira.corp.inmobi.com/browse/PROG-1052
+    private String displaymanager;
+    private String displaymanagerver;
 }
