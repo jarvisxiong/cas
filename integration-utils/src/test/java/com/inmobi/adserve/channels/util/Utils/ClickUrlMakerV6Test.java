@@ -40,7 +40,7 @@ public class ClickUrlMakerV6Test extends TestCase {
         builder.setBeaconEnabledOnSite(true);
         builder.setCarrierId(2);
         builder.setCountryId(12);
-        builder.setSegmentId(201);
+        builder.setSiteSegmentId(201);
         builder.setCPC(true);
         builder.setGender("m");
         builder.setHandsetInternalId((long) 2.0);
@@ -77,13 +77,15 @@ public class ClickUrlMakerV6Test extends TestCase {
 
     @Test
     public void testClickUrlMaker() {
-        final ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(generateBasicClickUrlMakerV6());
+        final ClickUrlMakerV6.Builder builder = generateBasicClickUrlMakerV6();
+        builder.setPlacementId(null);
+        final ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
         clickUrlMakerV6.createClickUrls();
         assertEquals(
-                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/73fe5594",
+                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/c5e31bc0",
                 clickUrlMakerV6.getBeaconUrl());
         assertEquals(
-                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/7ca42f24",
+                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/f4c5d28b",
                 clickUrlMakerV6.getClickUrl());
     }
 
@@ -92,13 +94,14 @@ public class ClickUrlMakerV6Test extends TestCase {
     public void testClickUrlMakerWithTest() {
         ClickUrlMakerV6.Builder builder = generateBasicClickUrlMakerV6();
         builder.setTestMode(true);
+        builder.setPlacementId(null);
         final ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
         clickUrlMakerV6.createClickUrls();
         assertEquals(
-                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/ae867707",
+                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/39ec2cdb",
                 clickUrlMakerV6.getBeaconUrl());
         assertEquals(
-                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/4963d407",
+                "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/18286e26",
                 clickUrlMakerV6.getClickUrl());
     }
 
@@ -107,13 +110,14 @@ public class ClickUrlMakerV6Test extends TestCase {
         ClickUrlMakerV6.Builder builder = generateBasicClickUrlMakerV6();
         builder.setTestMode(true);
         builder.setCPC(false);
+        builder.setPlacementId(null);
         final ClickUrlMakerV6 clickUrlMakerV6 = new ClickUrlMakerV6(builder);
         clickUrlMakerV6.createClickUrls();
         assertEquals(
-                "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/a4af85ef",
+                "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/c4801f9b",
                 clickUrlMakerV6.getBeaconUrl());
         assertEquals(
-                "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/f58a2179",
+                "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/76256371268/0/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/2/9e3f8b51",
                 clickUrlMakerV6.getClickUrl());
     }
 

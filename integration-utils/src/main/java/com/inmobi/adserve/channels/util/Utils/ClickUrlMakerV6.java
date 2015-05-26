@@ -61,7 +61,8 @@ public class ClickUrlMakerV6 {
     private final String cryptoSecretKey;
     private final String rmBeaconURLPrefix;
     private final String imageBeaconURLPrefix;
-    private final Integer segmentId;
+    private final Integer siteSegmentId;
+    private final Integer placementSegmentId;
     private final String clickURLPrefix;
     private final String imSdk;
     private final String impressionId;
@@ -98,7 +99,8 @@ public class ClickUrlMakerV6 {
         cryptoSecretKey = builder.cryptoSecretKey;
         rmBeaconURLPrefix = builder.rmBeaconURLPrefix;
         imageBeaconURLPrefix = builder.imageBeaconURLPrefix;
-        segmentId = builder.segmentId;
+        siteSegmentId = builder.siteSegmentId;
+        placementSegmentId = builder.placementSegmentId;
         clickURLPrefix = builder.clickURLPrefix;
         imSdk = builder.imSdk;
         impressionId = builder.impressionId;
@@ -171,7 +173,8 @@ public class ClickUrlMakerV6 {
         private String cryptoSecretKey;
         private String rmBeaconURLPrefix;
         private String imageBeaconURLPrefix;
-        private Integer segmentId;
+        private Integer siteSegmentId;
+        private Integer placementSegmentId;
         private String clickURLPrefix;
         private String imSdk;
         private String impressionId;
@@ -268,12 +271,14 @@ public class ClickUrlMakerV6 {
         } else {
             adUrlSuffix.append(appendSeparator(DEFAULTIMSDK));
         }
-        // 15th segmentId
-        if (null != segmentId) {
-            adUrlSuffix.append(appendSeparator(getIdBase36(segmentId)));
-        } else {
-            adUrlSuffix.append(appendSeparator(Integer.toString(0)));
+        // 15th siteSegmentId/placementSegmentId
+        String segmentIdStr = Integer.toString(0);
+        if (null != placementId && null != placementSegmentId) {
+            segmentIdStr = getIdBase36(placementSegmentId);
+        } else if (null == placementId && null != siteSegmentId) {
+            segmentIdStr = getIdBase36(siteSegmentId);
         }
+        adUrlSuffix.append(appendSeparator(segmentIdStr));
 
         // 16the field for tier info
         adUrlSuffix.append(appendSeparator(tierInfo));
@@ -356,7 +361,9 @@ public class ClickUrlMakerV6 {
 
         // 28th URL Component: encoded thrift serialized object with placementID, normalizedUserID and requestedAdType
         ImpressionInfo impInfo = new ImpressionInfo();
-        impInfo.setPlacementId(placementId);
+        if (null != placementId) {
+            impInfo.setPlacementId(placementId);
+        }
         impInfo.setNormalizedUserId(normalizedUserId);
 
         if (null != requestedAdType) {

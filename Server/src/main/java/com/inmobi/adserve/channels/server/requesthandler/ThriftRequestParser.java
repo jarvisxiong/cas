@@ -69,8 +69,12 @@ public class ThriftRequestParser {
         params.setAllowBannerAds(tObject.isSetSupplyAllowedContents()
                 && tObject.supplyAllowedContents.contains(SupplyContentType.BANNER));
         // TODO use segment id in cas as long
-        final int segmentId = tObject.isSetSegmentId() ? (int) tObject.segmentId : 0;
-        params.setSiteSegmentId(segmentId);
+        if (tObject.isSetSiteSegmentId()) {
+            params.setSiteSegmentId((int)tObject.siteSegmentId);
+        }
+        if (tObject.isSetPlacementSegmentId()) {
+            params.setPlacementSegmentId((int)tObject.placementSegmentId);
+        }
         params.setRequestedAdType(tObject.getRequestedAdType());
         params.setRichMedia(tObject.isSetSupplyAllowedContents()
                 && tObject.supplyAllowedContents.contains(SupplyContentType.RICH_MEDIA));
@@ -254,8 +258,10 @@ public class ThriftRequestParser {
                 params.setConnectionType(ConnectionType.UNKNOWN);
             }
         }
-        
-        params.setPlacementId(tObject.placementId);
+
+        if (tObject.isSetPlacementId()) {
+            params.setPlacementId(tObject.placementId);
+        }
         params.setIntegrationDetails(tObject.getIntegrationDetails());
         params.setAppBundleId(tObject.getAppBundleId());
         

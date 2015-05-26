@@ -429,6 +429,7 @@ public class Logging {
                 }
             }
 
+            // Currently only populating the siteSegmentId
             final Integer siteSegmentId = sasParams.getSiteSegmentId();
             if (null != siteSegmentId) {
                 request.setSegmentId(siteSegmentId);

@@ -194,7 +194,7 @@ public class ThriftRequestParserTest extends TestCase {
         supplyAllowedContents.add(SupplyContentType.TEXT);
         adPoolRequest.setSupplyAllowedContents(supplyAllowedContents);
         adPoolRequest.setRemoteHostIp("10.14.118.143");
-        adPoolRequest.setSegmentId(234);
+        adPoolRequest.setSiteSegmentId(234);
         final List<Short> selectedSlots = new ArrayList<Short>();
         selectedSlots.add((short) 12);
         adPoolRequest.setSelectedSlots(selectedSlots);
@@ -311,7 +311,7 @@ public class ThriftRequestParserTest extends TestCase {
         supplyAllowedContents.add(SupplyContentType.TEXT);
         adPoolRequest.setSupplyAllowedContents(supplyAllowedContents);
         adPoolRequest.setRemoteHostIp("10.14.118.143");
-        adPoolRequest.setSegmentId(234);
+        adPoolRequest.setSiteSegmentId(234);
         adPoolRequest.setRequestedAdCount((short) 1);
         adPoolRequest.setTaskId("tid");
         adPoolRequest.setResponseFormatDeprecated(ResponseFormat.XHTML);
@@ -425,7 +425,7 @@ public class ThriftRequestParserTest extends TestCase {
         supplyAllowedContents.add(SupplyContentType.TEXT);
         adPoolRequest.setSupplyAllowedContents(supplyAllowedContents);
         adPoolRequest.setRemoteHostIp("10.14.118.143");
-        adPoolRequest.setSegmentId(234);
+        adPoolRequest.setSiteSegmentId(234);
         adPoolRequest.setRequestedAdCount((short) 1);
         adPoolRequest.setTaskId("tid");
         adPoolRequest.setResponseFormatDeprecated(ResponseFormat.XHTML);

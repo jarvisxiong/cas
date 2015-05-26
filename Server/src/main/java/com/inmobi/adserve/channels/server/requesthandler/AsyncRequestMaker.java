@@ -228,7 +228,8 @@ public class AsyncRequestMaker {
         builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
         builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
         builder.setLocation(null != sasParams.getState() ? sasParams.getState() : 0);
-        builder.setSegmentId(null != sasParams.getSiteSegmentId() ? sasParams.getSiteSegmentId() : 0);
+        builder.setSiteSegmentId(sasParams.getSiteSegmentId());
+        builder.setPlacementSegmentId(sasParams.getPlacementSegmentId());
         builder.setGender(null != sasParams.getGender() ? sasParams.getGender() : StringUtils.EMPTY);
         builder.setCPC(pricingModel);
         builder.setCarrierId(sasParams.getCarrierId());

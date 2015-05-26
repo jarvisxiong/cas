@@ -51,6 +51,7 @@ public class SASRequestParameters {
     private Double siteFloor = 0.0d;
     private Boolean allowBannerAds = true;
     private Integer siteSegmentId;
+    private Integer placementSegmentId;
 
     // Pub Control parameter.
     private List<AdTypeEnum> pubControlSupportedAdTypes;
@@ -90,7 +91,7 @@ public class SASRequestParameters {
     private String osMajorVersion;
     private ConnectionType connectionType;
     private double marketRate;
-    private long placementId;
+    private Long placementId;
     private IntegrationDetails integrationDetails;
     private String appBundleId;
     private String normalizedUserId;
