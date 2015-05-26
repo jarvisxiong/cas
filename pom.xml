@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>5.13-SNAPSHOT</version>
+	<version>5.13</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -433,7 +433,7 @@
 		<connection>scm:git:git@github.corp.inmobi.com:channel-adserve/cas.git</connection>
 		<url>scm:git:git@github.corp.inmobi.com:channel-adserve/cas.git</url>
 		<developerConnection>scm:git:git@github.corp.inmobi.com:channel-adserve/cas.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>5.13</tag>
 	</scm>
 
 	<repositories>
