@@ -52,7 +52,7 @@ public abstract class BaseServlet implements Servlet {
     protected final CasUtils casUtils;
 
     /**
-     * 
+     *
      * @param matchSegments
      * @param traceMarkerProvider
      * @param channelSegmentFilterApplier
@@ -77,7 +77,7 @@ public abstract class BaseServlet implements Servlet {
     }
 
     /**
-     * 
+     *
      * @return
      */
     protected abstract boolean isEnabled();
@@ -187,7 +187,7 @@ public abstract class BaseServlet implements Servlet {
 
     /**
      * Enrichment common for all ad pools
-     * 
+     *
      * @param hrh
      * @param sasParams
      * @param sasParams
@@ -222,7 +222,7 @@ public abstract class BaseServlet implements Servlet {
 
     /**
      * Specific Enrichment for all ad pools
-     * 
+     *
      * @param casContext
      * @param sasParams
      * @param casInternal

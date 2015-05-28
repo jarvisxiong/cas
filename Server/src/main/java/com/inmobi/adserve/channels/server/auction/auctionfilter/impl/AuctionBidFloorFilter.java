@@ -24,11 +24,11 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
     }
 
     /**
-     * This filter fails channelSegments which have bid lower than the effective auction bid floor.
-     * For RTBD (excluding Hosted), the effective auction bid floor is set to
-     *     max(casInternalRequestParameters.getAuctionBidFloor(), demandDensity (=alpha*omega))
-     * otherwise, it is set to
-     *     casInternalRequestParameters.getAuctionBidFloor()
+     * This filter fails channelSegments which have bid lower than the effective auction bid floor.<br>
+     * For RTBD (excluding Hosted), the effective auction bid floor is set to<br>
+     * max(casInternalRequestParameters.getAuctionBidFloor(), demandDensity (=alpha*omega))<br>
+     * otherwise, it is set to<br>
+     * casInternalRequestParameters.getAuctionBidFloor()
      *
      * @param rtbSegment
      * @param casInternalRequestParameters
@@ -36,12 +36,12 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
      */
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-                                     final CasInternalRequestParameters casInternalRequestParameters) {
+            final CasInternalRequestParameters casInternalRequestParameters) {
 
         double effectiveAuctionBidFloor = casInternalRequestParameters.getAuctionBidFloor();
         if (rtbSegment.getAdNetworkInterface() instanceof RtbAdNetwork) {
-            effectiveAuctionBidFloor = Math.max(effectiveAuctionBidFloor,
-                    casInternalRequestParameters.getDemandDensity());
+            effectiveAuctionBidFloor =
+                    Math.max(effectiveAuctionBidFloor, casInternalRequestParameters.getDemandDensity());
         }
 
         if (rtbSegment.getAdNetworkInterface().getBidPriceInUsd() < effectiveAuctionBidFloor) {

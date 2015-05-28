@@ -12,8 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -25,7 +23,6 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -45,7 +42,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestParserHandler.class);
 
-    private final RequestParser requestParser;
     private final ThriftRequestParser thriftRequestParser;
     private final Provider<Marker> traceMarkerProvider;
     private final Provider<Servlet> servletProvider;
@@ -55,11 +51,9 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
     private final Injector injector;
 
     @Inject
-    RequestParserHandler(final RequestParser requestParser, final ThriftRequestParser thriftRequestParser,
-            final Provider<Marker> traceMarkerProvider, final Provider<Servlet> servletProvider,
-            final Provider<HttpRequestHandler> httpRequestHandlerProvider, final Injector injector,
-            final NettyRequestScope scope) {
-        this.requestParser = requestParser;
+    RequestParserHandler(final ThriftRequestParser thriftRequestParser, final Provider<Marker> traceMarkerProvider,
+            final Provider<Servlet> servletProvider, final Provider<HttpRequestHandler> httpRequestHandlerProvider,
+            final Injector injector, final NettyRequestScope scope) {
         this.thriftRequestParser = thriftRequestParser;
         this.traceMarkerProvider = traceMarkerProvider;
         this.servletProvider = servletProvider;
@@ -84,7 +78,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             final Map<String, List<String>> params = queryStringDecoder.parameters();
 
             sasParams.setKeepAlive(HttpHeaders.isKeepAlive(request));
-            String automationTestId = request.headers().get("x-mkhoj-automation");
+            final String automationTestId = request.headers().get("x-mkhoj-automation");
             if (StringUtils.isNotEmpty(automationTestId)) {
                 sasParams.setAutomationTestId(automationTestId);
             }
@@ -117,17 +111,6 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                     LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
                     InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
                 }
-            } else if (params.containsKey("args") && null != dst) {
-                JSONObject jsonObject;
-                try {
-                    jsonObject = requestParser.extractParams(params);
-                } catch (final JSONException exception) {
-                    terminationReason = CasConfigUtil.JSON_PARSING_ERROR;
-                    jsonObject = new JSONObject();
-                    LOG.debug("Encountered Json Error while creating json object inside ", exception);
-                    InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
-                }
-                requestParser.parseRequestParameters(jsonObject, sasParams, casInternalRequestParameters);
             } else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
                 String rawContent = null;
                 if (!params.isEmpty()) {

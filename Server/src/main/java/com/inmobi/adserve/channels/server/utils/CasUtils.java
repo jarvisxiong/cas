@@ -1,8 +1,15 @@
 package com.inmobi.adserve.channels.server.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +27,8 @@ import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * @author abhishek.parwal
- * 
+ * @author ritwik.kumar
+ *
  */
 @Singleton
 public class CasUtils {
@@ -55,11 +63,9 @@ public class CasUtils {
 
     public boolean isRequestFromLocalHost(final HttpRequest httpRequest) {
         final String host = getHost(httpRequest);
-
         if (host != null && host.startsWith("localhost")) {
             return true;
         }
-
         return false;
     }
 
@@ -78,7 +84,6 @@ public class CasUtils {
 
     public boolean isVideoSupported(final SASRequestParameters sasParams) {
         boolean isSupported = false;
-
         if (!(sasParams.getProcessedMkSlot().contains((short) 14) || sasParams.getProcessedMkSlot()
                 .contains((short) 32))) {
             return false;
@@ -112,5 +117,25 @@ public class CasUtils {
             }
         }
         return isSupported;
+    }
+
+    /**
+     *
+     * @param params
+     * @param jsonKey
+     * @return
+     * @throws JSONException
+     * @throws UnsupportedEncodingException
+     */
+    public static JSONObject extractParams(final Map<String, List<String>> params, final String jsonKey)
+            throws JSONException, UnsupportedEncodingException {
+        if (params != null && !params.isEmpty()) {
+            final List<String> values = params.get(jsonKey);
+            if (CollectionUtils.isNotEmpty(values)) {
+                final String stringVal = values.iterator().next();
+                return new JSONObject(stringVal);
+            }
+        }
+        return null;
     }
 }

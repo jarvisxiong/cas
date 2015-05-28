@@ -1,13 +1,9 @@
 package com.inmobi.adserve.channels.server.servlet;
 
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.ws.rs.Path;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,12 +16,15 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 /**
- * 
+ *
  * @author ritwik.kumar
  */
 @Singleton
@@ -34,12 +33,6 @@ public class ServletChangeConfig implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletChangeConfig.class);
     private static final String ADAPTER = "adapter.";
     private static final String SERVER = "server.";
-    private final RequestParser requestParser;
-
-    @Inject
-    ServletChangeConfig(final RequestParser requestParser) {
-        this.requestParser = requestParser;
-    }
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
@@ -47,7 +40,7 @@ public class ServletChangeConfig implements Servlet {
         final Map<String, List<String>> params = queryStringDecoder.parameters();
         JSONObject jObject = null;
         try {
-            jObject = requestParser.extractParams(params, "update");
+            jObject = CasUtils.extractParams(params, "update"); // requestParser.extractParams(params, "update");
         } catch (final JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet, {}", exeption);
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
@@ -71,13 +64,14 @@ public class ServletChangeConfig implements Servlet {
                 final String configKey = itr.next().toString();
                 String replacedString = null;
                 if (configKey.startsWith(ADAPTER)
-                        && CasConfigUtil.getAdapterConfig()
-                                .containsKey(replacedString = configKey.replace(ADAPTER, StringUtils.EMPTY))) {
+                        && CasConfigUtil.getAdapterConfig().containsKey(
+                                replacedString = configKey.replace(ADAPTER, StringUtils.EMPTY))) {
                     CasConfigUtil.getAdapterConfig().setProperty(replacedString, jObject.getString(configKey));
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getAdapterConfig().getString(replacedString)).append("\n");
                 } else if (configKey.startsWith(SERVER)
-                        && CasConfigUtil.getServerConfig().containsKey(replacedString = configKey.replace(SERVER, StringUtils.EMPTY))) {
+                        && CasConfigUtil.getServerConfig().containsKey(
+                                replacedString = configKey.replace(SERVER, StringUtils.EMPTY))) {
                     CasConfigUtil.getServerConfig().setProperty(replacedString, jObject.getString(configKey));
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getServerConfig().getString(replacedString)).append("\n");

@@ -124,6 +124,7 @@ public class InspectorStrings {
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
     public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloorInAdPoolRequest";
+    public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
 
     // Package Filter Level Stats
     public static final String PACKAGE_FILTER_STATS = "PackageFilterStats";

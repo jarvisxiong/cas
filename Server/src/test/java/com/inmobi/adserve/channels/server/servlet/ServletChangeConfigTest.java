@@ -6,9 +6,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
+import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
-import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.util.Iterator;
 
@@ -23,13 +23,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+// import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CasConfigUtil.class, InspectorStats.class})
+@PrepareForTest({CasConfigUtil.class, InspectorStats.class, CasUtils.class, InspectorStrings.class})
 public class ServletChangeConfigTest {
 
     @Test
@@ -38,10 +41,10 @@ public class ServletChangeConfigTest {
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        final RequestParser mockRequestParser = createMock(RequestParser.class);
+        mockStatic(CasUtils.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-        expect(mockRequestParser.extractParams(null, "update")).andThrow(new JSONException("Json Exception"));
+        expect(CasUtils.extractParams(null, "update")).andThrow(new JSONException("Json Exception"));
         mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
@@ -52,7 +55,7 @@ public class ServletChangeConfigTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        final ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
+        final ServletChangeConfig tested = new ServletChangeConfig();
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -63,10 +66,12 @@ public class ServletChangeConfigTest {
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        final RequestParser mockRequestParser = createMock(RequestParser.class);
+        mockStatic(CasUtils.class);
+        mockStaticNice(InspectorStrings.class);
+        mockStaticNice(InspectorStats.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-        expect(mockRequestParser.extractParams(null, "update")).andReturn(null).times(1);
+        expect(CasUtils.extractParams(null, "update")).andThrow(new JSONException("Json Exception"));
         mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
         mockResponseSender.sendResponse("Incorrect Json", null);
@@ -75,12 +80,13 @@ public class ServletChangeConfigTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        final ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
+        final ServletChangeConfig tested = new ServletChangeConfig();
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void testHandleRequestJsonSuccessfull() throws Exception {
         final String configKey1 = "adapter.key";
@@ -94,13 +100,13 @@ public class ServletChangeConfigTest {
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        final RequestParser mockRequestParser = createMock(RequestParser.class);
         final JSONObject mockJsonObject = createMock(JSONObject.class);
         final Iterator mockIterator = createMock(Iterator.class);
         final Configuration mockConfig = createMock(Configuration.class);
+        mockStatic(CasUtils.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-        expect(mockRequestParser.extractParams(null, "update")).andReturn(mockJsonObject).times(1);
+        expect(CasUtils.extractParams(null, "update")).andReturn(mockJsonObject).times(1);
         expect(mockJsonObject.keys()).andReturn(mockIterator).times(1);
         expect(mockJsonObject.getString(configKey1)).andReturn(value).times(1);
         expect(mockJsonObject.getString(configKey2)).andReturn(value).times(1);
@@ -122,7 +128,7 @@ public class ServletChangeConfigTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        final ServletChangeConfig tested = new ServletChangeConfig(mockRequestParser);
+        final ServletChangeConfig tested = new ServletChangeConfig();
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -130,7 +136,7 @@ public class ServletChangeConfigTest {
 
     @Test
     public void testGetName() throws Exception {
-        final ServletChangeConfig tested = new ServletChangeConfig(null);
+        final ServletChangeConfig tested = new ServletChangeConfig();
         assertThat(tested.getName(), is(IsEqual.equalTo("configchange")));
     }
 }

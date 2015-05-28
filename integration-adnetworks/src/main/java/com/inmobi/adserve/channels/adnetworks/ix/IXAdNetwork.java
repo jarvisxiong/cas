@@ -438,9 +438,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         forwardedBidGuidance = Math.max(sasParams.getMarketRate(), forwardedBidFloor);
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
-        impression.setInstl(null != sasParams.getRequestedAdType() &&
-                RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()
-                || isVideoRequest ? 1 : 0);
+        impression.setInstl(null != sasParams.getRequestedAdType()
+                && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() || isVideoRequest ? 1 : 0);
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
@@ -845,14 +844,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void setParamsForTransparentApp(final App app, final CommonExtension ext) {
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         app.setId(sasParams.getSiteId());
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
 
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getMarketId())) {
-            app.setBundle(wapSiteUACEntity.getMarketId());
+        String marketId = wapSiteUACEntity.getMarketId();
+        marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
+        if (StringUtils.isNotEmpty(marketId)) {
+            app.setBundle(marketId);
         }
 
         // Set either of title or Name, giving priority to title
@@ -862,6 +862,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             app.setName(wapSiteUACEntity.getSiteName());
         }
 
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         final Blind blindForApp = new Blind();
         blindForApp.setBundle(blindBundle);
@@ -869,12 +870,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void setParamsForBlindApp(final App app, final CommonExtension ext) {
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         app.setId(sasParams.getSiteId());
         final String category =
                 isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
                         .getAppType() : getCategories(',', false);
         app.setName(category);
+
+        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         app.setBundle(blindBundle);
 

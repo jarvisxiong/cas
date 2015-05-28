@@ -569,8 +569,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
 
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getMarketId())) {
-            app.setBundle(wapSiteUACEntity.getMarketId());
+        String marketId = wapSiteUACEntity.getMarketId();
+        marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
+        if (StringUtils.isNotEmpty(marketId)) {
+            app.setBundle(marketId);
         }
     }
 

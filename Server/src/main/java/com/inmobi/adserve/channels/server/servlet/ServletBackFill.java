@@ -57,13 +57,13 @@ public class ServletBackFill extends BaseServlet {
     }
 
     @Override
-    protected void specificEnrichment(CasContext casContext, SASRequestParameters sasParams,
-                                      CasInternalRequestParameters casInternal) {
+    protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal) {
         LOG.debug("enrichDstSpecific DCP");
         casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
         // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
         // This is currently only being used by DCPRubicon
-        double auctionBidFloor = sasParams.getSiteFloor();
+        final double auctionBidFloor = sasParams.getSiteFloor();
         casInternal.setAuctionBidFloor(auctionBidFloor);
         LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
         LOG.debug("AuctionBidFloor is {}", auctionBidFloor);

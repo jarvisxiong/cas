@@ -10,30 +10,26 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.powermock.api.support.membermodification.MemberModifier;
-import org.slf4j.Marker;
+import org.powermock.api.support.membermodification.MemberMatcher;
 import org.testng.annotations.Test;
 
-import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+// import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
-import junit.framework.TestCase;
-
 public class ServerTest extends TestCase {
-
     private ResponseSender responseSender;
-
     private Configuration mockConfig = null;
     private static ConfigurationLoader config;
     private final String debug = "debug";
@@ -45,7 +41,6 @@ public class ServerTest extends TestCase {
     private final String beaconURLPrefix = "http://c3.w.inmobi.com/c.asm";
     private final String secretKeyVersion = "1";
     private SASRequestParameters sasParam;
-    private RequestParser requestParser;
     private static String rrFile = StringUtils.EMPTY;
     private static String channelFile = StringUtils.EMPTY;
     private static int count = 0;
@@ -54,11 +49,7 @@ public class ServerTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-
-
-        MemberModifier.field(InspectorStats.class, "boxName")
-                .set(InspectorStats.class, "randomBox");
-
+        MemberMatcher.field(InspectorStats.class, "boxName").set(InspectorStats.class, "randomBox");
         if (count == 0) {
             prepareLogging();
             config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -72,13 +63,6 @@ public class ServerTest extends TestCase {
 
         final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
         Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig, "hostName");
-
-        requestParser = new RequestParser(new Provider<Marker>() {
-            @Override
-            public Marker get() {
-                return null;
-            }
-        });
     }
 
     public void prepareLogging() throws Exception {
@@ -153,40 +137,8 @@ public class ServerTest extends TestCase {
     }
 
     @Test
-    public void testStringify() throws Exception {
-        final JSONObject jsonObject = prepareParameters();
-        assertEquals(requestParser.stringify(jsonObject, "remoteHostIp"), "10.14.110.100");
-    }
-
-    @Test
     public void testResponseFormat() throws Exception {
         assertEquals(responseSender.getResponseFormat(), ResponseFormat.HTML);
-    }
-
-    @Test
-    public void testParseArray() throws Exception {
-        final JSONObject jsonObject = prepareParameters();
-        assertEquals(requestParser.parseArray(jsonObject, "testarr", 1), "2");
-    }
-
-    @Test
-    public void testGetUserParams() throws Exception {
-        final JSONObject jsonObject = prepareParameters();
-        SASRequestParameters params = new SASRequestParameters();
-        params = requestParser.getUserParams(params, jsonObject);
-        assertEquals(params.getAge().shortValue(), (short) 35);
-    }
-
-    /*
-     * @Test public void testImpressionId() throws Exception { JSONObject jsonObject = prepareParameters();
-     * assertEquals(httpRequestHandler.getImpressionId(jsonObject, 2345l), "4f8d98e2-4bbd-40bc-8729-22da000900f9"); }
-     */
-    @Test
-    public void testGetCategory() throws Exception {
-        final JSONObject jsonObject = prepareParameters();
-        final Long[] category = {1l, 2l};
-        assertTrue("Category are expected to be equal",
-                requestParser.getCategory(jsonObject, "category").equals(Arrays.asList(category)));
     }
 
 }

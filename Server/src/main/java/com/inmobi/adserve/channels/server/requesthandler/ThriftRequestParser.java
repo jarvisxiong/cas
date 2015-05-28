@@ -24,7 +24,6 @@ import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
-import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -48,6 +47,7 @@ import com.inmobi.types.InventoryType;
 @Singleton
 public class ThriftRequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
+    private static final Double MIN_BID_FLOOR = 0.05D;
 
     private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
             "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
@@ -55,7 +55,7 @@ public class ThriftRequestParser {
             AdTypeEnum.VIDEO);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
-            final CasInternalRequestParameters casInternalRequestParameters, final int dst) {
+            final CasInternalRequestParameters casInternal, final int dst) {
         LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
@@ -70,10 +70,13 @@ public class ThriftRequestParser {
                 && tObject.supplyAllowedContents.contains(SupplyContentType.BANNER));
         // TODO use segment id in cas as long
         if (tObject.isSetSiteSegmentId()) {
-            params.setSiteSegmentId((int)tObject.siteSegmentId);
+            params.setSiteSegmentId((int) tObject.siteSegmentId);
         }
         if (tObject.isSetPlacementSegmentId()) {
-            params.setPlacementSegmentId((int)tObject.placementSegmentId);
+            params.setPlacementSegmentId((int) tObject.placementSegmentId);
+        }
+        if (tObject.isSetPlacementId()) {
+            params.setPlacementId(tObject.placementId);
         }
         params.setRequestedAdType(tObject.getRequestedAdType());
         params.setRichMedia(tObject.isSetSupplyAllowedContents()
@@ -81,104 +84,80 @@ public class ThriftRequestParser {
         params.setAccountSegment(getAccountSegments(tObject.demandTypesAllowed));
         params.setIpFileVersion((int) tObject.ipFileVersion);
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.getValue() : 0);
-        final EncryptionKeys encryptionKeys = tObject.getEncryptionKeys();
-        params.setEncryptionKey(encryptionKeys);
+        params.setEncryptionKey(tObject.getEncryptionKeys());
         params.setReferralUrl(tObject.referralUrl);
-
-        // Fill params from integration details object
-        if (tObject.isSetIntegrationDetails()) {
-            params.setRqIframe(tObject.integrationDetails.iFrameId);
-            if (tObject.integrationDetails.isSetAdCodeType()) {
-                params.setAdcode(tObject.integrationDetails.adCodeType.toString());
-            }
-            params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType,
-                    tObject.integrationDetails.integrationVersion));
-            params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
-        }
+        params.setIntegrationDetails(tObject.getIntegrationDetails());
+        params.setAppBundleId(tObject.getAppBundleId());
 
         // Fill param from Site Object
-        if (tObject.isSetSite()) {
-            params.setSiteId(tObject.site.siteId);
-            final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
-            params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
+        setSiteObject(tObject, params, dst);
+        // Fill params from Device Object
+        setDevice(tObject, params);
+        // Fill params from Geo Object
+        setGeo(tObject, params);
+        // Fill Params from User Object
+        setUser(tObject, params);
+        // Fill params from Carrier Object
+        setCarrier(tObject, params);
+        // Fill params from integration details object
+        setIntegrationDetails(tObject, params);
+        // Fill params from UIDParams Object
+        if (tObject.isSetUidParams()) {
+            setUserIdParams(casInternal, tObject.getUidParams());
+            params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+        }
+        LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
+    }
 
-            if (CasConfigUtil.repositoryHelper != null) {
-                params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper
-                        .queryWapSiteUACRepository(tObject.site.siteId));
-
-                params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
-                        tObject.geo.countryId, (int) tObject.device.osId));
+    private void setCarrier(final AdPoolRequest tObject, final SASRequestParameters params) {
+        if (tObject.isSetCarrier()) {
+            params.setCarrierId((int) tObject.carrier.carrierId);
+            if (tObject.getCarrier().isSetConnectionType()) {
+                params.setConnectionType(tObject.carrier.connectionType);
+            } else if (tObject.getCarrier().isSetNetworkType()) {
+                params.setConnectionType(NetworkType.WIFI == tObject.getCarrier().getNetworkType()
+                        ? ConnectionType.WIFI
+                        : ConnectionType.CELLULAR_UNKNOWN);
+            } else {
+                params.setConnectionType(ConnectionType.UNKNOWN);
             }
-            params.setSiteContentType(tObject.site.isSetSiteContentType()
-                    ? tObject.site.getSiteContentType()
-                    : ContentType.FAMILY_SAFE);
-            params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
-            final double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
-            params.setSiteFloor(ecpmFloor);
-            final double marketRate = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
-            if (0.0 == marketRate) {
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
-                        DemandSourceType.findByValue(dst) + InspectorStrings.BID_GUIDANCE_ABSENT);
-            }
-            if (marketRate == ecpmFloor) {
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
-                        DemandSourceType.findByValue(dst) + InspectorStrings.BID_GUIDANCE_EQUAL_TO_UMP_FLOOR);
-            }
-            params.setMarketRate(marketRate);
+        }
+    }
 
-            params.setSiteIncId(tObject.site.siteIncId);
-            params.setAppUrl(tObject.site.siteUrl);
-            params.setPubId(tObject.site.publisherId);
+    private void setUser(final AdPoolRequest tObject, final SASRequestParameters params) {
+        if (tObject.isSetUser()) {
+            final int currentYear = (short) Calendar.getInstance().get(Calendar.YEAR);
+            final int yob = tObject.user.yearOfBirth;
+            if (tObject.getUser().isSetUserProfile() && tObject.getUser().getUserProfile().isSetNormalizedUserId()) {
+                params.setNormalizedUserId(tObject.getUser().getUserProfile().getNormalizedUserId());
+            }
 
-            // Fill params for Pub Control - Supported Ad Types.
-            List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
-            if (tObject.site.isSetEnrichedSiteAllowedMediaAttributes()) {
-                for (final int i : tObject.site.getEnrichedSiteAllowedMediaAttributes()) {
-                    if (i == AdAttributeType.VIDEO.getValue()) {
-                        pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
-                    } else if (i == AdAttributeType.DEFAULT.getValue()) {
-                        pubControlSupportedAdTypes.add(AdTypeEnum.BANNER);
-                    } // Ignore other fields which are not relevant to us.
+            // Condition to check whether user's age is less than 100
+            if (yob > currentYear - 100 && yob < currentYear) {
+                final int age = currentYear - yob;
+                params.setAge((short) age);
+            }
+            if (tObject.user.isSetUserProfile()) {
+                params.setCsiTags(tObject.user.userProfile.csiTags);
+            }
+
+            if (tObject.user.gender != null) {
+                switch (tObject.user.gender) {
+                    case FEMALE:
+                        params.setGender(GlobalConstant.GENDER_FEMALE);
+                        break;
+                    case MALE:
+                        params.setGender(GlobalConstant.GENDER_MALE);
+                        break;
+                    default:
+                        params.setGender(null);
+                        break;
                 }
             }
-            // If we don't get any value, set default values.
-            if (pubControlSupportedAdTypes.isEmpty()) {
-                pubControlSupportedAdTypes = DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
-            }
-            params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
-
-            // Fill params for pub control - Media preferences json.
-            final String mediaPreferencesJson =
-                    tObject.site.isSetMediaPreferences()
-                            ? tObject.site.mediaPreferences
-                            : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
-            params.setPubControlPreferencesJson(mediaPreferencesJson);
         }
+    }
 
-        // Fill params from Device Object
-        if (tObject.isSetDevice()) {
-            String userAgent = tObject.device.userAgent;
-            try {
-                userAgent = userAgent != null ? URLDecoder.decode(userAgent, GlobalConstant.UTF_8) : null;
-            } catch (final UnsupportedEncodingException e) {}
-            params.setUserAgent(userAgent);
-            params.setOsId(new Long(tObject.device.osId).intValue());
-            params.setModelId(tObject.device.modelId);
-            params.setManufacturerId(tObject.device.manufacturerId);
-            params.setHandsetInternalId(tObject.device.getHandsetInternalId());
-            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
-            if (tObject.device.isSetDeviceType()) {
-                params.setDeviceType(tObject.device.getDeviceType());
-            }
-            if (tObject.device.isSetModelName()) {
-                params.setDeviceModel(tObject.device.getModelName());
-            }
-            if (tObject.device.isSetManufacturerName()) {
-                params.setDeviceMake(tObject.device.getManufacturerName());
-            }
-        }
-
-        // Fill params from Geo Object
+    private void setGeo(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetGeo()) {
             params.setLocSrc(tObject.geo.isSetLocationSource()
                     ? tObject.geo.locationSource.name()
@@ -205,73 +184,109 @@ public class ThriftRequestParser {
             params.setGeoFenceIds(tObject.geo.getFenceIds());
             params.setLocationSource(tObject.geo.getLocationSource());
         }
+    }
 
-        // Fill Params from User Object
-        if (tObject.isSetUser()) {
-            // TODO Change age to integer in DCP
-            final int currentYear = (short) Calendar.getInstance().get(Calendar.YEAR);
-            final int yob = tObject.user.yearOfBirth;
-
-            // Condition to check whether user's age is less than 100
-            if (yob > currentYear - 100 && yob < currentYear) {
-                final int age = currentYear - yob;
-                params.setAge((short) age);
+    private void setDevice(final AdPoolRequest tObject, final SASRequestParameters params) {
+        if (tObject.isSetDevice()) {
+            String userAgent = tObject.device.userAgent;
+            try {
+                userAgent = userAgent != null ? URLDecoder.decode(userAgent, GlobalConstant.UTF_8) : null;
+            } catch (final UnsupportedEncodingException e) {}
+            params.setUserAgent(userAgent);
+            params.setOsId(new Long(tObject.device.osId).intValue());
+            params.setModelId(tObject.device.modelId);
+            params.setManufacturerId(tObject.device.manufacturerId);
+            params.setHandsetInternalId(tObject.device.getHandsetInternalId());
+            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
+            if (tObject.device.isSetDeviceType()) {
+                params.setDeviceType(tObject.device.getDeviceType());
             }
-            if (tObject.user.isSetUserProfile()) {
-                params.setCsiTags(tObject.user.userProfile.csiTags);
+            if (tObject.device.isSetModelName()) {
+                params.setDeviceModel(tObject.device.getModelName());
             }
+            if (tObject.device.isSetManufacturerName()) {
+                params.setDeviceMake(tObject.device.getManufacturerName());
+            }
+        }
+    }
 
-            if (tObject.user.gender != null) {
-                switch (tObject.user.gender) {
-                    case FEMALE:
-                        params.setGender(GlobalConstant.GENDER_FEMALE);
-                        break;
-                    case MALE:
-                        params.setGender(GlobalConstant.GENDER_MALE);
-                        break;
-                    default:
-                        params.setGender(null);
-                        break;
+    private void setIntegrationDetails(final AdPoolRequest tObject, final SASRequestParameters params) {
+        if (tObject.isSetIntegrationDetails()) {
+            params.setRqIframe(tObject.integrationDetails.iFrameId);
+            if (tObject.integrationDetails.isSetAdCodeType()) {
+                params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            }
+            params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType,
+                    tObject.integrationDetails.integrationVersion));
+            params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
+        }
+    }
+
+    private void setSiteObject(final AdPoolRequest tObject, final SASRequestParameters params, final int dst) {
+        if (tObject.isSetSite()) {
+            params.setSiteId(tObject.site.siteId);
+            params.setSiteIncId(tObject.site.siteIncId);
+            params.setAppUrl(tObject.site.siteUrl);
+            params.setPubId(tObject.site.publisherId);
+            final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
+            params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
+
+            if (CasConfigUtil.repositoryHelper != null) {
+                params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper
+                        .queryWapSiteUACRepository(tObject.site.siteId));
+
+                params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+                        tObject.geo.countryId, (int) tObject.device.osId));
+            }
+            params.setSiteContentType(tObject.site.isSetSiteContentType()
+                    ? tObject.site.getSiteContentType()
+                    : ContentType.FAMILY_SAFE);
+            params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
+
+            final DemandSourceType dstEnum = DemandSourceType.findByValue(dst);
+            double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
+            if (MIN_BID_FLOOR >= ecpmFloor) {
+                ecpmFloor = MIN_BID_FLOOR;
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
+                        + InspectorStrings.BID_FLOOR_TOO_LOW);
+            }
+            params.setSiteFloor(ecpmFloor);
+
+            final double marketRate = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
+            if (0.0 >= marketRate) {
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
+                        + InspectorStrings.BID_GUIDANCE_ABSENT);
+            }
+            if (marketRate == ecpmFloor) {
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
+                        + InspectorStrings.BID_GUIDANCE_EQUAL_TO_UMP_FLOOR);
+            }
+            params.setMarketRate(marketRate);
+
+            // Fill params for Pub Control - Supported Ad Types.
+            List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
+            if (tObject.site.isSetEnrichedSiteAllowedMediaAttributes()) {
+                for (final int i : tObject.site.getEnrichedSiteAllowedMediaAttributes()) {
+                    if (i == AdAttributeType.VIDEO.getValue()) {
+                        pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
+                    } else if (i == AdAttributeType.DEFAULT.getValue()) {
+                        pubControlSupportedAdTypes.add(AdTypeEnum.BANNER);
+                    } // Ignore other fields which are not relevant to us.
                 }
-
-            } else {
-                params.setGender(null);
             }
-        }
-
-        // Fill params from UIDParams Object
-        if (tObject.isSetUidParams()) {
-            setUserIdParams(casInternalRequestParameters, tObject.getUidParams());
-            params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
-        }
-
-        // Fill params from Carrier Object
-        if (tObject.isSetCarrier()) {
-            params.setCarrierId((int) tObject.carrier.carrierId);
-            if (tObject.getCarrier().isSetConnectionType()) {
-                params.setConnectionType(tObject.carrier.connectionType);
-            } else if (tObject.getCarrier().isSetNetworkType()) {
-                params.setConnectionType(NetworkType.WIFI == tObject.getCarrier().getNetworkType()
-                        ? ConnectionType.WIFI
-                        : ConnectionType.CELLULAR_UNKNOWN);
-            } else {
-                params.setConnectionType(ConnectionType.UNKNOWN);
+            // If we don't get any value, set default values.
+            if (pubControlSupportedAdTypes.isEmpty()) {
+                pubControlSupportedAdTypes = DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
             }
-        }
+            params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
 
-        if (tObject.isSetPlacementId()) {
-            params.setPlacementId(tObject.placementId);
+            // Fill params for pub control - Media preferences json.
+            final String mediaPreferencesJson =
+                    tObject.site.isSetMediaPreferences()
+                            ? tObject.site.mediaPreferences
+                            : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
+            params.setPubControlPreferencesJson(mediaPreferencesJson);
         }
-        params.setIntegrationDetails(tObject.getIntegrationDetails());
-        params.setAppBundleId(tObject.getAppBundleId());
-        
-        if(tObject.isSetUser() && tObject.getUser().isSetUserProfile() &&
-                tObject.getUser().getUserProfile().isSetNormalizedUserId()){
-            String normalizedUserId = tObject.getUser().getUserProfile().getNormalizedUserId();
-            params.setNormalizedUserId(normalizedUserId);
-        }
-
-        LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
     }
 
     protected String getPostalCode(final Set<Integer> postalCodes) {

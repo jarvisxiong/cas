@@ -59,7 +59,8 @@ public class ServletRtbd extends BaseServlet {
     }
 
     @Override
-    protected void specificEnrichment(CasContext casContext, SASRequestParameters sasParams, CasInternalRequestParameters casInternal) {
+    protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal) {
         LOG.debug("enrichDstSpecific RTBD");
         casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
         casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
@@ -67,12 +68,12 @@ public class ServletRtbd extends BaseServlet {
         final int bidFloorPercent = CasConfigUtil.getServerConfig().getInt("rtb.bidFloorPercent", 100);
         // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
         double auctionBidFloor = sasParams.getSiteFloor();
-        auctionBidFloor = (auctionBidFloor * bidFloorPercent) / 100;
+        auctionBidFloor = auctionBidFloor * bidFloorPercent / 100;
         sasParams.setMarketRate(Math.max(sasParams.getMarketRate(), auctionBidFloor));
         casInternal.setAuctionBidFloor(auctionBidFloor);
 
-        double tempDemandDensity = CasConfigUtil.getServerConfig().getDouble("rtb.demandDensity");
-        double tempLongTermRevenue = CasConfigUtil.getServerConfig().getDouble("rtb.longTermRevenue");
+        final double tempDemandDensity = CasConfigUtil.getServerConfig().getDouble("rtb.demandDensity");
+        final double tempLongTermRevenue = CasConfigUtil.getServerConfig().getDouble("rtb.longTermRevenue");
 
         /*
             Setting auction clearing price mechanics.

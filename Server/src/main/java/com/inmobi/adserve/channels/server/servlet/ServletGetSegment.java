@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.ws.rs.Path;
 
 import org.json.JSONArray;
@@ -22,7 +21,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
@@ -38,12 +37,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 @Path("/getsegments")
 public class ServletGetSegment implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletGetSegment.class);
-    private final RequestParser requestParser;
-
-    @Inject
-    ServletGetSegment(final RequestParser requestParser) {
-        this.requestParser = requestParser;
-    }
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
@@ -52,7 +45,7 @@ public class ServletGetSegment implements Servlet {
         final Map<String, List<String>> params = queryStringDecoder.parameters();
         JSONObject jObject;
         try {
-            jObject = requestParser.extractParams(params, "segments");
+            jObject = CasUtils.extractParams(params, "segments"); // requestParser.extractParams(params, "segments");
         } catch (final JSONException exception) {
             LOG.debug("Encountered Json Error while creating json object inside servlet, exception raised {}",
                     exception);
@@ -129,14 +122,16 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryIXVideoTrafficEntity(id.split("_")[0],
-                            Integer.parseInt(id.split("_")[1]));
+                    entity =
+                            CasConfigUtil.repositoryHelper.queryIXVideoTrafficEntity(id.split("_")[0],
+                                    Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY)) {
-                    ResultSet<IXPackageEntity> resultSet =
+                    final ResultSet<IXPackageEntity> resultSet =
                             CasConfigUtil.repositoryHelper.queryIXPackageRepository(Integer.parseInt(id.split("_")[0]),
-                                    id.split("_")[1], Integer.parseInt(id.split("_")[2]), Integer.parseInt(id.split("_")[3]));
-                    List<Integer> result = new ArrayList<>();
-                    for (IXPackageEntity packageEntity : resultSet) {
+                                    id.split("_")[1], Integer.parseInt(id.split("_")[2]),
+                                    Integer.parseInt(id.split("_")[3]));
+                    final List<Integer> result = new ArrayList<>();
+                    for (final IXPackageEntity packageEntity : resultSet) {
                         result.add(packageEntity.getId());
                     }
                     entity = result;

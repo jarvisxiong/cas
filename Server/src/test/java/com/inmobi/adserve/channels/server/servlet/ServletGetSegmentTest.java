@@ -9,11 +9,6 @@ import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.hamcrest.core.IsEqual;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,22 +37,16 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 import io.netty.handler.codec.http.QueryStringDecoder;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CasConfigUtil.class, InspectorStats.class})
+@PrepareForTest({CasConfigUtil.class, InspectorStats.class, CasUtils.class})
 public class ServletGetSegmentTest {
-
-    private Map<String, List<String>> createMapFromStringPair(final String key, final String value) {
-        final Map<String, List<String>> params = new HashMap<>();
-        params.put(key, Arrays.asList(value));
-        return params;
-    }
 
     @Test
     public void testHandleRequestJsonException() throws Exception {
@@ -65,10 +54,10 @@ public class ServletGetSegmentTest {
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        final RequestParser mockRequestParser = createMock(RequestParser.class);
+        mockStatic(CasUtils.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-        expect(mockRequestParser.extractParams(null, "segments")).andThrow(new JSONException("Json Exception"));
+        expect(CasUtils.extractParams(null, "segments")).andThrow(new JSONException("Json Exception"));
         mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
@@ -79,7 +68,7 @@ public class ServletGetSegmentTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        final ServletGetSegment tested = new ServletGetSegment(mockRequestParser);
+        final ServletGetSegment tested = new ServletGetSegment();
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -90,10 +79,10 @@ public class ServletGetSegmentTest {
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        final RequestParser mockRequestParser = createMock(RequestParser.class);
+        mockStatic(CasUtils.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-        expect(mockRequestParser.extractParams(null, "segments")).andReturn(null).times(1);
+        expect(CasUtils.extractParams(null, "segments")).andReturn(null).times(1);
         mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
         mockResponseSender.sendResponse("Incorrect Json", null);
@@ -102,7 +91,7 @@ public class ServletGetSegmentTest {
         replayAll();
         mockHttpRequestHandler.responseSender = mockResponseSender;
 
-        final ServletGetSegment tested = new ServletGetSegment(mockRequestParser);
+        final ServletGetSegment tested = new ServletGetSegment();
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -115,10 +104,10 @@ public class ServletGetSegmentTest {
         final int mockJSONArraySize = 15;
 
         mockStatic(CasConfigUtil.class);
+        mockStatic(CasUtils.class);
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
-        final RequestParser mockRequestParser = createMock(RequestParser.class);
         final JSONObject mockJSONObject = createMock(JSONObject.class);
         final JSONArray mockJSONArray = createMock(JSONArray.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
@@ -142,7 +131,7 @@ public class ServletGetSegmentTest {
         final CreativeEntity mockCreativeEntity = createMock(CreativeEntity.class);
 
         expect(mockQueryStringDecoder.parameters()).andReturn(null).times(1);
-        expect(mockRequestParser.extractParams(null, "segments")).andReturn(mockJSONObject).times(1);
+        expect(CasUtils.extractParams(null, "segments")).andReturn(mockJSONObject).times(1);
         expect(mockJSONObject.getJSONArray("segment-list")).andReturn(mockJSONArray).times(1);
         expect(mockJSONArray.length()).andReturn(mockJSONArraySize).times(mockJSONArraySize + 1);
         for (int i = 0; i < mockJSONArraySize; ++i) {
@@ -206,7 +195,7 @@ public class ServletGetSegmentTest {
         mockHttpRequestHandler.responseSender = mockResponseSender;
         CasConfigUtil.repositoryHelper = mockRepositoryHelper;
 
-        final ServletGetSegment tested = new ServletGetSegment(mockRequestParser);
+        final ServletGetSegment tested = new ServletGetSegment();
         tested.handleRequest(mockHttpRequestHandler, mockQueryStringDecoder, null);
 
         verifyAll();
@@ -214,7 +203,7 @@ public class ServletGetSegmentTest {
 
     @Test
     public void testGetName() throws Exception {
-        final ServletGetSegment tested = new ServletGetSegment(null);
+        final ServletGetSegment tested = new ServletGetSegment();
         assertThat(tested.getName(), is(IsEqual.equalTo("getSegment")));
     }
 }

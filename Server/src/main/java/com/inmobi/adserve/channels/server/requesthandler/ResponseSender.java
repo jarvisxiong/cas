@@ -173,13 +173,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
     public long getTotalTime() {
         return totalTime;
     }
-    
-    public long getTimeElapsed(){
+
+    public long getTimeElapsed() {
         return System.currentTimeMillis() - initialTime;
     }
-    
-    public String getDST(){
-        if(sasParams.getDst() == 0){
+
+    public String getDST() {
+        if (sasParams.getDst() == 0) {
             return StringUtils.EMPTY;
         }
         return DemandSourceType.findByValue(sasParams.getDst()).toString();
@@ -360,10 +360,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
                         if (ixAdNetwork.isExternalPersonaDeal()) {
                             csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
-                            TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+                            final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
                             try {
                                 adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
-                            } catch (TException exc) {
+                            } catch (final TException exc) {
                                 LOG.error("Could not send csId to UMP, thrift exception {}", exc);
 
                             }
@@ -462,8 +462,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
         System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
-       
-        if(serverChannel.isOpen()){
+
+        if (serverChannel.isOpen()) {
             if (sasParams.isKeepAlive()) {
                 serverChannel.writeAndFlush(response);
             } else {
@@ -488,8 +488,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private byte[] encryptResponseIfRequired(byte[] responseBytes) {
         if (sasParams.getSdkVersion() != null
                 && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
-                && sasParams.getDst() == 2
-                && sasParams.getEncryptionKey() != null) {
+                && sasParams.getDst() == 2 && sasParams.getEncryptionKey() != null) {
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
@@ -536,40 +535,36 @@ public class ResponseSender extends HttpRequestHandlerBase {
             InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
         }
 
-        HttpResponseStatus httpResponseStatus;
-        String defaultContent;
-        switch (getResponseFormat()) {
-            case IMAI:
-                // status code 204 whenever format=imai
-                httpResponseStatus = HttpResponseStatus.NO_CONTENT;
-                defaultContent = NO_AD_IMAI;
-                break;
-            case NATIVE:
-                // status code 200 and empty ad content( i.e. ads:[]) for format =
-                // native
-                httpResponseStatus = HttpResponseStatus.OK;
-                defaultContent = StringUtils.EMPTY;
-                break;
-            case XHTML:
-                // status code 200 & empty ad content (i.e. adUnit missing) for
-                // format=xml
-                httpResponseStatus = HttpResponseStatus.OK;
-                defaultContent = NO_AD_XHTML;
-                break;
-            case HTML:
-                httpResponseStatus = HttpResponseStatus.OK;
-                defaultContent = NO_AD_HTML;
-                break;
-            case JS_AD_CODE:
-                httpResponseStatus = HttpResponseStatus.OK;
-                defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
-                break;
-            default:
-                httpResponseStatus = HttpResponseStatus.OK;
-                defaultContent = NO_AD_HTML;
-                break;
+        HttpResponseStatus httpResponseStatus = HttpResponseStatus.NO_CONTENT;
+        String defaultContent = NO_AD_IMAI;
+        final ResponseFormat rFormat = getResponseFormat();
+        if (rFormat != null) {
+            switch (rFormat) {
+                case IMAI:
+                    // status code 204 whenever format=imai
+                    httpResponseStatus = HttpResponseStatus.NO_CONTENT;
+                    defaultContent = NO_AD_IMAI;
+                    break;
+                case NATIVE:
+                    // status code 200 and empty ad content( i.e. ads:[]) for format = native
+                    httpResponseStatus = HttpResponseStatus.OK;
+                    defaultContent = StringUtils.EMPTY;
+                    break;
+                case XHTML:
+                    // status code 200 & empty ad content (i.e. adUnit missing) for format=xml
+                    httpResponseStatus = HttpResponseStatus.OK;
+                    defaultContent = NO_AD_XHTML;
+                    break;
+                case HTML:
+                    httpResponseStatus = HttpResponseStatus.OK;
+                    defaultContent = NO_AD_HTML;
+                    break;
+                case JS_AD_CODE:
+                    httpResponseStatus = HttpResponseStatus.OK;
+                    defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
+                    break;
+            }
         }
-
         sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
                 getResponseBytes(sasParams.getDst(), defaultContent), new HashMap<String, String>(), serverChannel);
     }
@@ -595,8 +590,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
         return defaultResponse.getBytes(Charsets.UTF_8);
     }
 
-    // Return true if request contains Iframe Id and is a request from js
-    // adcode.
+    /**
+     *
+     * @return true if request contains Iframe Id and is a request from js adcode.
+     */
     private boolean isJsAdRequest() {
         if (null == sasParams) {
             return false;
@@ -705,8 +702,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return;
         }
 
-        List<ChannelSegment> dcpList = rankList;
-        List<ChannelSegment> rtbList = auctionEngine.getUnfilteredChannelSegmentList(); // Also acts as the ixList
+        final List<ChannelSegment> dcpList = rankList;
+        final List<ChannelSegment> rtbList = auctionEngine.getUnfilteredChannelSegmentList(); // Also acts as the ixList
         final List<ChannelSegment> list = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(dcpList) && CollectionUtils.isNotEmpty(rtbList)) {
@@ -755,7 +752,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 LOG.debug(getStackTrace(exception));
             }
         }
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Done with logging");
         }
     }
