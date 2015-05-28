@@ -56,7 +56,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
     private static final String FORMAT = "format";
-    // private static final String FORMAT_STRICT = "formatstrict";
+    private static final String FORMAT_STRICT = "formatstrict";
     private static final String DIMENSION = "dimension";
     private static final String DIMENSION_STRICT = "dimensionstrict";
     private static final String SUCCESS = "success";
@@ -150,7 +150,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
         appendQueryParam(url, FORMAT, RESPONSE_FORMAT, false);
-        // appendQueryParam(url, FORMAT_STRICT, strictField, false);
+        appendQueryParam(url, FORMAT_STRICT, FALSE, false);
         appendQueryParam(url, DIMENSION, dimension, false);
         appendQueryParam(url, DIMENSION_STRICT, TRUE, false);
 
