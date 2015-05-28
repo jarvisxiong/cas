@@ -39,7 +39,7 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
 
         try {
             final long nativeAdId = row.getLong("native_ad_id");
-            final Short uiLayoutId = ((Integer)row.getObject("ui_layout_id")).shortValue();
+            final Integer uiLayoutId = (Integer)row.getObject("ui_layout_id");
             final String contentJson = row.getString("content_json");
 
             final String encodedTemplate = row.getString("binary_template");

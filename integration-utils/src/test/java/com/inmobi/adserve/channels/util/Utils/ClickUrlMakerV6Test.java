@@ -32,7 +32,6 @@ public class ClickUrlMakerV6Test extends TestCase {
         prepareMockConfig();
     }
 
-
     private ClickUrlMakerV6.Builder generateBasicClickUrlMakerV6() {
         ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
         builder.setTestMode(false);

@@ -271,11 +271,17 @@ public class ClickUrlMakerV6 {
         } else {
             adUrlSuffix.append(appendSeparator(DEFAULTIMSDK));
         }
+
+        // Creation of ImpressionInfo object (28th field)
+        ImpressionInfo impInfo = new ImpressionInfo();
+
         // 15th siteSegmentId/placementSegmentId
         String segmentIdStr = Integer.toString(0);
         if (null != placementId && null != placementSegmentId) {
             segmentIdStr = getIdBase36(placementSegmentId);
-        } else if (null == placementId && null != siteSegmentId) {
+            // Setting placementId in the ImpressionInfo object
+            impInfo.setPlacementId(placementId);
+        } else if (null != siteSegmentId) {
             segmentIdStr = getIdBase36(siteSegmentId);
         }
         adUrlSuffix.append(appendSeparator(segmentIdStr));
@@ -360,12 +366,8 @@ public class ClickUrlMakerV6 {
         beaconUrlSuffix.append(appendSeparator(finalBundleId));
 
         // 28th URL Component: encoded thrift serialized object with placementID, normalizedUserID and requestedAdType
-        ImpressionInfo impInfo = new ImpressionInfo();
-        if (null != placementId) {
-            impInfo.setPlacementId(placementId);
-        }
+        // placementId is set alongside the 15th field
         impInfo.setNormalizedUserId(normalizedUserId);
-
         if (null != requestedAdType) {
             impInfo.setRequestedAdType(requestedAdType.toString());
         }
