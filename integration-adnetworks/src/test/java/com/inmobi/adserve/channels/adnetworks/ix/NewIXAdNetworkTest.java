@@ -87,8 +87,8 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getList(advertiserName + ".globalBlind")).andReturn(Lists.newArrayList("123")).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".bidFloorPercent", 100)).andReturn(100).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450)).andReturn(450).anyTimes();
-        expect(mockConfig.getString(advertiserName + ".sprout.uniqueIdentifierRegex", ".*data-creative[iI]d.*"))
-                .andReturn(".*data-creative[iI]d.*").anyTimes();
+        expect(mockConfig.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*"))
+                .andReturn("(?s).*data-creative[iI]d.*").anyTimes();
         expect(mockConfig.getString("key.1.value")).andReturn("Secret Key").anyTimes();
         expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconPrefix").anyTimes();
         expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickPrefix").anyTimes();
@@ -737,16 +737,20 @@ public class NewIXAdNetworkTest {
         final IXAdNetwork mockIXAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
         replayAll();
 
-        MemberMatcher.field(IXAdNetwork.class, "adm").set(mockIXAdNetwork, null);
-        assertThat(mockIXAdNetwork.isSproutAd(), is(false));
+        Object[][] testAdm = {
+                {null, false},
+                {"data-creativeId", true},
+                {"data-creativeid", true},
+                {"\ndata-creativeid", true},
+                {"\ndata-creativei", false},
+                {"\n\n\n\n\n\n\ndata-creativeid\n\n\n\n\n\n\n", true},
+                {"?*+{}|^.\\\t\n\r\fdata-creativeid", true}
+        };
 
-        MemberMatcher.field(IXAdNetwork.class, "adm")
-                .set(mockIXAdNetwork, "data-creativeId");
-        assertThat(mockIXAdNetwork.isSproutAd(), is(true));
-
-        MemberMatcher.field(IXAdNetwork.class, "adm")
-                .set(mockIXAdNetwork, "data-creativeid");
-        assertThat(mockIXAdNetwork.isSproutAd(), is(true));
+        for (Object[] adm : testAdm) {
+            MemberMatcher.field(IXAdNetwork.class, "adm").set(mockIXAdNetwork, adm[0]);
+            assertThat(mockIXAdNetwork.isSproutAd(), is(adm[1]));
+        }
     }
 
     @Test

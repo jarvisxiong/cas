@@ -244,7 +244,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         minimumSdkVerForVAST = config.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450);
         sproutUniqueIdentifierRegex =
-                config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", ".*data-creative[iI]d.*");
+                config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
