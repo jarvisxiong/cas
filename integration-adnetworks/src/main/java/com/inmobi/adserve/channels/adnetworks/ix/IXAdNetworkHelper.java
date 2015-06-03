@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.inmobi.adserve.channels.adnetworks.ix;
 
@@ -62,7 +62,7 @@ public class IXAdNetworkHelper {
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetworkHelper.class);
 
     /**
-     * 
+     *
      * @param adm
      * @param casIntenal
      * @param sasParams
@@ -77,15 +77,13 @@ public class IXAdNetworkHelper {
         final List<String> macros = new ArrayList<>(8);
         final List<String> substitutions = new ArrayList<>(8);
 
-        addSproutMacroToList(macros, substitutions,
-                JS_ESC_BEACON_URL, StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
+        addSproutMacroToList(macros, substitutions, JS_ESC_BEACON_URL,
+                StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
 
-        addSproutMacroToList(macros, substitutions,
-                JS_ESC_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
+        addSproutMacroToList(macros, substitutions, JS_ESC_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
 
         final String sdkVersion = sasParams.getSdkVersion();
-        addSproutMacroToList(macros, substitutions,
-                SDK_VERSION_ID, null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
+        addSproutMacroToList(macros, substitutions, SDK_VERSION_ID, null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
 
         // default value for replacement of macros is an empty string
         final Geo geo = createSproutGeoObject(casIntenal, sasParams, isCoppaSet);
@@ -113,14 +111,15 @@ public class IXAdNetworkHelper {
 
     /**
      * Helper function to populate macro and substitution lists
+     * 
      * @param macros
      * @param substitutions
      * @param macro
      * @param substitution
      */
     private static void addSproutMacroToList(final List<String> macros, final List<String> substitutions,
-                                              final String macro, final String substitution) {
-        for (Character character : SproutTemplateConstants.escapeCharacterList) {
+            final String macro, final String substitution) {
+        for (final Character character : SproutTemplateConstants.escapeCharacterList) {
             macros.add(character + macro);
             substitutions.add(substitution);
         }
@@ -128,11 +127,11 @@ public class IXAdNetworkHelper {
 
     /**
      * Function used to populate the Geo object for Sprout Macro Replacement
-     * 
+     *
      * @param casIntenal
      * @param sasParams
      * @param isCoppaSet
-     * 
+     *
      * @return
      */
     private static Geo createSproutGeoObject(final CasInternalRequestParameters casIntenal,
@@ -168,7 +167,7 @@ public class IXAdNetworkHelper {
      * 2) Response Asset object doesn't contain more than one of title, img, video or data objects <br>
      * 3) Height and width are present for IMAGE MAIN objects <br>
      * 4) Minimum width and height image constraints are met for IMAGE MAIN objects<br>
-     * 
+     *
      * @param requestAsset
      * @param responseAsset
      * @param contextBuilder
@@ -245,14 +244,13 @@ public class IXAdNetworkHelper {
                 } else if (Image.ImageAssetType.MAIN.getId() == requestAsset.getImg().getType()) {
                     final Screenshot.Builder screenshotBuilder = Screenshot.newBuilder();
                     screenshotBuilder.setUrl(img.getUrl());
-                    if (width < requestAsset.getImg().getWmin()
-                            || height < requestAsset.getImg().getHmin()) {
+                    if (width < requestAsset.getImg().getWmin() || height < requestAsset.getImg().getHmin()) {
                         LOG.debug("Image Constraints not met.");
                         return false;
                     }
                     screenshotBuilder.setW(width);
                     screenshotBuilder.setH(height);
-                    final Double ar = (double)  width/ height;
+                    final Double ar = (double) width / height;
                     screenshotBuilder.setAr(String.valueOf(ar));
                     contextBuilder.setScreenshots(Arrays.asList(new Screenshot[] {(Screenshot) screenshotBuilder
                             .build()}));
@@ -278,7 +276,7 @@ public class IXAdNetworkHelper {
 
     /**
      * Builds the interfacing object between the adapter and the native response maker.
-     * 
+     *
      * @param nativeObj
      * @param mandatoryAssetMap
      * @param nonMandatoryAssetMap
@@ -337,7 +335,7 @@ public class IXAdNetworkHelper {
 
     /**
      * Validates whether the ADM content is a VALID XML.
-     * 
+     *
      * @param adm
      * @return
      */

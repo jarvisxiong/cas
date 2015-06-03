@@ -93,7 +93,8 @@ server.aerospike.boostTimeFrame=3
 server.graphiteServer.host=<%= graphite_host %>
 server.graphiteServer.port=2020
 server.graphiteServer.intervalInMinutes=1
-server.graphiteServer.shouldLogAdapterLatencies=<%= graphite_shouldLogAdapterLatencies %>
+server.graphiteServer.repostat.intervalInMinutes=15
+server.graphiteServer.shouldLogAdapterLatencies=true
 
 server.circuitbreaker.disable=true
 server.circuitbreaker.failureThreshold=0.5
@@ -1503,7 +1504,7 @@ adapter.zhlRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 adapter.pxeneRTB.isRtb=true
 adapter.pxeneRTB.status=on
-adapter.pxeneRTB.siteBlinded=true
+adapter.pxeneRTB.siteBlinded=false
 adapter.pxeneRTB.rtbVer=2.0
 adapter.pxeneRTB.advertiserId=fc56e2b620874561960767c39427298c
 adapter.pxeneRTB.urlArg=query

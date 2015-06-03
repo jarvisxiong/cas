@@ -20,7 +20,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final String id;
     // Type of site (Android, IOS etc.)
     private final String marketId;
-    // Bundle Id of App
+    // long id ios=21, android=22 etc
     private final long siteTypeId;
     // Content Rating of the App
     private final String contentRating;
@@ -30,18 +30,19 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final List<String> categories;
     // Coppa enabled flag
     private final boolean isCoppaEnabled;
-    // last modified time of this table
+    // flag for transparency, this will be true if transparency is enabled at both publisher and site level
     private final boolean isTransparencyEnabled;
-    // flag to see if transparency is enabled, this will be true if transparency is enabled at both publisher and site
-    // level
-    private final List<Integer> blindList;
     // list of DSP's, for which the site is blind. Picked from wap_site table if available, otherwise from wap_publisher
-    // table
-    private final String siteUrl;
+    private final List<Integer> blindList;
     // Site page, App store URL
+    private final String siteUrl;
+    // site nape as in wap_site
     private final String siteName;
+    // App title as fetched from UAC
     private final String appTitle;
+    // Bundle Id of App - e.g. com.rovio.angrybirds for both IOS and Android
     private final String bundleId;
+    // last modified time of this table
     private final Timestamp modifiedOn;
 
 
@@ -61,11 +62,11 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
         bundleId = builder.bundleId;
         modifiedOn = builder.modifiedOn;
     }
-    
+
     public boolean isAndroid() {
         return ANDROID_SITE_TYPE == siteTypeId;
     }
-    
+
     public boolean isIOS() {
         return IOS_SITE_TYPE == siteTypeId;
     }

@@ -64,8 +64,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'false'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -144,8 +142,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'false'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -224,8 +220,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'false'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -304,8 +298,6 @@ prod:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'false'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -385,8 +377,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'false'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -465,8 +455,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'true'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -545,8 +533,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'true'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -625,8 +611,6 @@ pilot:
          - '150'
       in_vm_cnxn:
          - '80'
-      graphite_shouldLogAdapterLatencies:
-         - 'true'
       automation_tests_enabled:
          - 'false'
       rtb_enabled:
@@ -724,8 +708,6 @@ nonprod:
          - 'true'
       graphite_host :
          - 'cas-metrics-relay.corp.inmobi.com'
-      graphite_shouldLogAdapterLatencies:
-         - 'true'
       graphite_port:
          - 2020
       graphite_prefix:

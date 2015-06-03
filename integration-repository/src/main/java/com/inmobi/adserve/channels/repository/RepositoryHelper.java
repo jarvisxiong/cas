@@ -44,8 +44,9 @@ import lombok.Setter;
 
 @Getter
 public class RepositoryHelper {
-
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RepositoryHelper.class);
+    private final RepositoryStatsProvider repositoryStatsProvider;
+    private final IXPackageRepository ixPackageRepository;
 
     private final ChannelRepository channelRepository;
     private final ChannelAdGroupRepository channelAdGroupRepository;
@@ -61,9 +62,7 @@ public class RepositoryHelper {
     private final WapSiteUACRepository wapSiteUACRepository;
     private final IXAccountMapRepository ixAccountMapRepository;
     private final CreativeRepository creativeRepository;
-    private final RepositoryStatsProvider repositoryStatsProvider;
     private final NativeAdTemplateRepository nativeAdTemplateRepository;
-    private final IXPackageRepository ixPackageRepository;
     private final GeoZipRepository geoZipRepository;
     private final SlotSizeMapRepository slotSizeMapRepository;
     private final IXVideoTrafficRepository ixVideoTrafficRepository;
@@ -234,7 +233,7 @@ public class RepositoryHelper {
     }
 
     public SegmentAdGroupFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId,
-                                                                             final Integer segmentId) {
+            final Integer segmentId) {
         return siteAerospikeFeedbackRepository.query(siteId, segmentId);
     }
 
@@ -314,7 +313,8 @@ public class RepositoryHelper {
         return null;
     }
 
-    public GeoRegionFenceMapEntity queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(final String geoRegionNameCountryCombo) {
+    public GeoRegionFenceMapEntity queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(
+            final String geoRegionNameCountryCombo) {
         try {
             return geoRegionFenceMapRepository.query(geoRegionNameCountryCombo);
         } catch (final RepositoryException ignored) {
@@ -334,9 +334,11 @@ public class RepositoryHelper {
         return null;
     }
 
-    public ResultSet<IXPackageEntity> queryIXPackageRepository(final int osId, final String siteId, final int countryId, final int slotId) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public ResultSet<IXPackageEntity> queryIXPackageRepository(final int osId, final String siteId,
+            final int countryId, final int slotId) {
         // Prepare query for CQEngine repository
-        Query query =
+        final Query query =
                 and(in(IXPackageRepository.OS_ID, osId, IXPackageRepository.ALL_OS_ID),
                         in(IXPackageRepository.SITE_ID, siteId, IXPackageRepository.ALL_SITE_ID),
                         in(IXPackageRepository.COUNTRY_ID, countryId, IXPackageRepository.ALL_COUNTRY_ID),
@@ -345,13 +347,14 @@ public class RepositoryHelper {
         return ixPackageRepository.getPackageIndex().retrieve(query);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public IXPackageEntity queryIxPackageByDeal(final String dealId) {
-        //Prepare query for CQEngine repository
-        Query query = equal(IXPackageRepository.DEAL_IDS, dealId);
+        // Prepare query for CQEngine repository
+        final Query query = equal(IXPackageRepository.DEAL_IDS, dealId);
         return (IXPackageEntity)ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
     }
 
-    public short queryIXVideoTrafficEntity(String siteId, Integer countryId) {
+    public short queryIXVideoTrafficEntity(final String siteId, final Integer countryId) {
         short trafficPercentage = IXVideoTrafficRepository.DEFAULT_TRAFFIC_PERCENTAGE;
         try {
             // Query at site and country both
@@ -360,11 +363,13 @@ public class RepositoryHelper {
             if (entity == null) {
                 // Query at site level.
                 entity =
-                        ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId, IXVideoTrafficRepository.ALL_COUNTRY));
+                        ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId,
+                                IXVideoTrafficRepository.ALL_COUNTRY));
                 if (entity == null) {
                     // Query at country level.
                     entity =
-                            ixVideoTrafficRepository.query(new IXVideoTrafficQuery(IXVideoTrafficRepository.ALL_SITES, countryId));
+                            ixVideoTrafficRepository.query(new IXVideoTrafficQuery(IXVideoTrafficRepository.ALL_SITES,
+                                    countryId));
                 }
             }
             if (entity != null) {
@@ -373,7 +378,6 @@ public class RepositoryHelper {
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying IXVideoTraffic Repository, {}", ignored);
         }
-
         return trafficPercentage;
     }
 }

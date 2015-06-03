@@ -1,5 +1,11 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import java.nio.charset.Charset;
+
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.server.HttpRequestHandler;
+import com.inmobi.adserve.channels.server.api.Servlet;
+
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -10,17 +16,10 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
-import java.nio.charset.Charset;
-
-import com.google.inject.Singleton;
-import com.inmobi.adserve.channels.server.HttpRequestHandler;
-import com.inmobi.adserve.channels.server.api.Servlet;
-
 
 @Singleton
 public class ServletInvalid implements Servlet {
 
-    @SuppressWarnings("deprecation")
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {

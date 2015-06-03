@@ -48,6 +48,7 @@ import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.SlotSizeMapRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.repository.stats.RepositoryStats;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -156,6 +157,7 @@ public class ChannelServer {
                     configurationLoader.getServerConfiguration(), hostName);
 
             // Initializing graphite stats
+            RepositoryStats.init(configurationLoader.getServerConfiguration(), hostName);
             InspectorStats.init(configurationLoader.getServerConfiguration(), hostName);
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
