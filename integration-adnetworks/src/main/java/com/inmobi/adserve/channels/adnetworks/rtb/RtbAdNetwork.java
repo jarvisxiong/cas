@@ -825,6 +825,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 LOG.info(traceMarker, "Error in parsing rtb response");
                 return;
             }
+
+            buildInmobiAdTracker();
             adStatus = AD_STRING;
             if (isNativeRequest()) {
                 nativeAdBuilding();
@@ -838,6 +840,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private void bannerAdBuilding() {
         final VelocityContext velocityContext = new VelocityContext();
+        final String beaconUrl = getBeaconUrl();
         String admContent = getAdMarkUp();
 
         final int admSize = admContent.length();
@@ -904,8 +907,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
             final Map<String, String> params = new HashMap<String, String>();
-            params.put("beaconUrl", beaconUrl);
-            params.put("winUrl", beaconUrl + "?b=${WIN_BID}");
+            params.put("beaconUrl", getBeaconUrl());
+            params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}");
             params.put("impressionId", impressionId);
             params.put("appId", bidRequest.getApp().getId());
             params.put("siteId", sasParams.getSiteId());

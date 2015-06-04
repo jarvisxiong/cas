@@ -1,5 +1,17 @@
 package com.inmobi.adserve.channels.adnetworks.adsmogo;
 
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URLDecoder;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.velocity.VelocityContext;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -14,18 +26,6 @@ import com.ning.http.client.RequestBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.velocity.VelocityContext;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URLDecoder;
 
 public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
 
@@ -225,8 +225,11 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         } else {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
+            buildInmobiAdTracker();
+
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
                 statusCode = 200;
             } catch (final Exception exception) {

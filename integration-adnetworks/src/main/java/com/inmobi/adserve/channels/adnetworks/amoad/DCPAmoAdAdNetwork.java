@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.amoad;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +15,10 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
     // Updates the request parameters according to the Ad Network. Returns true
@@ -74,7 +74,7 @@ public class DCPAmoAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
         context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, tag);
         try {
-            responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+            responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, getBeaconUrl());
             adStatus = AD_STRING;
         } catch (final Exception exception) {
             adStatus = NO_AD;

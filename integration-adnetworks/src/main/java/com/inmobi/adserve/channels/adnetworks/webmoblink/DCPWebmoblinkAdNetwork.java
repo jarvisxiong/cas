@@ -77,11 +77,6 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
-
-    @Override
     public String getName() {
         return "webmoblinkDCP";
     }
@@ -174,11 +169,13 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
                 TemplateType t = null;
+                buildInmobiAdTracker();
+
                 context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getClickUrl());
                 if (StringUtils.isNotBlank(adResponse.getAdText())) {
                     context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getAdText());
                 }
-                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                 if (StringUtils.isNotBlank(adResponse.getFirepixel())) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getFirepixel().trim());
                 }
@@ -196,7 +193,7 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
 
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (Exception exception) {
                 adStatus = NO_AD;

@@ -5,6 +5,7 @@ import static com.github.dreamhead.moco.Moco.httpserver;
 import static com.github.dreamhead.moco.Moco.status;
 import static com.github.dreamhead.moco.Moco.uri;
 import static com.github.dreamhead.moco.Runner.runner;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPM;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
@@ -12,13 +13,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.createPartialMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -29,18 +29,26 @@ import java.util.GregorianCalendar;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import lombok.Getter;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.Runner;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilderFactory;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -52,6 +60,10 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
+
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import lombok.Getter;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InspectorStats.class)
@@ -234,6 +246,7 @@ public class BaseAdNetworkImplTest {
         expect(mockAdNetwork.getName()).andReturn("MockAdNetwork");
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
+        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getUserAgent()).andReturn("test-user-agent");
@@ -257,7 +270,7 @@ public class BaseAdNetworkImplTest {
         final BaseAdNetworkImpl baseAdNetwork =
                 createPartialMock(BaseAdNetworkImpl.class, mockedMethods, constructorArgs);
         baseAdNetwork.setHost(host);
-        baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, "", "", 14L, null);
+        baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, 14L, null);
         return baseAdNetwork;
     }
 
@@ -267,7 +280,7 @@ public class BaseAdNetworkImplTest {
         final Channel mockChannel = createMock(Channel.class);
         final AuctionEngineInterface mockAuctionEngine = createMock(AuctionEngineInterface.class);
         final AdNetworkInterface mockAdNetwork = createMock(AdNetworkInterface.class);
-        final SASRequestParameters mockSasParam = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParam = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternal = createMock(CasInternalRequestParameters.class);
 
@@ -280,8 +293,12 @@ public class BaseAdNetworkImplTest {
         expect(mockAdNetwork.getName()).andReturn("MockAdNetwork");
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
+        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockEntity.getDst()).andReturn(6).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
+        expect(mockSasParam.getCarrierId()).andReturn(0);
+        expect(mockSasParam.getIpFileVersion()).andReturn(0);
 
         replayAll();
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -295,9 +312,21 @@ public class BaseAdNetworkImplTest {
         final BaseAdNetworkImpl baseAdNetwork =
                 createPartialMock(BaseAdNetworkImpl.class, mockedMethods, constructorArgs);
         final String host = serverUrl + "/get";
-        baseAdNetwork.setHost(host);
-        baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, "", "", 14L, null);
 
+        Injector injector = Guice.createInjector(new AbstractModule() {
+            @Override
+            protected void configure() {
+                install(new FactoryModuleBuilder()
+                        .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
+                        .build(Key.get(InmobiAdTrackerBuilderFactory.class,
+                                DefaultLazyInmobiAdTrackerBuilderFactory.class)));
+            }
+        });
+        MemberModifier.field(BaseAdNetworkImpl.class, "inmobiAdTrackerBuilderFactory")
+                .set(baseAdNetwork, injector.getInstance(
+                        Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
+        baseAdNetwork.setHost(host);
+        baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, 14L, null);
 
         expect(baseAdNetwork.useJsAdTag()).andReturn(true);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
@@ -316,6 +345,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getCategories()).andReturn(Arrays.asList(31L, 32L, 39L)).anyTimes();
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getSiteIncId()).andReturn(10L);
+        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
         expect(mockEntity.getCategoryTaxonomy()).andReturn(new Long[] {31L, 32L, 33L}).times(4);
@@ -336,7 +366,7 @@ public class BaseAdNetworkImplTest {
         };
         final String host = serverUrl + "/get";
         baseAdNetwork.setHost(host);
-        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 14L, null);
+        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 14L, null);
 
         // Test to get all categories
         String categories = baseAdNetwork.getCategories(';');
@@ -387,6 +417,7 @@ public class BaseAdNetworkImplTest {
 
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(2);
         expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(2);
+        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(2);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(2);
 
@@ -407,11 +438,11 @@ public class BaseAdNetworkImplTest {
         final String host = serverUrl + "/get";
         baseAdNetwork.setHost(host);
 
-        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 14L, null);
+        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 14L, null);
         boolean result = baseAdNetwork.isInterstitial();
         assertTrue(result);
 
-        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 13L, null);
+        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 13L, null);
         result = baseAdNetwork.isInterstitial();
         assertFalse(result);
 
@@ -428,6 +459,7 @@ public class BaseAdNetworkImplTest {
 
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(1);
         expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(1);
+        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(1);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(1);
         expect(mockSasParam.getAge()).andReturn((short) 11).times(3);
@@ -449,7 +481,7 @@ public class BaseAdNetworkImplTest {
 
         expect(baseAdNetwork.isNativeRequest()).andReturn(true).times(1).andReturn(false).times(2);
 
-        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, "", "", 14L, null);
+        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 14L, null);
         replay(baseAdNetwork);
 
         // Test getCreativeType().
@@ -510,6 +542,7 @@ public class BaseAdNetworkImplTest {
 
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(1);
         expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(1);
+        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(1);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(1);
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)
@@ -545,7 +578,7 @@ public class BaseAdNetworkImplTest {
         final String host = serverUrl + "/get";
         baseAdNetwork.setHost(host);
         baseAdNetwork
-                .configureParameters(mockSasParam, mockCasInternalRequestParameters, mockEntity, "", "", 14L, null);
+                .configureParameters(mockSasParam, mockCasInternalRequestParameters, mockEntity, 14L, null);
 
         assertEquals("UID00000000000000000000000000000", baseAdNetwork.getUid());
         assertEquals("IDUS1000000000000000000000000000", baseAdNetwork.getUid());

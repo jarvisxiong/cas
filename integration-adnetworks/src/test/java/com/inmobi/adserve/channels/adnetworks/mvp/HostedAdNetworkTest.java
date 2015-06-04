@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.mvp;
 
 
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -11,7 +12,6 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 import static org.powermock.api.easymock.PowerMock.replayAll;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.lang.reflect.Field;
 
@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -32,12 +33,13 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ImpressionIdGenerator.class, HostedAdNetwork.class, InspectorStats.class})
 public class HostedAdNetworkTest {
-    private static Configuration mockConfig;
     private static final String advertiserName = "hosted";
-    
+    private static Configuration mockConfig;
     private final String hostedHost = "https://mrp.rubiconproject.com/ad_request";
 
     private static void prepareMockConfig() {
@@ -91,6 +93,8 @@ public class HostedAdNetworkTest {
 
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("externalSiteKey").anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adGroupIncId).anyTimes();
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPC).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(2).anyTimes();
         expect(mockChannelSegmentEntity.getAdditionalParams())
                 .andReturn(additionalParams).times(2)
                 .andReturn(null).times(1);
@@ -116,31 +120,38 @@ public class HostedAdNetworkTest {
 
         replayAll(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity);
 
-        HostedAdNetwork hostedAdNetwork = new HostedAdNetwork(mockConfig, null, null, null, urlBase, advertiserName, false);
-        
+        HostedAdNetwork hostedAdNetwork =
+                new HostedAdNetwork(mockConfig, null, null, null, urlBase, advertiserName, false);
+        MemberModifier.suppress(BaseAdNetworkImpl.class.getDeclaredMethod("buildInmobiAdTracker"));
+
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         hostedAdNetwork.setHost(hostedHost);
 
         // Positive Test Case #1: All mandatory params present
-        expectedBidRequestJSON = "{\"id\":10,\"app\":\"997EC9A04C2B01324BD122000B4000BD\",\"clt\":\"INMB_SERVER_NATIVE_1.0.0\",\"rtyp\":\"nativejson\",\"typ\":4,\"lat\":123.45,\"lng\":678.9,\"ltyp\":1,\"ip\":\"127.0.0.1\",\"udid\":\"idfaValue\",\"tud\":3,\"eud\":0}";
-        result = hostedAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity, null, TestUtils.SampleStrings.beaconUrl, slotId, null);
+        expectedBidRequestJSON =
+                "{\"id\":10,\"app\":\"997EC9A04C2B01324BD122000B4000BD\",\"clt\":\"INMB_SERVER_NATIVE_1.0.0\",\"rtyp\":\"nativejson\",\"typ\":4,\"lat\":123.45,\"lng\":678.9,\"ltyp\":1,\"ip\":\"127.0.0.1\",\"udid\":\"idfaValue\",\"tud\":3,\"eud\":0}";
+        result =
+                hostedAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity, slotId, null);
         assertThat(hostedAdNetwork.getBidRequestJson(), is(equalTo(expectedBidRequestJSON)));
         assertThat(result, is(equalTo(true)));
 
         // Positive Test Case #2: All mandatory params present + LocationSource is NO_TARGETING + Limit_Ad_Tracking is true => No location and device uid params in request
-        expectedBidRequestJSON = "{\"id\":10,\"app\":\"997EC9A04C2B01324BD122000B4000BD\",\"clt\":\"INMB_SERVER_NATIVE_1.0.0\",\"rtyp\":\"nativejson\",\"typ\":4,\"ip\":\"127.0.0.1\"}";
-        result = hostedAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity, null, TestUtils.SampleStrings.beaconUrl, slotId, null);
+        expectedBidRequestJSON =
+                "{\"id\":10,\"app\":\"997EC9A04C2B01324BD122000B4000BD\",\"clt\":\"INMB_SERVER_NATIVE_1.0.0\",\"rtyp\":\"nativejson\",\"typ\":4,\"ip\":\"127.0.0.1\"}";
+        result =
+                hostedAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity, slotId, null);
         assertThat(hostedAdNetwork.getBidRequestJson(), is(equalTo(expectedBidRequestJSON)));
         assertThat(result, is(equalTo(true)));
 
         // Negative Test Case #1: app is missing
         expectedBidRequestJSON = null;
-        result = hostedAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity, null, TestUtils.SampleStrings.beaconUrl, slotId, null);
+        result =
+                hostedAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity, slotId, null);
         assertThat(result, is(equalTo(false)));
     }
 
@@ -166,6 +177,7 @@ public class HostedAdNetworkTest {
         String[] methodsToBeMocked = {"nativeAdBuilding", "isNativeRequest"};
         HostedAdNetwork hostedAdNetwork = createPartialMock(HostedAdNetwork.class, methodsToBeMocked, constructerArgs);
 
+        MemberModifier.suppress(BaseAdNetworkImpl.class.getDeclaredMethod("buildInmobiAdTracker"));
         expect(hostedAdNetwork.isNativeRequest())
                 .andReturn(true).times(1);
         hostedAdNetwork.nativeAdBuilding();
@@ -214,7 +226,8 @@ public class HostedAdNetworkTest {
         assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
 
         //Negative Test Case #6: ErrorCode = 1002 (NO AD Condition for HAS)
-        response = "{\"id\":\"4567876766666\",\"status\":\"FAIL\",\"error_msg\":\"No ads available to serve\",\"error_code\":1002}";
+        response =
+                "{\"id\":\"4567876766666\",\"status\":\"FAIL\",\"error_msg\":\"No ads available to serve\",\"error_code\":1002}";
         expectedResponseContent = "";
         expectedResponseStatus = "NO_AD";
         hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);
@@ -222,7 +235,8 @@ public class HostedAdNetworkTest {
         assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
 
         //Negative Test Case #7: ErrorCode = 1003 (RFM error in selecting ad)
-        response = "{\"id\":\"456787676666454546\",\"status\":\"FAIL\",\"error_msg\":\"Ad filtered during validation/processing\",\"error_code\":1003}";
+        response =
+                "{\"id\":\"456787676666454546\",\"status\":\"FAIL\",\"error_msg\":\"Ad filtered during validation/processing\",\"error_code\":1003}";
         expectedResponseContent = "";
         expectedResponseStatus = "NO_AD";
         hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);
@@ -230,7 +244,8 @@ public class HostedAdNetworkTest {
         assertThat(hostedAdNetwork.getAdStatus(), is(equalTo(expectedResponseStatus)));
 
         //Negative Test Case #8: ErrorCode = 2000 (Unknown Errors from RP)
-        response = "{\"id\":\"45678767666465655\",\"status\":\"FAIL\",\"error_msg\":\"Can't serve ad as something broke on our side\",\"error_code\":2000}";
+        response =
+                "{\"id\":\"45678767666465655\",\"status\":\"FAIL\",\"error_msg\":\"Can't serve ad as something broke on our side\",\"error_code\":2000}";
         expectedResponseContent = "";
         expectedResponseStatus = "NO_AD";
         hostedAdNetwork.parseResponse(response, mockHttpResponseStatus);

@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.paypal;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,6 +22,10 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -162,6 +162,7 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
             try {
                 final VelocityContext context = new VelocityContext();
                 TemplateType t;
+                buildInmobiAdTracker();
 
                 if (responseFormat.equalsIgnoreCase(TemplateType.HTML.name())) {
                     t = TemplateType.HTML;
@@ -172,9 +173,9 @@ public class DCPPayPalAdNetwork extends AbstractDCPAdNetworkImpl {
                             new JSONObject(response).getJSONObject("adresponse").getJSONObject("imp");
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("imgurl"));
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {
                 adStatus = NO_AD;

@@ -61,9 +61,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
@@ -106,7 +105,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -1033,6 +1031,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
 
+            buildInmobiAdTracker();
             responseContent = DEFAULT_EMPTY_STRING;
             adStatus = AdStatus.AD.name();
 
@@ -1119,11 +1118,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     ImpressionIdGenerator.getInstance().resetWilburyIntKey(oldImpressionId, incId);
 
             if (StringUtils.isNotEmpty(newImpressionId)) {
-                // Update beacon and click URLs
-                beaconUrl =
-                        ClickUrlsRegenerator.regenerateBeaconUrl(beaconUrl, oldImpressionId, newImpressionId,
-                                sasParams.isRichMedia());
-                clickUrl = ClickUrlsRegenerator.regenerateClickUrl(clickUrl, oldImpressionId, newImpressionId);
                 impressionId = newImpressionId;
                 LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
             }
@@ -1182,6 +1176,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private void bannerAdBuilding() {
         final VelocityContext velocityContext = new VelocityContext();
+        final String beaconUrl = getBeaconUrl();
         String admContent = getAdMarkUp();
 
         final int admSize = admContent.length();
@@ -1214,7 +1209,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VALID_SPROUT_RESPONSES);
                 admContent =
                         IXAdNetworkHelper.replaceSproutMacros(admContent, casInternalRequestParameters, sasParams,
-                                isCoppaSet, clickUrl, beaconUrl);
+                                isCoppaSet, getClickUrl(), beaconUrl);
                 velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
                 velocityContext.put(VelocityTemplateFieldConstants.SPROUT, true);
                 LOG.debug(traceMarker, "Replaced Sprout Macros");
@@ -1235,7 +1230,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int admAfterMacroSize = admContent.length();
         if (templateWN || admAfterMacroSize == admSize) {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
-            velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+            velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
         }
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
@@ -1261,13 +1256,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // JS escaped IMWinUrl
-        final String imWinUrl = beaconUrl + "?b=${WIN_BID}";
+        final String imWinUrl = getBeaconUrl() + "?b=${WIN_BID}";
         velocityContext.put(VelocityTemplateFieldConstants.IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
 
         // JS escaped IM beacon and click URLs.
         velocityContext
-                .put(VelocityTemplateFieldConstants.IM_BEACON_URL, StringEscapeUtils.escapeJavaScript(beaconUrl));
-        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
+                .put(VelocityTemplateFieldConstants.IM_BEACON_URL, StringEscapeUtils.escapeJavaScript(getBeaconUrl()));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(getClickUrl()));
 
         // SDK version
         velocityContext.put(VelocityTemplateFieldConstants.IMSDK_VERSION, sasParams.getSdkVersion());
@@ -1332,8 +1327,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             final App app = bidRequest.getApp();
             final Map<String, String> params = new HashMap<>();
-            params.put("beaconUrl", beaconUrl);
-            params.put("winUrl", beaconUrl + "?b=${WIN_BID}");
+            params.put("beaconUrl", getBeaconUrl());
+            params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}");
             params.put("appId", app.getId());
             params.put("siteId", sasParams.getSiteId());
             params.put("nUrl", nurl);

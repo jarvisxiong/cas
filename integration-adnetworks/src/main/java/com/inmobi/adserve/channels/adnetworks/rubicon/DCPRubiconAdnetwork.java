@@ -351,7 +351,9 @@ public class DCPRubiconAdnetwork extends AbstractDCPAdNetworkImpl {
                         templateType = TemplateType.WAP_HTML_JS_AD_TAG;
                     }
 
-                    responseContent = Formatter.getResponseFromTemplate(templateType, context, sasParams, beaconUrl);
+                    buildInmobiAdTracker();
+                    responseContent = Formatter.getResponseFromTemplate(templateType, context, sasParams,
+                            getBeaconUrl());
                     adStatus = AD_STRING;
                 } else {
                     adStatus = NO_AD;

@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.mocean;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +24,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -91,11 +91,6 @@ public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getName() {
         return name + DCP_KEY;
-    }
-
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
     }
 
     @Override
@@ -212,6 +207,7 @@ public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.code();
                 final VelocityContext context = new VelocityContext();
+                buildInmobiAdTracker();
 
                 TemplateType t = TemplateType.HTML;
                 if (adResponse.has("content") && StringUtils.isNotBlank(adResponse.getString("content"))) {
@@ -222,7 +218,7 @@ public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
                     if (StringUtils.isNotBlank(partnerBeacon) && !"null".equalsIgnoreCase(partnerBeacon)) {
                         context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("track"));
                     }
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("text"));
@@ -239,7 +235,7 @@ public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
                     }
                 }
 
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {
                 adStatus = NO_AD;

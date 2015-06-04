@@ -1,10 +1,10 @@
 package com.inmobi.adserve.channels.adnetworks;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.replay;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -13,11 +13,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.testng.annotations.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.appnexus.DCPAppNexusAdnetwork;
@@ -31,20 +31,23 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
-public class DCPAppNexusAdnetworkTest extends TestCase {
-    private Configuration mockConfig = null;
-    private final String debug = "debug";
-    private final String loggerConf = "/tmp/channel-server.properties";
-    private DCPAppNexusAdnetwork dcpAppNexusAdNetwork;
-    private final String appNexusHost = "http://mobile.adnxs.com/mob?psa=0&format=json";
-    private final String appNexusStatus = "on";
-    private final String defintiAdvId = "appNexusAdv1";
-    private final String appNexusTest = "1";
-    private RepositoryHelper repositoryHelper;
+@RunWith(PowerMockRunner.class)
+public class DCPAppNexusAdnetworkTest {
+    private static final String debug = "debug";
+    private static final String loggerConf = "/tmp/channel-server.properties";
+    private static final String appNexusHost = "http://mobile.adnxs.com/mob?psa=0&format=json";
+    private static final String appNexusStatus = "on";
+    private static final String defintiAdvId = "appNexusAdv1";
+    private static final String appNexusTest = "1";
+    private static Configuration mockConfig = null;
+    private static DCPAppNexusAdnetwork dcpAppNexusAdNetwork;
+    private static RepositoryHelper repositoryHelper;
 
 
-    public void prepareMockConfig() {
+    public static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString("appnexus.host")).andReturn(appNexusHost).anyTimes();
         expect(mockConfig.getString("appnexus.status")).andReturn(appNexusStatus).anyTimes();
@@ -56,8 +59,8 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         replay(mockConfig);
     }
 
-    @Override
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -67,43 +70,43 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         final Channel serverChannel = createMock(Channel.class);
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
-        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor4);
-        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor9);
-        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor11);
-        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor14);
-        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor15);
-        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        replay(slotSizeMapEntityFor11);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        replay(slotSizeMapEntityFor15);
+        repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 4))
                 .andReturn(slotSizeMapEntityFor4).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 9))
                 .andReturn(slotSizeMapEntityFor9).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)11))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 11))
                 .andReturn(slotSizeMapEntityFor11).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 14))
                 .andReturn(slotSizeMapEntityFor14).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
-        EasyMock.replay(repositoryHelper);
+        replay(repositoryHelper);
         dcpAppNexusAdNetwork = new DCPAppNexusAdnetwork(mockConfig, null, base, serverChannel);
         dcpAppNexusAdNetwork.setName("appnexus");
-        
-        
+
+
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         dcpAppNexusAdNetwork.setHost(appNexusHost);
     }
 
@@ -132,8 +135,6 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
@@ -141,8 +142,8 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4, repositoryHelper));
+        assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 4, repositoryHelper));
     }
 
     @Test
@@ -153,8 +154,6 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "";
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
@@ -163,8 +162,8 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4, repositoryHelper));
+        assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 4, repositoryHelper));
     }
 
     @Test
@@ -175,8 +174,6 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         sasParams.setUserAgent(" ");
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
@@ -184,8 +181,8 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl,
-                null, (short) 4, repositoryHelper));
+        assertFalse(dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 4, repositoryHelper));
     }
 
     @Test
@@ -200,19 +197,19 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
         sasParams.setCategories(Arrays.asList(new Long[] {10l, 13l, 30l}));
         final String externalKey = "240";
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper)) {
+        if (dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 4, repositoryHelper)) {
             final String actualUrl = dcpAppNexusAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://mobile.adnxs.com/mob?psa=0&format=json&ip=206.29.182.240&ua=Mozilla&id=240&st=mobile_web&size=300x50&loc=37.4429%2C-122.1514";
             assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
-            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());        }
+            assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
+        }
     }
 
     @Test
@@ -227,15 +224,13 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
         final String externalKey = "19100";
-        final String beaconUrl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(defintiAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, beaconUrl, (short) 4, repositoryHelper);
+        dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 4, repositoryHelper);
         //final String response =
         //        "{ \"status\": \"ok\", \"ads\": [{\"type\":\"banner\", \"width\":300, \"height\":50, \"content\": \"<script type=\"text/javascript\">document.write('<a href=\"http://sin1.g.adnxs.com/click?AAAAAAAA4D8fhetRuB7dPwAAAAAAAPA_H4XrUbge3T8AAAAAAADgP5D-cuXdwZBvebWPt1919EczVUxSAAAAAHHIGwB2AgAAzgIAAAIAAAA_nHoASi8EAAYAAQBVU0QAVVNEACwBMgAgCAAAK4kABQUCAQIAAAAA1h2OcAAAAAA./cnd=%21mwarOwje030Qv7jqAxjK3hAgAA../clickenc=http%3A%2F%2Fcnct.tlvmedia.com%2Fckl.php%3Fs%3D1%26c%3Dsin1CPnqvrz7q536RxACGJD9y6veu7DIbyIOMjA2LjI5LjE4Mi4yNDAoAQ..%26mx%3Danx%26t%3D1%26d%3D93478%26r%3Dhttp%253A%252F%252Ftracking1.aleadpay.com%252FAdTag%252FClick%252FY21waWQ9MTc2NTEmdHNpZD01ODAg%253Fdp%253D%2524CLICKID%2524\" target=\"_blank\"><img width=\"300\" height=\"50\" style=\"border-style: none\" src=\"http://cdn.adnxs.com/p/01/db/74/d1/01db74d156327ffbb20463fcd3bda52c.gif\"/></a>');</script>\"}] }";
         // dcpAppNexusAdNetwork.parseResponse(response, HttpResponseStatus.OK);
@@ -274,10 +269,6 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd"
-                        + "-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         sasParams.setSiteContentType(ContentType.PERFORMANCE);
         final String externalKey = "f6wqjq1r5v";
@@ -286,7 +277,7 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 4, repositoryHelper);
+        dcpAppNexusAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 4, repositoryHelper);
         assertEquals(dcpAppNexusAdNetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 
@@ -295,8 +286,4 @@ public class DCPAppNexusAdnetworkTest extends TestCase {
         assertEquals(dcpAppNexusAdNetwork.getName(), "appnexusDCP");
     }
 
-    @Test
-    public void testDCPAppNexusIsClickUrlReq() throws Exception {
-        assertTrue(dcpAppNexusAdNetwork.isClickUrlRequired());
-    }
 }

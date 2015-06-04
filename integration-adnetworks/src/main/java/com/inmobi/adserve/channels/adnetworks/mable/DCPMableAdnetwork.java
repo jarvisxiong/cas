@@ -1,10 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.mable;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +24,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -95,7 +95,6 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
 
             request.put("site_id", externalSiteId);
             request.put("site_category", getCategories(',', true, true));
-            request.put("clk_track_url", clickUrl);
             request.put("client_agent", sasParams.getUserAgent());
             request.put("client_ip", sasParams.getRemoteHostIp());
             request.put("blind_id", blindedSiteId);
@@ -179,8 +178,10 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
         } else {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
+            buildInmobiAdTracker();
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

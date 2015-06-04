@@ -1,11 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.smaato;
 
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.HashMap;
@@ -26,9 +20,15 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -251,8 +251,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 final Ad ad = smaatoResponse.getAds().getAd();
 
                 TemplateType t = null;
+                buildInmobiAdTracker();
+
                 context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, ad.getAction().getTarget());
-                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
                 context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, ad.getBeacons().getBeacon());
                 if (IMAGE_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getLink())) {
@@ -271,7 +273,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     adStatus = NO_AD;
                     return;
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
 
             } catch (final Exception exception) {
@@ -285,11 +287,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return config.getString("smaato.advertiserId");
-    }
-
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
     }
 
 }

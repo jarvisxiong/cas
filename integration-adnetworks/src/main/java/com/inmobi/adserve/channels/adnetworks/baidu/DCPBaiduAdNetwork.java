@@ -238,11 +238,6 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
-
-    @Override
     public void parseResponse(final byte[] responseByte, final HttpResponseStatus status) {
         try {
             adStatus = NO_AD;
@@ -255,7 +250,9 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 TemplateType t = TemplateType.HTML;
                 MaterialMeta responseMeta = responses.getAds(0).getMaterialMeta();
                 BaiduBidResponse.Ad ad = responses.getAds(0);
-                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                buildInmobiAdTracker();
+
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                 if (null != responseMeta.getClickUrl()) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseMeta.getClickUrl());
                 }
@@ -293,8 +290,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 } else {
                     return;
                 }
-                responseContent = Formatter.getResponseFromTemplate(
-                        t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 LOG.debug("Baidu AD" + responseContent);
                 adStatus = AD_STRING;
                 statusCode = 200;

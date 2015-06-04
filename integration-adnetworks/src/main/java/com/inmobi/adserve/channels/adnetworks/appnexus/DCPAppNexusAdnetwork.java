@@ -197,8 +197,10 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 final JSONObject adsJson = responseArray.getJSONObject(0);
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adsJson.getString("content"));
+                buildInmobiAdTracker();
 
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
@@ -219,9 +221,4 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
         this.name = name;
     }
 
-    // if we need to send click url
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
 }

@@ -95,6 +95,7 @@ public class GoogleAdXAdNetwork extends AbstractDCPAdNetworkImpl {
     public void generateJsAdResponse() {
         statusCode = HttpResponseStatus.OK.code();
         final VelocityContext context = new VelocityContext();
+        final String beaconUrl = getBeaconUrl();
 
         String referalUrl = sasParams.getReferralUrl();
         if (!isApp()) {

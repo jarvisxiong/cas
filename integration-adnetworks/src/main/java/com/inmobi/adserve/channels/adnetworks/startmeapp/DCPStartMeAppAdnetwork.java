@@ -1,5 +1,17 @@
 package com.inmobi.adserve.channels.adnetworks.startmeapp;
 
+import java.awt.Dimension;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -14,18 +26,6 @@ import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.Dimension;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Created by deepak on 27/3/15.
@@ -132,7 +132,9 @@ public class DCPStartMeAppAdnetwork extends AbstractDCPAdNetworkImpl {
                 Formatter.TemplateType t = Formatter.TemplateType.HTML;
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("adm"));
                 adStatus = AD_STRING;
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                buildInmobiAdTracker();
+
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
             } catch (final JSONException exception) {
                 adStatus = NO_AD;

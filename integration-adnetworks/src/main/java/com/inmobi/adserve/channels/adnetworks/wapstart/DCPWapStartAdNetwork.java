@@ -252,8 +252,9 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 statusCode = 500;
                 return;
             }
+            buildInmobiAdTracker();
             context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, partnerClickUrl);
-            context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+            context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
             context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, responseJson.getString("vlink"));
             if (responseJson.has("graphic")) {
                 final JSONObject textGraphic = responseJson.getJSONObject("graphic").getJSONObject("picture");
@@ -284,7 +285,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
                 statusCode = 500;
                 return;
             }
-            responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+            responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
             adStatus = AD_STRING;
             statusCode = 200;
         } catch (final Exception exception) {
@@ -302,8 +303,4 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         return config.getString("wapstart.advertiserId");
     }
 
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
 }

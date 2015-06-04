@@ -241,8 +241,11 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerBeacon);
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlCode);
+            buildInmobiAdTracker();
+
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

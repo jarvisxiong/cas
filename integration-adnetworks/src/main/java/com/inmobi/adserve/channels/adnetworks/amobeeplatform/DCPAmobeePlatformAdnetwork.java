@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.amobeeplatform;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +23,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -191,8 +191,11 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
         } else {
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
+            buildInmobiAdTracker();
+
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

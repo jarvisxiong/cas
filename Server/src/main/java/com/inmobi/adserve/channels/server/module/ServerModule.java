@@ -71,6 +71,7 @@ public class ServerModule extends AbstractModule {
         requestStaticInjection(ResponseSender.class);
 
         install(new NativeModule());
+        install(new InmobiAdTrackerModule());
         install(new TemplateModule());
         install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
         install(new ChannelSegmentFilterModule());

@@ -1,16 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.adbay;
 
-import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
-import com.inmobi.adserve.channels.api.Formatter;
-import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
-import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -20,8 +12,17 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * Created by deepak on 28/5/15.
@@ -31,14 +32,15 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPAdbayAdnetwork.class);
 
 
-    public DCPAdbayAdnetwork(final Configuration config, final Bootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+    public DCPAdbayAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-            || StringUtils.isBlank(externalSiteId)) {
+                || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for adbaydcp so exiting adapter");
             LOG.info("Configure parameters inside adbaydcp returned false");
             return false;
@@ -84,16 +86,17 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
                 final VelocityContext context = new VelocityContext();
                 Formatter.TemplateType t = Formatter.TemplateType.IMAGE;
                 final JSONArray responseAd = adResponse.getJSONArray("creatives");
-                if(responseAd.length() > 0){
+                if (responseAd.length() > 0) {
+                    buildInmobiAdTracker();
                     final JSONObject responseAdObj = responseAd.getJSONObject(0);
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseAdObj.getString("src"));
                     context.put(VelocityTemplateFieldConstants.AD_TEXT, responseAdObj.getString("txt"));
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseAdObj.getString("click"));
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
-                    responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
+                    responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                     LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
                 }
-                } catch (final JSONException exception) {
+            } catch (final JSONException exception) {
                 adStatus = "NO_AD";
                 LOG.info("Error parsing response {} from adbay: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);

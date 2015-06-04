@@ -24,5 +24,4 @@ public class ThirdPartyAdResponse {
     private long latency;
     private long startTime;
     private String impressionId = null;
-    private String clickUrl = null;
 }

@@ -184,9 +184,11 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
                     responseContent = DEFAULT_EMPTY_STRING;
                     return;
                 }
+                buildInmobiAdTracker();
                 context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, htmlContent);
 
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

@@ -250,6 +250,8 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                     adStatus = NO_AD;
                     return;
                 }
+                buildInmobiAdTracker();
+
                 final JSONObject adResponse =
                         jsonObject.getJSONObject("data").getJSONObject("ad").getJSONObject("creative");
                 final JSONObject displayInfo = adResponse.getJSONObject("displayinfo");
@@ -279,7 +281,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 final VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                 context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, partnerClickUrl);
 
                 if (StringUtils.isNotBlank(imageUrl)) {
@@ -310,7 +312,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
                     type = TemplateType.IMAGE;
                     adStatus = AD_STRING;
                 }
-                responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(type, context, sasParams, getBeaconUrl());
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from lomark: {}", response, exception);
@@ -324,11 +326,6 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getId() {
         return config.getString("lomark.advertiserId");
-    }
-
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
     }
 
     private String getSignature(final HashMap<String, String> params, final String secret) throws IOException {

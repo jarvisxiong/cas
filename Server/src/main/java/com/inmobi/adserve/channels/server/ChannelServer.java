@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.repository.CcidMapRepository;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
@@ -55,7 +56,6 @@ import com.inmobi.adserve.channels.server.requesthandler.Logging;
 import com.inmobi.adserve.channels.server.servlet.ServletChangeLogLevel;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DataCenter;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -147,8 +147,8 @@ public class ChannelServer {
             // Initialising ImpressionIdGenerator
             ImpressionIdGenerator.init(ChannelServer.hostIdCode, ChannelServer.dataCenterIdCode);
 
-            // Initialising ClickUrlsRegenerator
-            ClickUrlsRegenerator.init(configurationLoader.getServerConfiguration().subset("clickmaker"));
+            // Initialising InmobiAdTracker Builders
+            DefaultLazyInmobiAdTrackerBuilder.init(configurationLoader.getServerConfiguration().subset("clickmaker"));
 
             final String rrLogKey = configurationLoader.getServerConfiguration().getString("rrLogKey");
             final String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");

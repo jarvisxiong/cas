@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
 
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPM;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -162,6 +163,8 @@ public class RtbNativeAdMakingTest {
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(siteIncId).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(2).anyTimes();
         expect(mockConfig.getString(advertiserName + ".advertiserId")).andReturn("advertiserId").anyTimes();
         expect(mockConfig.getString(advertiserName + ".urlArg")).andReturn("").anyTimes();
         expect(mockConfig.getString(advertiserName + ".rtbVer", "2.0")).andReturn("2.0").anyTimes();
@@ -191,8 +194,6 @@ public class RtbNativeAdMakingTest {
     }
 
     private static void setUpRtbAdapter() throws Exception {
-        final String beaconUrl = "www.dummyBeacon.inmobi.com";
-
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         final IPRepository ipRepository = new IPRepository();
@@ -211,7 +212,7 @@ public class RtbNativeAdMakingTest {
                 new NativeResponseMaker(new TemplateParser(templateConfiguration), templateDecorator,
                         templateConfiguration));
         rtbAdNetwork.setHost("http://localhost:8800/getBid");
-        rtbAdNetwork.configureParameters(mockSASRequestParameters, null, mockChannelSegmentEntity, null, beaconUrl, 0,
+        rtbAdNetwork.configureParameters(mockSASRequestParameters, null, mockChannelSegmentEntity, 0,
                 null);
         rtbAdNetwork.setBidRequest(mockBidRequest);
     }

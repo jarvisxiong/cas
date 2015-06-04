@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.tapit;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,6 +22,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -73,11 +73,6 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getName() {
         return "tapitDCP";
-    }
-
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
     }
 
     @Override
@@ -139,7 +134,8 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
-            LOG.debug("beacon url inside mullah media is {}", beaconUrl);
+            buildInmobiAdTracker();
+
             try {
                 statusCode = status.code();
                 final JSONObject adResponse = new JSONObject(response);
@@ -152,7 +148,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("clickurl"));
                     context.put(VelocityTemplateFieldConstants.WIDTH, adResponse.getString("adWidth"));
                     context.put(VelocityTemplateFieldConstants.HEIGHT, adResponse.getString("adHeight"));
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                     if ("text".equals(adResponse.getString("type"))) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("adtext"));
                         final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
@@ -167,7 +163,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                         t = TemplateType.IMAGE;
                     }
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {
                 adStatus = NO_AD;

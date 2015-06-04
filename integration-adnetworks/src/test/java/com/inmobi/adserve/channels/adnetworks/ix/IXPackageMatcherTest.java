@@ -54,8 +54,8 @@ public class IXPackageMatcherTest {
 
     @Test(dataProvider = "OS Version Targeting DP")
     public void testCheckForOsVersionTargeting(final String useCaseName, final Map<Integer, Range<Double>> metaData,
-                                               final int osId, final String osMajorVersionStr,
-                                               final boolean expectedOutcome) throws Exception {
+            final int osId, final String osMajorVersionStr,
+            final boolean expectedOutcome) throws Exception {
         Assert.assertEquals(expectedOutcome, checkForOsVersionTargeting(metaData, osId, osMajorVersionStr));
     }
 
@@ -96,9 +96,9 @@ public class IXPackageMatcherTest {
 
     @Test(dataProvider = "Manuf Model Targeting DP")
     public void testCheckForManufModelTargeting(final String useCaseName,
-                                                final Map<Long, Pair<Boolean, Set<Long>>> metaData,
-                                                final long manufacturerId, final long modelId,
-                                                final boolean expectedOutcome) throws Exception {
+            final Map<Long, Pair<Boolean, Set<Long>>> metaData,
+            final long manufacturerId, final long modelId,
+            final boolean expectedOutcome) throws Exception {
         Assert.assertEquals(expectedOutcome, checkForManufModelTargeting(metaData, manufacturerId, modelId));
     }
 }

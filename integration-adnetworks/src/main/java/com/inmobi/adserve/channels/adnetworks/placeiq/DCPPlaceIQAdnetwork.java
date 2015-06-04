@@ -282,8 +282,10 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
                 }
 
+                buildInmobiAdTracker();
                 statusCode = status.code();
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

@@ -1,8 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.replay;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -12,10 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork;
@@ -31,20 +35,20 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import junit.framework.TestCase;
 
 
-
-public class DCPPubmaticAdapterTest extends TestCase {
-    private Configuration mockConfig = null;
-    private final String debug = "debug";
-    private final String loggerConf = "/tmp/channel-server.properties";
-    private DCPPubmaticAdNetwork dcpPubmaticAdnetwork;
-    private final String pubmaticHost = "http://showads.pubmatic.com/AdServer/AdServerServlet";
-    private final String pubmaticStatus = "on";
-    private final String pubmaticAdvId = "pubmaticadv1";
-    private final String pubId = "2685";
-    private RepositoryHelper repositoryHelper;
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BaseAdNetworkImpl.class)
+public class DCPPubmaticAdapterTest {
+    private static final String debug = "debug";
+    private static final String loggerConf = "/tmp/channel-server.properties";
+    private static final String pubmaticHost = "http://showads.pubmatic.com/AdServer/AdServerServlet";
+    private static final String pubmaticStatus = "on";
+    private static final String pubmaticAdvId = "pubmaticadv1";
+    private static final String pubId = "2685";
+    private static Configuration mockConfig = null;
+    private static DCPPubmaticAdNetwork dcpPubmaticAdnetwork;
+    private static RepositoryHelper repositoryHelper;
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -58,7 +62,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
         replay(mockConfig);
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         File f;
         f = new File(loggerConf);
@@ -69,35 +73,35 @@ public class DCPPubmaticAdapterTest extends TestCase {
         final HttpRequestHandlerBase base = createMock(HttpRequestHandlerBase.class);
         prepareMockConfig();
         Formatter.init();
-        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor4);
-        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor9);
-        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor14);
-        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
-        EasyMock.replay(slotSizeMapEntityFor15);
-        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)4))
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        replay(slotSizeMapEntityFor4);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        replay(slotSizeMapEntityFor9);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        replay(slotSizeMapEntityFor14);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = createMock(SlotSizeMapEntity.class);
+        expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        replay(slotSizeMapEntityFor15);
+        repositoryHelper = createMock(RepositoryHelper.class);
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 4))
                 .andReturn(slotSizeMapEntityFor4).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)9))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 9))
                 .andReturn(slotSizeMapEntityFor9).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)14))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 14))
                 .andReturn(slotSizeMapEntityFor14).anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short)15))
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
-        EasyMock.replay(repositoryHelper);
+        replay(repositoryHelper);
         dcpPubmaticAdnetwork = new DCPPubmaticAdNetwork(mockConfig, null, base, serverChannel);
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
         IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
-        
+
         dcpPubmaticAdnetwork.setHost(pubmaticHost);
     }
 
@@ -111,8 +115,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSource("iphone");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "33327";
         final ChannelSegmentEntity entity =
@@ -121,7 +123,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper),
                 true);
     }
 
@@ -134,8 +136,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "33327";
         final ChannelSegmentEntity entity =
@@ -144,7 +144,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -157,8 +157,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setSource("iphone");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "";
         final ChannelSegmentEntity entity =
@@ -167,7 +165,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -179,8 +177,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setUserAgent(" ");
         sasParams.setSource("iphone");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "33327";
         final ChannelSegmentEntity entity =
@@ -189,7 +185,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(
-                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper),
+                dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper),
                 false);
     }
 
@@ -204,14 +200,12 @@ public class DCPPubmaticAdapterTest extends TestCase {
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSource("iphone");
         final String externalKey = "33327";
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"1231\"}"), new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             dcpPubmaticAdnetwork.makeAsyncRequest();
             final String actualUrl = dcpPubmaticAdnetwork.getRequestUrl();
             assertEquals(new URI(pubmaticHost).getQuery(), new URI(actualUrl).getQuery());
@@ -232,15 +226,13 @@ public class DCPPubmaticAdapterTest extends TestCase {
         final String externalKey = "33327";
         sasParams.setCategories(Arrays.asList(new Long[] {7l, 8l}));
         final Long[] segmentCategories = new Long[] {13l, 15l};
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&loc_source=0&nettype=carrier&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=Education%2CEntertainment&kltstamp=";
@@ -261,17 +253,13 @@ public class DCPPubmaticAdapterTest extends TestCase {
         final String externalKey = "33327";
         sasParams.setCategories(Arrays.asList(new Long[] {7l, 8l}));
         final Long[] segmentCategories = new Long[] {1l};
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
-                        + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
-                        + "?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, segmentCategories, true, true, externalKey, null, null, null, new Long[] {0L}, true,
                         null, null, 0, null, false, false, false, false, false, false, false, false, false, false,
                         new JSONObject("{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0,
                         new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&loc_source=0&nettype=carrier&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=Education%2CEntertainment&kltstamp=";
@@ -293,16 +281,12 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setOsId(5);
         sasParams.setConnectionType(ConnectionType.WIFI);
         final String externalKey = "33327";
-        final String clurl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
-                        + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&loc_source=0&nettype=wifi&udid=202cb962ac59075b964b07152d234b70&udidtype=4&udidhash=2&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -319,20 +303,16 @@ public class DCPPubmaticAdapterTest extends TestCase {
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
-        sasParams.setCategories(new ArrayList<Long>());
+        sasParams.setCategories(new ArrayList<>());
         sasParams.setSource("iphone");
         sasParams.setCountryCode("US");
         final String externalKey = "33327";
-        final String clurl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
-                        + "-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 9, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&loc_source=0&country=USA&nettype=carrier&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -359,7 +339,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 15, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=,-122.1514&udid=202cb962ac59075b964b07152d234b70&kadwidth=320&kadheight=50&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -384,7 +364,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"9\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, null, null, (short) 9, repositoryHelper)) {
+        if (dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             final String actualParams = dcpPubmaticAdnetwork.getRequestParams();
             final String expectedParams =
                     "timezone=0&frameName=test&inIframe=1&adVisibility=0&adPosition=-1x-1&operId=201&pubId=2685&adId=36844&siteId=33327&loc=37.4429,-122.1514&loc_source=0&nettype=carrier&kadwidth=320&kadheight=48&pageURL=00000000-0000-0000-0000-000000000000&keywords=miscellenous&kltstamp=";
@@ -399,13 +379,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent("Mozilla");
         final String externalKey = "33327";
-        final String beaconUrl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0"
-                        + "/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11"
-                        + "?beacon=true";
-        final String clickUrl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
@@ -413,14 +386,15 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
+        AdapterTestHelper.setBeaconAndClickStubs();
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
         dcpPubmaticAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpPubmaticAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpPubmaticAdnetwork.getHttpResponseContent());
     }
 
@@ -432,12 +406,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("wap");
         final String externalKey = "33327";
-        final String beaconUrl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
-                        + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
-        final String clickUrl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
@@ -445,14 +413,15 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
+        AdapterTestHelper.setBeaconAndClickStubs();
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
         dcpPubmaticAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpPubmaticAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpPubmaticAdnetwork.getHttpResponseContent());
     }
 
@@ -464,12 +433,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("app");
         final String externalKey = "33327";
-        final String beaconUrl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
-                        + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
-        final String clickUrl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
@@ -477,14 +440,15 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
+        AdapterTestHelper.setBeaconAndClickStubs();
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
         dcpPubmaticAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpPubmaticAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpPubmaticAdnetwork.getHttpResponseContent());
     }
 
@@ -498,12 +462,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setSdkVersion("a372");
         sasParams.setImaiBaseUrl("http://cdn.inmobi.com/android/mraid.js");
         final String externalKey = "33327";
-        final String beaconUrl =
-                "http://c2.w.inmobi.com/c"
-                        + ".asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc"
-                        + "-87e5-22da170600f9/-1/1/9cddca11?beacon=true";
-        final String clickUrl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(
                         AdNetworksTest.getChannelSegmentEntityBuilder(pubmaticAdvId, null, null, null, 0, null, null,
@@ -511,14 +469,15 @@ public class DCPPubmaticAdapterTest extends TestCase {
                                 false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                         "{\"4\":\"36844\"}"), new ArrayList<>(), 0.0d, null, null, 32,
                                 new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clickUrl, beaconUrl, (short) 4, repositoryHelper);
+        AdapterTestHelper.setBeaconAndClickStubs();
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 4, repositoryHelper);
 
         final String response =
                 "{\"PubMatic_Bid\":{\"ecpm\":1.000000,\"creative_tag\":\"<a target=\\\"_blank\\\" href=\\\"http://pubmatic.com\\\">\n<div style=\\\"left: 0px; top: 0px; width: 320px;\nheight: 50px; background-color:#003366; color:#ffffff; text-align:center;\\\" >\n<h4> PubMatic 320x50 Test Ad </h4>\n</div>\n</a>\",\"tracking_url\":\"http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED\",\"click_tracking_url\":\"http://track.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=3&clickData=aHR0cDovL3RyYWNrLnB1Ym1hdGljLmNvbS9BZFNlcnZlci9BZERpc3BsYXlUcmFja2VyU2VydmxldD9vcGVySWQ9MyZwdWJJZD0yNjg1JnNpdGVJZD0zMDcxMyZhZElkPTI4NjUyJmthZHNpemVpZD0yMDYxNTg0MzAyMzgmaW5kaXJlY3RBZElkPTQ3OTY1JmFkU2VydmVySWQ9MTIzOCZtb2JmbGFnPTEmaXNtb2JpbGVhcHA9MSZQdWJjbGt1cmw9&url=\",\"autorefresh_time\":0,\"prefetch_data\":0}}";
         dcpPubmaticAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpPubmaticAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a target=\"_blank\" href=\"http://pubmatic.com\"> <div style=\"left: 0px; top: 0px; width: 320px; height: 50px; background-color:#003366; color:#ffffff; text-align:center;\" > <h4> PubMatic 320x50 Test Ad </h4> </div> </a><img src='http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?operId=201&pubId=2685&siteId=30713&adId=28652&adServerId=1238&kefact=1.000000&kaxefact=1.000000&kadNetFrequecy=0&kadwidth=300&kadheight=50&kadsizeid=30&kltstamp=1360156017&indirectAdId=47965&adServerOptimizerId=1&ranreq=0.15638034541708&kpbmtpfact=0.000000&mobflag=1&ismobileapp=1&pageURL=NOPAGEURLSPECIFIED' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpPubmaticAdnetwork.getHttpResponseContent());
     }
 
@@ -550,8 +509,6 @@ public class DCPPubmaticAdapterTest extends TestCase {
         sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
                 + "+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        final String clurl =
-                "http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?ds=1";
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "33327";
         final ChannelSegmentEntity entity =
@@ -559,7 +516,7 @@ public class DCPPubmaticAdapterTest extends TestCase {
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, clurl, null, (short) 15, repositoryHelper);
+        dcpPubmaticAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         assertEquals(dcpPubmaticAdnetwork.getImpressionId(), "4f8d98e2-4bbd-40bc-8795-22da170700f9");
     }
 
@@ -568,8 +525,4 @@ public class DCPPubmaticAdapterTest extends TestCase {
         assertEquals(dcpPubmaticAdnetwork.getName(), "pubmaticDCP");
     }
 
-    @Test
-    public void testDCPPubmaticIsClickUrlReq() throws Exception {
-        assertEquals(dcpPubmaticAdnetwork.isClickUrlRequired(), false);
-    }
 }

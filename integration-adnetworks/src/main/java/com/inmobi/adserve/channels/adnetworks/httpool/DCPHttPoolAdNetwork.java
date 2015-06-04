@@ -83,11 +83,6 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
-
-    @Override
     public URI getRequestUri() throws Exception {
         try {
             final StringBuilder url = new StringBuilder(host);
@@ -145,7 +140,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
             responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
-            LOG.debug("beacon url inside httpool is {}", beaconUrl);
+            buildInmobiAdTracker();
 
             try {
                 final JSONObject adResponse = new JSONObject(response);
@@ -157,7 +152,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 statusCode = status.code();
                 TemplateType t;
                 final VelocityContext context = new VelocityContext();
-                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                 context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, adResponse.getString("impression_url"));
                 final String adType = adResponse.getString("ad_type");
                 if ("tpt".equalsIgnoreCase(adType)) {
@@ -183,7 +178,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                         t = TemplateType.IMAGE;
                     }
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {

@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.ajillion;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -24,6 +20,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
@@ -132,6 +132,8 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
 
                 statusCode = status.code();
                 final VelocityContext context = new VelocityContext();
+                buildInmobiAdTracker();
+
 
                 TemplateType t = TemplateType.IMAGE;
                 if (adResponse.has("beacon_url")) {
@@ -139,7 +141,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                 }
                 if ("image".equalsIgnoreCase(adResponse.getString("creative_type"))) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("click_url"));
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, adResponse.getString("creative_url"));
                 } else if ("3rdparty".equalsIgnoreCase(adResponse.getString("creative_type"))) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("creative_url"));
@@ -149,7 +151,7 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
                     responseContent = DEFAULT_EMPTY_STRING;
                     return;
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
@@ -166,8 +168,4 @@ public class DCPAjillionAdnetwork extends AbstractDCPAdNetworkImpl {
         return config.getString(name + ".advertiserId");
     }
 
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
 }

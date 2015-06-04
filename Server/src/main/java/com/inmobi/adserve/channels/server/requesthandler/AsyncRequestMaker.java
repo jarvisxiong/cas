@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,6 @@ import com.inmobi.adserve.channels.server.SegmentFactory;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlMakerV6;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
@@ -96,28 +94,13 @@ public class AsyncRequestMaker {
             sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
 
-            if ((network.isClickUrlRequired() || network.isBeaconUrlRequired())
-                    && null != sasParams.getImpressionId()) {
-                boolean isCpc = false;
-                if (null != channelSegmentEntity.getPricingModel()
-                        && "cpc".equalsIgnoreCase(channelSegmentEntity.getPricingModel())) {
-                    isCpc = true;
-                }
-                final ClickUrlMakerV6 clickUrlMakerV6 =
-                        setClickParams(isCpc, config, sasParams, channelSegmentEntity.getDst() - 1);
-                clickUrlMakerV6.createClickUrls();
-                clickUrl = clickUrlMakerV6.getClickUrl();
-                beaconUrl = clickUrlMakerV6.getBeaconUrl();
-                LOG.debug("click url : {}", clickUrl);
-                LOG.debug("beacon url : {}", beaconUrl);
-            }
-
             LOG.debug("Sending request to Channel of advertiserId {}", channelSegmentEntity.getAdvertiserId());
             LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
 
             network.disableIPResolution(config.getBoolean("isIPRepositoryDisabled", true));
-            if (network.configureParameters(sasParams, casInternal, channelSegmentEntity, clickUrl, beaconUrl,
-                    row.getRequestedSlotId(), repositoryHelper)) {
+
+            if (network.configureParameters(sasParams, casInternal, channelSegmentEntity, row.getRequestedSlotId(),
+                    repositoryHelper)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
                 row.setAdNetworkInterface(network);
                 if (network.isRtbPartner() || network.isIxPartner()) {
@@ -219,45 +202,6 @@ public class AsyncRequestMaker {
             }
         }
         return rankList;
-    }
-
-    private static ClickUrlMakerV6 setClickParams(final boolean pricingModel, final Configuration config,
-                                                  final SASRequestParameters sasParams, final Integer dst) {
-        final ClickUrlMakerV6.Builder builder = ClickUrlMakerV6.newBuilder();
-        builder.setImpressionId(sasParams.getImpressionId());
-        builder.setAge(null != sasParams.getAge() ? sasParams.getAge().intValue() : 0);
-        builder.setCountryId(null != sasParams.getCountryId() ? sasParams.getCountryId().intValue() : 0);
-        builder.setLocation(null != sasParams.getState() ? sasParams.getState() : 0);
-        builder.setSiteSegmentId(sasParams.getSiteSegmentId());
-        builder.setPlacementSegmentId(sasParams.getPlacementSegmentId());
-        builder.setGender(null != sasParams.getGender() ? sasParams.getGender() : StringUtils.EMPTY);
-        builder.setCPC(pricingModel);
-        builder.setCarrierId(sasParams.getCarrierId());
-        builder.setHandsetInternalId(sasParams.getHandsetInternalId());
-        builder.setIpFileVersion(sasParams.getIpFileVersion().longValue());
-        builder.setIsBillableDemog(false);
-        builder.setSiteIncId(sasParams.getSiteIncId());
-        builder.setUdIdVal(sasParams.getTUidParams());
-        builder.setCryptoSecretKey(config.getString("clickmaker.key.1.value"));
-        builder.setTestCryptoSecretKey(config.getString("clickmaker.key.2.value"));
-        builder.setImageBeaconFlag(true); // true/false
-        builder.setBeaconEnabledOnSite(true); // do not know
-        builder.setTestMode(false);
-        builder.setRmAd(sasParams.isRichMedia());
-        builder.setRmBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
-        builder.setClickURLPrefix(config.getString("clickmaker.clickURLPrefix"));
-        builder.setImageBeaconURLPrefix(config.getString("clickmaker.beaconURLPrefix"));
-        builder.setTestRequest(false);
-        builder.setLatlonval(sasParams.getLatLong());
-        builder.setRtbSite(sasParams.getSst() != 0); // TODO:- Change this according to thrift enums
-        builder.setDst(dst.toString());
-        builder.setBudgetBucketId("101"); // Default Value
-        builder.setPlacementId(sasParams.getPlacementId());
-        builder.setIntegrationDetails(sasParams.getIntegrationDetails());
-        builder.setAppBundleId(sasParams.getAppBundleId());
-        builder.setNormalizedUserId(sasParams.getNormalizedUserId());
-        builder.setRequestedAdType(sasParams.getRequestedAdType());
-        return new ClickUrlMakerV6(builder);
     }
 
     private boolean isNativeRequest(final SASRequestParameters sasParams) {

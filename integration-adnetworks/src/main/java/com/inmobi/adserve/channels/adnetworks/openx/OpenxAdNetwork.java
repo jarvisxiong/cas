@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.openx;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -22,6 +18,10 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -139,8 +139,11 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             statusCode = status.code();
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
+            buildInmobiAdTracker();
+
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from openx: {}", response, exception);

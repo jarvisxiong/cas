@@ -226,8 +226,11 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             statusCode = status.code();
             final VelocityContext context = new VelocityContext();
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
+            buildInmobiAdTracker();
+
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
+                        getBeaconUrl());
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from nexage: {}", response, exception);
@@ -252,7 +255,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         try {
             responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams, beaconUrl);
+                    Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams,
+                            getBeaconUrl());
             LOG.debug("response length is {}", responseContent.length());
             adStatus = AD_STRING;
         } catch (final Exception exception) {

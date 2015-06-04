@@ -118,6 +118,7 @@ public class InspectorStrings {
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
+    public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
@@ -134,6 +135,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_OS_VERSION_FILTER = "DroppedInPackageOSVersionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
+
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)

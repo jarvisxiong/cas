@@ -249,6 +249,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             final VelocityContext context = new VelocityContext();
             try {
                 final JSONObject ad = new JSONObject(response);
+                buildInmobiAdTracker();
 
                 // Banner or Interstitial.
                 if ("banner".equalsIgnoreCase(ad.getString("adType"))) {
@@ -261,6 +262,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                     // Other format.
                     // adType is "video" or "empty".
                     adStatus = NO_AD;
+                    responseContent = null;
                     LOG.info("Error parsing response {} from Marimedia", response);
                     return;
                 }
@@ -275,10 +277,11 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, impressionUrl);
                 }
 
-                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
                 responseContent =
-                        Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, beaconUrl);
+                        Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams,
+                                getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
@@ -298,8 +301,4 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
         return config.getString("marimedia.advertiserId");
     }
 
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
-    }
 }

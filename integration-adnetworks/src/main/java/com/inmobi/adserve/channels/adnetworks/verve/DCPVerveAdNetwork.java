@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.verve;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,6 +21,10 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
@@ -218,6 +218,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         } else {
             statusCode = status.code();
             final VelocityContext context = new VelocityContext();
+            buildInmobiAdTracker();
+            final String beaconUrl = getBeaconUrl();
+
             context.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             try {

@@ -1,10 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import static com.inmobi.adserve.channels.adnetworks.AdapterTestHelper.setInmobiAdTrackerBuilderFactoryForTest;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPM;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.createPartialMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
@@ -38,6 +41,7 @@ import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.natives.IxNativeBuilderImpl;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
@@ -46,7 +50,6 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.Utils.ClickUrlsRegenerator;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
@@ -65,8 +68,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 @PrepareForTest({IXAdNetwork.class, InspectorStats.class})
 @PowerMockIgnore("javax.crypto.*")
 public class NewIXAdNetworkTest {
-    private static Configuration mockConfig;
     private static final String advertiserName = "ix";
+    private static Configuration mockConfig;
     private static RepositoryHelper repositoryHelper;
 
     private static void prepareMockConfig() {
@@ -90,6 +93,7 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*"))
                 .andReturn("(?s).*data-creative[iI]d.*").anyTimes();
         expect(mockConfig.getString("key.1.value")).andReturn("Secret Key").anyTimes();
+        expect(mockConfig.getString("key.2.value")).andReturn("Secret Key").anyTimes();
         expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconPrefix").anyTimes();
         expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickPrefix").anyTimes();
         replayAll();
@@ -102,6 +106,7 @@ public class NewIXAdNetworkTest {
         MemberMatcher.field(IXAdNetwork.class, "templateConfiguration").set(IXAdNetwork.class, defaultConfiguration);
 
         prepareMockConfig();
+        DefaultLazyInmobiAdTrackerBuilder.init(mockConfig);
         final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor4);
@@ -194,7 +199,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
 
         expect(mockStatus.code()).andReturn(200).times(2);
@@ -202,8 +207,13 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
         expect(mockSasParams.getSdkVersion()).andReturn("SdkVer").times(1);
+        expect(mockSasParams.getCarrierId()).andReturn(0).times(1);
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).times(1);
+        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
 
@@ -230,8 +240,8 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -239,7 +249,7 @@ public class NewIXAdNetworkTest {
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
         assertThat(
                 ixAdNetwork.getResponseContent(),
-                is(equalTo("<html><head><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
+                is(equalTo("<html><head><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/AA/1/e1109049\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/AA/1/47f034e?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
     }
 
     @Test
@@ -262,6 +272,8 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getAdditionalParams()).andReturn(additionalParams).anyTimes();
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockNativeBuilderfactory.create(entity)).andReturn(new IxNativeBuilderImpl(entity));
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository("siteId")).andReturn(entity);
         replayAll();
@@ -290,8 +302,7 @@ public class NewIXAdNetworkTest {
         final CasInternalRequestParameters casInt = new CasInternalRequestParameters();
         casInt.setImpressionId("ImpressionId");
 
-        ixAdNetwork.configureParameters(sas, casInt, mockChannelSegmentEntity, TestUtils.SampleStrings.clickUrl,
-                TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(sas, casInt, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         final BidRequest bidReq = ixAdNetwork.getBidRequest();
 
         assertThat(ixAdNetwork.isNativeRequest(), is(true));
@@ -306,7 +317,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
@@ -316,12 +327,17 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
         expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").anyTimes();
         expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
+        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -348,8 +364,9 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
+        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
         ixAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParameters, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+                (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -357,7 +374,7 @@ public class NewIXAdNetworkTest {
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
         assertThat(
                 ixAdNetwork.getResponseContent(),
-                is(equalTo("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}body{overflow:hidden;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"http:\\/\\/localhost:8800\\/C\\/t\\/1\\/1\\/1\\/c\\/2\\/m\\/k\\/0\\/0\\/eyJVRElEIjoidWlkdmFsdWUifQ~~\\/c124b6b5-0148-1000-c54a-00012e330000\\/0\\/5l\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/1\\/1\\/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"http:\\/\\/localhost:8800\\/C\\/t\\/1\\/1\\/1\\/c\\/2\\/m\\/k\\/0\\/0\\/eyJVRElEIjoidWlkdmFsdWUifQ~~\\/c124b6b5-0148-1000-c54a-00012e330000\\/0\\/5l\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/1\\/1\\/bc20cfc3\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"123.45\",geo_lng:\"678.9\",geo_cc:\"55\",geo_zip:\"560103\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
+                is(equalTo("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}body{overflow:hidden;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/ImpressionId\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIA\\/1\\/b5d3612e?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/ImpressionId\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIA\\/1\\/7e38b8f2\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"123.45\",geo_lng:\"678.9\",geo_cc:\"55\",geo_zip:\"560103\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIA/1/7e38b8f2\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIA/1/b5d3612e?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
     }
 
     @Test
@@ -367,7 +384,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
@@ -381,8 +398,13 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -410,8 +432,9 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
+        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
         ixAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParameters, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+                (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -419,7 +442,7 @@ public class NewIXAdNetworkTest {
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
         assertThat(
                 ixAdNetwork.getResponseContent(),
-                is(equalTo("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}body{overflow:hidden;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"http:\\/\\/localhost:8800\\/C\\/t\\/1\\/1\\/1\\/c\\/2\\/m\\/k\\/0\\/0\\/eyJVRElEIjoidWlkdmFsdWUifQ~~\\/c124b6b5-0148-1000-c54a-00012e330000\\/0\\/5l\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/1\\/1\\/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"http:\\/\\/localhost:8800\\/C\\/t\\/1\\/1\\/1\\/c\\/2\\/m\\/k\\/0\\/0\\/eyJVRElEIjoidWlkdmFsdWUifQ~~\\/c124b6b5-0148-1000-c54a-00012e330000\\/0\\/5l\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/1\\/1\\/bc20cfc3\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"\",geo_lng:\"\",geo_cc:\"\",geo_zip:\"\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
+                is(equalTo("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}body{overflow:hidden;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/ImpressionId\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIA\\/1\\/b5d3612e?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/ImpressionId\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIA\\/1\\/7e38b8f2\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"\",geo_lng:\"\",geo_cc:\"\",geo_zip:\"\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIA/1/7e38b8f2\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIA/1/b5d3612e?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
     }
 
     @Test
@@ -429,7 +452,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
@@ -443,8 +466,12 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -472,8 +499,9 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
+        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
         ixAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParameters, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+                (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -489,7 +517,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
@@ -505,6 +533,10 @@ public class NewIXAdNetworkTest {
                 .anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -533,7 +565,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         ixAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParameters, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+                (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -550,7 +582,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
 
         expect(mockStatus.code()).andReturn(200).times(2);
@@ -560,8 +592,13 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
 
@@ -585,8 +622,7 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -594,7 +630,7 @@ public class NewIXAdNetworkTest {
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
         assertThat(
                 ixAdNetwork.getResponseContent(),
-                is(equalTo("<html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"imaiBaseUrl\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/c124b6b5-0148-1000-c54a-00012e330000/0/5l/-1/0/0/x/0/nw/101/1/1/bc20cfc3?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
+                is(equalTo("<html><head><meta name=\"viewport\" content=\"width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><base href=\"imaiBaseUrl\"></base><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AxJTlRFUlNUSVRJQUwA/1/dc06dc08\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/ImpressionId/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AxJTlRFUlNUSVRJQUwA/1/f0a081b4?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
     }
 
     @Test
@@ -626,6 +662,8 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getIncId(ADCreativeType.BANNER)).andReturn(dummyIncId).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("SiteKey").anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(1234L).anyTimes();
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
 
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
@@ -652,9 +690,8 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+                (short) 15, mockRepositoryHelper);
         ImpressionIdGenerator.init((short) 123, (byte) 10);
-        ClickUrlsRegenerator.init(mockConfig);
 
         boolean result;
 
@@ -1031,7 +1068,7 @@ public class NewIXAdNetworkTest {
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
 
         expect(mockStatus.code()).andReturn(200).times(2);
@@ -1043,6 +1080,10 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
 
@@ -1067,8 +1108,9 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
+        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
         ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity,
-                TestUtils.SampleStrings.clickUrl, TestUtils.SampleStrings.beaconUrl, (short) 15, mockRepositoryHelper);
+                (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);

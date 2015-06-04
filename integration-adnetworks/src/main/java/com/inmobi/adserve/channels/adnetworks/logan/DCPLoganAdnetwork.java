@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.logan;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +23,10 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 
 public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
@@ -46,10 +46,11 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
 
 
     /**
+     *
      * @param config
      * @param clientBootstrap
      * @param baseRequestHandler
-     * @param serverEvent
+     * @param serverChannel
      */
     public DCPLoganAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -84,11 +85,6 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getName() {
         return "loganDCP";
-    }
-
-    @Override
-    public boolean isClickUrlRequired() {
-        return true;
     }
 
     @Override
@@ -157,7 +153,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             responseContent = DEFAULT_EMPTY_STRING;
             return;
         } else {
-            LOG.debug("beacon url inside logan is {}", beaconUrl);
+            buildInmobiAdTracker();
+            LOG.debug("beacon url inside logan is {}", getBeaconUrl());
 
             try {
                 JSONArray jArray = null;
@@ -179,7 +176,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                 TemplateType t;
                 if (textAd || bannerAd) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, adResponse.getString("url"));
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                     if (textAd && StringUtils.isNotBlank(adResponse.getString("text"))) {
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, adResponse.getString("text"));
                         final String vmTemplate = Formatter.getRichTextTemplateForSlot(selectedSlotId.toString());
@@ -197,7 +194,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, adResponse.getString("content"));
                     t = TemplateType.HTML;
                 }
-                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, beaconUrl);
+                responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 LOG.debug("response length is {} responseContent is {}", responseContent.length(), responseContent);
                 adStatus = AD_STRING;
             } catch (final JSONException exception) {

@@ -88,11 +88,11 @@ public class PersonThriftTest {
         final Person personPefectInc =
                 getPersonInCarnated("{\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"address\":\"HSR\",\"mobile\":9964,\"id\":123,\"secondryPhone\":456}");
         applyStuffs(personPefectInc);
-        
+
         final Person personNameLessInc =
                 getPersonInCarnated("{\"firstName\":\"firstName\",\"address\":\"HSR\",\"mobile\":9964,\"id\":123,\"secondryPhone\":456}");
         applyStuffs(personNameLessInc);
-        
+
         final Person personIdLessInc =
                 getPersonInCarnated("{\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"address\":\"HSR\",\"mobile\":9964,\"secondryPhone\":456}");
         applyStuffs(personIdLessInc);

@@ -1,20 +1,11 @@
 package com.inmobi.adserve.channels.adnetworks.mvp;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +28,14 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.hosted.HostedBidRequest;
 import com.ning.http.client.RequestBuilder;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by ishanbhatnagar on 11/11/14.
@@ -137,8 +136,6 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
         this.userName = config.getString(advertiserName + ".userName");
         this.password = config.getString(advertiserName + ".password");
-
-        this.clickUrl = null; // Click Url has been nullified
     }
 
     @Override
@@ -365,6 +362,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
                 return;
             }
             adStatus = AD_STRING;
+            buildInmobiAdTracker();
 
             if (isNativeRequest()) {
                 nativeAdBuilding();
@@ -434,6 +432,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     protected void nativeAdBuilding() {
         // No WIN_BID Macro has been appended
+        final String beaconUrl = getBeaconUrl();
         final String winUrl = beaconUrl;
 
         final Map<String, String> params = new HashMap<String, String>();
