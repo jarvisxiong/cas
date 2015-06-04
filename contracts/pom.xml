@@ -7,7 +7,7 @@
     <parent>
         <artifactId>cas</artifactId>
         <groupId>com.inmobi.channels</groupId>
-        <version>5.17</version>
+        <version>5.18-SNAPSHOT</version>
     </parent>
 
     <build>
