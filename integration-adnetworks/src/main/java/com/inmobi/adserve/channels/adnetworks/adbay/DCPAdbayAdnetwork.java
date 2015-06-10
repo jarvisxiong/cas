@@ -95,13 +95,14 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
                     responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                     LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
+                    adStatus = AD_STRING;
                 }
             } catch (final JSONException exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from adbay: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             } catch (final Exception exception) {
-                adStatus = "NO_AD";
+                adStatus = NO_AD;
                 LOG.info("Error parsing response {} from adbay: {}", response, exception);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
             }
