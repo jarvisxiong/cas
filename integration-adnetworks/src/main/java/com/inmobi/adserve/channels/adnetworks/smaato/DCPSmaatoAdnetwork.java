@@ -2,7 +2,9 @@ package com.inmobi.adserve.channels.adnetworks.smaato;
 
 import java.awt.Dimension;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
@@ -62,6 +64,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String SUCCESS = "success";
     private static final String IMAGE_TYPE = "IMG";
     private static final String TEXT_TYPE = "TXT";
+    private static final String RICHMEDIA_TYPE = "RICHMEDIA";
 
     private static final String RESPONSE_FORMAT = "all";
     private static final String TRUE = "true";
@@ -248,7 +251,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     return;
                 }
 
-                final Ad ad = smaatoResponse.getAds().getAd();
+
+                final Ad ad = smaatoResponse.getAds().getAd().get(0);
+
+
 
                 TemplateType t = null;
                 buildInmobiAdTracker();
@@ -256,7 +262,12 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, ad.getAction().getTarget());
                 context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
-                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, ad.getBeacons().getBeacon());
+                List<String> partnerBeacons = new ArrayList<>();
+                for (int count=0;count<ad.getBeacons().getBeacon().size();count++){
+                    partnerBeacons.add(ad.getBeacons().getBeacon().get(count));
+                }
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST,partnerBeacons);
+                //context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, ad.getBeacons().getBeacon());
                 if (IMAGE_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getLink())) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, ad.getLink());
                     t = TemplateType.IMAGE;
@@ -269,13 +280,15 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                         context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                         t = TemplateType.RICH;
                     }
-                } else {
+                }else if(RICHMEDIA_TYPE.equalsIgnoreCase(ad.getType()) && null != ad.getMediadata()){
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, ad.getMediadata().toString());
+                    t = TemplateType.HTML;
+                }else {
                     adStatus = NO_AD;
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
-
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from Smaato: {}", response, exception);

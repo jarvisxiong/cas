@@ -4,6 +4,8 @@ package com.inmobi.adserve.channels.adnetworks.baidu;
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -256,12 +258,12 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 if (null != responseMeta.getClickUrl()) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseMeta.getClickUrl());
                 }
-                if (responseMeta.getWinNoticeUrlCount() > 1) {
-                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, responseMeta.getWinNoticeUrl(0));
-                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL_1, responseMeta.getWinNoticeUrl(1));
-                } else if (responseMeta.getWinNoticeUrlCount() == 1) {
-                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, responseMeta.getWinNoticeUrl(0));
+
+                List<String> partnerBeacons = new ArrayList<>();
+                for (int count=0;count <responseMeta.getWinNoticeUrlCount();count++){
+                    partnerBeacons.add(responseMeta.getWinNoticeUrl(count));
                 }
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST, partnerBeacons);
                 if (responseMeta.getCreativeType() == MaterialMeta.CreativeType.HTML) {
 
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
