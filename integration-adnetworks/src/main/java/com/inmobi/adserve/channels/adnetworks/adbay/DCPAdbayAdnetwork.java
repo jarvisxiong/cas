@@ -51,7 +51,7 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "adbaydcp";
+        return "adbayDCP";
     }
 
     @Override

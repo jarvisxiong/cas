@@ -87,7 +87,7 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "ironsource";
+        return "ironsourceDCP";
     }
 
     @Override
