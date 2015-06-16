@@ -51,7 +51,7 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "adbaydcp";
+        return "adbayDCP";
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
                 final JSONObject adResponse = new JSONObject(response);
                 statusCode = status.code();
                 final VelocityContext context = new VelocityContext();
-                Formatter.TemplateType t = Formatter.TemplateType.IMAGE;
+                Formatter.TemplateType t = Formatter.TemplateType.RICH;
                 final JSONArray responseAd = adResponse.getJSONArray("creatives");
                 if (responseAd.length() > 0) {
                     buildInmobiAdTracker();

@@ -4,6 +4,7 @@ import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -27,6 +28,7 @@ import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+
 /**
  * Created by deepak on 24/3/15.
  */
@@ -40,11 +42,13 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String OSVERSION = "osVersion";
     private static final String IDFA = "idfa";
     private static final String GAID = "gaid";
+    private static final String PLATFORM = "platform";
     private static final String UA = "ua";
     private boolean isApp;
     private static String UID = null;
     private int width;
     private int height;
+    private static String os = null;
     private transient String latitude;
     private transient String longitude;
     private static Short slotid;
@@ -57,7 +61,7 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId) || (StringUtils.isEmpty(casInternalRequestParameters.getUidIFA()) && StringUtils.isEmpty(getGPID()))) {
+                || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for ironsource so exiting adapter");
             LOG.info("Configure parameters inside ironsource returned false");
             return false;
@@ -87,7 +91,7 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return "ironsource";
+        return "ironsourceDCP";
     }
 
     @Override
@@ -106,6 +110,12 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
             else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                     appendQueryParam(url, GAID, getGPID(), false);
             }
+            if (sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue()) {
+                os = "IOS";
+            } else if (sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue()) {
+                os = "Android";
+            }
+            appendQueryParam(url,PLATFORM, os, false);
             appendQueryParam(url, UA,getURLEncode(sasParams.getUserAgent(), format), false);
         LOG.debug("IronSource url is {}", url);
         return new URI(url.toString());
@@ -130,24 +140,34 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
                 final JSONObject adResponse = new JSONObject(response);
                     statusCode = status.code();
                     final VelocityContext context = new VelocityContext();
-                    TemplateType t = TemplateType.IMAGE;
+
                     final JSONArray responseAd =adResponse.getJSONArray("ads");
                         //(JSONArray) adResponse.get("ads");
-                    if(responseAd.length() > 0){
+                    if(responseAd.length() > 0) {
                         final JSONObject responseAdObj = responseAd.getJSONObject(0);
                         final JSONObject responseCreative = responseAdObj.getJSONObject("creatives");
                         creativetype = "banner" + width + "x" + height;
-                        if (width == 800 && height == 1280) {
-                            creativetype = "banner768x1024";
-                        } else if (width == 1280 && height == 800) {
-                            creativetype = "banner1024x768";
+                        if (width == 320 && height == 50)  {
+                            TemplateType t = TemplateType.RICH;
+                            context.put(VelocityTemplateFieldConstants.AD_TEXT, responseAdObj.getString("title"));
+                            context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseCreative.getString("img"));
+                            buildInmobiAdTracker();
+                            context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseAdObj.getString("clickURL"));
+                            context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
+                            adStatus = AD_STRING;
+                            responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
+                            LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
+                        }else {
+                            TemplateType t = TemplateType.IMAGE;
+                            context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseCreative.getString(creativetype));
+                            buildInmobiAdTracker();
+                            context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseAdObj.getString("clickURL"));
+                            context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
+                            adStatus = AD_STRING;
+                            responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
+                            LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
+
                         }
-                        context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseCreative.getString(creativetype));
-                        buildInmobiAdTracker();
-                        context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseAdObj.getString("clickURL"));
-                        adStatus = AD_STRING;
-                        responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
-                        LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
                     }
                 } catch (final JSONException exception) {
                     adStatus = NO_AD;
