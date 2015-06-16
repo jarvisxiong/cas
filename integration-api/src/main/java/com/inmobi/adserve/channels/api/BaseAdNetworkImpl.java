@@ -551,7 +551,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.entity = entity;
         isCpc = getPricingModel(entity);
         final boolean isConfigured = configureParameters();
-        replaceHostWithIP();
+        if(isConfigured){
+            replaceHostWithIP();
+        }
         return isConfigured;
     }
 
