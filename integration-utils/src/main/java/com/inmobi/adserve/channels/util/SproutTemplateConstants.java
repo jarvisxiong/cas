@@ -17,5 +17,8 @@ public class SproutTemplateConstants {
         public static final String JS_ESC_GEO_CITY = "JS_ESC_GEO_CITY";
         public static final String OPEN_LP_FUN = "OPEN_LP_FUN";
 
+        // Not sprout macros
+        public static final String IMP_CB = "IMP_CB";
+
         public static final ImmutableList<Character> escapeCharacterList = ImmutableList.of('$', '#');
 }

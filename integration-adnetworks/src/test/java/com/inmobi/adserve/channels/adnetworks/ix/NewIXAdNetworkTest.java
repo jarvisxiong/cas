@@ -342,6 +342,7 @@ public class NewIXAdNetworkTest {
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
         expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
+        expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
@@ -409,6 +410,7 @@ public class NewIXAdNetworkTest {
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
         expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
+        expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =

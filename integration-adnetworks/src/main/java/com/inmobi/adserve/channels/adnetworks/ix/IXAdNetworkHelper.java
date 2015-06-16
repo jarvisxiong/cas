@@ -7,6 +7,7 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LAT;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LNG;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_ZIP;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.IMP_CB;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_BEACON_URL;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_CLICK_URL;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_GEO_CITY;
@@ -64,14 +65,14 @@ public class IXAdNetworkHelper {
     /**
      *
      * @param adm
-     * @param casIntenal
+     * @param casInternal
      * @param sasParams
      * @param isCoppaSet
      * @param clickUrl
      * @param beaconUrl
      * @return
      */
-    public static String replaceSproutMacros(final String adm, final CasInternalRequestParameters casIntenal,
+    public static String replaceSproutMacros(final String adm, final CasInternalRequestParameters casInternal,
             final SASRequestParameters sasParams, final boolean isCoppaSet, final String clickUrl,
             final String beaconUrl) {
         final List<String> macros = new ArrayList<>(8);
@@ -86,7 +87,7 @@ public class IXAdNetworkHelper {
         addSproutMacroToList(macros, substitutions, SDK_VERSION_ID, null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
 
         // default value for replacement of macros is an empty string
-        final Geo geo = createSproutGeoObject(casIntenal, sasParams, isCoppaSet);
+        final Geo geo = createSproutGeoObject(casInternal, sasParams, isCoppaSet);
         final String lat = null != geo.getLat() ? String.valueOf(geo.getLat()) : StringUtils.EMPTY;
         final String lng = null != geo.getLon() ? String.valueOf(geo.getLon()) : StringUtils.EMPTY;
         final String zip = null != geo.getZip() ? geo.getZip() : StringUtils.EMPTY;
@@ -103,6 +104,9 @@ public class IXAdNetworkHelper {
         addSproutMacroToList(macros, substitutions, RECORD_EVENT_FUN, StringUtils.EMPTY);
         // No function is being provided
         addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
+
+        // Non Sprout Macro
+        addSproutMacroToList(macros, substitutions, IMP_CB, casInternal.getAuctionId());
 
         final String[] macroArray = macros.toArray(new String[macros.size()]);
         final String[] substitutionsArray = substitutions.toArray(new String[substitutions.size()]);
