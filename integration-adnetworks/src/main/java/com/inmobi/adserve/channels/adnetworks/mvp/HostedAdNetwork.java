@@ -112,7 +112,6 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     // Auction specific parameters
     private double secondBidPriceInUsd;
-    private double secondBidPriceInLocal;
 
     // Logging specific parameters
     private boolean logCreative = false;
@@ -338,10 +337,8 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
         return new RequestBuilder(HTTP_POST).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
-                .setHeader(HttpHeaders.Names.AUTHORIZATION, authStr)
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setBody(body);
+                .setHeader(HttpHeaders.Names.AUTHORIZATION, authStr).setHeader(HttpHeaders.Names.HOST, uri.getHost())
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent()).setBody(body);
     }
 
     @Override
@@ -462,7 +459,6 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void setSecondBidPrice(final Double price) {
         secondBidPriceInUsd = price;
-        secondBidPriceInLocal = price;
         // No RTBMacros are replaced
         final ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.setResponse(responseContent);
@@ -476,11 +472,6 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     @Override
     public double getSecondBidPriceInUsd() {
         return secondBidPriceInUsd;
-    }
-
-    @Override
-    public double getSecondBidPriceInLocal() {
-        return secondBidPriceInLocal;
     }
 
     @Override

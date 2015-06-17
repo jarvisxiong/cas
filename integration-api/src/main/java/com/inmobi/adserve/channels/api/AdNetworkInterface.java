@@ -112,13 +112,6 @@ public interface AdNetworkInterface {
     double getSecondBidPriceInUsd();
 
     /**
-     * Returns the second bid price in local currency after auction
-     *
-     * @return
-     */
-    double getSecondBidPriceInLocal();
-
-    /**
      * Return bidder currency
      *
      * @return

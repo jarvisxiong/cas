@@ -762,10 +762,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return -1;
     }
 
-    @Override
-    public double getSecondBidPriceInLocal() {
-        return -1;
-    }
 
     @Override
     public long getConnectionLatency() {

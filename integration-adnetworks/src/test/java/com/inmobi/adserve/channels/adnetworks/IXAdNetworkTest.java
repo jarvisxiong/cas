@@ -128,8 +128,6 @@ public class IXAdNetworkTest {
         EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
         EasyMock.replay(currencyConversionEntity);
         repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
-        EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
-                .andReturn(currencyConversionEntity).anyTimes();
         final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
         EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor1);

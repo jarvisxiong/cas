@@ -173,7 +173,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final String advertiserId;
     private final String advertiserName;
     private double secondBidPriceInUsd = 0;
-    private double secondBidPriceInLocal = 0;
     private String bidRequestJson = DEFAULT_EMPTY_STRING;
     private String encryptedBid;
     private String responseImpressionId;
@@ -957,7 +956,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, USD);
         if (6 != sasParams.getDst()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInUsd));
         }
         if (null != bidResponse.getBidid()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
@@ -1668,7 +1667,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void setSecondBidPrice(final Double price) {
         secondBidPriceInUsd = price;
-        secondBidPriceInLocal = price;
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
         responseContent = replaceIXMacros(responseContent);
         final ThirdPartyAdResponse adResponse = getResponseAd();
@@ -1703,11 +1701,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public double getSecondBidPriceInUsd() {
         return secondBidPriceInUsd;
-    }
-
-    @Override
-    public double getSecondBidPriceInLocal() {
-        return secondBidPriceInLocal;
     }
 
     @Override

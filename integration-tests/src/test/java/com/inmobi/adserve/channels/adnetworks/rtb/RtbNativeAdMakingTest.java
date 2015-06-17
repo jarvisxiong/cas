@@ -175,9 +175,10 @@ public class RtbNativeAdMakingTest {
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(false).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported", false)).andReturn(false).anyTimes();
+        expect(mockConfig.getString(advertiserName + ".currency", "USD")).andReturn("USD").anyTimes();
         expect(mockBidRequest.getApp()).andReturn(mockApp).anyTimes();
         expect(mockApp.getId()).andReturn(siteId).anyTimes();
-
+        
         replayAll();
     }
 

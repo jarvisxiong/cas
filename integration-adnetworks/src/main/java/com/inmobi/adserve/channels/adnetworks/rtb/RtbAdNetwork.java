@@ -163,7 +163,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    private String bidderCurrency = USD;
+    private String bidderCurrency;
     private final List<String> blockedAdvertisers = Lists.newArrayList();
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
@@ -192,9 +192,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
+        bidderCurrency = config.getString(advertiserName + ".currency", USD);
     }
-
-
 
     @Override
     protected boolean configureParameters() {
@@ -347,7 +346,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (!isNativeRequest()) {
             impression.setBanner(banner);
         }
-        impression.setBidfloorcur(USD);
+        impression.setBidfloorcur(bidderCurrency);
         // Set interstitial or not
         if (null != sasParams.getRequestedAdType() && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
             impression.setInstl(1);
@@ -357,8 +356,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
         forwardedBidGuidance = sasParams.getMarketRate();
-        impression.setBidfloor(forwardedBidFloor);
-        LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
+        impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
+        LOG.debug(traceMarker, "Bid floor is {} {}", impression.getBidfloor(), impression.getBidfloorcur());
 
         if (null != sasParams.getSdkVersion()) {
             impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
@@ -569,6 +568,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
 
+        // Set either of title or Name, giving priority to title
+        if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
+            app.setName(wapSiteUACEntity.getAppTitle());
+        } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
+            app.setName(wapSiteUACEntity.getSiteName());
+        }
+
         String marketId = wapSiteUACEntity.getMarketId();
         marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
         if (StringUtils.isNotEmpty(marketId)) {
@@ -692,7 +698,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Map<String, String> getDeviceExt(final Device device) {
         final Map<String, String> deviceExtensions = new HashMap<>();
-
         if (null != sasParams.getAge()) {
             deviceExtensions.put("age", sasParams.getAge().toString());
         }
@@ -700,7 +705,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             deviceExtensions.put("gender", sasParams.getGender().toString());
         }
         device.setExt(deviceExtensions);
-
         return deviceExtensions;
     }
 
@@ -961,11 +965,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private double calculatePriceInUSD(final double price, String currencyCode) {
-        if (StringUtils.isEmpty(currencyCode)) {
-            currencyCode = USD;
-        }
-        if (USD.equalsIgnoreCase(currencyCode)) {
+    private double calculatePriceInUSD(final double price, final String currencyCode) {
+        if (StringUtils.isEmpty(currencyCode) || USD.equalsIgnoreCase(currencyCode)) {
             return price;
         } else {
             final CurrencyConversionEntity currencyConversionEntity =
@@ -1004,6 +1005,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public void setSecondBidPrice(final Double price) {
         secondBidPriceInUsd = price;
         secondBidPriceInLocal = calculatePriceInLocal(price);
+        LOG.debug("secondBidPriceInUsd {}, secondBidPriceInLocal {} {}", secondBidPriceInUsd, secondBidPriceInLocal,
+                bidderCurrency);
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
         responseContent = replaceRTBMacros(responseContent);
         final ThirdPartyAdResponse adResponse = getResponseAd();
@@ -1034,11 +1037,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public double getSecondBidPriceInUsd() {
         return secondBidPriceInUsd;
-    }
-
-    @Override
-    public double getSecondBidPriceInLocal() {
-        return secondBidPriceInLocal;
     }
 
     @Override
