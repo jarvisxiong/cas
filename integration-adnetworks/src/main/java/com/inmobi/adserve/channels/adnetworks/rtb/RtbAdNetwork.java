@@ -526,11 +526,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         site.setDomain(blindDomain);
     }
 
+    /**
+     * Blind App - Send Category as App Name <br>
+     * Transparent App - Set Proper App Name if available otherwise send Category.
+     * 
+     * @return
+     */
     private App createAppObject() {
         final App app = new App();
         if (isRequestBlinded()) {
             setParamsForBlindApp(app);
         } else {
+            // will set App Name too
             setParamsForTransparentApp(app);
         }
         if (null != sasParams.getCategories()) {
@@ -538,14 +545,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         String category = null;
 
-        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+        if (!app.isSetName() && isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
             app.setName(wapSiteUACEntity.getAppType());
-        } else if ((category = getCategories(',', false)) != null) {
+        } else if (!app.isSetName() && (category = getCategories(',', false)) != null) {
             app.setName(category);
         }
 
         // set App Ext fields
-        final AppExt ext = createAppExt(wapSiteUACEntity);
+        final AppExt ext = createAppExt();
         app.setExt(ext);
         return app;
     }
@@ -564,18 +571,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private void setParamsForTransparentApp(final App app) {
         app.setId(sasParams.getSiteId());
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
+        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
 
         // Set either of title or Name, giving priority to title
-        if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
+        if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             app.setName(wapSiteUACEntity.getAppTitle());
-        } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
+        } else if (isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
         }
 
-        String marketId = wapSiteUACEntity.getMarketId();
+        String marketId = isWapSiteUACEntity ? wapSiteUACEntity.getMarketId() : null;
         marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
@@ -593,7 +600,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private AppExt createAppExt(final WapSiteUACEntity entity) {
+    private AppExt createAppExt() {
         final AppExt ext = new AppExt();
 
         String appRating;
@@ -603,19 +610,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else {
             appRating = PERFORMANCE_RATING;
         }
-
         ext.setFs(appRating);
 
-        if (entity != null) {
+        if (isWapSiteUACEntity) {
             final AppStore store = new AppStore();
-            if (!StringUtils.isEmpty(entity.getContentRating())) {
-                store.setRating(entity.getContentRating());
+            if (!StringUtils.isEmpty(wapSiteUACEntity.getContentRating())) {
+                store.setRating(wapSiteUACEntity.getContentRating());
             }
-            if (!StringUtils.isEmpty(entity.getAppType())) {
-                store.setCat(entity.getAppType());
+            if (!StringUtils.isEmpty(wapSiteUACEntity.getAppType())) {
+                store.setCat(wapSiteUACEntity.getAppType());
             }
-            if (entity.getCategories() != null && !entity.getCategories().isEmpty()) {
-                store.setSeccat(entity.getCategories());
+            if (wapSiteUACEntity.getCategories() != null && !wapSiteUACEntity.getCategories().isEmpty()) {
+                store.setSeccat(wapSiteUACEntity.getCategories());
             }
             ext.setStore(store);
         }
