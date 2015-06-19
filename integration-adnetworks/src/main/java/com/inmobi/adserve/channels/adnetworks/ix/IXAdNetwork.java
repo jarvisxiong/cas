@@ -208,6 +208,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> packageIds;
     private List<String> iabCategories;
     private final int minimumSdkVerForVAST;
+    private final int defaultTrafficPercentageForVAST;
     private final String sproutUniqueIdentifierRegex;
 
     private WapSiteUACEntity wapSiteUACEntity;
@@ -240,6 +241,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         minimumSdkVerForVAST = config.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450);
+        defaultTrafficPercentageForVAST = config.getInt(advertiserName + ".vast.defaultTrafficPercentage", 50);
         sproutUniqueIdentifierRegex =
                 config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
@@ -626,9 +628,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (supportedAdTypes.size() == 1) {
                 isQualifiedForVideo = true;
             } else {
-                final int videoTrafficPercentage =
-                        repositoryHelper.queryIXVideoTrafficEntity(sasParams.getSiteId(), sasParams.getCountryId()
-                                .intValue());
+                final String siteId = sasParams.getSiteId();
+                final Long countryId = sasParams.getCountryId();
+
+                final int videoTrafficPercentage = IXAdNetworkHelper.getIXVideoTrafficPercentage(siteId,
+                        countryId.intValue(), repositoryHelper, defaultTrafficPercentageForVAST);
+                LOG.debug("IX Video Traffic Percentage for siteId: {}, countryId: {} is {}", siteId, countryId,
+                        videoTrafficPercentage);
                 // Based on the traffic percentage, determine whether this request should be selected for VIDEO or not.
                 if (videoTrafficPercentage > ThreadLocalRandom.current().nextInt(0, 100)) {
                     isQualifiedForVideo = true;

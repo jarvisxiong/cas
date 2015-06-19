@@ -368,30 +368,12 @@ public class RepositoryHelper {
         return (IXPackageEntity)ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
     }
 
-    public short queryIXVideoTrafficEntity(final String siteId, final Integer countryId) {
-        short trafficPercentage = IXVideoTrafficRepository.DEFAULT_TRAFFIC_PERCENTAGE;
-        try {
-            // Query at site and country both
-            IXVideoTrafficEntity entity = ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId, countryId));
-
-            if (entity == null) {
-                // Query at site level.
-                entity =
-                        ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId,
-                                IXVideoTrafficRepository.ALL_COUNTRY));
-                if (entity == null) {
-                    // Query at country level.
-                    entity =
-                            ixVideoTrafficRepository.query(new IXVideoTrafficQuery(IXVideoTrafficRepository.ALL_SITES,
-                                    countryId));
-                }
+    public IXVideoTrafficEntity queryIXVideoTrafficRepository(final String siteId, final Integer countryId) {
+            try {
+                return ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId, countryId));
+            } catch (final RepositoryException ignored) {
+                LOG.debug("Exception while querying IX Video Traffic Repository, {}", ignored);
             }
-            if (entity != null) {
-                trafficPercentage = entity.getTrafficPercentage();
-            }
-        } catch (final RepositoryException ignored) {
-            LOG.debug("Exception while querying IXVideoTraffic Repository, {}", ignored);
-        }
-        return trafficPercentage;
+        return null;
     }
 }

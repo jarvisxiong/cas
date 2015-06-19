@@ -93,6 +93,7 @@ public class IXAdNetworkTest {
         expect(mockConfig.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*"))
                 .andReturn("(?s)data-creativeId").anyTimes();
         expect(mockConfig.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450)).andReturn(450).anyTimes();
+        expect(mockConfig.getInt(advertiserName + ".vast.defaultTrafficPercentage", 50)).andReturn(50).anyTimes();
         expect(mockConfig.getStringArray("ix.blockedAdvertisers")).andReturn(
                 new String[] {"king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com",
                         "supercell.com"}).anyTimes();

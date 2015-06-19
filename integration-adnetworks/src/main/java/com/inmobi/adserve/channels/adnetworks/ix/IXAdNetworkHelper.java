@@ -43,6 +43,9 @@ import org.xml.sax.SAXException;
 
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
+import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
+import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
@@ -359,6 +362,32 @@ public class IXAdNetworkHelper {
             LOG.debug("VAST response is NOT a valid XML.", e);
             return false;
         }
+    }
+
+    public static int getIXVideoTrafficPercentage(final String siteId, final Integer countryId,
+            final RepositoryHelper repositoryHelper, final int defaultTrafficPercentageForVAST) {
+        int trafficPercentage = defaultTrafficPercentageForVAST;
+        try {
+            // Query at site and country both
+            IXVideoTrafficEntity entity = repositoryHelper.queryIXVideoTrafficRepository(siteId, countryId);
+
+            if (entity == null) {
+                // Query at site level.
+                entity = repositoryHelper.queryIXVideoTrafficRepository(siteId, IXVideoTrafficRepository.ALL_COUNTRY);
+                if (entity == null) {
+                    // Query at country level.
+                    entity = repositoryHelper.queryIXVideoTrafficRepository(IXVideoTrafficRepository.ALL_SITES,
+                            countryId);
+                }
+            }
+            if (entity != null) {
+                trafficPercentage = entity.getTrafficPercentage();
+            }
+
+        } catch (Exception ignored) {
+            LOG.debug("Exception encountered while computing ix video traffic percentage, {}", ignored);
+        }
+        return trafficPercentage;
     }
 
 }

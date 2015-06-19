@@ -122,8 +122,7 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY)) {
-                    entity =
-                            CasConfigUtil.repositoryHelper.queryIXVideoTrafficEntity(id.split("_")[0],
+                    entity = CasConfigUtil.repositoryHelper.queryIXVideoTrafficRepository(id.split("_")[0],
                                     Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY)) {
                     final ResultSet<IXPackageEntity> resultSet =
