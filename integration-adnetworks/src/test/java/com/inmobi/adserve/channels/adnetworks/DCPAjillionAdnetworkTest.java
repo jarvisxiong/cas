@@ -38,6 +38,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BaseAdNetworkImpl.class)
 public class DCPAjillionAdnetworkTest {
@@ -322,7 +323,7 @@ public class DCPAjillionAdnetworkTest {
         dcpAjillionAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpAjillionAdNetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ad.Ajilionmedia.com/traffic/f446a48aa6b011e2aa3a06311cd1216a/4/240/1541/1/8d35d80adcbc11e2b8aa06311cc966ad/?clientip=206.29.182.240&clientua=Mozilla&csize=300X50&keyword=Food+%26+Drink%2CAdventure%2CWord&cid=1516' onclick=\"document.getElementById('click').src='clickUrl';mraid.openExternal('http://ad.Ajilionmedia.com/traffic/f446a48aa6b011e2aa3a06311cd1216a/4/240/1541/1/8d35d80adcbc11e2b8aa06311cc966ad/?clientip=206.29.182.240&clientua=Mozilla&csize=300X50&keyword=Food+%26+Drink%2CAdventure%2CWord&cid=1516'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://mead-production.s3.amazonaws.com/advertiser_creative/2013/05/02/300x50_dog_1.jpg'  /></a><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://ad.Ajilionmedia.com/traffic/f446a48aa6b011e2aa3a06311cd1216a/4/240/1541/1/8d35d80adcbc11e2b8aa06311cc966ad/?clientip=206.29.182.240&clientua=Mozilla&csize=300X50&keyword=Food+%26+Drink%2CAdventure%2CWord&cid=1516' onclick=\"document.getElementById('click').src='clickUrl';imraid.openExternal('http://ad.Ajilionmedia.com/traffic/f446a48aa6b011e2aa3a06311cd1216a/4/240/1541/1/8d35d80adcbc11e2b8aa06311cc966ad/?clientip=206.29.182.240&clientua=Mozilla&csize=300X50&keyword=Food+%26+Drink%2CAdventure%2CWord&cid=1516'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://mead-production.s3.amazonaws.com/advertiser_creative/2013/05/02/300x50_dog_1.jpg'  /></a><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
                 dcpAjillionAdNetwork.getHttpResponseContent());
     }
 

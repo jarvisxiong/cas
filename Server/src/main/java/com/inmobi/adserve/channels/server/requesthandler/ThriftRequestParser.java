@@ -88,6 +88,7 @@ public class ThriftRequestParser {
         params.setReferralUrl(tObject.referralUrl);
         params.setIntegrationDetails(tObject.getIntegrationDetails());
         params.setAppBundleId(tObject.getAppBundleId());
+        params.setRequestGuid(tObject.isSetRequestGuid() ? tObject.requestGuid : StringUtils.EMPTY);
 
         // Fill param from Site Object
         setSiteObject(tObject, params, dst);

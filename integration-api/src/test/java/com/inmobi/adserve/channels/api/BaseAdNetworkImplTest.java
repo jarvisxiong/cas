@@ -45,6 +45,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
@@ -251,11 +252,11 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getUserAgent()).andReturn("test-user-agent");
         expect(mockSasParam.getRemoteHostIp()).andReturn("9.9.9.9");
+        expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
+        expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockCasInternal.isTraceEnabled()).andReturn(true);
         expect(mockChannel.isOpen()).andReturn(true).times(1);
-
-
-
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -345,6 +346,9 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getCategories()).andReturn(Arrays.asList(31L, 32L, 39L)).anyTimes();
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getSiteIncId()).andReturn(10L);
+        expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
+        expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
@@ -420,6 +424,9 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(2);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(2);
+        expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
+        expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
 
         replayAll();
 
@@ -465,7 +472,8 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getAge()).andReturn((short) 11).times(3);
         expect(mockSasParam.getDst()).andReturn(2).times(1).andReturn(6).times(1).andReturn(8).times(1);
         expect(mockSasParam.getOsId()).andReturn(3).times(1).andReturn(5).times(1);
-        expect(mockSasParam.getSource()).andReturn(null).times(1).andReturn("WAP").times(2).andReturn("APP").times(2);
+        expect(mockSasParam.getSource()).andReturn("WAP").times(1).andReturn(null).times(1).andReturn("WAP").times(2)
+                .andReturn("APP").times(2);
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -545,6 +553,9 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(1);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(1);
+        expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
+        expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)
                 .andReturn("IFA0000000000000000000000000000").times(2);
         expect(mockCasInternalRequestParameters.getGpid()).andReturn(null).times(5)

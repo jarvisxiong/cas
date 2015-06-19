@@ -23,6 +23,7 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.SiteFeedbackEntity;
@@ -66,6 +67,7 @@ public class RepositoryHelper {
     private final GeoZipRepository geoZipRepository;
     private final SlotSizeMapRepository slotSizeMapRepository;
     private final IXVideoTrafficRepository ixVideoTrafficRepository;
+    private final SdkMraidMapRepository sdkMraidMapRepository;
     private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private final CcidMapRepository ccidMapRepository;
 
@@ -89,6 +91,7 @@ public class RepositoryHelper {
         geoZipRepository = builder.geoZipRepository;
         slotSizeMapRepository = builder.slotSizeMapRepository;
         ixVideoTrafficRepository = builder.ixVideoTrafficRepository;
+        sdkMraidMapRepository = builder.sdkMraidMapRepository;
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
         ccidMapRepository = builder.ccidMapRepository;
 
@@ -102,8 +105,8 @@ public class RepositoryHelper {
                 .addRepositoryToStats(wapSiteUACRepository).addRepositoryToStats(ixAccountMapRepository)
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
                 .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(ixVideoTrafficRepository)
-                .addRepositoryToStats(geoRegionFenceMapRepository).addRepositoryToStats(ccidMapRepository);
-
+                .addRepositoryToStats(geoRegionFenceMapRepository).addRepositoryToStats(ccidMapRepository)
+                .addRepositoryToStats(sdkMraidMapRepository);
     }
 
     public static Builder newBuilder() {
@@ -131,6 +134,7 @@ public class RepositoryHelper {
         private GeoZipRepository geoZipRepository;
         private SlotSizeMapRepository slotSizeMapRepository;
         private IXVideoTrafficRepository ixVideoTrafficRepository;
+        private SdkMraidMapRepository sdkMraidMapRepository;
         private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
         private CcidMapRepository ccidMapRepository;
 
@@ -156,6 +160,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixVideoTrafficRepository);
             Preconditions.checkNotNull(geoRegionFenceMapRepository);
             Preconditions.checkNotNull(ccidMapRepository);
+            Preconditions.checkNotNull(sdkMraidMapRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -295,6 +300,15 @@ public class RepositoryHelper {
         return null;
     }
 
+    public SdkMraidMapEntity querySdkMraidMapRepository(final String sdk_name) {
+        try {
+            return sdkMraidMapRepository.query(sdk_name);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SdkMraidMap Repository, {}", ignored);
+        }
+        return null;
+    }
+
     public IXAccountMapEntity queryIXAccountMapRepository(final Long rpNetworkId) {
         try {
             return ixAccountMapRepository.query(rpNetworkId);
@@ -304,9 +318,9 @@ public class RepositoryHelper {
         return null;
     }
 
-    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final String siteId) {
+    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final Long placementId) {
         try {
-            return nativeAdTemplateRepository.query(siteId);
+            return nativeAdTemplateRepository.query(placementId);
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying NativeAdTemplate Repository, {}", ignored);
         }

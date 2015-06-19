@@ -167,7 +167,6 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean isRequestFormatSupported() {
-        isNativeRequest = NATIVE_STRING.equals(sasParams.getRFormat()) && APP.equalsIgnoreCase(sasParams.getSource());
         return isNativeRequest ? isNativeResponseSupported : isHTMLResponseSupported;
     }
 
@@ -436,22 +435,18 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         params.put("beaconUrl", beaconUrl);
         params.put("winUrl", winUrl);
         params.put("impressionId", impressionId);
-        params.put("siteId", sasParams.getSiteId());
-        if (APP.equalsIgnoreCase(sasParams.getSource())) {
-            // Does not support Blinded Site Ids neither do they make sense in HAS
-            params.put("appId", sasParams.getSiteId());
-        }
+        params.put("placementId", String.valueOf(sasParams.getPlacementId()));
 
         try {
             responseContent =
                     nativeResponseMaker.makeHostedResponse(adm, params,
-                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
+                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
         } catch (final Exception e) {
 
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, "
-                    + "exception = {}", sasParams.getSiteId(), advertiserName, e);
+            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
+                    + "exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
     }

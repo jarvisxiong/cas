@@ -1,5 +1,21 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.apache.commons.configuration.Configuration;
+import org.easymock.EasyMock;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ironsource.DCPIronSourceAdnetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -11,25 +27,11 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import junit.framework.TestCase;
-import org.apache.commons.configuration.Configuration;
-import org.easymock.EasyMock;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.awt.*;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import static org.easymock.EasyMock.expect;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BaseAdNetworkImpl.class)
@@ -252,7 +254,7 @@ public class DCPIronSourceAdnetworkTest extends TestCase {
         dcpIronSourceAdnetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(dcpIronSourceAdnetwork.getHttpResponseStatusCode(), 200);
         assertEquals(
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://media.mobilecore.com/get?t=d&aff_id=66&packageName=00000000-000c-905a-0004-f212e8baef8e&id=101870&fos=Android&deviceId=gpid80571d65720efasdfaf' onclick=\"document.getElementById('click').src='clickUrl';mraid.openExternal('http://media.mobilecore.com/get?t=d&aff_id=66&packageName=00000000-000c-905a-0004-f212e8baef8e&id=101870&fos=Android&deviceId=gpid80571d65720efasdfaf'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://cdn.castplatform.com/images/26b54dd5-5e1b-495a-8273-2b245b697d30.jpg'  /></a><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><a href='http://media.mobilecore.com/get?t=d&aff_id=66&packageName=00000000-000c-905a-0004-f212e8baef8e&id=101870&fos=Android&deviceId=gpid80571d65720efasdfaf' onclick=\"document.getElementById('click').src='clickUrl';imraid.openExternal('http://media.mobilecore.com/get?t=d&aff_id=66&packageName=00000000-000c-905a-0004-f212e8baef8e&id=101870&fos=Android&deviceId=gpid80571d65720efasdfaf'); return false;\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://cdn.castplatform.com/images/26b54dd5-5e1b-495a-8273-2b245b697d30.jpg'  /></a><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
                 dcpIronSourceAdnetwork.getHttpResponseContent());
     }
 

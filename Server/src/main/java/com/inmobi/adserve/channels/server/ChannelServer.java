@@ -42,6 +42,7 @@ import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SdkMraidMapRepository;
 import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteFilterRepository;
@@ -100,6 +101,7 @@ public class ChannelServer {
     private static GeoZipRepository geoZipRepository;
     private static SlotSizeMapRepository slotSizeMapRepository;
     private static IXVideoTrafficRepository ixVideoTrafficRepository;
+    private static SdkMraidMapRepository sdkMraidMapRepository;
     private static GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private static CcidMapRepository ccidMapRepository;
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
@@ -178,6 +180,7 @@ public class ChannelServer {
             geoZipRepository = new GeoZipRepository();
             slotSizeMapRepository = new SlotSizeMapRepository();
             ixVideoTrafficRepository = new IXVideoTrafficRepository();
+            sdkMraidMapRepository = new SdkMraidMapRepository();
             geoRegionFenceMapRepository = new GeoRegionFenceMapRepository();
             ccidMapRepository = new CcidMapRepository();
 
@@ -201,6 +204,7 @@ public class ChannelServer {
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
             repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
             repoHelperBuilder.setIxVideoTrafficRepository(ixVideoTrafficRepository);
+            repoHelperBuilder.setSdkMraidMapRepository(sdkMraidMapRepository);
             repoHelperBuilder.setGeoRegionFenceMapRepository(geoRegionFenceMapRepository);
             repoHelperBuilder.setCcidMapRepository(ccidMapRepository);
 
@@ -344,6 +348,7 @@ public class ChannelServer {
             loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config, logger);
             loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config, logger);
             loadRepos(ixVideoTrafficRepository, ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY, config, logger);
+            loadRepos(sdkMraidMapRepository, ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY, config, logger);
             loadRepos(geoRegionFenceMapRepository, ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
             loadRepos(ccidMapRepository, ChannelServerStringLiterals.CCID_MAP_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds,

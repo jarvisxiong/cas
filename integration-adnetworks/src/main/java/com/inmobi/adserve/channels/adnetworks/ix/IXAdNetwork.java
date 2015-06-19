@@ -324,7 +324,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean isRequestFormatSupported() {
-        isNativeRequest = NATIVE_STRING.equals(sasParams.getRFormat()) && APP.equalsIgnoreCase(sasParams.getSource());
         return isNativeRequest ? isNativeResponseSupported : isHTMLResponseSupported;
     }
 
@@ -521,10 +520,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Native createNativeObject() {
         final NativeAdTemplateEntity templateEntity =
-                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
+                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
-                    String.format("This site id %s doesn't have native template: ", sasParams.getSiteId()));
+                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
@@ -1329,7 +1328,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             params.put("beaconUrl", getBeaconUrl());
             params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}");
             params.put("appId", app.getId());
-            params.put("siteId", sasParams.getSiteId());
+            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
 
             final com.inmobi.template.context.App templateContext =
@@ -1347,8 +1346,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } catch (final Exception e) {
             adStatus = TERM;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, "
-                    + "exception = {}", sasParams.getSiteId(), advertiserName, e);
+            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
+                    + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
     }

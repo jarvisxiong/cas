@@ -8,7 +8,6 @@ import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
-import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,21 +28,23 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 
+import io.netty.handler.codec.http.QueryStringDecoder;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({NativeAdTemplateRepository.class, NativeAdTemplateEntity.class})
 public class ServletTemplateTest {
 
-    private Map<String, List<String>> createMapFromString(final String siteId) {
+    private Map<String, List<String>> createMapFromLong(final Long placementId) {
         final Map<String, List<String>> params = new HashMap<>();
-        if (null != siteId) {
-            params.put("siteId", Arrays.asList(siteId));
+        if (null != placementId) {
+            params.put("placementId", Arrays.asList(String.valueOf(placementId)));
         }
         return params;
     }
 
     @Test
-    public void testHandleRequestSiteIdFoundEntityNotNull() throws Exception {
-        final String siteId = TestUtils.SampleStrings.siteId;
+    public void testHandleRequestPlacementIdFoundEntityNotNull() throws Exception {
+        final long placementId = TestUtils.SampleStrings.placementId;
 
         mockStatic(CasConfigUtil.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
@@ -53,9 +54,9 @@ public class ServletTemplateTest {
         final NativeAdTemplateRepository mockTemplateRepository = createMock(NativeAdTemplateRepository.class);
         final NativeAdTemplateEntity mockEntity = createMock(NativeAdTemplateEntity.class);
 
-        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(siteId)).times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromLong(placementId)).times(1);
         expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockTemplateRepository).times(1);
-        expect(mockTemplateRepository.query(siteId)).andReturn(mockEntity).times(1);
+        expect(mockTemplateRepository.query(placementId)).andReturn(mockEntity).times(1);
         expect(mockEntity.getJSON()).andReturn("{dummy}").times(1);
         mockResponseSender.sendResponse("{dummy}", null);
         expectLastCall().times(1);
@@ -71,8 +72,8 @@ public class ServletTemplateTest {
     }
 
     @Test
-    public void testHandleRequestSiteIdFoundEntityNull() throws Exception {
-        final String siteId = TestUtils.SampleStrings.siteId;
+    public void testHandleRequestPlacementIdFoundEntityNull() throws Exception {
+        final long placementId = TestUtils.SampleStrings.placementId;
 
         mockStatic(CasConfigUtil.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
@@ -81,10 +82,10 @@ public class ServletTemplateTest {
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
         final NativeAdTemplateRepository mockTemplateRepository = createMock(NativeAdTemplateRepository.class);
 
-        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(siteId)).times(1);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromLong(placementId)).times(1);
         expect(mockRepositoryHelper.getNativeAdTemplateRepository()).andReturn(mockTemplateRepository).times(1);
-        expect(mockTemplateRepository.query(siteId)).andReturn(null).times(1);
-        mockResponseSender.sendResponse("No template found for site Id " + siteId, null);
+        expect(mockTemplateRepository.query(placementId)).andReturn(null).times(1);
+        mockResponseSender.sendResponse("No template found for placement Id " + placementId, null);
         expectLastCall().times(1);
 
         replayAll();
@@ -98,13 +99,13 @@ public class ServletTemplateTest {
     }
 
     @Test
-    public void testHandleRequestSiteIdNotFound() throws Exception {
+    public void testHandleRequestPlacementIdNotFound() throws Exception {
         final QueryStringDecoder mockQueryStringDecoder = createMock(QueryStringDecoder.class);
         final HttpRequestHandler mockHttpRequestHandler = createMock(HttpRequestHandler.class);
         final ResponseSender mockResponseSender = createMock(ResponseSender.class);
 
-        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromString(null)).times(1);
-        mockResponseSender.sendResponse("Invalid siteId", null);
+        expect(mockQueryStringDecoder.parameters()).andReturn(createMapFromLong(null)).times(1);
+        mockResponseSender.sendResponse("Invalid placementId", null);
         expectLastCall().times(1);
 
         replayAll();

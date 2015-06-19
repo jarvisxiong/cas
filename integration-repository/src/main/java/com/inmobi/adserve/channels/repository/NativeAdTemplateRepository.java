@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 
 import com.google.gson.Gson;
@@ -24,25 +25,28 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 import com.inmobi.template.formatter.TemplateManager;
 
-public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, String>
+public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, Long>
         implements
             RepositoryManager {
 
     private final static Gson gson = new Gson();
 
     @Override
-    public DBEntity<NativeAdTemplateEntity, String> buildObjectFromRow(final ResultSetRow resultSetRow)
+    public DBEntity<NativeAdTemplateEntity, Long> buildObjectFromRow(final ResultSetRow resultSetRow)
             throws RepositoryException {
         final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
-        final String siteId = row.getString("site_id");
+        final long placementId = row.getLong("placement_id");
         final Timestamp modifiedOn = row.getTimestamp("modified_on");
 
         try {
-            final long nativeAdId = row.getLong("native_ad_id");
+            final long nativeTemplateId = row.getLong("native_template_id");
             final Integer uiLayoutId = (Integer)row.getObject("ui_layout_id");
             final String contentJson = row.getString("content_json");
-
             final String encodedTemplate = row.getString("binary_template");
+
+            if (StringUtils.isEmpty(encodedTemplate)) {
+                throw new RepositoryException("No binary template found.");
+            }
             final byte[] binaryTemplate = Base64.decodeBase64(encodedTemplate);
 
             final TDeserializer deserializer = new TDeserializer();
@@ -50,9 +54,9 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
             deserializer.deserialize(adTemplate, binaryTemplate);
 
             final NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
-            builder.siteId(siteId);
+            builder.placementId(placementId);
             builder.modifiedOn(modifiedOn);
-            builder.nativeAdId(nativeAdId);
+            builder.nativeTemplateId(nativeTemplateId);
 
             if (null != uiLayoutId) {
                 try {
@@ -70,7 +74,7 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
 
             final List<String> keys = adTemplate.getDemandConstraints().getJsonPath();
             if (keys == null) {
-                throw new RepositoryException("No mandatory field found.");
+                throw new RepositoryException("No keys(mandatory/image) found.");
             }
 
             final Iterator<String> itr = keys.iterator();
@@ -88,19 +92,19 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
 
             final NativeAdTemplateEntity templateEntity = builder.build();
             if (templateEntity.getMandatoryKey() != null) {
-                TemplateManager.getInstance().addToTemplateCache(templateEntity.getSiteId(), templateContent);
+                TemplateManager.getInstance().addToTemplateCache(String.valueOf(templateEntity.getPlacementId()), templateContent);
                 if (logger.isDebugEnabled()) {
-                    logger.debug(String.format("Adding site id  %s and nativeId %s to NativeAdTemplateRespository",
-                            siteId, nativeAdId));
+                    logger.debug(String.format("Adding placement id %d and nativeId %s to NativeAdTemplateRepository",
+                            placementId, nativeTemplateId));
                 }
             } else {
-                logger.info("SiteId[" + siteId + "][" + nativeAdId
+                logger.info("PlacementId[" + placementId + "][" + nativeTemplateId
                         + "] doesn't have valid mandatory field thus not adding to Template Cache.");
             }
-            return new DBEntity<NativeAdTemplateEntity, String>(templateEntity, modifiedOn);
+            return new DBEntity<NativeAdTemplateEntity, Long>(templateEntity, modifiedOn);
         } catch (final Exception e) {
             logger.error("Error in resultset row", e);
-            return new DBEntity<NativeAdTemplateEntity, String>(new EntityError<String>(siteId,
+            return new DBEntity<NativeAdTemplateEntity, Long>(new EntityError<Long>(placementId,
                     "ERROR_IN_READING_NATIVE_TEMPLATE"), modifiedOn);
         }
     }

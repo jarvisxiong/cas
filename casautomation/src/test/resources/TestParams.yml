@@ -1,4 +1,3 @@
----
 # RTBD Test Cases
 TEST2_1_1: 
  - adpool_responseformat : 'imai'
@@ -626,20 +625,18 @@ TEST1_35_2:
 
 
 TEST1_36_1:
- - testName : 'HTML_Ad_Response_status'
-   os_id : '5'
-   device_osid : '5' # for req'
-   expected_status : '200'
-   site_type : 'PERFORMANCE'
-   site_ratings : '0,2'
-   targeting_platform : 'APP'
-   format : 'html'
-   adpool_responseformat : 'HTML'
-   new_category : '70,71'
-   maxCasRequestCounter : '1'
-   carriercountry : '94'
-   adpool_selectedslots : '2'
-
+- testName : 'HTML_Ad_Response_status'
+  os_id : '5'
+  expected_status : '200'
+  site_type : 'PERFORMANCE'
+  site_ratings : '0,2'
+  targeting_platform : 'APP'
+  r_format : 'html'
+  adpool_responseformat : 'HTML'
+  new_category : '70,71'
+  maxCasRequestCounter : '1'
+  adpool_selectedslots : '2'
+  device_osid : '5'
 
 
 TEST1_36_2:
@@ -725,6 +722,19 @@ TEST1_38_2:
    carriercountry : '1'
    geo_countryid : '1' #for req'
    adpool_selectedslots : '2'
+
+
+TEST1_SDK500_NO_AD_PROG_369:
+- adpool_responseformat: 'JSON'
+  integration_type: ANDROID_SDK
+  integration_version: '500'
+  requestguid: 'test'
+
+TEST1_SDK500_AD_PROG_369:
+ - adpool_responseformat: 'JSON'
+   integration_type: ANDROID_SDK
+   integration_version: '500'
+   requestguid: 'test'
 
 # IX Test Cases
 TEST3_1_1:

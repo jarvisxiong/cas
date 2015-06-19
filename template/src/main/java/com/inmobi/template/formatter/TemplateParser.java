@@ -35,7 +35,7 @@ public class TemplateParser {
     }
 
     public String format(final Context context, final String templateName) throws TemplateException {
-        LOG.debug("Formating Template for site : {}", templateName);
+        LOG.debug("Formating Template for placement : {}", templateName);
         try {
             final VelocityContext velocityContext = getVelocityContext();
             velocityContext.put("first", context);
@@ -47,7 +47,7 @@ public class TemplateParser {
             return writer.toString();
         } catch (final Exception e) {
             LOG.error(String.format("Error while fetching template for %s", templateName));
-            throw new TemplateException("Exception occurred for siteId " + templateName, e);
+            throw new TemplateException("Exception occurred for placementId " + templateName, e);
         }
 
     }

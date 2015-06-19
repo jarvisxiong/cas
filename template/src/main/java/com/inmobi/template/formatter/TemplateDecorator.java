@@ -22,6 +22,7 @@ public class TemplateDecorator {
     public void addContextFile(@Named("ContextCodeFile") final String contextCodeVm) throws TemplateException {
         contextCodeFile = contextCodeVm;
         final String cc = getFileContent(contextCodeFile);
+        // Hack: ContextCode has been added to the Native Template Cache
         TemplateManager.getInstance().addToTemplateCache(contextCodeFile, cc);
     }
 
@@ -48,8 +49,8 @@ public class TemplateDecorator {
             template.merge(velocityContext, writer);
             return writer.toString();
         } catch (final Exception e) {
-            LOG.error(String.format("Error while fetching template for %s", templateName));
-            throw new TemplateException("Exception occured for siteId " + templateName, e);
+            LOG.error(String.format("Error while fetching context code for %s", templateName));
+            throw new TemplateException("Exception occured while fetching context code", e);
         }
     }
 

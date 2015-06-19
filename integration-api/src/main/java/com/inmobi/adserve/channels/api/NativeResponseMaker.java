@@ -45,7 +45,7 @@ public class NativeResponseMaker {
 
     private void checkPreconditions(final Map<String, String> params, final NativeAdTemplateEntity templateEntity) {
         Preconditions.checkNotNull(params, ERROR_STR, "params");
-        Preconditions.checkNotNull(params.containsKey("siteId"), ERROR_STR, "siteId");
+        Preconditions.checkNotNull(params.containsKey("placementId"), ERROR_STR, "placementId");
         Preconditions.checkNotNull(templateEntity, ERROR_STR, "templateEntity");
     }
 
@@ -54,22 +54,22 @@ public class NativeResponseMaker {
         checkPreconditions(params, templateEntity);
         Preconditions.checkNotNull(response, ERROR_STR, "BidResponse");
 
-        final String siteId = params.get("siteId");
+        final String placementId = params.get("placementId");
         final App app = createNativeAppObject(response.getSeatbid().get(0).getBid().get(0).getAdm(), params);
         validateResponse(app, templateEntity);
         final VelocityContext vc = getVelocityContext(app, params);
         vc.put("NAMESPACE", Formatter.getRTBDNamespace());
 
-        return createNativeAd(vc, app, siteId);
+        return createNativeAd(vc, app, placementId);
     }
 
     public String makeIXResponse(final App app, final Map<String, String> params) throws Exception {
         Preconditions.checkNotNull(params, ERROR_STR, "params");
-        Preconditions.checkNotNull(params.containsKey("siteId"), ERROR_STR, "siteId");
+        Preconditions.checkNotNull(params.containsKey("placementId"), ERROR_STR, "placementId");
         final VelocityContext vc = getVelocityContext(app, params);
         vc.put("NAMESPACE", Formatter.getIXNamespace());
 
-        return createNativeAd(vc, app, params.get("siteId"));
+        return createNativeAd(vc, app, params.get("placementId"));
     }
 
     public String makeHostedResponse(final String adm, final Map<String, String> params,
@@ -77,20 +77,20 @@ public class NativeResponseMaker {
         checkPreconditions(params, templateEntity);
         Preconditions.checkNotNull(adm, ERROR_STR, "AdMarkup");
 
-        final String siteId = params.get("siteId");
+        final String placementId = params.get("placementId");
         final App app = createNativeAppObject(adm, params);
         validateResponse(app, templateEntity);
         final VelocityContext vc = getVelocityContext(app, params);
         vc.put("NAMESPACE", Formatter.getRTBDNamespace());
 
-        return createNativeAd(vc, app, siteId);
+        return createNativeAd(vc, app, placementId);
     }
 
-    private String createNativeAd(final VelocityContext vc, final App app, final String siteId) throws Exception {
+    private String createNativeAd(final VelocityContext vc, final App app, final String placementId) throws Exception {
         final String namespace = (String) vc.get("NAMESPACE");
-        final String pubContent = templateParser.format(app, siteId);
+        final String pubContent = templateParser.format(app, placementId);
         final String contextCode = templateDecorator.getContextCode(vc);
-        LOG.debug("Making response for siteId : {} ", siteId);
+        LOG.debug("Making response for placementId : {} ", placementId);
         LOG.debug("namespace : {}", namespace);
         LOG.debug("pubContent : {}", pubContent);
         LOG.debug("contextCode : {}", contextCode);

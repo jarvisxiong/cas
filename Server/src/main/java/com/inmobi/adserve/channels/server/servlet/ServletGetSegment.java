@@ -116,7 +116,7 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryNativeAdTemplateRepository(id);
+                    entity = CasConfigUtil.repositoryHelper.queryNativeAdTemplateRepository(Long.parseLong(id));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {

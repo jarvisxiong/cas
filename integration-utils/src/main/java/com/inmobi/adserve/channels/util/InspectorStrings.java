@@ -117,6 +117,7 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
+    public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
 

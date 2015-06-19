@@ -51,8 +51,6 @@ server.ecpmShift=0.01
 server.feedbackPower=4
 server.sampledadvertisercount=1
 server.logParserScript=/opt/bin/mkhoj/grepLog.sh
-server.androidBaseUrl=http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js
-server.iPhoneBaseUrl=http://inmobisdk-a.akamaihd.net/sdk/ios/mraid.js
 server.rtbBalanceFilterAmount=200
 server.guaranteedDelivery=false
 server.normalizingFactor=0.02
@@ -152,6 +150,14 @@ Cache.ChannelSegmentFeedbackRepository.refreshTime = 1129
 Cache.ChannelSegmentFeedbackRepository.isUpdatable = true
 Cache.ChannelSegmentFeedbackRepository.dataSourceName = jdbc
 
+Cache.Name = SdkMraidMapRepository
+Cache.SdkMraidMapRepository.Manager = com.inmobi.adserve.channels.repository.SdkMraidMapRepository
+Cache.SdkMraidMapRepository.query = select name\,mraid_path\,modified_on from ad_attribute where mraid_path is not null and modified_on >=('${last_update}')
+Cache.SdkMraidMapRepository.initialDelay = 300
+Cache.SdkMraidMapRepository.refreshTime = 3600
+Cache.SdkMraidMapRepository.isUpdatable = true
+Cache.SdkMraidMapRepository.dataSourceName = jdbc
+
 Cache.Name = CreativeRepository
 Cache.CreativeRepository.Manager = com.inmobi.adserve.channels.repository.CreativeRepository
 Cache.CreativeRepository.query = select * from rtbd_creative_fun('${last_update}')
@@ -162,7 +168,7 @@ Cache.CreativeRepository.dataSourceName = jdbc
 
 Cache.Name = NativeAdTemplateRepository
 Cache.NativeAdTemplateRepository.Manager = com.inmobi.adserve.channels.repository.NativeAdTemplateRepository
-Cache.NativeAdTemplateRepository.query = select * from site_native_template_fun_07052015('${last_update}')
+Cache.NativeAdTemplateRepository.query = select * from placement_native_template_fun('${last_update}')
 Cache.NativeAdTemplateRepository.initialDelay = 300
 Cache.NativeAdTemplateRepository.refreshTime = 1277
 Cache.NativeAdTemplateRepository.isUpdatable = true

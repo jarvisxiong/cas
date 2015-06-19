@@ -23,6 +23,8 @@ import com.inmobi.adserve.adpool.DeviceType;
 import com.inmobi.adserve.adpool.Education;
 import com.inmobi.adserve.adpool.Ethnicity;
 import com.inmobi.adserve.adpool.Geo;
+import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.LatLong;
 import com.inmobi.adserve.adpool.MaritalStatus;
 import com.inmobi.adserve.adpool.NetworkType;
@@ -127,6 +129,9 @@ public class AdserveBackfillRequest {
         final String def_geo_cityids = null;
         final String def_geo_stateids = null;
 
+        final String def_integrationdetails_integrationtype = IntegrationType.ANDROID_SDK.toString();
+        final String def_integrationdetails_integrationversion = "430";
+
         final String def_uidparams_rawuidvalues_um5 = null;
         final String def_uidparams_rawuidvalues_udid = null;
         final String def_uidparams_rawuidvalues_o1 = null;
@@ -165,6 +170,8 @@ public class AdserveBackfillRequest {
         final String def_adpool_supplysource = null;
         final String def_adpool_ipfileversion = "0";
         final String def_adpool_guidanceBid = "3250000";
+        // This is not the task id. It is a unique id used between adserving and the sdk.
+        final String def_adpool_requestGuid = "requestGuid";
 
         final String adpool_requestid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_requestid"), def_adpool_requestid);
@@ -348,6 +355,18 @@ public class AdserveBackfillRequest {
         final Set<Integer> geo_stateids =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
                     requestObject.get("geo_stateids"), def_geo_stateids));
+
+        final IntegrationType adpool_integration_integrationtype = AdserveBackfillRequest.getIntegrationType(
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("integration_type"),
+                        def_integrationdetails_integrationtype));
+
+        final int adpool_integration_integrationversion = Integer.valueOf(
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("integration_version"),
+                        def_integrationdetails_integrationversion));
+
+        final String adpool_requestguid =
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("requestguid"),
+                        def_adpool_requestGuid);
 
         final String adpool_uidparams_rawuidvalues_um5 =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_um5"),
@@ -544,6 +563,10 @@ public class AdserveBackfillRequest {
 
         adPoolRequest.setGeo(geo);
 
+        final IntegrationDetails integrationDetails = new IntegrationDetails();
+        integrationDetails.setIntegrationType(adpool_integration_integrationtype);
+        integrationDetails.setIntegrationVersion(adpool_integration_integrationversion);
+
         final UidParams uidParams = new UidParams();
 
         final Map<UidType, String> rawUidValues = new HashMap<UidType, String>();
@@ -614,6 +637,8 @@ public class AdserveBackfillRequest {
         adPoolRequest.setTestRequest(adpool_testrequest);
         adPoolRequest.setSupplySource(adpool_supplySource);
         adPoolRequest.setIpFileVersion(adpool_ipfileversion);
+        adPoolRequest.setIntegrationDetails(integrationDetails);
+        adPoolRequest.setRequestGuid(adpool_requestguid);
 
         // adPoolRequest.setIpFileVersion(1234);
         //
@@ -827,6 +852,13 @@ public class AdserveBackfillRequest {
         return null;
     }
 
+    public static IntegrationType getIntegrationType(final String integrationType) {
+        if (null != integrationType) {
+            return IntegrationType.valueOf(integrationType);
+        }
+        return null;
+    }
+
     public static ResponseFormat getResponseFormat(final String responseformat) {
         if (responseformat != null) {
             if (responseformat.toUpperCase().equals("AXML")) {
@@ -991,7 +1023,7 @@ public class AdserveBackfillRequest {
 
     }
 
-    public static AdPoolResponse getDeSerializedBody(final String responseByteArray) {
+    public static AdPoolResponse getDeserializedBody(final String responseByteArray) {
         try {
 
             // String targetUrl = "http://localhost:8800/rtbdFill";

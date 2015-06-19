@@ -44,33 +44,33 @@ public class TemplateManager {
 
     /**
      * 
-     * @param siteId
+     * @param placementId
      * @param templateContent
      */
-    public void addToTemplateCache(final String siteId, final String templateContent) {
-        Preconditions.checkNotNull(siteId, ERROR_STR, siteId);
-        Preconditions.checkNotNull(siteId, ERROR_STR, templateContent);
-        LOG.debug(String.format("Adding to template cache for site id %s ", siteId));
-        stringResourceRepository.putStringResource(siteId, templateContent);
+    public void addToTemplateCache(final String placementId, final String templateContent) {
+        Preconditions.checkNotNull(placementId, ERROR_STR, placementId);
+        Preconditions.checkNotNull(templateContent, ERROR_STR, templateContent);
+        LOG.debug(String.format("Adding to template cache for placement id %s ", placementId));
+        stringResourceRepository.putStringResource(placementId, templateContent);
     }
 
     /**
      * 
-     * @param siteId
+     * @param placementId
      * @return
      */
-    public Template getTemplate(final String siteId) {
-        LOG.debug(String.format("GET Template for site : %s", siteId));
-        return velocityEngine.getTemplate(siteId);
+    public Template getTemplate(final String placementId) {
+        LOG.debug("GET Template for placementId: " + placementId);
+        return velocityEngine.getTemplate(placementId);
     }
 
     /**
      * 
-     * @param siteId
+     * @param placementId
      * @return
      */
-    public String getTemplateContent(final String siteId) {
-        LOG.debug(String.format("GET getTemplateContent for site : %s", siteId));
-        return velocityEngine.getTemplate(siteId).getData().toString();
+    public String getTemplateContent(final String placementId) {
+        LOG.debug(String.format("Get templateContent for placement: %d", placementId));
+        return velocityEngine.getTemplate(placementId).getData().toString();
     }
 }

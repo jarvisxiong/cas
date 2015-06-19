@@ -275,7 +275,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockNativeBuilderfactory.create(entity)).andReturn(new IxNativeBuilderImpl(entity));
-        expect(mockRepositoryHelper.queryNativeAdTemplateRepository("siteId")).andReturn(entity);
+        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(99L)).andReturn(entity);
         replayAll();
 
         final Field nativeBuilderfactoryField = IXAdNetwork.class.getDeclaredField("nativeBuilderfactory");
@@ -297,6 +297,7 @@ public class NewIXAdNetworkTest {
         sas.setSiteIncId(1234L);
         sas.setImpressionId("ImpressionId");
         sas.setSiteId("siteId");
+        sas.setPlacementId(99L);
         sas.setWapSiteUACEntity(wapBuild.build());
 
         final CasInternalRequestParameters casInt = new CasInternalRequestParameters();
@@ -670,6 +671,9 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
+        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
+        expect(mockSasParams.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};

@@ -26,6 +26,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTracker;
@@ -549,6 +550,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
+        isNativeRequest = APP.equalsIgnoreCase(sasParams.getSource()) && (NATIVE_STRING.equals(sasParams.getRFormat())
+                || RequestedAdType.NATIVE == sasParams.getRequestedAdType());
         isCpc = getPricingModel(entity);
         final boolean isConfigured = configureParameters();
         if(isConfigured){
@@ -1020,6 +1023,4 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         ningRequestBuilder.setVirtualHost(publicHostName);
     }
-
-
 }

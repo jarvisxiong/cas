@@ -11,10 +11,10 @@ import lombok.Getter;
 
 @Getter
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
-public final class NativeAdTemplateEntity implements IdentifiableEntity<String> {
+public final class NativeAdTemplateEntity implements IdentifiableEntity<Long> {
     private static final long serialVersionUID = -648051414378424341L;
-    private final String siteId;
-    private final long nativeAdId;
+    private final long placementId;
+    private final long nativeTemplateId;
     private final String mandatoryKey;
     private final String imageKey;
     private NativeAdContentUILayoutType nativeUILayout;
@@ -25,12 +25,12 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<String> 
     @Override
     public String getJSON() {
         return String
-                .format("{\"siteId\":\"%s\",\"nativeAdId\":%s,\"mandatoryKey\":\"%s\",\"imageKey\":\"%s\",\"template\":\"%s\"}",
-                        siteId, nativeAdId, mandatoryKey, imageKey, template);
+                .format("{\"placementId\":\"%d\",\"nativeTemplateId\":%d,\"mandatoryKey\":\"%s\",\"imageKey\":\"%s\",\"template\":\"%s\"}",
+                        placementId, nativeTemplateId, mandatoryKey, imageKey, template);
     }
 
     @Override
-    public String getId() {
-        return siteId;
+    public Long getId() {
+        return placementId;
     }
 }

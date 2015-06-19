@@ -13,6 +13,7 @@ import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -132,7 +133,10 @@ public abstract class BaseServlet implements Servlet {
         // Incrementing Adapter Specific Total Selected Segments Stats
         incrementTotalSelectedSegmentStats(filteredSegments);
 
-        commonEnrichment(hrh, sasParams, casInternal);
+        if (!commonEnrichment(hrh, sasParams, casInternal, serverChannel)) {
+            hrh.responseSender.sendNoAdResponse(serverChannel);
+            return;
+        }
         specificEnrichment(casContext, sasParams, casInternal);
         auctionEngine.casInternalRequestParameters = casInternal;
         auctionEngine.sasParams = sasParams;
@@ -192,19 +196,23 @@ public abstract class BaseServlet implements Servlet {
      * @param sasParams
      * @param sasParams
      * @param casInternal
-     * @param casInternal
      */
-    protected final void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternal) {
+    protected final boolean commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternal, final Channel serverChannel) {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
-        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI) {
-            if (sasParams.getOsId() == 3) {
-                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("androidBaseUrl");
-            } else {
-                imaiBaseUrl = CasConfigUtil.getServerConfig().getString("iPhoneBaseUrl");
+        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI ||
+                hrh.responseSender.getResponseFormat() == ResponseFormat.JSON) {
+            SdkMraidMapEntity sdkMraidMapEntity = CasConfigUtil.repositoryHelper
+                    .querySdkMraidMapRepository(sasParams.getSdkVersion());
+            if (null == sdkMraidMapEntity) {
+                LOG.error(traceMarkerProvider.get(), "Mraid Path not found for Sdk version: {}",
+                        sasParams.getSdkVersion());
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND);
+                return false;
             }
+            imaiBaseUrl = sdkMraidMapEntity.getMraidPath();
         }
         sasParams.setImaiBaseUrl(imaiBaseUrl);
         LOG.debug("imai base url is {}", imaiBaseUrl);
@@ -218,6 +226,7 @@ public abstract class BaseServlet implements Servlet {
         casInternal.setSiteAccountType(AccountType.SELF_SERVE);
         casInternal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(sasParams.getSiteIncId()));
         LOG.debug("Auction id generated is {}", casInternal.getAuctionId());
+        return true;
     }
 
     /**

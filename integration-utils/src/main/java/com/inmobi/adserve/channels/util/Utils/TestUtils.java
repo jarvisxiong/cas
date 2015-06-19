@@ -98,6 +98,8 @@ public class TestUtils {
 
         public static final String siteId = "df2e3c99edfd4bef90f285b6a7b418a6";
 
+        public static final long placementId = 1427434390278003L;
+
         public static final String userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534."
                 + "46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3";
 

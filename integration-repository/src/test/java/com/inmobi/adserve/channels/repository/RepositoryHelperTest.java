@@ -125,7 +125,7 @@ public class RepositoryHelperTest {
         expect(mockCreativeRepository.query(mockCreativeQuery))
                 .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockCreativeEntity)
                 .times(1);
-        expect(mockNativeAdTemplateRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+        expect(mockNativeAdTemplateRepository.query(query4)).andThrow(new RepositoryException("Repository Exception"))
                 .times(1).andReturn(mockNativeAdTemplateEntity).times(1);
         replayAll();
 
@@ -274,7 +274,7 @@ public class RepositoryHelperTest {
 
     @Test
     public void testQueryNativeAdTemplateRepository() throws Exception {
-        assertThat(tested.queryNativeAdTemplateRepository(query1), is(equalTo(null)));
-        assertThat(tested.queryNativeAdTemplateRepository(query1), is(equalTo(mockNativeAdTemplateEntity)));
+        assertThat(tested.queryNativeAdTemplateRepository(query4), is(equalTo(null)));
+        assertThat(tested.queryNativeAdTemplateRepository(query4), is(equalTo(mockNativeAdTemplateEntity)));
     }
 }

@@ -18,7 +18,6 @@ import com.inmobi.types.LocationSource;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @NoArgsConstructor
 @Data
 public class SASRequestParameters {
@@ -41,6 +40,7 @@ public class SASRequestParameters {
     private String impressionId;
     private String clurl;
     private String siteId;
+    private Long placementId;
     private ContentType siteContentType;
     private String sdkVersion;
     private long siteIncId;
@@ -91,7 +91,6 @@ public class SASRequestParameters {
     private String osMajorVersion;
     private ConnectionType connectionType;
     private double marketRate;
-    private Long placementId;
     private IntegrationDetails integrationDetails;
     private String appBundleId;
     private String normalizedUserId;
@@ -110,6 +109,12 @@ public class SASRequestParameters {
 
     private String automationTestId;
 
+    // requestGuid is a unique identifier used for tracking purposes between ump and the SDK. This value was
+    // earlier being set by ump only in case of Native Ads so DCP flow was unaffected, but due to response format
+    // unification introduced in SDK 500, DCP will be setting this value directly in the wrapped DCP response.
+    // note: requestGuid is different from the task id (the unique id between ump and other adpools)
+    private String requestGuid;
+
     public enum HandSetOS {
         OTHERS(1), Linux_Smartphone_OS(2), Android(3), Nokia_OS(4), iOS(5), RIM_OS(6), MTK_Nucleus_OS(7), Symbian_OS(8), Windows_Mobile_OS(
                 9), Palm_OS(10), Bada_OS(11), webOS(12), Windows_Phone_OS(13), Rex_Qualcomm_OS(14), Hiptop_OS(15), MeeGo(
@@ -125,6 +130,5 @@ public class SASRequestParameters {
             return id;
         }
     }
-
 
 }

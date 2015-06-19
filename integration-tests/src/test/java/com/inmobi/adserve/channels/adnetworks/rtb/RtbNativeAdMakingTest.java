@@ -69,7 +69,7 @@ public class RtbNativeAdMakingTest {
     private static App mockApp;
 
     private static String advertiserName = "advertiserName";
-    private static String siteId = "siteId";
+    private static long placementId = 94L;
     private static String impressionId = "impressionId";
     private static String externalSiteKey = "externalSiteKey";
     private static String nUrl = "responseNurl";
@@ -158,9 +158,11 @@ public class RtbNativeAdMakingTest {
         mockBidRequest = createMock(BidRequest.class);
         mockApp = createMock(App.class);
 
-        expect(mockSASRequestParameters.getSiteId()).andReturn(siteId).anyTimes();
+        expect(mockSASRequestParameters.getPlacementId()).andReturn(placementId).anyTimes();
         expect(mockSASRequestParameters.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(siteIncId).anyTimes();
+        expect(mockSASRequestParameters.getSource()).andReturn("APP").anyTimes();
+        expect(mockSASRequestParameters.getRFormat()).andReturn("native").anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
@@ -177,8 +179,7 @@ public class RtbNativeAdMakingTest {
         expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported", false)).andReturn(false).anyTimes();
         expect(mockConfig.getString(advertiserName + ".currency", "USD")).andReturn("USD").anyTimes();
         expect(mockBidRequest.getApp()).andReturn(mockApp).anyTimes();
-        expect(mockApp.getId()).andReturn(siteId).anyTimes();
-        
+        expect(mockApp.getId()).andReturn(String.valueOf(placementId)).anyTimes();
         replayAll();
     }
 
@@ -219,7 +220,7 @@ public class RtbNativeAdMakingTest {
     }
 
     private static void setUpMockTemplate() throws Exception {
-        TemplateManager.getInstance().addToTemplateCache(siteId, tangoTemplateContent);
+        TemplateManager.getInstance().addToTemplateCache(String.valueOf(placementId), tangoTemplateContent);
     }
 
     @BeforeClass
@@ -250,7 +251,7 @@ public class RtbNativeAdMakingTest {
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
 
-        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(siteId)).andReturn(null).times(1)
+        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(placementId)).andReturn(null).times(1)
                 .andReturn(mockNativeAdTemplateEntity).times(1);
 
         replayAll();
@@ -274,7 +275,7 @@ public class RtbNativeAdMakingTest {
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
 
-        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(siteId)).andReturn(mockNativeAdTemplateEntity)
+        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(placementId)).andReturn(mockNativeAdTemplateEntity)
                 .anyTimes();
 
         replayAll();
@@ -319,7 +320,7 @@ public class RtbNativeAdMakingTest {
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
 
-        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(siteId)).andReturn(mockNativeAdTemplateEntity)
+        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(placementId)).andReturn(mockNativeAdTemplateEntity)
                 .anyTimes();
         expect(mockNativeAdTemplateEntity.getMandatoryKey()).andReturn(LAYOUT_CONSTRAINT_1).times(3)
                 .andReturn(LAYOUT_CONSTRAINT_2).times(3).andReturn(LAYOUT_CONSTRAINT_3).times(3);
@@ -356,7 +357,7 @@ public class RtbNativeAdMakingTest {
         final NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
 
         expect(Formatter.getRTBDNamespace()).andReturn(namespace).anyTimes();
-        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(siteId)).andReturn(mockNativeAdTemplateEntity)
+        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(placementId)).andReturn(mockNativeAdTemplateEntity)
                 .anyTimes();
         expect(mockNativeAdTemplateEntity.getMandatoryKey()).andReturn(LAYOUT_CONSTRAINT_3).anyTimes();
         expect(mockNativeAdTemplateEntity.getImageKey()).andReturn(INM_TAG_A056).anyTimes();
@@ -436,7 +437,7 @@ public class RtbNativeAdMakingTest {
         final NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
 
         expect(Formatter.getRTBDNamespace()).andReturn(namespace).anyTimes();
-        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(siteId)).andReturn(mockNativeAdTemplateEntity)
+        expect(mockRepositoryHelper.queryNativeAdTemplateRepository(placementId)).andReturn(mockNativeAdTemplateEntity)
                 .anyTimes();
         expect(mockNativeAdTemplateEntity.getMandatoryKey()).andReturn(LAYOUT_CONSTRAINT_3).anyTimes();
         expect(mockNativeAdTemplateEntity.getImageKey()).andReturn(INM_TAG_A056).anyTimes();

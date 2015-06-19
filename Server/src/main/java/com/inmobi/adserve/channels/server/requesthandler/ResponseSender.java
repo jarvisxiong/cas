@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
@@ -41,6 +42,7 @@ import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
@@ -96,7 +98,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
             + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
             + "<script type=\"text/javascript\" charset=\"utf-8\">"
             + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
-    private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native");
+    private static final String SDK_500_DCP_WRAPPING_NO_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[]}";
+    private static final String SDK_500_DCP_WRAPPING_AD_JSON =
+            "{\"requestId\":\"%s\",\"ads\":[{\"pubContent\":\"%s\"}]}";
+    private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native",
+            "json");
 
     /**
      * At IX-Rubicon, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then the return
@@ -241,11 +247,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (slotSizeMapEntity != null) {
             LOG.debug("slot served is {}", selectedSlotId);
 
-            if (getResponseFormat() == ResponseFormat.XHTML) {
+            final ResponseFormat rFormat = getResponseFormat();
+            if (rFormat == ResponseFormat.XHTML) {
                 final Dimension dim = slotSizeMapEntity.getDimension();
                 final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalResponse = startElement + finalResponse + END_TAG;
-            } else if (getResponseFormat() == ResponseFormat.IMAI) {
+            } else if (rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON) {
                 finalResponse = AD_IMAI_START_TAG + finalResponse;
             }
         } else {
@@ -433,8 +440,15 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     // send response to the caller
     @SuppressWarnings("rawtypes")
-    private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
+    private void sendResponse(final HttpResponseStatus status, String responseString, final Map responseHeaders,
             final Channel serverChannel) {
+        if (DemandSourceType.DCP.getValue() == sasParams.getDst() &&
+                Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
+            responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                    new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
+            LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
+        }
+
         final byte[] bytes = responseString.getBytes(Charsets.UTF_8);
         sendResponse(status, bytes, responseHeaders, serverChannel);
     }
@@ -545,10 +559,27 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     httpResponseStatus = HttpResponseStatus.NO_CONTENT;
                     defaultContent = NO_AD_IMAI;
                     break;
+                case JSON:
+                    httpResponseStatus = HttpResponseStatus.NO_CONTENT;
+                    defaultContent = NO_AD_IMAI;
+
+                    if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
+                        defaultContent = String.format(SDK_500_DCP_WRAPPING_NO_AD_JSON, sasParams.getRequestGuid());
+                        LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", defaultContent);
+                    }
+
+                    break;
                 case NATIVE:
                     // status code 200 and empty ad content( i.e. ads:[]) for format = native
                     httpResponseStatus = HttpResponseStatus.OK;
                     defaultContent = StringUtils.EMPTY;
+
+                    // Native on dcp
+                    if (DemandSourceType.DCP.getValue() == sasParams.getDst() &&
+                            Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
+                        defaultContent = String.format(SDK_500_DCP_WRAPPING_NO_AD_JSON, sasParams.getRequestGuid());
+                        LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", defaultContent);
+                    }
                     break;
                 case XHTML:
                     // status code 200 & empty ad content (i.e. adUnit missing) for format=xml
@@ -830,7 +861,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public enum ResponseFormat {
-        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode");
+        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode"), JSON("json");
 
         private String[] formats;
 

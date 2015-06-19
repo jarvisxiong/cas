@@ -6,7 +6,7 @@ var e=encodeURIComponent,f=window,h=document,k='appendChild',n='createElement',p
 function S(a){
 this.g=a.lp;this.h=a.lps;this.c=a.ct;this.d=a.tc;this.e=a.bcu;this.a=a.ns;this.i=a.ws;a=this.a;var c=this;
 f[a+M]=function(){
-var a=S.b(c.g),b=f.mraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=S.b(c.h),b=h[n](y),b[p](Q,x),b[p](G,a),h.body[k](b),S.f(b))};
+var a=S.b(c.g),b=f.imraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=S.b(c.h),b=h[n](y),b[p](Q,x),b[p](G,a),h.body[k](b),S.f(b))};
 f[a+A]=function(a){
 T(c,a)};f[a+K]=function(){U(c)};
 f[a+N]=function(a,b){V(c,a,b)}}f.inmobi.Bolt=S;

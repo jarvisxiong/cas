@@ -693,7 +693,7 @@ nonprod:
       rtb2_status:
          - 'on'
       ix_default_url:
-          - 'http://staged-by.rubiconproject.com/a/api/exchange.json'
+          - 'http://10.14.118.66:8889/getIXBid'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:

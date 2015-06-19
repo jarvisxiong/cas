@@ -256,6 +256,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         }
         String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes()));
         String finalBundleId = encodedBundleId.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
+
         adUrlSuffix.append(appendSeparator(finalBundleId));
         beaconUrlSuffix.append(appendSeparator(finalBundleId));
 

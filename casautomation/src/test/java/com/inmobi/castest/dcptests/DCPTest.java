@@ -1,9 +1,11 @@
 package com.inmobi.castest.dcptests;
 
+import org.apache.commons.codec.binary.Base64;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
+import com.inmobi.castest.api.LogLines;
 import com.inmobi.castest.casconfenums.def.CasConf.LogStringParams;
 import com.inmobi.castest.casconfenums.impl.LogStringConf;
 import com.inmobi.castest.commons.generichelper.LogParserHelper;
@@ -416,6 +418,43 @@ public class DCPTest {
 
         Reporter.log(parserOutput, true);
 
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST1_SDK500_NO_AD_PROG_369", dataProvider = "fender_dcp_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST1_SDK500_NO_AD_PROG_369(final String x) throws Exception {
+        parserOutput = LogParserHelper.logParser(
+                "sdk-version : a500",
+                "Sending No ads",
+                "Wrapping in JSON for SDK > 500. Wrapped Response is: {\"requestId\":\"test\",\"ads\":[]}"
+        );
+
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST1_SDK500_AD_PROG_369", dataProvider = "fender_dcp_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST1_SDK500_AD_PROG_369(final String x) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(
+                "sdk-version : a500"
+        );
+
+        LogLines responseLogLine = LogParserHelper.queryForLogs("Wrapping in JSON for SDK > 500. Wrapped Response is:");
+        String responseGuid = responseLogLine.applyRegex("test");
+        String pubContent = responseLogLine.applyRegex("\\{.+\\}", "pubContent\":\".+\"\\}", ":\".+\"", "\".+\"");
+        String googleAdxStaticTag = "<script type=\"text/javascript\">google_ad_client = \"ca-pub-4422296448758371"
+                + "\";google_ad_slot = \"9805306843\";google_ad_width = 320;google_ad_height = 50;</script>";
+
+        if (null == responseGuid || null == pubContent) {
+            parserOutput = "FAIL";
+        }
+        pubContent = new String(Base64.decodeBase64(pubContent));
+
+        Reporter.log(parserOutput, true);
+
+        Assert.assertEquals(pubContent.contains(googleAdxStaticTag), true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 }

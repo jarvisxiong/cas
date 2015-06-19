@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -205,6 +206,8 @@ public class AsyncRequestMaker {
     }
 
     private boolean isNativeRequest(final SASRequestParameters sasParams) {
-        return GlobalConstant.NATIVE_STRING.equalsIgnoreCase(sasParams.getRFormat());
+        return GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource()) &&
+                (GlobalConstant.NATIVE_STRING.equals(sasParams.getRFormat()) ||
+                        RequestedAdType.NATIVE == sasParams.getRequestedAdType());
     }
 }

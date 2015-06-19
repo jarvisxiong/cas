@@ -266,7 +266,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean isRequestFormatSupported() {
-        isNativeRequest = NATIVE_STRING.equals(sasParams.getRFormat()) && APP.equalsIgnoreCase(sasParams.getSource());
         return isNativeRequest ? isNativeResponseSupported : isHTMLResponseSupported;
     }
 
@@ -383,7 +382,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
         // nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
         final NativeAdTemplateEntity templateEntity =
-                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId());
+                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
                     String.format("This site id %s doesn't have native template :", sasParams.getSiteId()));
@@ -920,19 +919,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             params.put("beaconUrl", getBeaconUrl());
             params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}");
             params.put("impressionId", impressionId);
-            params.put("appId", bidRequest.getApp().getId());
-            params.put("siteId", sasParams.getSiteId());
+            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
 
-            responseContent =
-                    nativeResponseMaker.makeResponse(bidResponse, params,
-                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getSiteId()));
+            responseContent = nativeResponseMaker.makeResponse(bidResponse, params,
+                    repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
 
-            LOG.error("Some exception is caught while filling the native template for siteId = {}, advertiser = {}, "
-                    + "exception = {}", sasParams.getSiteId(), advertiserName, e);
+            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
+                    + "exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
     }
