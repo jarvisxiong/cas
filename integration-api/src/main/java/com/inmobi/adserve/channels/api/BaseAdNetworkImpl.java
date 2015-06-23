@@ -190,19 +190,22 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     /**
-     * This method builds the InmobiAdTracker object.
+     * This method builds the InmobiAdTracker object.<br>
+     * <br>
      *
-     * note:
-     *   1) This function can be called anytime after method configureParameters has been called
-     *      and impressionId has been generated.
-     *   2) The InmobiAdTracker object will be built only once, subsequent calls to this method will be ignored.
-     *   3) To override any field of the InmobiAdTracker Builder, please override overrideInmobiAdTracker() in the
-     *      specific adapter
-     *   4) To build a non default InmobiAdTracker:
-     *      a) Create new implementations of InmobiAdTracker and InmobiAdTrackerBuilder
-     *      b) Create a new InmobiAdTrackerBuilderFactory annotation
-     *      c) Add a new entry in InmobiAdTrackerModule
-     *      d) Redeclare InmobiAdTrackerBuilderFactory with the new annotation
+     * 1) This function can be called anytime after method configureParameters has been called and impressionId has been
+     * generated. <br>
+     * <br>
+     * 2) The InmobiAdTracker object will be built only once, subsequent calls to this method will be ignored. <br>
+     * <br>
+     * 3) To override any field of the InmobiAdTracker Builder, please override overrideInmobiAdTracker() in the
+     * specific adapter <br>
+     * <br>
+     * 4) To build a non default InmobiAdTracker: <br>
+     * a) Create new implementations of InmobiAdTracker and InmobiAdTrackerBuilder <br>
+     * b) Create a new InmobiAdTrackerBuilderFactory annotation <br>
+     * c) Add a new entry in InmobiAdTrackerModule <br>
+     * d) Redeclare InmobiAdTrackerBuilderFactory with the new annotation
      */
     protected final void buildInmobiAdTracker() {
         if (null != inmobiAdTracker) {
@@ -210,14 +213,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
 
         LOG.debug("Generating tracker urls for {} with impressionId: {}", this.getName(), this.impressionId);
-        final InmobiAdTrackerBuilder builder = getInmobiAdTrackerBuilderFactory().getBuilder(
-                sasParams, impressionId, isCpc);
+        final InmobiAdTrackerBuilder builder =
+                getInmobiAdTrackerBuilderFactory().getBuilder(sasParams, impressionId, isCpc);
         overrideInmobiAdTracker(builder);
         inmobiAdTracker = builder.buildInmobiAdTracker();
     }
 
     /**
      * This method is for overriding any fields of the InmobiAdTrackerBuilder
+     * 
      * @param builder
      */
     protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
@@ -226,6 +230,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * Returns the InmobiAdTrackerBuilderFactory instance
+     * 
      * @return
      */
     protected InmobiAdTrackerBuilderFactory getInmobiAdTrackerBuilderFactory() {
@@ -429,13 +434,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 .setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
-    // request url of each adapter for logging
+    /**
+     * request url of each adapter for logging
+     */
     @Override
     public String getRequestUrl() {
         return requestUrl;
     }
 
-    // Returns the status code after the request is complete
+    /**
+     * Returns the status code after the request is complete
+     */
     @Override
     public int getHttpResponseStatusCode() {
         return statusCode;
@@ -539,8 +548,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public boolean configureParameters(final SASRequestParameters param, final CasInternalRequestParameters casParams,
-                                       final ChannelSegmentEntity entity, final long slotId,
-                                       final RepositoryHelper repositoryHelper) {
+            final ChannelSegmentEntity entity, final long slotId, final RepositoryHelper repositoryHelper) {
         sasParams = param;
         this.casInternalRequestParameters = casParams;
         externalSiteId = entity.getExternalSiteKey();
@@ -550,11 +558,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        isNativeRequest = APP.equalsIgnoreCase(sasParams.getSource()) && (NATIVE_STRING.equals(sasParams.getRFormat())
-                || RequestedAdType.NATIVE == sasParams.getRequestedAdType());
+        isNativeRequest =
+                APP.equalsIgnoreCase(sasParams.getSource())
+                        && (NATIVE_STRING.equals(sasParams.getRFormat()) || RequestedAdType.NATIVE == sasParams
+                                .getRequestedAdType());
         isCpc = getPricingModel(entity);
         final boolean isConfigured = configureParameters();
-        if(isConfigured){
+        if (isConfigured) {
             replaceHostWithIP();
         }
         return isConfigured;
@@ -973,7 +983,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected String getGPID() {
         return StringUtils.isNotBlank(casInternalRequestParameters.getGpid())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters.getGpid() : null;
+                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters
+                .getGpid() : null;
     }
 
     @Override

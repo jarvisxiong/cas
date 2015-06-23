@@ -373,15 +373,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private Regulations createRegsObject() {
         final Regulations regs = new Regulations();
-        if (isWapSiteUACEntity) {
-            if (wapSiteUACEntity.isCoppaEnabled() || sasParams.getAge() != null
-                    && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA) {
-                regs.setCoppa(1);
-                isCoppaSet = true;
-            } else {
-                regs.setCoppa(0);
-            }
-        }
+        isCoppaSet =
+                isWapSiteUACEntity && wapSiteUACEntity.isCoppaEnabled()
+                        || (sasParams.getAge() != null && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA);
+        regs.setCoppa(isCoppaSet ? 1 : 0);
         return regs;
     }
 
@@ -606,8 +601,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     /**
      * Determines whether this request is selected to serve VIDEO Ad. Video serving capability is determined based on
-     * the following: 1) The VIDEO serving prerequisites (OS, sdk version and slot) are met. 2) This site support Video
-     * as per the SiteControls repository. 3) Honor the video traffic % as defined in IXVideoTraffic Repository.
+     * the following: <br>
+     * 1) The VIDEO serving prerequisites (OS, sdk version and slot) are met. <br>
+     * 2) This site support Video as per the SiteControls repository. <br>
+     * 3) Honor the video traffic % as defined in IXVideoTraffic Repository.
      */
     private boolean isRequestQualifiedForVideo() {
         // Check the Video support prerequisites.
@@ -1264,9 +1261,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         velocityContext.put(VelocityTemplateFieldConstants.IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
 
         // JS escaped IM beacon and click URLs.
-        velocityContext
-                .put(VelocityTemplateFieldConstants.IM_BEACON_URL, StringEscapeUtils.escapeJavaScript(getBeaconUrl()));
-        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(getClickUrl()));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL,
+                StringEscapeUtils.escapeJavaScript(getBeaconUrl()));
+        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL,
+                StringEscapeUtils.escapeJavaScript(getClickUrl()));
 
         // SDK version
         velocityContext.put(VelocityTemplateFieldConstants.IMSDK_VERSION, sasParams.getSdkVersion());

@@ -55,14 +55,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             final String appTitle = row.getString("title");
             final String bundleId = row.getString("bundle_id");
 
-            boolean pubTransparencyEnabled = false;
-            if (1 == exchange_settings) {
-                // exchange_settings==1 => Publisher is transparent and exchange enabled
-                pubTransparencyEnabled = true;
-            }
-
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-
             if (siteTypeId == WapSiteUACEntity.ANDROID_SITE_TYPE && contentRating != null
                     && !contentRating.trim().isEmpty()) {
                 builder.setContentRating(CONTENT_RATING_MAP.get(contentRating));
@@ -83,6 +76,10 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
                 builder.setCategories(catList);
             }
 
+            // 1 = EXCHANGE_ENABLED WITH SITE TRANSPARENCY ON
+            // 2 = EXCHANGE_ENABLED WITH SITE TRANSPARENCY OFF
+            // 3 = EXCHANGE_DISABLED
+            final boolean pubTransparencyEnabled = 1 == exchange_settings;
             // Both Publisher level and site level transparency have to be enabled for an ad request to be transparent
             builder.setTransparencyEnabled(pubTransparencyEnabled && siteTransparencyEnabled);
 

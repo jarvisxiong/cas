@@ -46,7 +46,6 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.contracts.ix.response.Bid;
 import com.inmobi.adserve.contracts.ix.response.BidResponse;
 import com.inmobi.adserve.contracts.ix.response.SeatBid;
@@ -165,8 +164,6 @@ public class IXAdNetworkTest {
                 .andReturn(slotSizeMapEntityFor14).anyTimes();
         EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
                 .andReturn(slotSizeMapEntityFor15).anyTimes();
-        MemberModifier.field(InspectorStats.class, "boxName")
-                .set(InspectorStats.class, "randomBox");
 
         final ResultSet<IXPackageEntity> resultSet = new ResultSet<IXPackageEntity>() {
             @Override

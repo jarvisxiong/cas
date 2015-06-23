@@ -91,8 +91,6 @@ public class AsyncRequestMaker {
                 continue;
             }
 
-            String clickUrl = null;
-            String beaconUrl = null;
             // Replacing int key in auction id to generate impression id
             sasParams.setImpressionId(
                     ImpressionIdGenerator.getInstance().resetWilburyIntKey(casInternalGlobal.getAuctionId(), incId));

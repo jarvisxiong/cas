@@ -1,5 +1,31 @@
 package com.inmobi.adserve.channels.server;
 
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.AEROSPIKE_FEEDBACK;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CCID_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATABASE;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATA_CENTER_ID_KEY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.HOST_NAME_KEY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_FILTER_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_METADATA_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY;
 import static com.inmobi.adserve.channels.util.LoggerUtils.checkLogFolders;
 import static com.inmobi.adserve.channels.util.LoggerUtils.configureApplicationLoggers;
 import static com.inmobi.adserve.channels.util.LoggerUtils.sendMail;
@@ -70,10 +96,16 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 
 /**
- * Run jar:- java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50
- * -DconfigFile=sampleConfigFile -jar cas-server.jar If these are not specified server will pick these values from
- * channel-server.properties config file. If configFile is not specified, it takes the DEFAULT_CONFIG_FILE from location
- * "/opt/mkhoj/conf/cas/channel-server.properties"
+ * @author ritwik.kumar<br>
+ * <br>
+ *         Run jar: <br>
+ * <br>
+ *         java -Dincoming.connections=100 -Ddcpoutbound.connections=50 -Drtboutbound.connections=50
+ *         -DconfigFile=sampleConfigFile -jar cas-server.jar <br>
+ * <br>
+ *         If these are not specified server will pick these values from channel-server.properties config file. <br>
+ *         If configFile is not specified, it takes the DEFAULT_CONFIG_FILE from location
+ *         "/opt/mkhoj/conf/cas/channel-server.properties"
  */
 public class ChannelServer {
     private static int repoLoadRetryCount;
@@ -134,10 +166,10 @@ public class ChannelServer {
 
             // parsing the data center id given in the vm parameters
             final ChannelServerHelper channelServerHelper = new ChannelServerHelper();
-            dataCenterIdCode = channelServerHelper.getDataCenterId(ChannelServerStringLiterals.DATA_CENTER_ID_KEY);
-            final String hostName = channelServerHelper.getHostName(ChannelServerStringLiterals.HOST_NAME_KEY);
+            dataCenterIdCode = channelServerHelper.getDataCenterId(DATA_CENTER_ID_KEY);
+            final String hostName = channelServerHelper.getHostName(HOST_NAME_KEY);
             hostIdCode = channelServerHelper.getHostId(hostName);
-            dataCentreName = channelServerHelper.getDataCentreName(ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY);
+            dataCentreName = channelServerHelper.getDataCentreName(DATA_CENTRE_NAME_KEY);
 
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
@@ -294,7 +326,7 @@ public class ChannelServer {
 
             final String connectUri =
                     "jdbc:postgresql://" + databaseConfig.getString("host") + ":" + databaseConfig.getInt("port") + "/"
-                            + databaseConfig.getString(ChannelServerStringLiterals.DATABASE) + "?socketTimeout="
+                            + databaseConfig.getString(DATABASE) + "?socketTimeout="
                             + databaseConfig.getString("socketTimeout");
 
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
@@ -326,42 +358,36 @@ public class ChannelServer {
             if (repoLoadRetryCount < 1) {
                 repoLoadRetryCount = 1;
             }
-            logger.error(String.format("*************** Starting repo loading with retry count as %s", repoLoadRetryCount));
-            loadRepos(creativeRepository, ChannelServerStringLiterals.CREATIVE_REPOSITORY, config, logger);
-            loadRepos(currencyConversionRepository, ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY,
-                    config, logger);
-            loadRepos(wapSiteUACRepository, ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY, config, logger);
-            loadRepos(ixAccountMapRepository, ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY, config, logger);
-            loadRepos(channelAdGroupRepository, ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY, config, logger);
-            loadRepos(channelRepository, ChannelServerStringLiterals.CHANNEL_REPOSITORY, config, logger);
-            loadRepos(channelFeedbackRepository, ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY,
-                    config, logger);
-            loadRepos(channelSegmentFeedbackRepository,
-                    ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config, logger);
-            loadRepos(siteTaxonomyRepository, ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY, config, logger);
-            loadRepos(siteMetaDataRepository, ChannelServerStringLiterals.SITE_METADATA_REPOSITORY, config, logger);
-            loadRepos(pricingEngineRepository, ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY, config, logger);
-            loadRepos(siteFilterRepository, ChannelServerStringLiterals.SITE_FILTER_REPOSITORY, config, logger);
-            loadRepos(siteEcpmRepository, ChannelServerStringLiterals.SITE_ECPM_REPOSITORY, config, logger);
-            loadRepos(nativeAdTemplateRepository, ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY,
-                    config, logger);
-            loadRepos(geoZipRepository, ChannelServerStringLiterals.GEO_ZIP_REPOSITORY, config, logger);
-            loadRepos(slotSizeMapRepository, ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY, config, logger);
-            loadRepos(ixVideoTrafficRepository, ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY, config, logger);
-            loadRepos(sdkMraidMapRepository, ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY, config, logger);
-            loadRepos(geoRegionFenceMapRepository, ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
-            loadRepos(ccidMapRepository, ChannelServerStringLiterals.CCID_MAP_REPOSITORY, config, logger);
-            ixPackageRepository.init(logger, ds,
-                    config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY),
-                    ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY);
-            siteAerospikeFeedbackRepository.init(
-                    config.getServerConfiguration().subset(ChannelServerStringLiterals.AEROSPIKE_FEEDBACK),
-                    getDataCenter());
+            logger.error(String.format("*************** Starting repo loading with retry count as %s",
+                    repoLoadRetryCount));
+            loadRepos(creativeRepository, CREATIVE_REPOSITORY, config, logger);
+            loadRepos(currencyConversionRepository, CURRENCY_CONVERSION_REPOSITORY, config, logger);
+            loadRepos(wapSiteUACRepository, WAP_SITE_UAC_REPOSITORY, config, logger);
+            loadRepos(ixAccountMapRepository, IX_ACCOUNT_MAP_REPOSITORY, config, logger);
+            loadRepos(channelAdGroupRepository, CHANNEL_ADGROUP_REPOSITORY, config, logger);
+            loadRepos(channelRepository, CHANNEL_REPOSITORY, config, logger);
+            loadRepos(channelFeedbackRepository, CHANNEL_FEEDBACK_REPOSITORY, config, logger);
+            loadRepos(channelSegmentFeedbackRepository, CHANNEL_SEGMENT_FEEDBACK_REPOSITORY, config, logger);
+            loadRepos(siteTaxonomyRepository, SITE_TAXONOMY_REPOSITORY, config, logger);
+            loadRepos(siteMetaDataRepository, SITE_METADATA_REPOSITORY, config, logger);
+            loadRepos(pricingEngineRepository, PRICING_ENGINE_REPOSITORY, config, logger);
+            loadRepos(siteFilterRepository, SITE_FILTER_REPOSITORY, config, logger);
+            loadRepos(siteEcpmRepository, SITE_ECPM_REPOSITORY, config, logger);
+            loadRepos(nativeAdTemplateRepository, NATIVE_AD_TEMPLATE_REPOSITORY, config, logger);
+            loadRepos(geoZipRepository, GEO_ZIP_REPOSITORY, config, logger);
+            loadRepos(slotSizeMapRepository, SLOT_SIZE_MAP_REPOSITORY, config, logger);
+            loadRepos(ixVideoTrafficRepository, IX_VIDEO_TRAFFIC_REPOSITORY, config, logger);
+            loadRepos(sdkMraidMapRepository, SDK_MRAID_MAP_REPOSITORY, config, logger);
+            loadRepos(geoRegionFenceMapRepository, GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
+            loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);
+            ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY),
+                    IX_PACKAGE_REPOSITORY);
+            final DataCenter dc = getDataCenter();
+            siteAerospikeFeedbackRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
 
             logger.error("* * * * Instantiating repository completed * * * *");
             LOG.error("* * * * Instantiating repository completed * * * *");
-            config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
-                    .subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY);
+            config.getCacheConfiguration().subset(SITE_METADATA_REPOSITORY).subset(SITE_METADATA_REPOSITORY);
         } catch (final NamingException exception) {
             logger.error("failed to create binding for postgresql data source " + exception.getMessage());
             ServerStatusInfo.setStatusCodeAndString(404, getStackTrace(exception));
@@ -398,7 +424,7 @@ public class ChannelServer {
             throw new InitializationException(msg, exp);
         }
         final long endTime = System.currentTimeMillis();
-        logger.error(String.format("*************** Loaded repo %s, in %s ms", repoName, (endTime - startTime)));
+        logger.error(String.format("*************** Loaded repo %s, in %s ms", repoName, endTime - startTime));
         return;
     }
 

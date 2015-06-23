@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -38,7 +37,6 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.DemandSourceType;
 
@@ -55,12 +53,7 @@ public class AuctionEngineTest {
     @BeforeMethod
     public void setUp() throws IOException, IllegalAccessException {
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
-
-        MemberModifier.field(InspectorStats.class, "boxName")
-                .set(InspectorStats.class, "randomBox");
-
         CasConfigUtil.init(config, null);
-
         ImpressionIdGenerator.init((short) 123, (byte) 10);
 
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
@@ -103,7 +96,7 @@ public class AuctionEngineTest {
 
     @SuppressWarnings("deprecation")
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-                                     final String adNetworkName, final Double bidValue, final Long latencyValue) {
+            final String adNetworkName, final Double bidValue, final Long latencyValue) {
 
         final Long[] rcList = null;
         final Long[] tags = null;
@@ -215,10 +208,10 @@ public class AuctionEngineTest {
 
     @Test(dataProvider = "DataProviderWith3Bidders")
     public void testAuctionEngineWith3BiddersExample(final String useCaseName, final Double floorPrice,
-                                                     final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
-                                                     final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
-                                                     final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
-                                                     final Double expectedWinnerBidValue) {
+            final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
+            final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
+            final Long latencyInput3, final Double expectedSecondPriceValue, final String expectedRTBName,
+            final Double expectedWinnerBidValue) {
 
         final AuctionEngine auctionEngine = new AuctionEngine();
         auctionEngine.sasParams = new SASRequestParameters();
@@ -299,10 +292,10 @@ public class AuctionEngineTest {
 
     @Test(dataProvider = "DataProviderWith4Bidders")
     public void testAuctionEngineWith4BiddersExample(final String useCaseName, final Double floorPrice,
-                                                     final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
-                                                     final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
-                                                     final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
-                                                     final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
+            final String rtbNameInput1, final Double bidInput1, final Long latencyInput1, final String rtbNameInput2,
+            final Double bidInput2, final Long latencyInput2, final String rtbNameInput3, final Double bidInput3,
+            final Long latencyInput3, final String rtbNameInput4, final Double bidInput4, final Long latencyInput4,
+            final Double expectedSecondPriceValue, final String expectedRTBName, final Double expectedWinnerBidValue) {
 
         final AuctionEngine auctionEngine = new AuctionEngine();
         auctionEngine.sasParams = new SASRequestParameters();
@@ -462,29 +455,25 @@ public class AuctionEngineTest {
     }
 
     /**
-     * Assumptions:
-     *  demandDensity <= longTermRevenue
-     *  demandDensity <= highestBid
-     *  publisherYield >= 1
+     * Assumptions: demandDensity <= longTermRevenue demandDensity <= highestBid publisherYield >= 1
+     * 
      * @return
      */
     @DataProvider(name = "DataProviderForClearingPrice")
     public Object[][] paramDataProviderForClearingPrice() {
-        return new Object[][] {
-                {"testClearingPriceUpperBoundLowerThanHighestBid", 1.5, 0.0, 1.0, 10, 1.0},
+        return new Object[][] { {"testClearingPriceUpperBoundLowerThanHighestBid", 1.5, 0.0, 1.0, 10, 1.0},
                 {"testPublisherYieldIsLargeAndUpperBoundIsLowerThanHighestBid", 1.5, 0.0, 1.0, 1000000, 1.0},
                 {"testPublisherYieldIsLarge", 1.5, 0.0, 2.0, 1000000, 1.5},
                 {"testClearingPriceLowerBoundIsEqualToHighestBid", 1.5, 1.5, 2.0, 10, 1.5},
                 {"testClearingPriceUpperBoundIsEqualToHighestBid", 1.5, 0.0, 1.5, 10, 1.5},
                 {"testClearingPriceLowerBoundIsEqualToUpperBound", 1.5, 1.0, 1.0, 100, 1.0},
-                {"testClearingPriceStandardCase", 1.5, 0.0, 2.0, 101, 1.4851485148514851}
-        };
+                {"testClearingPriceStandardCase", 1.5, 0.0, 2.0, 101, 1.4851485148514851}};
     }
 
     @Test(dataProvider = "DataProviderForClearingPrice")
     public void testGetClearingPrice(final String useCaseName, final double highestBid, final double demandDensity,
-                                     final double longTermRevenue, final int publisherYield,
-                                     final double expectedClearingPrice) throws Exception {
+            final double longTermRevenue, final int publisherYield, final double expectedClearingPrice)
+            throws Exception {
         CasInternalRequestParameters casParams = new CasInternalRequestParameters();
         casParams.setDemandDensity(demandDensity);
         casParams.setLongTermRevenue(longTermRevenue);

@@ -26,7 +26,7 @@ public class ChangeServletUtil {
     private static final String URL_GET_SERVER_PATTERN = "getServerConfig";
     private static final String URL_GET_STATS_PATTERN = "stat";
     private static final String URL_CHANGE_PATTERN = "configChange?update=%s";
-    private static final int BOX_LIMIT = 1015;
+    private static final int BOX_LIMIT = 1018;
 
     private static final Set<String> COLO = new HashSet<>();
     private final BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));

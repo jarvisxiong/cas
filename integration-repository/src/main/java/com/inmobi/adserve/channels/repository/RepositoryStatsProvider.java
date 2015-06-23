@@ -21,7 +21,7 @@ public class RepositoryStatsProvider {
     private static final Logger LOG = LoggerFactory.getLogger(RepositoryStatsProvider.class);
     protected static final String PROD = "prod";
     private static final long FIFTEEN_MIN = 15 * 60 * 1000;
-    private static final String REPO_PREFIX = "repoStats.";
+    private static final String REPO_PREFIX = "x1repoStats.";
     private static final String TIMER_NAME = "Repo-Stat-Yammer-Timer";
     private final TimerTask repoStatYammerTask;
     private final Timer repoStatYammerTimer;
@@ -40,7 +40,7 @@ public class RepositoryStatsProvider {
                         final DBRepositoryStats stats = repo.getStats();
                         RepositoryStats.addYammerGauge(repoName, "lastUpdateTime", stats.getLastUpdateTime());
                         RepositoryStats.addYammerGauge(repoName, "lastSuccessfulUpdateTime",
-                                repo.getLastSuccessfulUpdateTime());
+                                stats.getLastSuccessfulUpdateTime());
                         RepositoryStats.addYammerGauge(repoName, "timeForUpdate", stats.getTimeForUpdate());
                         RepositoryStats.addYammerGauge(repoName, "entityCount", stats.getEntityCount());
                         RepositoryStats.addYammerGauge(repoName, "updatedEntityCount", stats.getUpdatedEntityCount());
@@ -53,13 +53,13 @@ public class RepositoryStatsProvider {
 
             }
         };
-        repoStatYammerTimer = new Timer("Repo-Stat-Yammer-Timer");
+        repoStatYammerTimer = new Timer(TIMER_NAME);
         repoStatYammerTimer.scheduleAtFixedRate(repoStatYammerTask, FIFTEEN_MIN, FIFTEEN_MIN);
         LOG.info("Scheduled {} at delay of {} ms", TIMER_NAME, FIFTEEN_MIN);
     }
 
     /**
-     * 
+     *
      * @param repository
      * @return
      */
@@ -70,7 +70,7 @@ public class RepositoryStatsProvider {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws JSONException
      */
@@ -83,7 +83,7 @@ public class RepositoryStatsProvider {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws JSONException
      */
@@ -96,7 +96,7 @@ public class RepositoryStatsProvider {
     }
 
     /**
-     * 
+     *
      * @param stats
      * @return
      */

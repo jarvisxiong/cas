@@ -660,14 +660,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setConnectiontype(0);
         }
 
+        // Spec says - If “0”, then do not track Is set to false, if “1”, then do no track is set to true in browser.
         // Setting do not track
-        if (null != casInternalRequestParameters.getUidADT()) {
-            try {
-                device.setDnt(Integer.parseInt(casInternalRequestParameters.getUidADT()) == 0 ? 1 : 0);
-            } catch (final NumberFormatException e) {
-                LOG.debug(traceMarker, "Exception while parsing uidADT to integer {}", e);
-            }
-        }
+        device.setDnt(GlobalConstant.ZERO.equals(casInternalRequestParameters.getUidADT()) ? 1 : 0);
+
         // Setting platform id sha1 hashed
         if (null != casInternalRequestParameters.getUidSO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidSO1());
@@ -922,15 +918,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
 
-            responseContent = nativeResponseMaker.makeResponse(bidResponse, params,
-                    repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+            responseContent =
+                    nativeResponseMaker.makeResponse(bidResponse, params,
+                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
 
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
 
-            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
-                    + "exception = {}", sasParams.getPlacementId(), advertiserName, e);
+            LOG.error(
+                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
+                            + "exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
     }

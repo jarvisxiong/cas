@@ -9,11 +9,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.inmobi.adserve.channels.util.InspectorStats;
 import junit.framework.TestCase;
 
 import org.apache.commons.configuration.Configuration;
-import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.annotations.Test;
 
 import com.google.inject.Guice;
@@ -40,10 +38,6 @@ public class MatchSegmentsTest extends TestCase {
         System.out.println(configurationLoder.getAdapterConfiguration());
 
         final RepositoryHelper repositoryHelper = createMock(RepositoryHelper.class);
-
-        MemberModifier.field(InspectorStats.class, "boxName")
-                .set(InspectorStats.class, "randomBox");
-
         CasConfigUtil.init(configurationLoder, repositoryHelper);
 
         final Injector injector =

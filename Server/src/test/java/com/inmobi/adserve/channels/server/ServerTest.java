@@ -16,16 +16,13 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.powermock.api.support.membermodification.MemberMatcher;
 import org.testng.annotations.Test;
 
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
-// import com.inmobi.adserve.channels.server.requesthandler.RequestParser;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 public class ServerTest extends TestCase {
@@ -49,7 +46,6 @@ public class ServerTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        MemberMatcher.field(InspectorStats.class, "boxName").set(InspectorStats.class, "randomBox");
         if (count == 0) {
             prepareLogging();
             config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");

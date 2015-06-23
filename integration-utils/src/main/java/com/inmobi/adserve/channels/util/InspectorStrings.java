@@ -143,18 +143,18 @@ public class InspectorStrings {
     public static final String INVALID_AUCTION = "InvalidAuction";
 
     // IX Response Object Status Code Strings
-    public static final String IX_INVALID_REQUEST = "NO_AD:InvalidRequest";
-    public static final String IX_NO_MATCH = "NO_AD:NoAdMatchedCriteria";
-    public static final String IX_REFERRER_NOT_ALLOWED = "NO_AD:ReferrerNotAllowed";
-    public static final String IX_INVENTORY_IDENTIFIER_INVALID = "NO_AD:InvalidInventoryIdentifiers";
-    public static final String IX_SUSPECTED_SPIDER = "NO_AD:SuspectedSpider";
-    public static final String IX_SUSPECTED_BOTNET = "NO_AD:SuspectedBotnet";
-    public static final String IX_REFERRER_BLOCKED = "NO_AD:ReferrerBlocked";
-    public static final String IX_NOT_AUTHORIZED = "NO_AD:NotAuthorized";
-    public static final String IX_PROXY_BID_WINS = "NO_AD:ProxyBidWins";
-    public static final String IX_OTHER_ERRORS = "NO_AD:OtherErrors";
+    public static final String IX_INVALID_REQUEST = "NO_AD.InvalidRequest";
+    public static final String IX_NO_MATCH = "NO_AD.NoAdMatchedCriteria";
+    public static final String IX_REFERRER_NOT_ALLOWED = "NO_AD.ReferrerNotAllowed";
+    public static final String IX_INVENTORY_IDENTIFIER_INVALID = "NO_AD.InvalidInventoryIdentifiers";
+    public static final String IX_SUSPECTED_SPIDER = "NO_AD.SuspectedSpider";
+    public static final String IX_SUSPECTED_BOTNET = "NO_AD.SuspectedBotnet";
+    public static final String IX_REFERRER_BLOCKED = "NO_AD.ReferrerBlocked";
+    public static final String IX_NOT_AUTHORIZED = "NO_AD.NotAuthorized";
+    public static final String IX_PROXY_BID_WINS = "NO_AD.ProxyBidWins";
+    public static final String IX_OTHER_ERRORS = "NO_AD.OtherErrors";
 
-    // TestStrings:
+    // TestStrings
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
 
     // Hosted Ad Server Specific Stats
@@ -166,8 +166,8 @@ public class InspectorStrings {
     public static final String HOSTED_FILLS = "HostedFills";
     // Hosted Ad Server RFM Error Codes
     public static final String RFM_INVALID_CREDENTIALS = "HostedInvalidCredentials";
-    public static final String RFM_AD_SELECTION_ERROR = "RFM_AD_SELECTION_ERROR: ";
-    public static final String RFM_ERROR = "RFM_ERROR: ";
+    public static final String RFM_AD_SELECTION_ERROR = "RFM_AD_SELECTION_ERROR. ";
+    public static final String RFM_ERROR = "RFM_ERROR. ";
 
     // IP repository Strings
     public static final String URI_SYNTAX_EXCEPTION = "URISyntaxException";

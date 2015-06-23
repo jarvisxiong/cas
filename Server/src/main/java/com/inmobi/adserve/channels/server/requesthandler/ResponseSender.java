@@ -341,13 +341,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         // TODO: Create method and write UT
         switch (getRtbResponse().getAdNetworkInterface().getDst()) {
             case IX: // If IX,
-
                 // Set IX specific parameters
                 if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
                     final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
                     final String dealId = ixAdNetwork.returnDealId();
                     final long highestBid = (long) (ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
-
                     IXPackageEntity dealIXPackageEntity = null;
                     // Checking whether a dealId was provided in the bid response
                     if (dealId != null) {
@@ -361,10 +359,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                             InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
                         }
                     }
-
-
                     if (null != dealIXPackageEntity) {
-
                         if (ixAdNetwork.isExternalPersonaDeal()) {
                             csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
                             final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
@@ -372,19 +367,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
                                 adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
                             } catch (final TException exc) {
                                 LOG.error("Could not send csId to UMP, thrift exception {}", exc);
-
                             }
                         }
 
                         final int indexOfDealId = dealIXPackageEntity.getDealIds().indexOf(dealId);
-
                         final String dealType =
                                 dealIXPackageEntity.getAccessTypes().size() > indexOfDealId ? dealIXPackageEntity
-                                        .getAccessTypes().get(indexOfDealId) : "RIGHT_TO_FIRST_REFUSAL_DEAL";
+                                        .getAccessTypes().get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
                         rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
-
                         if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
                             // At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if
                             // the bid is absent, then

@@ -9,8 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONObject;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.MetricName;
 
@@ -21,20 +19,21 @@ import com.yammer.metrics.core.MetricName;
  *
  */
 public class InspectorStats extends BaseStats {
-    private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
-
-    private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>>();
-
-    private static Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
-
-    private static final String STATS = "stats";
+    private static final InspectorStats INSTANCE = new InspectorStats();
     private static final String WORK_FLOW = "WorkFlow";
     private static final String GOOD = "GOOD";
     private static final String BAD = "BAD";
     private static boolean shouldLog = false;
+
+    private Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats =
+            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
+
+    private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats =
+            new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
+
+    
+    private InspectorStats() {
+    }
 
     /**
      * Init graphite and Stats metrics. Graphite Interval is set in minutes.
@@ -48,10 +47,28 @@ public class InspectorStats extends BaseStats {
         final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 2020);
         final int graphiteInterval = serverConfiguration.getInt("graphiteServer.intervalInMinutes", 1);
         shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
-        BaseStats.init(graphiteServer, graphitePort, graphiteInterval, hostName);
+        INSTANCE.baseInit(graphiteServer, graphitePort, graphiteInterval, hostName, INSTANCE.REGISTRY);
     }
-
+    
+    /**
+    *
+    * @param hostName
+    * @return
+    */
+   public static String getMetricProducer(final String hostName) {
+       return INSTANCE._getMetricProducer(hostName);
+   }
    
+   /**
+    * Use this to increment only yammer.
+    *
+    * @param key - A new key apart from WORKFLOW
+    * @param parameter - Parameter will go under key
+    * @param value
+    */
+   public static void incrementYammerCount(final String key, final String parameter, final long value) {
+       INSTANCE._incrementYammerCount(key, parameter, value);
+   }
 
     /**
      * Use this to increment yammer and stats page by value
@@ -90,6 +107,10 @@ public class InspectorStats extends BaseStats {
      * @param value
      */
     public static void incrementStatCount(final String key, final String parameter, final long value) {
+        INSTANCE._incrementStatCount(key, parameter, value);
+    }
+    
+    private void _incrementStatCount(final String key, final String parameter, final long value) {
         if (ingrapherCounterStats.get(key) == null) {
             synchronized (parameter) {
                 if (ingrapherCounterStats.get(key) == null) {
@@ -119,40 +140,7 @@ public class InspectorStats extends BaseStats {
         incrementYammerCount(key, parameter, value);
     }
 
-    /**
-     * Use this to increment only yammer.
-     * 
-     * @param key - A new key apart from WORKFLOW
-     * @param parameter - Parameter will go under key
-     * @param value
-     */
-    public static void incrementYammerCount(final String key, final String parameter, final long value) {
-        if (yammerCounterStats.get(key) == null) {
-            synchronized (parameter) {
-                if (yammerCounterStats.get(key) == null) {
-                    yammerCounterStats.put(key, new ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>());
-                }
-            }
-        }
-        if (yammerCounterStats.get(key).get(STATS) == null) {
-            synchronized (parameter) {
-                if (yammerCounterStats.get(key).get(STATS) == null) {
-                    yammerCounterStats.get(key).put(STATS, new ConcurrentHashMap<String, Counter>());
-                }
-            }
-        }
-        if (yammerCounterStats.get(key).get(STATS).get(parameter) == null) {
-            synchronized (parameter) {
-                if (yammerCounterStats.get(key).get(STATS).get(parameter) == null) {
-                    // MetricName(group,type,name) to which the group belongs, according to the format specified, type
-                    // is null
-                    final MetricName metricName = new MetricName(boxName, key, parameter);
-                    yammerCounterStats.get(key).get(STATS).put(parameter, Metrics.newCounter(metricName));
-                }
-            }
-        }
-        yammerCounterStats.get(key).get(STATS).get(parameter).inc(value);
-    }
+
 
     /**
      * @param dst
@@ -176,6 +164,10 @@ public class InspectorStats extends BaseStats {
      * @param value
      */
     public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
+        INSTANCE._updateYammerTimerStats(dst, parameter, value);
+    }
+    
+    private void _updateYammerTimerStats(final String dst, final String parameter, final long value) {
         if (yammerTimerStats.get(dst) == null) {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst) == null) {
@@ -189,7 +181,7 @@ public class InspectorStats extends BaseStats {
                     // MetricName(group,type,name) to which the group belongs, according to the format specified, type
                     // is null
                     final MetricName metricName = new MetricName(boxName, dst, parameter);
-                    yammerTimerStats.get(dst).put(parameter, Metrics.newHistogram(metricName, true));
+                    yammerTimerStats.get(dst).put(parameter, INSTANCE.REGISTRY.newHistogram(metricName, true));
                 }
             }
         }
@@ -200,6 +192,10 @@ public class InspectorStats extends BaseStats {
      * Resets only Yammer Timer Stats
      */
     public static void resetTimers() {
+        INSTANCE._resetTimers();
+    }
+    
+    private void _resetTimers() {
         final Iterator<Entry<String, ConcurrentHashMap<String, Histogram>>> dstIterator =
                 yammerTimerStats.entrySet().iterator();
         while (dstIterator.hasNext()) {
@@ -217,14 +213,7 @@ public class InspectorStats extends BaseStats {
      * @return JsnonObject of ingrapherCounterStats
      */
     public static JSONObject getStatsObj() {
-        return new JSONObject(ingrapherCounterStats);
-    }
-
-    /**
-     * @return String value of <code>getStatsObj()</code>
-     */
-    public static String getStatsString() {
-        return getStatsObj().toString();
+        return new JSONObject(INSTANCE.ingrapherCounterStats);
     }
 
 }

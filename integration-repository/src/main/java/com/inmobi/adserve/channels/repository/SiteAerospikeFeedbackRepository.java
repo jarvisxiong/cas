@@ -34,19 +34,21 @@ import com.inmobi.casthrift.Feedback;
 import com.inmobi.casthrift.SiteFeedback;
 import com.inmobi.phoenix.exception.InitializationException;
 
-// Assumptions:
-// siteId is never null
-
+/**
+ * 
+ * @author ritwik.kumar
+ *
+ *         Assumptions : siteId is never null
+ */
 public class SiteAerospikeFeedbackRepository {
     private static final Logger LOG = LoggerFactory.getLogger(SiteAerospikeFeedbackRepository.class);
-
     private AerospikeClient aerospikeClient;
     private Policy policy;
     private String namespace;
     private String set;
     private DataCenter colo;
     // Cache to store segment feedback entities loaded from aerospike.
-    private Map<String/* siteId */, SiteFeedbackEntity> siteSegmentFeedbackCache;
+    private Map<String, SiteFeedbackEntity> siteSegmentFeedbackCache;
     private ConcurrentHashMap<String, Boolean> currentlyUpdatingSites;
     private int refreshTime;
     private ExecutorService executorService;
@@ -69,29 +71,28 @@ public class SiteAerospikeFeedbackRepository {
 
         siteSegmentFeedbackCache = new ConcurrentHashMap<>();
         currentlyUpdatingSites = new ConcurrentHashMap<>();
-
         this.colo = colo;
         executorService = Executors.newCachedThreadPool();
-
         try {
             final ClientPolicy clientPolicy = new ClientPolicy();
             clientPolicy.maxThreads = 10;
-
             aerospikeClient = new AerospikeClient(clientPolicy, config.getString("host"), config.getInt("port"));
         } catch (final AerospikeException e) {
             LOG.error("Exception while creating Aerospike client: {}", e);
             throw new InitializationException("Could not instantiate Aerospike client");
         }
-
         policy = new Policy();
     }
 
     /**
+     * 
      * Method to get SegmentAdGroupFeedbackEntity for the request site and segment combination. Looks first in cache
      * with a configurable refresh time if hits within the refresh time , returns the hit entity otherwise makes a call
      * to aerospike to load the fresh data while returning the stale entity for the current request.
      * 
-     * @return : returns the entity matching for the site, segment and adgroup combination
+     * @param siteId
+     * @param segmentId
+     * @returns the entity matching for the site, segment and adgroup combination
      */
     public SegmentAdGroupFeedbackEntity query(final String siteId, final Integer segmentId) {
         SiteFeedbackEntity siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
@@ -107,8 +108,7 @@ public class SiteAerospikeFeedbackRepository {
         } else {
             LOG.debug("siteFeedback not found for siteId: {}", siteId);
         }
-        LOG.debug("Returning default/old siteFeedback entity and fetching new data from aerospike for siteId: {}",
-                siteId);
+        LOG.debug("Returning old siteFeedback entity and fetching new data from aerospike for siteId: {}", siteId);
         InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_CACHE_MISS);
         asynchronouslyFetchFeedbackFromAerospike(siteId);
         siteFeedbackEntity = siteSegmentFeedbackCache.get(siteId);
@@ -151,7 +151,7 @@ public class SiteAerospikeFeedbackRepository {
         /**
          * Method which gets feedback from aerospike in case of a cache miss and updates the cache
          */
-        void getFeedbackFromAerospike(final String siteId) {
+        private void getFeedbackFromAerospike(final String siteId) {
             // getting all data for the site
             final Record record = getFromAerospike(siteId);
             if (null == record) {
@@ -166,11 +166,10 @@ public class SiteAerospikeFeedbackRepository {
         /**
          * Method which makes a call to aerospike to load the complete site info
          */
-        Record getFromAerospike(final String site) {
+        private Record getFromAerospike(final String site) {
             InspectorStats.incrementStatCount(InspectorStrings.SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE);
             long time = System.currentTimeMillis();
             Record record;
-
             try {
                 final Key key = new Key(namespace, set, site);
                 record = aerospikeClient.get(policy, key);
@@ -185,10 +184,10 @@ public class SiteAerospikeFeedbackRepository {
 
         /**
          * Processes feedback , extract global and colo data to get the siteFeedbackEntity object
-         * 
+         *
          * @param record : ClResult object containing the feedback
          */
-        SiteFeedbackEntity processResultFromAerospike(final Record record) {
+        private SiteFeedbackEntity processResultFromAerospike(final Record record) {
             if (null != record) {
                 final Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackEntityMap = new HashMap<>();
                 for (final Map.Entry<String, Object> binValuePair : record.bins.entrySet()) {
@@ -254,7 +253,7 @@ public class SiteAerospikeFeedbackRepository {
          * Builds the siteFeedbackEntity object from the global and colo feedback objects(thrift generated) fetched from
          * aerospike
          */
-        SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(final SiteFeedback globalFeedback,
+        private SegmentAdGroupFeedbackEntity buildSiteFeedbackEntity(final SiteFeedback globalFeedback,
                 final SiteFeedback rctFeedback, final SiteFeedback coloFeedback) {
             if (globalFeedback == null && rctFeedback == null && coloFeedback == null) {
                 return null;

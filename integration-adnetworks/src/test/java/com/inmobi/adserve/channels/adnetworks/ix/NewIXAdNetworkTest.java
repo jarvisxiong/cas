@@ -125,8 +125,6 @@ public class NewIXAdNetworkTest {
         EasyMock.replay(slotSizeMapEntityFor15);
         repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
 
-        MemberMatcher.field(InspectorStats.class, "boxName").set(InspectorStats.class, "randomBox");
-
         expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11).anyTimes();

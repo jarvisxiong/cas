@@ -10,11 +10,10 @@ import lombok.ToString;
 @Getter
 @ToString
 public class SiteFeedbackEntity {
-
     @Setter
     private long lastUpdated;
     private final String siteGuId;
-    private Map<Integer/* segmentId */, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackMap;
+    private Map<Integer, SegmentAdGroupFeedbackEntity> segmentAdGroupFeedbackMap;
 
     public SiteFeedbackEntity(final Builder builder) {
         lastUpdated = builder.lastUpdated;

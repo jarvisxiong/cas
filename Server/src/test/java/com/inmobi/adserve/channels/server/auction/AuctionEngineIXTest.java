@@ -1,8 +1,8 @@
 package com.inmobi.adserve.channels.server.auction;
 
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.powermock.api.easymock.PowerMock.createMock;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,7 +37,6 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentF
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
@@ -56,10 +54,6 @@ public class AuctionEngineIXTest {
 
     @BeforeMethod
     public void setUp() throws IOException, IllegalAccessException {
-
-        MemberModifier.field(InspectorStats.class, "boxName")
-                .set(InspectorStats.class, "randomBox");
-
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(config, null);
 
@@ -110,8 +104,8 @@ public class AuctionEngineIXTest {
 
     @SuppressWarnings("deprecation")
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
-                                     final String adNetworkName, final Double bidValue, final Long latencyValue,
-                                     final ADCreativeType adCreativeType) {
+            final String adNetworkName, final Double bidValue, final Long latencyValue,
+            final ADCreativeType adCreativeType) {
 
         final Long[] rcList = null;
         final Long[] tags = null;
@@ -163,8 +157,8 @@ public class AuctionEngineIXTest {
 
         // Only for video ads, setLogCreative() should be set to true.
         if (adCreativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
-            expect(((IXAdNetwork) mockAdnetworkInterface).getDspChannelSegmentEntity()).andReturn(channelSegmentEntity1)
-                    .times(1);
+            expect(((IXAdNetwork) mockAdnetworkInterface).getDspChannelSegmentEntity())
+                    .andReturn(channelSegmentEntity1).times(1);
             mockAdnetworkInterface.setLogCreative(true);
             EasyMock.expectLastCall().times(1);
         }

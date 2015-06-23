@@ -7,9 +7,10 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
-import org.powermock.api.support.membermodification.MemberModifier;
 import org.testng.annotations.Test;
 
 import com.google.inject.Guice;
@@ -30,11 +31,8 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.filters.TestScopeModule;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
-import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
-
-import junit.framework.TestCase;
 
 
 public class HttpRequestHandlerTest extends TestCase {
@@ -50,9 +48,6 @@ public class HttpRequestHandlerTest extends TestCase {
         channelentity = builder.build();
         final ConfigurationLoader config =
                 ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
-
-        MemberModifier.field(InspectorStats.class, "boxName")
-                .set(InspectorStats.class, "randomBox");
 
         CasConfigUtil.init(config, null);
 
