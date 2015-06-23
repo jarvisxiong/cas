@@ -185,4 +185,8 @@ public class Formatter {
     public static String getIXNamespace() {
         return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(10000)) + 20000) + "_";
     }
+
+    public static String getDCPNamespace() {
+        return "im_" + (Math.abs(ThreadLocalRandom.current().nextInt(20000)) + 30000) + "_";
+    }
 }

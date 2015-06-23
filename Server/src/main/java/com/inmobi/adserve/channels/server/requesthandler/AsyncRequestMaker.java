@@ -28,6 +28,8 @@ import com.inmobi.casthrift.ADCreativeType;
 
 import io.netty.channel.Channel;
 
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+
 
 @Singleton
 public class AsyncRequestMaker {
@@ -52,14 +54,19 @@ public class AsyncRequestMaker {
 
         final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
         LOG.debug("Total channels available for sending requests {}", rows.size());
+
         /*
          NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
          interstitial video response will be sent or Banner.
          At this point, the creative type is set to Banner for video supported requests. If the request gets fullfiled
          with a video ad, creative type will be chosen accordingly.
+         Setting the creativeType to BANNER for DCP native requests
         */
-        final ADCreativeType creativeType = isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
+        final ADCreativeType creativeType = sasParams.getDst() == DCP.getValue() ? ADCreativeType.BANNER :
+                isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
         LOG.debug("Creative type is : {}", creativeType);
+
+
 
         for (final ChannelSegment row : rows) {
             final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
@@ -87,8 +94,8 @@ public class AsyncRequestMaker {
             String clickUrl = null;
             String beaconUrl = null;
             // Replacing int key in auction id to generate impression id
-            sasParams.setImpressionId(ImpressionIdGenerator.getInstance().resetWilburyIntKey(
-                    casInternalGlobal.getAuctionId(), incId));
+            sasParams.setImpressionId(
+                    ImpressionIdGenerator.getInstance().resetWilburyIntKey(casInternalGlobal.getAuctionId(), incId));
             final CasInternalRequestParameters casInternal = getLocalCasInternal(sasParams, casInternalGlobal);
 
             controlEnrichment(casInternal, channelSegmentEntity);
@@ -179,8 +186,9 @@ public class AsyncRequestMaker {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
-                LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
-                        .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
+                LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}",
+                        channelSegment.getChannelSegmentEntity().getId(),
+                        channelSegment.getChannelSegmentEntity().getChannelId());
                 AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
                         System.currentTimeMillis());
             } else {
@@ -194,8 +202,8 @@ public class AsyncRequestMaker {
                     InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
-                        channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
-                                .getChannelId());
+                        channelSegment.getChannelSegmentEntity().getId(),
+                        channelSegment.getChannelSegmentEntity().getChannelId());
                 AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
                         System.currentTimeMillis());
             } else {
@@ -206,8 +214,8 @@ public class AsyncRequestMaker {
     }
 
     private boolean isNativeRequest(final SASRequestParameters sasParams) {
-        return GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource()) &&
-                (GlobalConstant.NATIVE_STRING.equals(sasParams.getRFormat()) ||
-                        RequestedAdType.NATIVE == sasParams.getRequestedAdType());
+        return GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource()) && (
+                GlobalConstant.NATIVE_STRING.equals(sasParams.getRFormat())
+                        || RequestedAdType.NATIVE == sasParams.getRequestedAdType());
     }
 }

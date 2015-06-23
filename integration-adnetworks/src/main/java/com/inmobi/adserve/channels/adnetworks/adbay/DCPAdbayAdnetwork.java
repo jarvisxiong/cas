@@ -80,27 +80,13 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
             responseContent = "";
             return;
         } else {
+            statusCode = status.code();
+            final VelocityContext context = new VelocityContext();
+            buildInmobiAdTracker();
+            context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response);
             try {
-                final JSONObject adResponse = new JSONObject(response);
-                statusCode = status.code();
-                final VelocityContext context = new VelocityContext();
-                Formatter.TemplateType t = Formatter.TemplateType.RICH;
-                final JSONArray responseAd = adResponse.getJSONArray("creatives");
-                if (responseAd.length() > 0) {
-                    buildInmobiAdTracker();
-                    final JSONObject responseAdObj = responseAd.getJSONObject(0);
-                    context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseAdObj.getString("src"));
-                    context.put(VelocityTemplateFieldConstants.AD_TEXT, responseAdObj.getString("txt"));
-                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL, responseAdObj.getString("click"));
-                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
-                    responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
-                    LOG.debug("response content length is {} and the response is {}", responseContent.length(), responseContent);
-                    adStatus = AD_STRING;
-                }
-            } catch (final JSONException exception) {
-                adStatus = NO_AD;
-                LOG.info("Error parsing response {} from adbay: {}", response, exception);
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.PARSE_RESPONSE_EXCEPTION);
+                responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.HTML, context, sasParams, getBeaconUrl());
+                adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from adbay: {}", response, exception);

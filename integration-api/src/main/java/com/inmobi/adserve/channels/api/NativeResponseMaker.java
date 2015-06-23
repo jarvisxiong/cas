@@ -63,6 +63,15 @@ public class NativeResponseMaker {
         return createNativeAd(vc, app, placementId);
     }
 
+    public String makeDCPNativeResponse(final App app, final Map<String, String> params,
+                                        final NativeAdTemplateEntity templateEntity)throws Exception{
+        validateResponse(app, templateEntity);
+        final VelocityContext vc = getVelocityContext(app, params);
+        vc.put("NAMESPACE", Formatter.getDCPNamespace());
+
+        return createNativeAd(vc, app, params.get("placementId"));
+    }
+
     public String makeIXResponse(final App app, final Map<String, String> params) throws Exception {
         Preconditions.checkNotNull(params, ERROR_STR, "params");
         Preconditions.checkNotNull(params.containsKey("placementId"), ERROR_STR, "placementId");

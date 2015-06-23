@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.inmobi.adserve.channels.adnetworks.taboola.DCPTaboolaAdnetwork;
 import org.apache.commons.configuration.Configuration;
 
 import com.google.common.collect.Maps;
@@ -44,6 +45,7 @@ public class AdapterConfigModule extends AbstractModule {
         requestStaticInjection(RtbAdNetwork.class);
         requestStaticInjection(IXAdNetwork.class);
         requestStaticInjection(HostedAdNetwork.class);
+        requestStaticInjection(DCPTaboolaAdnetwork.class);
 
         install(new FactoryModuleBuilder().build(AdapterConfigFactory.class));
         bind(String.class).annotatedWith(Names.named("dcName")).toProvider(Providers.of(dcName));
