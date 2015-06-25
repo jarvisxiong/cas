@@ -907,7 +907,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             device.setDidsha1(casInternalRequestParameters.getUidSO1());
             device.setDpidsha1(casInternalRequestParameters.getUidSO1());
         } else if (null != casInternalRequestParameters.getUidO1()) {
-        } else if (null != casInternalRequestParameters.getUidO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidO1());
             device.setDpidsha1(casInternalRequestParameters.getUidO1());
         }
