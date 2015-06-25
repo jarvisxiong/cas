@@ -21,8 +21,8 @@ public class UpdateDBWithWAPAdGroupData {
 
         map =
                 CasPartnerConf.setPartnerConfig(
-                    ChannelPartners.valueOf(YamlDataIOHelper.readTestIndex().get(testCaseName.toUpperCase())
-                        .toUpperCase()), map);
+                        ChannelPartners.valueOf(YamlDataIOHelper.readTestIndex().get(testCaseName.toUpperCase())
+                                .toUpperCase()), map);
         System.out.println("\n\nMAP: \n\n" + map);
         wapChannelAdGroup.putAll(map);
         System.out.println("\n\nWAP CHAN AD GRP : \n\n" + wapChannelAdGroup);
@@ -38,8 +38,8 @@ public class UpdateDBWithWAPAdGroupData {
 
         map =
                 CasPartnerConf.setPartnerConfig(
-                    ChannelPartners.valueOf(YamlDataIOHelper.readTestIndex().get(testCaseName.toUpperCase())
-                        .toUpperCase()), map);
+                        ChannelPartners.valueOf(YamlDataIOHelper.readTestIndex().get(testCaseName.toUpperCase())
+                                .toUpperCase()), map);
         System.out.println("\n\nMAP: \n\n" + map);
         wapChannelAdGroup.putAll(map);
 
@@ -55,9 +55,9 @@ public class UpdateDBWithWAPAdGroupData {
 
         final String advertiserIdList =
                 wapChannelAdGroup.get("advertiser_id")
-                + "','"
-                + CasPartnerConf.setPartnerConfig(ChannelPartners.RTBD2, new LinkedHashMap<String, String>())
-                .get("advertiserId");
+                        + "','"
+                        + CasPartnerConf.setPartnerConfig(ChannelPartners.RTBD2, new LinkedHashMap<String, String>())
+                                .get("advertiserId");
 
         System.out.println("****** advertiser list  ****** :" + advertiserIdList);
 

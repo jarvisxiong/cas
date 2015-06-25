@@ -3,23 +3,20 @@ package com.inmobi.castest.utils.common;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
-import sun.net.www.protocol.http.HttpURLConnection;
-
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.ResponseFormat;
 
-@SuppressWarnings("restriction")
 public class NewPostRequest {
-
     public static ResponseBuilder sendPost(final AdPoolRequest adPoolRequest, final String servletName,
-                                           final String testCaseName) throws Exception {
+            final String testCaseName) throws Exception {
 
         // backfill
         // rtbdFill
@@ -82,7 +79,7 @@ public class NewPostRequest {
 
             responseStatusCode = connection.getResponseCode();
             responseData = result;
-            responseFormat = adPoolRequest.getResponseFormat();
+            responseFormat = adPoolRequest.getResponseFormatDeprecated();
 
             if (new String(result) != null && new String(result).length() != 0 && servletName.equals("rtbdFill")) {
                 final AdPoolResponse adPoolResponse = new AdPoolResponse();
@@ -102,7 +99,7 @@ public class NewPostRequest {
 
         responseBuilder =
                 responseBuilder.setStatusCode(responseStatusCode).setResponseData(responseData)
-                .setResponseFormat(responseFormat).build();
+                        .setResponseFormat(responseFormat).build();
 
         if (servletName.equals("rtbdFill")) {
             responseBuilder.setIsRtbd(true);

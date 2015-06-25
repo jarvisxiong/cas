@@ -19,6 +19,7 @@ public class WAPChannelAdgroupVitals {
         wapChannelAdGroup.put("targeting_platform", "1");
         wapChannelAdGroup.put("carrier_country", "94");
         wapChannelAdGroup.put("new_category", "70,71");
+        wapChannelAdGroup.put("adpool_responseformat", "imai");
         return wapChannelAdGroup;
 
     }

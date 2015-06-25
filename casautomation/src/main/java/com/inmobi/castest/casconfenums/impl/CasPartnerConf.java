@@ -11,7 +11,7 @@ import com.inmobi.castest.casconfenums.def.CasConf.ChannelPartners;
 public class CasPartnerConf {
 
     public static Map<String, String> setPartnerConfig(final ChannelPartners partner,
-        final Map<String, String> wapChannelAdGroup) {
+            final Map<String, String> wapChannelAdGroup) {
 
         switch (partner) {
             case ADELPHIC: {

@@ -14,11 +14,11 @@ public class RefineWapAdGroupData {
         // 3= android ,5= ios
         if (wapChnAdGrp.get("os_id") != null) {
             wapChnAdGrp.put("os_version_targeting", "{\"os\":[{\"id\":" + wapChnAdGrp.get("os_id")
-                + ",\"incl\":true}]}");
+                    + ",\"incl\":true}]}");
         }
         if (wapChnAdGrp.get("device_osid") != null) {
             wapChnAdGrp.put("os_version_targeting", "{\"os\":[{\"id\":" + wapChnAdGrp.get("device_osid")
-                + ",\"incl\":true}]}");
+                    + ",\"incl\":true}]}");
         }
 
         // 1= APP ,2= WAP

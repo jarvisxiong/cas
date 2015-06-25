@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.inmobi.castest.api.LogLines;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Created by ishanbhatnagar on 16/3/15.
@@ -22,7 +22,7 @@ import lombok.Setter;
 public class LogLinesImpl implements LogLines {
     private List<String> logLines;
 
-    public LogLinesImpl(BufferedReader bufferedReader) {
+    public LogLinesImpl(final BufferedReader bufferedReader) {
         if (null == bufferedReader) {
             logLines = null;
         }
@@ -33,13 +33,13 @@ public class LogLinesImpl implements LogLines {
             while (StringUtils.isNotEmpty(line = bufferedReader.readLine())) {
                 logLines.add(line);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             System.out.print(e);
         }
     }
 
     @Override
-    public String applyRegex(String ...regexes) {
+    public String applyRegex(final String... regexes) {
         if (null == logLines || logLines.size() > 1) {
             System.out.println("ERROR: Cannot apply regex to multiple log lines. "
                     + "Please grep for a more unique log line.");
@@ -51,7 +51,7 @@ public class LogLinesImpl implements LogLines {
 
         String searchString = logLines.get(0);
         Matcher matcher = null;
-        for (String regex : regexes) {
+        for (final String regex : regexes) {
             matcher = Pattern.compile(regex).matcher(searchString);
             if (matcher.find()) {
                 searchString = matcher.group();
@@ -71,7 +71,7 @@ public class LogLinesImpl implements LogLines {
 
     @Override
     public void printAllLogLines() {
-        for (String logLine : logLines) {
+        for (final String logLine : logLines) {
             System.out.println(logLine);
         }
     }
@@ -81,7 +81,7 @@ public class LogLinesImpl implements LogLines {
         if (null == logLines) {
             return false;
         } else {
-            return logLines.size()>0;
+            return logLines.size() > 0;
         }
     }
 

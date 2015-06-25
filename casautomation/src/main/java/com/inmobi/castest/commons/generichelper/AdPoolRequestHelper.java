@@ -11,16 +11,24 @@ import com.inmobi.castest.commons.iohelper.FenderTestIOHelper;
 import com.inmobi.castest.utils.common.AdserveBackfillRequest;
 import com.inmobi.castest.utils.common.CasServerDetails;
 import com.inmobi.castest.utils.common.NewPostRequest;
+import com.inmobi.castest.utils.common.ResponseBuilder;
+import com.inmobi.castest.utils.common.config.ConfigChangeUtil;
+import com.inmobi.castest.utils.common.ResponseBuilder;
 
 public class AdPoolRequestHelper {
     private static Map<String, String> newRequestInput = new HashMap<String, String>();
     private static AdPoolRequest adpRequest = new AdPoolRequest();
+    private static ResponseBuilder responseBuilder = new ResponseBuilder();
+    private static ConfigChangeUtil chngConfigHelper = new ConfigChangeUtil();
 
-    public static void fireAdPoolRequestForRTBD(String testName) throws FileNotFoundException {
+    public static ResponseBuilder fireAdPoolRequestForRTBD(String testName) throws FileNotFoundException,
+            InterruptedException {
 
         // Ad pool request part:
         testName = testName.toUpperCase();
         newRequestInput = FenderTestIOHelper.setTestParams(testName);
+
+        chngConfigHelper.checkChangeConfFlag(newRequestInput);
 
         Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
         Reporter.log("****** new Request param - user interest ***** \n" + newRequestInput.get("user_interests"), true);
@@ -32,20 +40,24 @@ public class AdPoolRequestHelper {
 
         try {
 
-            NewPostRequest.sendPost(adpRequest, "rtbdFill", testName);
+            responseBuilder = NewPostRequest.sendPost(adpRequest, "rtbdFill", testName);
 
         } catch (final Exception e) {
 
             e.printStackTrace();
 
         }
+        return responseBuilder;
     }
 
-    public static void fireAdPoolRequestForIX(String testName) throws FileNotFoundException {
+    public static ResponseBuilder fireAdPoolRequestForIX(String testName) throws FileNotFoundException,
+            InterruptedException {
 
         // Ad pool request part:
         testName = testName.toUpperCase();
         newRequestInput = FenderTestIOHelper.setTestParams(testName);
+
+        chngConfigHelper.checkChangeConfFlag(newRequestInput);
 
         Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
 
@@ -56,21 +68,25 @@ public class AdPoolRequestHelper {
 
         try {
 
-            NewPostRequest.sendPost(adpRequest, "ixFill", testName);
+            responseBuilder = NewPostRequest.sendPost(adpRequest, "ixFill", testName);
 
         } catch (final Exception e) {
 
             e.printStackTrace();
 
         }
+        return responseBuilder;
     }
 
-    public static void fireAdPoolRequestForDCP(String testName) throws FileNotFoundException {
+    public static ResponseBuilder fireAdPoolRequestForDCP(String testName) throws FileNotFoundException,
+            InterruptedException {
 
         testName = testName.toUpperCase();
         newRequestInput = FenderTestIOHelper.setTestParams(testName);
 
         Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
+
+        chngConfigHelper.checkChangeConfFlag(newRequestInput);
 
         adpRequest = AdserveBackfillRequest.formulateNewBackFillRequest(newRequestInput);
 
@@ -78,12 +94,13 @@ public class AdPoolRequestHelper {
 
         try {
 
-            NewPostRequest.sendPost(adpRequest, "backfill", testName);
+            responseBuilder = NewPostRequest.sendPost(adpRequest, "backfill", testName);
 
         } catch (final Exception e) {
 
             e.printStackTrace();
 
         }
+        return responseBuilder;
     }
 }

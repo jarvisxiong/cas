@@ -11,15 +11,15 @@ import com.inmobi.castest.casconfenums.def.QueryConf.Query;
 public class CasQueryConf {
 
     public static String setQuery(final Query query, final Map<String, String> adGroup,
-                                  final String... advertiser_id_list) {
+            final String... advertiser_id_list) {
         String queryString = new String();
         switch (query) {
 
             case SELECT_WAPCHANNEL_ADGROUP_SEGMENT: {
                 queryString =
                         "select * from wap_channel_adgroup where advertiser_id = '" + adGroup.get("advertiser_id")
-                        + "' and rc_list!=\'{-1}\' and rc_list!=\'{}\' "
-                        + "and external_site_key not like '% %' order by adgroup_id desc limit 1";
+                                + "' and rc_list!=\'{-1}\' and rc_list!=\'{}\' "
+                                + "and external_site_key not like '% %' order by adgroup_id desc limit 1";
                 System.out.println(queryString);
                 break;
             }
@@ -50,19 +50,47 @@ public class CasQueryConf {
 
             case INSERT_WAP_CHANNEL_AD: {
 
-                queryString =
-                        "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
-                        + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
-                        + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                        + adGroup.get("adgroup_id") + "',1,now(),2)";
+                if (adGroup.get("adpool_responseformat").equalsIgnoreCase("NATIVE")) {
+                    queryString =
+                            "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
+                                    + "',(select max(inc_id) from wap_channel_ad)+1,9,'" + adGroup.get("advertiser_id")
+                                    + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                                    + adGroup.get("adgroup_id") + "',1,now(),2)";
+                } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
+                        && adGroup.get("adpool_selectedslots").equals("14")) {
+                    queryString =
+                            "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
+                                    + "',(select max(inc_id) from wap_channel_ad)+1,11,'"
+                                    + adGroup.get("advertiser_id")
+                                    + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                                    + adGroup.get("adgroup_id") + "',1,now(),2)";
+                } else {
+                    queryString =
+                            "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
+                                    + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
+                                    + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                                    + adGroup.get("adgroup_id") + "',1,now(),2)";
+                }
+
                 System.out.println(queryString);
                 break;
             }
             case UPDATE_WAP_CHANNEL_AD: {
 
-                queryString =
-                        "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id") + "' where id = '"
-                                + adGroup.get("ad_id") + "'";
+                if (adGroup.get("adpool_responseformat").equalsIgnoreCase("NATIVE")) {
+                    queryString =
+                            "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
+                                    + "',is_banner_ad=9 where id = '" + adGroup.get("ad_id") + "'";
+                } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
+                        && adGroup.get("slot_ids").equals("14")) {
+                    queryString =
+                            "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
+                                    + "',is_banner_ad=11 where id = '" + adGroup.get("ad_id") + "'";
+                } else {
+                    queryString =
+                            "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
+                                    + "',is_banner_ad=0 where id = '" + adGroup.get("ad_id") + "'";
+                }
                 System.out.println(queryString);
                 break;
             }
@@ -76,7 +104,7 @@ public class CasQueryConf {
             case selectEarningsFeedBackQuery: {
                 queryString =
                         "select * from earnings_dcp_feedback where account_id='" + adGroup.get("advertiser_id")
-                        + "' and segment_id='" + adGroup.get("external_site_key") + "'";
+                                + "' and segment_id='" + adGroup.get("external_site_key") + "'";
                 System.out.println(queryString);
                 break;
             }
@@ -189,8 +217,8 @@ public class CasQueryConf {
 
                 queryString =
                         "update wap_channel set account_id='" + adGroup.get("advertiser_id")
-                        + "' , impression_ceil=1000000, account_segment='" + adGroup.get("account_segment")
-                        + "',priority=2,modified_on=now() where id='" + adGroup.get("channel_id") + "'";
+                                + "' , impression_ceil=1000000, account_segment='" + adGroup.get("account_segment")
+                                + "',priority=2,modified_on=now() where id='" + adGroup.get("channel_id") + "'";
                 System.out.println(queryString);
                 break;
             }
@@ -218,6 +246,18 @@ public class CasQueryConf {
                 System.out.println(queryString);
                 break;
             }
+            case DELETE_IX_PACKAGES: {
+
+                queryString = "delete from ix_packages where modified_by ='Fender'";
+                System.out.println(queryString);
+                break;
+            }
+            case DELETE_IX_PACKAGE_DEALS: {
+
+                queryString = "delete from ix_package_deals where modified_by ='Fender'";
+                System.out.println(queryString);
+                break;
+            }
             case INSERT_WAP_CHANNEL: {
                 queryString =
                         "insert into wap_channel values ('" + adGroup.get("channel_id") + "','test','"
@@ -230,7 +270,7 @@ public class CasQueryConf {
             case insertDCPAdvertiserBurnQuery: {
                 queryString =
                         "insert into dcp_advertiser_burn values ('" + adGroup.get("advertiser_id")
-                        + "',10,10,100000,'Automation',now())";
+                                + "',10,10,100000,'Automation',now())";
                 System.out.println(queryString);
                 break;
             }
@@ -259,6 +299,16 @@ public class CasQueryConf {
             case insertSiteEcpm: {
                 queryString =
                         "insert into site_country_os_ecpm(site_id,country_id,operating_system,ecpm,network_ecpm,modified_on) values ('4028cbff3b93b240013bafe7696d0221',217,'Android',4,0.90,now()) , ('4028cbff3af511e5013b14ae9bf50280',301,'Android',1.1,0.90,now()), ('4028cbff3b187e27013b262f7a300142',197,'Android',4,0.90,now()), ('4028cbff3b77ce76013b8dddd836029a',299,'Android',4,0.90,now()), ('4028cbff3b77ce76013b91f534b20357',286,'Android',1.1,0.90,now())";
+                System.out.println(queryString);
+                break;
+            }
+            case INSERT_IX_PACKAGES: {
+                queryString = "";
+                System.out.println(queryString);
+                break;
+            }
+            case INSERT_IX_PACKAGE_DEALS: {
+                queryString = "";
                 System.out.println(queryString);
                 break;
             }

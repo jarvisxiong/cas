@@ -7,7 +7,7 @@ import java.util.List;
  */
 public interface LogLines {
 
-    public String applyRegex(String ...regexes);
+    public String applyRegex(final String... regexes);
 
     public List<String> getAllLogLines();
 

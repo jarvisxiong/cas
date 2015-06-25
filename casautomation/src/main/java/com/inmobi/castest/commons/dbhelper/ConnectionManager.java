@@ -67,7 +67,7 @@ public class ConnectionManager {
     }
 
     public static ArrayList<Map> executeAndGetColumnsOutput(final Object dbQuery) throws SQLException,
-    ClassNotFoundException {
+            ClassNotFoundException {
 
         final String statement = (String) dbQuery;
         new ConnectionManager().getDBConnection();

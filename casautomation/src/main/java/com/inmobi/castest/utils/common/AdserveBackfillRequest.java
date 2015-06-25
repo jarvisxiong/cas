@@ -1,5 +1,6 @@
 package com.inmobi.castest.utils.common;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,7 +33,7 @@ import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.adpool.ResponseFormat;
 import com.inmobi.adserve.adpool.SexualOrientation;
 import com.inmobi.adserve.adpool.Site;
-import com.inmobi.adserve.adpool.SupplyCapability;
+import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.adserve.adpool.UidParams;
 import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.adpool.User;
@@ -101,6 +102,10 @@ public class AdserveBackfillRequest {
         final String def_contenttype = "PERFORMANCE";
         final String def_sitetags = "70,71";
         final String def_sitetaxonomies = "70,71";
+        final String def_enriched_media_attributes = "0"; // 0- Banner , 2 - Video
+        final String def_media_preferences =
+                "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
+
         final String def_device_useragent = "useragent";
         final String def_device_modelid = "1234";
         final String def_device_manufacturerid = "12";
@@ -110,6 +115,9 @@ public class AdserveBackfillRequest {
         final String def_device_browsermajorversion = "0";
         final String def_device_handsetinternalid = "0";
         final String def_device_devicetype = "SMARTPHONE";
+        final String def_device_manufacturername = "WHATEVER_MANUF_NAME";
+        final String def_device_modelname = "WHATEVER_MODEL_NAME";
+
         final String def_carrier_carrierid = "0";
         final String def_carrier_networktype = null;
         final String def_requestadcount = "1";
@@ -130,7 +138,7 @@ public class AdserveBackfillRequest {
         final String def_geo_stateids = null;
 
         final String def_integrationdetails_integrationtype = IntegrationType.ANDROID_SDK.toString();
-        final String def_integrationdetails_integrationversion = "430";
+        final String def_integrationdetails_integrationversion = "450";
 
         final String def_uidparams_rawuidvalues_um5 = null;
         final String def_uidparams_rawuidvalues_udid = null;
@@ -172,27 +180,33 @@ public class AdserveBackfillRequest {
         final String def_adpool_guidanceBid = "3250000";
         // This is not the task id. It is a unique id used between adserving and the sdk.
         final String def_adpool_requestGuid = "requestGuid";
+        final String def_adpool_placementId = "1234";
+
+
+        final Long adpool_placementId =
+                Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_placementId"),
+                        def_adpool_placementId));
 
         final String adpool_requestid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_requestid"), def_adpool_requestid);
         final String adpool_remotehostip =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_remotehostip"),
-                    def_adpool_remotehostip);
+                        def_adpool_remotehostip);
         final Long adpool_guidanceBid =
                 Long.valueOf(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_guidanceBid"),
-                    def_adpool_guidanceBid));
+                        def_adpool_guidanceBid));
 
         final Long site_siteincid =
                 Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteincid"),
-                    def_siteincid));
+                        def_siteincid));
         final String site_siteurl =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteurl"), def_siteurl);
         final Double site_cpcfloor =
                 Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_cpcflooor"),
-                    def_cpcfloor));
+                        def_cpcfloor));
         final Double site_ecpmfloor =
                 Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_ecpmflooor"),
-                    def_ecpmfloor));
+                        def_ecpmfloor));
         final String site_siteid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteid"), def_siteid);
         final String site_publisherid =
@@ -207,10 +221,15 @@ public class AdserveBackfillRequest {
 
         final Set<Integer> site_sitetags =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("site_sitetags"), def_sitetags));
+                        requestObject.get("site_sitetags"), def_sitetags));
         final Set<Integer> site_sitetaxonomies =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("site_sitetaxonomies"), def_sitetaxonomies));
+                        requestObject.get("site_sitetaxonomies"), def_sitetaxonomies));
+        final Integer site_enriched_media_attributes =
+                Integer.parseInt(defaultSetVariable(requestObject.get("site_enriched_media_attributes"),
+                        def_enriched_media_attributes));
+        final String site_media_preferences =
+                defaultSetVariable(requestObject.get("site_media_preferences"), def_media_preferences);
         final String device_useragent =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_useragent"), def_device_useragent);
 
@@ -223,7 +242,7 @@ public class AdserveBackfillRequest {
 
         final String temp_device_manufacturerid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_manufacturerid"),
-                    def_device_manufacturerid);
+                        def_device_manufacturerid);
         Long device_manufacturerid = null;
         if (temp_device_manufacturerid != null) {
             device_manufacturerid = Long.parseLong(temp_device_manufacturerid);
@@ -238,7 +257,7 @@ public class AdserveBackfillRequest {
 
         final String temp_device_osmajorversion =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_osmajorversion"),
-                    def_device_osmajorversion);
+                        def_device_osmajorversion);
         // Double device_osmajorversion = null;
         String device_osmajorversion = null;
         if (temp_device_osmajorversion != null) {
@@ -254,7 +273,7 @@ public class AdserveBackfillRequest {
 
         final String temp_device_browsermajorversion =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_browsermajorversion"),
-                    def_device_browsermajorversion);
+                        def_device_browsermajorversion);
         // Double device_browsermajorversion = null;
         String device_browsermajorversion = null;
         if (temp_device_browsermajorversion != null) {
@@ -263,29 +282,36 @@ public class AdserveBackfillRequest {
 
         final String temp_device_handsetinternalid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_handsetinternalid"),
-                    def_device_handsetinternalid);
+                        def_device_handsetinternalid);
         Long device_handsetinternalid = null;
         if (temp_device_handsetinternalid != null) {
             device_handsetinternalid = Long.parseLong(temp_device_handsetinternalid);
         }
         final String device_devicetype =
                 AdserveBackfillRequest
-                .defaultSetVariable(requestObject.get("device_devicetype"), def_device_devicetype);
+                        .defaultSetVariable(requestObject.get("device_devicetype"), def_device_devicetype);
+
+        final String device_manufacturername =
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_manufacturername"),
+                        def_device_manufacturername);
+
+        final String device_modelname =
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_modelname"), def_device_modelname);
 
         final String temp_carrier_carrierid =
                 AdserveBackfillRequest
-                .defaultSetVariable(requestObject.get("carrier_carrierid"), def_carrier_carrierid);
+                        .defaultSetVariable(requestObject.get("carrier_carrierid"), def_carrier_carrierid);
         Long carrier_carrierid = null;
         if (temp_carrier_carrierid != null) {
             carrier_carrierid = Long.parseLong(temp_carrier_carrierid);
         }
         final String carrier_networktype =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("carrier_networktype"),
-                    def_carrier_networktype);
+                        def_carrier_networktype);
 
         final String temp_adpool_requestadcount =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_requestedadcount"),
-                    def_requestadcount);
+                        def_requestadcount);
         Short adpool_requestadcount = null;
         if (temp_adpool_requestadcount != null) {
             adpool_requestadcount = Short.parseShort(temp_adpool_requestadcount);
@@ -293,18 +319,18 @@ public class AdserveBackfillRequest {
 
         final ResponseFormat adpool_responseformat =
                 AdserveBackfillRequest.getResponseFormat(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("adpool_responseformat"), def_responseformat));
+                        requestObject.get("adpool_responseformat"), def_responseformat));
         final String adpool_tracerequest =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_tracerequest"), def_tracerequest);
         final String adpool_transcoderipdetected =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_transcoderipdetected"),
-                    def_transcoderipdetected);
+                        def_transcoderipdetected);
         final String adpool_requestadtype =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_requestedadtype"),
-                    def_requestadtype);
+                        def_requestadtype);
         final String adpool_supplycapability =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_supplycapability"),
-                    def_supplycapability);
+                        def_supplycapability);
 
         final String temp_geo_countryid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("geo_countryid"), def_geo_countryid);
@@ -317,11 +343,11 @@ public class AdserveBackfillRequest {
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("geo_countrycode"), def_geo_countrycode);
         final String geo_locationsource =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("geo_locationsource"),
-                    def_geo_locationsource);
+                        def_geo_locationsource);
 
         final String temp_geo_latlong_latitude =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("latlong_latitude"),
-                    def_geo_latlong_latitude);
+                        def_geo_latlong_latitude);
         Double geo_latlong_latitude = null;
         if (temp_geo_latlong_latitude != null) {
             geo_latlong_latitude = Double.parseDouble(temp_geo_latlong_latitude);
@@ -329,7 +355,7 @@ public class AdserveBackfillRequest {
 
         final String temp_geo_latlong_longitude =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("latlong_longitude"),
-                    def_geo_latlong_longitude);
+                        def_geo_latlong_longitude);
         Double geo_latlong_longitude = null;
         if (temp_geo_latlong_longitude != null) {
             geo_latlong_longitude = Double.parseDouble(temp_geo_latlong_longitude);
@@ -337,7 +363,7 @@ public class AdserveBackfillRequest {
 
         final String temp_geo_latlong_accuracy =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("latlong_accuracy"),
-                    def_geo_latlong_accuracy);
+                        def_geo_latlong_accuracy);
         Double geo_latlong_accuracy = null;
         if (temp_geo_latlong_accuracy != null) {
             geo_latlong_accuracy = Double.parseDouble(temp_geo_latlong_accuracy);
@@ -345,79 +371,78 @@ public class AdserveBackfillRequest {
 
         final Set<Integer> geo_zipids =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("geo_zipids"), def_geo_zipids));
+                        requestObject.get("geo_zipids"), def_geo_zipids));
         final Set<Long> geo_fenceids =
                 AdserveBackfillRequest.getListOfLong(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("geo_fenceids"), def_geo_fenceids));
+                        requestObject.get("geo_fenceids"), def_geo_fenceids));
         final Set<Integer> geo_cityids =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("geo_cityids"), def_geo_cityids));
+                        requestObject.get("geo_cityids"), def_geo_cityids));
         final Set<Integer> geo_stateids =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("geo_stateids"), def_geo_stateids));
+                        requestObject.get("geo_stateids"), def_geo_stateids));
 
-        final IntegrationType adpool_integration_integrationtype = AdserveBackfillRequest.getIntegrationType(
-                AdserveBackfillRequest.defaultSetVariable(requestObject.get("integration_type"),
-                        def_integrationdetails_integrationtype));
+        final IntegrationType adpool_integration_integrationtype =
+                AdserveBackfillRequest.getIntegrationType(AdserveBackfillRequest.defaultSetVariable(
+                        requestObject.get("integration_type"), def_integrationdetails_integrationtype));
 
-        final int adpool_integration_integrationversion = Integer.valueOf(
-                AdserveBackfillRequest.defaultSetVariable(requestObject.get("integration_version"),
+        final int adpool_integration_integrationversion =
+                Integer.valueOf(AdserveBackfillRequest.defaultSetVariable(requestObject.get("integration_version"),
                         def_integrationdetails_integrationversion));
 
         final String adpool_requestguid =
-                AdserveBackfillRequest.defaultSetVariable(requestObject.get("requestguid"),
-                        def_adpool_requestGuid);
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("requestguid"), def_adpool_requestGuid);
 
         final String adpool_uidparams_rawuidvalues_um5 =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_um5"),
-                    def_uidparams_rawuidvalues_um5);
+                        def_uidparams_rawuidvalues_um5);
         final String adpool_uidparams_rawuidvalues_udid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_udid"),
-                    def_uidparams_rawuidvalues_udid);
+                        def_uidparams_rawuidvalues_udid);
         final String adpool_uidparams_rawuidvalues_o1 =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_o1"),
-                    def_uidparams_rawuidvalues_o1);
+                        def_uidparams_rawuidvalues_o1);
         final String adpool_uidparams_rawuidvalues_ix =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_ix"),
-                    def_uidparams_rawuidvalues_ix);
+                        def_uidparams_rawuidvalues_ix);
         final String adpool_uidparams_rawuidvalues_lid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_lid"),
-                    def_uidparams_rawuidvalues_lid);
+                        def_uidparams_rawuidvalues_lid);
         final String adpool_uidparams_rawuidvalues_sid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_sid"),
-                    def_uidparams_rawuidvalues_sid);
+                        def_uidparams_rawuidvalues_sid);
         final String adpool_uidparams_rawuidvalues_ida =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_ida"),
-                    def_uidparams_rawuidvalues_ida);
+                        def_uidparams_rawuidvalues_ida);
         final String adpool_uidparams_rawuidvalues_idv =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_idv"),
-                    def_uidparams_rawuidvalues_idv);
+                        def_uidparams_rawuidvalues_idv);
         final String adpool_uidparams_rawuidvalues_so1 =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_so1"),
-                    def_uidparams_rawuidvalues_so1);
+                        def_uidparams_rawuidvalues_so1);
         final String adpool_uidparams_rawuidvalues_iuds1 =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_iuds1"),
-                    def_uidparams_rawuidvalues_iuds1);
+                        def_uidparams_rawuidvalues_iuds1);
         final String adpool_uidparams_rawuidvalues_gid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_gid"),
-                    def_uidparams_rawuidvalues_gid);
+                        def_uidparams_rawuidvalues_gid);
         final String adpool_uidparams_rawuidvalues_wc =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_wc"),
-                    def_uidparams_rawuidvalues_wc);
+                        def_uidparams_rawuidvalues_wc);
 
         final String adpool_uidparams_udidfromrequest =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_udidfromrequest"),
-                    def_uidparams_udidfromrequest);
+                        def_uidparams_udidfromrequest);
         final String adpool_uidparams_uuidfromuidcookie =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_uuidfromuidcookie"),
-                    def_uidparams_udidfromuidcookie);
+                        def_uidparams_udidfromuidcookie);
         final String adpool_uidparams_limitiosadtracking =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_limitiosadtracking"),
-                    def_uidparams_limitiosadtracking);
+                        def_uidparams_limitiosadtracking);
 
         final String temp_user_datavendorid =
                 AdserveBackfillRequest
-                .defaultSetVariable(requestObject.get("user_datavendorid"), def_user_datavendorid);
+                        .defaultSetVariable(requestObject.get("user_datavendorid"), def_user_datavendorid);
         Long user_datavendorid = null;
         if (temp_user_datavendorid != null) {
             user_datavendorid = Long.parseLong(temp_user_datavendorid);
@@ -425,7 +450,7 @@ public class AdserveBackfillRequest {
 
         final String user_datavendorname =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_datavendorname"),
-                    def_user_datavendorname);
+                        def_user_datavendorname);
 
         final String temp_user_yearofbirth =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_yearofbirth"), def_user_yearofbirth);
@@ -436,7 +461,7 @@ public class AdserveBackfillRequest {
 
         final Gender user_gender =
                 AdserveBackfillRequest.getGender(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("user_gender"), def_user_gender));
+                        requestObject.get("user_gender"), def_user_gender));
 
         final String temp_user_income =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_income"), def_user_income);
@@ -447,34 +472,34 @@ public class AdserveBackfillRequest {
 
         final MaritalStatus user_maritalstatus =
                 AdserveBackfillRequest.getMaritalStatus(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("user_maritalstatus"), def_user_maritalstatus));
+                        requestObject.get("user_maritalstatus"), def_user_maritalstatus));
         final Education user_education =
                 AdserveBackfillRequest.getEducation(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("user_education"), def_user_education));
+                        requestObject.get("user_education"), def_user_education));
         final String user_nativelanguage =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_nativelanguage"),
-                    def_user_nativelanguage);
+                        def_user_nativelanguage);
         System.out.println("User_Interest : " + requestObject.get("user_interests"));
         final List<String> user_interests =
                 AdserveBackfillRequest.getListOfString(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("user_interests"), def_user_interests));
+                        requestObject.get("user_interests"), def_user_interests));
         final Ethnicity user_ethnicity =
                 AdserveBackfillRequest.getEthnicity(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("user_ethnicity"), def_user_ethnicity));
+                        requestObject.get("user_ethnicity"), def_user_ethnicity));
         final SexualOrientation user_sexualorientation =
                 AdserveBackfillRequest.getSexualOrientation(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("user_sexualorientation"), def_user_sexualorientation));
+                        requestObject.get("user_sexualorientation"), def_user_sexualorientation));
         final Boolean user_haschildren =
                 Boolean.parseBoolean(AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_haschildren"),
-                    def_user_haschildren));
+                        def_user_haschildren));
 
         final List<Short> adpool_selectedslots =
                 AdserveBackfillRequest.getListOfShort(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("adpool_selectedslots"), def_adpool_selectedslots));
+                        requestObject.get("adpool_selectedslots"), def_adpool_selectedslots));
 
         final Set<DemandType> adpool_demandtypesallowed =
                 AdserveBackfillRequest.getSetOfDemandTypes(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("adpool_demandtypesallowed"), def_adpool_demandtypesallowed));
+                        requestObject.get("adpool_demandtypesallowed"), def_adpool_demandtypesallowed));
 
         final String temp_adpool_segmentid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_segmentid"), def_adpool_segmentid);
@@ -485,15 +510,15 @@ public class AdserveBackfillRequest {
 
         final Boolean adpool_testrequest =
                 Boolean.parseBoolean(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_testrequest"),
-                    def_adpool_testrequest));
+                        def_adpool_testrequest));
 
         final SupplySource adpool_supplySource =
                 AdserveBackfillRequest.getSupplySource(AdserveBackfillRequest.defaultSetVariable(
-                    requestObject.get("adpool_supplysource"), def_adpool_supplysource));
+                        requestObject.get("adpool_supplysource"), def_adpool_supplysource));
 
         final String temp_adpool_ipfileversion =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_ipfileversion"),
-                    def_adpool_ipfileversion);
+                        def_adpool_ipfileversion);
         Long adpool_ipfileversion = null;
         if (temp_adpool_ipfileversion != null) {
             adpool_ipfileversion = Long.parseLong(temp_adpool_ipfileversion);
@@ -503,6 +528,9 @@ public class AdserveBackfillRequest {
         adPoolRequest.setTaskId(adpool_requestid);
         adPoolRequest.setRemoteHostIp(adpool_remotehostip);
         adPoolRequest.setGuidanceBid(adpool_guidanceBid);
+        adPoolRequest.setIpFileVersion(adpool_ipfileversion);
+        adPoolRequest.setIntegrationDetails(new IntegrationDetails().setIntegrationType(IntegrationType.IOS_SDK)
+                .setIntegrationVersion(450));
 
         final Site site = new Site();
         site.setSiteIncId(site_siteincid);
@@ -516,6 +544,8 @@ public class AdserveBackfillRequest {
         site.setSiteTags(site_sitetags);
         site.setSiteTaxonomies(site_sitetaxonomies);
         site.setSiteContentType(AdserveBackfillRequest.getSiteContentType(site_contentType));
+        site.setEnrichedSiteAllowedMediaAttributes(new HashSet<Integer>(Arrays.asList(site_enriched_media_attributes)));
+        site.setMediaPreferences(site_media_preferences);
 
         adPoolRequest.setSite(site);
 
@@ -528,7 +558,12 @@ public class AdserveBackfillRequest {
         device.setBrowserId(device_browserid);
         device.setBrowserMajorVersion(device_browsermajorversion);
         device.setHandsetInternalId(device_handsetinternalid);
-        device.setDeviceTypeDeprecated(AdserveBackfillRequest.getDeviceType(device_devicetype));
+        device.setDeviceTypeDeprecated(AdserveBackfillRequest.getDeviceTypeDeprecated(device_devicetype));
+
+        device.setDeviceType(AdserveBackfillRequest.getDeviceType(device_devicetype));
+
+        device.setManufacturerName(device_manufacturername);
+        device.setModelName(device_modelname);
 
         adPoolRequest.setDevice(device);
 
@@ -539,11 +574,12 @@ public class AdserveBackfillRequest {
         adPoolRequest.setCarrier(carrier);
 
         adPoolRequest.setRequestedAdCount(adpool_requestadcount);
-        adPoolRequest.setResponseFormat(adpool_responseformat);
+        adPoolRequest.setResponseFormatDeprecated(adpool_responseformat);
         adPoolRequest.setTraceRequest(Boolean.parseBoolean(adpool_tracerequest));
         adPoolRequest.setTranscoderIpDetected(Boolean.parseBoolean(adpool_transcoderipdetected));
         adPoolRequest.setRequestedAdType(AdserveBackfillRequest.getRequestedAdType(adpool_requestadtype));
-        adPoolRequest.setSupplyCapabilities(AdserveBackfillRequest.getListOfSupplyCapability(adpool_supplycapability));
+        adPoolRequest.setSupplyAllowedContents(AdserveBackfillRequest
+                .getListOfSupplyContentType(adpool_supplycapability));
 
         final Geo geo = new Geo();
         geo.setCountryId(geo_countryid);
@@ -633,12 +669,15 @@ public class AdserveBackfillRequest {
         adPoolRequest.setSelectedSlots(adpool_selectedslots);
         adPoolRequest.setDemandTypesAllowed(adpool_demandtypesallowed);
 
-        adPoolRequest.setSegmentId(adpool_segmentid);
-        adPoolRequest.setTestRequest(adpool_testrequest);
+        adPoolRequest.setSiteSegmentId(adpool_segmentid);
+        adPoolRequest.setTestRequestDeprecated(adpool_testrequest);
         adPoolRequest.setSupplySource(adpool_supplySource);
         adPoolRequest.setIpFileVersion(adpool_ipfileversion);
         adPoolRequest.setIntegrationDetails(integrationDetails);
         adPoolRequest.setRequestGuid(adpool_requestguid);
+
+        // Placement related setters
+        adPoolRequest.setPlacementId(adpool_placementId);
 
         // adPoolRequest.setIpFileVersion(1234);
         //
@@ -701,7 +740,22 @@ public class AdserveBackfillRequest {
         return null;
     }
 
-    public static DeviceType getDeviceType(final String device_type) {
+    public static com.inmobi.types.DeviceType getDeviceType(final String device_type) {
+        if (device_type != null) {
+            if (device_type.toUpperCase().equals("FEATURE_PHONE")) {
+                return com.inmobi.types.DeviceType.FEATURE_PHONE;
+            } else if (device_type.toUpperCase().equals("TABLET")) {
+                return com.inmobi.types.DeviceType.TABLET;
+            } else if (device_type.toUpperCase().equals("SMARTPHONE")) {
+                return com.inmobi.types.DeviceType.SMARTPHONE;
+            }
+        }
+
+        return null;
+
+    }
+
+    public static DeviceType getDeviceTypeDeprecated(final String device_type) {
         if (device_type != null) {
             if (device_type.toUpperCase().equals("FEATURE_PHONE")) {
                 return DeviceType.FEATURE_PHONE;
@@ -744,27 +798,31 @@ public class AdserveBackfillRequest {
         if (requestadtype != null) {
             if (requestadtype.toUpperCase().equals("INTERSTITIAL")) {
                 return RequestedAdType.INTERSTITIAL;
-            } else if (requestadtype.toUpperCase().equals("ADHESION")) {
-                return RequestedAdType.ADHESION;
+            } else if (requestadtype.toUpperCase().equals("NATIVE")) {
+                return RequestedAdType.NATIVE;
+            } else if (requestadtype.toUpperCase().equals("BANNER")) {
+                return RequestedAdType.BANNER;
             }
+
         }
 
         return null;
     }
 
-    public static SupplyCapability getSupplyCapability(final String supplycapability) {
+    public static SupplyContentType getSupplyContent(final String supplycapability) {
         if (supplycapability != null) {
             if (supplycapability.toUpperCase().equals("TEXT")) {
-                return SupplyCapability.TEXT;
+                return SupplyContentType.TEXT;
             } else if (supplycapability.toUpperCase().equals("BANNER")) {
-                return SupplyCapability.BANNER;
+                return SupplyContentType.BANNER;
             } else if (supplycapability.toUpperCase().equals("JS")) {
-                return SupplyCapability.JS;
+                return SupplyContentType.JS;
             } else if (supplycapability.toUpperCase().equals("RICH_MEDIA")) {
-                return SupplyCapability.RICH_MEDIA;
+                return SupplyContentType.RICH_MEDIA;
+            } else if (supplycapability.toUpperCase().equals("RICH_TEXT")) {
+                return SupplyContentType.RICH_TEXT;
             }
         }
-
         return null;
     }
 
@@ -956,15 +1014,15 @@ public class AdserveBackfillRequest {
         return listInt;
     }
 
-    public static List<SupplyCapability> getListOfSupplyCapability(final String input_string) {
-        final List<SupplyCapability> listInt = new LinkedList<SupplyCapability>();
+    public static List<SupplyContentType> getListOfSupplyContentType(final String input_string) {
+        final List<SupplyContentType> listInt = new LinkedList<SupplyContentType>();
 
         if (input_string != null) {
             final String[] splitValues = input_string.split(",");
 
             if (splitValues.length != 0) {
                 for (final String sEach : splitValues) {
-                    listInt.add(AdserveBackfillRequest.getSupplyCapability(sEach));
+                    listInt.add(AdserveBackfillRequest.getSupplyContent(sEach));
                 }
             }
         }

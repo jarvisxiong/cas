@@ -20,7 +20,7 @@ public class WapChannelAdGroup {
     }
 
     public static Map<String, String> setWapChannelAdGroup(final WapChannelAdGroupTemplates prop,
-        final Map<String, String> wapChannelAdGroup) throws ClassNotFoundException, SQLException {
+            final Map<String, String> wapChannelAdGroup) throws ClassNotFoundException, SQLException {
         ArrayList<Map> wapGroup = new ArrayList<Map>();
 
         // prop = prop.toLowerCase();

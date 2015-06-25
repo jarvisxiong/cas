@@ -12,13 +12,64 @@ public class LogStringConf {
         String logLine = new String();
 
         switch (logString) {
+
+            case MSG_RTBD_EXT_OBJECT_NEGATIVE_DATA_SIGNALS: {
+                logLine = "ext\":{\"gender\":\"M\"}}";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+
+            case MSG_RTBD_MAKE_AND_MANUF_DATA_SIGNALS: {
+                logLine = "\"make\":\"WHATEVER_MANUF_NAME !@#$12345\",\"model\":\"WHATEVER_MODEL_NAME !@#$12345\"";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_EXT_OBJECT_DATA_SIGNALS: {
+                logLine = "\"ext\":{\"gender\":\"M\",\"age\":\"20\"}}";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_DEVICETYPE_SMARTPHONE: {
+                logLine = "deviceType:SMARTPHONE";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_DEVICETYPE_FEATUREPHONE: {
+                logLine = "deviceType:SMARTPHONE";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_DEVICETYPE_TABLET: {
+                logLine = "deviceType:SMARTPHONE";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_MANUFNAME: {
+                logLine = "manufacturerName:WHATEVER_MANUF_NAME";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_MODELNAME: {
+                logLine = "modelName:WHATEVER_MODEL_NAME";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_MANUFNAME_NEGATIVE: {
+                logLine = "manufacturerName:WHATEVER_MANUF_NAME !@#$12345";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
+            case MSG_RTBD_SASPARAMS_MODELNAME_NEGATIVE: {
+                logLine = "modelName:WHATEVER_MODEL_NAME !@#$12345";
+                System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
+                break;
+            }
             case MSG_RTBD_RESPONSE: {
                 logLine = "RTBD response json to RE is AdPoolResponse";
                 System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
                 break;
             }
             case MSG_RTBD_AdRR_FLAG: {
-
                 logLine = "dst:RTBD,";
                 break;
             }
@@ -27,8 +78,9 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTB_MANDATE_PARAM_MISSING: {
-                logLine = "mandate parameters missing or request format is not compatible to partner supported response"
-                        + " for dummy so exiting adapter";
+                logLine =
+                        "mandate parameters missing or request format is not compatible to partner supported response"
+                                + " for dummy so exiting adapter";
                 break;
             }
             case MSG_DCP_TAPIT_CONFIG_SUCCESS: {
@@ -39,16 +91,10 @@ public class LogStringConf {
                 logLine = "n_ads_served:1";
                 break;
             }
-
-            case MSG_DCP_SENDING_NO_AD: {
-                logLine = "Sending No ads";
+            case MSG_IX_AD_SERVED: {
+                logLine = "n_ads_served:1";
                 break;
             }
-            case MSG_DCP_TERMINATE_CONFIG_SEARCH: {
-                logLine = "Terminating request as incompatible content type";
-                break;
-            }
-
             case MSG_IX_ADRRFLAG: {
                 logLine = "dst:IX,";
                 break;
@@ -131,7 +177,7 @@ public class LogStringConf {
             }
             case MSG_IX_UA: {
                 logLine =
-                        "\"device\":{\"lmt\":0,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
+                        "\"device\":{\"lmt\":1,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
                                 + "AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36\"";
                 break;
             }
@@ -249,7 +295,32 @@ public class LogStringConf {
                 logLine = "\"blind\":{\"bundle\":\"com.ix.84d5c8dd-fb27-31ee-af1a-55c2850d41be\"}";
                 break;
             }
-
+            case MSG_IX_ADAPTER_CONFIG_FAIL: {
+                logLine =
+                        "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter";
+                break;
+            }
+            case MSG_IX_ADAPTER_CONFIG_FAIL2: {
+                logLine = "Configure parameters inside IX returned false ix: BasicParams Not Available";
+                break;
+            }
+            case MSG_IX_CREATIVE_NATIVE: {
+                logLine = "Creative type is : NATIVE";
+                break;
+            }
+            case MSG_IX_VAST_MEDIA_PREFS: {
+                logLine =
+                        "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
+                break;
+            }
+            case MSG_DCP_SENDING_NO_AD: {
+                logLine = "Sending No ads";
+                break;
+            }
+            case MSG_DCP_TERMINATE_CONFIG_SEARCH: {
+                logLine = "Terminating request as incompatible content type";
+                break;
+            }
             default: {
                 logLine = "FENDER HAS NO MATCHING LOG LINE TO VALIDATE FOR";
                 break;

@@ -28,7 +28,7 @@ public class QueryManager {
     }
 
     public static ArrayList<Map> executeAndGetColumnsOutput(final String dbQuery) throws SQLException,
-    ClassNotFoundException {
+            ClassNotFoundException {
         System.out.println(dbQuery);
         final ConnectionManager connectionManager = new ConnectionManager();
         final Connection connection = connectionManager.getDBConnection();

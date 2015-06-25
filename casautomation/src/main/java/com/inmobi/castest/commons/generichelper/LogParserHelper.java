@@ -19,7 +19,7 @@ public class LogParserHelper {
     private static final String FAIL = "FAIL";
 
     public static LogLines queryForLogs(final String logSearchString) throws IOException {
-        StringBuilder queryString = new StringBuilder();
+        final StringBuilder queryString = new StringBuilder();
 
         queryString.append("search=");
         queryString.append(logSearchString);
@@ -36,7 +36,7 @@ public class LogParserHelper {
         final HttpResponse response = client.execute(post);
         final BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-        LogLines logLines = new LogLinesImpl(rd);
+        final LogLines logLines = new LogLinesImpl(rd);
         if (logLines.isNotEmpty()) {
             System.out.println(logLines.getSize() + " log lines matched: " + logSearchString);
         } else {
@@ -50,7 +50,7 @@ public class LogParserHelper {
     public static String logParser(final String... logSearchStrings) throws IOException {
         boolean result = true;
 
-        for (String logSearchString : logSearchStrings) {
+        for (final String logSearchString : logSearchStrings) {
             result &= queryForLogs(logSearchString).isNotEmpty();
         }
 

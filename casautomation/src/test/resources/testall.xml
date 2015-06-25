@@ -3,6 +3,7 @@
 <suite name="Suite1" verbose="1">
 	<test name="Regression1">
 		<classes>
+			<class name="com.inmobi.castest.suite.ParentTest"></class>
 			<class name="com.inmobi.castest.dcptests.DCPTest" />
 			<class name="com.inmobi.castest.rtbdtests.RTBD_NewTest" />
 			<class name="com.inmobi.castest.ixtests.IXTest" />

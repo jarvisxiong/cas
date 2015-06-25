@@ -14,13 +14,13 @@ import com.inmobi.castest.casconfenums.impl.CasQueryConf;
 public class WAPGroupDBManipulation {
 
     public static void UpdateWapChannelAdgroupInDB(final Map<String, String> wapChannelAdgroupObject,
-                                                   final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAPCHANNEL_ADGROUP_SEGMENT,
-            wapChannelAdgroupObject));
+                wapChannelAdgroupObject));
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAPCHANNEL_ADGROUP_SEGMENT,
-            wapChannelAdgroupObject));
+                wapChannelAdgroupObject));
 
         /*
          * WAP Channel Ad query
@@ -28,22 +28,22 @@ public class WAPGroupDBManipulation {
 
         final ArrayList<Map> resultSetOfWapChannelAd =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_WAP_CHANNEL_AD,
-                    wapChannelAdgroupObject));
+                        wapChannelAdgroupObject));
         System.out.println("***RESULT SET 1 SIZE***  : " + resultSetOfWapChannelAd.size());
 
         if (resultSetOfWapChannelAd.size() == 0) {
             QueryManager
-            .executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_CHANNEL_AD, wapChannelAdgroupObject));
+                    .executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_CHANNEL_AD, wapChannelAdgroupObject));
         } else {
             QueryManager
-            .executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_WAP_CHANNEL_AD, wapChannelAdgroupObject));
+                    .executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_WAP_CHANNEL_AD, wapChannelAdgroupObject));
         }
 
         // update wap_channel table
 
         final ArrayList<Map> resultSetOfWapChannel =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_WAP_CHANNEL,
-                    wapChannelAdgroupObject));
+                        wapChannelAdgroupObject));
 
         System.out.println("***RESULT SET 2 SIZE***  : " + resultSetOfWapChannel.size());
 
@@ -62,59 +62,59 @@ public class WAPGroupDBManipulation {
 
         final ArrayList<Map> resultSetOfRealTimeDcpFeedback =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectRealTimeDcpFeedback,
-                    wapChannelAdgroupObject, advertiser_id_list));
+                        wapChannelAdgroupObject, advertiser_id_list));
         System.out.println("***RESULT SET 3 SIZE***  : " + resultSetOfRealTimeDcpFeedback.size());
 
         if (resultSetOfRealTimeDcpFeedback.size() == 0) {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertRealtimeDcpFeedbackQuery,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         } else {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateRealtimeDCPFeedbackQuery,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         }
 
         // update dcp_advertiser_burn table
         final ArrayList<Map> resultSetOfDcpAdvertiserBurnQuery =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectDCPAdvertiserBurnQuery,
-                    wapChannelAdgroupObject));
+                        wapChannelAdgroupObject));
         System.out.println("***RESULT SET 4 SIZE***  : " + resultSetOfDcpAdvertiserBurnQuery.size());
 
         if (resultSetOfDcpAdvertiserBurnQuery.size() == 0) {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertDCPAdvertiserBurnQuery,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         } else {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_DCP_ADV_BURN_QUERY,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         }
 
         // update earnings_dcp_feedback table
         final ArrayList<Map> resultSetOfEarningsFeedbackQuery =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectEarningsFeedBackQuery,
-                    wapChannelAdgroupObject));
+                        wapChannelAdgroupObject));
         System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfEarningsFeedbackQuery.size());
 
         if (resultSetOfEarningsFeedbackQuery.size() == 0) {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertEarningsDcpFeedbackQuery,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         } else {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updatEarningsDcpFeedBackQuery,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         }
 
         final ArrayList<Map> resultSetOfDcpChnSiteIncExc =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_DCP_CHN_SITE_INC_EXC,
-                    wapChannelAdgroupObject));
+                        wapChannelAdgroupObject));
         System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfDcpChnSiteIncExc.size());
 
         if (resultSetOfDcpChnSiteIncExc.size() != 0) {
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_DCP_CHN_SITE_INC_EXC,
-                wapChannelAdgroupObject));
+                    wapChannelAdgroupObject));
         }
 
     }
 
     public static void UpdateDemandSupplyData(final Map<String, String> wapChannelAdgroupObject,
-                                              final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateAllSites, wapChannelAdgroupObject));
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deleteSiteEcpm, wapChannelAdgroupObject));
