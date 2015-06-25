@@ -5,6 +5,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.replay;
@@ -46,6 +47,8 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
+import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.contracts.ix.response.Bid;
 import com.inmobi.adserve.contracts.ix.response.BidResponse;
 import com.inmobi.adserve.contracts.ix.response.SeatBid;
@@ -128,6 +131,11 @@ public class IXAdNetworkTest {
         EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
         EasyMock.replay(currencyConversionEntity);
         repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
+                .andReturn(currencyConversionEntity).anyTimes();
+        expect(repositoryHelper.queryIXBlocklistRepository(anyObject(String.class),
+                anyObject(IXBlocklistKeyType.class), anyObject(IXBlocklistType.class))).andReturn(null).anyTimes();
+
         final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
         EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor1);
@@ -576,8 +584,8 @@ public class IXAdNetworkTest {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "TESTSITE");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getPage(), "www.testSite.com");
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
-                    Lists.newArrayList("blk423", "InMobiPERF"));
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), (Integer) 11726);
+                    Lists.newArrayList("blk423", "InMobiPERFAdv", "InMobiPERFInd", "InMobiPERFCre"));
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), (Integer)11726);
 
             // checking for blocked list if siteType is not PERFORMANCE, also if site is not transparent
 
@@ -603,8 +611,8 @@ public class IXAdNetworkTest {
             assertEquals(ixAdNetwork.getBidRequest().getSite().getName(), "Games");
             assertNotNull(ixAdNetwork.getBidRequest().getSite().getPage());
             assertEquals(ixAdNetwork.getBidRequest().getSite().getBlocklists(),
-                    Lists.newArrayList("blk423", "InMobiFS"));
-            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), (Integer) 11726);
+                    Lists.newArrayList("blk423", "InMobiFSAdv", "InMobiFSInd", "InMobiFSCre"));
+            assertEquals(ixAdNetwork.getBidRequest().getSite().getPublisher().getExt().getRp().getAccount_id(), (Integer)11726);
 
             sas.setSource("app");
             sas.setSdkVersion("a430");

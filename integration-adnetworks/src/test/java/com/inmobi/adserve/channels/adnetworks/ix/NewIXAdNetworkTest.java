@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import static com.inmobi.adserve.channels.adnetworks.AdapterTestHelper.setInmobiAdTrackerBuilderFactoryForTest;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPM;
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -32,6 +33,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.Lists;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -49,6 +51,8 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
+import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
@@ -275,6 +279,8 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockNativeBuilderfactory.create(entity)).andReturn(new IxNativeBuilderImpl(entity));
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository(99L)).andReturn(entity);
+        expect(mockRepositoryHelper.queryIXBlocklistRepository(anyObject(String.class),
+                anyObject(IXBlocklistKeyType.class), anyObject(IXBlocklistType.class))).andReturn(null).anyTimes();
         replayAll();
 
         final Field nativeBuilderfactoryField = IXAdNetwork.class.getDeclaredField("nativeBuilderfactory");
@@ -298,6 +304,8 @@ public class NewIXAdNetworkTest {
         sas.setSiteId("siteId");
         sas.setPlacementId(99L);
         sas.setWapSiteUACEntity(wapBuild.build());
+        sas.setCountryId(1L);
+        sas.setSiteContentType(ContentType.PERFORMANCE);
 
         final CasInternalRequestParameters casInt = new CasInternalRequestParameters();
         casInt.setImpressionId("ImpressionId");

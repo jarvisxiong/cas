@@ -19,6 +19,8 @@ import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
+import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
+import com.inmobi.adserve.channels.entity.IXBlocklistRepository;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
@@ -33,10 +35,13 @@ import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
+import com.inmobi.adserve.channels.query.IXBlocklistsQuery;
 import com.inmobi.adserve.channels.query.IXVideoTrafficQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
+import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
+import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.phoenix.exception.RepositoryException;
 
 import lombok.Getter;
@@ -70,6 +75,7 @@ public class RepositoryHelper {
     private final SdkMraidMapRepository sdkMraidMapRepository;
     private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private final CcidMapRepository ccidMapRepository;
+    private final IXBlocklistRepository ixBlocklistRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -94,6 +100,7 @@ public class RepositoryHelper {
         sdkMraidMapRepository = builder.sdkMraidMapRepository;
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
         ccidMapRepository = builder.ccidMapRepository;
+        ixBlocklistRepository = builder.ixBlocklistRepository;
 
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
@@ -106,7 +113,7 @@ public class RepositoryHelper {
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
                 .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(ixVideoTrafficRepository)
                 .addRepositoryToStats(geoRegionFenceMapRepository).addRepositoryToStats(ccidMapRepository)
-                .addRepositoryToStats(sdkMraidMapRepository);
+                .addRepositoryToStats(ixBlocklistRepository).addRepositoryToStats(sdkMraidMapRepository);
     }
 
     public static Builder newBuilder() {
@@ -137,6 +144,7 @@ public class RepositoryHelper {
         private SdkMraidMapRepository sdkMraidMapRepository;
         private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
         private CcidMapRepository ccidMapRepository;
+        private IXBlocklistRepository ixBlocklistRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -160,6 +168,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixVideoTrafficRepository);
             Preconditions.checkNotNull(geoRegionFenceMapRepository);
             Preconditions.checkNotNull(ccidMapRepository);
+            Preconditions.checkNotNull(ixBlocklistRepository);
             Preconditions.checkNotNull(sdkMraidMapRepository);
             return new RepositoryHelper(this);
         }
@@ -344,6 +353,16 @@ public class RepositoryHelper {
             } catch (final RepositoryException ignored) {
                 LOG.debug("Exception while querying Ccid Map Repository, {}", ignored);
             }
+        }
+        return null;
+    }
+
+    public IXBlocklistEntity queryIXBlocklistRepository(final String key, final IXBlocklistKeyType keyType,
+            final IXBlocklistType blocklistType) {
+        try {
+            return ixBlocklistRepository.query(new IXBlocklistsQuery(key, keyType, blocklistType));
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying IX Blocklist Repository, {}", ignored);
         }
         return null;
     }

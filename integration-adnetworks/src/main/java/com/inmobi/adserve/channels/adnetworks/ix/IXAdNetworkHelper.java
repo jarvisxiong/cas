@@ -38,14 +38,21 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
 import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
+import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
@@ -64,6 +71,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class IXAdNetworkHelper {
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetworkHelper.class);
+    private static final String PUBLISHER_BLOCKLIST_FORMAT = "blk%s";
+
+    private static final String IX_PERF_ADVERTISER_BLOCKLIST_ID = "InMobiPERFAdv";
+    private static final String IX_PERF_INDUSTRY_BLOCKLIST_ID = "InMobiPERFInd";
+    private static final String IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID = "InMobiPERFCre";
+
+    private static final String IX_FS_ADVERTISER_BLOCKLIST_ID = "InMobiFSAdv";
+    private static final String IX_FS_INDUSTRY_BLOCKLIST_ID = "InMobiFSInd";
+    private static final String IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID = "InMobiFSCre";
+
+    private static final ImmutableMap<IXBlocklistType, String> inmobiPerfBlocklistMap = ImmutableMap.of(
+            IXBlocklistType.ADVERTISERS, IX_PERF_ADVERTISER_BLOCKLIST_ID,
+            IXBlocklistType.INDUSTRY_IDS, IX_PERF_INDUSTRY_BLOCKLIST_ID,
+            IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID
+    );
+    private static final ImmutableMap<IXBlocklistType, String> inmobiFsBlocklistMap = ImmutableMap.of(
+            IXBlocklistType.ADVERTISERS, IX_FS_ADVERTISER_BLOCKLIST_ID,
+            IXBlocklistType.INDUSTRY_IDS, IX_FS_INDUSTRY_BLOCKLIST_ID,
+            IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID
+    );
+    private static final ImmutableList<IXBlocklistType> supportedBlocklistTypes = ImmutableList.of(
+            IXBlocklistType.ADVERTISERS, IXBlocklistType.INDUSTRY_IDS, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS
+    );
 
     /**
      *
@@ -362,6 +392,78 @@ public class IXAdNetworkHelper {
             LOG.debug("VAST response is NOT a valid XML.", e);
             return false;
         }
+    }
+
+    /**
+     * This function returns the list of applicable ix blocklists.
+     *  1) Publisher defined blocklists (advertisers and industries) are always included
+     *  2) Advertiser, Industry and Creative Attribute blocklists are checked individually first at the site level,
+     *  if not found then at the country level, otherwise global defaults are used.
+     *  3) Blocklists with empty blocklists, imply that nothing is to be blocked.
+     *
+     * @param sasParams
+     * @param repositoryHelper
+     * @param traceMarker
+     * @return The list of publisher and inmobi defined ix blocklists
+     */
+    public static List<String> getBlocklists(final SASRequestParameters sasParams,
+            final RepositoryHelper repositoryHelper, final Marker traceMarker) {
+        final String siteId = sasParams.getSiteId();
+        final long siteIncId = sasParams.getSiteIncId();
+        final long countryId = sasParams.getCountryId();
+        final ContentType siteContentRating = sasParams.getSiteContentType();
+
+        LOG.debug(traceMarker, "Setting publisher and strategic blocklists based on: siteId: {}, siteIncId: {}, "
+                + "countryId: {}, siteContentRating: {}", siteId, siteIncId, countryId, siteContentRating);
+
+        final ImmutableList.Builder<String> blocklistBuilder = new ImmutableList.Builder<>();
+        String blocklistName;
+
+        blocklistName = String.format(PUBLISHER_BLOCKLIST_FORMAT, sasParams.getSiteIncId());
+        blocklistBuilder.add(blocklistName);
+        LOG.debug(traceMarker, "Setting publisher defined blocklist, {}", blocklistName);
+
+        for (final IXBlocklistType blocklistType : supportedBlocklistTypes) {
+            blocklistName = null;
+            final IXBlocklistEntity siteBlocklistEntity =
+                    repositoryHelper.queryIXBlocklistRepository(siteId, IXBlocklistKeyType.SITE, blocklistType);
+
+            if (null != siteBlocklistEntity) {
+                if (0 != siteBlocklistEntity.getBlocklistSize()) {
+                    blocklistName = siteBlocklistEntity.getBlocklistName();
+                    LOG.debug(traceMarker, "Setting strategic {} blocklist at the site level, {}", blocklistType,
+                            blocklistName);
+                } else {
+                    LOG.debug(traceMarker, "No strategic {} blocklists", blocklistType);
+                }
+            } else {
+                final IXBlocklistEntity countryBlocklistEntity =
+                        repositoryHelper.queryIXBlocklistRepository(String.valueOf(countryId),
+                                IXBlocklistKeyType.COUNTRY, blocklistType);
+                if (null != countryBlocklistEntity) {
+                    if (0 != countryBlocklistEntity.getBlocklistSize()) {
+                        blocklistName = countryBlocklistEntity.getBlocklistName();
+                        LOG.debug(traceMarker, "Setting strategic {} blocklist at the country level, {}", blocklistType,
+                                blocklistName);
+                    } else {
+                        LOG.debug(traceMarker, "No strategic {} blocklists", blocklistType);
+                    }
+                } else if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
+                    blocklistName = inmobiPerfBlocklistMap.get(blocklistType);
+                    LOG.debug(traceMarker, "Setting strategic {} blocklist at the global level, {}", blocklistType,
+                            blocklistName);
+                } else {
+                    blocklistName = inmobiFsBlocklistMap.get(blocklistType);
+                    LOG.debug(traceMarker, "Setting strategic {} blocklist at the global level, {}", blocklistType,
+                            blocklistName);
+                }
+            }
+            if (null != blocklistName) {
+                blocklistBuilder.add(blocklistName);
+            }
+        }
+
+        return blocklistBuilder.build();
     }
 
     public static int getIXVideoTrafficPercentage(final String siteId, final Integer countryId,

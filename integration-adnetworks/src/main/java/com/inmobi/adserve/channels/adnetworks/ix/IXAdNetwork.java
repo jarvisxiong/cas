@@ -117,9 +117,6 @@ import lombok.Setter;
  */
 public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetwork.class);
-    private static final String SITE_BLOCKLIST_FORMAT = "blk%s";
-    private static final String RUBICON_PERF_BLOCKLIST_ID = "InMobiPERF";
-    private static final String RUBICON_FS_BLOCKLIST_ID = "InMobiFS";
     private static final String BSSID_DERIVED = "BSSID_DERIVED";
     private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
     private static final String CELL_TOWER = "CELL_TOWER";
@@ -700,7 +697,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             setParamsForBlindSite(site, ext);
         }
 
-        final List<String> blockedList = getBlockedList();
+        final List<String> blockedList = IXAdNetworkHelper.getBlocklists(sasParams, repositoryHelper, traceMarker);
         site.setBlocklists(blockedList);
 
         final Publisher publisher = createPublisher();
@@ -821,7 +818,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         app.setCat(iabCategories);
 
-        final List<String> blockedList = getBlockedList();
+        final List<String> blockedList = IXAdNetworkHelper.getBlocklists(sasParams, repositoryHelper, traceMarker);
         app.setBlocklists(blockedList);
 
         final Publisher publisher = createPublisher();
@@ -884,18 +881,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         ext.setBlind(blindForApp);
     }
 
-    private List<String> getBlockedList() {
-        final List<String> blockedList = Lists.newArrayList();
-        LOG.debug(traceMarker, "{}", sasParams.getSiteIncId());
-        blockedList.add(String.format(SITE_BLOCKLIST_FORMAT, sasParams.getSiteIncId()));
-        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
-            blockedList.add(RUBICON_PERF_BLOCKLIST_ID);
-        } else {
-            blockedList.add(RUBICON_FS_BLOCKLIST_ID);
-        }
-        return blockedList;
-    }
-
     private Device createDeviceObject(final Geo geo) {
         final Device device = new Device(sasParams.getUserAgent(), sasParams.getRemoteHostIp());
         device.setGeo(geo);
@@ -921,6 +906,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.getUidSO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidSO1());
             device.setDpidsha1(casInternalRequestParameters.getUidSO1());
+        } else if (null != casInternalRequestParameters.getUidO1()) {
         } else if (null != casInternalRequestParameters.getUidO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidO1());
             device.setDpidsha1(casInternalRequestParameters.getUidO1());

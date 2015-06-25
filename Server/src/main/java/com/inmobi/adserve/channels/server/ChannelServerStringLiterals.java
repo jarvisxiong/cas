@@ -22,6 +22,7 @@ public final class ChannelServerStringLiterals {
     public static final String SDK_MRAID_MAP_REPOSITORY = "SdkMraidMapRepository";
     public static final String GEO_REGION_FENCE_MAP_REPOSITORY = "GeoRegionFenceMapRepository";
     public static final String CCID_MAP_REPOSITORY = "CcidMapRepository";
+    public static final String IX_BLOCKLIST_REPOSITORY = "IXBlocklistRepository";
     public static final String AEROSPIKE_FEEDBACK = "aerospike";
     public static final String DATABASE = "database";
     public static final String QUERY = "query";
