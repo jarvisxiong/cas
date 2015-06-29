@@ -304,8 +304,7 @@ Cache.CcidMapRepository.dataSourceName = jdbc
 
 Cache.Name = IXBlocklistRepository
 Cache.IXBlocklistRepository.Manager = com.inmobi.adserve.channels.repository.IXBlocklistRepository
-#Cache.IXBlocklistRepository.query = select * from ix_blocklists_fun('${last_update}')
-Cache.IXBlocklistRepository.query = select blocklist_name\,key_id\,key_type\,filter_data_type\,array_length(filter_data\, 1) as filter_data_size\,modified_on from ix_blocklists where is_active = true and 0 != key_type and modified_on >= ('${last_update}')
+Cache.IXBlocklistRepository.query = select * from ix_blocklists_fun('${last_update}')
 Cache.IXBlocklistRepository.initialDelay = 300
 Cache.IXBlocklistRepository.refreshTime = 601
 Cache.IXBlocklistRepository.isUpdatable = true
