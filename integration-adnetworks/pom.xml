@@ -160,6 +160,7 @@
 				<groupId>com.google.protobuf.tools</groupId>
 				<artifactId>maven-protoc-plugin</artifactId>
 				<version>0.4.2</version>
+				<extensions>true</extensions>
 				<configuration>
 					<protocArtifact>com.google.protobuf:protoc:2.6.1:exe:${os.detected.classifier}</protocArtifact>
 				</configuration>
