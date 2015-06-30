@@ -157,22 +157,33 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>de.softwareforge.mojo</groupId>
+				<groupId>com.google.protobuf.tools</groupId>
 				<artifactId>maven-protoc-plugin</artifactId>
-				<version>0.1.11</version>
+				<version>0.4.2</version>
 				<configuration>
-					<protocExecutable>/usr/local/bin/protoc-2.6.1</protocExecutable>
+					<protocArtifact>com.google.protobuf:protoc:2.6.1:exe:${os.detected.classifier}</protocArtifact>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>compile</goal>
-							<goal>testCompile</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.2.3.Final</version>
+			</extension>
+		</extensions>
 	</build>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>protoc-plugin</id>
+			<url>https://dl.bintray.com/sergei-ivanov/maven/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
