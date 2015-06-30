@@ -1,10 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-import org.json.JSONArray;
 
-import java.util.List;
+import lombok.Data;
 
 /**
  * Created by thushara.v on 04/06/15.

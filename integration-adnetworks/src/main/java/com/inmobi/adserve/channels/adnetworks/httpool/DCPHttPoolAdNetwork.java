@@ -102,7 +102,7 @@ public class DCPHttPoolAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&geo_lng=").append(longitude);
             }
 
-            String did = getUid();
+            String did = getUid(true);
             if (StringUtils.isEmpty(did) || "null".equals(did)) {
                 did = "nodeviceid-1234567890";
             }

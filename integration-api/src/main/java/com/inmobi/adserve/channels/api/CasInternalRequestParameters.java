@@ -17,9 +17,9 @@ public class CasInternalRequestParameters {
     private boolean traceEnabled;
 
     // Auction Clearing Price Mechanics
-    private double demandDensity;   // Equivalent to Alpha*Omega
+    private double demandDensity; // Equivalent to Alpha*Omega
     private double longTermRevenue; // Equivalent to Beta*Omega
-    private int publisherYield;     // Equivalent to Gamma
+    private int publisherYield; // Equivalent to Gamma
 
     private String impressionId;
 
@@ -30,9 +30,9 @@ public class CasInternalRequestParameters {
     private String uidMd5; // UM5
     private String uidIFA; // IDA
     private String uidIFV; // IDV
-    private String uidSO1;
-    private String uidIDUS1;
-    private String uidADT;
+    private String uidSO1; //remove
+    private String uidIDUS1; //remove
+    private boolean trackingAllowed = true;
     private String uidWC;
     private String uuidFromUidCookie; // imuc_5
     private String zipCode;

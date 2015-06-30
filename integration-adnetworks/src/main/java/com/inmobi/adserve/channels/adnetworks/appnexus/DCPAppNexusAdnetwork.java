@@ -152,8 +152,9 @@ public class DCPAppNexusAdnetwork extends AbstractDCPAdNetworkImpl {
                 } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
                     appendQueryParam(url, ODIN1, getURLEncode(casInternalRequestParameters.getUidSO1(), format), false);
                 }
-                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                    appendQueryParam(url, IDFA, getURLEncode(casInternalRequestParameters.getUidIFA(), format), false);
+                final String ifa = getUidIFA(false);
+                if (StringUtils.isNotBlank(ifa)) {
+                    appendQueryParam(url, IDFA, getURLEncode(ifa, format), false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
                     appendQueryParam(url, OPENUDID_SHA1,

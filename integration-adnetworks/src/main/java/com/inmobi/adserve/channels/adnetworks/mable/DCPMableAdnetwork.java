@@ -98,7 +98,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             request.put("client_agent", sasParams.getUserAgent());
             request.put("client_ip", sasParams.getRemoteHostIp());
             request.put("blind_id", blindedSiteId);
-            final String uid = getUid();
+            final String uid = getUid(true);
             if (uid != null) {
                 request.put("device_id", uid);
                 request.put("did_format", uidType);
@@ -180,8 +180,8 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, response.trim());
             buildInmobiAdTracker();
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
-                        getBeaconUrl());
+                responseContent =
+                        Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
@@ -199,11 +199,11 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
-    protected String getUid() {
-        if (sasParams.getOsId() == HandSetOS.iOS.getValue()
-                && StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
+    protected String getUid(final boolean considerDnt) {
+        final String ifa = getUidIFA(false);
+        if (sasParams.getOsId() == HandSetOS.iOS.getValue() && StringUtils.isNotEmpty(ifa)) {
             uidType = IFA_FORMAT;
-            return casInternalRequestParameters.getUidIFA();
+            return ifa;
         }
         if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
             uidType = UDID_FORMAT;
@@ -225,7 +225,7 @@ public class DCPMableAdnetwork extends AbstractDCPAdNetworkImpl {
             uidType = UDID_FORMAT;
             return casInternalRequestParameters.getUidIDUS1();
         } else {
-            final String gpid = getGPID();
+            final String gpid = getGPID(true);
             if (gpid != null) {
                 uidType = UDID_FORMAT;
                 return gpid;

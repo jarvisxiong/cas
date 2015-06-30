@@ -83,7 +83,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
 
         }
 
-        udid = getUid();
+        udid = getUid(true);
         if (StringUtils.isBlank(udid)) {
             LOG.debug("Udid mandatory for Wapstart");
             LOG.info("Configure parameters inside wapstart returned false");
@@ -143,7 +143,7 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         final Device device = new Device();
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
-        final String gpid = getGPID();
+        final String gpid = getGPID(true);
         if (gpid != null) {
             adid = gpid;
             device.setAdid(adid);
@@ -154,9 +154,9 @@ public class DCPWapStartAdNetwork extends AbstractDCPAdNetworkImpl {
         } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
             device.setAndroid_id(casInternalRequestParameters.getUidO1());
         }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
-            device.setIfa(casInternalRequestParameters.getUidIFA());
+        final String ifa = getUidIFA(true);
+        if (StringUtils.isNotEmpty(ifa)) {
+            device.setIfa(ifa);
         }
         device.setGeo(geo);
 

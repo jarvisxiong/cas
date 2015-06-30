@@ -91,8 +91,9 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
                 url.append("&long=").append(longitude);
             }
 
-            if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
-                url.append("&enctype=raw&idfa=").append(casInternalRequestParameters.getUidIFA());
+            final String ifa = getUidIFA(false);
+            if (StringUtils.isNotEmpty(ifa)) {
+                url.append("&enctype=raw&idfa=").append(ifa);
             }
 
             if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidO1())) {
@@ -102,7 +103,7 @@ public class DCPTapitAdNetwork extends AbstractDCPAdNetworkImpl {
             } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
                 appendQueryParam(url, "&enctype=sha1&udid=", casInternalRequestParameters.getUidIDUS1(), false);
             }
-            final String gpid = getGPID();
+            final String gpid = getGPID(true);
             if (gpid != null) {
                 url.append("&adid=").append(gpid);
             }

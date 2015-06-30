@@ -97,7 +97,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             nettype = "carrier";
         }
 
-        final String udid = getUid();
+        final String udid = getUid(true);
         if (!"wap".equalsIgnoreCase(sasParams.getSource()) && StringUtils.isBlank(udid)) { // deviceid mandatory for
                                                                                            // App traffic
             LOG.debug("mandate parameters missing for pubmatic, so returning from adapter");
@@ -264,8 +264,9 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
 
     private void setDeviceIdandType() {
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                deviceId = casInternalRequestParameters.getUidIFA();
+            final String ifa = getUidIFA(false);
+            if (StringUtils.isNotBlank(ifa)) {
+                deviceId = ifa;
                 udidtype = 1;
                 udidhash = 1;
                 return;
@@ -278,7 +279,7 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             }
 
         } else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-            final String gpid = getGPID();
+            final String gpid = getGPID(true);
             if (StringUtils.isNotBlank(gpid)) {
                 deviceId = gpid;
                 udidtype = 9;

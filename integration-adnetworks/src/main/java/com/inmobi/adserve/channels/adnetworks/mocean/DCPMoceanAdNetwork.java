@@ -130,19 +130,17 @@ public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
                 if (!StringUtils.isBlank(casInternalRequestParameters.getUid())) {
                     url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUid());
                 }
-                if (null != casInternalRequestParameters.getGpid()) {
-                    url.append("&androidaid=").append(casInternalRequestParameters.getGpid());
-                    url.append("&adtracking=").append(casInternalRequestParameters.getUidADT());
-
+                final String gpId = getGPID(false);
+                if (null != gpId) {
+                    url.append("&androidaid=").append(gpId);
+                    url.append("&adtracking=").append(casInternalRequestParameters.isTrackingAllowed() ? 1 : 0);
                 }
 
             }
             if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-
-                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                        && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
-
-                    appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
+                final String ifa = getUidIFA(true);
+                if (StringUtils.isNotBlank(ifa)) {
+                    appendQueryParam(url, IDFA, ifa, false);
                 }
                 if (casInternalRequestParameters.getUidSO1() != null) {
                     url.append("&udidtype=odin1&udid=").append(casInternalRequestParameters.getUidSO1());
@@ -153,7 +151,7 @@ public class DCPMoceanAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
             } else {
-                final String uid = getUid();
+                final String uid = getUid(true);
                 if (!StringUtils.isBlank(uid)) {
                     url.append("&udidtype=custom&udid=").append(casInternalRequestParameters.getUid());
                 }

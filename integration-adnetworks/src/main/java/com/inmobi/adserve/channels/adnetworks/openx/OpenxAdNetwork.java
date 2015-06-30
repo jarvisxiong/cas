@@ -86,8 +86,8 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
                 .append(blindedSiteId);
 
         if (HandSetOS.iOS.getValue() == sasParams.getOsId()) {
-            finalUrl.append("&did.ia=").append(casInternalRequestParameters.getUidIFA());
-            finalUrl.append("&did.iat=").append(casInternalRequestParameters.getUidADT());
+            finalUrl.append("&did.ia=").append(getUidIFA(false));
+            finalUrl.append("&did.iat=").append(casInternalRequestParameters.isTrackingAllowed() ? 1 : 0);
             finalUrl.append("&did.o1=").append(casInternalRequestParameters.getUidO1());
             finalUrl.append("&did.ma.md5=").append(casInternalRequestParameters.getUidMd5());
             finalUrl.append("&did.ma.sha1=").append(casInternalRequestParameters.getUidSO1());
@@ -95,7 +95,7 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&did.ai.md5=").append(casInternalRequestParameters.getUidMd5());
             finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.getUidO1());
         }
-        String gpid = getGPID();
+        String gpid = getGPID(true);
         if(null != gpid){
         	finalUrl.append("&did.adid=").append(gpid);
         }

@@ -21,7 +21,7 @@ public class RepositoryStatsProvider {
     private static final Logger LOG = LoggerFactory.getLogger(RepositoryStatsProvider.class);
     protected static final String PROD = "prod";
     private static final long FIFTEEN_MIN = 15 * 60 * 1000;
-    private static final String REPO_PREFIX = "x1repoStats.";
+    private static final String REPO_PREFIX = "repoStats.";
     private static final String TIMER_NAME = "Repo-Stat-Yammer-Timer";
     private final TimerTask repoStatYammerTask;
     private final Timer repoStatYammerTimer;

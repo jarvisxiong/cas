@@ -1,11 +1,23 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
-import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
-import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -19,23 +31,10 @@ import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.interfaces.TemplateConfiguration;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import lombok.Data;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by thushara.v on 25/05/15.
@@ -132,7 +131,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         appendQueryParam(requestBuilder, THUMBNAIL_HEIGHT, thumbnailHeight, false);
         appendQueryParam(requestBuilder, THUMBNAIL_WIDTH, thumbnailWidth, false);
-        String udid = getUid();
+        String udid = getUid(true);
         if (udid != null) {
             appendQueryParam(requestBuilder, USER_ID, udid, false);
         }
@@ -251,10 +250,6 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public String getName() {
         return "taboolaDCP";
-    }
-
-    private boolean isRequestFormatSupported() {
-        return isNativeRequest ? isNativeResponseSupported : isHTMLResponseSupported;
     }
 
     private boolean buildImageAssets() {

@@ -131,8 +131,8 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             url.append("&uid=").append(deviceId);
             url.append("&uid_type=").append(getURLEncode(deviceIdType, format));
-            if (IDFA_PLAIN.equals(deviceIdType) && StringUtils.isNotBlank(casInternalRequestParameters.getUidADT())) {
-                url.append("&uid_tr=").append(casInternalRequestParameters.getUidADT());
+            if (IDFA_PLAIN.equals(deviceIdType)) {
+                url.append("&uid_tr=").append(casInternalRequestParameters.isTrackingAllowed() ? 1 : 0);
             }
             url.append("&size=").append(width).append("x").append(height);
             if (sasParams.getCountryCode() != null) {
@@ -221,8 +221,9 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
      */
     private void setDeviceIdandType() {
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                deviceId = casInternalRequestParameters.getUidIFA();
+            final String ifa = getUidIFA(false);
+            if (StringUtils.isNotBlank(ifa)) {
+                deviceId = ifa;
                 deviceIdType = IDFA_PLAIN;
                 return;
             }
@@ -234,7 +235,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
 
         } else if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
-            String gpid = getGPID();
+            String gpid = getGPID(true);
             if (StringUtils.isNotBlank(gpid)) {
                 deviceId = gpid;
                 deviceIdType = GPID_PLAIN;

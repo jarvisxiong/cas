@@ -202,7 +202,7 @@ public class DCPPlaceIQAdnetworkTest {
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUidIFA("23e2ewq445545");
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
@@ -310,7 +310,7 @@ public class DCPPlaceIQAdnetworkTest {
         sasParams.setUserAgent("Mozilla");
         sasParams.setSource("APP");
         casInternalRequestParameters.setGpid("ABDC-ASDW-EWFJ-FHSA");
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final List<Long> category = new ArrayList<Long>();

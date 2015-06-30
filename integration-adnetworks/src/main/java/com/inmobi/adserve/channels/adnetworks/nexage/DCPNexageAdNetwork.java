@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -146,14 +145,15 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
                 finalUrlBuilder.append("&u(id)=").append(casInternalRequestParameters.getUid());
             }
         }
-        String gpid = getGPID();
+        String gpid = getGPID(true);
         if (gpid != null) {
             finalUrlBuilder.append("&d(id24)=").append(gpid);
         }
 
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
-            finalUrlBuilder.append("&d(id24)=").append(casInternalRequestParameters.getUidIFA());
+        final String ifa = getUidIFA(false);
+        if (StringUtils.isNotEmpty(ifa)
+                && casInternalRequestParameters.isTrackingAllowed()) {
+            finalUrlBuilder.append("&d(id24)=").append(ifa);
         }
 
         if (isGeo) {

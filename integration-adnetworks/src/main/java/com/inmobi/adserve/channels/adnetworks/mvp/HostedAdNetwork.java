@@ -25,7 +25,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.hosted.HostedBidRequest;
 import com.ning.http.client.RequestBuilder;
 
@@ -34,6 +33,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -238,16 +238,17 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         }
 
         // If Limit Ad Tracking Flag is set then no unique device identifiers are passed
-        if (GlobalConstant.ZERO.equals(casInternalRequestParameters.getUidADT())) {
+        if (casInternalRequestParameters.isTrackingAllowed()) {
             // If iOS IDFA is available then send that
-            if (null != casInternalRequestParameters.getUidIFA()) {
-                bidRequest.setUdid(casInternalRequestParameters.getUidIFA());
+            final String ifa = getUidIFA(false);
+            if (null != ifa) {
+                bidRequest.setUdid(ifa);
                 bidRequest.setTud(TUD_IDFA);
                 bidRequest.setEud(EUD_NONE);
             }
             // If Android GPID is available then send that
-            else if (null != casInternalRequestParameters.getGpid()) {
-                bidRequest.setUdid(casInternalRequestParameters.getGpid());
+            else if (null != getGPID(false)) {
+                bidRequest.setUdid(getGPID(false));
                 bidRequest.setTud(TUD_GAID);
                 bidRequest.setEud(EUD_NONE);
             }

@@ -116,8 +116,9 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         // TODO is [p(url for sites) required?]
         appendQueryParam(url, TRAFFICTYPE, TYPE, false);
         appendQueryParam(url, MRAIDSUPPORT, MRAID_TYPE, false);
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-            appendQueryParam(url, IFA, casInternalRequestParameters.getUidIFA(), false);
+        final String ifa = getUidIFA(false);
+        if (StringUtils.isNotBlank(ifa)) {
+            appendQueryParam(url, IFA, ifa, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidSO1(), false);
@@ -132,7 +133,7 @@ public class DCPMobFoxAdnetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
             appendQueryParam(url, SHA1UDID, casInternalRequestParameters.getUidIDUS1(), false);
         } else {
-            final String gpid = getGPID();
+            final String gpid = getGPID(true);
             if (gpid != null) {
                 url.append("&o_andadvid=").append(gpid);
             }

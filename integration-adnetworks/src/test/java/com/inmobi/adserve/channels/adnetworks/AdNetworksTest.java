@@ -289,7 +289,7 @@ public class AdNetworksTest {
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 14, repositoryHelper)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
-                    "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.ia=dfjksahfdjksahdkaw2e23231&did=1234";
+                    "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.ia=dfjksahfdjksahdkaw2e23231&did.iat=1&did=1234";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -316,7 +316,7 @@ public class AdNetworksTest {
         if (openxAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 14, repositoryHelper)) {
             final String actualUrl = openxAdNetwork.getRequestUri().toString();
             final String expectedUrl =
-                    "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.o1=dfjksahfdjksahdkaw2e23231&did=1234";
+                    "http://openx.com/get?auid=118398&cnt=us&ip=206.29.182.240&lat=37.4429&lon=-122.1514&lt=3&c.siteId=00000000-0000-0020-0000-000000000012&did.iat=1&did.o1=dfjksahfdjksahdkaw2e23231&did=1234";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -435,7 +435,7 @@ public class AdNetworksTest {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         sasParams.setSiteIncId(18);
         casInternalRequestParameters.setGpid("ASAD-SDSSD-SDADADAD-AAQW");
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         casInternalRequestParameters.setUidMd5("202cb962ac59075b964b07152d234b70");
         sasParams.setSource("android");
         final String externalKey = "19100";

@@ -625,8 +625,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 final String siteId = sasParams.getSiteId();
                 final Long countryId = sasParams.getCountryId();
 
-                final int videoTrafficPercentage = IXAdNetworkHelper.getIXVideoTrafficPercentage(siteId,
-                        countryId.intValue(), repositoryHelper, defaultTrafficPercentageForVAST);
+                final int videoTrafficPercentage =
+                        IXAdNetworkHelper.getIXVideoTrafficPercentage(siteId, countryId.intValue(), repositoryHelper,
+                                defaultTrafficPercentageForVAST);
                 LOG.debug("IX Video Traffic Percentage for siteId: {}, countryId: {} is {}", siteId, countryId,
                         videoTrafficPercentage);
                 // Based on the traffic percentage, determine whether this request should be selected for VIDEO or not.
@@ -672,7 +673,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private User createUserObject() {
         final User user = new User();
-        user.setId(getUid());
+        user.setId(getUid(false));
         return user;
     }
 
@@ -899,8 +900,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             device.setConnectiontype(ConnectionType.UNKNOWN.getValue());
         }
-        // Setting do not track
-        device.setLmt(GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? 1 : 0);
+        // lmt = 0 is false (i.e. lmt not enabled and is default). lmt = 1 is true (i.e. lmt is enabled)
+        device.setLmt(casInternalRequestParameters.isTrackingAllowed() ? 0 : 1);
 
         // Setting platform id sha1 hashed
         if (null != casInternalRequestParameters.getUidSO1()) {
@@ -921,10 +922,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Setting Extension for ifa if Coppa is not set, only then set IFA
         String id;
         if (!isCoppaSet) {
-            if (!StringUtils.isEmpty(id = casInternalRequestParameters.getUidIFA())) {
+            if (StringUtils.isNotEmpty(id = getUidIFA(false))) {
                 // Set to UIDIFA for IOS Device
                 device.setIfa(id);
-            } else if (!StringUtils.isEmpty(id = getGPID())) {
+            } else if (StringUtils.isNotEmpty(id = getGPID(false))) {
                 // Set to GPID for Android Device
                 device.setIfa(id);
             }
@@ -1296,10 +1297,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             // setCallbackContent();
             // Win notification is required
             LOG.debug(traceMarker, "nurl is {}", nurl);
-            if (!StringUtils.isEmpty(callbackUrl)) {
+            if (StringUtils.isNotEmpty(callbackUrl)) {
                 LOG.debug(traceMarker, "inside wn from config");
                 winUrl = callbackUrl;
-            } else if (!StringUtils.isEmpty(nurl)) {
+            } else if (StringUtils.isNotEmpty(nurl)) {
                 LOG.debug(traceMarker, "inside wn from nurl");
                 winUrl = nurl;
             }
@@ -1335,8 +1336,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } catch (final Exception e) {
             adStatus = TERM;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
-                    + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
+            LOG.error(
+                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
+                            + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
     }

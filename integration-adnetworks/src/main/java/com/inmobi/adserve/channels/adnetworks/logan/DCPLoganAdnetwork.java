@@ -102,8 +102,8 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             String udid = null;
             if (casInternalRequestParameters.getUidO1() != null) {
                 udid = casInternalRequestParameters.getUidO1();
-            } else if (casInternalRequestParameters.getUidIFA() != null) {
-                udid = casInternalRequestParameters.getUidIFA();
+            } else if (getUidIFA(false) != null) {
+                udid = getUidIFA(false);
             } else if (casInternalRequestParameters.getUidMd5() != null) {
                 udid = casInternalRequestParameters.getUidMd5();
             } else if (casInternalRequestParameters.getUidIDUS1() != null) {
@@ -111,7 +111,7 @@ public class DCPLoganAdnetwork extends AbstractDCPAdNetworkImpl {
             } else if (!StringUtils.isBlank(casInternalRequestParameters.getUid())) {
                 udid = casInternalRequestParameters.getUid();
             } else {
-                final String gpid = getGPID();
+                final String gpid = getGPID(true);
                 if (gpid != null) {
                     udid = gpid;
                 }

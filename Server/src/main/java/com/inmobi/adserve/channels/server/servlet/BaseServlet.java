@@ -202,10 +202,10 @@ public abstract class BaseServlet implements Servlet {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;
-        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI ||
-                hrh.responseSender.getResponseFormat() == ResponseFormat.JSON) {
-            SdkMraidMapEntity sdkMraidMapEntity = CasConfigUtil.repositoryHelper
-                    .querySdkMraidMapRepository(sasParams.getSdkVersion());
+        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI
+                || hrh.responseSender.getResponseFormat() == ResponseFormat.JSON) {
+            final SdkMraidMapEntity sdkMraidMapEntity =
+                    CasConfigUtil.repositoryHelper.querySdkMraidMapRepository(sasParams.getSdkVersion());
             if (null == sdkMraidMapEntity) {
                 LOG.error(traceMarkerProvider.get(), "Mraid Path not found for Sdk version: {}",
                         sasParams.getSdkVersion());

@@ -266,7 +266,7 @@ public class DCPMoceanAdNetworksTest {
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setUidMd5("111a222b333c444d555e666f777");
         casInternalRequestParameters.setUidIFA("12q12q12q12q12q12q12q12q12q12q12q");
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         sasParams.setSource("APP");
         sasParams.setOsId(3);
         sasParams.setCategories(Arrays.asList(new Long[] {10l, 13l, 30l}));

@@ -283,7 +283,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 if (highestBid != null) {
                     LOG.debug("Sending auction response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);
-                    // highestBid.impressionCallback();
                     LOG.debug("sent auction response");
                     return;
                 } else {
@@ -499,9 +498,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
     }
 
-    // returning the ThirdPartyAdResponse object to indicate status code,
-    // response
-    // message and latency
+    /**
+     * returning the ThirdPartyAdResponse object to indicate status code, response message and latency
+     **/
     @Override
     public ThirdPartyAdResponse getResponseAd() {
         if (responseStruct != null) {
@@ -710,14 +709,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     /**
      * function returns the unique device id
      * 
+     * @param considerDnt - Should casInternalRequestParameters.isTrackingAllowed() taken into consideration
      * @return
      */
-    protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
+    protected String getUid(final boolean considerDnt) {
+        final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
+        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA()) && trackIFA) {
             return casInternalRequestParameters.getUidIFA();
-        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getGpid())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
+        } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getGpid()) && trackIFA) {
             return casInternalRequestParameters.getGpid();
         } else if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidSO1())) {
             return casInternalRequestParameters.getUidSO1();
@@ -981,10 +980,28 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
     }
 
-    protected String getGPID() {
-        return StringUtils.isNotBlank(casInternalRequestParameters.getGpid())
-                && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT()) ? casInternalRequestParameters
-                .getGpid() : null;
+    /**
+     * 
+     * @param considerDnt -Should casInternalRequestParameters.isTrackingAllowed() taken into consideration
+     * @return
+     */
+    protected String getGPID(final boolean considerDnt) {
+        final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
+        return StringUtils.isNotBlank(casInternalRequestParameters.getGpid()) && trackIFA
+                ? casInternalRequestParameters.getGpid()
+                : null;
+    }
+
+    /**
+     * 
+     * @param considerDnt - Should casInternalRequestParameters.isTrackingAllowed() taken into consideration
+     * @return
+     */
+    protected String getUidIFA(final boolean considerDnt) {
+        final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
+        return StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA()) && trackIFA
+                ? casInternalRequestParameters.getUidIFA()
+                : null;
     }
 
     @Override

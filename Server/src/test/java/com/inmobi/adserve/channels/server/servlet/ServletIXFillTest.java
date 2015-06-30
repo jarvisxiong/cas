@@ -295,7 +295,7 @@ public class ServletIXFillTest {
         expect(
                 mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
                         null, null)).andReturn(mockChannelSegmentList).anyTimes();
-        expect(mockCasUtils.getNetworkSiteEcpm(mockCasContext, mockSASRequestParameters, 0.5)).andReturn(0.5).anyTimes();
+        expect(mockCasUtils.getNetworkSiteEcpm(mockSASRequestParameters)).andReturn(null).anyTimes();
         expect(mockCasUtils.getRtbFloor(mockCasContext)).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).anyTimes();

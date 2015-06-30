@@ -275,7 +275,7 @@ public class DCPWebmoblinkAdnetworkTest {
         sasParams.setSiteIncId(123456);
         sasParams.setSource("APP");
         sasParams.setOsId(3);
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         casInternalRequestParameters.setUidMd5("");
         sasParams.setCountryCode("us");
         sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
@@ -312,7 +312,7 @@ public class DCPWebmoblinkAdnetworkTest {
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         casInternalRequestParameters.setGpid("202cb962ac59075b964b07152d234b70");
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();
@@ -332,7 +332,7 @@ public class DCPWebmoblinkAdnetworkTest {
         sasParams.setSiteIncId(123456);
         sasParams.setSource("APP");
         sasParams.setOsId(5);
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         casInternalRequestParameters.setUidMd5("");
         sasParams.setCountryCode("us");
         sasParams.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29"
@@ -369,7 +369,7 @@ public class DCPWebmoblinkAdnetworkTest {
         assertEquals(new URI(expectedUrl).getQuery(), new URI(actualUrl).getQuery());
         assertEquals(new URI(expectedUrl).getPath(), new URI(actualUrl).getPath());
 
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         casInternalRequestParameters.setUidIFA("202cb962ac59075b964b07152d234b70");
         dcpWebmoblinkAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         actualUrl = dcpWebmoblinkAdNetwork.getRequestUri().toString();

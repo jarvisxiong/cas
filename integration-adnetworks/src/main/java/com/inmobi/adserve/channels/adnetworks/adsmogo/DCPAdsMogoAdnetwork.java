@@ -105,7 +105,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
             os = HandSetOS.values()[sasParamsOsId - 1].toString();
         }
 
-        if (isApp && StringUtils.isEmpty(getUid())) {
+        if (isApp && StringUtils.isEmpty(getUid(false))) {
             LOG.debug("mandatory parameter udid is missing for APP traffic in AdsMogo so exiting adapter");
             return false;
         }
@@ -150,8 +150,9 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, ADSPACE_HEIGHT, height, false);
 
         if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
+            final String ifa = getUidIFA(false);
+            if (StringUtils.isNotBlank(ifa)) {
+                appendQueryParam(url, IDFA, ifa, false);
 
             }
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
@@ -246,21 +247,5 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     public String getId() {
         return config.getString("adsmogo.advertiserId");
     }
-
-    @Override
-    protected String getUid() {
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIFA())) {
-            return casInternalRequestParameters.getUidIFA();
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidMd5())) {
-            return casInternalRequestParameters.getUidMd5();
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUidIDUS1())) {
-            return casInternalRequestParameters.getUidIDUS1();
-        }
-        if (StringUtils.isNotEmpty(casInternalRequestParameters.getUid())) {
-            return casInternalRequestParameters.getUid();
-        }
-        return null;
-    }
+    
 }

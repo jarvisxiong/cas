@@ -821,7 +821,7 @@ public class DCPNexageAdNetworkTest {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setUidIFA("TEST_IFA");
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         final List<Long> cat = new ArrayList<Long>();
         cat.add(46l);
         sasParams.setCategories(cat);

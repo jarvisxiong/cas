@@ -69,17 +69,14 @@ public class CasUtils {
         return false;
     }
 
-    // No longer being used
-    public Double getNetworkSiteEcpm(final CasContext casContext, final SASRequestParameters sasParams,
-            final double factor) {
-        final SiteEcpmEntity siteEcpmEntity =
-                repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(), sasParams.getCountryId().intValue(),
-                        sasParams.getOsId());
-        double networkEcpm = 0.0;
-        if (null != siteEcpmEntity) {
-            networkEcpm = factor * siteEcpmEntity.getEcpm();
-        }
-        return networkEcpm;
+    /**
+     * 
+     * @param sasParams
+     * @return
+     */
+    public SiteEcpmEntity getNetworkSiteEcpm(final SASRequestParameters sasParams) {
+        return repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(), sasParams.getCountryId().intValue(),
+                sasParams.getOsId());
     }
 
     public boolean isVideoSupported(final SASRequestParameters sasParams) {

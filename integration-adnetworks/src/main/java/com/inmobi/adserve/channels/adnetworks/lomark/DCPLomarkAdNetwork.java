@@ -116,7 +116,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
         }
 
-        uuid = getUid();
+        uuid = getUid(true);
         client = 3;
         siteType = 2; // wap
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android

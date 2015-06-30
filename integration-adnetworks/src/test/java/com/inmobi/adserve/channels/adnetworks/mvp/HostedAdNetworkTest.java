@@ -71,8 +71,8 @@ public class HostedAdNetworkTest {
         String latLong = "123.45,678.90";
         String ip = "127.0.0.1";
         String userAgent = TestUtils.SampleStrings.userAgent;
-        String limitAdTrackingIsFalse = "0";
-        String limitAdTrackingIsTrue = "1";
+        //String limitAdTrackingIsFalse = "0";
+        //String limitAdTrackingIsTrue = "1";
         String idfa = "idfaValue";
         String siteId = "siteId";
         String impressionId = "impressionId";
@@ -112,10 +112,8 @@ public class HostedAdNetworkTest {
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
 
         expect(mockCasInternalRequestParams.getLatLong()).andReturn(latLong).anyTimes();
-        expect(mockCasInternalRequestParams.getUidADT())
-                .andReturn(limitAdTrackingIsFalse).times(1)
-                .andReturn(limitAdTrackingIsTrue).times(1)
-                .andReturn(limitAdTrackingIsFalse).times(1);
+        expect(mockCasInternalRequestParams.isTrackingAllowed()).andReturn(true).times(1).andReturn(false).times(1)
+                .andReturn(true).times(1);
         expect(mockCasInternalRequestParams.getUidIFA()).andReturn(idfa).anyTimes();
 
         replayAll(mockSasParams, mockCasInternalRequestParams, mockChannelSegmentEntity);

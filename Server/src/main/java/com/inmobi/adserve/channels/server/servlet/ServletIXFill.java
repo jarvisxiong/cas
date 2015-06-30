@@ -59,10 +59,16 @@ public class ServletIXFill extends BaseServlet {
     protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal) {
         LOG.debug("enrichDstSpecific IX");
-        // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
+        // final SiteEcpmEntity nwSiteEcpmEntity = casUtils.getNetworkSiteEcpm(sasParams);
+        // nwSiteEcpmEntity = null that means no value for the given site, os, country combination exists
+
+        // final double bidFloor =
+        // nwSiteEcpmEntity == null ? sasParams.getSiteFloor() : Math.min(
+        // Math.max(GlobalConstant.MIN_BID_FLOOR, nwSiteEcpmEntity.getEcpm()), sasParams.getSiteFloor());
         casInternal.setAuctionBidFloor(sasParams.getSiteFloor());
-        // SasParams marketRate has tObject.guidanceBid * 1.0 / Math.pow(10, 6)
         sasParams.setMarketRate(Math.max(sasParams.getMarketRate(), casInternal.getAuctionBidFloor()));
+        // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
+        // SasParams marketRate has tObject.guidanceBid * 1.0 / Math.pow(10, 6)
 
         final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
         sasParams.setVideoSupported(isVideoSupported);

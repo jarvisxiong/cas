@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -116,7 +115,7 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, EXT_SITE_KEY, externalSiteId, false);
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
             appendQueryParam(url, IP_ADDR, sasParams.getRemoteHostIp(), false);
-            appendQueryParam(url, DEVICE_ID, getUid(), false);
+            appendQueryParam(url, DEVICE_ID, getUid(true), false);
             appendQueryParam(url, TIME, System.currentTimeMillis(), false);
             appendQueryParam(url, CATEGORIES, getURLEncode(getCategories(',', true), format), false);
             if (width != 0 && height != 0) {
@@ -125,9 +124,9 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             }
 
             if (client == 2) {
-                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                        && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
-                    appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
+                final String ifa = getUidIFA(true);
+                if (StringUtils.isNotBlank(ifa)) {
+                    appendQueryParam(url, IDFA, ifa, false);
                 }
                 if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
                     appendQueryParam(url, UDID, casInternalRequestParameters.getUidIDUS1(), false);
@@ -194,8 +193,8 @@ public class DCPAmobeePlatformAdnetwork extends AbstractDCPAdNetworkImpl {
             buildInmobiAdTracker();
 
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
-                        getBeaconUrl());
+                responseContent =
+                        Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

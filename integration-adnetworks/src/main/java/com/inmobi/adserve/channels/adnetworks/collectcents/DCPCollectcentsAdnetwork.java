@@ -85,7 +85,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
 
         }
 
-        final String udid = getUid();
+        final String udid = getUid(true);
         if (null == udid) {
             LOG.debug("mandate parameters missing for Collectcents, so returning from adapter");
             LOG.info("Configure parameters inside Collectcents returned false");
@@ -158,7 +158,7 @@ public class DCPCollectcentsAdnetwork extends AbstractDCPAdNetworkImpl {
             device.setConntype("wifi");
         }
         device.setUa(sasParams.getUserAgent());
-        final String uid = getUid();
+        final String uid = getUid(true);
         if (uid != null) {
             device.setDeviceid(uid);
         }

@@ -158,8 +158,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
 
             if (!"wap".equalsIgnoreCase(sasParams.getSource())) {
                 if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
-                    if (casInternalRequestParameters.getUidIFA() != null) {
-                        url.append("&uis=a&ui=").append(casInternalRequestParameters.getUidIFA());
+                    final String ifa = getUidIFA(false);
+                    if (ifa != null) {
+                        url.append("&uis=a&ui=").append(ifa);
                     } else if (casInternalRequestParameters.getUidSO1() != null) {
                         url.append("&uis=us&ui=").append(casInternalRequestParameters.getUidSO1());
                     } else if (casInternalRequestParameters.getUidO1() != null) {
@@ -177,7 +178,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                     } else if (!StringUtils.isBlank(casUid) && !"null".equals(casUid)) {
                         url.append("&uis=v&ui=").append(casUid);
                     } else {
-                        final String gpid = getGPID();
+                        final String gpid = getGPID(true);
                         if (gpid != null) {
                             url.append("&g=").append(gpid);
                         }

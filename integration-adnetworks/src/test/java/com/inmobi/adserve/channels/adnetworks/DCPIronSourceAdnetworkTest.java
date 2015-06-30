@@ -46,7 +46,6 @@ public class DCPIronSourceAdnetworkTest extends TestCase {
     private final String IronsourceAdvId = "IronSourceadv1";
     private final String IronSourceTokenId = "w9pR1SCLuM54sziOtvJw";
     private final String placementId = "240";
-    private final String fsPlacementId = "230";
     private RepositoryHelper repositoryHelper;
 
 
@@ -205,7 +204,7 @@ public class DCPIronSourceAdnetworkTest extends TestCase {
      sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
      sasParams.setOsMajorVersion("4.4");
      sasParams.setOsId(SASRequestParameters.HandSetOS.Android.getValue());
-     casInternalRequestParameters.setUidADT("1");
+     casInternalRequestParameters.setTrackingAllowed(true);
      casInternalRequestParameters.setGpid("gpidtest123");
      casInternalRequestParameters.setUidIFA("uidifsa123");
      sasParams.setUserAgent("Mozilla");

@@ -21,7 +21,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -102,12 +101,11 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
         if (isApp) {
             if (sasParams.getOsId() == HandSetOS.Android.getValue()) {
                 // if android : o1,uid,um5,gpid
-                String gpid = getGPID();
+                String gpid = getGPID(true);
                 if (null != gpid) {
                     appendQueryParam(url, DEVICE_ID, gpid, false);
                     appendQueryParam(url, DID_TYPE, 7, false);
-                }
-                else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+                } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                     appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidMd5(), false);
                     appendQueryParam(url, DID_TYPE, 4, false);
                 } else if (casInternalRequestParameters.getUidO1() != null) {
@@ -119,11 +117,10 @@ public class DCPWebmoblinkAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
             } else if (sasParams.getOsId() == HandSetOS.iOS.getValue()) {
                 // ios : ifa,so1 and o1 is odin1,idus as already added
-                if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                        && GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())) {
-                    appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidIFA(), false);
+                final String ifa = getUidIFA(true);
+                if (StringUtils.isNotBlank(ifa)) {
+                    appendQueryParam(url, DEVICE_ID, ifa, false);
                     appendQueryParam(url, DID_TYPE, 1, false);
-
                 } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
                     appendQueryParam(url, DEVICE_ID, casInternalRequestParameters.getUidIDUS1(), false);
                     appendQueryParam(url, DID_TYPE, 3, false);

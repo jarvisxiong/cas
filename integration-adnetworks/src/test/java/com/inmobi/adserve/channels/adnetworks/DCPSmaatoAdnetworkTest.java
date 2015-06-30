@@ -210,7 +210,7 @@ public class DCPSmaatoAdnetworkTest {
                 .setUserAgent("Mozilla/5.0 (iPod; CPU iPhone OS 6_1_5 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Mobile/10B400");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setGpid("TEST_GPID");
-        casInternalRequestParameters.setUidADT("1");
+        casInternalRequestParameters.setTrackingAllowed(true);
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final List<Long> category = new ArrayList<Long>();
         category.add(3l);

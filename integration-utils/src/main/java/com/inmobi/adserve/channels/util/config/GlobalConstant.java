@@ -22,4 +22,5 @@ public class GlobalConstant {
     public static final String CPM = "cpm";
     public static final String DISPLAY_MANAGER_INMOBI_SDK = "inmobi_sdk";
     public static final String DISPLAY_MANAGER_INMOBI_JS = "inmobi_js";
+    public static final Double MIN_BID_FLOOR = 0.05D;
 }

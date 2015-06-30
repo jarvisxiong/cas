@@ -47,7 +47,6 @@ import com.inmobi.types.InventoryType;
 @Singleton
 public class ThriftRequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
-    private static final Double MIN_BID_FLOOR = 0.05D;
 
     private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
             "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
@@ -132,7 +131,6 @@ public class ThriftRequestParser {
             if (tObject.getUser().isSetUserProfile() && tObject.getUser().getUserProfile().isSetNormalizedUserId()) {
                 params.setNormalizedUserId(tObject.getUser().getUserProfile().getNormalizedUserId());
             }
-
             // Condition to check whether user's age is less than 100
             if (yob > currentYear - 100 && yob < currentYear) {
                 final int age = currentYear - yob;
@@ -246,8 +244,8 @@ public class ThriftRequestParser {
 
             final DemandSourceType dstEnum = DemandSourceType.findByValue(dst);
             double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
-            if (MIN_BID_FLOOR >= ecpmFloor) {
-                ecpmFloor = MIN_BID_FLOOR;
+            if (GlobalConstant.MIN_BID_FLOOR >= ecpmFloor) {
+                ecpmFloor = GlobalConstant.MIN_BID_FLOOR;
                 InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
                         + InspectorStrings.BID_FLOOR_TOO_LOW);
             }
@@ -358,9 +356,10 @@ public class ThriftRequestParser {
 
     private void setUserIdParams(final CasInternalRequestParameters parameter, final UidParams uidParams) {
         final Map<UidType, String> uidMap = uidParams.getRawUidValues();
-        parameter.setUidADT(uidParams.isLimitIOSAdTracking() ? GlobalConstant.ZERO : GlobalConstant.ONE);
+        if (uidParams.isSetLimitIOSAdTracking()) {
+            parameter.setTrackingAllowed(!uidParams.isLimitIOSAdTracking());
+        }
         parameter.setUuidFromUidCookie(uidParams.getUuidFromUidCookie());
-
         for (final Entry<UidType, String> entry : uidMap.entrySet()) {
             final UidType uidType = entry.getKey();
             final String uidValue = entry.getValue();

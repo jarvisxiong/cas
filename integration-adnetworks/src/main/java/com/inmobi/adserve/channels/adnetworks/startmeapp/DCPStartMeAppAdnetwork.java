@@ -94,9 +94,9 @@ public class DCPStartMeAppAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, IP, sasParams.getRemoteHostIp(), false);
             appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
             if (sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue()) {
-                appendQueryParam(url, PDID, casInternalRequestParameters.getUidIFA(), false);
+                appendQueryParam(url, PDID, getUidIFA(false), false);
             } else {
-                appendQueryParam(url, PDID, casInternalRequestParameters.getGpid(), false);
+                appendQueryParam(url, PDID, getGPID(false), false);
             }
             appendQueryParam(url, HEIGHT, height, false);
             appendQueryParam(url, WIDTH, width, false);

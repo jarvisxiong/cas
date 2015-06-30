@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
@@ -129,7 +128,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             height = (int) Math.ceil(dim.getHeight());
 
         }
-        if (StringUtils.isBlank(getUid())) {
+        if (StringUtils.isBlank(getUid(true))) {
             LOG.debug("mandatory parameters missing for smaato so exiting adapter");
             LOG.info("Configure parameters inside Smaato returned false");
             return false;
@@ -158,9 +157,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, DIMENSION_STRICT, TRUE, false);
 
         // TODO map the udids
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-            appendQueryParam(url, IFA, casInternalRequestParameters.getUidIFA(), false);
-            appendQueryParam(url, IFA_TRACKING, casInternalRequestParameters.getUidADT(), false);
+        final String ifa = getUidIFA(false);
+        if (StringUtils.isNotBlank(ifa)) {
+            appendQueryParam(url, IFA, ifa, false);
+            appendQueryParam(url, IFA_TRACKING, casInternalRequestParameters.isTrackingAllowed() ? 1 : 0, false);
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
             appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
@@ -176,12 +176,13 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidO1(), false);
         }
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getGpid())) {
-            appendQueryParam(url, GPID, casInternalRequestParameters.getGpid(), false);
-            if(GlobalConstant.ONE.equals(casInternalRequestParameters.getUidADT())){
-                appendQueryParam(url,GPID_TRACKING,FALSE,false);
-            }else{
-                appendQueryParam(url,GPID_TRACKING,TRUE,false);
+        final String gpId = getGPID(false);
+        if (StringUtils.isNotBlank(gpId)) {
+            appendQueryParam(url, GPID, gpId, false);
+            if (casInternalRequestParameters.isTrackingAllowed()) {
+                appendQueryParam(url, GPID_TRACKING, FALSE, false);
+            } else {
+                appendQueryParam(url, GPID_TRACKING, TRUE, false);
             }
         }
 
@@ -263,11 +264,11 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                 context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
                 List<String> partnerBeacons = new ArrayList<>();
-                for (int count=0;count<ad.getBeacons().getBeacon().size();count++){
+                for (int count = 0; count < ad.getBeacons().getBeacon().size(); count++) {
                     partnerBeacons.add(ad.getBeacons().getBeacon().get(count));
                 }
-                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST,partnerBeacons);
-                //context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, ad.getBeacons().getBeacon());
+                context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST, partnerBeacons);
+                // context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, ad.getBeacons().getBeacon());
                 if (IMAGE_TYPE.equalsIgnoreCase(ad.getType()) && StringUtils.isNotBlank(ad.getLink())) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, ad.getLink());
                     t = TemplateType.IMAGE;
@@ -280,10 +281,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                         context.put(VelocityTemplateFieldConstants.TEMPLATE, vmTemplate);
                         t = TemplateType.RICH;
                     }
-                }else if(RICHMEDIA_TYPE.equalsIgnoreCase(ad.getType()) && null != ad.getMediadata()){
+                } else if (RICHMEDIA_TYPE.equalsIgnoreCase(ad.getType()) && null != ad.getMediadata()) {
                     context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, ad.getMediadata().toString());
                     t = TemplateType.HTML;
-                }else {
+                } else {
                     adStatus = NO_AD;
                     return;
                 }

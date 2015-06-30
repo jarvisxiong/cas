@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.adpool.ConnectionType;
-import com.inmobi.adserve.channels.adnetworks.rubicon.DCPRubiconAdnetwork;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -32,7 +31,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DCPRubiconAdnetwork.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DCPMarimediaAdNetwork.class);
     private static final String UA = "u";
     private static final String APP_ID = "a";
     private static final String IP_ADDRESS = "i";
@@ -186,8 +185,9 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, ANDROID_ID_SHA1, casInternalRequestParameters.getUidO1(), false);
             }
 
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getGpid())) {
-                appendQueryParam(url, ANDROID_ADVERTISING_ID, casInternalRequestParameters.getGpid(), false);
+            final String gpId = getGPID(false);
+            if (StringUtils.isNotBlank(gpId)) {
+                appendQueryParam(url, ANDROID_ADVERTISING_ID, gpId, false);
             }
         }
 
@@ -196,8 +196,9 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
                 appendQueryParam(url, UDID, casInternalRequestParameters.getUidIDUS1(), false);
             }
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
+            final String ifa = getUidIFA(false);
+            if (StringUtils.isNotBlank(ifa)) {
+                appendQueryParam(url, IDFA, ifa, false);
             }
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
                 appendQueryParam(url, UDID_MD5, casInternalRequestParameters.getUidMd5(), false);

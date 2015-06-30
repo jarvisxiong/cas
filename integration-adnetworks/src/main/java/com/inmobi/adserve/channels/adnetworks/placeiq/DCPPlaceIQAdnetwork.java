@@ -145,7 +145,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside PlaceIQ returned false");
             return false;
         }
-        final String udid = getUid();
+        final String udid = getUid(true);
         if (sasParams.getOsId() == HandSetOS.Android.getValue()) { // android
             os = ANDROID;
             isApp = true;
@@ -209,8 +209,9 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
 
         appendQueryParam(url, SIZE, String.format(SIZE_FORMAT, width, height), false);
         if (os.equalsIgnoreCase(IOS)) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())) {
-                appendQueryParam(url, IDFA, casInternalRequestParameters.getUidIFA(), false);
+            final String ifa = getUidIFA(false);
+            if (StringUtils.isNotBlank(ifa)) {
+                appendQueryParam(url, IDFA, ifa, false);
 
             }
             if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
@@ -218,7 +219,7 @@ public class DCPPlaceIQAdnetwork extends AbstractDCPAdNetworkImpl {
             }
         }
         if (os.equalsIgnoreCase(ANDROID)) {
-            final String gpid = getGPID();
+            final String gpid = getGPID(true);
             if (null != gpid) {
                 appendQueryParam(url, GPID, gpid, false);
             }

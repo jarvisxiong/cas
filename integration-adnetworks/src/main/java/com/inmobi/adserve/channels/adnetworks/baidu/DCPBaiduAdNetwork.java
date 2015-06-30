@@ -36,7 +36,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -52,23 +51,19 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
     private int height;
     private double latitude;
     private double longitude;
-    private String adSlotId=null;
-    private static final String BLANK_VAL =DEFAULT_EMPTY_STRING;
-    private static final String AD_TRACKING_ENABLED = GlobalConstant.ONE;
-    private static final String AD_SLOTID_DB_KEY="slot";
+    private String adSlotId = null;
+    private static final String BLANK_VAL = DEFAULT_EMPTY_STRING;
+    private static final String AD_SLOTID_DB_KEY = "slot";
 
-    public DCPBaiduAdNetwork(final Configuration config,
-                             final Bootstrap clientBootstrap,
-                             final HttpRequestHandlerBase baseRequestHandler,
-                             final Channel serverChannel) {
+    public DCPBaiduAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
 
     }
 
     @Override
     public boolean configureParameters() {
-        if (StringUtils.isBlank(sasParams.getRemoteHostIp())
-                || StringUtils.isBlank(sasParams.getUserAgent())
+        if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for baidu so exiting adapter");
             return false;
@@ -76,8 +71,7 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         host = config.getString("baidu.host");
         isByteResponseSupported = true;
 
-        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper
-                .querySlotSizeMapRepository(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
         if (null != slotSizeMapEntity) {
             final Dimension dim = slotSizeMapEntity.getDimension();
             width = (int) Math.ceil(dim.getWidth());
@@ -89,15 +83,13 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         if (casInternalRequestParameters.getLatLong() != null
-                && StringUtils.countMatches(
-                casInternalRequestParameters.getLatLong(), ",") > 0) {
-            String[] latlong = casInternalRequestParameters.getLatLong().split(
-                    ",");
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = Double.valueOf(latlong[0]);
             longitude = Double.valueOf(latlong[1]);
 
         }
-        String udid = getUid();
+        String udid = getUid(true);
         if (null == udid) {
             LOG.debug("mandate parameters missing for Baidu, so returning from adapter");
             LOG.info("Configure parameters inside Baidu returned false");
@@ -116,10 +108,9 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
-        if (sasParams.getOsId() != com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android.getValue() &&
-                sasParams.getOsId() != com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS.getValue()) {
-            LOG.debug("Not Android/ios request {}",
-                    getName());
+        if (sasParams.getOsId() != com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android.getValue()
+                && sasParams.getOsId() != com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS.getValue()) {
+            LOG.debug("Not Android/ios request {}", getName());
             LOG.info("Configure parameters inside Baidu returned false");
             return false;
         }
@@ -161,11 +152,10 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         builder.setApp(appBuilder);
 
         Device.Builder deviceBuilder = Device.newBuilder();
-        //Device device = new Device();
         UdId.Builder udidBuilder = UdId.newBuilder();
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA())
-                && AD_TRACKING_ENABLED.equals(casInternalRequestParameters.getUidADT())) {
-            udidBuilder.setIdfa(casInternalRequestParameters.getUidIFA());
+        final String ifa = getUidIFA(true);
+        if (StringUtils.isNotBlank(ifa)) {
+            udidBuilder.setIdfa(ifa);
         }
         deviceBuilder.setUdid(udidBuilder);
         deviceBuilder.setType(com.baidu.BaiduBidRequest.Device.Type.PHONE);
@@ -218,17 +208,14 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
             uri = new URIBuilder(uri).setPort(80).build();
         }
 
-        RequestBuilder ningRequestBuilder = new RequestBuilder(POST)
-                .setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.USER_AGENT,
-                        sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING,
-                        HttpHeaders.Values.BYTES)
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/protobuf")
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
-                .setBody(getRequest().toByteArray());
+        RequestBuilder ningRequestBuilder =
+                new RequestBuilder(POST).setUrl(uri.toString())
+                        .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                        .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                        .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                        .setHeader(HttpHeaders.Names.CONTENT_TYPE, "application/protobuf")
+                        .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                        .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(getRequest().toByteArray());
 
         LOG.debug("Baidu request: {}", ningRequestBuilder);
         return ningRequestBuilder;
@@ -260,14 +247,13 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 List<String> partnerBeacons = new ArrayList<>();
-                for (int count=0;count <responseMeta.getWinNoticeUrlCount();count++){
+                for (int count = 0; count < responseMeta.getWinNoticeUrlCount(); count++) {
                     partnerBeacons.add(responseMeta.getWinNoticeUrl(count));
                 }
                 context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST, partnerBeacons);
                 if (responseMeta.getCreativeType() == MaterialMeta.CreativeType.HTML) {
 
-                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE,
-                            ad.getHtmlSnippet());
+                    context.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, ad.getHtmlSnippet());
                 } else if (responseMeta.getCreativeType() == MaterialMeta.CreativeType.IMAGE) {
 
                     context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseMeta.getMediaUrl());

@@ -391,7 +391,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
         final Native nat = (Native) nb.buildNative();
         // TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
-        // if(!StringUtils.isEmpty(sasParams.getSdkVersion())){
+        // if(StringUtils.isNotEmpty(sasParams.getSdkVersion())){
         // nat.api.add(3);
         // }
         nat.setBattr(nativeTemplateAttributeFinder.findAttribute(new BAttrNativeType()));
@@ -415,7 +415,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // api type is always mraid
-        if (!StringUtils.isEmpty(sasParams.getSdkVersion()) && sasParams.getSdkVersion().length() > 1) {
+        if (StringUtils.isNotEmpty(sasParams.getSdkVersion()) && sasParams.getSdkVersion().length() > 1) {
             final List<Integer> apis = new ArrayList<>();
             apis.add(3);
             banner.setApi(apis);
@@ -613,10 +613,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         if (isWapSiteUACEntity) {
             final AppStore store = new AppStore();
-            if (!StringUtils.isEmpty(wapSiteUACEntity.getContentRating())) {
+            if (StringUtils.isNotEmpty(wapSiteUACEntity.getContentRating())) {
                 store.setRating(wapSiteUACEntity.getContentRating());
             }
-            if (!StringUtils.isEmpty(wapSiteUACEntity.getAppType())) {
+            if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
                 store.setCat(wapSiteUACEntity.getAppType());
             }
             if (wapSiteUACEntity.getCategories() != null && !wapSiteUACEntity.getCategories().isEmpty()) {
@@ -661,8 +661,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Spec says - If “0”, then do not track Is set to false, if “1”, then do no track is set to true in browser.
-        // Setting do not track
-        device.setDnt(GlobalConstant.ZERO.equals(casInternalRequestParameters.getUidADT()) ? 1 : 0);
+        device.setDnt(casInternalRequestParameters.isTrackingAllowed() ? 0 : 1);
 
         // Setting platform id sha1 hashed
         if (null != casInternalRequestParameters.getUidSO1()) {
@@ -684,15 +683,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
 
+        final String ifa = getUidIFA(false);
         // Setting Extension for idfa
-        if (!StringUtils.isEmpty(casInternalRequestParameters.getUidIFA())) {
-            deviceExtensions.put("idfa", casInternalRequestParameters.getUidIFA());
-            deviceExtensions.put("idfasha1", getHashedValue(casInternalRequestParameters.getUidIFA(), "SHA-1"));
-            deviceExtensions.put("idfamd5", getHashedValue(casInternalRequestParameters.getUidIFA(), "MD5"));
+        if (StringUtils.isNotEmpty(ifa)) {
+            deviceExtensions.put("idfa", ifa);
+            deviceExtensions.put("idfasha1", getHashedValue(ifa, "SHA-1"));
+            deviceExtensions.put("idfamd5", getHashedValue(ifa, "MD5"));
         }
 
-        if (!StringUtils.isEmpty(casInternalRequestParameters.getGpid())) {
-            deviceExtensions.put("gpid", casInternalRequestParameters.getGpid());
+        final String gpId = getGPID(false);
+        if (StringUtils.isNotEmpty(gpId)) {
+            deviceExtensions.put("gpid", gpId);
         }
         return device;
     }
@@ -897,10 +898,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 LOG.debug(traceMarker, "Exception while parsing response {}", e);
             }
             LOG.debug(traceMarker, "nurl is {}", nUrl);
-            if (!StringUtils.isEmpty(callbackUrl)) {
+            if (StringUtils.isNotEmpty(callbackUrl)) {
                 LOG.debug(traceMarker, "inside wn from config");
                 winUrl = callbackUrl;
-            } else if (!StringUtils.isEmpty(nUrl)) {
+            } else if (StringUtils.isNotEmpty(nUrl)) {
                 LOG.debug(traceMarker, "inside wn from nurl");
                 winUrl = nUrl;
             }
@@ -943,7 +944,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 LOG.debug(traceMarker, "BidResponse does not have seat bid object");
                 return false;
             }
-            if (!StringUtils.isEmpty(bidResponse.getCur())) {
+            if (StringUtils.isNotEmpty(bidResponse.getCur())) {
                 bidderCurrency = bidResponse.getCur();
             }
             bidPriceInLocal = bidResponse.getSeatbid().get(0).getBid().get(0).getPrice();

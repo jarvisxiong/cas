@@ -556,6 +556,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+        expect(mockCasInternalRequestParameters.isTrackingAllowed()).andReturn(true).anyTimes();
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)
                 .andReturn("IFA0000000000000000000000000000").times(2);
         expect(mockCasInternalRequestParameters.getGpid()).andReturn(null).times(5)
@@ -569,7 +570,6 @@ public class BaseAdNetworkImplTest {
         expect(mockCasInternalRequestParameters.getUidIDUS1()).andReturn(null).times(1)
                 .andReturn("IDUS1000000000000000000000000000").times(2);
         expect(mockCasInternalRequestParameters.getUid()).andReturn("UID00000000000000000000000000000").times(2);
-        expect(mockCasInternalRequestParameters.getUidADT()).andReturn("1").times(2);
 
         replayAll();
 
@@ -591,13 +591,13 @@ public class BaseAdNetworkImplTest {
         baseAdNetwork
                 .configureParameters(mockSasParam, mockCasInternalRequestParameters, mockEntity, 14L, null);
 
-        assertEquals("UID00000000000000000000000000000", baseAdNetwork.getUid());
-        assertEquals("IDUS1000000000000000000000000000", baseAdNetwork.getUid());
-        assertEquals("O1000000000000000000000000000000", baseAdNetwork.getUid());
-        assertEquals("MD500000000000000000000000000000", baseAdNetwork.getUid());
-        assertEquals("SO100000000000000000000000000000", baseAdNetwork.getUid());
-        assertEquals("GPID0000000000000000000000000000", baseAdNetwork.getUid());
-        assertEquals("IFA0000000000000000000000000000", baseAdNetwork.getUid());
+        assertEquals("UID00000000000000000000000000000", baseAdNetwork.getUid(true));
+        assertEquals("IDUS1000000000000000000000000000", baseAdNetwork.getUid(true));
+        assertEquals("O1000000000000000000000000000000", baseAdNetwork.getUid(true));
+        assertEquals("MD500000000000000000000000000000", baseAdNetwork.getUid(true));
+        assertEquals("SO100000000000000000000000000000", baseAdNetwork.getUid(true));
+        assertEquals("GPID0000000000000000000000000000", baseAdNetwork.getUid(true));
+        assertEquals("IFA0000000000000000000000000000", baseAdNetwork.getUid(true));
 
         verifyAll();
     }

@@ -121,11 +121,10 @@ public class DCPMarimediaAdNetworkTest {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        // casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setUidIFA("23e2ewq445545");
-        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setTrackingAllowed(false);
         casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -179,11 +178,10 @@ public class DCPMarimediaAdNetworkTest {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        // casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setUidIFA("23e2ewq445545");
-        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setTrackingAllowed(false);
         casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -214,11 +212,10 @@ public class DCPMarimediaAdNetworkTest {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        // casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setUidIFA("23e2ewq445545");
-        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setTrackingAllowed(false);
         casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
@@ -253,11 +250,10 @@ public class DCPMarimediaAdNetworkTest {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
 
-        // casInternalRequestParameters.blockedCategories = new ArrayList<Long>(Arrays.asList(new Long[]{50l, 51l}));
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         casInternalRequestParameters.setUidIFA("23e2ewq445545");
-        casInternalRequestParameters.setUidADT("0");
+        casInternalRequestParameters.setTrackingAllowed(false);
         casInternalRequestParameters.setUidIDUS1("202cb962ac59075b964b07152d234b70");
 
         sasParams.setRemoteHostIp("206.29.182.240");
