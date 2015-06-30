@@ -4,14 +4,11 @@ import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import com.inmobi.castest.api.LogLines;
-import com.inmobi.castest.casconfenums.def.CasConf.LogLinesRegex;
 import com.inmobi.castest.casconfenums.def.CasConf.LogStringParams;
 import com.inmobi.castest.casconfenums.impl.LogStringConf;
 import com.inmobi.castest.commons.generichelper.LogParserHelper;
 import com.inmobi.castest.dataprovider.FenderDataProvider;
 import com.inmobi.castest.utils.common.ResponseBuilder;
-import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 public class IXTest {
 
@@ -1312,7 +1309,6 @@ public class IXTest {
     // Assert.assertEquals(auctionId, resetWilburyIntKey(impressionFromBeaconUrl, siteIncId));
     // Assert.assertEquals(auctionId, resetWilburyIntKey(impressionFromClickUrl, siteIncId));
     // }
-
     @Test(testName = "Test3_Native_Layout_1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_NATIVE_LAYOUT_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         searchStringInLog = "\"native\":{\"requestobj\":{\"layout\":3";
@@ -1466,4 +1462,30 @@ public class IXTest {
         Assert.assertFalse(response.contains(responseString1), "Found " + responseString1 + "in the response");
         Assert.assertFalse(response.contains(responseString2), "Found " + responseString2 + "in the response");
     }
+
+    @Test(testName = "TEST_STUDIO_POSITIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_STUDIO_POSITIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        searchStringInLog = "Sprout Ad Received";
+        String searchStringInLog2 = "Replaced Sprout Macros";
+
+        parserOutput = LogParserHelper.logParser(searchStringInLog, searchStringInLog2);
+
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_STUDIO_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_STUDIO_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        searchStringInLog = "Sprout Ad Received";
+        String searchStringInLog2 = "Replaced Sprout Macros";
+
+        response = new String(responseBuilder.getResponseData());
+
+        Assert.assertFalse(response.contains(searchStringInLog), "Found " + searchStringInLog + "in the response");
+        Assert.assertFalse(response.contains(searchStringInLog2), "Found " + searchStringInLog + "in the response");
+    }
+
 }

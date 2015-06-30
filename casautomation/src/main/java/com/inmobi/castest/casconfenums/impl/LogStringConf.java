@@ -18,7 +18,6 @@ public class LogStringConf {
                 System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
                 break;
             }
-
             case MSG_RTBD_MAKE_AND_MANUF_DATA_SIGNALS: {
                 logLine = "\"make\":\"WHATEVER_MANUF_NAME !@#$12345\",\"model\":\"WHATEVER_MODEL_NAME !@#$12345\"";
                 System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
@@ -70,6 +69,7 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTBD_AdRR_FLAG: {
+
                 logLine = "dst:RTBD,";
                 break;
             }
@@ -78,9 +78,8 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTB_MANDATE_PARAM_MISSING: {
-                logLine =
-                        "mandate parameters missing or request format is not compatible to partner supported response"
-                                + " for dummy so exiting adapter";
+                logLine = "mandate parameters missing or request format is not compatible to partner supported response"
+                        + " for dummy so exiting adapter";
                 break;
             }
             case MSG_DCP_TAPIT_CONFIG_SUCCESS: {
@@ -91,6 +90,16 @@ public class LogStringConf {
                 logLine = "n_ads_served:1";
                 break;
             }
+
+            case MSG_DCP_SENDING_NO_AD: {
+                logLine = "Sending No ads";
+                break;
+            }
+            case MSG_DCP_TERMINATE_CONFIG_SEARCH: {
+                logLine = "Terminating request as incompatible content type";
+                break;
+            }
+
             case MSG_IX_AD_SERVED: {
                 logLine = "n_ads_served:1";
                 break;
@@ -313,14 +322,7 @@ public class LogStringConf {
                         "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
                 break;
             }
-            case MSG_DCP_SENDING_NO_AD: {
-                logLine = "Sending No ads";
-                break;
-            }
-            case MSG_DCP_TERMINATE_CONFIG_SEARCH: {
-                logLine = "Terminating request as incompatible content type";
-                break;
-            }
+
             default: {
                 logLine = "FENDER HAS NO MATCHING LOG LINE TO VALIDATE FOR";
                 break;

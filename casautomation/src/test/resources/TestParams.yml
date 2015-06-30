@@ -10,6 +10,7 @@ TEST2_1_1:
    site_sitetaxonomies : '70,71'
    site_sitetags : '70,71'
    adpool_selectedslots : '2'
+
 TEST2_2_1:
  - adpool_requestid : 'EMPTY'
    site_sitetaxonomies : '70,71'
@@ -1407,7 +1408,7 @@ TEST3_NATIVE_LAYOUT_1 :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
-  adpool_placementId : '1427434390278003'
+  adpool_placementId : '1431975542156823'
 
 TEST3_NATIVE_LAYOUT_2 :
 - testName: Native Layout 2 checks.
@@ -1420,7 +1421,7 @@ TEST3_NATIVE_LAYOUT_2 :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
-  adpool_placementId : '1427434400785597'
+  adpool_placementId : '1431976048482536'
 
 TEST3_NATIVE_LAYOUT_3 :
 - testName: Native Layout 3 checks.
@@ -1433,7 +1434,7 @@ TEST3_NATIVE_LAYOUT_3 :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
-  adpool_placementId : '1427434405546925'
+  adpool_placementId : '1431975538797857'
 
 TEST3_NATIVE_LAYOUT_4 :
 - testName: Native Layout 4 checks.
@@ -1446,7 +1447,7 @@ TEST3_NATIVE_LAYOUT_4 :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
-  adpool_placementId : '1427434433295229'
+  adpool_placementId : '1431975539707753'
 
 TEST3_NATIVE_LAYOUT_5 :
 - testName: Native Layout 5 checks.
@@ -1459,7 +1460,7 @@ TEST3_NATIVE_LAYOUT_5 :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
-  adpool_placementId : '1427434469598551'
+  adpool_placementId : '1431975540151941'
   
 TEST3_NATIVE_LAYOUT_6 :
 - testName: Native Layout 6 checks.
@@ -1472,7 +1473,7 @@ TEST3_NATIVE_LAYOUT_6 :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
-  adpool_placementId : '1427434470773952'
+  adpool_placementId : '1431975540397297'
   
 TEST3_NATIVE_LAYOUT_ADAPTER_FAIL :
 - testName:  IX adapter disabled for native checks.
@@ -1517,3 +1518,41 @@ TEST_VAST_PUBCONTROLS_BANNER_450 :
   adpool_requestedadtype : 'INTERSTITIAL'
   site_enriched_media_attributes : '0'
   adpool_responseformat : 'IMAI'
+
+TEST_VAST_PUBCONTROLS_BANNER_450 :
+- adpool_selectedslots : '14'
+  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+  device_osid : '3'
+  device_osmajorversion : '6.0'
+  adpool_requestedadtype : 'INTERSTITIAL'
+  site_enriched_media_attributes : '0'
+  adpool_responseformat : 'IMAI'
+
+TEST_STUDIO_POSITIVE :
+- os_id : '3'
+  site_type : 'PERFORMANCE'
+  site_ratings : '0,2'
+  targeting_platform : 'APP'
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  adpool_selectedslots : '15'
+  site_siteid : 'StudioSite'
+  enable_change_conf : 'true'
+  change_config_key : 'adapter.ix.sprout.uniqueIdentifierRegex'
+  change_config_val : '(?s).*data-creative[iI]d.*'
+
+TEST_STUDIO_NEGATIVE :
+- os_id : '3'
+  site_type : 'PERFORMANCE'
+  site_ratings : '0,2'
+  targeting_platform : 'APP'
+  site_sitetaxonomies : '70,71'
+  site_sitetags : '70,71'
+  new_category : '70,71'
+  adpool_selectedslots : '15'
+  site_siteid : 'StudioSite'
+  enable_change_conf : 'true'
+  change_config_key : 'adapter.ix.sprout.uniqueIdentifierRegex'
+  change_config_val : 'AbraKaDabra'
