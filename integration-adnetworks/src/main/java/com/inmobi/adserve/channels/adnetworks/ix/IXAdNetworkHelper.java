@@ -3,6 +3,7 @@
  */
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import static com.inmobi.adserve.channels.api.BaseAdNetworkImpl.getHashedValue;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LAT;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LNG;
@@ -14,6 +15,11 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_GE
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.OPEN_LP_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.RECORD_EVENT_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSION_ID;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.DATA;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.IMAGE;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.TITLE;
@@ -138,8 +144,20 @@ public class IXAdNetworkHelper {
         // No function is being provided
         addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
 
-        // Non Sprout Macro
+        final String userId = StringUtils.isNotEmpty(casInternal.getUidIFA()) ? casInternal.getUidIFA() :
+                StringUtils.isNotEmpty(casInternal.getGpid()) ? casInternal.getGpid() : null;
+
+        // Non Sprout Macros
         addSproutMacroToList(macros, substitutions, IMP_CB, casInternal.getAuctionId());
+
+        if (null != userId) {
+            final String userIdMD5 = getHashedValue(userId, MD5);
+            final String userIdSHA1 = getHashedValue(userId, SHA1);
+            
+            addSproutMacroToList(macros, substitutions, USER_ID, userIdMD5);
+            addSproutMacroToList(macros, substitutions, USER_ID_MD5_HASHED, userIdMD5);
+            addSproutMacroToList(macros, substitutions, USER_ID_SHA1_HASHED, userIdSHA1);
+        }
 
         final String[] macroArray = macros.toArray(new String[macros.size()]);
         final String[] substitutionsArray = substitutions.toArray(new String[substitutions.size()]);

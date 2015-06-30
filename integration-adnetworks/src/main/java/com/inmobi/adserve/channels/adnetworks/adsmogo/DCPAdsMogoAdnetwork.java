@@ -21,6 +21,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -194,7 +195,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         LOG.debug("AdsMogo url is {}", url);
         final URI requestUrl = new URI(url.toString());
         final StringBuilder query = new StringBuilder(URLDecoder.decode(requestUrl.getQuery())).append(authSecret);
-        authSignature = getHashedValue(query.toString(), "MD5");
+        authSignature = getHashedValue(query.toString(), GlobalConstant.MD5);
 
         return requestUrl;
 

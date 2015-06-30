@@ -157,11 +157,11 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.google.protobuf.tools</groupId>
+				<groupId>de.softwareforge.mojo</groupId>
 				<artifactId>maven-protoc-plugin</artifactId>
-				<version>0.1.10</version>
+				<version>0.1.11</version>
 				<configuration>
-                    			<protocExecutable>/usr/local/bin/protoc-2.6.1</protocExecutable>
+					<protocExecutable>/usr/local/bin/protoc-2.6.1</protocExecutable>
 				</configuration>
 				<executions>
 					<execution>

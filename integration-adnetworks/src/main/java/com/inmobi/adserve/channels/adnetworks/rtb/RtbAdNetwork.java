@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -687,8 +690,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Setting Extension for idfa
         if (StringUtils.isNotEmpty(ifa)) {
             deviceExtensions.put("idfa", ifa);
-            deviceExtensions.put("idfasha1", getHashedValue(ifa, "SHA-1"));
-            deviceExtensions.put("idfamd5", getHashedValue(ifa, "MD5"));
+            deviceExtensions.put("idfasha1", getHashedValue(ifa, SHA1));
+            deviceExtensions.put("idfamd5", getHashedValue(ifa, MD5));
         }
 
         final String gpId = getGPID(false);

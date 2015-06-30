@@ -851,7 +851,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
     }
 
-    protected String getHashedValue(final String message, final String hashingType) {
+    public static String getHashedValue(final String message, final String hashingType) {
         try {
             final MessageDigest md = MessageDigest.getInstance(hashingType);
             final byte[] array = md.digest(message.getBytes());
