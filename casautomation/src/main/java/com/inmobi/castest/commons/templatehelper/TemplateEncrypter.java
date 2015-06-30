@@ -12,20 +12,20 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 
 public class TemplateEncrypter {
 
-    public static String getEncryptedResponse(String vastXML) throws InvalidMessageException,
+    public static String getEncryptedResponse(final String vastXML) throws InvalidMessageException,
             UnsupportedEncodingException {
-        byte[] adResponsebyte = vastXML.getBytes(Charset.forName("UTF-8"));
-        byte[] encryptedByte = encryptResponse(adResponsebyte);
-        String adResponseStr = new String(encryptedByte, "UTF-8");
+        final byte[] adResponsebyte = vastXML.getBytes(Charset.forName("UTF-8"));
+        final byte[] encryptedByte = encryptResponse(adResponsebyte);
+        final String adResponseStr = new String(encryptedByte, "UTF-8");
         System.out.println("Encrytpted Ad Response : " + adResponseStr);
         return adResponseStr;
     }
 
-    public static void getEncryptedResponseHosted(String vastXML) throws InvalidMessageException,
+    public static void getEncryptedResponseHosted(final String vastXML) throws InvalidMessageException,
             UnsupportedEncodingException, InterruptedException {
-        byte[] adResponsebyte = vastXML.getBytes(Charset.forName("UTF-8"));
-        byte[] encryptedByte = encryptResponse(adResponsebyte);
-        String adResponseStr = new String(encryptedByte, "UTF-8");
+        final byte[] adResponsebyte = vastXML.getBytes(Charset.forName("UTF-8"));
+        final byte[] encryptedByte = encryptResponse(adResponsebyte);
+        final String adResponseStr = new String(encryptedByte, "UTF-8");
         System.out.println("Encrytpted Ad Response : " + adResponseStr);
 
         Spark.post("/eres", (req, res) -> {
@@ -41,14 +41,14 @@ public class TemplateEncrypter {
 
     public static byte[] encryptResponse(byte[] byteResponse) throws InvalidMessageException {
 
-        InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
+        final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
 
         // key to encrypt
-        String key = "abcdefghijklmnop";
-        byte[] byteKey = key.getBytes(Charset.forName("UTF-8"));
+        final String key = "abcdefghijklmnop";
+        final byte[] byteKey = key.getBytes(Charset.forName("UTF-8"));
         try {
             byteResponse = inmobiSession.write(byteResponse, byteKey, byteKey);
-        } catch (InmobiSecureException e) {
+        } catch (final InmobiSecureException e) {
             System.out.println("Exception while encrypting response from {}" + e);
             throw new RuntimeException(e);
         }

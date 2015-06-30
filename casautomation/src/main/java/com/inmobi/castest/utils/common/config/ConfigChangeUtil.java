@@ -15,8 +15,7 @@ import com.inmobi.castest.utils.common.CasServerDetails;
  */
 public class ConfigChangeUtil {
 
-    public CasServerDetails server = new CasServerDetails();
-    public String CasServer = server.getCasServerEndPoint();
+    public String CasServer = CasServerDetails.getCasServerEndPoint();
     private final BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
     private String getJsonKey() throws IOException {

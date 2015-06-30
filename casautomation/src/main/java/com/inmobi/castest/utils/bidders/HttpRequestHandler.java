@@ -17,12 +17,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
-import org.apache.thrift.TBase;
-import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import com.inmobi.castest.utils.bidders.stats.InspectorStats;
-import com.inmobi.castest.utils.bidders.stats.InspectorStrings;
+
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -30,6 +25,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.thrift.TBase;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TSimpleJSONProtocol;
+
+import com.inmobi.castest.utils.bidders.stats.InspectorStats;
+import com.inmobi.castest.utils.bidders.stats.InspectorStrings;
 
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 

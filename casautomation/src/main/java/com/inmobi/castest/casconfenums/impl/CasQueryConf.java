@@ -57,7 +57,7 @@ public class CasQueryConf {
                                     + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
                                     + adGroup.get("adgroup_id") + "',1,now(),2)";
                 } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
-                        && adGroup.get("adpool_selectedslots").equals("14")) {
+                        && adGroup.get("slot_ids").contains("14")) {
                     queryString =
                             "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                                     + "',(select max(inc_id) from wap_channel_ad)+1,11,'"
@@ -82,7 +82,7 @@ public class CasQueryConf {
                             "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
                                     + "',is_banner_ad=9 where id = '" + adGroup.get("ad_id") + "'";
                 } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
-                        && adGroup.get("slot_ids").equals("14")) {
+                        && adGroup.get("slot_ids").contains("14")) {
                     queryString =
                             "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
                                     + "',is_banner_ad=11 where id = '" + adGroup.get("ad_id") + "'";

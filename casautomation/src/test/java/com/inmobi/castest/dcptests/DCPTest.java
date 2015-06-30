@@ -438,10 +438,11 @@ public class DCPTest {
 
         parserOutput = LogParserHelper.logParser("sdk-version : a500");
 
-        LogLines responseLogLine = LogParserHelper.queryForLogs("Wrapping in JSON for SDK > 500. Wrapped Response is:");
-        String responseGuid = responseLogLine.applyRegex("test");
+        final LogLines responseLogLine =
+                LogParserHelper.queryForLogs("Wrapping in JSON for SDK > 500. Wrapped Response is:");
+        final String responseGuid = responseLogLine.applyRegex("test");
         String pubContent = responseLogLine.applyRegex("\\{.+\\}", "pubContent\":\".+\"\\}", ":\".+\"", "\".+\"");
-        String googleAdxStaticTag =
+        final String googleAdxStaticTag =
                 "<script type=\"text/javascript\">google_ad_client = \"ca-pub-4422296448758371"
                         + "\";google_ad_slot = \"9805306843\";google_ad_width = 320;google_ad_height = 50;</script>";
 

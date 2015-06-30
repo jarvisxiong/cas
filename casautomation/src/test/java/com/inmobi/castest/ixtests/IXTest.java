@@ -1414,8 +1414,8 @@ public class IXTest {
     @Test(testName = "TEST_VAST_HAPPY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_VAST_HAPPY(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
-        String responseString1 = "<VASTAdTagURI>";
-        String responseString2 = "<\\/VASTAdTagURI>";
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
 
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
         response = new String(responseBuilder.getResponseData());
@@ -1431,8 +1431,8 @@ public class IXTest {
     @Test(testName = "TEST_VAST_SDKVERSION_440", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_VAST_SDKVERSION_440(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
-        String responseString1 = "<VASTAdTagURI>";
-        String responseString2 = "<\\/VASTAdTagURI>";
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
 
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
         response = new String(responseBuilder.getResponseData());
@@ -1449,8 +1449,8 @@ public class IXTest {
     public void TEST_VAST_PUBCONTROLS_BANNER_450(final String x, final ResponseBuilder responseBuilder)
             throws Exception {
         /* Deriving the parser output to assert for */
-        String responseString1 = "<VASTAdTagURI>";
-        String responseString2 = "<\\/VASTAdTagURI>";
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
 
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
         response = new String(responseBuilder.getResponseData());
@@ -1461,6 +1461,44 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
         Assert.assertFalse(response.contains(responseString1), "Found " + responseString1 + "in the response");
         Assert.assertFalse(response.contains(responseString2), "Found " + responseString2 + "in the response");
+    }
+
+    @Test(testName = "TEST_IX_JSAC_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_JSAC_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        /* Deriving the parser output to assert for */
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_API_ANDROID_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_API_ANDROID_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        /* Deriving the parser output to assert for */
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+
+    @Test(testName = "TEST_IX_API_IOS_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_API_IOS_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        /* Deriving the parser output to assert for */
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_STUDIO_POSITIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)

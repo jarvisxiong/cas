@@ -78,8 +78,9 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTB_MANDATE_PARAM_MISSING: {
-                logLine = "mandate parameters missing or request format is not compatible to partner supported response"
-                        + " for dummy so exiting adapter";
+                logLine =
+                        "mandate parameters missing or request format is not compatible to partner supported response"
+                                + " for dummy so exiting adapter";
                 break;
             }
             case MSG_DCP_TAPIT_CONFIG_SUCCESS: {

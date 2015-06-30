@@ -2,6 +2,7 @@ package com.inmobi.castest.utils.bidders;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.rtb.BannerExtVideo;

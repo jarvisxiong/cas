@@ -912,7 +912,7 @@ public class AdserveBackfillRequest {
 
     public static IntegrationType getIntegrationType(final String integrationType) {
         if (null != integrationType) {
-            return IntegrationType.valueOf(integrationType);
+            return IntegrationType.valueOf(integrationType.trim().toUpperCase());
         }
         return null;
     }

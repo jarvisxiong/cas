@@ -1,12 +1,14 @@
 package com.inmobi.castest.utils.bidders;
 
-import com.inmobi.adserve.adpool.RequestedAdType;
-import org.apache.thrift.TBase;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import org.apache.thrift.TBase;
+
+import com.inmobi.adserve.adpool.RequestedAdType;
 
 /**
  * Created by aartika.rai on 07/11/14.

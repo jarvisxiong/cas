@@ -584,8 +584,6 @@ TEST1_34_1:
    carriercountry : '94'
    adpool_selectedslots : '2'
 
-
-
 TEST1_34_2:
  - testName : 'IMAI_NOAd_Response_status'
    os_id : '5'
@@ -601,8 +599,6 @@ TEST1_34_2:
    geo_countryid : '1' #for req
    adpool_selectedslots : '2'
 
-
-
 TEST1_35_1:
  - testName : 'HTML_Ad_Response_status'
    os_id : '3'
@@ -616,8 +612,6 @@ TEST1_35_1:
    maxCasRequestCounter : '1'
    carriercountry : '94'
    adpool_selectedslots : '2'
-
-
 
 TEST1_35_2:
  - testName : 'HTML_Ad_Response_status'
@@ -1518,17 +1512,20 @@ TEST_VAST_PUBCONTROLS_BANNER_450 :
   adpool_requestedadtype : 'INTERSTITIAL'
   site_enriched_media_attributes : '0'
   adpool_responseformat : 'IMAI'
-
-TEST_VAST_PUBCONTROLS_BANNER_450 :
-- adpool_selectedslots : '14'
-  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
-  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
-  device_osid : '3'
-  device_osmajorversion : '6.0'
-  adpool_requestedadtype : 'INTERSTITIAL'
-  site_enriched_media_attributes : '0'
-  adpool_responseformat : 'IMAI'
-
+  
+TEST_IX_JSAC_INTEGRATION_TYPE : 
+- integration_type : 'JSAC'
+  adpool_selectedslots : '15'
+  adpool_responseformat : 'HTML'
+TEST_IX_API_ANDROID_INTEGRATION_TYPE : 
+- integration_type : 'ANDROID_API'
+  adpool_selectedslots : '15'
+  adpool_responseformat : 'HTML'
+TEST_IX_API_IOS_INTEGRATION_TYPE :
+- integration_type : 'IOS_API'
+  adpool_selectedslots : '15'
+  adpool_responseformat : 'HTML'
+  
 TEST_STUDIO_POSITIVE :
 - os_id : '3'
   site_type : 'PERFORMANCE'

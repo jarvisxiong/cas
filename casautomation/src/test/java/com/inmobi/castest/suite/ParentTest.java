@@ -1,6 +1,7 @@
 package com.inmobi.castest.suite;
 
 import org.testng.annotations.BeforeSuite;
+
 import com.inmobi.castest.utils.bidders.Main;
 import com.inmobi.castest.utils.common.DummyBidderDetails;
 
