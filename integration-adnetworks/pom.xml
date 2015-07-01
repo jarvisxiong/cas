@@ -160,10 +160,9 @@
 				<groupId>com.google.protobuf.tools</groupId>
 				<artifactId>maven-protoc-plugin</artifactId>
 				<version>0.4.2</version>
-				<!--<extensions>true</extensions>-->
+				<extensions>true</extensions>
 				<configuration>
-					<!--<protocArtifact>com.google.protobuf:protoc:2.6.1:exe:${os.detected.classifier}</protocArtifact>-->
-					<protocExecutable>/usr/local/bin/protoc-2.6.1</protocExecutable>
+					<protocArtifact>com.google.protobuf:protoc:2.6.1:exe:${os.detected.classifier}</protocArtifact>
 				</configuration>
 				<executions>
 					<execution>
@@ -174,13 +173,13 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<!--<extensions>
+		<extensions>
 			<extension>
 				<groupId>kr.motd.maven</groupId>
 				<artifactId>os-maven-plugin</artifactId>
 				<version>1.2.3.Final</version>
 			</extension>
-		</extensions>-->
+		</extensions>
 	</build>
 	<pluginRepositories>
 		<pluginRepository>
