@@ -1398,7 +1398,6 @@ public class IXTest {
     @Test(testName = "Test3_Native_Layout_Adapter_Fail", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_NATIVE_LAYOUT_ADAPTER_FAIL(final String x, final ResponseBuilder responseBuilder)
             throws Exception {
-        /* Deriving the parser output to assert for */
 
         parserOutput =
                 LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL),
@@ -1406,7 +1405,20 @@ public class IXTest {
                         LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL2));
 
         Reporter.log(parserOutput, true);
-        // System.out.println("ParserOutput : " + parserOutput);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "Test_Native_Non_Native_Site", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_NATIVE_NON_NATIVE_SITE(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+
+        searchStringInLog = "This placement id 123456 doesn't have native template";
+        parserOutput =
+                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
+                        LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),searchStringInLog);
+
+        Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1526,4 +1538,16 @@ public class IXTest {
         Assert.assertFalse(response.contains(searchStringInLog2), "Found " + searchStringInLog + "in the response");
     }
 
+    @Test(testName = "TEST_ZONE_ID_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_ZONE_ID_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        searchStringInLog = "zone id not present, will say false";
+
+        parserOutput =
+                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
+                        searchStringInLog);
+
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
 }

@@ -1482,6 +1482,19 @@ TEST3_NATIVE_LAYOUT_ADAPTER_FAIL :
   change_config_val : 'false'
   adpool_placementId: '1427434470773952'
 
+TEST_NATIVE_NON_NATIVE_SITE :
+- testName:  IX adapter fails for non native placement id.
+  device_osid : '5' #forreq
+  adpool_selectedslots : '0'
+  site_inventorytype : 'APP' #forreq
+  site_siteid : 'NonNativeSiteID'
+  site_publisherid : '4028cb1e35513d9b0135a9d3b4b21d77'
+  adpool_responseformat : 'NATIVE'
+  enable_change_conf : 'true'
+  change_config_key : 'adapter.ix.nativeSupported'
+  change_config_val : 'true'
+  adpool_placementId: '123456'
+
 TEST_VAST_HAPPY : 
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
@@ -1539,6 +1552,8 @@ TEST_STUDIO_POSITIVE :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.sprout.uniqueIdentifierRegex'
   change_config_val : '(?s).*data-creative[iI]d.*'
+  geo_zipids : '12345'
+
 
 TEST_STUDIO_NEGATIVE :
 - os_id : '3'
@@ -1553,3 +1568,16 @@ TEST_STUDIO_NEGATIVE :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.sprout.uniqueIdentifierRegex'
   change_config_val : 'AbraKaDabra'
+
+TEST_ZONE_ID_FAIL :
+- adpool_selectedslots : '15'
+  site_inventorytype : 'WAP' #forreq
+  site_siteid : '5f0eb5b2200740b7828cf78f9d5e1c1c' #trans
+  site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #tran
+  site_sitetaxonomies : '9'
+  site_sitetags : '9'
+  new_category : '9'
+  additional_params : '{"mime":"html","70": "160214","site": "38132"}'
+
+
+

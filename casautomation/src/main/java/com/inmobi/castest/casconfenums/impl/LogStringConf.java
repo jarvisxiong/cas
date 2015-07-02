@@ -78,9 +78,8 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTB_MANDATE_PARAM_MISSING: {
-                logLine =
-                        "mandate parameters missing or request format is not compatible to partner supported response"
-                                + " for dummy so exiting adapter";
+                logLine = "mandate parameters missing or request format is not compatible to partner supported response"
+                        + " for dummy so exiting adapter";
                 break;
             }
             case MSG_DCP_TAPIT_CONFIG_SUCCESS: {
@@ -187,7 +186,7 @@ public class LogStringConf {
             }
             case MSG_IX_UA: {
                 logLine =
-                        "\"device\":{\"lmt\":1,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
+                        "\"device\":{\"lmt\":0,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
                                 + "AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36\"";
                 break;
             }
@@ -312,6 +311,10 @@ public class LogStringConf {
             }
             case MSG_IX_ADAPTER_CONFIG_FAIL2: {
                 logLine = "Configure parameters inside IX returned false ix: BasicParams Not Available";
+                break;
+            }
+            case MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL: {
+                logLine = "Configure parameters inside IX returned false ix: Impression Obj is null";
                 break;
             }
             case MSG_IX_CREATIVE_NATIVE: {
