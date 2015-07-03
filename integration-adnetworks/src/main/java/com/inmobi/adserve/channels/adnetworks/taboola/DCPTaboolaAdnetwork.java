@@ -83,9 +83,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside tabooladcp returned false");
             return false;
         }
-        host = config.getString("taboola.host");
+        host = String.format(config.getString("taboola.host"), externalSiteId);
         iconUrl = config.getString("taboola.icon");
-        notificationUrl = config.getString("taboola.notification");
+        notificationUrl = String.format(config.getString("taboola.notification"),externalSiteId);
         if (selectedSlotId != 0) {
             LOG.info(traceMarker, "Configure parameters inside Taboola returned false as the slot size is not zero");
             return false;
