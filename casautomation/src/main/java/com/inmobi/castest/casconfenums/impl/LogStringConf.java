@@ -331,11 +331,14 @@ public class LogStringConf {
                 logLine = "\"target\":{\"packages\":[\"10002\",\"10003\"]}";
                 break;
             }
+            case MSG_IX_PACKAGE_CSID2: {
+                logLine = "\"target\":{\"packages\":[\"10003\",\"10002\"]}";
+                break;
+            }
             case MSG_IX_PACKAGE_NORMAL: {
                 logLine = "\"target\":{\"packages\":[\"10001\"]";
                 break;
             }
-
             default: {
                 logLine = "FENDER HAS NO MATCHING LOG LINE TO VALIDATE FOR";
                 break;

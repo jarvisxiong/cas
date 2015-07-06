@@ -1550,10 +1550,13 @@ public class IXTest {
     @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_PACKAGES_CSIDDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
+        String parserOutput2;
+
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_PACKAGE_CSID));
         Reporter.log(parserOutput, true);
+        parserOutput2 = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_PACKAGE_CSID2));
+        Assert.assertTrue(parserOutput.equals("PASS") || parserOutput2.equals("PASS"));
 
-        Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
