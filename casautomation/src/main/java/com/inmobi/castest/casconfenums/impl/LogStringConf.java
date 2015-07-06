@@ -78,8 +78,9 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTB_MANDATE_PARAM_MISSING: {
-                logLine = "mandate parameters missing or request format is not compatible to partner supported response"
-                        + " for dummy so exiting adapter";
+                logLine =
+                        "mandate parameters missing or request format is not compatible to partner supported response"
+                                + " for dummy so exiting adapter";
                 break;
             }
             case MSG_DCP_TAPIT_CONFIG_SUCCESS: {
@@ -324,6 +325,14 @@ public class LogStringConf {
             case MSG_IX_VAST_MEDIA_PREFS: {
                 logLine =
                         "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
+                break;
+            }
+            case MSG_IX_PACKAGE_CSID: {
+                logLine = "\"target\":{\"packages\":[\"10002\",\"10003\"]}";
+                break;
+            }
+            case MSG_IX_PACKAGE_NORMAL: {
+                logLine = "\"target\":{\"packages\":[\"10001\"]";
                 break;
             }
 

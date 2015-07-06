@@ -126,9 +126,21 @@ public class WAPGroupDBManipulation {
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertPricingEngine, wapChannelAdgroupObject));
     }
 
-    public static void main(final String[] args) {
-        // TODO Auto-generated method stub
+    public static void DeleteIXPackageData(final Map<String, String> wapChannelAdgroupObject,
+            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_IX_PACKAGE_DEALS, wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_IX_PACKAGES, wapChannelAdgroupObject));
 
     }
 
+    public static void InsertIXPackageData(final Map<String, String> wapChannelAdgroupObject,
+            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_IX_PACKAGES, wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_IX_PACKAGE_DEALS, wapChannelAdgroupObject));
+        final int pack_int = 1 + Integer.parseInt(wapChannelAdgroupObject.get("package_id"));
+        wapChannelAdgroupObject.put("package_id", Integer.toString(pack_int));
+
+    }
 }

@@ -1409,14 +1409,14 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test_Native_Non_Native_Site", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_NATIVE_NON_NATIVE_SITE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    @Test(testName = "TEST_NATIVE_NON_NATIVE_SITE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_NATIVE_NON_NATIVE_SITE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         searchStringInLog = "This placement id 123456 doesn't have native template";
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),searchStringInLog);
+                LogParserHelper.logParser(
+                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
+                        LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
 
@@ -1517,7 +1517,7 @@ public class IXTest {
     public void TEST_STUDIO_POSITIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         searchStringInLog = "Sprout Ad Received";
-        String searchStringInLog2 = "Replaced Sprout Macros";
+        final String searchStringInLog2 = "Replaced Sprout Macros";
 
         parserOutput = LogParserHelper.logParser(searchStringInLog, searchStringInLog2);
 
@@ -1530,7 +1530,7 @@ public class IXTest {
     public void TEST_STUDIO_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         searchStringInLog = "Sprout Ad Received";
-        String searchStringInLog2 = "Replaced Sprout Macros";
+        final String searchStringInLog2 = "Replaced Sprout Macros";
 
         response = new String(responseBuilder.getResponseData());
 
@@ -1538,13 +1538,69 @@ public class IXTest {
         Assert.assertFalse(response.contains(searchStringInLog2), "Found " + searchStringInLog + "in the response");
     }
 
+    @Test(testName = "TEST_IX_PACKAGES_NORMALDEAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_PACKAGES_NORMALDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_PACKAGE_NORMAL));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_PACKAGES_CSIDDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_PACKAGE_CSID));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_PACKAGE_CSID));
+        response = new String(responseBuilder.getResponseData());
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("FAIL"));
+    }
+
+    // @Test(testName = "TEST_IX_PACKAGES_MANUFDEAL", dataProvider = "fender_ix_dp", dataProviderClass =
+    // FenderDataProvider.class)
+    // public void TEST_IX_PACKAGES_MANUFDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    //
+    // // searchStringInLog = "Sprout Ad Received";
+    // // String searchStringInLog2 = "Replaced Sprout Macros";
+    // //
+    // // response = new String(responseBuilder.getResponseData());
+    // //
+    // // Assert.assertFalse(response.contains(searchStringInLog), "Found " + searchStringInLog + "in the response");
+    // // Assert.assertFalse(response.contains(searchStringInLog2), "Found " + searchStringInLog + "in the response");
+    // }
+    //
+    // @Test(testName = "TEST_IX_PACKAGES_MODELID_WIFI_DEAL", dataProvider = "fender_ix_dp", dataProviderClass =
+    // FenderDataProvider.class)
+    // public void TEST_IX_PACKAGES_MODELID_WIFI_DEAL(final String x, final ResponseBuilder responseBuilder)
+    // throws Exception {
+    //
+    // // searchStringInLog = "Sprout Ad Received";
+    // // String searchStringInLog2 = "Replaced Sprout Macros";
+    // //
+    // // response = new String(responseBuilder.getResponseData());
+    // //
+    // // Assert.assertFalse(response.contains(searchStringInLog), "Found " + searchStringInLog + "in the response");
+    // // Assert.assertFalse(response.contains(searchStringInLog2), "Found " + searchStringInLog + "in the response");
+    // }
     @Test(testName = "TEST_ZONE_ID_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_ZONE_ID_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         searchStringInLog = "zone id not present, will say false";
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
+                LogParserHelper.logParser(
+                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
                         searchStringInLog);
 
         Reporter.log(parserOutput, true);

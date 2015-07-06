@@ -6,6 +6,7 @@ package com.inmobi.castest.casconfenums.impl;
 
 import java.util.Map;
 
+import com.inmobi.castest.casconfenums.def.CasConf;
 import com.inmobi.castest.casconfenums.def.QueryConf.Query;
 
 public class CasQueryConf {
@@ -248,13 +249,13 @@ public class CasQueryConf {
             }
             case DELETE_IX_PACKAGES: {
 
-                queryString = "delete from ix_packages where modified_by ='Fender'";
+                queryString = "Delete from ix_packages where description = 'Fender_Driven'";
                 System.out.println(queryString);
                 break;
             }
             case DELETE_IX_PACKAGE_DEALS: {
 
-                queryString = "delete from ix_package_deals where modified_by ='Fender'";
+                queryString = "delete from ix_package_deals where created_by ='Fender'";
                 System.out.println(queryString);
                 break;
             }
@@ -303,12 +304,32 @@ public class CasQueryConf {
                 break;
             }
             case INSERT_IX_PACKAGES: {
-                queryString = "";
+                final String csidParam =
+                        CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getCSIDParamName() != null
+                                ? CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getCSIDParamName()
+                                : "";
+                final String manufParam =
+                        CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getManufModelParamName() != null
+                                ? CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id"))
+                                        .getManufModelParamName() : "[]";
+                queryString =
+                        "insert into ix_packages(id, name, description,rp_data_segment_id,pmp_class,country_ids, inventory_types, os_ids, carrier_ids,site_categories,connection_types,app_store_categories, sdk_versions,site_ids, zip_codes, cs_ids, scheduled_tods, placement_ad_types, placement_slot_ids,is_active,data_vendor_cost,city_ids, geo_source_types,os_version_targeting , dmp_filter_expression , manuf_model_targeting) values ("
+                                + adGroup.get("package_id")
+                                + ",'Fender_Deal','Fender_Driven','"
+                                + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName()
+                                + "','RIGHT_TO_FIRST_REFUSAL','{"
+                                + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getCountryId()
+                                + "}','{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','{}','{}','{}','{}','{}','{BANNER}','{}','t',0,'{}','{}', '[{\"osId\":3, \"range\":[]},{\"osId\":5, \"range\":[]}]' , '"
+                                + csidParam + "','" + manufParam + "')";
                 System.out.println(queryString);
                 break;
             }
             case INSERT_IX_PACKAGE_DEALS: {
-                queryString = "";
+                queryString =
+                        "Insert into ix_package_deals (rp_deal_id, package_id, created_by,access_type, deal_floor, modified_on) values ('"
+                                + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName()
+                                + "'," + adGroup.get("package_id")
+                                + ",'Fender','RIGHT_TO_FIRST_REFUSAL_DEAL',1, now())";
                 System.out.println(queryString);
                 break;
             }
