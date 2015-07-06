@@ -20,6 +20,11 @@ public class WAPChannelAdgroupVitals {
         wapChannelAdGroup.put("carrier_country", "94");
         wapChannelAdGroup.put("new_category", "70,71");
         wapChannelAdGroup.put("adpool_responseformat", "imai");
+        if (wapChannelAdGroup.get("dst").equals("8")) {
+            wapChannelAdGroup.put("additional_params",
+                    "'{\"mime\":\"html\",\"default\": \"160214\",\"site\": \"38132\"}'");
+
+        }
         return wapChannelAdGroup;
 
     }
@@ -31,11 +36,7 @@ public class WAPChannelAdgroupVitals {
         wapChannelAdGroup.put("adgroup_id", wapChannelAdGroup.get("fender_test_case_id"));
         wapChannelAdGroup.put("status", "true");
 
-        if (wapChannelAdGroup.get("dst").equals("8")) {
-            wapChannelAdGroup.put("additional_params",
-                    "'{\"mime\":\"html\",\"default\": \"160214\",\"site\": \"38132\"}'");
 
-        }
 
         return wapChannelAdGroup;
 

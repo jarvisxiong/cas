@@ -10,7 +10,11 @@ public class RefineWapAdGroupData {
                 wapChnAdGrp.put("rc_list", "{" + wapChnAdGrp.get("carrier_country") + "}");
             }
         }
-
+        if (wapChnAdGrp.get("geo_countryid") != null) {
+            if (!wapChnAdGrp.get("geo_countryid").contains("{")) {
+                wapChnAdGrp.put("rc_list", "{" + wapChnAdGrp.get("geo_countryid") + "}");
+            }
+        }
         // 3= android ,5= ios
         if (wapChnAdGrp.get("os_id") != null) {
             wapChnAdGrp.put("os_version_targeting", "{\"os\":[{\"id\":" + wapChnAdGrp.get("os_id")

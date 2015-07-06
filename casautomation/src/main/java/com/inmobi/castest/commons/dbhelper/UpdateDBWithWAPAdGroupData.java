@@ -1,5 +1,6 @@
 package com.inmobi.castest.commons.dbhelper;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -90,7 +91,9 @@ public class UpdateDBWithWAPAdGroupData {
      */
 
     public static void updateDBWithAllData() throws Exception {
+
         final HashMap<String, String> testCasesFromDataFile = YamlDataIOHelper.readTestIndex();
+
         System.out.println(testCasesFromDataFile);
 
         for (final String key : testCasesFromDataFile.keySet()) {
@@ -99,9 +102,21 @@ public class UpdateDBWithWAPAdGroupData {
 
     }
 
+    public static void updateDBWithIXPackageData() throws ClassNotFoundException, SQLException {
+
+        final HashMap<String, String> ixPackageData = new HashMap<String, String>();
+        ixPackageData.put("package_id", "10001");
+        WAPGroupDBManipulation.DeleteIXPackageData(ixPackageData, "");
+        while (Integer.parseInt(ixPackageData.get("package_id")) <= 10005) {
+            WAPGroupDBManipulation.InsertIXPackageData(ixPackageData, "");
+        }
+
+    }
+
     public static void main(final String[] args) throws Exception {
 
         updateDBWithAllData();
+        updateDBWithIXPackageData();
         RepoRefreshHelper.RefreshRepo();
 
     }

@@ -187,7 +187,7 @@ public class LogStringConf {
             }
             case MSG_IX_UA: {
                 logLine =
-                        "\"device\":{\"lmt\":1,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
+                        "\"device\":{\"lmt\":0,\"ua\":\"Mozilla/5.0(Linux;Android4.4.2;SM-G900TBuild/KOT49H)"
                                 + "AppleWebKit/537.36(KHTML,likeGecko)Version/4.0Chrome/30.0.0.0MobileSafari/537.36\"";
                 break;
             }
@@ -314,6 +314,10 @@ public class LogStringConf {
                 logLine = "Configure parameters inside IX returned false ix: BasicParams Not Available";
                 break;
             }
+            case MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL: {
+                logLine = "Configure parameters inside IX returned false ix: Impression Obj is null";
+                break;
+            }
             case MSG_IX_CREATIVE_NATIVE: {
                 logLine = "Creative type is : NATIVE";
                 break;
@@ -321,6 +325,14 @@ public class LogStringConf {
             case MSG_IX_VAST_MEDIA_PREFS: {
                 logLine =
                         "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
+                break;
+            }
+            case MSG_IX_PACKAGE_CSID: {
+                logLine = "\"target\":{\"packages\":[\"10002\",\"10003\"]}";
+                break;
+            }
+            case MSG_IX_PACKAGE_NORMAL: {
+                logLine = "\"target\":{\"packages\":[\"10001\"]";
                 break;
             }
 

@@ -37,6 +37,7 @@ import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.adserve.adpool.UidParams;
 import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.adpool.User;
+import com.inmobi.adserve.adpool.UserProfile;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
@@ -169,6 +170,8 @@ public class AdserveBackfillRequest {
         final String def_user_ethnicity = null;
         final String def_user_sexualorientation = null;
         final String def_user_haschildren = "true";
+
+        final String def_userprofile_csitags = null;
 
         final String def_adpool_selectedslots = "9";
         final String def_adpool_demandtypesallowed = null;
@@ -452,6 +455,18 @@ public class AdserveBackfillRequest {
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_datavendorname"),
                         def_user_datavendorname);
 
+        final String temp_userprofile_csitags =
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("userprofile_csitags"),
+                        def_userprofile_csitags);
+        final Set<Integer> userprofile_csitags = new HashSet<Integer>();
+
+        if (temp_userprofile_csitags != null) {
+            final String[] temp = temp_userprofile_csitags.split(",");
+            for (final String a : temp) {
+                userprofile_csitags.add(Integer.parseInt(a));
+            }
+        }
+
         final String temp_user_yearofbirth =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_yearofbirth"), def_user_yearofbirth);
         Short user_yearofbirth = null;
@@ -663,6 +678,11 @@ public class AdserveBackfillRequest {
         user.setEthnicity(user_ethnicity);
         user.setSexualOrientation(user_sexualorientation);
         user.setHasChildren(user_haschildren);
+
+        final UserProfile userProfile = new UserProfile();
+        userProfile.setCsiTags(userprofile_csitags);
+
+        user.setUserProfile(userProfile);
 
         adPoolRequest.setUser(user);
 
