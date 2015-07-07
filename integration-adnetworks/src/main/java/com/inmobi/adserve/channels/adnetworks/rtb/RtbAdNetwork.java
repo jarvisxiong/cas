@@ -685,6 +685,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 if (imei != null) {
                     device.setDidmd5(imei.getImei());
                     device.setDpidmd5(imei.getImei());
+                } else {
+                    // TODO: Adding to match real data with the data provided - Remove once verified
+                    LOG.info(traceMarker, "IMEI Lookup failed for GPID->{}, GPID_MD5->{}", gpId, gpIdMD5);
                 }
             }
         }
@@ -706,8 +709,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             deviceExtensions.put("idfasha1", getHashedValue(ifa, SHA1));
             deviceExtensions.put("idfamd5", getHashedValue(ifa, MD5));
         }
-
-
         if (StringUtils.isNotEmpty(gpId)) {
             deviceExtensions.put("gpid", gpId);
         }
