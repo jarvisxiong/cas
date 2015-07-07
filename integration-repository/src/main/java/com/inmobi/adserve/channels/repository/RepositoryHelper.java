@@ -18,6 +18,7 @@ import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
 import com.inmobi.adserve.channels.entity.IXBlocklistRepository;
@@ -53,6 +54,8 @@ public class RepositoryHelper {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RepositoryHelper.class);
     private final RepositoryStatsProvider repositoryStatsProvider;
     private final IXPackageRepository ixPackageRepository;
+    private final SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository;
+    private final IMEIAerospikeRepository imeiAerospikeRepository;
 
     private final ChannelRepository channelRepository;
     private final ChannelAdGroupRepository channelAdGroupRepository;
@@ -60,7 +63,6 @@ public class RepositoryHelper {
     private final ChannelSegmentFeedbackRepository channelSegmentFeedbackRepository;
     private final SiteMetaDataRepository siteMetaDataRepository;
     private final SiteTaxonomyRepository siteTaxonomyRepository;
-    private final SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository;
     private final PricingEngineRepository pricingEngineRepository;
     private final SiteFilterRepository siteFilterRepository;
     private final SiteEcpmRepository siteEcpmRepository;
@@ -85,6 +87,7 @@ public class RepositoryHelper {
         siteMetaDataRepository = builder.siteMetaDataRepository;
         siteTaxonomyRepository = builder.siteTaxonomyRepository;
         siteAerospikeFeedbackRepository = builder.siteAerospikeFeedbackRepository;
+        imeiAerospikeRepository = builder.imeiAerospikeRepository;
         pricingEngineRepository = builder.pricingEngineRepository;
         siteFilterRepository = builder.siteFilterRepository;
         siteEcpmRepository = builder.siteEcpmRepository;
@@ -101,6 +104,7 @@ public class RepositoryHelper {
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
         ccidMapRepository = builder.ccidMapRepository;
         ixBlocklistRepository = builder.ixBlocklistRepository;
+
 
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
@@ -129,6 +133,7 @@ public class RepositoryHelper {
         private SiteMetaDataRepository siteMetaDataRepository;
         private SiteTaxonomyRepository siteTaxonomyRepository;
         private SiteAerospikeFeedbackRepository siteAerospikeFeedbackRepository;
+        private IMEIAerospikeRepository imeiAerospikeRepository;
         private PricingEngineRepository pricingEngineRepository;
         private SiteFilterRepository siteFilterRepository;
         private SiteEcpmRepository siteEcpmRepository;
@@ -154,6 +159,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(siteMetaDataRepository);
             Preconditions.checkNotNull(siteTaxonomyRepository);
             Preconditions.checkNotNull(siteAerospikeFeedbackRepository);
+            Preconditions.checkNotNull(imeiAerospikeRepository);
             Preconditions.checkNotNull(pricingEngineRepository);
             Preconditions.checkNotNull(siteFilterRepository);
             Preconditions.checkNotNull(siteEcpmRepository);
@@ -249,6 +255,10 @@ public class RepositoryHelper {
     public SegmentAdGroupFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId,
             final Integer segmentId) {
         return siteAerospikeFeedbackRepository.query(siteId, segmentId);
+    }
+
+    public IMEIEntity queryIMEIRepository(final String gpId) {
+        return imeiAerospikeRepository.query(gpId);
     }
 
     public SiteFeedbackEntity querySiteAerospikeFeedbackRepository(final String siteId) {
@@ -384,7 +394,7 @@ public class RepositoryHelper {
     public IXPackageEntity queryIxPackageByDeal(final String dealId) {
         // Prepare query for CQEngine repository
         final Query query = equal(IXPackageRepository.DEAL_IDS, dealId);
-        return (IXPackageEntity)ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
+        return (IXPackageEntity) ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
     }
 
     public IXVideoTrafficEntity queryIXVideoTrafficRepository(final String siteId, final Integer countryId) {

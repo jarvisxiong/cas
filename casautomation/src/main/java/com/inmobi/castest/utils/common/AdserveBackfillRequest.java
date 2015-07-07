@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// import com.sun.tools.javac.util.*;
+
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -43,6 +43,8 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+
+import io.netty.util.CharsetUtil;
 
 public class AdserveBackfillRequest {
 
@@ -1105,7 +1107,7 @@ public class AdserveBackfillRequest {
         try {
 
             // String targetUrl = "http://localhost:8800/rtbdFill";
-            final byte[] result = responseByteArray.getBytes();
+            final byte[] result = responseByteArray.getBytes(CharsetUtil.UTF_8);
             final AdPoolResponse adPoolResponse = new AdPoolResponse();
             final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             tDeserializer.deserialize(adPoolResponse, result);

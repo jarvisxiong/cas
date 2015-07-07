@@ -5,8 +5,8 @@ public class CasServerDetails {
     private final static String CAS_SERVER_IP = System.getProperty("cas_end_point") != null ? System
             .getProperty("cas_end_point") : "localhost";
 
-    private final static String CAS_SERVER_ENDPOINT = "http://" + CAS_SERVER_IP + ":8800/";// "http://10.14.118.66:8800/";
-
+    private final static String CAS_SERVER_ENDPOINT = "http://" + CAS_SERVER_IP + ":8800/";
+    //private final static String CAS_SERVER_ENDPOINT = "http://10.14.118.66:8800/";
 
     private final static String LOG_FILE_PATH = "/opt/mkhoj/logs/cas/debug/";
 

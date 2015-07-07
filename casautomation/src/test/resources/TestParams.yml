@@ -742,6 +742,26 @@ TEST1_SDK500_AD_PROG_369:
    integration_version: '500'
    requestguid: 'test'
 
+TEST1_SDK500_NATIVE_AD:
+ - adpool_responseformat: 'JSON'
+   adpool_requestedadtype: 'NATIVE'
+   adpool_selectedslots : '0'
+   site_siteid : '9eb350a1706643c6a44bc18fca31ae0f'
+   adpool_placementId : '1431975542156823'
+   integration_type: ANDROID_SDK
+   integration_version: '500'
+   requestguid: 'test'
+
+TEST1_SDK450_NATIVE_AD:
+ - adpool_responseformat: 'JSON'
+   adpool_requestedadtype: 'NATIVE'
+   adpool_selectedslots : '0'
+   site_siteid : '9eb350a1706643c6a44bc18fca31ae0f'
+   adpool_placementId : '1431975542156823'
+   integration_type: ANDROID_SDK
+   integration_version: '450'
+   requestguid: 'test'
+
 # IX Test Cases
 TEST3_1_1:
  - adpool_requestid : 'anotherreqid'

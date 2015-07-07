@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -50,6 +51,8 @@ import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
@@ -105,6 +108,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -983,8 +987,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes(CharsetUtil.UTF_8)));
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body)
-                .setHeader("Authorization", "Basic " + authEncoded).setHeader(HttpHeaders.Names.HOST, uri.getHost());
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
+                .setHeader(HttpHeaders.Names.CONTENT_ENCODING, GlobalConstant.UTF_8)
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
+                .setHeader(HttpHeaders.Names.AUTHORIZATION, "Basic " + authEncoded)
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body);
     }
 
     @Override
@@ -1652,6 +1659,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getName() {
         return advertiserName;
+    }
+
+    @Override
+    protected void overrideInmobiAdTracker(InmobiAdTrackerBuilder trackerBuilder) {
+        if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0 &&
+                trackerBuilder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+            DefaultLazyInmobiAdTrackerBuilder builder = (DefaultLazyInmobiAdTrackerBuilder) trackerBuilder;
+            builder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
+            builder.setEnrichmentCost(dataVendorCost);
+        }
     }
 
     @Override

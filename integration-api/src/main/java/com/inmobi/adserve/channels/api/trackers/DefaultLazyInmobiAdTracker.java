@@ -6,9 +6,11 @@ import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.get
 import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.getIdBase36;
 import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.getIntegrationVersionStr;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -16,15 +18,13 @@ import org.apache.thrift.protocol.TCompactProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.util.Utils.CryptoHashGenerator;
-import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.channels.util.Utils.CryptoHashGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.types.eventserver.ImpressionInfo;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.netty.util.CharsetUtil;
 
 import lombok.Builder;
 
@@ -92,6 +92,8 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
     private String appBundleId;
     private String normalizedUserId;
     private RequestedAdType requestedAdType;
+    private Double enrichmentCost;
+    private List<Integer> matchedCsids;
 
     // State
     private boolean trackersHaveBeenGenerated = false;
@@ -227,8 +229,8 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         // 24nd URL Component: integrationMethod -- not using it, hence setting it default value
         String integrationMethod = DEFAULT_UNUSED_PARAMETER;
         if (null != integrationDetails && integrationDetails.isSetIntegrationMethod()) {
-            integrationMethod = integrationDetails.getIntegrationMethod().toString().toLowerCase()
-                    .replace("_", StringUtils.EMPTY);
+            integrationMethod =
+                    integrationDetails.getIntegrationMethod().toString().toLowerCase().replace("_", StringUtils.EMPTY);
         }
         adUrlSuffix.append(appendSeparator(integrationMethod));
         beaconUrlSuffix.append(appendSeparator(integrationMethod));
@@ -254,7 +256,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         if (StringUtils.isBlank(bundleId)) {
             bundleId = DEFAULT_BUNDLE_ID;
         }
-        String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes()));
+        String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes(CharsetUtil.UTF_8)));
         String finalBundleId = encodedBundleId.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
 
         adUrlSuffix.append(appendSeparator(finalBundleId));
@@ -266,6 +268,12 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         if (null != requestedAdType) {
             impInfo.setRequestedAdType(requestedAdType.toString());
         }
+        if (null != enrichmentCost && CollectionUtils.isNotEmpty(matchedCsids)) {
+            impInfo.setEnrichment_cost(enrichmentCost);
+            impInfo.setMatched_csids(matchedCsids);
+        }
+
+        LOG.debug("Impression Info Object: {}", impInfo);
 
         TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
         String encodedString = StringUtils.EMPTY;
@@ -284,8 +292,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         CryptoHashGenerator cryptoHashGenerator;
         if (testMode) {
             adUrlSuffix.append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
-            beaconUrlSuffix
-                    .append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
+            beaconUrlSuffix.append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
             cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
         } else {
             adUrlSuffix.append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36));

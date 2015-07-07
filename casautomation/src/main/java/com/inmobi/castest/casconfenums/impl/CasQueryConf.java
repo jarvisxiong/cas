@@ -319,7 +319,7 @@ public class CasQueryConf {
                                 + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName()
                                 + "','RIGHT_TO_FIRST_REFUSAL','{"
                                 + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getCountryId()
-                                + "}','{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','{}','{}','{}','{}','{}','{BANNER}','{}','t',0,'{}','{}', '[{\"osId\":3, \"range\":[]},{\"osId\":5, \"range\":[]}]' , '"
+                                + "}','{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','{}','{}','{}','{}','{}','{BANNER}','{}','t',1,'{}','{}', '[{\"osId\":3, \"range\":[]},{\"osId\":5, \"range\":[]}]' , '"
                                 + csidParam + "','" + manufParam + "')";
                 System.out.println(queryString);
                 break;

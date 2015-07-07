@@ -42,6 +42,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BaseAdNetworkImpl.class)
@@ -615,7 +616,7 @@ public class DCPLomarkAdnetworkTest {
         }
         basestring.append(secret);
         // MD5 Hashed
-        final byte[] bytes = DigestUtils.md5(basestring.toString().getBytes());
+        final byte[] bytes = DigestUtils.md5(basestring.toString().getBytes(CharsetUtil.UTF_8));
         final StringBuilder sign = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
             final String hex = Integer.toHexString(bytes[i] & 0xFF);

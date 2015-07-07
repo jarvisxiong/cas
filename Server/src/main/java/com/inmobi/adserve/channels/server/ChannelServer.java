@@ -64,6 +64,7 @@ import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
 import com.inmobi.adserve.channels.repository.GeoRegionFenceMapRepository;
 import com.inmobi.adserve.channels.repository.GeoZipRepository;
+import com.inmobi.adserve.channels.repository.IMEIAerospikeRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.IXPackageRepository;
 import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
@@ -138,6 +139,7 @@ public class ChannelServer {
     private static SdkMraidMapRepository sdkMraidMapRepository;
     private static GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private static CcidMapRepository ccidMapRepository;
+    private static IMEIAerospikeRepository imeiAerospikeRepository;
     private static IXBlocklistRepository ixBlocklistRepository;
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     private static String configFile;
@@ -203,6 +205,7 @@ public class ChannelServer {
             siteMetaDataRepository = new SiteMetaDataRepository();
             siteTaxonomyRepository = new SiteTaxonomyRepository();
             siteAerospikeFeedbackRepository = new SiteAerospikeFeedbackRepository();
+            imeiAerospikeRepository = new IMEIAerospikeRepository();
             pricingEngineRepository = new PricingEngineRepository();
             siteFilterRepository = new SiteFilterRepository();
             siteEcpmRepository = new SiteEcpmRepository();
@@ -228,6 +231,7 @@ public class ChannelServer {
             repoHelperBuilder.setSiteMetaDataRepository(siteMetaDataRepository);
             repoHelperBuilder.setSiteTaxonomyRepository(siteTaxonomyRepository);
             repoHelperBuilder.setSiteAerospikeFeedbackRepository(siteAerospikeFeedbackRepository);
+            repoHelperBuilder.setImeiAerospikeRepository(imeiAerospikeRepository);
             repoHelperBuilder.setPricingEngineRepository(pricingEngineRepository);
             repoHelperBuilder.setSiteFilterRepository(siteFilterRepository);
             repoHelperBuilder.setSiteEcpmRepository(siteEcpmRepository);
@@ -363,7 +367,6 @@ public class ChannelServer {
             if (repoLoadRetryCount < 1) {
                 repoLoadRetryCount = 1;
             }
-
             logger.error(String.format("*************** Starting repo loading with retry count as %s",
                     repoLoadRetryCount));
             loadRepos(creativeRepository, CREATIVE_REPOSITORY, config, logger);
@@ -387,12 +390,11 @@ public class ChannelServer {
             loadRepos(geoRegionFenceMapRepository, GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
             loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);
             loadRepos(ixBlocklistRepository, IX_BLOCKLIST_REPOSITORY, config, logger);
-
             ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY),
                     IX_PACKAGE_REPOSITORY);
             final DataCenter dc = getDataCenter();
             siteAerospikeFeedbackRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
-
+            imeiAerospikeRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
             logger.error("* * * * Instantiating repository completed * * * *");
             LOG.error("* * * * Instantiating repository completed * * * *");
             config.getCacheConfiguration().subset(SITE_METADATA_REPOSITORY).subset(SITE_METADATA_REPOSITORY);

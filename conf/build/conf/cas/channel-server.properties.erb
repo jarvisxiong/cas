@@ -87,6 +87,8 @@ server.aerospike.set=feedback2.0
 server.aerospike.refreshTime=300000
 server.aerospike.feedbackTimeFrame=11
 server.aerospike.boostTimeFrame=3
+server.aerospike.imeiNamespae=device_imei
+server.aerospike.imeiSet=imei
 
 server.graphiteServer.host=<%= graphite_host %>
 server.graphiteServer.port=2020
@@ -311,7 +313,7 @@ Cache.IXBlocklistRepository.isUpdatable = true
 Cache.IXBlocklistRepository.dataSourceName = jdbc
 
 adapter.adbaydcp.status=on
-adapter.adbaydcp.host=http://ad.about.co.kr/mad/html/InMobi/total01/bottom_middle
+adapter.adbaydcp.host=http://ad.about.co.kr/mad/json/InMobi/total01/bottom_middle
 adapter.adbaydcp.advertiserId=7f7edb117307402fa89afeadb56174d7
 adapter.adbaydcp.partnerSegmentNo=1
 adapter.adbaydcp.host.uh1=NA
@@ -621,7 +623,7 @@ adapter.motivefeed.class=com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjil
 
 adapter.taboola.advertiserId=86490ae2c95a4fae9f6036317da740d3
 adapter.taboola.status=on
-adapter.taboola.host=http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init
+adapter.taboola.host=<%= taboola_default_url %>
 adapter.taboola.notification=http://api.taboola.com/json/%s/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s
 adapter.taboola.partnerSegmentNo=1
 adapter.taboola.icon=http://inmobitr-a.akamaihd.net/dcpnative/Sponsored-icon.png

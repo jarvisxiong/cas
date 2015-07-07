@@ -57,6 +57,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -854,7 +856,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public static String getHashedValue(final String message, final String hashingType) {
         try {
             final MessageDigest md = MessageDigest.getInstance(hashingType);
-            final byte[] array = md.digest(message.getBytes());
+            final byte[] array = md.digest(message.getBytes(CharsetUtil.UTF_8));
             final StringBuffer sb = new StringBuffer();
             for (int i = 0; i < array.length; ++i) {
                 sb.append(Integer.toHexString(array[i] & 0xFF | 0x100).substring(1, 3));

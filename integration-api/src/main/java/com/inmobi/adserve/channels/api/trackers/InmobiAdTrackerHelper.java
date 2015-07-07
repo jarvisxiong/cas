@@ -7,6 +7,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 
+import io.netty.util.CharsetUtil;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -32,7 +34,7 @@ class InmobiAdTrackerHelper {
 
     protected static String getEncodedJson(final Map<String, String> clickUidMap) {
         final String unEncodedString = gson.toJson(clickUidMap);
-        final byte[] unEncoded = unEncodedString.getBytes();
+        final byte[] unEncoded = unEncodedString.getBytes(CharsetUtil.UTF_8);
         final String encodedString = new String(Base64.encodeBase64(unEncoded))
                 .replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
         return encodedString;

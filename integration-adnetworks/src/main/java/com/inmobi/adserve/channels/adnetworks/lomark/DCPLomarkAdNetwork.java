@@ -35,6 +35,7 @@ import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.CharsetUtil;
 
 
 public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
@@ -339,7 +340,7 @@ public class DCPLomarkAdNetwork extends AbstractDCPAdNetworkImpl {
         }
         basestring.append(secret);
         // MD5 Hashed
-        final byte[] bytes = DigestUtils.md5(basestring.toString().getBytes());
+        final byte[] bytes = DigestUtils.md5(basestring.toString().getBytes(CharsetUtil.UTF_8));
         final StringBuilder sign = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
             final String hex = Integer.toHexString(bytes[i] & 0xFF);

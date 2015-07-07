@@ -456,4 +456,29 @@ public class DCPTest {
         Assert.assertEquals(pubContent.contains(googleAdxStaticTag), true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
+
+    // Commented till taboola response is hosted
+    /*@Test(testName = "TEST1_SDK500_NATIVE_AD", dataProvider = "fender_dcp_dp", dataProviderClass =
+            FenderDataProvider.class)
+    public void TEST1_SDK500_NATIVE_AD(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+
+        parserOutput = LogParserHelper.logParser("sdk-version : a500",
+                "Rewrapping native JSON for DCP traffic. Wrapped Response is:");
+
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST1_SDK450_NATIVE_AD", dataProvider = "fender_dcp_dp", dataProviderClass =
+            FenderDataProvider.class)
+    public void TEST1_SDK450_NATIVE_AD(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+
+        parserOutput = LogParserHelper.logParser("sdk-version : a450",
+                "Rewrapping native JSON for DCP traffic. Wrapped Response is:");
+
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }*/
 }

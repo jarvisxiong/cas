@@ -43,6 +43,15 @@ public class CasPartnerConf {
                 break;
 
             }
+            case TABOOLA: {
+                wapChannelAdGroup.put("name", "taboola");
+                wapChannelAdGroup.put("advertiser_id", "86490ae2c95a4fae9f6036317da740d3");
+                wapChannelAdGroup.put("host", "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init");
+                wapChannelAdGroup.put("dst", "2");
+                wapChannelAdGroup.put("account_segment", "11");
+                break;
+
+            }
             case MOBILECOMMERCE: {
                 wapChannelAdGroup.put("name", "mobilecommerce");
                 wapChannelAdGroup.put("host", "http://ms-api.us.mcproton.com/search/inmobi/banner/v1/service.svc/");

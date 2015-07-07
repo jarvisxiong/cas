@@ -10,6 +10,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.netty.util.CharsetUtil;
+
 
 public class CryptoHashGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(CryptoHashGenerator.class);
@@ -28,7 +30,7 @@ public class CryptoHashGenerator {
             Mac mac;
             SecretKeySpec sk;
             try {
-                sk = new SecretKeySpec(secretKey.getBytes(), "HmacMD5");
+                sk = new SecretKeySpec(secretKey.getBytes(CharsetUtil.UTF_8), "HmacMD5");
                 mac = Mac.getInstance("HmacMD5");
                 mac.init(sk);
                 return mac;
@@ -48,7 +50,7 @@ public class CryptoHashGenerator {
 
     public String generateHash(final String url) {
         final CRC32 crc = new CRC32();
-        crc.update(mac.get().doFinal(url.getBytes()));
+        crc.update(mac.get().doFinal(url.getBytes(CharsetUtil.UTF_8)));
         final String hash = Long.toHexString(crc.getValue());
         LOG.debug("CryptoHash Generated is {}", hash);
         return hash;
