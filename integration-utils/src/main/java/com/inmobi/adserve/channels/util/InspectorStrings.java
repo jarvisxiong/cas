@@ -72,7 +72,16 @@ public class InspectorStrings {
     public static final String SITE_FEEDBACK_CACHE_HIT = "SiteFeedbackCacheHit";
     public static final String SITE_FEEDBACK_CACHE_MISS = "SiteFeedbackCacheMiss";
     public static final String SITE_FEEDBACK_LATENCY = "SiteFeedbackLatency";
+    public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
+    public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
     public static final String MISSING_CATEGORY = "MissingCategory";
+    
+    public static final String IMEI_CACHE_MISS = "IMEICacheMiss";
+    public static final String IMEI_CACHE_HIT = "IMEICacheHit";
+    public static final String IMEI_REQUESTS_TO_AEROSPIKE = "IMEIRequestsToAerospike";
+    public static final String IMEI_FAILED_TO_LOAD_FROM_AEROSPIKE = "IMEIFailedToLoadFromAerospike";
+    public static final String IMEI_LATENCY = "IMEILatency";
+    
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
@@ -84,8 +93,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_ADVERTISER_DOMAINS_MISSING_FILTER = "DroppedInAdvertiserDomainsFilter";
     public static final String DROPPED_IN_CREATIVE_ATTRIBUTES_MISSING_FILTER = "DroppedInCreativeAttributesFilter";
     public static final String DROPPED_IN_CREATIVE_VALIDATOR_FILTER = "DroppedInCreativeValidatorFilter";
-    public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
-    public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
     public static final String DROPPED_IN_AUCTION_IX_IMPRESSION_ID_FILTER = "DroppedInAuctionIxImpressionIdFilter";
     public static final String DROPPED_IN_ACCOUNT_SEGMENT_FILTER = "DroppedInAccountSegmentFilter";
     public static final String DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER =

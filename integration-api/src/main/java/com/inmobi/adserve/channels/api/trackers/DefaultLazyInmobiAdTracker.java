@@ -24,6 +24,8 @@ import com.inmobi.adserve.channels.util.Utils.CryptoHashGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.types.eventserver.ImpressionInfo;
 
+import io.netty.util.CharsetUtil;
+
 import lombok.Builder;
 
 /**
@@ -227,8 +229,8 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         // 24nd URL Component: integrationMethod -- not using it, hence setting it default value
         String integrationMethod = DEFAULT_UNUSED_PARAMETER;
         if (null != integrationDetails && integrationDetails.isSetIntegrationMethod()) {
-            integrationMethod = integrationDetails.getIntegrationMethod().toString().toLowerCase()
-                    .replace("_", StringUtils.EMPTY);
+            integrationMethod =
+                    integrationDetails.getIntegrationMethod().toString().toLowerCase().replace("_", StringUtils.EMPTY);
         }
         adUrlSuffix.append(appendSeparator(integrationMethod));
         beaconUrlSuffix.append(appendSeparator(integrationMethod));
@@ -254,7 +256,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         if (StringUtils.isBlank(bundleId)) {
             bundleId = DEFAULT_BUNDLE_ID;
         }
-        String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes()));
+        String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes(CharsetUtil.UTF_8)));
         String finalBundleId = encodedBundleId.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
 
         adUrlSuffix.append(appendSeparator(finalBundleId));
@@ -271,7 +273,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
             impInfo.setMatched_csids(matchedCsids);
         }
 
-        LOG.debug("Impression Info Object: {}",  impInfo);
+        LOG.debug("Impression Info Object: {}", impInfo);
 
         TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
         String encodedString = StringUtils.EMPTY;
@@ -290,8 +292,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         CryptoHashGenerator cryptoHashGenerator;
         if (testMode) {
             adUrlSuffix.append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
-            beaconUrlSuffix
-                    .append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
+            beaconUrlSuffix.append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION_BASE_36));
             cryptoHashGenerator = new CryptoHashGenerator(testCryptoSecretKey);
         } else {
             adUrlSuffix.append(appendSeparator(CLICK_URL_HASHING_SECRET_KEY_VERSION_BASE_36));

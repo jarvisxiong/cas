@@ -48,6 +48,7 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
@@ -676,10 +677,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting platform id md5 hashed
-        if (null != casInternalRequestParameters.getUidMd5()) {
+        final String gpId = getGPID(false);
+        if (isWapSiteUACEntity && wapSiteUACEntity.isAndroid() && "CN".equals(sasParams.getCountryCode())) {
+            if (gpId != null) {
+                final String gpIdMD5 = getHashedValue(gpId, MD5);
+                final IMEIEntity imei = repositoryHelper.queryIMEIRepository(gpIdMD5);
+                if (imei != null) {
+                    device.setDidmd5(imei.getImei());
+                    device.setDpidmd5(imei.getImei());
+                }
+            }
+        }
+
+        if (!device.isSetDidmd5() && null != casInternalRequestParameters.getUidMd5()) {
             device.setDidmd5(casInternalRequestParameters.getUidMd5());
             device.setDpidmd5(casInternalRequestParameters.getUidMd5());
-        } else if (null != casInternalRequestParameters.getUid()) {
+        } else if (!device.isSetDidmd5() && null != casInternalRequestParameters.getUid()) {
             device.setDidmd5(casInternalRequestParameters.getUid());
             device.setDpidmd5(casInternalRequestParameters.getUid());
         }
@@ -694,7 +707,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             deviceExtensions.put("idfamd5", getHashedValue(ifa, MD5));
         }
 
-        final String gpId = getGPID(false);
+
         if (StringUtils.isNotEmpty(gpId)) {
             deviceExtensions.put("gpid", gpId);
         }
@@ -735,6 +748,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final Request ningRequest =
                 new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod(POST)
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
+                        .setHeader(HttpHeaders.Names.CONTENT_ENCODING, GlobalConstant.UTF_8)
                         .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
                         .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
 

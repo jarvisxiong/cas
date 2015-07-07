@@ -108,6 +108,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -986,8 +987,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes(CharsetUtil.UTF_8)));
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body)
-                .setHeader("Authorization", "Basic " + authEncoded).setHeader(HttpHeaders.Names.HOST, uri.getHost());
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
+                .setHeader(HttpHeaders.Names.CONTENT_ENCODING, GlobalConstant.UTF_8)
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
+                .setHeader(HttpHeaders.Names.AUTHORIZATION, "Basic " + authEncoded)
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body);
     }
 
     @Override

@@ -36,6 +36,7 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.util.CharsetUtil;
 
 @Sharable
 @Singleton
@@ -123,7 +124,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 final AdPoolRequest adPoolRequest = new AdPoolRequest();
 
                 if (StringUtils.isNotEmpty(rawContent)) {
-                    final byte[] decodedContent = urlCodec.decode(rawContent.getBytes());
+                    final byte[] decodedContent = urlCodec.decode(rawContent.getBytes(CharsetUtil.UTF_8));
                     LOG.debug("Decoded String : {}", decodedContent);
                     final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                     try {

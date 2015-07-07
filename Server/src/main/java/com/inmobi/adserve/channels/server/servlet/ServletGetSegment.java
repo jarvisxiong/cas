@@ -8,6 +8,7 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHA
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IMEI_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY;
@@ -121,6 +122,8 @@ public class ServletGetSegment implements Servlet {
                     } else {
                         entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id);
                     }
+                } else if (repoName.equalsIgnoreCase(IMEI_REPOSITORY)) {
+                    entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(id);
                 } else if (repoName.equalsIgnoreCase(SITE_ECPM_REPOSITORY)) {
                     entity =
                             CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
@@ -135,7 +138,6 @@ public class ServletGetSegment implements Servlet {
                                     .queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
                 } else if (repoName.equalsIgnoreCase(CREATIVE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
-
                 } else if (repoName.equalsIgnoreCase(NATIVE_AD_TEMPLATE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryNativeAdTemplateRepository(Long.parseLong(id));
                 } else if (repoName.equalsIgnoreCase(GEO_ZIP_REPOSITORY)) {

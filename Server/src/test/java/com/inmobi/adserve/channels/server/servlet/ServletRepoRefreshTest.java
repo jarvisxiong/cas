@@ -40,7 +40,6 @@ import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
 import com.inmobi.adserve.channels.repository.SiteFilterRepository;
 import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
@@ -60,10 +59,10 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConfigurationLoader.class, ServletRepoRefresh.class, ChannelServer.class, ChannelRepository.class,
         ChannelAdGroupRepository.class, ChannelFeedbackRepository.class, ChannelSegmentFeedbackRepository.class,
-        SiteMetaDataRepository.class, SiteTaxonomyRepository.class, SiteAerospikeFeedbackRepository.class,
-        PricingEngineRepository.class, SiteFilterRepository.class, SiteEcpmRepository.class,
-        CurrencyConversionRepository.class, WapSiteUACRepository.class, IXAccountMapRepository.class,
-        CreativeRepository.class, NativeAdTemplateRepository.class})
+        SiteMetaDataRepository.class, SiteTaxonomyRepository.class, PricingEngineRepository.class,
+        SiteFilterRepository.class, SiteEcpmRepository.class, CurrencyConversionRepository.class,
+        WapSiteUACRepository.class, IXAccountMapRepository.class, CreativeRepository.class,
+        NativeAdTemplateRepository.class})
 public class ServletRepoRefreshTest {
     private static HttpRequestHandler httpRequestHandler;
     private static QueryStringDecoder mockQueryStringDecoder;
@@ -223,8 +222,6 @@ public class ServletRepoRefreshTest {
                 createMock(ChannelSegmentFeedbackRepository.class);
         final SiteMetaDataRepository mockSiteMetaDataRepository = createMock(SiteMetaDataRepository.class);
         final SiteTaxonomyRepository mockSiteTaxonomyRepository = createMock(SiteTaxonomyRepository.class);
-        final SiteAerospikeFeedbackRepository mockSiteAerospikeFeedbackRepository =
-                createMock(SiteAerospikeFeedbackRepository.class);
         final PricingEngineRepository mockPricingEngineRepository = createMock(PricingEngineRepository.class);
         final SiteFilterRepository mockSiteFilterRepository = createMock(SiteFilterRepository.class);
         final SiteEcpmRepository mockSiteEcpmRepository = createMock(SiteEcpmRepository.class);

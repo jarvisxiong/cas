@@ -43,6 +43,8 @@ import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.InventoryType;
 
+import io.netty.util.CharsetUtil;
+
 
 @Singleton
 public class ThriftRequestParser {
@@ -402,8 +404,8 @@ public class ThriftRequestParser {
 
     public String MD5(final String md5) {
         try {
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            final byte[] array = md.digest(md5.getBytes());
+            final MessageDigest md = MessageDigest.getInstance(GlobalConstant.MD5);
+            final byte[] array = md.digest(md5.getBytes(CharsetUtil.UTF_8));
             final StringBuffer sb = new StringBuffer();
             for (final byte anArray : array) {
                 sb.append(Integer.toHexString(anArray & 0xFF | 0x100).substring(1, 3));

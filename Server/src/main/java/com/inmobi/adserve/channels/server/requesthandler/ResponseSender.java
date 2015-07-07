@@ -253,8 +253,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 final Dimension dim = slotSizeMapEntity.getDimension();
                 final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalResponse = startElement + finalResponse + END_TAG;
-            } else if ((rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON) &&
-                    RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
+            } else if ((rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON)
+                    && RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
                 finalResponse = AD_IMAI_START_TAG + finalResponse;
             }
         } else {
@@ -438,12 +438,12 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final Channel serverChannel) {
         if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
             if (RequestedAdType.NATIVE == sasParams.getRequestedAdType()) {
-                responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                        responseString);
+                responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), responseString);
                 LOG.debug("Rewrapping native JSON for DCP traffic. Wrapped Response is: {}", responseString);
             } else if (Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
-                responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                        new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
+                responseString =
+                        String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                                new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
                 LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
             }
         }
@@ -473,6 +473,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, responseBytes.length);
         response.headers().add(HttpHeaders.Names.EXPIRES, "-1");
         response.headers().add(HttpHeaders.Names.PRAGMA, "no-cache");
+        response.headers().add(HttpHeaders.Names.CONTENT_ENCODING, GlobalConstant.UTF_8);
         HttpHeaders.setKeepAlive(response, sasParams.isKeepAlive());
         System.getProperties().setProperty("http.keepAlive", String.valueOf(sasParams.isKeepAlive()));
 
@@ -574,8 +575,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     defaultContent = StringUtils.EMPTY;
 
                     // Native on dcp
-                    if (DemandSourceType.DCP.getValue() == sasParams.getDst() &&
-                            Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
+                    if (DemandSourceType.DCP.getValue() == sasParams.getDst()
+                            && Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
                         defaultContent = String.format(SDK_500_DCP_WRAPPING_NO_AD_JSON, sasParams.getRequestGuid());
                         LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", defaultContent);
                     }
