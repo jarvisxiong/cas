@@ -103,7 +103,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                     final byte[] adPoolRequestBytes = new byte[request.content().readableBytes()];
                     request.content().getBytes(0, adPoolRequestBytes);
                     tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
-                    isTraceEnabled = adPoolRequest.isTraceRequest();
+                    isTraceEnabled = adPoolRequest.isDeprecatedTraceRequest();
                     thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters,
                             dst);
                 } catch (final TException ex) {

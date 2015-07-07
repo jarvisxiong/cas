@@ -2,6 +2,8 @@ package com.inmobi.adserve.channels.api.trackers;
 
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ZERO;
 
+import java.util.List;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
@@ -93,6 +95,14 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
         builder.testMode(TEST_MODE);
         builder.isTestRequest(IS_TEST_REQUEST);
         builder.budgetBucketId(BUDGET_BUCKET_ID);
+    }
+
+    public void setMatchedCsids(final List<Integer> matchedCsidList) {
+        builder.matchedCsids(matchedCsidList);
+    }
+
+    public void setEnrichmentCost(final Double dataVenderEnrichmentCost) {
+        builder.enrichmentCost(dataVenderEnrichmentCost);
     }
 
     @Override

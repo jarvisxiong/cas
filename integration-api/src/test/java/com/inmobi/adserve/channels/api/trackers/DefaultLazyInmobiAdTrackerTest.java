@@ -12,6 +12,7 @@ import org.apache.commons.configuration.Configuration;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.IntegrationMethod;
@@ -61,6 +62,66 @@ public class DefaultLazyInmobiAdTrackerTest {
         SASRequestParameters sasParams = copyHelper();
         DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
                 true);
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+                + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/4d5de1c7";
+        String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+                + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/eb576f7e";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerDataVendorPositive() {
+        SASRequestParameters sasParams = copyHelper();
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+                true);
+        builder.setEnrichmentCost(4.5);
+        builder.setMatchedCsids(ImmutableList.of(5));
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+                + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwpFQoXAAAAAAAAEkAA/1/5f21f405";
+        String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+                + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwpFQoXAAAAAAAAEkAA/1/349d2e51";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerDataVendorNegativeMatchedCsidsMissing() {
+        SASRequestParameters sasParams = copyHelper();
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+                true);
+        builder.setEnrichmentCost(4.5);
+        builder.setMatchedCsids(null);
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+                + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/4d5de1c7";
+        String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+                + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/eb576f7e";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerDataVendorNegativeEnrichmentCostNull() {
+        SASRequestParameters sasParams = copyHelper();
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+                true);
+        builder.setEnrichmentCost(null);
+        builder.setMatchedCsids(ImmutableList.of(5));
         DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
 
         String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"

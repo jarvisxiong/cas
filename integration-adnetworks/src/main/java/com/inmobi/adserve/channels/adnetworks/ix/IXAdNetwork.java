@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -50,6 +51,8 @@ import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
@@ -1652,6 +1655,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getName() {
         return advertiserName;
+    }
+
+    @Override
+    protected void overrideInmobiAdTracker(InmobiAdTrackerBuilder trackerBuilder) {
+        if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0 &&
+                trackerBuilder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+            DefaultLazyInmobiAdTrackerBuilder builder = (DefaultLazyInmobiAdTrackerBuilder) trackerBuilder;
+            builder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
+            builder.setEnrichmentCost(dataVendorCost);
+        }
     }
 
     @Override
