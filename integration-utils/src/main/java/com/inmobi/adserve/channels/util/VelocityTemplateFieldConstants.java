@@ -10,6 +10,8 @@ public class VelocityTemplateFieldConstants {
     public static final String PARTNER_CLICK_URL = "PartnerClickUrl";
     public static final String PARTNER_HTML_CODE = "PartnerHtmlCode";
     public static final String PARTNER_IMG_URL = "PartnerImgUrl";
+    public static final String PARTNER_LOGO_IMG_URL = "PartnerLogoImgUrl";
+    public static final String PARTNER_LOGO_CLICK_URL = "PartnerLogoClickUrl";
     public static final String PARTNER_CLICK_BEACON = "PartnerClickBeacon";
     public static final String AD_TEXT = "AdText";
     public static final String DESCRIPTION = "description";

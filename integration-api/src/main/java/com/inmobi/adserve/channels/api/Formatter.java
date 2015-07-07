@@ -25,7 +25,7 @@ public class Formatter {
     private static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
 
     public enum TemplateType {
-        HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML
+        HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML,ADBAY_HTML
     }
 
     private static VelocityEngine velocityEngine;
@@ -38,6 +38,7 @@ public class Formatter {
     private static Template velocityTemplateInterstitialVideo;
     private static Template velocityTemplateJsAdTag;
     private static Template velocityTemplateWapHtmlJsAdTag;
+    private static Template velocityTemplateAdbay;
 
 
     public static void init() throws Exception {
@@ -53,6 +54,7 @@ public class Formatter {
         velocityTemplateInterstitialVideo = velocityEngine.getTemplate("interstitialVideoAdFormat.vm");
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
+        velocityTemplateAdbay = velocityEngine.getTemplate("adbayHtmlTag.vm");
     }
 
     static void updateVelocityContext(final VelocityContext context, final SASRequestParameters sasParams,
@@ -140,6 +142,9 @@ public class Formatter {
                 break;
             case WAP_HTML_JS_AD_TAG:
                 velocityTemplateWapHtmlJsAdTag.merge(context, writer);
+                break;
+            case ADBAY_HTML:
+                velocityTemplateAdbay.merge(context,writer);
                 break;
             default:
                 break;
