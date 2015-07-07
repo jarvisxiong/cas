@@ -10,7 +10,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,8 +187,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                     appBuilder.setDesc(taboolaNative.getDescription());
                 }
                 App app = (App) appBuilder.build();
-                responseContent =
-                        generateNativeWrapperForDCP(nativeResponseMaker.makeDCPNativeResponse(app, params, repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId())));
+                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params,
+                        repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 
@@ -274,14 +273,4 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         return true;
     }
-
-    private String generateNativeWrapperForDCP(String response) throws Exception {
-        JSONObject nativeResponse = new JSONObject();
-        nativeResponse.put("request_id", impressionId);
-        JSONObject[] objectArray = new JSONObject[1];
-        objectArray[0] = new JSONObject(response);
-        nativeResponse.put("adds", objectArray);
-        return nativeResponse.toString();
-    }
-
 }

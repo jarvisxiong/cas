@@ -11,7 +11,7 @@ public class CasConf {
         /*
          * Partner related enum settings
          */
-        ADELPHIC, DRAWBRIDGE, IX, TAPIT, RTBD2, NEXAGE, GOOGLEADX, DMG, AMOAD, MOBILECOMMERCE
+        ADELPHIC, DRAWBRIDGE, IX, TAPIT, RTBD2, NEXAGE, GOOGLEADX, DMG, AMOAD, MOBILECOMMERCE, TABOOLA
     }
     /*
      * Wap Channel adgroup settings

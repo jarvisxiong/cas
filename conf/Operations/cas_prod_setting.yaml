@@ -22,6 +22,8 @@ prod:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -100,6 +102,8 @@ prod:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -178,6 +182,8 @@ prod:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -256,6 +262,8 @@ prod:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -335,6 +343,8 @@ pilot:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -413,6 +423,8 @@ pilot:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -491,6 +503,8 @@ pilot:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -569,6 +583,8 @@ pilot:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
@@ -642,6 +658,8 @@ nonprod:
          - 'off'
       ix_default_url:
          - 'NA'
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       ning_timeout_dcp:
          - 600
       cas_timer_handler_timeout_dcp:
@@ -694,6 +712,8 @@ nonprod:
          - 'on'
       ix_default_url:
           - 'http://10.14.118.66:8889/getIXBid'
+      taboola_default_url:
+          - 'http://10.14.118.66:8100/taboola_resp.html'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
@@ -764,6 +784,8 @@ nonprod:
          - ads01.ifd.vip.ua2.inmobi.com 
       ifd_status:
          - "off"
+      taboola_default_url:
+         - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:

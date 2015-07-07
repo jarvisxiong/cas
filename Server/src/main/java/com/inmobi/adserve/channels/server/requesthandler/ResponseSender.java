@@ -38,6 +38,7 @@ import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.adpool.EncryptionKeys;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -76,7 +77,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -101,6 +101,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final String SDK_500_DCP_WRAPPING_NO_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[]}";
     private static final String SDK_500_DCP_WRAPPING_AD_JSON =
             "{\"requestId\":\"%s\",\"ads\":[{\"pubContent\":\"%s\"}]}";
+    private static final String DCP_NATIVE_WRAPPING_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[%s]}";
     private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native",
             "json");
 
@@ -252,7 +253,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 final Dimension dim = slotSizeMapEntity.getDimension();
                 final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
                 finalResponse = startElement + finalResponse + END_TAG;
-            } else if (rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON) {
+            } else if ((rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON) &&
+                    RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
                 finalResponse = AD_IMAI_START_TAG + finalResponse;
             }
         } else {
@@ -434,11 +436,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
     @SuppressWarnings("rawtypes")
     private void sendResponse(final HttpResponseStatus status, String responseString, final Map responseHeaders,
             final Channel serverChannel) {
-        if (DemandSourceType.DCP.getValue() == sasParams.getDst() &&
-                Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
-            responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                    new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
-            LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
+        if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
+            if (RequestedAdType.NATIVE == sasParams.getRequestedAdType()) {
+                responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                        responseString);
+                LOG.debug("Rewrapping native JSON for DCP traffic. Wrapped Response is: {}", responseString);
+            } else if (Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
+                responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                        new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
+                LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
+            }
         }
 
         final byte[] bytes = responseString.getBytes(Charsets.UTF_8);
