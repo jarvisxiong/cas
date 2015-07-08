@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.api;
 
 
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.CHINA_COUNTRY_CODE;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -33,6 +34,7 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTracker;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.CategoryList;
@@ -214,7 +216,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return;
         }
 
-        LOG.debug("Generating tracker urls for {} with impressionId: {}", this.getName(), this.impressionId);
+        LOG.debug("Generating tracker urls for {} with impressionId: {}", getName(), impressionId);
         final InmobiAdTrackerBuilder builder =
                 getInmobiAdTrackerBuilderFactory().getBuilder(sasParams, impressionId, isCpc);
         overrideInmobiAdTracker(builder);
@@ -223,7 +225,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * This method is for overriding any fields of the InmobiAdTrackerBuilder
-     * 
+     *
      * @param builder
      */
     protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
@@ -232,7 +234,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * Returns the InmobiAdTrackerBuilderFactory instance
-     * 
+     *
      * @return
      */
     protected InmobiAdTrackerBuilderFactory getInmobiAdTrackerBuilderFactory() {
@@ -313,7 +315,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
         try {
             requestUrl = getRequestUri().toString();
-            RequestBuilder ningRequestBuilder = getNingRequestBuilder();
+            final RequestBuilder ningRequestBuilder = getNingRequestBuilder();
             setVirtualHost(ningRequestBuilder);
             final Request ningRequest = ningRequestBuilder.build();
             LOG.debug("request : {}", ningRequest);
@@ -342,7 +344,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                         LOG.debug(traceMarker, "{} status code is {}", getName(), httpResponseStatus);
                         if (isByteResponseSupported) {
-                            byte[] responseBytes = response.getResponseBodyAsBytes();
+                            final byte[] responseBytes = response.getResponseBodyAsBytes();
                             parseResponse(responseBytes, httpResponseStatus);
                         } else {
                             parseResponse(responseStr, httpResponseStatus);
@@ -551,7 +553,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public boolean configureParameters(final SASRequestParameters param, final CasInternalRequestParameters casParams,
             final ChannelSegmentEntity entity, final long slotId, final RepositoryHelper repositoryHelper) {
         sasParams = param;
-        this.casInternalRequestParameters = casParams;
+        casInternalRequestParameters = casParams;
         externalSiteId = entity.getExternalSiteKey();
         selectedSlotId = (short) slotId;
         this.repositoryHelper = repositoryHelper;
@@ -571,7 +573,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return isConfigured;
     }
 
-    private static final Boolean getPricingModel(ChannelSegmentEntity entity) {
+    private static final Boolean getPricingModel(final ChannelSegmentEntity entity) {
         boolean isCpc = false;
         if (null != entity.getPricingModel() && CPC.equalsIgnoreCase(entity.getPricingModel())) {
             isCpc = true;
@@ -710,7 +712,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * function returns the unique device id
-     * 
+     *
      * @param considerDnt - Should casInternalRequestParameters.isTrackingAllowed() taken into consideration
      * @return
      */
@@ -762,7 +764,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 final Calendar cal = new GregorianCalendar();
                 return cal.get(Calendar.YEAR) - sasParams.getAge();
             }
-        } catch (Exception e) {}
+        } catch (final Exception e) {}
         return -1;
     }
 
@@ -983,7 +985,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     /**
-     * 
+     *
      * @param considerDnt -Should casInternalRequestParameters.isTrackingAllowed() taken into consideration
      * @return
      */
@@ -995,7 +997,23 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     /**
+     * Lookup and return IMEI from CL. Only for Android China Traffic
      * 
+     * @return
+     */
+    protected String getIMEI() {
+        if (isAndroid() && CHINA_COUNTRY_CODE.equals(sasParams.getCountryCode())) {
+            final IMEIEntity entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidO1());
+            if (entity != null) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.IMEI_MATCH);
+                return entity.getImei();
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
      * @param considerDnt - Should casInternalRequestParameters.isTrackingAllowed() taken into consideration
      * @return
      */
@@ -1017,7 +1035,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public void disableIPResolution(boolean isIPResolutionDisabled) {
+    public void disableIPResolution(final boolean isIPResolutionDisabled) {
         this.isIPResolutionDisabled = isIPResolutionDisabled;
     }
 
@@ -1032,12 +1050,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         if (host != null) {
             try {
-                URI uri = new URI(host);
+                final URI uri = new URI(host);
                 publicHostName = uri.getHost();
                 if (uri.getPort() != -1) {
                     publicHostName = publicHostName + ":" + uri.getPort();
                 }
-            } catch (URISyntaxException e) {
+            } catch (final URISyntaxException e) {
                 if (LOG.isErrorEnabled()) {
                     LOG.error(traceMarker, "URISyntaxException " + ExceptionBlock.getStackTrace(e), this.getClass()
                             .getSimpleName());
@@ -1047,7 +1065,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         host = ipRepository.getIPAddress(getName(), host, traceMarker);
     }
 
-    private void setVirtualHost(RequestBuilder ningRequestBuilder) {
+    private void setVirtualHost(final RequestBuilder ningRequestBuilder) {
         if (isIPResolutionDisabled) {
             return;
         }

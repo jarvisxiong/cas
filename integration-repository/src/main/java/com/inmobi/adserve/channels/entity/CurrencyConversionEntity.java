@@ -11,7 +11,6 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Data
 public class CurrencyConversionEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
-    private final Integer id;
     private final String currencyId;
     private final Double conversionRate;
     private final Timestamp startDate;
@@ -19,7 +18,6 @@ public class CurrencyConversionEntity implements IdentifiableEntity<String> {
     private final Timestamp modifiedOn;
 
     public CurrencyConversionEntity(final Builder builder) {
-        id = builder.id;
         currencyId = builder.currencyId;
         conversionRate = builder.conversionRate;
         startDate = builder.startDate;
@@ -33,7 +31,6 @@ public class CurrencyConversionEntity implements IdentifiableEntity<String> {
 
     @Setter
     public static class Builder {
-        private Integer id;
         private String currencyId;
         private Double conversionRate;
         private Timestamp startDate;

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class IXBlocklistEntity implements IdentifiableEntity<IXBlocklistsQuery> {
+    private static final long serialVersionUID = 1L;
     private final String blocklistName;
     private final String keyId;
     private final IXBlocklistKeyType keytype;

@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class IMEIEntity {
-    private final String gpId;
+    private final String androidId;
     private String imei;
 }

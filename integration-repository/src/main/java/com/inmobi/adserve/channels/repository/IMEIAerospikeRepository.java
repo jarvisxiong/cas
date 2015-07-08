@@ -24,7 +24,7 @@ import com.inmobi.phoenix.exception.InitializationException;
 
 
 /**
- * 
+ *
  * @author ritwik.kumar
  *
  */
@@ -68,23 +68,21 @@ public class IMEIAerospikeRepository {
     }
 
     /**
-     * 
-     * @param gpId
+     *
+     * @param androidId
      * @return
      */
-    public IMEIEntity query(final String gpId) {
-        if (DataCenter.HKG1 != colo || StringUtils.isBlank(gpId)) {
+    public IMEIEntity query(final String androidId) {
+        if (DataCenter.HKG1 != colo || StringUtils.isBlank(androidId)) {
             return null;
         }
-        IMEIEntity imeiEntity = imeiCache.get(gpId);
+        final IMEIEntity imeiEntity = imeiCache.get(androidId);
         if (imeiEntity == null) {
-            LOG.debug("Cache MISS : Querying aerospike for : gpId: {}", gpId);
+            LOG.debug("Cache MISS : Querying aerospike for : androidId: {}", androidId);
             InspectorStats.incrementStatCount(InspectorStrings.IMEI_CACHE_MISS);
-            asynchronouslyFetchFeedbackFromAerospike(gpId);
-        }
-        imeiEntity = imeiCache.get(gpId);
-        if (imeiEntity != null) {
-            LOG.debug("Got IMEIEntity from cache for query: gpId: {}", gpId);
+            asynchronouslyFetchFeedbackFromAerospike(androidId);
+        } else {
+            LOG.debug("Got IMEIEntity from cache for query: androidId: {}", androidId);
             InspectorStats.incrementStatCount(InspectorStrings.IMEI_CACHE_HIT);
         }
         return imeiEntity;
@@ -93,11 +91,11 @@ public class IMEIAerospikeRepository {
     /**
      * Method that asynchronously fetches Entity from aerospike and puts it into the cache.
      */
-    private void asynchronouslyFetchFeedbackFromAerospike(final String gpId) {
-        final Boolean isSiteGettingUpdated = currentlyUpdatingIds.putIfAbsent(gpId, true);
+    private void asynchronouslyFetchFeedbackFromAerospike(final String androidId) {
+        final Boolean isSiteGettingUpdated = currentlyUpdatingIds.putIfAbsent(androidId, true);
         if (isSiteGettingUpdated == null) {
             // forking new thread to fetch feedback from Aerospike
-            final CacheUpdater cacheUpdater = new CacheUpdater(gpId);
+            final CacheUpdater cacheUpdater = new CacheUpdater(androidId);
             final Runnable cacheUpdaterThread = new Thread(cacheUpdater);
             executorService.execute(cacheUpdaterThread);
         } else {
@@ -109,15 +107,15 @@ public class IMEIAerospikeRepository {
      * Class that performs feedback fetch from aerospike and cache updating tasks asynchronously
      */
     class CacheUpdater implements Runnable {
-        private final String gpId;
+        private final String androidId;
 
-        protected CacheUpdater(final String gpId) {
-            this.gpId = gpId;
+        protected CacheUpdater(final String androidId) {
+            this.androidId = androidId;
         }
 
         @Override
         public void run() {
-            LOG.debug("Getting feedback from the aerospike for query {}", gpId);
+            LOG.debug("Getting feedback from the aerospike for query {}", androidId);
             getFeedbackFromAerospike();
         }
 
@@ -125,26 +123,29 @@ public class IMEIAerospikeRepository {
          * Method which gets feedback from aerospike in case of a cache miss and updates the cache
          */
         private void getFeedbackFromAerospike() {
-            final Record record = getFromAerospike(gpId);
+            final Record record = getFromAerospike(androidId);
             if (null == record) {
-                LOG.debug("Key not found in aerospike :{}", gpId);
+                LOG.debug("Key not found in aerospike :{}", androidId);
                 InspectorStats.incrementStatCount(InspectorStrings.IMEI_FAILED_TO_LOAD_FROM_AEROSPIKE);
                 return;
             }
-            LOG.debug("Key found in aerospike :{}", gpId);
+            LOG.debug("Key found in aerospike :{}", androidId);
             final IMEIEntity imeiEntity = processResultFromAerospike(record);
-            updateCache(imeiEntity);
+            if (imeiEntity != null) {
+                imeiCache.put(androidId, imeiEntity);
+            }
+            currentlyUpdatingIds.remove(androidId);
         }
 
         /**
          * Method which makes a call to aerospike to load the complete site info
          */
-        private Record getFromAerospike(final String gpId) {
+        private Record getFromAerospike(final String androidId) {
             InspectorStats.incrementStatCount(InspectorStrings.IMEI_REQUESTS_TO_AEROSPIKE);
             long time = System.currentTimeMillis();
             Record record;
             try {
-                final Key key = new Key(namespace, set, gpId);
+                final Key key = new Key(namespace, set, androidId);
                 record = aerospikeClient.get(policy, key);
             } catch (final AerospikeException e) {
                 LOG.error("Exception while retrieving record: {}", e);
@@ -163,19 +164,9 @@ public class IMEIAerospikeRepository {
         private IMEIEntity processResultFromAerospike(final Record record) {
             final String imei = (String) record.getValue("imei");
             final IMEIEntity.Builder imeiBuilder = IMEIEntity.newBuilder();
-            imeiBuilder.gpId(gpId);
+            imeiBuilder.androidId(androidId);
             imeiBuilder.imei(imei);
             return imeiBuilder.build();
-        }
-
-        /**
-         * Update the cache with fetched site IMEIEntity and remove from currentlyUpdatingIds
-         */
-        private void updateCache(final IMEIEntity imeiEntity) {
-            if (imeiEntity != null) {
-                imeiCache.put(gpId, imeiEntity);
-            }
-            currentlyUpdatingIds.remove(gpId);
         }
     }
 

@@ -12,6 +12,7 @@ import lombok.Setter;
  */
 @Getter
 public class SdkMraidMapEntity implements IdentifiableEntity<String> {
+    private static final long serialVersionUID = 1L;
     private final String sdkName;
     private final String mraidPath;
     private final Timestamp modifiedOn;

@@ -25,4 +25,5 @@ public class GlobalConstant {
     public static final String MD5 = "MD5";
     public static final String SHA1 = "SHA-1";
     public static final Double MIN_BID_FLOOR = 0.05D;
+    public static final String CHINA_COUNTRY_CODE = "CN";
 }

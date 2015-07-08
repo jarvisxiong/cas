@@ -48,7 +48,6 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
@@ -676,25 +675,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setDpidsha1(casInternalRequestParameters.getUidO1());
         }
 
-        // Setting platform id md5 hashed
-        if (isAndroid() && "CN".equals(sasParams.getCountryCode())) {
-            final IMEIEntity imei = getIMEIEntity();
-            if (imei != null) {
-                device.setDidmd5(imei.getImei());
-                device.setDpidmd5(imei.getImei());
-            }
-        }
-
-        if (!device.isSetDidmd5() && null != casInternalRequestParameters.getUidMd5()) {
+        // Setting platform id as imei or md5 hashed
+        final String imei = getIMEI();
+        if (imei != null) {
+            device.setDidmd5(imei);
+            device.setDpidmd5(imei);
+        } else if (null != casInternalRequestParameters.getUidMd5()) {
             device.setDidmd5(casInternalRequestParameters.getUidMd5());
             device.setDpidmd5(casInternalRequestParameters.getUidMd5());
-        } else if (!device.isSetDidmd5() && null != casInternalRequestParameters.getUid()) {
+        } else if (null != casInternalRequestParameters.getUid()) {
             device.setDidmd5(casInternalRequestParameters.getUid());
             device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
-
         final String ifa = getUidIFA(false);
         // Setting Extension for idfa
         if (StringUtils.isNotEmpty(ifa)) {
@@ -709,45 +703,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         return device;
     }
-
-    private IMEIEntity getIMEIEntity() {
-        IMEIEntity entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidIDUS1());
-        if (entity != null) {
-            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidIDUS1");
-            return entity;
-        } else {
-            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidSO1());
-        }
-
-        if (entity != null) {
-            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidSO1");
-            return entity;
-        } else {
-            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidO1());
-        }
-
-        if (entity != null) {
-            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidO1");
-            return entity;
-        } else {
-            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUid());
-        }
-
-        if (entity != null) {
-            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUid");
-            return entity;
-        } else {
-            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidMd5());
-        }
-
-        if (entity != null) {
-            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidMd5");
-            return entity;
-        }
-
-        return entity;
-    }
-
 
     private Map<String, String> getDeviceExt(final Device device) {
         final Map<String, String> deviceExtensions = new HashMap<>();

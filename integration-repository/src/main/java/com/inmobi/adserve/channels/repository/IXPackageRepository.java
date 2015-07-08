@@ -33,6 +33,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Range;
 import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -83,20 +84,22 @@ public class IXPackageRepository {
 
     public static final Attribute<IXPackageEntity, String> DEAL_IDS =
             new MultiValueNullableAttribute<IXPackageEntity, String>("deal_ids", false) {
-        @Override
-        public List<String> getNullableValues(IXPackageEntity entity) {
-            List<String> dealIds = entity.getDealIds();
-            return dealIds;
-        }
-    };
+                @Override
+                public List<String> getNullableValues(final IXPackageEntity entity) {
+                    final List<String> dealIds = entity.getDealIds();
+                    return dealIds;
+                }
+            };
 
     public static final Attribute<IXPackageEntity, String> SITE_ID = new MultiValueAttribute<IXPackageEntity, String>(
             "site_id") {
-        public List<String> getValues(IXPackageEntity entity) {
-            Segment segment = entity.getSegment();
+        @Override
+        @SuppressWarnings("unchecked")
+        public List<String> getValues(final IXPackageEntity entity) {
+            final Segment segment = entity.getSegment();
 
             Collection<String> siteIds = null;
-            SegmentParameter<?> siteIdParam = segment.getSegmentParameters().get(SiteId.class.getName());
+            final SegmentParameter<?> siteIdParam = segment.getSegmentParameters().get(SiteId.class.getName());
             if (siteIdParam != null) {
                 siteIds = (Collection<String>) siteIdParam.getValue();
             }
@@ -109,11 +112,13 @@ public class IXPackageRepository {
 
     public static final Attribute<IXPackageEntity, Integer> COUNTRY_ID =
             new MultiValueAttribute<IXPackageEntity, Integer>("country_id") {
-                public List<Integer> getValues(IXPackageEntity entity) {
-                    Segment segment = entity.getSegment();
-
+                @Override
+                @SuppressWarnings("unchecked")
+                public List<Integer> getValues(final IXPackageEntity entity) {
+                    final Segment segment = entity.getSegment();
                     Collection<Integer> countryIds = null;
-                    SegmentParameter<?> countryIdParam = segment.getSegmentParameters().get(Country.class.getName());
+                    final SegmentParameter<?> countryIdParam =
+                            segment.getSegmentParameters().get(Country.class.getName());
                     if (countryIdParam != null) {
                         countryIds = (Collection<Integer>) countryIdParam.getValue();
                     }
@@ -126,11 +131,13 @@ public class IXPackageRepository {
 
     public static final Attribute<IXPackageEntity, Integer> OS_ID = new MultiValueAttribute<IXPackageEntity, Integer>(
             "os_id") {
-        public List<Integer> getValues(IXPackageEntity entity) {
-            Segment segment = entity.getSegment();
+        @Override
+        @SuppressWarnings("unchecked")
+        public List<Integer> getValues(final IXPackageEntity entity) {
+            final Segment segment = entity.getSegment();
 
             Collection<Integer> osIds = null;
-            SegmentParameter<?> osIdParam = segment.getSegmentParameters().get(DeviceOs.class.getName());
+            final SegmentParameter<?> osIdParam = segment.getSegmentParameters().get(DeviceOs.class.getName());
             if (osIdParam != null) {
                 osIds = (Collection<Integer>) osIdParam.getValue();
             }
@@ -143,11 +150,13 @@ public class IXPackageRepository {
 
     public static final Attribute<IXPackageEntity, Integer> SLOT_ID =
             new MultiValueAttribute<IXPackageEntity, Integer>("slot_id") {
-                public List<Integer> getValues(IXPackageEntity entity) {
-                    Segment segment = entity.getSegment();
+                @Override
+                @SuppressWarnings("unchecked")
+                public List<Integer> getValues(final IXPackageEntity entity) {
+                    final Segment segment = entity.getSegment();
 
                     Collection<Integer> slotIds = null;
-                    SegmentParameter<?> slotIdParam = segment.getSegmentParameters().get(SlotId.class.getName());
+                    final SegmentParameter<?> slotIdParam = segment.getSegmentParameters().get(SlotId.class.getName());
                     if (slotIdParam != null) {
                         slotIds = (Collection<Integer>) slotIdParam.getValue();
                     }
@@ -158,16 +167,17 @@ public class IXPackageRepository {
                 }
             };
 
-    public void init(Logger logger, DataSource dataSource, Configuration config, String instanceName) {
+    public void init(final Logger logger, final DataSource dataSource, final Configuration config,
+            final String instanceName) {
 
         this.logger = logger;
-        String query = config.getString("query");
-        MetricRegistry metricsRegistry = new MetricRegistry();
+        final String query = config.getString("query");
+        final MetricRegistry metricsRegistry = new MetricRegistry();
 
-        this.reader =
+        reader =
                 new ScheduledDbReader(dataSource, query, null, new IXPackageReaderDelegate(), new MetricRegistry(),
                         getRepositorySchedule(config), Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-                        .setNameFormat("repository-update-%d").build()), instanceName);
+                                .setNameFormat("repository-update-%d").build()), instanceName);
 
         packageIndex = CQEngine.newInstance();
         packageIndex.addIndex(HashIndex.onAttribute(SITE_ID));
@@ -194,41 +204,41 @@ public class IXPackageRepository {
         }
 
         @Override
-        public Timestamp readRow(ResultSet rs) throws SQLException {
+        public Timestamp readRow(final ResultSet rs) throws SQLException {
 
             Timestamp ts;
             try {
-                int id = rs.getInt("id");
-                Integer[] osIds = (Integer[]) rs.getArray("os_ids").getArray();
-                String[] siteIds = (String[]) rs.getArray("site_ids").getArray();
-                boolean latLongOnly = rs.getBoolean("lat_long_only");
-                boolean zipCodeOnly = rs.getBoolean("zip_code_only");
-                boolean ifaOnly = rs.getBoolean("ifa_only");
-                Integer[] countryIds = (Integer[]) rs.getArray("country_ids").getArray();
-                Integer[] cityIds = (Integer[]) rs.getArray("city_ids").getArray();
-                String[] inventoryTypes = (String[]) rs.getArray("inventory_types").getArray();
-                Long[] carrierIds = (Long[]) rs.getArray("carrier_ids").getArray();
-                String[] siteCategories = (String[]) rs.getArray("site_categories").getArray();
-                String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
+                final int id = rs.getInt("id");
+                final Integer[] osIds = (Integer[]) rs.getArray("os_ids").getArray();
+                final String[] siteIds = (String[]) rs.getArray("site_ids").getArray();
+                final boolean latLongOnly = rs.getBoolean("lat_long_only");
+                final boolean zipCodeOnly = rs.getBoolean("zip_code_only");
+                final boolean ifaOnly = rs.getBoolean("ifa_only");
+                final Integer[] countryIds = (Integer[]) rs.getArray("country_ids").getArray();
+                final Integer[] cityIds = (Integer[]) rs.getArray("city_ids").getArray();
+                final String[] inventoryTypes = (String[]) rs.getArray("inventory_types").getArray();
+                final Long[] carrierIds = (Long[]) rs.getArray("carrier_ids").getArray();
+                final String[] siteCategories = (String[]) rs.getArray("site_categories").getArray();
+                final String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
                 String[] geoSourceTypes = null;
-                String geoFenceRegion = rs.getString("geo_fence_region");
+                final String geoFenceRegion = rs.getString("geo_fence_region");
 
                 if (null != rs.getArray("geo_source_types")) {
                     geoSourceTypes = (String[]) rs.getArray("geo_source_types").getArray();
                 }
 
-                int dataVendorId = rs.getInt("data_vendor_id");
-                Double dataVendorCost = rs.getDouble("data_vendor_cost");
-                int dmpId = rs.getInt("dmp_id");
+                final int dataVendorId = rs.getInt("data_vendor_id");
+                final Double dataVendorCost = rs.getDouble("data_vendor_cost");
+                final int dmpId = rs.getInt("dmp_id");
 
-                String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
-                String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
-                Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
+                final String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
+                final String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
+                final Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
 
                 Set<Set<Integer>> dmpFilterSegmentExpression;
                 try {
                     dmpFilterSegmentExpression = extractDmpFilterExpression(rs.getString("dmp_filter_expression"));
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     logger.error("Invalid dmpFilterExpressionJson in IXPackageRepository for id " + id, e);
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
@@ -237,7 +247,7 @@ public class IXPackageRepository {
                 Map<Integer, Range<Double>> osVersionTargeting;
                 try {
                     osVersionTargeting = extractOsVersionTargeting(rs.getString("os_version_targeting"));
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     logger.error("Invalid OsVersionTargeting Json in IXPackageRepository for id " + id, e);
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
@@ -246,17 +256,17 @@ public class IXPackageRepository {
                 Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
                 try {
                     manufModelTargeting = extractManufModelTargeting(rs.getString("manuf_model_targeting"));
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     logger.error("Invalid ManufModelTargeting Json in IXPackageRepository for id " + id, e);
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
                 }
 
-                Object[] outputArray = (Object[]) rs.getArray("scheduled_tods").getArray();
-                Integer[][] scheduleTimeOfDays =
-                        (outputArray.length == 0) ? EMPTY_2D_INTEGER_ARRAY : (Integer[][]) outputArray;
+                final Object[] outputArray = (Object[]) rs.getArray("scheduled_tods").getArray();
+                final Integer[][] scheduleTimeOfDays =
+                        outputArray.length == 0 ? EMPTY_2D_INTEGER_ARRAY : (Integer[][]) outputArray;
 
-                Integer[] slotIds = (Integer[]) rs.getArray("placement_slot_ids").getArray();
+                final Integer[] slotIds = (Integer[]) rs.getArray("placement_slot_ids").getArray();
 
                 SiteId site = null;
                 if (ArrayUtils.isNotEmpty(siteIds)) {
@@ -301,7 +311,7 @@ public class IXPackageRepository {
                 }
                 InventoryType inventoryType = null;
                 if (ArrayUtils.isNotEmpty(inventoryTypes)) {
-                    InventoryTypeEnum[] inventoryTypeEnums = new InventoryTypeEnum[inventoryTypes.length];
+                    final InventoryTypeEnum[] inventoryTypeEnums = new InventoryTypeEnum[inventoryTypes.length];
                     for (int i = 0; i < inventoryTypes.length; i++) {
                         inventoryTypeEnums[i] = InventoryTypeEnum.valueOf(inventoryTypes[i]);
                     }
@@ -317,7 +327,7 @@ public class IXPackageRepository {
 
                 SiteCategory siteCategory = null;
                 if (ArrayUtils.isNotEmpty(siteCategories)) {
-                    SiteCategoryEnum[] siteCategoryEnums = new SiteCategoryEnum[siteCategories.length];
+                    final SiteCategoryEnum[] siteCategoryEnums = new SiteCategoryEnum[siteCategories.length];
                     for (int i = 0; i < siteCategories.length; i++) {
                         siteCategoryEnums[i] = SiteCategoryEnum.valueOf(siteCategories[i]);
                     }
@@ -327,7 +337,7 @@ public class IXPackageRepository {
 
                 ConnectionType connectionType = null;
                 if (ArrayUtils.isNotEmpty(connectionTypes)) {
-                    ConnectionTypeEnum[] connectionTypeEnums = new ConnectionTypeEnum[connectionTypes.length];
+                    final ConnectionTypeEnum[] connectionTypeEnums = new ConnectionTypeEnum[connectionTypes.length];
                     for (int i = 0; i < connectionTypes.length; i++) {
                         connectionTypeEnums[i] = ConnectionTypeEnum.valueOf(connectionTypes[i]);
                     }
@@ -337,7 +347,7 @@ public class IXPackageRepository {
 
                 GeoSourceType geoSourceType = null;
                 if (ArrayUtils.isNotEmpty(geoSourceTypes)) {
-                    GeoSourceTypeEnum[] geoSourceTypeEnums = new GeoSourceTypeEnum[geoSourceTypes.length];
+                    final GeoSourceTypeEnum[] geoSourceTypeEnums = new GeoSourceTypeEnum[geoSourceTypes.length];
                     for (int i = 0; i < geoSourceTypes.length; i++) {
                         geoSourceTypeEnums[i] = GeoSourceTypeEnum.valueOf(geoSourceTypes[i]);
                     }
@@ -352,7 +362,7 @@ public class IXPackageRepository {
                 }
 
                 // Segment builder.
-                Segment.Builder repoSegmentBuilder = new Segment.Builder();
+                final Segment.Builder repoSegmentBuilder = new Segment.Builder();
 
                 if (site != null) {
                     repoSegmentBuilder.addSegmentParameter(site);
@@ -405,10 +415,10 @@ public class IXPackageRepository {
                     repoSegmentBuilder.addSegmentParameter(geoSourceType);
                 }
 
-                Segment segment = repoSegmentBuilder.build();
+                final Segment segment = repoSegmentBuilder.build();
 
                 // Entity builder
-                IXPackageEntity.Builder entityBuilder = IXPackageEntity.newBuilder();
+                final IXPackageEntity.Builder entityBuilder = IXPackageEntity.newBuilder();
                 entityBuilder.id(id);
                 entityBuilder.segment(segment);
                 entityBuilder.dmpId(dmpId);
@@ -424,7 +434,7 @@ public class IXPackageRepository {
                 if (null != dealFloors) {
                     entityBuilder.dealFloors(Arrays.asList(dealFloors));
                 }
-                if(null != accessTypes){
+                if (null != accessTypes) {
                     entityBuilder.accessTypes(Arrays.asList(accessTypes));
                 }
                 if (null != geoFenceRegion) {
@@ -432,9 +442,9 @@ public class IXPackageRepository {
                 }
                 entityBuilder.dataVendorCost(dataVendorCost);
 
-                IXPackageEntity entity = entityBuilder.build();
+                final IXPackageEntity entity = entityBuilder.build();
 
-                boolean active = rs.getBoolean("is_active");
+                final boolean active = rs.getBoolean("is_active");
                 if (active) {
                     newIXPackageSet.put(id, entity);
                     if (logger.isDebugEnabled()) {
@@ -448,7 +458,7 @@ public class IXPackageRepository {
                 }
                 ts = rs.getTimestamp("last_modified");
 
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 logger.error("Error while reading row in IXPackageRepository.", e);
                 ts = new Timestamp(0);
             }
@@ -478,30 +488,31 @@ public class IXPackageRepository {
     }
 
     public Collection<IXPackageEntity> getIXPackageSet() {
-        if (this.packageSet != null) {
-            return this.packageSet.values();
+        if (packageSet != null) {
+            return packageSet.values();
         } else {
             return Collections.emptySet();
         }
     }
 
-    private Scheduler getRepositorySchedule(Configuration config) {
-        int initialDelay = Preconditions.checkNotNull(config.getInt("initialDelay"));
-        int refreshTime = Preconditions.checkNotNull(config.getInt("refreshTime"));
+    private Scheduler getRepositorySchedule(final Configuration config) {
+        final int initialDelay = Preconditions.checkNotNull(config.getInt("initialDelay"));
+        final int refreshTime = Preconditions.checkNotNull(config.getInt("refreshTime"));
 
         return Scheduler.newFixedRateSchedule(initialDelay, refreshTime, TimeUnit.SECONDS);
     }
 
-    private static Set<Set<Integer>> extractDmpFilterExpression(String dmpFilterExpressionJson) throws JSONException {
-        Set<Set<Integer>> dmpFilterSegmentExpression = new HashSet<>();
+    private static Set<Set<Integer>> extractDmpFilterExpression(final String dmpFilterExpressionJson)
+            throws JSONException {
+        final Set<Set<Integer>> dmpFilterSegmentExpression = new HashSet<>();
 
         if (StringUtils.isNotEmpty(dmpFilterExpressionJson)) {
-            JSONArray dmpSegmentsJsonArray = new JSONArray(dmpFilterExpressionJson);
+            final JSONArray dmpSegmentsJsonArray = new JSONArray(dmpFilterExpressionJson);
             for (int andSetIdx = 0; andSetIdx < dmpSegmentsJsonArray.length(); andSetIdx++) {
-                JSONArray andJsonArr = (JSONArray) dmpSegmentsJsonArray.get(andSetIdx);
-                Set<Integer> orSet = new HashSet<>();
+                final JSONArray andJsonArr = (JSONArray) dmpSegmentsJsonArray.get(andSetIdx);
+                final Set<Integer> orSet = new HashSet<>();
                 for (int orSetIdx = 0; orSetIdx < andJsonArr.length(); orSetIdx++) {
-                    orSet.add((Integer) (andJsonArr.get(orSetIdx)));
+                    orSet.add((Integer) andJsonArr.get(orSetIdx));
                 }
                 dmpFilterSegmentExpression.add(orSet);
             }
@@ -511,25 +522,26 @@ public class IXPackageRepository {
     }
 
     /**
-     * This function extracts the os version targeting meta data.
-     * Meta Data consists of a map that maps the os id to a Closed Range
+     * This function extracts the os version targeting meta data. Meta Data consists of a map that maps the os id to a
+     * Closed Range
      *
      * note: osId in the adPoolRequest is a long, osId in CAS is an int and osId in the ix_packages table is a short
+     * 
      * @param osVersionTargetingJson
      * @return
      * @throws JSONException
      */
-    protected static Map<Integer, Range<Double>> extractOsVersionTargeting(String osVersionTargetingJson)
+    protected static Map<Integer, Range<Double>> extractOsVersionTargeting(final String osVersionTargetingJson)
             throws JSONException {
-        ImmutableMap.Builder<Integer, Range<Double>>  osVersionTargeting = new ImmutableMap.Builder<>();
+        final ImmutableMap.Builder<Integer, Range<Double>> osVersionTargeting = new ImmutableMap.Builder<>();
 
         if (StringUtils.isNotEmpty(osVersionTargetingJson)) {
-            JSONArray jsonArray = new JSONArray(osVersionTargetingJson);
+            final JSONArray jsonArray = new JSONArray(osVersionTargetingJson);
 
             // Iterate over all os ids
             for (int index = 0; index < jsonArray.length(); ++index) {
-                JSONObject osEntry = (JSONObject) jsonArray.get(index);
-                JSONArray osVersionRangeJsonArray = osEntry.getJSONArray("range");
+                final JSONObject osEntry = (JSONObject) jsonArray.get(index);
+                final JSONArray osVersionRangeJsonArray = osEntry.getJSONArray("range");
                 Range<Double> osVersionRange;
 
                 // Sanity for malformed ranges
@@ -540,7 +552,7 @@ public class IXPackageRepository {
                     double maxVer = osVersionRangeJsonArray.getDouble(1);
                     // Sanity for range: minVer must always be <= maxVer
                     if (minVer > maxVer) {
-                        double temp = minVer;
+                        final double temp = minVer;
                         minVer = maxVer;
                         maxVer = temp;
                     }
@@ -556,35 +568,34 @@ public class IXPackageRepository {
     }
 
     /**
-     * This function extracts the device manufacturer and device model targeting meta data.
-     * Meta Data consists of a map that maps the device manufacturer id (Long) to the inclusion boolean (Boolean)
-     * to the set of device model ids.
+     * This function extracts the device manufacturer and device model targeting meta data. Meta Data consists of a map
+     * that maps the device manufacturer id (Long) to the inclusion boolean (Boolean) to the set of device model ids.
      *
      * @param manufModelTargetingJson
      * @return Map as described above
      * @throws JSONException
      */
-    protected static Map<Long, Pair<Boolean, Set<Long>>> extractManufModelTargeting(String manufModelTargetingJson)
+    protected static Map<Long, Pair<Boolean, Set<Long>>> extractManufModelTargeting(final String manufModelTargetingJson)
             throws JSONException {
-        ImmutableMap.Builder<Long, Pair<Boolean, Set<Long>>> manufModelTargeting = new ImmutableMap.Builder<>();
+        final ImmutableMap.Builder<Long, Pair<Boolean, Set<Long>>> manufModelTargeting = new ImmutableMap.Builder<>();
 
         if (StringUtils.isNotEmpty(manufModelTargetingJson)) {
-            JSONArray jsonArray = new JSONArray(manufModelTargetingJson);
+            final JSONArray jsonArray = new JSONArray(manufModelTargetingJson);
 
             // Iterate over all device manufacturer ids
             for (int manufIndex = 0; manufIndex < jsonArray.length(); ++manufIndex) {
-                JSONObject manufEntry = (JSONObject) jsonArray.get(manufIndex);
+                final JSONObject manufEntry = (JSONObject) jsonArray.get(manufIndex);
 
-                ImmutableSet.Builder<Long> modelIds = new ImmutableSet.Builder();
-                JSONArray modelIdsJsonArray = manufEntry.getJSONArray("modelIds");
+                final Builder<Long> modelIds = new Builder<Long>();
+                final JSONArray modelIdsJsonArray = manufEntry.getJSONArray("modelIds");
 
                 // Iterate over all the device model ids and add them to the modelIds Set
-                for (int modelIndex = 0; modelIndex < modelIdsJsonArray.length(); ++ modelIndex) {
+                for (int modelIndex = 0; modelIndex < modelIdsJsonArray.length(); ++modelIndex) {
                     modelIds.add(modelIdsJsonArray.getLong(modelIndex));
                 }
 
                 // Determine whether the modelIds Set is an inclusion or an exclusion Set
-                Boolean incl = manufEntry.getBoolean("incl");
+                final Boolean incl = manufEntry.getBoolean("incl");
 
                 // Sanity: If modelIds Set is empty and incl is false, then skip manufacturer
                 if (0 == modelIdsJsonArray.length() && !incl) {
