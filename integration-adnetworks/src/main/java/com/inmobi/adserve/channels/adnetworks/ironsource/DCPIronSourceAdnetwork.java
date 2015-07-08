@@ -133,37 +133,35 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
                 final VelocityContext context = new VelocityContext();
 
                 final JSONArray responseAd = adResponse.getJSONArray("ads");
-                // (JSONArray) adResponse.get("ads");
                 if (responseAd.length() > 0) {
                     final JSONObject responseAdObj = responseAd.getJSONObject(0);
                     final JSONObject responseCreative = responseAdObj.getJSONObject("creatives");
                     creativetype = "banner" + width + "x" + height;
+                    final TemplateType t;
                     if (width == 320 && height == 50) {
-                        final TemplateType t = TemplateType.RICH;
+                        t = TemplateType.RICH;
                         context.put(VelocityTemplateFieldConstants.AD_TEXT, responseAdObj.getString("title"));
                         context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL, responseCreative.getString("img"));
-                        buildInmobiAdTracker();
-                        context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL,
-                                responseAdObj.getString("clickURL"));
-                        context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
-                        adStatus = AD_STRING;
-                        responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
-                        LOG.debug("response content length is {} and the response is {}", responseContent.length(),
-                                responseContent);
                     } else {
-                        final TemplateType t = TemplateType.IMAGE;
+                        t = TemplateType.IMAGE;
                         context.put(VelocityTemplateFieldConstants.PARTNER_IMG_URL,
                                 responseCreative.getString(creativetype));
-                        buildInmobiAdTracker();
-                        context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL,
-                                responseAdObj.getString("clickURL"));
-                        context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
-                        adStatus = AD_STRING;
-                        responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
-                        LOG.debug("response content length is {} and the response is {}", responseContent.length(),
-                                responseContent);
+
 
                     }
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, responseAdObj.getString("impressionURL"));
+                    buildInmobiAdTracker();
+                    context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_URL,
+                                responseAdObj.getString("clickURL"));
+                    context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
+                    adStatus = AD_STRING;
+                    responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
+                    LOG.debug("response content length is {} and the response is {}", responseContent.length(),
+                              responseContent);
+                }
+                else{
+                    adStatus = NO_AD;
+                    return;
                 }
             } catch (final JSONException exception) {
                 adStatus = NO_AD;
