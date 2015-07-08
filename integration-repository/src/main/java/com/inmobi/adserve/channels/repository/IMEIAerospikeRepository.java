@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +73,7 @@ public class IMEIAerospikeRepository {
      * @return
      */
     public IMEIEntity query(final String gpId) {
-        if (DataCenter.HKG1 != colo) {
+        if (DataCenter.HKG1 != colo || StringUtils.isBlank(gpId)) {
             return null;
         }
         IMEIEntity imeiEntity = imeiCache.get(gpId);

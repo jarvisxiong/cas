@@ -677,18 +677,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Setting platform id md5 hashed
-        final String gpId = getGPID(false);
-        if (isWapSiteUACEntity && wapSiteUACEntity.isAndroid() && "CN".equals(sasParams.getCountryCode())) {
-            if (gpId != null) {
-                final String gpIdMD5 = getHashedValue(gpId, MD5);
-                final IMEIEntity imei = repositoryHelper.queryIMEIRepository(gpIdMD5);
-                if (imei != null) {
-                    device.setDidmd5(imei.getImei());
-                    device.setDpidmd5(imei.getImei());
-                } else {
-                    // TODO: Adding to match real data with the data provided - Remove once verified
-                    LOG.info(traceMarker, "IMEI Lookup failed for GPID->{}, GPID_MD5->{}", gpId, gpIdMD5);
-                }
+        if (isAndroid() && "CN".equals(sasParams.getCountryCode())) {
+            final IMEIEntity imei = getIMEIEntity();
+            if (imei != null) {
+                device.setDidmd5(imei.getImei());
+                device.setDpidmd5(imei.getImei());
             }
         }
 
@@ -709,11 +702,52 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             deviceExtensions.put("idfasha1", getHashedValue(ifa, SHA1));
             deviceExtensions.put("idfamd5", getHashedValue(ifa, MD5));
         }
+
+        final String gpId = getGPID(false);
         if (StringUtils.isNotEmpty(gpId)) {
             deviceExtensions.put("gpid", gpId);
         }
         return device;
     }
+
+    private IMEIEntity getIMEIEntity() {
+        IMEIEntity entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidIDUS1());
+        if (entity != null) {
+            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidIDUS1");
+            return entity;
+        } else {
+            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidSO1());
+        }
+
+        if (entity != null) {
+            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidSO1");
+            return entity;
+        } else {
+            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidO1());
+        }
+
+        if (entity != null) {
+            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidO1");
+            return entity;
+        } else {
+            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUid());
+        }
+
+        if (entity != null) {
+            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUid");
+            return entity;
+        } else {
+            entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidMd5());
+        }
+
+        if (entity != null) {
+            InspectorStats.incrementStatCount(getName(), "IMEI-MATCH-getUidMd5");
+            return entity;
+        }
+
+        return entity;
+    }
+
 
     private Map<String, String> getDeviceExt(final Device device) {
         final Map<String, String> deviceExtensions = new HashMap<>();
