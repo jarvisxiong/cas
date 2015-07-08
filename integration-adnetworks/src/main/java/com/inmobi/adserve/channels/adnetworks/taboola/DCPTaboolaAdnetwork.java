@@ -167,7 +167,13 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 updateNativeParams(params, nurl);
                 App.Builder appBuilder = App.newBuilder();
                 NativeJson taboolaNative = taboolaResponse.getList()[0];
-                appBuilder.setTitle(taboolaNative.getName());
+                String title = taboolaNative.getBranding();
+                String description = taboolaNative.getName();
+                if(null == title){
+                    title = description;
+                    description = taboolaNative.getDescription();
+                }
+                appBuilder.setTitle(title);
                 appBuilder.setOpeningLandingUrl(taboolaNative.getUrl());
                 appBuilder.setId(taboolaNative.getId());
                 List<Icon> icons = new ArrayList<>();
@@ -183,8 +189,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 appBuilder.setIcons(icons);
                 appBuilder.setScreenshots(screenshotList);
                 appBuilder.setAdImpressionId(impressionId);
-                if (StringUtils.isNotBlank(taboolaNative.getDescription())) {
-                    appBuilder.setDesc(taboolaNative.getDescription());
+                if (null != description) {
+                    appBuilder.setDesc(description);
                 }
                 App app = (App) appBuilder.build();
                 responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params,

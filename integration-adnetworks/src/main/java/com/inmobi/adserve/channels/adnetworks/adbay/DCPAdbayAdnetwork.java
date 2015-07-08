@@ -120,7 +120,5 @@ public class DCPAdbayAdnetwork extends AbstractDCPAdNetworkImpl {
             }
 
         }
-
-
     }
 }
