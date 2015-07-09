@@ -231,14 +231,32 @@ public class GoogleAdXNetworkTest {
         assertEquals(googleAdXNetwork.getHttpResponseStatusCode(), 200);
 
         final String expectedResponse =
-                "<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type='text/javascript' src='http://www.googletagservices.com/tag/js/gpt.js'>\n"
-                        + "  googletag.pubads().set(\"page_url\", \"http://www.inmobi.com\");\n"
-                        + "  googletag.pubads().definePassback('/14503685/AdUnitForAdx', [[320, 50]]).setTargeting('adxtagid', ['8a809449013c3c643cad82cb412b5857']).display();\n"
-                        + "  googletag.pubads().addEventListener('slotRenderEnded', function(event) {\n"
+                "<html><head><title></title><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body>\n"
+                        + "<script type='text/javascript'>\n" + "  var googletag = googletag || {};\n"
+                        + "  googletag.cmd = googletag.cmd || [];\n" + "  (function() {\n"
+                        + "    var gads = document.createElement('script');\n" + "    gads.async = true;\n"
+                        + "    gads.type = 'text/javascript';\n"
+                        + "    var useSSL = 'https:' == document.location.protocol;\n"
+                        + "    gads.src = (useSSL ? 'https:' : 'http:') +\n"
+                        + "      '//www.googletagservices.com/tag/js/gpt.js';\n"
+                        + "    var node = document.getElementsByTagName('script')[0];\n"
+                        + "    node.parentNode.insertBefore(gads, node);\n" + "  })();\n" + "</script>\n" + "\n"
+                        + "<script type='text/javascript'>\n" + "  googletag.cmd.push(function() {\n"
+                        + "    googletag.pubads().set(\"page_url\", \"http://www.inmobi.com\");\n"
+                        + "    googletag.defineSlot('/14503685/AdUnitForAdx', [[320, 50]], 'div-gpt-ad-1435740571311-0').setTargeting('adxtagid', ['8a809449013c3c643cad82cb412b5857']).addService(googletag.pubads());\n"
+                        + "    googletag.pubads().addEventListener('slotRenderEnded', function(event) {\n"
                         + "        if (!event.isEmpty) {\n"
-                        + "            document.write(\"<img src='beaconUrl' height=1 width=1 border=0 style='display:none;'/>\");        }\n"
-                        + "    });\n"
-                        + "</script></body></html>";
+                        + "            var beaconElement = document.createElement(\"img\");\n"
+                        + "            beaconElement.src = \"beaconUrl\";\n"
+                        + "            beaconElement.style = \"display:none\";\n"
+                        + "            beaconElement.height = 1;\n" + "            beaconElement.width = 1;\n"
+                        + "            beaconElement.border = 0;\n"
+                        + "            document.getElementById(\"div-gpt-ad-1435740571311-0\").appendChild(beaconElement);\n"
+                        + "          }\n" + "    });\n" + "    googletag.enableServices();\n" + "  });\n"
+                        + "</script>\n" + "<!-- /14503685/AdUnitForAdx -->\n"
+                        + "<div id='div-gpt-ad-1435740571311-0'>\n" + "<script type='text/javascript'>\n"
+                        + "googletag.cmd.push(function() { googletag.display('div-gpt-ad-1435740571311-0'); });\n"
+                        + "</script>\n" + "</div></body></html>\n";
         assertEquals(expectedResponse, googleAdXNetwork.getHttpResponseContent());
     }
 

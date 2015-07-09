@@ -1,9 +1,40 @@
-<html><head><title></title><style type="text/css">body {margin: 0px; overflow: hidden;} </style></head><body><script type='text/javascript' src='http://www.googletagservices.com/tag/js/gpt.js'>
-  googletag.pubads().set("page_url", "$googlePageURL");
-  googletag.pubads().definePassback('/14503685/AdUnitForAdx', [[$width, $height]]).setTargeting('adxtagid', ['$adTagId']).display();
-  googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+<html><head><title></title><style type="text/css">body {margin: 0px; overflow: hidden;} </style></head><body>
+<script type='text/javascript'>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+  (function() {
+    var gads = document.createElement('script');
+    gads.async = true;
+    gads.type = 'text/javascript';
+    var useSSL = 'https:' == document.location.protocol;
+    gads.src = (useSSL ? 'https:' : 'http:') +
+      '//www.googletagservices.com/tag/js/gpt.js';
+    var node = document.getElementsByTagName('script')[0];
+    node.parentNode.insertBefore(gads, node);
+  })();
+</script>
+
+<script type='text/javascript'>
+  googletag.cmd.push(function() {
+    googletag.pubads().set("page_url", "$googlePageURL");
+    googletag.defineSlot('/14503685/AdUnitForAdx', [[$width, $height]], 'div-gpt-ad-1435740571311-0').setTargeting('adxtagid', ['$adTagId']).addService(googletag.pubads());
+    googletag.pubads().addEventListener('slotRenderEnded', function(event) {
         if (!event.isEmpty) {
-            #if($IMBeaconUrl)document.write("<img src='$IMBeaconUrl' height=1 width=1 border=0 style='display:none;'/>");#end
-        }
+            var beaconElement = document.createElement("img");
+            beaconElement.src = "$IMBeaconUrl";
+            beaconElement.style = "display:none";
+            beaconElement.height = 1;
+            beaconElement.width = 1;
+            beaconElement.border = 0;
+            document.getElementById("div-gpt-ad-1435740571311-0").appendChild(beaconElement);
+          }
     });
-</script></body></html>
+    googletag.enableServices();
+  });
+</script>
+<!-- /14503685/AdUnitForAdx -->
+<div id='div-gpt-ad-1435740571311-0'>
+<script type='text/javascript'>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-1435740571311-0'); });
+</script>
+</div></body></html>
