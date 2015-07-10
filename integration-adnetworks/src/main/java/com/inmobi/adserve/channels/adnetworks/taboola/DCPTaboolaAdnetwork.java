@@ -51,6 +51,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_REFERRER = "user.referrer";
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
+    private static final String READ_MORE = "Read More";
+
     @Inject
     protected static TemplateConfiguration templateConfiguration;
 
@@ -85,11 +87,6 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         host = String.format(config.getString("taboola.host"), externalSiteId);
         iconUrl = config.getString("taboola.icon");
         notificationUrl = String.format(config.getString("taboola.notification"),externalSiteId);
-        if (selectedSlotId != 0) {
-            LOG.info(traceMarker, "Configure parameters inside Taboola returned false as the slot size is not zero");
-            return false;
-        }
-
 
         if (sasParams.getWapSiteUACEntity() != null
                 && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
@@ -189,6 +186,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 appBuilder.setIcons(icons);
                 appBuilder.setScreenshots(screenshotList);
                 appBuilder.setAdImpressionId(impressionId);
+                appBuilder.setActionText(READ_MORE);
                 if (null != description) {
                     appBuilder.setDesc(description);
                 }
