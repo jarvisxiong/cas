@@ -85,6 +85,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = String.format(config.getString("taboola.host"), externalSiteId);
+        iconUrl = config.getString("taboola.icon");
         notificationUrl = config.getString("taboola.notification");
 
         if (sasParams.getWapSiteUACEntity() != null
