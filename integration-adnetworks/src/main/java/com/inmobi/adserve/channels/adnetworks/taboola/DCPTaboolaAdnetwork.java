@@ -85,8 +85,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         host = String.format(config.getString("taboola.host"), externalSiteId);
-        iconUrl = config.getString("taboola.icon");
-        notificationUrl = String.format(config.getString("taboola.notification"),externalSiteId);
+        notificationUrl = config.getString("taboola.notification");
 
         if (sasParams.getWapSiteUACEntity() != null
                 && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
@@ -160,7 +159,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             buildInmobiAdTracker();
             TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
             if (taboolaResponse.getList().length > 0) {
-                String nurl = String.format(notificationUrl, taboolaResponse.getId());
+                String nurl = String.format(notificationUrl,externalSiteId, taboolaResponse.getId());
                 updateNativeParams(params, nurl);
                 App.Builder appBuilder = App.newBuilder();
                 NativeJson taboolaNative = taboolaResponse.getList()[0];
