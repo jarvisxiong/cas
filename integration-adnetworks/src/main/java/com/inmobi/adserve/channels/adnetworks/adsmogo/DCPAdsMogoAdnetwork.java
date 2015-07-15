@@ -42,6 +42,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String ANDROID_ID = "anid";
     private static final String IDFA = "ida";
     private static final String IOS_ID = "ouid";
+    private static final String IMEI = "imei";
     private static final String DEVICE_OS = "os";
     private static final String LON = "lon";
     private static final String COUNTRY = "co";
@@ -179,6 +180,10 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
                 appendQueryParam(url, ANDROID_ID, getURLEncode(casInternalRequestParameters.getUidO1(), format), false);
             }
             appendQueryParam(url,DEVICE_TYPE, ANDROID,false);
+        }
+        final String imei = getIMEI();
+        if(null != imei){
+            appendQueryParam(url,IMEI, imei,false);
         }
         final String gen = sasParams.getGender();
         if (StringUtils.isNotEmpty(gen)) {

@@ -157,6 +157,10 @@ public class DCPBaiduAdNetwork extends AbstractDCPAdNetworkImpl {
         if (StringUtils.isNotBlank(ifa)) {
             udidBuilder.setIdfa(ifa);
         }
+        String imei = getIMEI();
+        if(null != imei){
+            udidBuilder.setImei(imei);
+        }
         deviceBuilder.setUdid(udidBuilder);
         deviceBuilder.setType(com.baidu.BaiduBidRequest.Device.Type.PHONE);
         deviceBuilder.setVendor(BLANK_VAL);
