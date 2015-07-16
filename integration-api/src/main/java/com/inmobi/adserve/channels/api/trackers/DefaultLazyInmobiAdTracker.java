@@ -22,10 +22,10 @@ import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.util.Utils.CryptoHashGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.types.eventserver.IXSpecificInfo;
 import com.inmobi.types.eventserver.ImpressionInfo;
 
 import io.netty.util.CharsetUtil;
-
 import lombok.Builder;
 
 /**
@@ -92,6 +92,8 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
     private String appBundleId;
     private String normalizedUserId;
     private RequestedAdType requestedAdType;
+    private Double agencyRebatePercentage;
+    private Long chargedBid;
     private Double enrichmentCost;
     private List<Integer> matchedCsids;
 
@@ -265,8 +267,16 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         // 28th URL Component: encoded thrift serialized object with placementID, normalizedUserID and requestedAdType
         // placementId is set alongside the 15th field
         impInfo.setNormalizedUserId(normalizedUserId);
+        IXSpecificInfo ixSpecificInfo = new IXSpecificInfo();
+        impInfo.setIxSpecificInfo(ixSpecificInfo);
         if (null != requestedAdType) {
             impInfo.setRequestedAdType(requestedAdType.toString());
+        }
+        if (null != chargedBid) {
+            impInfo.setChargedBid(chargedBid);
+        }
+        if (null != agencyRebatePercentage) {
+            ixSpecificInfo.setAgencyRebatePercentage(agencyRebatePercentage);
         }
         if (null != enrichmentCost && CollectionUtils.isNotEmpty(matchedCsids)) {
             impInfo.setEnrichment_cost(enrichmentCost);

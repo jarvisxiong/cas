@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
@@ -158,7 +159,13 @@ public class AuctionEngine implements AuctionEngineInterface {
 
         auctionResponse = filteredChannelSegmentList.get(winnerIndex);
         AdNetworkInterface winningAdNetwork = filteredChannelSegmentList.get(winnerIndex).getAdNetworkInterface();
-        winningAdNetwork.setEncryptedBid(getEncryptedBid(secondBidPrice));
+
+        if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
+            winningAdNetwork.setEncryptedBid(getEncryptedBid(
+                    ((IXAdNetwork)winningAdNetwork).getOriginalBidPriceInUsd()));
+        } else {
+            winningAdNetwork.setEncryptedBid(getEncryptedBid(secondBidPrice));
+        }
         winningAdNetwork.setSecondBidPrice(secondBidPrice);
 
         LOG.debug("Auction complete, winner is {}, secondBidPrice is {}", winningAdNetwork.getName(), secondBidPrice);

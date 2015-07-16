@@ -66,10 +66,10 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/4d5de1c7";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/e97fdb57";
         String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/eb576f7e";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/87b215a9";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
@@ -86,10 +86,10 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwpFQoXAAAAAAAAEkAA/1/5f21f405";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwpFQoXAAAAAAAAEkAsAAA/1/aa2083d6";
         String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwpFQoXAAAAAAAAEkAA/1/349d2e51";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwpFQoXAAAAAAAAEkAsAAA/1/bbd9783c";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
@@ -106,10 +106,10 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/4d5de1c7";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/e97fdb57";
         String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/eb576f7e";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/87b215a9";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
@@ -126,10 +126,10 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/4d5de1c7";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/e97fdb57";
         String expectedClickUrl = "http://localhost:8800/C/t/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/eb576f7e";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/87b215a9";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
@@ -144,10 +144,10 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/12690401";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/58ec07ba";
         String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/241db49b";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/497f9505";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
@@ -163,10 +163,10 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/12690401";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/58ec07ba";
         String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/5l/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/241db49b";
+                + "2BBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/497f9505";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
@@ -183,10 +183,94 @@ public class DefaultLazyInmobiAdTrackerTest {
 
         String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/4dq/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/8e3980bf";
+                + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/a424f8cf";
         String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
                 + "76256371268/-1/4dq/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
-                + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUwA/1/813f0f69";
+                + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/87d69466";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerChargedBidSet() {
+        SASRequestParameters sasParams = copyHelper();
+        sasParams.setPlacementId(1234L);
+        sasParams.setPlacementSegmentId(5678);
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+            false);
+        builder.setChargedBid(5.6);
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "FoDMqwUmpBOoEG5vcm1hbGl6ZWRVc2VySWQYDElOVEVSU1RJVElBTFwAAA/1/b1c1609a";
+        String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "FoDMqwUmpBOoEG5vcm1hbGl6ZWRVc2VySWQYDElOVEVSU1RJVElBTFwAAA/1/69712add";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerChargedBidSetNegative() {
+        SASRequestParameters sasParams = copyHelper();
+        sasParams.setPlacementId(1234L);
+        sasParams.setPlacementSegmentId(5678);
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+            false);
+        builder.setChargedBid(0);
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/a424f8cf";
+        String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/87d69466";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerAgencyRebate() {
+        SASRequestParameters sasParams = copyHelper();
+        sasParams.setPlacementId(1234L);
+        sasParams.setPlacementSegmentId(5678);
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+            false);
+        builder.setAgencyRebatePercentage(5.0);
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcFwAAAAAAABRAAAA/1/9dfcc5d7";
+        String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcFwAAAAAAABRAAAA/1/a4750121";
+
+        assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
+        assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));
+    }
+
+    @Test
+    public void testDefaultLazyInmobiAdTrackerAgencyRebateNull() {
+        SASRequestParameters sasParams = copyHelper();
+        sasParams.setPlacementId(1234L);
+        sasParams.setPlacementSegmentId(5678);
+        DefaultLazyInmobiAdTrackerBuilder builder = new DefaultLazyInmobiAdTrackerBuilder(sasParams, "76256371268",
+            false);
+        builder.setAgencyRebatePercentage(null);
+        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+
+        String expectedBeaconUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/0/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/a424f8cf";
+        String expectedClickUrl = "http://localhost:8800/C/b/1/1/1/c/2/m/k/0/0/eyJVRElEIjoidWlkdmFsdWUifQ~~/"
+            + "76256371268/-1/4dq/-1/1/0/x/0/nw/101/1/sdk/3.7.0/-1/YXBwQnVuZGxlSWQ~/"
+            + "NqQTqBBub3JtYWxpemVkVXNlcklkGAxJTlRFUlNUSVRJQUxcAAA/1/87d69466";
 
         assertThat(inmobiAdTracker.getBeaconUrl(), is(equalTo(expectedBeaconUrl)));
         assertThat(inmobiAdTracker.getClickUrl(), is(equalTo(expectedClickUrl)));

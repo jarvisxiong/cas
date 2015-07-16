@@ -407,7 +407,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 break;
         }
 
-        final List<AdIdChain> adIdChains = new ArrayList<AdIdChain>();
+        final List<AdIdChain> adIdChains = new ArrayList<>();
         adIdChains.add(adIdChain);
         rtbdAd.setAdIds(adIdChains);
 

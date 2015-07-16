@@ -166,6 +166,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String urlArg;
     private final String ixMethod;
     private final String callbackUrl;
+    @Getter
+    private double originalBidPriceInUsd;
     private double bidPriceInUsd;
     private double bidPriceInLocal;
     private boolean templateWN = true;
@@ -182,12 +184,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private String dspId;
     @Getter
+    private String seatId;
+    @Getter
     private String advId;
     @Getter
     private Integer winningPackageId;
     @Getter
     private String dealId;
     private Double dealFloor;
+    @Getter
+    private Double agencyRebatePercentage;
     private Double dataVendorCost;
     private Double adjustbid;
     private String aqid;
@@ -203,6 +209,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private int impressionObjCount;
     @Getter
     private int responseBidObjCount;
+    @Getter
+    private boolean isAgencyRebateDeal;
     @Getter
     private boolean isExternalPersonaDeal;
     private Set<Integer> usedCsIds;
@@ -948,17 +956,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String replaceIXMacros(String url) {
         url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, USD);
-        if (6 != sasParams.getDst()) {
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInUsd));
-        }
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInUsd));
+
         if (null != bidResponse.getBidid()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
         }
-        if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url =
-                    url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
-                            .getSeat());
+        if (null != seatId) {
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, seatId);
         }
         if (isExternalPersonaDeal) {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id=" + dealId);
@@ -1469,23 +1474,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final SeatBid seatBid = bidResponse.getSeatbid().get(0);
         final Bid bid = seatBid.getBid().get(0);
         dspId = seatBid.getBuyer();
+        seatId = seatBid.getSeat();
 
         responseAuctionId = bidResponse.getId();
         responseBidObjCount = seatBid.getBid().size();
         responseImpressionId = bid.getImpid();
         dealId = bid.getDealid();
         isExternalPersonaDeal = false;
+        isAgencyRebateDeal = false;
+
+        // bidderCurrency is set to USD by default
+        bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = bid.getPrice();
+
         if (dealId != null) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
-            setFloorVendorUsedCsids();
+            setDealRelatedMetadata();
         }
         nurl = bid.getNurl();
         // creativeId = bid.getCrid(); // Replaced with aqid
         aqid = bid.getAqid();
         adjustbid = bid.getAdjustbid();
-        // bidderCurrency is set to USD by default
-        bidPriceInLocal = bid.getPrice();
-        bidPriceInUsd = getBidPriceInLocal();
 
         adm = bid.getAdm();
         if (null != bid.getAdmobject()) {
@@ -1576,7 +1584,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
 
-    private void setFloorVendorUsedCsids() {
+    protected void setDealRelatedMetadata() {
         IXPackageEntity matchedPackageEntity;
 
         try {
@@ -1591,15 +1599,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
-        dealFloor =
-                matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
-                        indexOfDealId) : 0.0;
+
+        // Setting deal floor
+        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId ?
+                        matchedPackageEntity.getDealFloors().get(indexOfDealId) : 0.0;
+
+        // Setting used csids and data vendor cost
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;
 
-            usedCsIds = new HashSet<Integer>();
-
+            usedCsIds = new HashSet<>();
             final Set<Set<Integer>> csIdInPackages = matchedPackageEntity.getDmpFilterSegmentExpression();
             for (final Set<Integer> smallSet : csIdInPackages) {
                 for (final Integer csIdInSet : smallSet) {
@@ -1609,7 +1619,53 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 }
             }
         }
-        return;
+
+        // Applying if agency rebate is applicable
+        agencyRebatePercentage = matchedPackageEntity.getAgencyRebatePercentages().size() > indexOfDealId ?
+                matchedPackageEntity.getAgencyRebatePercentages().get(indexOfDealId) : null;
+        if (null != agencyRebatePercentage) {
+            if (agencyRebatePercentage <= 0 || agencyRebatePercentage > 100) {
+                agencyRebatePercentage = null;
+                LOG.debug("Agency rebate percentage out of range. DealId: {}", dealId);
+            }
+        }
+
+        //  Setting agency/seat Id if not present in RP response
+        if (null != agencyRebatePercentage ) {
+            isAgencyRebateDeal = true;
+            String dealMetaDataSeatId = matchedPackageEntity.getRpAgencyIds().size() > indexOfDealId
+                && null != matchedPackageEntity.getRpAgencyIds().get(indexOfDealId) ?
+                String.valueOf(matchedPackageEntity.getRpAgencyIds().get(indexOfDealId)) :
+                null;
+            if (StringUtils.isEmpty(seatId)) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
+                seatId = dealMetaDataSeatId;
+                LOG.debug("Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}", dealId);
+
+                if (StringUtils.isEmpty(seatId)) {
+                    // This has been enforced in the UI and DB.
+                    InspectorStats.incrementStatCount(getName(), InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
+                    LOG.error("Agency Id cannot be determined for Agency Rebate Deal.");
+                    agencyRebatePercentage = null;
+                    isAgencyRebateDeal = false;
+                }
+            } else if (!seatId.equals(dealMetaDataSeatId)) {
+                InspectorStats.incrementStatCount(getName(),
+                    InspectorStrings.AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE);
+                LOG.error("Agency Id mismatch between response and deal metadata. DealId: {}, ReceivedSeatId: {}, "
+                    + "DealMetadataSeatId: {}", dealId, seatId, dealMetaDataSeatId);
+                agencyRebatePercentage = null;
+                isAgencyRebateDeal = false;
+            }
+        }
+
+        if (isAgencyRebateDeal) {
+            // Setting bidPriceInLocal and bidPriceInUsd to the net bid.
+            bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - agencyRebatePercentage/100.0);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AGENCY_REBATE_DEAL_RESPONSES);
+            LOG.debug(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
+                dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
+        }
     }
 
     public Double returnAdjustBid() {
@@ -1647,12 +1703,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    protected void overrideInmobiAdTracker(InmobiAdTrackerBuilder trackerBuilder) {
-        if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0
-                && trackerBuilder instanceof DefaultLazyInmobiAdTrackerBuilder) {
-            DefaultLazyInmobiAdTrackerBuilder builder = (DefaultLazyInmobiAdTrackerBuilder) trackerBuilder;
-            builder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
-            builder.setEnrichmentCost(dataVendorCost);
+    protected void overrideInmobiAdTracker(InmobiAdTrackerBuilder builder) {
+        if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+            DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
+
+            // Setting agency rebate
+            if (isAgencyRebateDeal) {
+                trackerBuilder.setAgencyRebatePercentage(agencyRebatePercentage);
+                trackerBuilder.setChargedBid(originalBidPriceInUsd);
+            }
+            if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0) {
+                trackerBuilder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
+                trackerBuilder.setEnrichmentCost(dataVendorCost);
+            }
         }
     }
 
@@ -1678,11 +1741,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     public void setImpressionId(final String impressionId) {
         this.impressionId = impressionId;
-    }
-
-    @Override
-    public String getSeatId() {
-        return null;
     }
 
     @Override

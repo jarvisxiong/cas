@@ -235,6 +235,15 @@ public class IXPackageRepository {
                 final String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
                 final Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
 
+                Integer[] rpAgencyIds = null;
+                Double[] agencyRebatePercentages = null;
+                if (null != rs.getArray("rp_agency_ids")) {
+                    rpAgencyIds = (Integer[]) rs.getArray("rp_agency_ids").getArray();
+                }
+                if (null != rs.getArray("agency_rebate_percentages")) {
+                    agencyRebatePercentages = (Double[]) rs.getArray("agency_rebate_percentages").getArray();
+                }
+
                 Set<Set<Integer>> dmpFilterSegmentExpression;
                 try {
                     dmpFilterSegmentExpression = extractDmpFilterExpression(rs.getString("dmp_filter_expression"));
@@ -433,6 +442,12 @@ public class IXPackageRepository {
                 }
                 if (null != dealFloors) {
                     entityBuilder.dealFloors(Arrays.asList(dealFloors));
+                }
+                if (null != rpAgencyIds) {
+                    entityBuilder.rpAgencyIds(Arrays.asList(rpAgencyIds));
+                }
+                if (null != agencyRebatePercentages) {
+                    entityBuilder.agencyRebatePercentages(Arrays.asList(agencyRebatePercentages));
                 }
                 if (null != accessTypes) {
                     entityBuilder.accessTypes(Arrays.asList(accessTypes));

@@ -11,6 +11,8 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 
+import jdk.nashorn.internal.runtime.GlobalConstants;
+
 /**
  * Created by ishanbhatnagar on 14/5/15.
  */
@@ -37,6 +39,7 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
     private static final boolean IS_TEST_REQUEST = false;
     private static final String BUDGET_BUCKET_ID = "101";
     private static final String TIER_INFO = "-1";
+    private static final String ZERO = "0";
 
     @Inject
     public DefaultLazyInmobiAdTrackerBuilder(@Assisted final SASRequestParameters sasParams,
@@ -95,6 +98,16 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
         builder.testMode(TEST_MODE);
         builder.isTestRequest(IS_TEST_REQUEST);
         builder.budgetBucketId(BUDGET_BUCKET_ID);
+    }
+
+    public void setAgencyRebatePercentage(Double agencyRebatePercentage) {
+        builder.agencyRebatePercentage(agencyRebatePercentage);
+    }
+
+    public void setChargedBid(double originalBid) {
+        if (originalBid > 0) {
+            builder.chargedBid((long) (originalBid * Math.pow(10, 6)));
+        }
     }
 
     public void setMatchedCsids(final List<Integer> matchedCsidList) {

@@ -15,7 +15,6 @@ import lombok.Getter;
 @Getter
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class IXPackageEntity {
-
     private int id;
     private Segment segment;
 
@@ -26,6 +25,8 @@ public class IXPackageEntity {
     private List<String> dealIds;
     private List<String> accessTypes;
     private List<Double> dealFloors;
+    private List<Integer> rpAgencyIds;
+    private List<Double> agencyRebatePercentages;
     private Map<Integer, Range<Double>> osVersionTargeting;
     private Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
     private Double dataVendorCost;

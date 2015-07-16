@@ -1,10 +1,9 @@
-
-CREATE FUNCTION ix_package_fun_04052015()
+CREATE FUNCTION ix_package_fun_06072015()
 RETURNS
-    SETOF ix_package_type_04052015 AS
+    SETOF ix_package_type_06072015 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_04052015%ROWTYPE;
+    row1    ix_package_type_06072015%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -47,9 +46,17 @@ SELECT
                 ix_packages.modified_by AS modified_by,
                 deals.access_types as access_types,
                 deals.deal_ids AS deal_ids,
-                deals.deal_floors AS deal_floors
+                deals.deal_floors AS deal_floors,
+                deals.rp_agency_ids AS rp_agency_ids,
+                deals.agency_rebate_percentages AS agency_rebate_percentages
                 from ix_packages JOIN (
-                    select makeList(rp_deal_id) AS deal_ids,makeList(deal_floor) AS deal_floors, makeList(access_type) as access_types,package_id
+                    select
+                        makeList(rp_deal_id) AS deal_ids,
+                        makeList(deal_floor) AS deal_floors,
+                        makeList(access_type) AS access_types,
+                        makeList(rp_agency_id) AS rp_agency_ids,
+                        makeList(agency_rebate_percentage) AS agency_rebate_percentages,
+                        package_id
                     from ix_package_deals
                     where (start_date is null or start_date <= now()+interval '1 minute')
                     and (end_date is null or end_date >= now())

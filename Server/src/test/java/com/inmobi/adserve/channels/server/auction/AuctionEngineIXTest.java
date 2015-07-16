@@ -144,6 +144,8 @@ public class AuctionEngineIXTest {
         expect(mockAdnetworkInterface.getCreativeId()).andReturn("creativeId").anyTimes();
         expect(mockAdnetworkInterface.getDst()).andReturn(DemandSourceType.IX).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getResponseBidObjCount()).andReturn(1).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).getAgencyRebatePercentage()).andReturn(null).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).getOriginalBidPriceInUsd()).andReturn(bidValue).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
         expect(mockAdnetworkInterface.getCreativeType()).andReturn(adCreativeType).anyTimes();
         // responseBidObjCount

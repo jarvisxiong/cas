@@ -193,9 +193,9 @@ public class Logging {
 
     public static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
         if (null == rankList) {
-            return new ArrayList<Channel>();
+            return new ArrayList<>();
         }
-        final List<Channel> channels = new ArrayList<Channel>();
+        final List<Channel> channels = new ArrayList<>();
 
         for (final ChannelSegment channelSegment : rankList) {
             final Channel channel = new Channel();
@@ -210,11 +210,20 @@ public class Logging {
             if (bid > 0) {
                 channel.setBid(bid);
             }
-            // Log IX specific fields in ixAdInfo.
+            /**
+             * Logging IX specific fields in ixAdInfo.
+             * Populating this only if,
+             *   1) we get an AD response from IX or,
+             *   2) forward any package to RP.
+             */
             if (adNetwork instanceof IXAdNetwork) {
+                // Logging the original bid in case of agency rebate deals
                 final IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
+                final double originalBid = ixAdNetwork.getOriginalBidPriceInUsd();
+                if (originalBid > 0) {
+                    channel.setBid(originalBid);
+                }
 
-                // Populate IXAd only if 1) we get an AD response from IX OR 2) forward any package to RP.
                 if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
                         || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
                     channel.setIxAds(Arrays.asList(createIxAd(ixAdNetwork)));
@@ -299,12 +308,17 @@ public class Logging {
                 ixAd.setWinningPackageId(ixAdNetwork.getWinningPackageId());
             }
 
-            // Set higest Bid
+            // Log highest Bid
             if (null != ixAdNetwork.returnAdjustBid()) {
-                ixAd.setHighestBid(ixAdNetwork.returnAdjustBid());    
+                ixAd.setHighestBid(ixAdNetwork.returnAdjustBid());
             }
-            
+
+            // Log agency rebate percentage
+            if (null != ixAdNetwork.getAgencyRebatePercentage()) {
+                ixAd.setAgencyRebatePercentage(ixAdNetwork.getAgencyRebatePercentage());
+            }
         }
+
         return ixAd;
     }
 
@@ -401,10 +415,9 @@ public class Logging {
             final AdMeta adMeta = new AdMeta(contentRating, pricingModel, BANNER);
             final Ad ad = new Ad(adChain, adMeta);
 
+            // In case of Agency Rebates, this is the net bid. The gross bid is logged in channelsLog
             final double winBid = adNetworkInterface.getSecondBidPriceInUsd();
-            if (winBid != -1) {
-                ad.setWinBid(winBid);
-            }
+            ad.setWinBid(winBid);
 
             impression = new Impression(adNetworkInterface.getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
