@@ -38,13 +38,9 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         final Marker traceMarker = traceMarkerProvider.get();
-
         final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
-
         final Double dcpFloor = pricingEngineEntity == null ? null : pricingEngineEntity.getDcpFloor();
-
         if (dcpFloor != null) {
             // applying the boost
             final Date eCPMBoostExpiryDate = channelSegment.getChannelSegmentEntity().getEcpmBoostExpiryDate();
@@ -76,7 +72,6 @@ public class AdGroupPricingEngineFilter extends AbstractAdGroupLevelFilter {
             } else {
                 percentage = 1;
             }
-
             return CasConfigUtil.RANDOM.nextInt(100) >= percentage;
         }
 

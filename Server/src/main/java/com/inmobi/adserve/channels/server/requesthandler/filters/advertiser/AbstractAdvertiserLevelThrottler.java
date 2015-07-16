@@ -14,15 +14,13 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
  * This class can be extend to throttle request sent to the advertiser/partner on various parameters like
  * failure(timeouts+terminates), low fill rates(partners giving fill rates in third decimal range) or partners giving
  * low ecpm
- * 
+ *
  * @author rajashekhar.c
- * 
+ *
  */
 public abstract class AbstractAdvertiserLevelThrottler extends AbstractAdvertiserLevelFilter {
-
     private static final long START_TIME_OF_APPLICATION = System.currentTimeMillis();
     private static final long TEN_MINUTES = 60 * 10 * 1000;
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     public AbstractAdvertiserLevelThrottler(final Provider<Marker> traceMarkerProvider, final String inspectorString,
@@ -32,32 +30,32 @@ public abstract class AbstractAdvertiserLevelThrottler extends AbstractAdvertise
     }
 
     @Override
-    protected boolean failedInFilter(ChannelSegment channelSegment, SASRequestParameters sasParams) {
+    protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId());
-        String advertiserId = adapterConfig.getAdvertiserId();
-
-        CircuitBreakerInterface circuitBreaker = this.getRequestsThrottlerMovingWindowCounter(advertiserId);
-
+        final CircuitBreakerInterface circuitBreaker =
+                getRequestsThrottlerMovingWindowCounter(adapterConfig.getAdvertiserId());
         if (circuitBreaker == null) {
             return false;
         }
-
         if (isLessThanTenMinutes()) {
             return false;
         }
-
-
-        boolean canForwardTheRequest = circuitBreaker.canForwardTheRequest();
-
-        return !canForwardTheRequest;
+        return !circuitBreaker.canForwardTheRequest();
     }
 
+    /**
+     * 
+     * @return
+     */
     private static boolean isLessThanTenMinutes() {
         return System.currentTimeMillis() - START_TIME_OF_APPLICATION < TEN_MINUTES;
     }
 
-    protected abstract CircuitBreakerInterface getRequestsThrottlerMovingWindowCounter(String advertiserName);
-
-
+    /**
+     * 
+     * @param advertiserName
+     * @return
+     */
+    protected abstract CircuitBreakerInterface getRequestsThrottlerMovingWindowCounter(final String advertiserName);
 
 }

@@ -318,7 +318,6 @@ public class ChannelServer {
             initialContext.createSubcontext("java:");
             initialContext.createSubcontext("java:comp");
             initialContext.createSubcontext("java:comp/env");
-
             Class.forName("org.postgresql.Driver");
 
             final Properties props = new Properties();
@@ -336,27 +335,21 @@ public class ChannelServer {
             final String connectUri =
                     "jdbc:postgresql://" + databaseConfig.getString("host") + ":" + databaseConfig.getInt("port") + "/"
                             + databaseConfig.getString(DATABASE) + "?socketTimeout="
-                            + databaseConfig.getString("socketTimeout");
-
+                            + databaseConfig.getString("socketTimeout") + "&ApplicationName=cas";
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
-
-            final PoolableConnectionFactory poolableConnectionFactory =
-                    new PoolableConnectionFactory(connectionFactory, null);
-
-            final GenericObjectPool<PoolableConnection> connectionPool =
-                    new GenericObjectPool<>(poolableConnectionFactory);
+            final PoolableConnectionFactory pcFactory = new PoolableConnectionFactory(connectionFactory, null);
+            final GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcFactory);
             connectionPool.setMaxTotal(maxActive);
             connectionPool.setMaxIdle(maxIdle);
             connectionPool.setMaxWaitMillis(maxWait * 1000);
             connectionPool.setTestOnBorrow(testOnBorrow);
 
-            poolableConnectionFactory.setPool(connectionPool);
-            poolableConnectionFactory.setValidationQuery(validationQuery);
-            poolableConnectionFactory.setDefaultReadOnly(true);
-            poolableConnectionFactory.setDefaultAutoCommit(false);
+            pcFactory.setPool(connectionPool);
+            pcFactory.setValidationQuery(validationQuery);
+            pcFactory.setDefaultReadOnly(true);
+            pcFactory.setDefaultAutoCommit(false);
 
             final PoolingDataSource<PoolableConnection> ds = new PoolingDataSource<>(connectionPool);
-
             initialContext.bind("java:comp/env/jdbc", ds);
 
             ChannelSegmentMatchingCache.init(logger);

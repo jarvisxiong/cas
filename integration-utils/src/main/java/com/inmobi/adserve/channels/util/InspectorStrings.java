@@ -110,7 +110,9 @@ public class InspectorStrings {
     public static final String IX_SENT_AS_BLIND = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
-    public static final String INVALID_DSP_ID = "DroppedDueToInvalidDspId";
+    public static final String INVALID_ADV_ID = "NoAdvertiserId";
+    public static final String UNKNOWN_ADV_ID = "ADFromUnknownAdvId";
+    public static final String DROPPED_INVALID_DSP_ID = "DroppedDueToInvalidDspId";
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
     public static final String IX_DEAL_NON_EXISTING = "IxDealNonExisting";
     public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";

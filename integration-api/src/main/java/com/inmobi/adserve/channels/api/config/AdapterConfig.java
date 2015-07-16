@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.api.config;
 
 import javax.annotation.Nullable;
 
-import lombok.EqualsAndHashCode;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
@@ -12,10 +10,12 @@ import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 
+import lombok.EqualsAndHashCode;
+
 
 /**
  * @author abhishek.parwal
- * 
+ *
  */
 @EqualsAndHashCode
 public class AdapterConfig implements CasConfig {
@@ -62,6 +62,8 @@ public class AdapterConfig implements CasConfig {
     }
 
     /**
+     * Status == on
+     * 
      * @return the isActive
      */
     public boolean isActive() {
@@ -70,7 +72,7 @@ public class AdapterConfig implements CasConfig {
     }
 
     /**
-     * @return the adapterHost
+     * @return the adapterHost based on Data Center
      */
     public String getAdapterHost() {
         String adapterHost = adapterConfig.getString("host." + dcName);
@@ -80,10 +82,14 @@ public class AdapterConfig implements CasConfig {
         if (StringUtils.isBlank(adapterHost)) {
             adapterHost = adapterConfig.getString("host");
         }
-
         return adapterHost;
     }
 
+    /**
+     * Not blank and not equals to NA
+     * 
+     * @return
+     */
     public boolean isValidHost() {
         final String hostName = getAdapterHost();
         return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);

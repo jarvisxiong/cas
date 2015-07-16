@@ -34,9 +34,7 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-
         if (channelSegmentEntity.isUdIdRequired()
                 && (StringUtils.isEmpty(sasParams.getUidParams()) || "{}".equals(sasParams.getUidParams()))
                 && (null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty())) {
@@ -57,18 +55,16 @@ public class AdGroupPropertyViolationFilter extends AbstractAdGroupLevelFilter {
         }
 
         final RequestedAdType requestedAdType = sasParams.getRequestedAdType();
-
-        if (channelSegmentEntity.isInterstitialOnly() &&
-                (null == requestedAdType || RequestedAdType.INTERSTITIAL != requestedAdType)) {
+        if (channelSegmentEntity.isInterstitialOnly()
+                && (null == requestedAdType || RequestedAdType.INTERSTITIAL != requestedAdType)) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_INTERSTITIAL_FILTER);
             return true;
         }
-        if (channelSegmentEntity.isNonInterstitialOnly() && null != requestedAdType &&
-                RequestedAdType.INTERSTITIAL == requestedAdType) {
+        if (channelSegmentEntity.isNonInterstitialOnly() && null != requestedAdType
+                && RequestedAdType.INTERSTITIAL == requestedAdType) {
             channelSegment.incrementInspectorStats(InspectorStrings.DROPPED_IN_ONLY_NON_INTERSTITIAL_FILTER);
             return true;
         }
-
         return false;
     }
 

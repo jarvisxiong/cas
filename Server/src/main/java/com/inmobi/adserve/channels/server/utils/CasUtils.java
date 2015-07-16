@@ -56,17 +56,14 @@ public class CasUtils {
         return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
     }
 
+    /**
+     * 
+     * @param httpRequest
+     * @return
+     */
     public static String getHost(final HttpRequest httpRequest) {
         final HttpHeaders headers = httpRequest.headers();
         return headers.get("Host");
-    }
-
-    public boolean isRequestFromLocalHost(final HttpRequest httpRequest) {
-        final String host = getHost(httpRequest);
-        if (host != null && host.startsWith("localhost")) {
-            return true;
-        }
-        return false;
     }
 
     /**

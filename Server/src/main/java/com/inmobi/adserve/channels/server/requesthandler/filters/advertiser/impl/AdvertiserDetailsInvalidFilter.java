@@ -21,7 +21,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilter {
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
 
     @Inject
@@ -33,21 +32,16 @@ public class AdvertiserDetailsInvalidFilter extends AbstractAdvertiserLevelFilte
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId());
-
         if (adapterConfig == null) {
             return true;
         }
-
         if (!adapterConfig.isValidHost()) {
             return true;
         }
-
         if (!adapterConfig.isActive()) {
             return true;
         }
-
         return false;
     }
 

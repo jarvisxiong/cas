@@ -16,15 +16,12 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 
 /**
  * @author abhishek.parwal
- * 
+ *
  */
 public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
-
     protected final Provider<Marker> traceMarkerProvider;
     private final String inspectorString;
-
     private FilterOrder order;
 
     protected AbstractAdGroupLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
@@ -35,14 +32,10 @@ public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
     @Override
     public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         final Marker traceMarker = traceMarkerProvider.get();
-
         for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
             final ChannelSegment channelSegment = iterator.next();
-
             final boolean result = failedInFilter(channelSegment, sasParams, casContext);
-
             if (result) {
                 iterator.remove();
                 LOG.debug(traceMarker, "Failed in filter {}  , adgroup {}", this.getClass().getSimpleName(),

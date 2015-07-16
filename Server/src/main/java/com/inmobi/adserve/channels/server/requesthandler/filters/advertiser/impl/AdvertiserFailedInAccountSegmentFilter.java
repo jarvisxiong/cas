@@ -19,13 +19,11 @@ import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
 /**
  * @author abhishek.parwal
- * 
+ *
  */
 @Singleton
 public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLevelFilter {
-
     private static final Logger LOG = LoggerFactory.getLogger(AdvertiserFailedInAccountSegmentFilter.class);
-
     private final Map<String, String> advertiserIdNameMap;
 
     @Inject
@@ -37,10 +35,8 @@ public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLe
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-
         final int accountSegment = channelSegment.getChannelEntity().getAccountSegment();
         final String advertiserId = channelSegment.getChannelEntity().getAccountId();
-
         LOG.debug("AccountId from ChannelEntity: {} ", channelSegment.getChannelEntity().getAccountId());
         LOG.debug("AdvertiserId from ChannelFeedbackEntity: {}", channelSegment.getChannelFeedbackEntity()
                 .getAdvertiserId());
@@ -48,7 +44,6 @@ public class AdvertiserFailedInAccountSegmentFilter extends AbstractAdvertiserLe
                 .getAdvertiserId());
 
         final String advertiserName = advertiserIdNameMap.get(advertiserId);
-
         return advertiserName == null || sasParams.getDst() == 6 && null != sasParams.getAccountSegment()
                 && !sasParams.getAccountSegment().isEmpty() && !sasParams.getAccountSegment().contains(accountSegment);
     }

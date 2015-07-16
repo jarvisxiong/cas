@@ -20,11 +20,10 @@ public class AuctionFilterApplier {
     }
 
     public List<ChannelSegment> applyFilters(final List<ChannelSegment> rtbdSegments,
-                                             final CasInternalRequestParameters casInternalRequestParameters) {
+            final CasInternalRequestParameters casInternalRequestParameters) {
         for (final AuctionFilter auctionFilter : auctionFilters) {
             // Assuming that the dst of each channelSegment is the same
-            if (!rtbdSegments.isEmpty()
-                    && auctionFilter.isApplicable(rtbdSegments.get(0).getAdNetworkInterface())) {
+            if (!rtbdSegments.isEmpty() && auctionFilter.isApplicable(rtbdSegments.get(0).getAdNetworkInterface())) {
                 auctionFilter.filter(rtbdSegments, casInternalRequestParameters);
             }
         }

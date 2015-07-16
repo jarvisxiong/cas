@@ -171,6 +171,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean templateWN = true;
     protected boolean isSproutSupported = false;
 
+    private final String unknownAdvertiserId;
     private final String advertiserId;
     private final String advertiserName;
     private double secondBidPriceInUsd = 0;
@@ -225,6 +226,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
+        unknownAdvertiserId = config.getString(advertiserName + ".unknownAdvId");
         urlArg = config.getString(advertiserName + ".urlArg");
         callbackUrl = config.getString(advertiserName + ".wnUrlback");
         ixMethod = config.getString(advertiserName + ".ixMethod");
@@ -1056,26 +1058,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return isSproutAd;
     }
 
-    protected boolean updateDSPAccountInfo(final String buyer) {
-        LOG.debug(traceMarker, "Inside updateDSPAccountInfo");
-        Long buyerId;
+    protected boolean updateRPAccountInfo(final String rpAccIdStr) {
+        LOG.debug(traceMarker, "Inside updateRPAccountInfo");
+        String inmobiAccId = unknownAdvertiserId;
         try {
-            buyerId = Long.parseLong(buyer);
-        } catch (final NumberFormatException e) {
-            LOG.debug("NumberFormatException: Invalid DSP Buyer ID Format");
-            return false;
+            final Long rpAccId = Long.parseLong(rpAccIdStr);
+            // Get Inmobi account id for the DSP on Rubicon side
+            final IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(rpAccId);
+            if (ixAccountMapEntity != null && ixAccountMapEntity.getInmobiAccountId() != null) {
+                inmobiAccId = ixAccountMapEntity.getInmobiAccountId();
+            }
+        } catch (final Exception exp) {
+            if (LOG.isInfoEnabled()) {
+                final String msg =
+                        String.format("Error in updateRPAccountInfo for rpAccIdStr %s, msg ->%s", rpAccIdStr,
+                                exp.getMessage());
+                LOG.info(traceMarker, msg, exp);
+            }
         }
-
-        // Get Inmobi account id for the DSP on Rubicon side
-        final IXAccountMapEntity ixAccountMapEntity = repositoryHelper.queryIXAccountMapRepository(buyerId);
-        if (null == ixAccountMapEntity) {
-            LOG.error("Invalid Rubicon DSP id: {}", buyer);
-            return false;
-        }
-        final String dspAccountId = ixAccountMapEntity.getInmobiAccountId();
-        if (StringUtils.isEmpty(dspAccountId)) {
-            LOG.error("Inmobi Account ID is null or empty for Rubicon DSP id: {}", buyer);
-            return false;
+        if(unknownAdvertiserId.equals(inmobiAccId)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.UNKNOWN_ADV_ID);
         }
 
         // Get collection of Channel Segment Entities for the particular Inmobi account id
@@ -1085,19 +1087,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
 
-        final Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(dspAccountId);
+        final Collection<ChannelSegmentEntity> adGroupMap = channelAdGroupRepository.getEntities(inmobiAccId);
         if (null == adGroupMap || adGroupMap.isEmpty()) {
             // If collection is empty
-            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: DSP id:{}, inmobi account id:{}",
-                    buyer, dspAccountId);
+            LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: RP Acc id:{}, inmobi account id:{}",
+                    rpAccIdStr, inmobiAccId);
             return false;
         } else {
             // Else picking up the first channel segment entity and assuming that to be the correct entity
             dspChannelSegmentEntity = adGroupMap.iterator().next();
-
-            // Create a new ChannelSegment with DSP information. So that, all the logging happens on DSP Id.
-            // this.auctionResponse = new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
-            // auctionResponse.getAdNetworkInterface(), -1L);
 
             // Get response creative type and get the incId for the respective response creative type
             final ADCreativeType responseCreativeType = getCreativeType();
@@ -1110,12 +1108,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.debug(traceMarker, "Modifying existing impression id with new int key: incId {}", incId);
             final String newImpressionId =
                     ImpressionIdGenerator.getInstance().resetWilburyIntKey(oldImpressionId, incId);
-
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 impressionId = newImpressionId;
                 LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
             }
-
             return true;
         }
     }
@@ -1435,14 +1431,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
 
-        // No Need for making this required, since we have AbstractAuctionFilter
-        // final String aqid = bid.getAqid();
-        // if (StringUtils.isEmpty(aqid)) {
-        // LOG.error(traceMarker, "Deserialisation failed: Missing required field: aqid");
-        // adStatus = AdStatus.TERM.name();
-        // return false;
-        // }
-
         if (StringUtils.isEmpty(bid.getAdm()) && null == bid.getAdmobject()) {
             LOG.error(traceMarker, "Deserialisation failed: Both adm and admobject are missing");
             adStatus = AdStatus.TERM.name();
@@ -1514,7 +1502,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             advId = bid.getExt().getRp().getAdvid();
         }
 
-
         // For video requests, validate that a valid XML is received.
         if (isVideoRequest) {
             if (IXAdNetworkHelper.isAdmValidXML(getAdMarkUp())) {
@@ -1525,19 +1512,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 return false;
             }
         }
-        /* The following fields are not being used:
-            BidResponse->bidid
-            SeatBid->seat
-            Bid->estimated
-            Bid->adomain
-            Bid->w and Bid->h
-         */
 
-        if (updateDSPAccountInfo(dspId)) {
+        // Going forward, we will be using Advertiser Id, so an prelim check to see how many of it is null
+        if (StringUtils.isEmpty(advId)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_ADV_ID);
+        }
+
+        if (updateRPAccountInfo(dspId)) {
             LOG.debug(traceMarker, "Response successfully deserialised");
             return true;
         } else {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_DSP_ID);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_INVALID_DSP_ID);
             adStatus = TERM;
             return false;
         }
@@ -1663,8 +1648,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @Override
     protected void overrideInmobiAdTracker(InmobiAdTrackerBuilder trackerBuilder) {
-        if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0 &&
-                trackerBuilder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+        if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0
+                && trackerBuilder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             DefaultLazyInmobiAdTrackerBuilder builder = (DefaultLazyInmobiAdTrackerBuilder) trackerBuilder;
             builder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
             builder.setEnrichmentCost(dataVendorCost);

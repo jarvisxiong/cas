@@ -79,6 +79,7 @@ public class NewIXAdNetworkTest {
     private static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
         expect(mockConfig.getString(advertiserName + ".advertiserId")).andReturn("advertiserId").anyTimes();
+        expect(mockConfig.getString(advertiserName + ".unknownAdvId")).andReturn("2770").anyTimes();
         expect(mockConfig.getString(advertiserName + ".urlArg")).andReturn("urlArg").anyTimes();
         expect(mockConfig.getString(advertiserName + ".wnUrlback")).andReturn(
                 "http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}")
@@ -226,7 +227,7 @@ public class NewIXAdNetworkTest {
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -239,7 +240,7 @@ public class NewIXAdNetworkTest {
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).anyTimes();
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
@@ -356,7 +357,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -370,7 +371,7 @@ public class NewIXAdNetworkTest {
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixStudioResponseAdTag).anyTimes();
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
@@ -425,7 +426,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -440,7 +441,7 @@ public class NewIXAdNetworkTest {
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixStudioResponseAdTag).anyTimes();
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
@@ -492,7 +493,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -507,7 +508,7 @@ public class NewIXAdNetworkTest {
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixStudioResponseAdTag).anyTimes();
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
@@ -557,7 +558,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -572,7 +573,7 @@ public class NewIXAdNetworkTest {
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixStudioResponseAdTag).anyTimes();
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
@@ -617,7 +618,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -630,7 +631,7 @@ public class NewIXAdNetworkTest {
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
         expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).anyTimes();
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
@@ -655,7 +656,7 @@ public class NewIXAdNetworkTest {
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final SASRequestParameters mockSasParams = createMock(SASRequestParameters.class);
 
-        final String dummyAccountId = "1a3d6a94f0024377885edc3c701ba548";
+        final String dummyAccountId = "2770";
         final long dummyIncId = 1234L;
 
         expect(mockRepositoryHelper.queryIXAccountMapRepository(2770L)).andReturn(null).times(1)
@@ -709,36 +710,16 @@ public class NewIXAdNetworkTest {
         ImpressionIdGenerator.init((short) 123, (byte) 10);
 
         boolean result;
-
-        result = ixAdNetwork.updateDSPAccountInfo(null);
-        assertThat(result, is(false));
-        result = ixAdNetwork.updateDSPAccountInfo("can't parse this");
-        assertThat(result, is(false));
-        result = ixAdNetwork.updateDSPAccountInfo("2770L");
-        assertThat(result, is(false));
-        result = ixAdNetwork.updateDSPAccountInfo("");
-        assertThat(result, is(false));
-
-        // ixAccountMapEntity is null
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
-        assertThat(result, is(false));
-        // ixAccountMapEntity.getInmobiAccountId is null
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
-        assertThat(result, is(false));
-        // ixAccountMapEntity.getInmobiAccountId is empty
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
-        assertThat(result, is(false));
-        // channelAdGroupRepository is null
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
+        result = ixAdNetwork.updateRPAccountInfo("2770");
         assertThat(result, is(false));
         // adGroupMap is null
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
+        result = ixAdNetwork.updateRPAccountInfo("2770");
         assertThat(result, is(false));
         // adGroupMap is empty
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
+        result = ixAdNetwork.updateRPAccountInfo("2770");
         assertThat(result, is(false));
         // Positive Test Case
-        result = ixAdNetwork.updateDSPAccountInfo("2770");
+        result = ixAdNetwork.updateRPAccountInfo("2770");
         assertThat(result, is(true));
 
         String oldImpressionId = WilburyUUID.setIntKey(TestUtils.SampleStrings.impressionId, 0).toString();
@@ -785,7 +766,7 @@ public class NewIXAdNetworkTest {
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo"};
+        final String[] methodsToBeMocked = {"isNativeRequest", "updateRPAccountInfo"};
         final IXAdNetwork mockIXAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
         replayAll();
 
@@ -1105,7 +1086,7 @@ public class NewIXAdNetworkTest {
         final String response = TestUtils.SampleStrings.ixNativeResponseJson;
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName, true};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
+        final String[] methodsToBeMocked = {"isNativeRequest", "updateRPAccountInfo", "nativeAdBuilding"};
         final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -1117,7 +1098,7 @@ public class NewIXAdNetworkTest {
         ixAdNetwork.setHost("http://localhost:8080/getIXBid");
 
         expect(ixAdNetwork.isNativeRequest()).andReturn(true).times(1);
-        expect(ixAdNetwork.updateDSPAccountInfo("2770")).andReturn(true).times(1);
+        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
         ixAdNetwork.nativeAdBuilding();
         expectLastCall();
         replayAll();

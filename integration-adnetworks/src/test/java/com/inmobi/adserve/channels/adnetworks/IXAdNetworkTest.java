@@ -80,6 +80,7 @@ public class IXAdNetworkTest {
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
         final String advertiserName = "ix";
         expect(mockConfig.getString(advertiserName + ".advertiserId")).andReturn("").anyTimes();
+        expect(mockConfig.getString(advertiserName + ".unknownAdvId")).andReturn("").anyTimes();
         expect(mockConfig.getString(advertiserName + ".urlArg")).andReturn("").anyTimes();
         expect(mockConfig.getString(advertiserName + ".rtbVer", "2.0")).andReturn("2.0").anyTimes();
         expect(mockConfig.getString(advertiserName + ".wnUrlback")).andReturn("").anyTimes();

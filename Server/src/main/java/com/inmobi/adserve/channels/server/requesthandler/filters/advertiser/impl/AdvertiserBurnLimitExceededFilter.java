@@ -19,7 +19,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdvertiserBurnLimitExceededFilter extends AbstractAdvertiserLevelFilter {
-
     private final ServerConfig serverConfiguration;
 
     @Inject

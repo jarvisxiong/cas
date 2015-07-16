@@ -39,7 +39,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     @Override
     public void filter(final List<ChannelSegment> channelSegments,
             final CasInternalRequestParameters casInternalRequestParameters) {
-        Marker traceMarker = null; // traceMarkerProvider.get()
+        Marker traceMarker = null; 
         for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
             final ChannelSegment channelSegment = iterator.next();
 

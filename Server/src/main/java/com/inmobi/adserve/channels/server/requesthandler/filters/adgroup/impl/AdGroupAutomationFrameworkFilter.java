@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -19,7 +17,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupAutomationFrameworkFilter extends AbstractAdGroupLevelFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(AdGroupAutomationFrameworkFilter.class);
 
     @Inject
     protected AdGroupAutomationFrameworkFilter(final Provider<Marker> traceMarkerProvider) {
@@ -28,9 +25,9 @@ public class AdGroupAutomationFrameworkFilter extends AbstractAdGroupLevelFilter
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-                                     final CasContext casContext) {
-
-        return null != sasParams.getAutomationTestId() &&
-                !sasParams.getAutomationTestId().equalsIgnoreCase(channelSegment.getChannelSegmentEntity().getAutomationTestId());
+            final CasContext casContext) {
+        return null != sasParams.getAutomationTestId()
+                && !sasParams.getAutomationTestId().equalsIgnoreCase(
+                        channelSegment.getChannelSegmentEntity().getAutomationTestId());
     }
 }

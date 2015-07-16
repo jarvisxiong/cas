@@ -5,8 +5,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -24,7 +22,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupHandsetTargetingFilter extends AbstractAdGroupLevelFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(AdGroupHandsetTargetingFilter.class);
 
     /**
      * @param traceMarkerProvider
@@ -37,7 +34,6 @@ public class AdGroupHandsetTargetingFilter extends AbstractAdGroupLevelFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         final List<Long> manufModelTargetingList =
                 channelSegment.getChannelSegmentEntity().getManufModelTargetingList();
         return CollectionUtils.isNotEmpty(manufModelTargetingList)

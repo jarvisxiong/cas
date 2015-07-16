@@ -2,8 +2,6 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -21,7 +19,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupDailyImpressionCountFilter extends AbstractAdGroupLevelFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(AdGroupTimeOfDayTargetingFilter.class);
 
     /**
      * @param traceMarkerProvider
@@ -35,7 +32,6 @@ public class AdGroupDailyImpressionCountFilter extends AbstractAdGroupLevelFilte
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         return channelSegment.getChannelSegmentFeedbackEntity().getTodayImpressions() > channelSegment
                 .getChannelSegmentEntity().getImpressionCeil();
 

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
@@ -40,6 +41,14 @@ public class AeroSpikeDataIngestion {
     private final String setName;
     private static int totalCount = 0;
 
+    /**
+     * 
+     * @param host
+     * @param port
+     * @param namespace
+     * @param set
+     * @throws AerospikeException
+     */
     public AeroSpikeDataIngestion(final String host, final int port, final String namespace, final String set)
             throws AerospikeException {
         this.namespace = namespace;
@@ -52,14 +61,50 @@ public class AeroSpikeDataIngestion {
         policy.expiration = -1;
     }
 
+    /**
+     * 
+     * @param key
+     * @param binName
+     * @param binValue
+     * @throws AerospikeException
+     */
     public void writeBin(final String key, final String binName, final String binValue) throws AerospikeException {
         aerospikeClient.put(policy, new Key(namespace, setName, key), new Bin(binName, binValue));
     }
 
+    /**
+     * 
+     * @param binName
+     * @param key
+     * @throws AerospikeException
+     */
     public void deleteBin(final String binName, final String key) throws AerospikeException {
         aerospikeClient.put(policy, new Key(namespace, setName, key), Bin.asNull(binName));
     }
 
+    /**
+     * 
+     * @param keySet
+     * @throws AerospikeException
+     */
+    public void exists(final Set<String> keySet) throws AerospikeException {
+        final Key[] keys = new Key[keySet.size()];
+        int count = 0;
+        for (final String keyStr : keySet) {
+            keys[count++] = new Key(namespace, setName, keyStr);
+        }
+        final boolean[] bool = aerospikeClient.exists(policy, keys);
+        for (int i = 0; i < bool.length; i++) {
+            if (!bool[i]) {
+                System.out.println(keys[i].userKey);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param lines
+     */
     public void insertData(final List<String> lines) {
         final int size = lines.size() / NO_OF_THREADS;
         final List<List<String>> smallerLists = Lists.partition(lines, size);
@@ -68,6 +113,18 @@ public class AeroSpikeDataIngestion {
             final Thread job = new Job(smallerList, this, String.valueOf(++count));
             job.start();
         }
+    }
+
+    /**
+     * 
+     * @param line
+     * @return
+     */
+    private static String[] getKeyAndVal(final String line) {
+        final String spilitStr[] = line.split(",");
+        final String key = spilitStr[0];
+        final String val = spilitStr[1].split("\\|")[0];
+        return new String[] {key, val};
     }
 
     /**
@@ -97,9 +154,9 @@ public class AeroSpikeDataIngestion {
             int success = 0, failure = 0;
             for (final String line : lines) {
                 try {
-                    final String spilitStr[] = line.split(",");
+                    final String spilitStr[] = getKeyAndVal(line);
                     key = spilitStr[0];
-                    val = spilitStr[1].split("\\|")[0];
+                    val = spilitStr[1];
                     aeroSpike.writeBin(key, BIN_NAME, val);
                     success++;
                     totalCount++;

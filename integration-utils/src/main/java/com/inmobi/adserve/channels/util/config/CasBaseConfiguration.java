@@ -19,9 +19,7 @@ import org.apache.commons.lang.NotImplementedException;
  * 
  */
 public class CasBaseConfiguration extends PropertiesConfiguration {
-
     final static private Object lock = new Object();
-
     final private Map<String, Object> map;
 
     public CasBaseConfiguration(final String configFile) throws ConfigurationException {
@@ -52,6 +50,7 @@ public class CasBaseConfiguration extends PropertiesConfiguration {
         return map.get(key);
     }
 
+    @SuppressWarnings("unchecked")
     private void cloneMap() {
         final Iterator<String> keys = getKeys();
         while (keys.hasNext()) {

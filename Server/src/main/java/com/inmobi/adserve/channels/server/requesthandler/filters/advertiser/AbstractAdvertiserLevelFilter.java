@@ -19,15 +19,16 @@ import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatched
  * 
  */
 public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFilter {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAdvertiserLevelFilter.class);
-
     private final Provider<Marker> traceMarkerProvider;
-
     private final String inspectorString;
-
     private FilterOrder order;
 
+    /**
+     * 
+     * @param traceMarkerProvider
+     * @param inspectorString
+     */
     protected AbstractAdvertiserLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.inspectorString = inspectorString;
@@ -36,24 +37,18 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     @Override
     public final void filter(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
             final SASRequestParameters sasParams) {
-
         final Marker traceMarker = traceMarkerProvider.get();
-
         for (final Iterator<AdvertiserMatchedSegmentDetail> iterator = matchedSegmentDetails.iterator(); iterator
                 .hasNext();) {
             final AdvertiserMatchedSegmentDetail matchedSegmentDetail = iterator.next();
-
             /*
              * All the Advertiser Level filters (extending this abstract class) are on advertiser level properties.
              * The filer is applied only on the first channelSegment in the ChannelSegmentList for an advertiser. Being a
              * filter on advertiser level properties, the filtering result is expected to be same for all segments.
              */
             final ChannelSegment channelSegment = matchedSegmentDetail.getChannelSegmentList().get(0);
-
             final boolean result = failedInFilter(channelSegment, sasParams);
-
             final String advertiserId = channelSegment.getChannelEntity().getAccountId();
-
             if (result) {
                 iterator.remove();
                 LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),

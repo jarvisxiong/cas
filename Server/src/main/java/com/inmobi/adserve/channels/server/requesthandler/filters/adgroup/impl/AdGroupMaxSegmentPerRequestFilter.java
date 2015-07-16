@@ -27,13 +27,9 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAdGroupLevelFilter.class);
-
     private final Provider<Marker> traceMarkerProvider;
-
     private final ServerConfig serverConfig;
-
     private FilterOrder order;
 
     @Inject
@@ -45,22 +41,16 @@ public class AdGroupMaxSegmentPerRequestFilter implements AdGroupLevelFilter {
     @Override
     public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         final Marker traceMarker = traceMarkerProvider.get();
-
         final int maxSegmentSelectionCount = serverConfig.getMaxSegmentSelectionCount();
-
         if (maxSegmentSelectionCount == -1) {
             return;
         }
 
         int selectedSegmentCount = 0;
-
         for (final Iterator<ChannelSegment> iterator = channelSegments.listIterator(); iterator.hasNext();) {
             final ChannelSegment channelSegment = iterator.next();
-
             final boolean result = failedInFilter(maxSegmentSelectionCount, selectedSegmentCount);
-
             if (result) {
                 // TODO: we can optimize if we don't need these inspector stats , then we can shorten our iteration
                 iterator.remove();

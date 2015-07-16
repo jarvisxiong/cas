@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdvertiserExcludedFilter extends AbstractAdvertiserLevelFilter {
-
     private final RepositoryHelper repositoryHelper;
 
     @Inject

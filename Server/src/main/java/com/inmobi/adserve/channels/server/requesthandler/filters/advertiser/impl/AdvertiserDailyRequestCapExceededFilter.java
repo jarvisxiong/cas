@@ -26,7 +26,6 @@ public class AdvertiserDailyRequestCapExceededFilter extends AbstractAdvertiserL
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
-
         return channelSegment.getChannelFeedbackEntity().getTodayRequests() > channelSegment.getChannelEntity()
                 .getRequestCap();
     }

@@ -23,12 +23,11 @@ import com.inmobi.adserve.channels.server.utils.CasUtils;
 
 /**
  * @author abhishek.parwal
- * 
+ *
  */
 @Singleton
 public class ChannelSegmentFilterApplier {
     private static final Logger LOG = LoggerFactory.getLogger(ChannelSegmentFilterApplier.class);
-
     private final Provider<Marker> traceMarkerProvider;
     private final CasUtils casUtils;
 
@@ -41,24 +40,17 @@ public class ChannelSegmentFilterApplier {
     public List<ChannelSegment> getChannelSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails,
             final SASRequestParameters sasParams, final CasContext casContext,
             final List<AdvertiserLevelFilter> advertiserLevelFilters, final List<AdGroupLevelFilter> adGroupLevelFilters) {
-
         final Marker traceMarker = traceMarkerProvider.get();
-
         // apply all filters
-
         // advertiser level filter
         for (final AdvertiserLevelFilter advertiserLevelFilter : advertiserLevelFilters) {
             advertiserLevelFilter.filter(matchedSegmentDetails, sasParams);
         }
-
         printSegments(matchedSegmentDetails);
-
-        // adGroup level filter
         casContext.setPricingEngineEntity(casUtils.fetchPricingEngineEntity(sasParams));
 
         // get the channel segments
         final List<ChannelSegment> channelSegmentList = Lists.newArrayList();
-
         for (final AdvertiserMatchedSegmentDetail matchedSegmentDetail : matchedSegmentDetails) {
             channelSegmentList.addAll(matchedSegmentDetail.getChannelSegmentList());
         }
@@ -70,13 +62,12 @@ public class ChannelSegmentFilterApplier {
         casContext.setSumOfSiteImpressions(sumOfSiteImpressions);
         LOG.debug(traceMarker, "Sum of Site impressions:{}", sumOfSiteImpressions);
 
+        // adGroup level filter
         for (final AdGroupLevelFilter adGroupLevelFilter : adGroupLevelFilters) {
             adGroupLevelFilter.filter(channelSegmentList, sasParams, casContext);
         }
-
         Collections.sort(channelSegmentList, ChannelSegment.CHANNEL_SEGMENT_REVERSE_COMPARATOR);
         printSegments(traceMarker, channelSegmentList);
-
         return channelSegmentList;
     }
 
@@ -96,7 +87,6 @@ public class ChannelSegmentFilterApplier {
 
     private void printSegments(final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails) {
         final Marker traceMarker = traceMarkerProvider.get();
-
         if (LOG.isDebugEnabled(traceMarker)) {
             LOG.debug(traceMarker, "Remaining AdGroups are :");
             for (final AdvertiserMatchedSegmentDetail advertiserMatchedSegmentDetail : matchedSegmentDetails) {

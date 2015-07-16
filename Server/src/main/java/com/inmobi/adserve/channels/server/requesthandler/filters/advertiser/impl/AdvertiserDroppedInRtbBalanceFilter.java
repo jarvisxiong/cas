@@ -22,7 +22,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
  */
 @Singleton
 public class AdvertiserDroppedInRtbBalanceFilter extends AbstractAdvertiserLevelFilter {
-
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
     private final ServerConfig serverConfiguration;
 

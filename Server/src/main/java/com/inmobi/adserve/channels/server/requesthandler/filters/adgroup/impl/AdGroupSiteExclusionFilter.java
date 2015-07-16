@@ -31,14 +31,11 @@ public class AdGroupSiteExclusionFilter extends AbstractAdGroupLevelFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
             final CasContext casContext) {
-
         final boolean isFilterAtAdvertiserLevel = channelSegment.getChannelSegmentEntity().getSitesIE().isEmpty();
-
         // applying site inclusion-exclusion at advertiser level
         if (isFilterAtAdvertiserLevel) {
             return isSiteExcludedAtAdvertiserLevel(channelSegment, sasParams);
         }
-
         return isSiteExcludedAtAdGroupLevel(channelSegment, sasParams);
 
     }

@@ -37,23 +37,24 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
     private final List<String> adGroupSupplyDemandExclusionList;
 
+    @SuppressWarnings("unchecked")
     @Inject
     protected AdGroupSupplyDemandClassificationFilter(final Provider<Marker> traceMarkerProvider,
-                                                      final RepositoryHelper repositoryHelper, final ServerConfig serverConfig,
-                                                      final Map<String, AdapterConfig> advertiserIdConfigMap) {
+            final RepositoryHelper repositoryHelper, final ServerConfig serverConfig,
+            final Map<String, AdapterConfig> advertiserIdConfigMap) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER);
         this.repositoryHelper = repositoryHelper;
         this.serverConfig = serverConfig;
         this.advertiserIdConfigMap = advertiserIdConfigMap;
-        this.adGroupSupplyDemandExclusionList = CasConfigUtil.getServerConfig().getList("adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList());
+        this.adGroupSupplyDemandExclusionList =
+                CasConfigUtil.getServerConfig().getList(
+                        "adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter", Lists.newArrayList());
     }
 
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
-                                     final CasContext casContext) {
-
+            final CasContext casContext) {
         final Marker traceMarker = traceMarkerProvider.get();
-
         if (advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId()).isRtb()) {
             LOG.debug(traceMarker, "SDC is disabled for RTBD partners");
             return false;
@@ -67,12 +68,10 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
         final byte supplyClass = getSupplyClass(siteEcpmEntity);
         channelSegment.setPrioritisedECPM(calculatePrioritisedECPM(channelSegment, casContext));
         final byte demandClass = getDemandClass(siteEcpmEntity, channelSegment.getPrioritisedECPM());
-
         LOG.debug(traceMarker, "Supply Class {} , Demand class is {} for adgroup {}", supplyClass, demandClass,
                 channelSegment.getChannelSegmentEntity().getAdgroupId());
 
         final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
-
         if (pricingEngineEntity == null) {
             return !(PricingEngineEntity.DEFAULT_SUPPLY_DEMAND_MAPPING[supplyClass][demandClass] == 1);
         } else {
@@ -83,7 +82,6 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
 
     private double calculatePrioritisedECPM(final ChannelSegment channelSegment, final CasContext casContext) {
         final Marker traceMarker = traceMarkerProvider.get();
-
         final ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity =
                 channelSegment.getChannelSegmentAerospikeFeedbackEntity();
         final double eCPM = channelSegmentFeedbackEntity.getECPM();
@@ -92,7 +90,6 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
                 .getChannelSegmentEntity().getAdgroupId());
 
         double eCPMBoost;
-
         if (casContext.getSumOfSiteImpressions() == 0) {
             eCPMBoost = 0;
         } else {
@@ -123,7 +120,6 @@ public class AdGroupSupplyDemandClassificationFilter extends AbstractAdGroupLeve
 
     private byte getSupplyClass(final SiteEcpmEntity siteEcpmEntity) {
         final Marker traceMarker = traceMarkerProvider.get();
-
         if (siteEcpmEntity == null) {
             LOG.debug(traceMarker, "SiteEcpmEntity is null, thus returning default class");
             return serverConfig.getDefaultSupplyClass();
