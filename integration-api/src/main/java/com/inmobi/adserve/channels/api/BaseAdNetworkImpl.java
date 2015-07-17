@@ -1006,7 +1006,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             final IMEIEntity entity = repositoryHelper.queryIMEIRepository(casInternalRequestParameters.getUidO1());
             if (entity != null) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.IMEI_MATCH);
-                return entity.getImei();
+                return entity.getImei().toLowerCase();
             }
         }
         return null;
