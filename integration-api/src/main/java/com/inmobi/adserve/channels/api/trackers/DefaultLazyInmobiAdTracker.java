@@ -319,6 +319,9 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
             if (null != rmBeaconURLPrefix) {
                 beaconUrl = rmBeaconURLPrefix + beaconUrlSuffix.toString();
             }
+
+            LOG.debug("Generated Click Url: {}", clickUrl);
+            LOG.debug("Generated Beacon Url: {}", beaconUrl);
             return;
         }
 

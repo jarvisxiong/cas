@@ -476,27 +476,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             impExt.setRp(rp);
         }
 
-        // Find matching packages for Banner. NOTE: Packages are not yet supported for video & Native
-        if (!(isVideoRequest || isNativeRequest)) {
-            final long startTime = System.currentTimeMillis();
-            packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
-            final long endTime = System.currentTimeMillis();
-            InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
-                    InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+        // Find matching packages
+        final long startTime = System.currentTimeMillis();
+        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
+        final long endTime = System.currentTimeMillis();
+        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
+                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
-            if (!packageIds.isEmpty()) {
-                final RPImpressionExtension rp =
-                        impExt.getRp() == null ? new RPImpressionExtension(zoneId) : impExt.getRp();
+        if (!packageIds.isEmpty()) {
+            final RPImpressionExtension rp =
+                    impExt.getRp() == null ? new RPImpressionExtension(zoneId) : impExt.getRp();
 
-                final RPTargetingExtension target = new RPTargetingExtension();
-                target.setPackages(Lists.transform(packageIds, Functions.toStringFunction()));
-                rp.setTarget(target);
-                impExt.setRp(rp);
+            final RPTargetingExtension target = new RPTargetingExtension();
+            target.setPackages(Lists.transform(packageIds, Functions.toStringFunction()));
+            rp.setTarget(target);
+            impExt.setRp(rp);
 
-                // Update the stats
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
-            }
+            // Update the stats
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
         }
+
         return impExt;
     }
 
