@@ -66,7 +66,6 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
     @Override
     protected void decode(final ChannelHandlerContext ctx, final DefaultFullHttpRequest request, final List<Object> out)
             throws Exception {
-
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         String terminationReason = null;

@@ -18,8 +18,16 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSI
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
+import static com.inmobi.adserve.channels.util.VASTTemplateObject.AD_OBJECT_PREFIX;
+import static com.inmobi.adserve.channels.util.VASTTemplateObject.FIRST_OBJECT_PREFIX;
+import static com.inmobi.adserve.channels.util.VASTTemplateObject.IM_WIN_URL;
+import static com.inmobi.adserve.channels.util.VASTTemplateObject.PARTNER_BEACON_URL;
+import static com.inmobi.adserve.channels.util.VASTTemplateObject.VAST_CONTENT_JS_ESC;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.WIFI;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.DATA;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.IMAGE;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.TITLE;
@@ -29,6 +37,7 @@ import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetTyp
 import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType.DOWNLOADS;
 import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType.RATING;
 
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -42,6 +51,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -50,16 +60,21 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
 import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
+import com.inmobi.adserve.channels.util.VASTTemplateObject;
 import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image;
@@ -88,18 +103,14 @@ public class IXAdNetworkHelper {
     private static final String IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID = "InMobiFSCre";
 
     private static final ImmutableMap<IXBlocklistType, String> inmobiPerfBlocklistMap = ImmutableMap.of(
-            IXBlocklistType.ADVERTISERS, IX_PERF_ADVERTISER_BLOCKLIST_ID,
-            IXBlocklistType.INDUSTRY_IDS, IX_PERF_INDUSTRY_BLOCKLIST_ID,
-            IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID
-    );
+            IXBlocklistType.ADVERTISERS, IX_PERF_ADVERTISER_BLOCKLIST_ID, IXBlocklistType.INDUSTRY_IDS,
+            IX_PERF_INDUSTRY_BLOCKLIST_ID, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS,
+            IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
     private static final ImmutableMap<IXBlocklistType, String> inmobiFsBlocklistMap = ImmutableMap.of(
-            IXBlocklistType.ADVERTISERS, IX_FS_ADVERTISER_BLOCKLIST_ID,
-            IXBlocklistType.INDUSTRY_IDS, IX_FS_INDUSTRY_BLOCKLIST_ID,
-            IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID
-    );
+            IXBlocklistType.ADVERTISERS, IX_FS_ADVERTISER_BLOCKLIST_ID, IXBlocklistType.INDUSTRY_IDS,
+            IX_FS_INDUSTRY_BLOCKLIST_ID, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
     private static final ImmutableList<IXBlocklistType> supportedBlocklistTypes = ImmutableList.of(
-            IXBlocklistType.ADVERTISERS, IXBlocklistType.INDUSTRY_IDS, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS
-    );
+            IXBlocklistType.ADVERTISERS, IXBlocklistType.INDUSTRY_IDS, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS);
 
     /**
      *
@@ -144,8 +155,9 @@ public class IXAdNetworkHelper {
         // No function is being provided
         addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
 
-        final String userId = StringUtils.isNotEmpty(casInternal.getUidIFA()) ? casInternal.getUidIFA() :
-                StringUtils.isNotEmpty(casInternal.getGpid()) ? casInternal.getGpid() : null;
+        final String userId =
+                StringUtils.isNotEmpty(casInternal.getUidIFA()) ? casInternal.getUidIFA() : StringUtils
+                        .isNotEmpty(casInternal.getGpid()) ? casInternal.getGpid() : null;
 
         // Non Sprout Macros
         addSproutMacroToList(macros, substitutions, IMP_CB, casInternal.getAuctionId());
@@ -153,7 +165,7 @@ public class IXAdNetworkHelper {
         if (null != userId) {
             final String userIdMD5 = getHashedValue(userId, MD5);
             final String userIdSHA1 = getHashedValue(userId, SHA1);
-            
+
             addSproutMacroToList(macros, substitutions, USER_ID, userIdMD5);
             addSproutMacroToList(macros, substitutions, USER_ID_MD5_HASHED, userIdMD5);
             addSproutMacroToList(macros, substitutions, USER_ID_SHA1_HASHED, userIdSHA1);
@@ -166,7 +178,7 @@ public class IXAdNetworkHelper {
 
     /**
      * Helper function to populate macro and substitution lists
-     * 
+     *
      * @param macros
      * @param substitutions
      * @param macro
@@ -413,11 +425,11 @@ public class IXAdNetworkHelper {
     }
 
     /**
-     * This function returns the list of applicable ix blocklists.
-     *  1) Publisher defined blocklists (advertisers and industries) are always included
-     *  2) Advertiser, Industry and Creative Attribute blocklists are checked individually first at the site level,
-     *  if not found then at the country level, otherwise global defaults are used.
-     *  3) Blocklists with empty blocklists, imply that nothing is to be blocked.
+     * This function returns the list of applicable ix blocklists. <br>
+     * 1) Publisher defined blocklists (advertisers and industries) are always included <br>
+     * 2) Advertiser, Industry and Creative Attribute blocklists are checked individually first at the site level, <br>
+     * if not found then at the country level, otherwise global defaults are used. <br>
+     * 3) Blocklists with empty blocklists, imply that nothing is to be blocked.
      *
      * @param sasParams
      * @param repositoryHelper
@@ -461,8 +473,8 @@ public class IXAdNetworkHelper {
                 if (null != countryBlocklistEntity) {
                     if (0 != countryBlocklistEntity.getBlocklistSize()) {
                         blocklistName = countryBlocklistEntity.getBlocklistName();
-                        LOG.debug(traceMarker, "Setting strategic {} blocklist at the country level, {}", blocklistType,
-                                blocklistName);
+                        LOG.debug(traceMarker, "Setting strategic {} blocklist at the country level, {}",
+                                blocklistType, blocklistName);
                     } else {
                         LOG.debug(traceMarker, "No strategic {} blocklists", blocklistType);
                     }
@@ -484,6 +496,14 @@ public class IXAdNetworkHelper {
         return blocklistBuilder.build();
     }
 
+    /**
+     *
+     * @param siteId
+     * @param countryId
+     * @param repositoryHelper
+     * @param defaultTrafficPercentageForVAST
+     * @return
+     */
     public static int getIXVideoTrafficPercentage(final String siteId, final Integer countryId,
             final RepositoryHelper repositoryHelper, final int defaultTrafficPercentageForVAST) {
         int trafficPercentage = defaultTrafficPercentageForVAST;
@@ -496,18 +516,92 @@ public class IXAdNetworkHelper {
                 entity = repositoryHelper.queryIXVideoTrafficRepository(siteId, IXVideoTrafficRepository.ALL_COUNTRY);
                 if (entity == null) {
                     // Query at country level.
-                    entity = repositoryHelper.queryIXVideoTrafficRepository(IXVideoTrafficRepository.ALL_SITES,
-                            countryId);
+                    entity =
+                            repositoryHelper.queryIXVideoTrafficRepository(IXVideoTrafficRepository.ALL_SITES,
+                                    countryId);
                 }
             }
             if (entity != null) {
                 trafficPercentage = entity.getTrafficPercentage();
             }
 
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
             LOG.debug("Exception encountered while computing ix video traffic percentage, {}", ignored);
         }
         return trafficPercentage;
+    }
+
+    /**
+     *
+     * Macros used -
+     *
+     * $VASTContentJSEsc <br>
+     * ${first.ns}<br>
+     * ${first.clickServerUrl}<br>
+     * ${first.beaconUrl}<br>
+     *
+     * $ad.supplyWidth<br>
+     * $ad.supplyHeight<br>
+     * ${ad.sdkVersion}<br>
+     * ${ad.sitePreferencesJson}<br>
+     * ${ad.requestJson}
+     *
+     * @param sasParams
+     * @param repositoryHelper
+     * @param selectedSlotId
+     * @param beaconUrl
+     * @param clickUrl
+     * @param adMarkup
+     * @param winUrl
+     * @return
+     * @throws Exception
+     */
+    public static String videoAdBuilding(final SASRequestParameters sasParams, final RepositoryHelper repositoryHelper,
+            final Short selectedSlotId, final String beaconUrl, final String clickUrl, final String adMarkup,
+            final String winUrl) throws Exception {
+        final VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put(VAST_CONTENT_JS_ESC, StringEscapeUtils.escapeJavaScript(adMarkup));
+        // JS escaped WinUrl for partner.
+        if (StringUtils.isNotEmpty(winUrl)) {
+            velocityContext.put(PARTNER_BEACON_URL, StringEscapeUtils.escapeJavaScript(winUrl));
+        }
+        // IMAIBaseUrl
+        velocityContext.put(IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+
+        // JS escaped IMWinUrl
+        final String imWinUrl = beaconUrl + "?b=${WIN_BID}";
+        velocityContext.put(IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
+
+        final VASTTemplateObject vastTemplFirst = new VASTTemplateObject();
+        // JS escaped IM beacon and click URLs.
+        vastTemplFirst.setBeaconUrl(StringEscapeUtils.escapeJavaScript(beaconUrl));
+        vastTemplFirst.setClickServerUrl(StringEscapeUtils.escapeJavaScript(clickUrl));
+        // Namespace
+        vastTemplFirst.setNs(Formatter.getRTBDNamespace());
+
+        final VASTTemplateObject vastTemplAd = new VASTTemplateObject();
+        // SDK version
+        vastTemplAd.setSdkVersion(sasParams.getSdkVersion());
+        // Sprout related parameters.
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        if (null != slotSizeMapEntity) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
+            vastTemplAd.setSupplyWidth((int) dim.getWidth());
+            vastTemplAd.setSupplyHeight((int) dim.getHeight());
+        }
+
+        final ConnectionType connectionType = sasParams.getConnectionType();
+        final String connectionTypeString =
+                null != connectionType && ConnectionType.WIFI == connectionType ? WIFI : NON_WIFI;
+        final String requestNetworkTypeJson = "{\"networkType\":\"" + connectionTypeString + "\"}";
+        // Publisher control settings
+        vastTemplAd.setRequestJson(requestNetworkTypeJson);
+        vastTemplAd.setSitePreferencesJson(sasParams.getPubControlPreferencesJson());
+        // Add object to velocityContext
+        velocityContext.put(FIRST_OBJECT_PREFIX, vastTemplFirst);
+        velocityContext.put(AD_OBJECT_PREFIX, vastTemplAd);
+
+        return Formatter.getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
     }
 
 }

@@ -1,8 +1,10 @@
 package com.inmobi.adserve.channels.api;
 
 
-import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CHINA_COUNTRY_CODE;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.TIME_OUT;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -89,8 +91,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String TERM = "TERM";
     protected static final String LATLON = GlobalConstant.LATLON;
     protected static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
-    protected static final String WIFI = "WIFI";
-    protected static final String NON_WIFI = "NON_WIFI";
     protected static final String CCID = "CCID";
     protected static final String GET = "GET";
     protected static final String POST = "POST";
@@ -147,7 +147,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String blindedSiteId;
     protected Short selectedSlotId;
     protected RepositoryHelper repositoryHelper;
-    protected String format = GlobalConstant.UTF_8;
+    protected String format = UTF_8;
     protected final Channel serverChannel;
 
     private Map<?, ?> responseHeaders;
@@ -338,7 +338,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         LOG.debug("Operation complete for channel partner: {}", getName());
                         LOG.debug("{} operation complete latency {}", getName(), latency);
 
-                        final String responseStr = response.getResponseBody(GlobalConstant.UTF_8);
+                        final String responseStr = response.getResponseBody(UTF_8);
                         final HttpResponseStatus httpResponseStatus =
                                 HttpResponseStatus.valueOf(response.getStatusCode());
 
@@ -392,7 +392,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
-                        adStatus = GlobalConstant.TIME_OUT;
+                        adStatus = TIME_OUT;
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.CONNECTION_TIMEOUT);
                         InspectorStats.incrementStatCount(InspectorStrings.CONNECTION_TIMEOUT);
                         processResponse();
@@ -401,7 +401,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                     if (t instanceof java.util.concurrent.TimeoutException) {
                         LOG.debug("{} timeout latency {}", getName(), latency);
-                        adStatus = GlobalConstant.TIME_OUT;
+                        adStatus = TIME_OUT;
                         processResponse();
                         InspectorStats.incrementStatCount(InspectorStrings.TIMEOUT_EXCEPTION);
                         return;
@@ -998,7 +998,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * Lookup and return IMEI from CL. Only for Android China Traffic
-     * 
+     *
      * @return
      */
     protected String getIMEI() {

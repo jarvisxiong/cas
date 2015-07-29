@@ -1,5 +1,11 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_JS;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.WIFI;
+
 import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,7 +24,6 @@ import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
@@ -64,9 +69,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
 import com.inmobi.adserve.contracts.ix.request.App;
@@ -385,8 +389,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Regulations createRegsObject() {
         final Regulations regs = new Regulations();
         isCoppaSet =
-                isWapSiteUACEntity && wapSiteUACEntity.isCoppaEnabled()
-                        || (sasParams.getAge() != null && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA);
+                isWapSiteUACEntity && wapSiteUACEntity.isCoppaEnabled() || sasParams.getAge() != null
+                        && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA;
         regs.setCoppa(isCoppaSet ? 1 : 0);
         return regs;
     }
@@ -402,7 +406,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != casInternalRequestParameters.getImpressionId()) {
             // In order to conform to the rubicon spec, we are passing a unique integer identifier whose value starts
             // with 1, and increments up to n for n impressions.
-            impression = new Impression(GlobalConstant.ONE);
+            impression = new Impression(ONE);
         } else {
             LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
@@ -448,10 +452,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
         if (null != sasParams.getSdkVersion()) {
-            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
+            impression.setDisplaymanager(DISPLAY_MANAGER_INMOBI_SDK);
             impression.setDisplaymanagerver(sasParams.getSdkVersion());
         } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
-            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
+            impression.setDisplaymanager(DISPLAY_MANAGER_INMOBI_JS);
         }
 
         final ImpressionExtension ext = getImpExt();
@@ -541,7 +545,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Banner banner = new Banner();
         // Presently only one banner object per impression object is being sent
         // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
-        banner.setId(GlobalConstant.ONE);
+        banner.setId(ONE);
         final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
         if (null != slotSizeMapEntity) {
             final Dimension dim = slotSizeMapEntity.getDimension();
@@ -994,7 +998,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
                 .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
-                .setHeader(HttpHeaders.Names.CONTENT_ENCODING, GlobalConstant.UTF_8)
+                .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
                 .setHeader(HttpHeaders.Names.AUTHORIZATION, "Basic " + authEncoded)
                 .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body);
@@ -1080,7 +1084,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 LOG.info(traceMarker, msg, exp);
             }
         }
-        if(unknownAdvertiserId.equals(inmobiAccId)) {
+        if (unknownAdvertiserId.equals(inmobiAccId)) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.UNKNOWN_ADV_ID);
         }
 
@@ -1237,59 +1241,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void videoAdBuilding() {
-        final VelocityContext velocityContext = new VelocityContext();
-
-        final String vastContentJSEsc = StringEscapeUtils.escapeJavaScript(getAdMarkUp());
-        velocityContext.put(VelocityTemplateFieldConstants.VAST_CONTENT_JS_ESC, vastContentJSEsc);
-
-        // JS escaped WinUrl for partner.
-        final String partnerWinUrl = getWinUrl();
-        if (StringUtils.isNotEmpty(partnerWinUrl)) {
-            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL,
-                    StringEscapeUtils.escapeJavaScript(partnerWinUrl));
-        }
-
-        // JS escaped IMWinUrl
-        final String imWinUrl = getBeaconUrl() + "?b=${WIN_BID}";
-        velocityContext.put(VelocityTemplateFieldConstants.IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
-
-        // JS escaped IM beacon and click URLs.
-        velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL,
-                StringEscapeUtils.escapeJavaScript(getBeaconUrl()));
-        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL,
-                StringEscapeUtils.escapeJavaScript(getClickUrl()));
-
-        // SDK version
-        velocityContext.put(VelocityTemplateFieldConstants.IMSDK_VERSION, sasParams.getSdkVersion());
-
-        // Namespace
-        velocityContext.put(VelocityTemplateFieldConstants.NAMESPACE, Formatter.getRTBDNamespace());
-
-        // IMAIBaseUrl
-        velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
-
-        // Sprout related parameters.
-        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
-        if (null != slotSizeMapEntity) {
-            final Dimension dim = slotSizeMapEntity.getDimension();
-            velocityContext.put(VelocityTemplateFieldConstants.WIDTH, (int) dim.getWidth());
-            velocityContext.put(VelocityTemplateFieldConstants.HEIGHT, (int) dim.getHeight());
-        }
-
-        final ConnectionType connectionType = sasParams.getConnectionType();
-        final String connectionTypeString =
-                null != connectionType && ConnectionType.WIFI == connectionType ? WIFI : NON_WIFI;
-
-        final String requestNetworkTypeJson = "{\"networkType\":\"" + connectionTypeString + "\"}";
-        // Publisher control settings
-        velocityContext.put(VelocityTemplateFieldConstants.REQUEST_JSON, requestNetworkTypeJson);
-        velocityContext.put(VelocityTemplateFieldConstants.SITE_PREFERENCES_JSON,
-                sasParams.getPubControlPreferencesJson());
-
         try {
             responseContent =
-                    Formatter
-                            .getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
+                    IXAdNetworkHelper.videoAdBuilding(sasParams, repositoryHelper, selectedSlotId, getBeaconUrl(),
+                            getClickUrl(), getAdMarkUp(), getWinUrl());
         } catch (final Exception e) {
             adStatus = NO_AD;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
@@ -1600,8 +1555,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
 
         // Setting deal floor
-        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId ?
-                        matchedPackageEntity.getDealFloors().get(indexOfDealId) : 0.0;
+        dealFloor =
+                matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
+                        indexOfDealId) : 0.0;
 
         // Setting used csids and data vendor cost
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
@@ -1620,8 +1576,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Applying if agency rebate is applicable
-        agencyRebatePercentage = matchedPackageEntity.getAgencyRebatePercentages().size() > indexOfDealId ?
-                matchedPackageEntity.getAgencyRebatePercentages().get(indexOfDealId) : null;
+        agencyRebatePercentage =
+                matchedPackageEntity.getAgencyRebatePercentages().size() > indexOfDealId ? matchedPackageEntity
+                        .getAgencyRebatePercentages().get(indexOfDealId) : null;
         if (null != agencyRebatePercentage) {
             if (agencyRebatePercentage <= 0 || agencyRebatePercentage > 100) {
                 agencyRebatePercentage = null;
@@ -1629,30 +1586,34 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
         }
 
-        //  Setting agency/seat Id if not present in RP response
-        if (null != agencyRebatePercentage ) {
+        // Setting agency/seat Id if not present in RP response
+        if (null != agencyRebatePercentage) {
             isAgencyRebateDeal = true;
-            String dealMetaDataSeatId = matchedPackageEntity.getRpAgencyIds().size() > indexOfDealId
-                && null != matchedPackageEntity.getRpAgencyIds().get(indexOfDealId) ?
-                String.valueOf(matchedPackageEntity.getRpAgencyIds().get(indexOfDealId)) :
-                null;
+            final String dealMetaDataSeatId =
+                    matchedPackageEntity.getRpAgencyIds().size() > indexOfDealId
+                            && null != matchedPackageEntity.getRpAgencyIds().get(indexOfDealId) ? String
+                            .valueOf(matchedPackageEntity.getRpAgencyIds().get(indexOfDealId)) : null;
             if (StringUtils.isEmpty(seatId)) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
+                InspectorStats
+                        .incrementStatCount(getName(), InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
                 seatId = dealMetaDataSeatId;
-                LOG.debug("Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}", dealId);
+                LOG.debug(
+                        "Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}",
+                        dealId);
 
                 if (StringUtils.isEmpty(seatId)) {
                     // This has been enforced in the UI and DB.
-                    InspectorStats.incrementStatCount(getName(), InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
+                    InspectorStats.incrementStatCount(getName(),
+                            InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
                     LOG.error("Agency Id cannot be determined for Agency Rebate Deal.");
                     agencyRebatePercentage = null;
                     isAgencyRebateDeal = false;
                 }
             } else if (!seatId.equals(dealMetaDataSeatId)) {
                 InspectorStats.incrementStatCount(getName(),
-                    InspectorStrings.AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE);
+                        InspectorStrings.AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE);
                 LOG.error("Agency Id mismatch between response and deal metadata. DealId: {}, ReceivedSeatId: {}, "
-                    + "DealMetadataSeatId: {}", dealId, seatId, dealMetaDataSeatId);
+                        + "DealMetadataSeatId: {}", dealId, seatId, dealMetaDataSeatId);
                 agencyRebatePercentage = null;
                 isAgencyRebateDeal = false;
             }
@@ -1660,10 +1621,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         if (isAgencyRebateDeal) {
             // Setting bidPriceInLocal and bidPriceInUsd to the net bid.
-            bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - agencyRebatePercentage/100.0);
+            bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - agencyRebatePercentage / 100.0);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AGENCY_REBATE_DEAL_RESPONSES);
             LOG.debug(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
-                dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
+                    dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
         }
     }
 
@@ -1702,9 +1663,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     @Override
-    protected void overrideInmobiAdTracker(InmobiAdTrackerBuilder builder) {
+    protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
-            DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
+            final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
 
             // Setting agency rebate
             if (isAgencyRebateDeal) {
