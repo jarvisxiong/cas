@@ -483,7 +483,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
                 InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
-        if (!packageIds.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(packageIds)) {
             final RPImpressionExtension rp =
                     impExt.getRp() == null ? new RPImpressionExtension(zoneId) : impExt.getRp();
 

@@ -73,7 +73,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 // TODO: Merge with IXAdNetworkTest.java
 // TODO: Remove dependency on beacon and click changes
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({IXAdNetwork.class, InspectorStats.class})
+@PrepareForTest({IXAdNetwork.class, InspectorStats.class, IXPackageMatcher.class})
 @PowerMockIgnore("javax.crypto.*")
 public class NewIXAdNetworkTest {
     private static final String advertiserName = "ix";
@@ -263,6 +263,7 @@ public class NewIXAdNetworkTest {
     @Test
     public void testNativeAdBuilding() throws Exception {
         mockStaticNice(InspectorStats.class);
+        mockStaticNice(IXPackageMatcher.class);
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
@@ -309,6 +310,7 @@ public class NewIXAdNetworkTest {
         sas.setPlacementId(99L);
         sas.setWapSiteUACEntity(wapBuild.build());
         sas.setCountryId(1L);
+        sas.setDst(8);
         sas.setSiteContentType(ContentType.PERFORMANCE);
 
         final CasInternalRequestParameters casInt = new CasInternalRequestParameters();
