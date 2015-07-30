@@ -31,6 +31,8 @@ public interface KeyConstants {
 
     public static final String WIDTH = "w";
     public static final String HEIGHT = "h";
+    public static final String WIDTH_FULL_TEXT = "width";
+    public static final String HEIGHT_FULL_TEXT = "height";
     public static final String URL = "url";
 
 }

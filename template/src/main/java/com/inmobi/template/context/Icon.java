@@ -2,11 +2,11 @@ package com.inmobi.template.context;
 
 import java.util.Map;
 
+import com.inmobi.template.interfaces.Context;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import com.inmobi.template.interfaces.Context;
 
 @Getter
 @ToString
@@ -31,6 +31,8 @@ public class Icon extends AbstractContext {
     void setValues(final Map<String, Object> params) {
         params.put(KeyConstants.WIDTH, w);
         params.put(KeyConstants.HEIGHT, h);
+        params.put(KeyConstants.WIDTH_FULL_TEXT, w);
+        params.put(KeyConstants.HEIGHT_FULL_TEXT, h);
         params.put(KeyConstants.URL, url);
     }
 
