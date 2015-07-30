@@ -841,9 +841,9 @@ nonprod:
 skyhookprod:
    uj1:
       db_host:
-         - db1001.ads.wc1.inmobi.com
+         - dbadserve.vip.wc1.inmobi.com
       db_port:
-         - 5499
+         - 6543
       database:
          - wap_prod_adserve_cas
       cas_user:
