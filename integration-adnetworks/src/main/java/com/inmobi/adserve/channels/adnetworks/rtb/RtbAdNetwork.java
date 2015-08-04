@@ -803,7 +803,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         final String httpRequestMethod = GET.equalsIgnoreCase(rtbMethod) ? GET : POST;
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body).setBodyEncoding(GlobalConstant.UTF_8)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
