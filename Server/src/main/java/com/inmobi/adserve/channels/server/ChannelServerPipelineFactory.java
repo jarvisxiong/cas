@@ -1,42 +1,33 @@
 package com.inmobi.adserve.channels.server;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.logging.LoggingHandler;
-
 import javax.inject.Inject;
-
-import lombok.Getter;
 
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.handler.NettyRequestScopeSeedHandler;
 
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+
 @Singleton
 public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChannel> {
-
     private final RequestIdHandler requestIdHandler;
     private final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler;
-    @Getter
     private final ConnectionLimitHandler incomingConnectionLimitHandler;
     private final ServerConfig serverConfig;
-    private final LoggingHandler loggingHandler;
     private final RequestParserHandler requestParserHandler;
 
     @Inject
     ChannelServerPipelineFactory(final ServerConfig serverConfig,
             final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler,
-            final ConnectionLimitHandler incomingConnectionLimitHandler, final LoggingHandler loggingHandler,
-            final RequestParserHandler requestParserHandler) {
-
+            final ConnectionLimitHandler incomingConnectionLimitHandler, final RequestParserHandler requestParserHandler) {
         this.serverConfig = serverConfig;
         this.nettyRequestScopeSeedHandler = nettyRequestScopeSeedHandler;
         requestIdHandler = new RequestIdHandler();
         this.incomingConnectionLimitHandler = incomingConnectionLimitHandler;
-        this.loggingHandler = loggingHandler;
         this.requestParserHandler = requestParserHandler;
     }
 

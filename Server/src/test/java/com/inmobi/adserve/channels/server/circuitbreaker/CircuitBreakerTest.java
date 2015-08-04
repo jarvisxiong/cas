@@ -71,6 +71,7 @@ public class CircuitBreakerTest extends TestCase {
         assertThat(circuitBreaker.canForwardTheRequest(), is(equalTo(true)));
     }
     
+    @SuppressWarnings("deprecation")
     @Test
     public void testMovingToCircuitOpenState() throws Exception {
         replayAll();
@@ -82,6 +83,7 @@ public class CircuitBreakerTest extends TestCase {
         PowerMock.reset(CircuitBreakerImpl.class);
     }
     
+    @SuppressWarnings("deprecation")
     @Test
     public void testMovingToCircuitObservationState() throws Exception {
         replayAll();

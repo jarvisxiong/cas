@@ -15,26 +15,29 @@ import com.google.gson.JsonParseException;
 public class GsonUtils {
     /**
      * Boiler Plate code for getting an attribute from a jsonObject
+     * 
      * @param attr
      * @param jsonObj
      * @param <T>
      * @return
      */
-    public static <T> T getAttribute(Class<T> clazz, final String attr, final JsonObject jsonObj,
-                                            JsonDeserializationContext context) throws JsonParseException {
-        JsonElement jsonElt = jsonObj.get(attr);
+    @SuppressWarnings("unchecked")
+    public static <T> T getAttribute(final Class<T> clazz, final String attr, final JsonObject jsonObj,
+            final JsonDeserializationContext context) throws JsonParseException {
+        final JsonElement jsonElt = jsonObj.get(attr);
         if (null != jsonElt) {
-            return (T)context.deserialize(jsonElt, clazz);
+            return (T) context.deserialize(jsonElt, clazz);
         } else {
             return null;
         }
     }
 
-    public static <T> T getAttribute(Class<T> clazz, final String attr, final JsonObject jsonObj,
-                                     JsonDeserializationContext context, T defaultValue) throws JsonParseException {
-        JsonElement jsonElt = jsonObj.get(attr);
+    @SuppressWarnings("unchecked")
+    public static <T> T getAttribute(final Class<T> clazz, final String attr, final JsonObject jsonObj,
+            final JsonDeserializationContext context, final T defaultValue) throws JsonParseException {
+        final JsonElement jsonElt = jsonObj.get(attr);
         if (null != jsonElt) {
-            return (T)context.deserialize(jsonElt, clazz);
+            return (T) context.deserialize(jsonElt, clazz);
         } else {
             return defaultValue;
         }
@@ -42,19 +45,21 @@ public class GsonUtils {
 
     /**
      * Boiler Plate code for getting an list of attribute from a jsonObject
+     * 
      * @param attr
      * @param jsonObj
      * @param <T>
      * @return
      */
-    public static <T> List<T> getListAttribute(Class<T> clazz, final String attr, final JsonObject jsonObj,
-                                                      JsonDeserializationContext context) throws JsonParseException {
-        JsonArray jsonArray = jsonObj.getAsJsonArray(attr);
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> getListAttribute(final Class<T> clazz, final String attr, final JsonObject jsonObj,
+            final JsonDeserializationContext context) throws JsonParseException {
+        final JsonArray jsonArray = jsonObj.getAsJsonArray(attr);
 
         if (null != jsonArray) {
-            List<T> list = new ArrayList<T>();
-            for (JsonElement jsonElt : jsonArray) {
-                list.add((T)context.deserialize(jsonElt, clazz));
+            final List<T> list = new ArrayList<T>();
+            for (final JsonElement jsonElt : jsonArray) {
+                list.add((T) context.deserialize(jsonElt, clazz));
             }
             return list;
         } else {

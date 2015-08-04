@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.rtb;
 
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 
 import java.awt.Dimension;
 import java.net.URI;
@@ -738,9 +739,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final Request ningRequest =
                 new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod(POST)
                         .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
-                        .setHeader(HttpHeaders.Names.CONTENT_ENCODING, GlobalConstant.UTF_8)
-                        .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length)).setBody(body)
-                        .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).build();
+                        .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
+                        .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
+                        .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).setBody(body).setBodyEncoding(UTF_8)
+                        .build();
 
         final boolean callbackResult =
                 impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, getAsyncHttpClient());
@@ -803,7 +805,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         final String httpRequestMethod = GET.equalsIgnoreCase(rtbMethod) ? GET : POST;
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body).setBodyEncoding(GlobalConstant.UTF_8)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE).setBody(body).setBodyEncoding(UTF_8)
                 .setHeader(X_OPENRTB_VERSION, rtbVer).setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 

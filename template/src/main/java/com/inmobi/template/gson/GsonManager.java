@@ -16,6 +16,11 @@ import com.inmobi.template.interfaces.GsonDeserializerConfiguration;
 public class GsonManager {
     private final Gson gson;
 
+    /**
+     * 
+     * @param dc
+     */
+    @SuppressWarnings("rawtypes")
     @Inject
     public GsonManager(final GsonDeserializerConfiguration dc) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
@@ -24,14 +29,18 @@ public class GsonManager {
         gsonBuilder.registerTypeAdapter(Screenshot.class, dc.getImageDeserializer());
         gsonBuilder.registerTypeAdapter(DataMap.class, dc.getDataDeserializer());
 
-        Reflections reflections = new Reflections("com.inmobi.adserve.contracts");
-        Set<Class<?>> gsonContracts = reflections.getTypesAnnotatedWith(GsonContract.class);
-        for (Class gsonContract : gsonContracts) {
+        final Reflections reflections = new Reflections("com.inmobi.adserve.contracts");
+        final Set<Class<?>> gsonContracts = reflections.getTypesAnnotatedWith(GsonContract.class);
+        for (final Class gsonContract : gsonContracts) {
             gsonBuilder.registerTypeAdapter(gsonContract, new GsonContractDeserialiser());
         }
         gson = gsonBuilder.disableHtmlEscaping().create();
     }
 
+    /**
+     * 
+     * @return
+     */
     public Gson getGsonInstance() {
         return gson;
     }

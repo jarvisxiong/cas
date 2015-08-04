@@ -29,7 +29,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(InspectorStats.class)
 public class ServletChangeRolloutTest {
-    private static HttpRequestHandler mockHttpRequestHandler;
     private static QueryStringDecoder mockQueryStringDecoder;
 
     private Map<String, List<String>> createMapFromString(final String rollout) {

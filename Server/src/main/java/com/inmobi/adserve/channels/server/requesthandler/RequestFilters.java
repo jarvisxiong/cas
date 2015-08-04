@@ -1,10 +1,13 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -56,7 +59,8 @@ public class RequestFilters {
         }
 
         if (hrh.responseSender.getSasParams().getSiteContentType() != null
-                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.getSasParams().getSiteContentType().name())) {
+                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.getSasParams().getSiteContentType()
+                        .name())) {
             LOG.info("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
@@ -84,18 +88,34 @@ public class RequestFilters {
         }
 
         if (hrh.responseSender.getSasParams().getProcessedMkSlot().isEmpty()) {
-            if (DemandSourceType.IX.getValue() == hrh.responseSender.getSasParams().getDst()) {
-                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_IX_INVALID_SLOT_REQUEST_FILTER);
-            } else if (DemandSourceType.RTBD.getValue() == hrh.responseSender.getSasParams().getDst()) {
-                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_RTBD_INVALID_SLOT_REQUEST_FILTER);
-            } else {
-                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_DCP_INVALID_SLOT_REQUEST_FILTER);
-            }
-
+            incrementStats(hrh.responseSender.getSasParams());
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
-
         return false;
     }
+
+    /**
+     * Increment stats for DST Level and also for all slots that were requested from UMP
+     * 
+     * @param sasParams
+     */
+    private void incrementStats(final SASRequestParameters sasParams) {
+        final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
+        final StringBuilder buildDst =
+                new StringBuilder(dst != null ? dst.name() : String.valueOf(sasParams.getDst())).append("-").append(
+                        InspectorStrings.DROPPED_IN_INVALID_SLOT_REQUEST_FILTER);
+        // Increment stats for DST
+        InspectorStats.incrementStatCount(buildDst.toString());
+        // Increment stats all slots that were requested from UMP
+        final List<Short> requestedSlots = sasParams.getRqMkSlot();
+        if (CollectionUtils.isNotEmpty(requestedSlots)) {
+            for (final Short slotId : requestedSlots) {
+                final StringBuilder buildslots = new StringBuilder(buildDst);
+                buildslots.append("-").append(slotId);
+                InspectorStats.incrementStatCount(buildslots.toString());
+            }
+        }
+    }
+
 }

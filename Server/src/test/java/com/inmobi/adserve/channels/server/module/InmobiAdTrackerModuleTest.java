@@ -35,6 +35,7 @@ public class InmobiAdTrackerModuleTest {
     private static final int GUICE_DEFAULT_BINDINGS_COUNT = 3;
 
     private final Class<? extends Annotation> builderFactoryAnnotation;
+    @SuppressWarnings("rawtypes")
     private final Class builderClass;
     private static Injector injector;
 

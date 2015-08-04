@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.server.module;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.logging.LoggingHandler;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,15 +23,22 @@ import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.StatServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
 
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.logging.LoggingHandler;
+
 
 /**
  * @author abhishek.parwal
- * 
+ *
  */
 public class CasNettyModule extends AbstractModule {
-
     private final Configuration serverConfiguration;
 
+    /**
+     *
+     * @param serverConfiguration
+     */
     public CasNettyModule(final Configuration serverConfiguration) {
         this.serverConfiguration = serverConfiguration;
     }
@@ -47,7 +50,7 @@ public class CasNettyModule extends AbstractModule {
 
         // server pipelines
         final TypeLiteral<ChannelInitializer<SocketChannel>> channelInitializerType =
-                new TypeLiteral<ChannelInitializer<SocketChannel>>() { };
+                new TypeLiteral<ChannelInitializer<SocketChannel>>() {};
         bind(channelInitializerType).annotatedWith(ServerChannelInitializer.class)
                 .to(ChannelServerPipelineFactory.class).asEagerSingleton();
         bind(channelInitializerType).annotatedWith(StatServerChannelInitializer.class)

@@ -1001,7 +1001,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
                 .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
                 .setHeader(HttpHeaders.Names.AUTHORIZATION, "Basic " + authEncoded)
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body);
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).setBodyEncoding(UTF_8);
     }
 
     @Override

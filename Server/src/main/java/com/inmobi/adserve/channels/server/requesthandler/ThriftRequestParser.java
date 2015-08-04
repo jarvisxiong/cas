@@ -435,12 +435,12 @@ public class ThriftRequestParser {
 
     public List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
         if (selectedSlots == null) {
-            LOG.warn("Emply selectedSlots !!!");
+            LOG.error("Emply selectedSlots received by CAS!!!");
             return Collections.emptyList();
         }
-        final List<Short> listOfUmpSlots = new ArrayList<Short>();
+        final List<Short> validSlots = new ArrayList<Short>();
         for (final Short slotId : selectedSlots) {
-            if (listOfUmpSlots.size() >= 5) {
+            if (validSlots.size() >= 5) {
                 // Keep at most 5 slots in the list
                 break;
             }
@@ -448,10 +448,10 @@ public class ThriftRequestParser {
                     isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper
                             .querySlotSizeMapRepository(slotId) != null;
             if (toAdd) {
-                listOfUmpSlots.add(slotId);
+                validSlots.add(slotId);
             }
         }
-        return listOfUmpSlots;
+        return validSlots;
     }
 
 }
