@@ -27,7 +27,7 @@ prod:
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
-         - '192.168.96.64'
+         - 'tzns4003.grid.uj1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -107,7 +107,7 @@ prod:
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
-         - '10.45.0.136'
+         - 'krvm4102.grid.uh1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -187,7 +187,7 @@ prod:
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
-         - '192.168.176.80'
+         - 'erns4003.grid.lhr1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -267,7 +267,7 @@ prod:
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
-         - '192.168.192.72'
+         - 'opns4006.grid.hkg1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -348,7 +348,7 @@ pilot:
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
-         - '192.168.96.64'
+         - 'tzns4003.grid.uj1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -428,7 +428,7 @@ pilot:
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
-         - '10.45.0.136'
+         - 'krvm4102.grid.uh1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -508,7 +508,7 @@ pilot:
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
-         - '192.168.176.80'
+         - 'erns4003.grid.lhr1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -588,7 +588,7 @@ pilot:
       nexage_host:
          - 'sjc.ads.nexage.com'
       mondemand_address:
-         - '192.168.192.72'
+         - 'opns4006.grid.hkg1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -671,7 +671,7 @@ nonprod:
       nexage_host:
          - 'bos.non_prod'
       mondemand_address:
-         - '192.168.176.80'
+         - 'erns4003.grid.lhr1.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
@@ -789,7 +789,7 @@ nonprod:
       nexage_host:
          - 'bos.ads.nexage.com'
       mondemand_address:
-         - '10.3.0.167'
+         - 'gsmon2000.red.ua2.inmobi.com'
       mondemand_port:
          - '12555'
       log_type :
