@@ -667,26 +667,26 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Spec says - If “0”, then do not track Is set to false, if “1”, then do no track is set to true in browser.
         device.setDnt(casInternalRequestParameters.isTrackingAllowed() ? 0 : 1);
 
-        // Setting platform id sha1 hashed
+        // Setting platform id sha1 hashed and md5 hashed
         if (null != casInternalRequestParameters.getUidSO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidSO1());
             device.setDpidsha1(casInternalRequestParameters.getUidSO1());
         } else if (null != casInternalRequestParameters.getUidO1()) {
             device.setDidsha1(casInternalRequestParameters.getUidO1());
             device.setDpidsha1(casInternalRequestParameters.getUidO1());
+        } else if (null != casInternalRequestParameters.getUidMd5()) {
+            device.setDidsha1(casInternalRequestParameters.getUidMd5());
+            device.setDpidsha1(casInternalRequestParameters.getUidMd5());
+        } else if (null != casInternalRequestParameters.getUid()) {
+            device.setDidsha1(casInternalRequestParameters.getUid());
+            device.setDpidsha1(casInternalRequestParameters.getUid());
         }
 
-        // Setting platform id as imei or md5 hashed
+        // Setting platform id as imei
         final String imei = getIMEI();
         if (imei != null) {
             device.setDidmd5(imei);
             device.setDpidmd5(imei);
-        } else if (null != casInternalRequestParameters.getUidMd5()) {
-            device.setDidmd5(casInternalRequestParameters.getUidMd5());
-            device.setDpidmd5(casInternalRequestParameters.getUidMd5());
-        } else if (null != casInternalRequestParameters.getUid()) {
-            device.setDidmd5(casInternalRequestParameters.getUid());
-            device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
