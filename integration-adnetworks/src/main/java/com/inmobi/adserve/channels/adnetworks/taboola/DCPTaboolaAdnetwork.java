@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.inmobi.adserve.channels.repository.NativeConstraints;
+import com.inmobi.adserve.contracts.ix.request.nativead.Image;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,6 +54,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
     private static final String READ_MORE = "Read More";
+    private static final int defaultIconWidthAndHeight = 150;
 
     @Inject
     protected static TemplateConfiguration templateConfiguration;
@@ -261,20 +264,43 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
         if(nativeContentObject == null) {
-            LOG.info("Content json is empty for placement Id {}", sasParams.getPlacementId());
-            return false;
-        }
-        for (ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
-            CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
-            Dimension dimensions = imageAsset.getDimension();
-            thumbnailHeight = dimensions.getHeight();
-            thumbnailWidth = dimensions.getWidth();
+            setDimentionForHandwritenTemplate();
+        }else{
+            for (ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
+                CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
+                Dimension dimensions = imageAsset.getDimension();
+                thumbnailHeight = dimensions.getHeight();
+                thumbnailWidth = dimensions.getWidth();
 
-            if (attributes.getAdContentAsset() == NativeAdContentAsset.SCREENSHOT) {
+                if (attributes.getAdContentAsset() == NativeAdContentAsset.SCREENSHOT) {
+                    isScreenshotResponse = true;
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void setDimentionForHandwritenTemplate() {
+        final List<NativeConstraints.Mandatory> mandatoryKeys = NativeConstraints.getDCPMandatoryList(
+                templateEntity.getMandatoryKey());
+
+        for (final NativeConstraints.Mandatory mandatory : mandatoryKeys) {
+            switch (mandatory) {
+                case ICON:
+                    thumbnailHeight = defaultIconWidthAndHeight;
+                    thumbnailWidth = defaultIconWidthAndHeight;
+                    break;
+                case SCREEN_SHOT:
+                    final Image screen = NativeConstraints.getDCPImage(templateEntity.getImageKey());
+                    thumbnailHeight = screen.getHmin();
+                    thumbnailWidth = screen.getWmin();
+                    break;
+            }
+            if(mandatory == NativeConstraints.Mandatory.SCREEN_SHOT) {
                 isScreenshotResponse = true;
                 break;
             }
         }
-        return true;
     }
 }

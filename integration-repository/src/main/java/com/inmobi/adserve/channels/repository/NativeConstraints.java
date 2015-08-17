@@ -61,14 +61,20 @@ public class NativeConstraints {
                                                                      INM_TAG_A12, INM_TAG_A15, INM_TAG_A177, INM_TAG_A191, INM_TAG_A64, INM_TAG_A808};
 
     private static final Map<String, List<Integer>> RTB_MANDATORY = new HashMap<>();
+    private static final Map<String, List<Mandatory>> DCP_MANDATORY = new HashMap<>();
     private static final Map<String, List<Mandatory>> IX_MANDATORY = new HashMap<>();
     private static final Map<String, Image> RTB_IMG = new HashMap<>();
+    private static final Map<String, com.inmobi.adserve.contracts.ix.request.nativead.Image> DCP_IMG = new HashMap<>();
     private static final Map<String, com.inmobi.adserve.contracts.ix.request.nativead.Image> IX_IMG = new HashMap<>();
 
     static {
         RTB_MANDATORY.put(LAYOUT_ICON, getIndexList(MAND_ICON));
         RTB_MANDATORY.put(LAYOUT_FEED, getIndexList(MAND_FEED));
         RTB_MANDATORY.put(LAYOUT_STREAM, getIndexList(MAND_STREAM));
+
+        DCP_MANDATORY.put(LAYOUT_ICON, MAND_ICON);
+        DCP_MANDATORY.put(LAYOUT_FEED, MAND_FEED);
+        DCP_MANDATORY.put(LAYOUT_STREAM, MAND_STREAM);
 
         // IX Mandatory maps
         IX_MANDATORY.put(LAYOUT_ICON, MAND_ICON);
@@ -84,6 +90,8 @@ public class NativeConstraints {
             final int minH = Integer.parseInt(arr[4]);
             RTB_IMG.put(key, getRTBImage(ar, minW, maxW));
             IX_IMG.put(key, getIXImage(minW, minH));
+            DCP_IMG.put(key, getDCPImage(minW, minH));
+
         }
     }
 
@@ -115,6 +123,22 @@ public class NativeConstraints {
         img.setMaxwidth(maxW);
         img.setMinwidth(minW);
         return img;
+    }
+
+    /**
+     *
+     * @param wMin
+     * @param hMin
+     * @return
+     */
+
+    private static com.inmobi.adserve.contracts.ix.request.nativead.Image getDCPImage(final int wMin, final int hMin) {
+        final com.inmobi.adserve.contracts.ix.request.nativead.Image image = new com.inmobi.adserve.contracts.ix
+                .request.nativead.Image();
+        image.setType(ImageAssetType.MAIN);
+        image.setWmin(wMin);
+        image.setHmin(hMin);
+        return image;
     }
 
     /**
@@ -170,8 +194,25 @@ public class NativeConstraints {
      * @param key
      * @return
      */
+    public static com.inmobi.adserve.contracts.ix.request.nativead.Image getDCPImage(final String key) {
+        final com.inmobi.adserve.contracts.ix.request.nativead.Image img = DCP_IMG.get(key);
+        if (img != null) {
+            return new com.inmobi.adserve.contracts.ix.request.nativead.Image(img);
+        }
+        return img;
+    }
+
+    /**
+     *
+     * @param key
+     * @return
+     */
     public static List<Mandatory> getIXMandatoryList(final String key) {
         return IX_MANDATORY.get(key);
+    }
+
+    public static List<Mandatory> getDCPMandatoryList(final String key) {
+        return DCP_MANDATORY.get(key);
     }
 
 }
