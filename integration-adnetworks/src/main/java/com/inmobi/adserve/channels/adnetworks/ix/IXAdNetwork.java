@@ -968,7 +968,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != seatId) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, seatId);
         }
-        if (isExternalPersonaDeal) {
+        if (null != dealId) {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id=" + dealId);
         } else {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, StringUtils.EMPTY);
