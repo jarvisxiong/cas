@@ -1243,8 +1243,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private void videoAdBuilding() {
         try {
             responseContent =
-                    IXAdNetworkHelper.videoAdBuilding(sasParams, repositoryHelper, selectedSlotId, getBeaconUrl(),
-                            getClickUrl(), getAdMarkUp(), getWinUrl());
+                    IXAdNetworkHelper
+                            .videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams, repositoryHelper,
+                                    selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
         } catch (final Exception e) {
             adStatus = NO_AD;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
@@ -1540,7 +1541,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     protected void setDealRelatedMetadata() {
         IXPackageEntity matchedPackageEntity;
-
         try {
             matchedPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
             winningPackageId = matchedPackageEntity.getId();
@@ -1553,7 +1553,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
-
         // Setting deal floor
         dealFloor =
                 matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
@@ -1563,7 +1562,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;
-
             usedCsIds = new HashSet<>();
             final Set<Set<Integer>> csIdInPackages = matchedPackageEntity.getDmpFilterSegmentExpression();
             for (final Set<Integer> smallSet : csIdInPackages) {
@@ -1597,10 +1595,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats
                         .incrementStatCount(getName(), InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
                 seatId = dealMetaDataSeatId;
-                LOG.debug(
+                LOG.info(
                         "Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}",
                         dealId);
-
                 if (StringUtils.isEmpty(seatId)) {
                     // This has been enforced in the UI and DB.
                     InspectorStats.incrementStatCount(getName(),
@@ -1623,7 +1620,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             // Setting bidPriceInLocal and bidPriceInUsd to the net bid.
             bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - agencyRebatePercentage / 100.0);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AGENCY_REBATE_DEAL_RESPONSES);
-            LOG.debug(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
+            LOG.info(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
                     dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
         }
     }

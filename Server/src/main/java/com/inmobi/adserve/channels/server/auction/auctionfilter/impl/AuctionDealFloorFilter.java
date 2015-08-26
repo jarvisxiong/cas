@@ -24,13 +24,11 @@ public class AuctionDealFloorFilter extends AbstractAuctionFilter {
     }
 
     @Override
-    protected boolean failedInFilter(final ChannelSegment rtbSegment,
-                                     final CasInternalRequestParameters casInternalRequestParameters) {
+    protected boolean failedInFilter(final ChannelSegment rtbSegment, final CasInternalRequestParameters casInternal) {
         if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
             final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
             if (ixAdNetwork.isExternalPersonaDeal()) {
-                if ((ixAdNetwork.getBidPriceInUsd()
-                        < casInternalRequestParameters.getSiteFloor() + ixAdNetwork.returnDataVendorCost())
+                if ((ixAdNetwork.getBidPriceInUsd() < casInternal.getSiteFloor() + ixAdNetwork.returnDataVendorCost())
                         || (ixAdNetwork.getBidPriceInUsd() < ixAdNetwork.returndealFloor())) {
                     return true;
                 }

@@ -14,10 +14,13 @@ import com.inmobi.template.interfaces.Context;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.template.interfaces.Tools;
 
-
+/**
+ *
+ * @author ritwik.kumar
+ *
+ */
 public class TemplateParser {
     private final static Logger LOG = LoggerFactory.getLogger(TemplateParser.class);
-
     private final Tools tools;
     private final MathTool mTool;
 
@@ -27,6 +30,10 @@ public class TemplateParser {
         mTool = tc.getMathTool();
     }
 
+    /**
+     *
+     * @return
+     */
     private VelocityContext getVelocityContext() {
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("tool", tools);
@@ -34,6 +41,13 @@ public class TemplateParser {
         return velocityContext;
     }
 
+    /**
+     *
+     * @param context
+     * @param templateName
+     * @return
+     * @throws TemplateException
+     */
     public String format(final Context context, final String templateName) throws TemplateException {
         LOG.debug("Formating Template for placement : {}", templateName);
         try {

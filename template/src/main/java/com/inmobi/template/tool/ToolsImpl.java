@@ -6,11 +6,16 @@ import com.inmobi.template.gson.GsonManager;
 import com.inmobi.template.interfaces.Context;
 import com.inmobi.template.interfaces.Tools;
 
+/**
+ *
+ * @author ritwik.kumar
+ *
+ */
 public class ToolsImpl extends Tools {
     private final Gson gson;
 
     @Inject
-    public ToolsImpl(GsonManager gsonManager) {
+    public ToolsImpl(final GsonManager gsonManager) {
         gson = gsonManager.getGsonInstance();
     }
 

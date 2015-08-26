@@ -12,9 +12,14 @@ import com.inmobi.template.gson.GsonManager;
 import com.inmobi.template.interfaces.GsonDeserializerConfiguration;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.template.interfaces.Tools;
+import com.inmobi.template.tool.TemplateTool;
 import com.inmobi.template.tool.ToolsImpl;
 
-
+/**
+ *
+ * @author ritwik.kumar
+ *
+ */
 public class TemplateModule extends AbstractModule {
 
     @Override
@@ -26,11 +31,15 @@ public class TemplateModule extends AbstractModule {
         bind(TemplateConfiguration.class).to(defaultTemplateInitializer()).asEagerSingleton();
     }
 
+    /**
+     *
+     * @return
+     */
     private Class<? extends TemplateConfiguration> defaultTemplateInitializer() {
         bind(Tools.class).to(ToolsImpl.class).asEagerSingleton();
         bind(MathTool.class).asEagerSingleton();
+        bind(TemplateTool.class).asEagerSingleton();
         bind(GsonManager.class).asEagerSingleton();
-
         return DefaultConfiguration.class;
     }
 }

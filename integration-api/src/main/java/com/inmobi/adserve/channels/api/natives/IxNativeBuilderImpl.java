@@ -30,13 +30,13 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
     private static final int DEFAULT_TITLE_LENGTH = 100;
     private static final int DEFAULT_DESC_LENGTH = 100;
     private static final int ICON_DEFAULT_DIMENSION = 300;
+    private static final int DEFAULT_AD_UNIT_ID = 500;
 
     private final NativeReqObj nativeReqObj;
 
     @Inject
-    public IxNativeBuilderImpl(@Assisted NativeAdTemplateEntity templateEntity) {
+    public IxNativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
         super(templateEntity);
-
         NativeLayoutId layoutId = NativeLayoutId.findByInmobiNativeUILayoutType(templateEntity.getNativeUILayout());
         if (null == layoutId) {
             switch (templateEntity.getMandatoryKey()) {
@@ -49,10 +49,12 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
                 case NativeConstraints.LAYOUT_STREAM:
                     layoutId = DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_STREAM;
                     break;
-                // default is already taken care of in the repository.
+            // default is already taken care of in the repository.
             }
         }
         nativeReqObj = new NativeReqObj(layoutId);
+        // https://jira.corp.inmobi.com/browse/CAS-81
+        nativeReqObj.setAdunit(DEFAULT_AD_UNIT_ID);
     }
 
     @Override
@@ -73,11 +75,11 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
     }
 
     private void buildImageAssets() {
-        NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
+        final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
 
-        for (ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
-            CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
-            Dimension dimensions = imageAsset.getDimension();
+        for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
+            final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
+            final Dimension dimensions = imageAsset.getDimension();
 
             final Image image = new Image();
             image.setHmin(dimensions.getHeight());
@@ -99,10 +101,10 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
     }
 
     private void buildTextAssets() {
-        NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
+        final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
 
-        for (TextAsset textAsset : nativeContentObject.getTextAssets()) {
-            CommonAssetAttributes attributes = textAsset.getCommonAttributes();
+        for (final TextAsset textAsset : nativeContentObject.getTextAssets()) {
+            final CommonAssetAttributes attributes = textAsset.getCommonAttributes();
             int maxChars = textAsset.getMaxChars();
 
             switch (attributes.getAdContentAsset()) {
@@ -114,10 +116,11 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
                     nativeReqObj.addAsset(!attributes.isOptional(), new Title(maxChars));
                     break;
                 case DESCRIPTION:
-                    if (0 == maxChars)
+                    if (0 == maxChars) {
                         maxChars = DEFAULT_DESC_LENGTH;
+                    }
 
-                    Data description = new Data(Data.DataAssetType.DESC);
+                    final Data description = new Data(Data.DataAssetType.DESC);
                     description.setLen(maxChars);
 
                     nativeReqObj.addAsset(!attributes.isOptional(), description);
@@ -130,10 +133,10 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
     }
 
     private void buildOtherAssets() {
-        NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
+        final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
 
-        for (OtherAsset otherAsset : nativeContentObject.getOtherAssets()) {
-            CommonAssetAttributes attributes = otherAsset.getCommonAttributes();
+        for (final OtherAsset otherAsset : nativeContentObject.getOtherAssets()) {
+            final CommonAssetAttributes attributes = otherAsset.getCommonAttributes();
 
             Data data;
             switch (attributes.getAdContentAsset()) {
@@ -152,7 +155,8 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
     }
 
     private void buildMandatory() {
-        final List<NativeConstraints.Mandatory> mandatoryKeys = NativeConstraints.getIXMandatoryList(templateEntity.getMandatoryKey());
+        final List<NativeConstraints.Mandatory> mandatoryKeys =
+                NativeConstraints.getIXMandatoryList(templateEntity.getMandatoryKey());
         for (final NativeConstraints.Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case TITLE:

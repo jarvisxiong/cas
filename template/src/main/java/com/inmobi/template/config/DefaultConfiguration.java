@@ -6,24 +6,21 @@ import com.google.inject.Inject;
 import com.inmobi.template.gson.GsonManager;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.template.interfaces.Tools;
+import com.inmobi.template.tool.TemplateTool;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
+@Data
 public class DefaultConfiguration implements TemplateConfiguration {
-
-    @Getter
-    @Setter
     @Inject
     private GsonManager gsonManager;
 
-    @Getter
-    @Setter
     @Inject
     private Tools tool;
 
-    @Getter
-    @Setter
     @Inject
     private MathTool mathTool;
+
+    @Inject
+    private TemplateTool templateTool;
 }

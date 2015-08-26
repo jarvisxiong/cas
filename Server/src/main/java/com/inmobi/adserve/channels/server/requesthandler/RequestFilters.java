@@ -67,7 +67,6 @@ public class RequestFilters {
             return true;
         }
         final String tempSdkVersion = hrh.responseSender.getSasParams().getSdkVersion();
-
         if (null != tempSdkVersion) {
             try {
                 if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1)) || "a".equalsIgnoreCase(tempSdkVersion
@@ -84,7 +83,6 @@ public class RequestFilters {
             } catch (final NumberFormatException exception) {
                 LOG.error("Invalid sdk-version, Exception raised {}", exception);
             }
-
         }
 
         if (hrh.responseSender.getSasParams().getProcessedMkSlot().isEmpty()) {

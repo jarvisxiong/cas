@@ -6,6 +6,7 @@ import lombok.Data;
 public class VASTTemplateObject {
     public static final String AD_OBJECT_PREFIX = "ad";
     public static final String FIRST_OBJECT_PREFIX = "first";
+    public static final String TOOL_OBJECT = "tool";
     
     public static final String VAST_CONTENT_JS_ESC = "VASTContentJSEsc";
     public static final String IM_WIN_URL = "IMWinUrl";

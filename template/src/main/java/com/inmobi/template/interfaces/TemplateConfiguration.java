@@ -3,9 +3,35 @@ package com.inmobi.template.interfaces;
 import org.apache.velocity.tools.generic.MathTool;
 
 import com.inmobi.template.gson.GsonManager;
+import com.inmobi.template.tool.TemplateTool;
 
+/**
+ * 
+ * @author ritwik.kumar
+ *
+ */
 public interface TemplateConfiguration {
-    public MathTool getMathTool();
-    public Tools getTool();
-    public GsonManager getGsonManager();
+    /**
+     * 
+     * @return
+     */
+    MathTool getMathTool();
+
+    /**
+     * 
+     * @return
+     */
+    Tools getTool();
+
+    /**
+     * 
+     * @return
+     */
+    TemplateTool getTemplateTool();
+
+    /**
+     * 
+     * @return
+     */
+    GsonManager getGsonManager();
 }

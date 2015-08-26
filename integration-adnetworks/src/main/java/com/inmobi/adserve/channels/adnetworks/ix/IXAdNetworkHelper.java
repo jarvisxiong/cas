@@ -19,6 +19,7 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
 import static com.inmobi.adserve.channels.util.VASTTemplateObject.AD_OBJECT_PREFIX;
+import static com.inmobi.adserve.channels.util.VASTTemplateObject.TOOL_OBJECT;
 import static com.inmobi.adserve.channels.util.VASTTemplateObject.FIRST_OBJECT_PREFIX;
 import static com.inmobi.adserve.channels.util.VASTTemplateObject.IM_WIN_URL;
 import static com.inmobi.adserve.channels.util.VASTTemplateObject.PARTNER_BEACON_URL;
@@ -82,6 +83,7 @@ import com.inmobi.adserve.contracts.ix.response.nativead.Native;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
+import com.inmobi.template.tool.TemplateTool;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -537,8 +539,8 @@ public class IXAdNetworkHelper {
      *
      * $VASTContentJSEsc <br>
      * ${first.ns}<br>
-     * ${first.clickServerUrl}<br>
-     * ${first.beaconUrl}<br>
+     * $tool.jsInline($first.beaconUrl)<br>
+     * $tool.jsInline($first.clickServerUrl)<br>
      *
      * $ad.supplyWidth<br>
      * $ad.supplyHeight<br>
@@ -556,9 +558,9 @@ public class IXAdNetworkHelper {
      * @return
      * @throws Exception
      */
-    public static String videoAdBuilding(final SASRequestParameters sasParams, final RepositoryHelper repositoryHelper,
-            final Short selectedSlotId, final String beaconUrl, final String clickUrl, final String adMarkup,
-            final String winUrl) throws Exception {
+    public static String videoAdBuilding(final TemplateTool tool, final SASRequestParameters sasParams,
+            final RepositoryHelper repositoryHelper, final Short selectedSlotId, final String beaconUrl,
+            final String clickUrl, final String adMarkup, final String winUrl) throws Exception {
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(VAST_CONTENT_JS_ESC, StringEscapeUtils.escapeJavaScript(adMarkup));
         // JS escaped WinUrl for partner.
@@ -600,6 +602,7 @@ public class IXAdNetworkHelper {
         // Add object to velocityContext
         velocityContext.put(FIRST_OBJECT_PREFIX, vastTemplFirst);
         velocityContext.put(AD_OBJECT_PREFIX, vastTemplAd);
+        velocityContext.put(TOOL_OBJECT, tool);
 
         return Formatter.getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
     }

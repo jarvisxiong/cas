@@ -29,7 +29,7 @@ import java.util.Map;
  *         Size ID 61: Full page (1000x1000)<br>
  * <br>
  *         InMobi supported slots<br>
- *         wap_prod_adserve=> select id,height,width,ad_type from serving_unit;<br>
+ *         wap_prod_adserve=> select id, width, height, ad_type from serving_unit;<br>
  */
 public class SlotSizeMapping {
     private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
