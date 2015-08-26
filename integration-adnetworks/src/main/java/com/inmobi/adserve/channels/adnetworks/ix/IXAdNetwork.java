@@ -195,11 +195,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Integer winningPackageId;
     @Getter
     private String dealId;
+    @Getter
     private Double dealFloor;
     @Getter
     private Double agencyRebatePercentage;
+    @Getter
     private Double dataVendorCost;
+    @Getter
     private Double adjustbid;
+    @Getter
     private String aqid;
     private String nurl;
     protected boolean isCoppaSet = false;
@@ -217,6 +221,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean isAgencyRebateDeal;
     @Getter
     private boolean isExternalPersonaDeal;
+    @Getter
     private Set<Integer> usedCsIds;
     @Getter
     private List<Integer> packageIds;
@@ -968,7 +973,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != seatId) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, seatId);
         }
-        if (null != dealId) {
+        if (isExternalPersonaDeal) {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id=" + dealId);
         } else {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, StringUtils.EMPTY);
@@ -1623,30 +1628,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
                     dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
         }
-    }
-
-    public Double returnAdjustBid() {
-        return adjustbid;
-    }
-
-    public String returnDealId() {
-        return dealId;
-    }
-
-    public double returndealFloor() {
-        return dealFloor;
-    }
-
-    public double returnDataVendorCost() {
-        return dataVendorCost;
-    }
-
-    public Set<Integer> returnUsedCsids() {
-        return usedCsIds;
-    }
-
-    public String returnAqid() {
-        return aqid;
     }
 
     @Override

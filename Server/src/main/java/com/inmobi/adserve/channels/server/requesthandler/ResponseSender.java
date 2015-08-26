@@ -346,8 +346,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 // Set IX specific parameters
                 if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
                     final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
-                    final String dealId = ixAdNetwork.returnDealId();
-                    final long highestBid = (long) (ixAdNetwork.returnAdjustBid() * Math.pow(10, 6));
+                    final String dealId = ixAdNetwork.getDealId();
+                    final long highestBid = (long) (ixAdNetwork.getAdjustbid() * Math.pow(10, 6));
                     IXPackageEntity dealIXPackageEntity = null;
                     // Checking whether a dealId was provided in the bid response
                     if (dealId != null) {
@@ -363,7 +363,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     }
                     if (null != dealIXPackageEntity) {
                         if (ixAdNetwork.isExternalPersonaDeal()) {
-                            csids.setMatchedCsids(ixAdNetwork.returnUsedCsids());
+                            csids.setMatchedCsids(ixAdNetwork.getUsedCsIds());
                             final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
                             try {
                                 adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));

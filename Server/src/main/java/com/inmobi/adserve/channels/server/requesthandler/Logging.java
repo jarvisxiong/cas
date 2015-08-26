@@ -285,8 +285,8 @@ public class Logging {
         if (StringUtils.isNotEmpty(ixAdNetwork.getDspId())) {
             ixAd.setDspId(ixAdNetwork.getDspId());
         }
-        if (StringUtils.isNotEmpty(ixAdNetwork.returnAqid())) {
-            ixAd.setAqId(ixAdNetwork.returnAqid());
+        if (StringUtils.isNotEmpty(ixAdNetwork.getAqid())) {
+            ixAd.setAqId(ixAdNetwork.getAqid());
         }
         if (StringUtils.isNotEmpty(ixAdNetwork.getAdvId())) {
             ixAd.setAdvId(ixAdNetwork.getAdvId());
@@ -309,8 +309,8 @@ public class Logging {
             }
 
             // Log highest Bid
-            if (null != ixAdNetwork.returnAdjustBid()) {
-                ixAd.setHighestBid(ixAdNetwork.returnAdjustBid());
+            if (null != ixAdNetwork.getAdjustbid()) {
+                ixAd.setHighestBid(ixAdNetwork.getAdjustbid());
             }
 
             // Log agency rebate percentage

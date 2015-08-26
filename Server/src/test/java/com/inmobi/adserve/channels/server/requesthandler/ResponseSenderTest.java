@@ -423,14 +423,14 @@ public class ResponseSenderTest {
         expect(mockIXAdNetwork.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
         expect(mockIXAdNetwork.getSecondBidPriceInUsd()).andReturn(secondBidPriceInUSD).anyTimes();
         expect(mockIXAdNetwork.getCurrency()).andReturn(currency).anyTimes();
-        expect(mockIXAdNetwork.returnAdjustBid()).andReturn(adjustBidPrice).anyTimes();
+        expect(mockIXAdNetwork.getAdjustbid()).andReturn(adjustBidPrice).anyTimes();
         expect(mockIXAdNetwork.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
 
         expect(mockIXAdNetwork.isExternalPersonaDeal()).andReturn(false).times(2).andReturn(true).anyTimes();
-        expect(mockIXAdNetwork.returnDealId()).andReturn(null).times(1).andReturn(dealId).anyTimes();
+        expect(mockIXAdNetwork.getDealId()).andReturn(null).times(1).andReturn(dealId).anyTimes();
         HashSet<Integer> temp = new HashSet<Integer>();
         temp.add(1);
-        expect(mockIXAdNetwork.returnUsedCsids()).andReturn(temp).times(1).andReturn(null).anyTimes();
+        expect(mockIXAdNetwork.getUsedCsIds()).andReturn(temp).times(1).andReturn(null).anyTimes();
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();

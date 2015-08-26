@@ -547,10 +547,10 @@ public class LoggingTest {
         expect(mockIXAdNetwork.getDspId()).andReturn(dspId).times(2);
         expect(mockIXAdNetwork.getAdvId()).andReturn(advId).times(2);
         expect(mockIXAdNetwork.getSeatId()).andReturn(seatId).times(2);
-        expect(mockIXAdNetwork.returnAqid()).andReturn(aqId).times(2);
+        expect(mockIXAdNetwork.getAqid()).andReturn(aqId).times(2);
         expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIds).times(2);
         expect(mockIXAdNetwork.getWinningPackageId()).andReturn(winningPackageId).times(2);
-        expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.8).times(2);
+        expect(mockIXAdNetwork.getAdjustbid()).andReturn(0.8).times(2);
         expect(mockIXAdNetwork.getDealId()).andReturn(dealId).times(2);
 
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();
@@ -636,10 +636,10 @@ public class LoggingTest {
         expect(mockIXAdNetwork.getDspId()).andReturn(dspId).times(2);
         expect(mockIXAdNetwork.getAdvId()).andReturn(advId).times(2);
         expect(mockIXAdNetwork.getSeatId()).andReturn(seatId).times(2);
-        expect(mockIXAdNetwork.returnAqid()).andReturn(aqId).times(2);
+        expect(mockIXAdNetwork.getAqid()).andReturn(aqId).times(2);
         expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIds).times(2);
         expect(mockIXAdNetwork.getWinningPackageId()).andReturn(winningPackageId).times(2);
-        expect(mockIXAdNetwork.returnAdjustBid()).andReturn(0.8).times(2);
+        expect(mockIXAdNetwork.getAdjustbid()).andReturn(0.8).times(2);
         expect(mockIXAdNetwork.getDealId()).andReturn(dealId).times(2);
         expect(mockIXAdNetwork.getOriginalBidPriceInUsd()).andReturn(originalBidPriceInUSD).times(2);
         expect(mockIXAdNetwork.getAgencyRebatePercentage()).andReturn(agencyRebatePercentage).anyTimes();

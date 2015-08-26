@@ -28,8 +28,8 @@ public class AuctionDealFloorFilter extends AbstractAuctionFilter {
         if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
             final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
             if (ixAdNetwork.isExternalPersonaDeal()) {
-                if ((ixAdNetwork.getBidPriceInUsd() < casInternal.getSiteFloor() + ixAdNetwork.returnDataVendorCost())
-                        || (ixAdNetwork.getBidPriceInUsd() < ixAdNetwork.returndealFloor())) {
+                if ((ixAdNetwork.getBidPriceInUsd() < casInternal.getSiteFloor() + ixAdNetwork.getDataVendorCost())
+                        || (ixAdNetwork.getBidPriceInUsd() < ixAdNetwork.getDealFloor())) {
                     return true;
                 }
             }
