@@ -107,7 +107,7 @@ public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler
                 circuitBreaker = circuitBreakerClass.getConstructor(new Class[] {String.class}).newInstance(advertiserName);
                 circuitBreakerMap.put(advertiserid, circuitBreaker);
             } catch (final Exception ex) {
-                LOG.error("Error instantiating circuit breaker" + ExceptionBlock.getStackTrace(ex));
+                LOG.error("Error instantiating circuit breaker for AdvertiserId : " + advertiserid + " : " + ExceptionBlock.getStackTrace(ex));
             }
 
         }
