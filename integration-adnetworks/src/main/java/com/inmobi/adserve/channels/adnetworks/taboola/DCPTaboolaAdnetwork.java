@@ -161,10 +161,11 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         try {
             final Map<String, String> params = new HashMap<String, String>();
             buildInmobiAdTracker();
+            String beacon = getBeaconUrl();
             TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
             if (taboolaResponse.getList().length > 0) {
                 String nurl = String.format(notificationUrl,externalSiteId, taboolaResponse.getId());
-                updateNativeParams(params, nurl);
+                updateNativeParams(params, nurl, beacon);
                 App.Builder appBuilder = App.newBuilder();
                 NativeJson taboolaNative = taboolaResponse.getList()[0];
                 String title = taboolaNative.getBranding();
@@ -193,6 +194,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 if (null != description) {
                     appBuilder.setDesc(description);
                 }
+                List<String> pixelUrls = new ArrayList<>();
+                pixelUrls.add(beacon);
+                appBuilder.setPixelUrls(pixelUrls);
                 App app = (App) appBuilder.build();
                 responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params,
                         repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
@@ -241,8 +245,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
     }
 
-    private void updateNativeParams(Map<String, String> params, String nurl) {
-        params.put("beaconUrl", getBeaconUrl());
+    private void updateNativeParams(Map<String, String> params, String nurl, String beacon) {
+        params.put("beaconUrl", beacon);
         params.put("impressionId", impressionId);
         params.put("placementId", String.valueOf(sasParams.getPlacementId()));
         params.put("nUrl", nurl);
