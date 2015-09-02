@@ -17,6 +17,7 @@ public final class Screenshot extends AbstractContext {
     private final int width;
     private final int height;
     private final String ar;
+    private final String aspectRatio;
     private final String url;
 
     private Screenshot(final Builder builder) {
@@ -26,6 +27,7 @@ public final class Screenshot extends AbstractContext {
         height = h;
         url = builder.url;
         ar = builder.ar;
+        aspectRatio = builder.ar;
         setValues(params);
     }
 
@@ -36,6 +38,7 @@ public final class Screenshot extends AbstractContext {
         params.put("width", w);
         params.put("height", h);
         params.put("ar", ar);
+        params.put("aspectRatio", ar);
         params.put("url", url);
     }
 

@@ -16,6 +16,8 @@ public class Icon extends AbstractContext {
     private final int width;
     private final int height;
     private final int h;
+    private final String ar;
+    private final String aspectRatio;
     private final String url;
 
     private Icon(final Builder builder) {
@@ -24,6 +26,8 @@ public class Icon extends AbstractContext {
         height = builder.h;
         width = builder.w;
         url = builder.url;
+        ar = String.valueOf(((double) w) / ((double)h));
+        aspectRatio = ar;
         setValues(params);
     }
 
@@ -31,8 +35,10 @@ public class Icon extends AbstractContext {
     void setValues(final Map<String, Object> params) {
         params.put(KeyConstants.WIDTH, w);
         params.put(KeyConstants.HEIGHT, h);
+        params.put(KeyConstants.AR, ar);
         params.put(KeyConstants.WIDTH_FULL_TEXT, w);
         params.put(KeyConstants.HEIGHT_FULL_TEXT, h);
+        params.put(KeyConstants.AR_FULL_TEXT, ar);
         params.put(KeyConstants.URL, url);
     }
 
