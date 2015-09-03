@@ -16,7 +16,7 @@
         _im_imai.pingInWebView('${first.clickServerUrl}');
     };
 	window['${first.ns}impressionCallback'] = function() {
-        _im_imai.pingInWebView('${IMWinUrl}');
+        _im_imai.pingInWebView('${IMWinUrl}${DEAL_GET_PARAM}');
         #if($PartnerBeaconUrl)_im_imai.pingInWebView('${PartnerBeaconUrl}');#end
     };
     window['${first.ns}LandingPageEvent'] = function() {

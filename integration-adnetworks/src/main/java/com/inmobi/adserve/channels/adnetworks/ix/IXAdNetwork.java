@@ -489,8 +489,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final long startTime = System.currentTimeMillis();
         packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
         final long endTime = System.currentTimeMillis();
-        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
-                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst())
+            .name(), InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
         if (CollectionUtils.isNotEmpty(packageIds)) {
             final RPImpressionExtension rp =
@@ -973,7 +973,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != seatId) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, seatId);
         }
-        if (isExternalPersonaDeal) {
+        if (null != dealId) {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, "&d-id=" + dealId);
         } else {
             url = url.replaceAll(RTBCallbackMacros.DEAL_ID_INSENSITIVE, StringUtils.EMPTY);
@@ -1284,7 +1284,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final App app = bidRequest.getApp();
             final Map<String, String> params = new HashMap<>();
             params.put("beaconUrl", getBeaconUrl());
-            params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}");
+            params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}${DEAL_GET_PARAM}");
             params.put("appId", app.getId());
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
