@@ -88,6 +88,11 @@ public class DCPIronSourceAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     @Override
+    public String getId() {
+        return config.getString("ironsource.advertiserId");
+    }
+
+    @Override
     public URI getRequestUri() throws Exception {
         try {
             final StringBuilder url = new StringBuilder(host);

@@ -484,11 +484,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     abstract public URI getRequestUri() throws Exception;
 
     @Override
-    public String getId() {
-        return DEFAULT_EMPTY_STRING;
-    }
-
-    @Override
     public void cleanUp() {
         if (!isRequestCompleted()) {
             isRequestComplete = true;

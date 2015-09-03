@@ -111,6 +111,11 @@ public class BaseAdNetworkImplTest {
 
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(mockHttpRequestHandlerBase, mockChannel) {
             @Override
+            public String getId() {
+                return null;
+            }
+
+            @Override
             public URI getRequestUri() throws Exception {
                 return new URI(serverUrl);
             }
@@ -135,6 +140,11 @@ public class BaseAdNetworkImplTest {
         replayAll();
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(mockHttpRequestHandlerBase, mockChannel) {
             @Override
+            public String getId() {
+                return null;
+            }
+
+            @Override
             public URI getRequestUri() throws Exception {
                 return new URI(serverUrl);
             }
@@ -153,6 +163,7 @@ public class BaseAdNetworkImplTest {
         expect(baseAdNetwork.getAsyncHttpClient()).andReturn(asyncHttpClientForTest);
         expect(baseAdNetwork.getRequestUri()).andReturn(new URI(serverUrl + "/get")).times(2);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
+        expect(baseAdNetwork.getId()).andReturn("testAdapterId").anyTimes();
         replay(baseAdNetwork);
 
         MemberMatcher.field(BaseAdNetworkImpl.class, "scope").set(baseAdNetwork, new NettyRequestScope());
@@ -173,6 +184,7 @@ public class BaseAdNetworkImplTest {
         expect(baseAdNetwork.getAsyncHttpClient()).andReturn(asyncHttpClientForTest);
         expect(baseAdNetwork.getRequestUri()).andReturn(new URI(serverUrl + "/emptyResponse")).times(2);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
+        expect(baseAdNetwork.getId()).andReturn("testAdapterId").anyTimes();
         replay(baseAdNetwork);
 
         MemberMatcher.field(BaseAdNetworkImpl.class, "scope").set(baseAdNetwork, new NettyRequestScope());
@@ -193,6 +205,7 @@ public class BaseAdNetworkImplTest {
         expect(baseAdNetwork.getAsyncHttpClient()).andReturn(asyncHttpClientForTest);
         expect(baseAdNetwork.getRequestUri()).andReturn(new URI(serverUrl + "/http503")).times(2);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
+        expect(baseAdNetwork.getId()).andReturn("testAdapterId").anyTimes();
         replay(baseAdNetwork);
 
         MemberMatcher.field(BaseAdNetworkImpl.class, "scope").set(baseAdNetwork, new NettyRequestScope());
@@ -214,6 +227,7 @@ public class BaseAdNetworkImplTest {
         expect(baseAdNetwork.getAsyncHttpClient()).andReturn(asyncHttpClientForTest);
         expect(baseAdNetwork.getRequestUri()).andReturn(new URI("http://localhos-invalidURL")).times(2);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
+        expect(baseAdNetwork.getId()).andReturn("testAdapterId").anyTimes();
         replayAll();
 
         MemberMatcher.field(BaseAdNetworkImpl.class, "scope").set(baseAdNetwork, new NettyRequestScope());
@@ -331,6 +345,7 @@ public class BaseAdNetworkImplTest {
 
         expect(baseAdNetwork.useJsAdTag()).andReturn(true);
         expect(baseAdNetwork.getName()).andReturn("testAdapterName").anyTimes();
+        expect(baseAdNetwork.getId()).andReturn("testAdapterId").anyTimes();
         replay(baseAdNetwork);
 
         baseAdNetwork.makeAsyncRequest();
@@ -364,6 +379,11 @@ public class BaseAdNetworkImplTest {
 
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
             @Override
+            public String getId() {
+                return null;
+            }
+
+            @Override
             public URI getRequestUri() throws Exception {
                 return null;
             }
@@ -394,6 +414,11 @@ public class BaseAdNetworkImplTest {
     @Test
     public void testIsValidResponse() {
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
+            @Override
+            public String getId() {
+                return null;
+            }
+
             @Override
             public URI getRequestUri() throws Exception {
                 return null;
@@ -437,6 +462,11 @@ public class BaseAdNetworkImplTest {
         ipRepositoryField.set(null, ipRepository);
 
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
+            @Override
+            public String getId() {
+                return null;
+            }
+
             @Override
             public URI getRequestUri() throws Exception {
                 return null;
@@ -488,6 +518,7 @@ public class BaseAdNetworkImplTest {
         baseAdNetwork.setHost(host);
 
         expect(baseAdNetwork.isNativeRequest()).andReturn(true).times(1).andReturn(false).times(2);
+        expect(baseAdNetwork.getId()).andReturn("testAdapterId").anyTimes();
 
         baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 14L, null);
         replay(baseAdNetwork);
@@ -581,6 +612,11 @@ public class BaseAdNetworkImplTest {
         ipRepositoryField.set(null, ipRepository);
 
         final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
+            @Override
+            public String getId() {
+                return null;
+            }
+
             @Override
             public URI getRequestUri() throws Exception {
                 return null;
