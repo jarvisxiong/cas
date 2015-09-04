@@ -59,6 +59,7 @@ import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
@@ -616,6 +617,8 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getDemandAdFormatConstraints()).andReturn(DemandAdFormatConstraints.STATIC)
+            .anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
 
@@ -687,6 +690,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParams.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
 
         final Object[] constructerArgs =
@@ -1149,6 +1153,7 @@ public class NewIXAdNetworkTest {
         stringListWithNull.add(null);
         expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
         expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
+        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(0.0)).anyTimes();
         replayAll();
@@ -1202,6 +1207,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
         expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
+        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(101.0)).anyTimes();
         replayAll();
 
@@ -1254,6 +1260,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
         expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
+        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(integerListWithNull).anyTimes();
         replayAll();
@@ -1306,6 +1313,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
         expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
+        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
         replayAll();
@@ -1357,6 +1365,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
         expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
+        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
         replayAll();

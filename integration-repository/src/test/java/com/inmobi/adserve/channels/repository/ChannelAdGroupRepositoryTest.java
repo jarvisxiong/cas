@@ -26,6 +26,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.NullAsZeroResultSetRow;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
@@ -53,6 +54,7 @@ public class ChannelAdGroupRepositoryTest {
         final Integer[] siteRatings = new Integer[] {2};
         final Long[] rcList = new Long[] {53L};
         final Long[] slotIds = new Long[] {4L, 9L, 15L};
+        final Integer adTypeTargeting = 0;
         final Integer[] creativeTypes = new Integer[] {0};
         final Long[] tags = new Long[] {1L, 2L};
         final Integer[] segmentFlags = new Integer[] {1, 2, 3, 9, 10};
@@ -103,6 +105,7 @@ public class ChannelAdGroupRepositoryTest {
         expect(mockNullAsZeroResultSetRow.getArray("site_ratings")).andReturn(siteRatings).times(1);
         expect(mockNullAsZeroResultSetRow.getArray("rc_list")).andReturn(rcList).times(1);
         expect(mockNullAsZeroResultSetRow.getArray("slot_ids")).andReturn(slotIds).times(1);
+        expect(mockNullAsZeroResultSetRow.getInt("ad_type_targeting")).andReturn(adTypeTargeting).times(1);
         expect(mockNullAsZeroResultSetRow.getArray("creative_types")).andReturn(creativeTypes).times(1);
         expect(mockNullAsZeroResultSetRow.getArray("tags")).andReturn(tags).times(2);
         expect(mockNullAsZeroResultSetRow.getArray("segment_flags")).andReturn(segmentFlags).times(2);
@@ -147,6 +150,8 @@ public class ChannelAdGroupRepositoryTest {
         assertThat(output.getSiteRatings(), is(equalTo(siteRatings)));
         assertThat(output.getRcList(), is(equalTo(rcList)));
         assertThat(output.getSlotIds(), is(equalTo(slotIds)));
+        assertThat(output.getDemandAdFormatConstraints(), is(equalTo(DemandAdFormatConstraints
+            .getDemandAdFormatConstraintsByValue(adTypeTargeting))));
         assertThat(output.getAdFormatIds(), is(equalTo(creativeTypes)));
         assertThat(output.getTags(), is(equalTo(tags)));
         assertThat(output.getPlatformTargeting(), is(equalTo(platformTargeting)));

@@ -18,17 +18,19 @@ import org.slf4j.Marker;
 
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
+import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 import io.netty.handler.codec.http.HttpRequest;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({InspectorStats.class})
+@PrepareForTest({InspectorStats.class, CasUtils.class})
 public class ServletBackFillTest {
 
     @SuppressWarnings("unchecked")
@@ -40,13 +42,16 @@ public class ServletBackFillTest {
         final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
         final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createMock(CasInternalRequestParameters.class);
+            createMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final CasUtils mockCasUtils = createMock(CasUtils.class);
+        final SASRequestParameters sasRequestParameters = new SASRequestParameters();
 
+        expect(mockCasUtils.isVideoSupported(sasRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
-        expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
+        expect(mockResponseSender.getSasParams()).andReturn(sasRequestParameters).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).times(1);
 
@@ -64,7 +69,7 @@ public class ServletBackFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletBackFill tested =
-                new ServletBackFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
+            new ServletBackFill(mockTraceMarkerProvider, null, mockRequestFilters, null, mockCasUtils, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();

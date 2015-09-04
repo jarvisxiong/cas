@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.EntityError;
@@ -49,11 +50,14 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             final Integer[] siteRatings = (Integer[]) row.getArray("site_ratings");
             final Long[] rcList = (Long[]) row.getArray("rc_list");
             final Long[] slotIds = (Long[]) row.getArray("slot_ids");
+            // TODO: Test null and empty cases
+            final int adTypeTargeting = row.getInt("ad_type_targeting");
             final Integer[] creativeTypes = (Integer[]) row.getArray("creative_types");
             Long[] tags = null;
             if (null != row.getArray("tags")) {
                 tags = (Long []) row.getArray("tags");
             }
+
             List<Integer> segmentFlags;
             if (null != row.getArray("segment_flags")) {
                 segmentFlags = Arrays.asList((Integer[]) row.getArray("segment_flags"));
@@ -126,6 +130,8 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setModified_on(modifyTime);
             builder.setCampaignId(campaignId);
             builder.setSlotIds(slotIds);
+            builder.setDemandAdFormatConstraints(DemandAdFormatConstraints
+                .getDemandAdFormatConstraintsByValue(adTypeTargeting));
             builder.setIncIds(adIncIds);
             builder.setPricingModel(pricingModel.toUpperCase());
             builder.setSiteRatings(siteRatings);

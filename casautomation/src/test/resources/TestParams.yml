@@ -1502,7 +1502,7 @@ TEST3_NATIVE_LAYOUT_ADAPTER_FAIL :
   change_config_val : 'false'
   adpool_placementId: '1427434470773952'
 
-TEST_VAST_HAPPY : 
+TEST_VAST_HAPPY :
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
   site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
@@ -1511,6 +1511,7 @@ TEST_VAST_HAPPY :
   adpool_requestedadtype : 'INTERSTITIAL'
   adpool_responseformat : 'IMAI'
   site_enriched_media_attributes : '2'
+  ad_type_targeting : '1'
 
 TEST_VAST_SDKVERSION_440 : 
 - adpool_selectedslots : '14'
@@ -1522,8 +1523,9 @@ TEST_VAST_SDKVERSION_440 :
   integration_version : '440'
   site_enriched_media_attributes : '2'
   adpool_responseformat : 'IMAI'
+  ad_type_targeting : '1'
   
-TEST_VAST_PUBCONTROLS_BANNER_450 : 
+TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH :
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
   site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
@@ -1532,6 +1534,57 @@ TEST_VAST_PUBCONTROLS_BANNER_450 :
   adpool_requestedadtype : 'INTERSTITIAL'
   site_enriched_media_attributes : '0'
   adpool_responseformat : 'IMAI'
+  ad_type_targeting : '1'
+
+TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY :
+- adpool_selectedslots : '14'
+  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+  device_osid : '3'
+  device_osmajorversion : '6.0'
+  adpool_requestedadtype : 'INTERSTITIAL'
+  site_enriched_media_attributes : '2'
+  adpool_responseformat : 'IMAI'
+  ad_type_targeting : '0'
+
+#TEST_MULTI_FORMAT_BOTH_ADGROUPS_INTERSTITIAL :
+#- adpool_selectedslots : '14'
+#  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+#  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+#  device_osid : '3'
+#  device_osmajorversion : '6.0'
+#  adpool_requestedadtype : 'INTERSTITIAL'
+#  site_enriched_media_attributes : '0'
+#  adpool_responseformat : 'IMAI'
+#  ad_type_targeting : '0'
+#  ad_type_targeting2 : '0'
+#  multiformat_request : '2'
+#
+#TEST_MULTI_FORMAT_BOTH_ADGROUPS_VIDEO :
+#- adpool_selectedslots : '14'
+#  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+#  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+#  device_osid : '3'
+#  device_osmajorversion : '6.0'
+#  adpool_requestedadtype : 'INTERSTITIAL'
+#  site_enriched_media_attributes : '2'
+#  adpool_responseformat : 'IMAI'
+#  ad_type_targeting : '1'
+#  ad_type_targeting2 : '1'
+#  multiformat_request : '2'
+#
+#TEST_MULTI_FORMAT_INTERSTITIAL_PLUS_VIDEO_REQUEST :
+#- adpool_selectedslots : '14'
+#  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+#  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+#  device_osid : '3'
+#  device_osmajorversion : '6.0'
+#  adpool_requestedadtype : 'INTERSTITIAL'
+#  site_enriched_media_attributes : '0,2'
+#  adpool_responseformat : 'IMAI'
+#  ad_type_targeting : '0'
+#  ad_type_targeting2 : '1'
+#  multiformat_request : '2'
   
 TEST_IX_JSAC_INTEGRATION_TYPE : 
 - integration_type : 'JSAC'
@@ -1615,3 +1668,6 @@ TEST_NATIVE_NON_NATIVE_SITE :
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
   adpool_placementId: '123456'
+
+TEST_REWARDED_NEGATIVE :
+ - site_rewarded_video : 'true'

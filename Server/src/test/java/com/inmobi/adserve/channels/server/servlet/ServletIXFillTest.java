@@ -55,7 +55,7 @@ import io.netty.handler.codec.http.HttpRequest;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class, CasConfigUtil.class, BaseServlet.class, ServletIXFill.class})
 public class ServletIXFillTest {
-    
+
     @BeforeMethod
     public void setUp() throws IOException, IllegalAccessException {
         ImpressionIdGenerator.init((short) 123, (byte) 10);
@@ -73,17 +73,20 @@ public class ServletIXFillTest {
         final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
         final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createMock(CasInternalRequestParameters.class);
+            createMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
         final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
+        final CasUtils mockCasUtils = createMock(CasUtils.class);
+        final SASRequestParameters sasRequestParameters = new SASRequestParameters();
 
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
-        expect(mockResponseSender.getSasParams()).andReturn(null).anyTimes();
+        expect(mockResponseSender.getSasParams()).andReturn(sasRequestParameters).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).anyTimes();
+        expect(mockCasUtils.isVideoSupported(sasRequestParameters)).andReturn(false).anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
@@ -96,7 +99,7 @@ public class ServletIXFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
-                new ServletIXFill(mockTraceMarkerProvider, null, mockRequestFilters, null, null, null, null, null);
+            new ServletIXFill(mockTraceMarkerProvider, null, mockRequestFilters, null, mockCasUtils, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -116,7 +119,7 @@ public class ServletIXFillTest {
         final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
         final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createMock(CasInternalRequestParameters.class);
+            createMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
         final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
@@ -125,6 +128,7 @@ public class ServletIXFillTest {
         final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
         final CasUtils mockCasUtils = createMock(CasUtils.class);
 
+        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
@@ -134,8 +138,8 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
-        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(
-                new ArrayList<AdvertiserMatchedSegmentDetail>());
+        expect(mockMatchSegments.matchSegments(mockSASRequestParameters))
+            .andReturn(new ArrayList<AdvertiserMatchedSegmentDetail>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
 
         mockSASRequestParameters.setImaiBaseUrl(null);
@@ -155,8 +159,7 @@ public class ServletIXFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
-                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, mockCasUtils,
-                        null, null, null);
+            new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, null, mockCasUtils, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -177,7 +180,7 @@ public class ServletIXFillTest {
         final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
         final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createMock(CasInternalRequestParameters.class);
+            createMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
         final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
@@ -187,13 +190,14 @@ public class ServletIXFillTest {
         final CasUtils mockCasUtils = createMock(CasUtils.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
-                createMock(ChannelSegmentFilterApplier.class);
+            createMock(ChannelSegmentFilterApplier.class);
         final CasContext mockCasContext = createMock(CasContext.class);
 
         final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
 
         expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
+        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
@@ -208,10 +212,10 @@ public class ServletIXFillTest {
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).anyTimes();
         expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null)
-                .anyTimes();
-        expect(
-                mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
-                        null, null)).andReturn(null).anyTimes();
+            .anyTimes();
+        expect(mockChannelSegmentFilterApplier
+                .getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null, null)).andReturn(null)
+            .anyTimes();
 
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
@@ -231,8 +235,7 @@ public class ServletIXFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
         final ServletIXFill tested =
-                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
-                        mockChannelSegmentFilterApplier, mockCasUtils, null, null, null);
+            new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, mockChannelSegmentFilterApplier, mockCasUtils, null, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();
@@ -253,7 +256,7 @@ public class ServletIXFillTest {
         final Provider<Marker> mockTraceMarkerProvider = createMock(Provider.class);
         final AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createNiceMock(CasInternalRequestParameters.class);
+            createNiceMock(CasInternalRequestParameters.class);
         final HttpRequest mockHttpRequest = createMock(HttpRequest.class);
         final HttpHeaders mockHttpHeaders = createMock(HttpHeaders.class);
         final RequestFilters mockRequestFilters = createMock(RequestFilters.class);
@@ -262,17 +265,18 @@ public class ServletIXFillTest {
         final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final ChannelSegmentFilterApplier mockChannelSegmentFilterApplier =
-                createMock(ChannelSegmentFilterApplier.class);
+            createMock(ChannelSegmentFilterApplier.class);
         final CasContext mockCasContext = createMock(CasContext.class);
         final CasUtils mockCasUtils = createMock(CasUtils.class);
         final AsyncRequestMaker mockAsyncRequestMaker = createNiceMock(AsyncRequestMaker.class);
 
         final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
         final List<ChannelSegment> mockChannelSegmentList =
-                Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
+            Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
 
         expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
+        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
@@ -290,11 +294,11 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getMarketRate()).andReturn(1.5).anyTimes();
         mockSASRequestParameters.setMarketRate(1.5);
         expectLastCall().anyTimes();
-        expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null).times(
-                1);
-        expect(
-                mockChannelSegmentFilterApplier.getChannelSegments(mockList, mockSASRequestParameters, mockCasContext,
-                        null, null)).andReturn(mockChannelSegmentList).anyTimes();
+        expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null)
+            .times(1);
+        expect(mockChannelSegmentFilterApplier
+                .getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null, null))
+            .andReturn(mockChannelSegmentList).anyTimes();
         expect(mockCasUtils.getNetworkSiteEcpm(mockSASRequestParameters)).andReturn(null).anyTimes();
         expect(mockCasUtils.getRtbFloor(mockCasContext)).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).anyTimes();
@@ -324,14 +328,13 @@ public class ServletIXFillTest {
         mockResponseSender.casInternalRequestParameters = mockCasInternalRequestParameters;
 
 
-        MemberModifier.suppress(ServletIXFill.class.getDeclaredMethod("specificEnrichment",
-                CasContext.class, SASRequestParameters.class, CasInternalRequestParameters.class));
+        MemberModifier.suppress(ServletIXFill.class
+            .getDeclaredMethod("specificEnrichment", CasContext.class, SASRequestParameters.class, CasInternalRequestParameters.class));
         MemberModifier.suppress(BaseServlet.class.getDeclaredMethod("incrementTotalSelectedSegmentStats", List.class));
 
         ImpressionIdGenerator.init((short) 123, (byte) 10);
         final ServletIXFill tested =
-                new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters,
-                        mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
+            new ServletIXFill(mockTraceMarkerProvider, mockMatchSegments, mockRequestFilters, mockChannelSegmentFilterApplier, mockCasUtils, mockAsyncRequestMaker, null, null);
         tested.handleRequest(mockHttpRequestHandler, null, null);
 
         verifyAll();

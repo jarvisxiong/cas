@@ -211,16 +211,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     @Override
     public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
-
-        /*
-         * Updating rankList for the selected DSP ChannelSegment.
-         * This is being done so that all the logging happens on the selected DSP parameters, not on the RP parameters.
-         * NOTE: In case of No Ad, the logging will happen on RP parameters only.
-         */
-        if (selectedAdNetwork instanceof IXAdNetwork) {
-            getAuctionEngine().setUnfilteredChannelSegmentList(Arrays.asList(getAuctionEngine().getAuctionResponse()));
-        }
-
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
 
@@ -234,7 +224,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     // send Ad Response
-
     private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel,
             final Short selectedSlotId, final RepositoryHelper repositoryHelper, final Boolean isHASAdResponse) {
         // Making sure response is sent only once

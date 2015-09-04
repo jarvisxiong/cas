@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.auction;
 
+import static com.inmobi.adserve.channels.server.auction.AuctionEngineHelper.mapRPChannelSegmentsToDSPChannelSegments;
+import static com.inmobi.adserve.channels.server.auction.AuctionEngineHelper.updateChannelSegmentWithDSPFields;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_AUCTION;
 
 import java.util.ArrayList;
@@ -17,7 +19,6 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
@@ -79,39 +80,44 @@ public class AuctionEngine implements AuctionEngineInterface {
             return null;
         }
 
+        // TODO: Refactor the two auctions into one (minimising QA effort for now)
         int winnerIndex = 0;
         final AdNetworkInterface firstAdNetwork = filteredChannelSegmentList.get(0).getAdNetworkInterface();
         double highestBid = firstAdNetwork.getBidPriceInUsd();
         double lowestLatency = firstAdNetwork.getLatency();
-        double secondHighestDistinctBid = casInternalRequestParameters.getAuctionBidFloor(); // Acts as the default secondBidPrice
-
-        /*
-            Iterate over all the channel segments, and find the channel segment with the highest bid (if there are
-            any conflicts, then the one with the lowest latency is chosen).
-
-            SecondBidPrice is set to the second highest distinct bid (defaulting to the auctionBidFloor if all the bids
-            are the same.
-         */
-        for (int index = 1; index < filteredChannelSegmentList.size(); ++index) {
-            final AdNetworkInterface adNetworkInterface = filteredChannelSegmentList.get(index).getAdNetworkInterface();
-            final double bid = adNetworkInterface.getBidPriceInUsd();
-            final double latency = adNetworkInterface.getLatency();
-
-            if (bid < highestBid) {
-                secondHighestDistinctBid = Math.max(secondHighestDistinctBid, bid);
-            } else if (bid > highestBid) {
-                winnerIndex = index;
-                lowestLatency = latency;
-                secondHighestDistinctBid = highestBid;
-                highestBid = bid;
-            } else if (latency < lowestLatency) {
-                // If bid == highestBid, then choose the one with the lowest latency
-                winnerIndex = index;
-                lowestLatency = latency;
-            }
-        }
 
         if (DemandSourceType.RTBD.getValue() == sasParams.getDst()) {
+            /*
+                Run a second price auction
+
+                Iterate over all the channel segments, and find the channel segment with the highest bid (if there are
+                any conflicts, then the one with the lowest latency is chosen).
+
+                SecondBidPrice is set to the second highest distinct bid (defaulting to the auctionBidFloor if all the
+                bids are the same.
+             */
+            double secondHighestDistinctBid = casInternalRequestParameters.getAuctionBidFloor(); // Acts as the default secondBidPrice
+
+            for (int index = 1; index < filteredChannelSegmentList.size(); ++index) {
+                final AdNetworkInterface adNetworkInterface =
+                    filteredChannelSegmentList.get(index).getAdNetworkInterface();
+                final double bid = adNetworkInterface.getBidPriceInUsd();
+                final double latency = adNetworkInterface.getLatency();
+
+                if (bid < highestBid) {
+                    secondHighestDistinctBid = Math.max(secondHighestDistinctBid, bid);
+                } else if (bid > highestBid) {
+                    winnerIndex = index;
+                    lowestLatency = latency;
+                    secondHighestDistinctBid = highestBid;
+                    highestBid = bid;
+                } else if (latency < lowestLatency) {
+                    // If bid == highestBid, then choose the one with the lowest latency
+                    winnerIndex = index;
+                    lowestLatency = latency;
+                }
+            }
+
             // Hack for Hosted
             if (filteredChannelSegmentList.get(0).getAdNetworkInterface() instanceof HostedAdNetwork) {
                 if (filteredChannelSegmentList.size() > 1) {
@@ -128,7 +134,7 @@ public class AuctionEngine implements AuctionEngineInterface {
             } else {
                 Double clearingPrice = getClearingPrice(highestBid, casInternalRequestParameters);
                 LOG.debug("Clearing Price: " + clearingPrice);
-                clearingPrice = clearingPrice * (0.98+random.nextDouble()*0.02);
+                clearingPrice = clearingPrice * (0.98 + random.nextDouble() * 0.02);
                 LOG.debug("Clearing Price +  Random(0.98, 1.00): " + clearingPrice);
 
                 if (clearingPrice >= secondHighestDistinctBid) {
@@ -140,16 +146,80 @@ public class AuctionEngine implements AuctionEngineInterface {
                 }
             }
         } else if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
-            if (filteredChannelSegmentList.size() > 1) {
-                auctionResponse = null;
-                InspectorStats.incrementStatCount(
-                        filteredChannelSegmentList.get(0).getAdNetworkInterface().getName(), INVALID_AUCTION);
-                LOG.debug("Returning from auction engine, as more than one segment was selected for ix. No winner.");
-                return null;
-            } else {
-                secondBidPrice = highestBid;
+            /*
+                Run a first price auction
+                Iterate over all the channel segments, and find the channel segment with the highest bid (if there are
+                any conflicts, then the one with the lowest latency is chosen). Channel segments with Trump deals are
+                given preference.
+             */
+            boolean doesWinnerHaveTrumpDeal = hasTrumpDeal(firstAdNetwork);
+            final boolean ixMultiFormatAuction = (filteredChannelSegmentList.size() > 1 ? true : false);
+            int ixMultiFormatAuctionTrumpDealsCount = doesWinnerHaveTrumpDeal ? 1 : 0;
+
+            for (int index = 1; index < filteredChannelSegmentList.size(); ++index) {
+                final AdNetworkInterface adNetworkInterface =
+                    filteredChannelSegmentList.get(index).getAdNetworkInterface();
+                final double bid = adNetworkInterface.getBidPriceInUsd();
+                final double latency = adNetworkInterface.getLatency();
+                final boolean hasTrumpDeal = hasTrumpDeal(adNetworkInterface);
+                if (hasTrumpDeal) {
+                    ++ixMultiFormatAuctionTrumpDealsCount;
+                }
+
+                if (!doesWinnerHaveTrumpDeal && hasTrumpDeal) {
+                    doesWinnerHaveTrumpDeal = true;
+                    winnerIndex = index;
+                    lowestLatency = latency;
+                    highestBid = bid;
+                } else if (doesWinnerHaveTrumpDeal == hasTrumpDeal) {
+                    // When both or none of doesWinnerHaveTrumpDeal and hasTrumpDeal are true
+                    if (bid > highestBid) {
+                        winnerIndex = index;
+                        lowestLatency = latency;
+                        highestBid = bid;
+                    } else if (bid == highestBid && latency < lowestLatency) {
+                        // If bid == highestBid, then choose the one with the lowest latency
+                        winnerIndex = index;
+                        lowestLatency = latency;
+                    }
+                }
             }
 
+            if (ixMultiFormatAuction) {
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                    InspectorStrings.MULTI_FORMAT_AUCTIONS_TOTAL);
+                switch (ixMultiFormatAuctionTrumpDealsCount) {
+                    case 0:
+                        InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                            InspectorStrings.MULTI_FORMAT_AUCTIONS_NO_TRUMP);
+                        break;
+                    case 1:
+                        InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                            InspectorStrings.MULTI_FORMAT_AUCTIONS_SINGLE_TRUMP);
+                        break;
+                    default:
+                        InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                            InspectorStrings.MULTI_FORMAT_AUCTIONS_MULTIPLE_TRUMP);
+                        break;
+                }
+                LOG.debug("IX multi-format auction run. ({} Trump Deals)", ixMultiFormatAuctionTrumpDealsCount);
+                final IXAdNetwork winningIXAdNetwork =
+                    (IXAdNetwork) filteredChannelSegmentList.get(winnerIndex).getAdNetworkInterface();
+                if (winningIXAdNetwork.isVideoRequest()) {
+                    LOG.debug("Winning ad type is VAST_VIDEO");
+                    InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                        InspectorStrings.MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS);
+                } else {
+                    LOG.debug("Winning ad type is INTERSTITIAL");
+                    InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                        InspectorStrings.MULTI_FORMAT_AUCTIONS_STATIC_WINS);
+                }
+                if (winningIXAdNetwork.isTrumpDeal()) {
+                    LOG.debug("Winner has trump deal: {}", winningIXAdNetwork.getDealId());
+                }
+            }
+
+            secondBidPrice = highestBid;
         } else {
             // Unhandled DST
             auctionResponse = null;
@@ -162,7 +232,14 @@ public class AuctionEngine implements AuctionEngineInterface {
 
         if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
             winningAdNetwork.setEncryptedBid(getEncryptedBid(
-                    ((IXAdNetwork)winningAdNetwork).getOriginalBidPriceInUsd()));
+                    ((IXAdNetwork) winningAdNetwork).getOriginalBidPriceInUsd()));
+
+            // For all ads that pass auction filters, we update their channel segments with DSP specific info. The rest
+            // are left with RP parent specific info.
+            unfilteredChannelSegmentList = mapRPChannelSegmentsToDSPChannelSegments(unfilteredChannelSegmentList,
+                filteredChannelSegmentList);
+            auctionResponse = updateChannelSegmentWithDSPFields(auctionResponse);
+
         } else {
             winningAdNetwork.setEncryptedBid(getEncryptedBid(secondBidPrice));
         }
@@ -170,17 +247,6 @@ public class AuctionEngine implements AuctionEngineInterface {
 
         LOG.debug("Auction complete, winner is {}, secondBidPrice is {}", winningAdNetwork.getName(), secondBidPrice);
         return winningAdNetwork;
-    }
-
-    @Override
-    /**
-     * Update auctionResponse with DSP ChannelSegmentEntity
-     * This is being done because we want all the logging to be done on the DSP details, not RP.
-     */
-    public void updateIXChannelSegment(final ChannelSegmentEntity dspChannelSegmentEntity) {
-        auctionResponse =
-                new ChannelSegment(dspChannelSegmentEntity, null, null, null, null,
-                        auctionResponse.getAdNetworkInterface(), -1L);
     }
 
     @Override
@@ -273,5 +339,18 @@ public class AuctionEngine implements AuctionEngineInterface {
         } else {
             return demandDensity;
         }
+    }
+
+    /**
+     * Determines whether the deal present in the AdNetworkInterface is a TRUMP deal or not.
+     * @param adNetworkInterface
+     * @return
+     */
+    private static boolean hasTrumpDeal(final AdNetworkInterface adNetworkInterface) {
+        boolean hasTrumpDeal = false;
+        if (adNetworkInterface instanceof IXAdNetwork) {
+            hasTrumpDeal = ((IXAdNetwork)adNetworkInterface).isTrumpDeal();
+        }
+        return hasTrumpDeal;
     }
 }

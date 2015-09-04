@@ -3,6 +3,10 @@ package com.inmobi.adserve.channels.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/**
+ * Please consult https://github.corp.inmobi.com/channel-adserve/nagios-monitoring before modifying/removing any values
+ * as this may break Alerting and existing data funnels.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InspectorStrings {
 
@@ -67,6 +71,8 @@ public class InspectorStrings {
     public static final String DROPPED_IN_SITE_EXCLUSION_FILTER = "DroppedinSiteExclusionFilter";
     public static final String DROPPED_IN_HANDSET_TARGETING_FILTER = "DroppedinHandsetTargetingFilter";
     public static final String DROPPED_IN_AUTOMATION_FRAMEWORK_FILTER = "DroppedinAutomationFrameworkFilter";
+    public static final String DROPPED_IN_AD_TYPE_TARGETING_FILTER = "DroppedInAdTypeTargetingFilter";
+    public static final String DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE = "DroppedInAdTypeTargetingFilter.UnknownAdTypeFormat";
     public static final String DROPPED_IN_PRICING_ENGINE_FILTER = "DroppedinPricingEngineFilter";
     public static final String DROPPED_IN_TOD_FILTER = "DroppedInTODFilter";
     public static final String SITE_FEEDBACK_CACHE_HIT = "SiteFeedbackCacheHit";
@@ -101,6 +107,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
+    public static final String DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER = "DroppedInRewardedNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
     public static final String DROPPED_IN_INVALID_SLOT_REQUEST_FILTER = "DroppedInInvalidSlotRequestFilter";
@@ -137,8 +144,18 @@ public class InspectorStrings {
     public static final String AUCTION_STATS = "AuctionStats";
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
-    public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloorInAdPoolRequest";
+    public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloor";
     public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
+    public static final String MULTI_FORMAT_AUCTIONS_TOTAL = "IX-MultiFormatAuctions.TotalAuctions";
+    public static final String MULTI_FORMAT_AUCTIONS_NO_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithNoTrumpDeals";
+    public static final String MULTI_FORMAT_AUCTIONS_SINGLE_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithOnlyOneTrumpDeal";
+    public static final String MULTI_FORMAT_AUCTIONS_MULTIPLE_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithMultipleTrumpDeals";
+    public static final String MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS = "IX-MultiFormatAuctions.TotalVastVideoWins";
+    public static final String MULTI_FORMAT_AUCTIONS_STATIC_WINS = "IX-MultiFormatAuctions.TotalStaticWins";
+
+    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout (=2)
+    public static final String TOTAL_MULTI_FORMAT_REQUESTS = "IX-TotalMultiFormatRequests";
+    public static final String TOTAL_SINGLE_FORMAT_REQUESTS = "IX-TotalSingleFormatRequests";
 
     // Package Filter Level Stats
     public static final String PACKAGE_FILTER_STATS = "PackageFilterStats";

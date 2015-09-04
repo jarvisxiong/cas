@@ -80,6 +80,7 @@ public class SASRequestParameters {
     private List<Short> processedMkSlot;
     private Integer ipFileVersion;
     private boolean isRichMedia;
+    private boolean isRewardedVideo;
     private String imaiBaseUrl;
     private String appUrl;
     private Set<String> uAdapters;

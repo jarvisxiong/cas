@@ -182,14 +182,6 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSlotSizeMapRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY)) {
-                final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
-                resultSet = statement.executeQuery(query);
-                CasConfigUtil.repositoryHelper.getIxVideoTrafficRepository().newUpdateFromResultSetToOptimizeUpdate(
-                        resultSet);
             } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)) {
                 final String query =
                         config.getCacheConfiguration()

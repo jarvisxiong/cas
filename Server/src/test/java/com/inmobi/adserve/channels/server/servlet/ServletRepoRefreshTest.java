@@ -301,7 +301,6 @@ public class ServletRepoRefreshTest {
         } catch (final RepositoryException ignored) {}
     }
 
-    // Add -XX:-UseSplitVerifier to VM options if running manually
     @Test
     public void testHandleRequest() throws Exception {
         for (int i = 0; i < 17; ++i) {

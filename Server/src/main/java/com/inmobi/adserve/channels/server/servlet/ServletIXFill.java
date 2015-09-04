@@ -70,9 +70,6 @@ public class ServletIXFill extends BaseServlet {
         // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
         // SasParams marketRate has tObject.guidanceBid * 1.0 / Math.pow(10, 6)
 
-        final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
-        sasParams.setVideoSupported(isVideoSupported);
-        LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
         LOG.debug("Final ixFloor is {}", casInternal.getAuctionBidFloor());
         LOG.debug("Final ixMarketRate is {}", sasParams.getMarketRate());
     }

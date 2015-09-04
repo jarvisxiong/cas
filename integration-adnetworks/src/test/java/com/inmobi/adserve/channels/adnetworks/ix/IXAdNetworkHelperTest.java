@@ -4,8 +4,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
@@ -18,21 +16,12 @@ import com.google.common.collect.ImmutableList;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
-import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
 
 public class IXAdNetworkHelperTest {
     private static RepositoryHelper mockRepositoryHelper;
-    private static IXVideoTrafficEntity mockIxVideoTrafficEntity;
-    private static final String siteIdWithCountryEntry = "siteId1";
-    private static final String siteIdWithoutCountryEntry = "siteId2";
-    private static final String siteIdWithoutSiteEntry = "siteId3";
-    private static final String siteIdWithoutSiteAndCountryEntry = "siteId4";
-    private static final Integer countryWithEntry = 94;
-    private static final Integer countryWithoutEntry = 95;
-    private static final int defaultTrafficPercentage = 50;
 
     private static final String siteId = "siteId";
     private static final Long siteIncId = 1L;
@@ -94,7 +83,6 @@ public class IXAdNetworkHelperTest {
         repositoryHelperWithEmptyEntries = createNiceMock(RepositoryHelper.class);
 
         mockRepositoryHelper = createMock(RepositoryHelper.class);
-        mockIxVideoTrafficEntity = createMock(IXVideoTrafficEntity.class);
 
         expect(repositoryHelperWithOnlySiteEntries.queryIXBlocklistRepository(siteId, IXBlocklistKeyType.SITE,
                 IXBlocklistType.ADVERTISERS)).andReturn(siteAdvertiserBlocklistEntity).anyTimes();
@@ -139,33 +127,9 @@ public class IXAdNetworkHelperTest {
         expect(repositoryHelperWithEmptyEntries.queryIXBlocklistRepository(siteId, IXBlocklistKeyType.SITE,
                 IXBlocklistType.CREATIVE_ATTRIBUTE_IDS)).andReturn(emptySiteCreativeAttributesBlocklistEntity).anyTimes();
 
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithCountryEntry, countryWithEntry))
-                .andReturn(mockIxVideoTrafficEntity).anyTimes();
-
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithoutCountryEntry, countryWithEntry))
-                .andReturn(null).anyTimes();
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithoutCountryEntry, -1))
-                .andReturn(mockIxVideoTrafficEntity).anyTimes();
-
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithoutSiteEntry, countryWithEntry))
-                .andReturn(null).anyTimes();
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithoutSiteEntry, -1))
-                .andReturn(null).anyTimes();
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository("", countryWithEntry))
-                .andReturn(mockIxVideoTrafficEntity).anyTimes();
-
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithoutSiteAndCountryEntry,
-                countryWithoutEntry)).andReturn(null).anyTimes();
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository(siteIdWithoutSiteAndCountryEntry, -1))
-                .andReturn(null).anyTimes();
-        expect(mockRepositoryHelper.queryIXVideoTrafficRepository("", countryWithoutEntry))
-                .andReturn(null).anyTimes();
-
-        expect(mockIxVideoTrafficEntity.getTrafficPercentage()).andReturn((short)60).anyTimes();
-
         replay(repositoryHelperWithOnlySiteEntries, repositoryHelperWithOnlyCountryEntries,
                 repositoryHelperWithBothSiteAndCountryEntries, repositoryHelperWithNoEntries,
-                repositoryHelperWithEmptyEntries, mockRepositoryHelper, mockIxVideoTrafficEntity);
+                repositoryHelperWithEmptyEntries, mockRepositoryHelper);
     }
 
     @DataProvider(name = "BlocklistDataProvider")
@@ -192,20 +156,4 @@ public class IXAdNetworkHelperTest {
         assertEquals(IXAdNetworkHelper.getBlocklists(sasParams, repositoryHelper, null), expectedBlocklists);
     }
 
-    @DataProvider(name = "VideoTrafficPercentageDataProvider")
-    public Object[][] videoTrafficPercentDataProvider() {
-        return new Object[][] {
-                {"testBothSiteAndCountryMatch", siteIdWithCountryEntry, countryWithEntry, 60},
-                {"testOnlySiteMatches", siteIdWithoutCountryEntry, countryWithEntry, 60},
-                {"testOnlyCountryMatches", siteIdWithoutSiteEntry, countryWithEntry, 60},
-                {"testNoMatch", siteIdWithoutSiteAndCountryEntry, countryWithoutEntry, defaultTrafficPercentage}
-        };
-    }
-
-    @Test(dataProvider = "VideoTrafficPercentageDataProvider")
-    public void testGetIXVideoTrafficPercentage(final String testCaseName, final String siteId, final Integer countryId,
-            final int expectedTrafficPercentage) throws Exception {
-        assertThat(IXAdNetworkHelper.getIXVideoTrafficPercentage(siteId, countryId, mockRepositoryHelper,
-                        defaultTrafficPercentage), is(expectedTrafficPercentage));
-    }
 }

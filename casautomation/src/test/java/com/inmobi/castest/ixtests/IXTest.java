@@ -1442,38 +1442,49 @@ public class IXTest {
 
     @Test(testName = "TEST_VAST_SDKVERSION_440", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_VAST_SDKVERSION_440(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        /* Deriving the parser output to assert for */
-        final String responseString1 = "<VASTAdTagURI>";
-        final String responseString2 = "<\\/VASTAdTagURI>";
-
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
-        response = new String(responseBuilder.getResponseData());
-
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as request failed minimum SDK check");
         Reporter.log(parserOutput, true);
-        // System.out.println("ParserOutput : " + parserOutput);
-
-        Assert.assertTrue(parserOutput.equals("PASS"));
-        Assert.assertFalse(response.contains(responseString1), "Found " + responseString1 + "in the response");
-        Assert.assertFalse(response.contains(responseString2), "Found " + responseString2 + "in the response");
     }
 
-    @Test(testName = "TEST_VAST_PUBCONTROLS_BANNER_450", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_PUBCONTROLS_BANNER_450(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
-        /* Deriving the parser output to assert for */
-        final String responseString1 = "<VASTAdTagURI>";
-        final String responseString2 = "<\\/VASTAdTagURI>";
-
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
-        response = new String(responseBuilder.getResponseData());
-
+    @Test(testName = "TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser(LogStringConf
+            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
         Reporter.log(parserOutput, true);
-        // System.out.println("ParserOutput : " + parserOutput);
-
-        Assert.assertTrue(parserOutput.equals("PASS"));
-        Assert.assertFalse(response.contains(responseString1), "Found " + responseString1 + "in the response");
-        Assert.assertFalse(response.contains(responseString2), "Found " + responseString2 + "in the response");
     }
+
+    @Test(testName = "TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser(LogStringConf
+            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
+        Reporter.log(parserOutput, true);
+    }
+
+    /*@Test(testName = "TEST_MULTI_FORMAT_BOTH_ADGROUPS_INTERSTITIAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_MULTI_FORMAT_BOTH_ADGROUPS_INTERSTITIAL(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser(LogStringConf
+            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
+        Reporter.log(parserOutput, true);
+    }
+
+    @Test(testName = "TEST_MULTI_FORMAT_BOTH_ADGROUPS_VIDEO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_MULTI_FORMAT_BOTH_ADGROUPS_VIDEO(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser(LogStringConf
+            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
+        Reporter.log(parserOutput, true);
+    }
+
+    @Test(testName = "TEST_MULTI_FORMAT_INTERSTITIAL_PLUS_VIDEO_REQUEST", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_MULTI_FORMAT_INTERSTITIAL_PLUS_VIDEO_REQUEST(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser(LogStringConf
+            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
+        Reporter.log(parserOutput, true);
+    }*/
 
     @Test(testName = "TEST_IX_JSAC_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_JSAC_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder) throws Exception {
@@ -1601,12 +1612,20 @@ public class IXTest {
 
         searchStringInLog = "zone id not present, will say false";
 
-        parserOutput =
-                LogParserHelper.logParser(
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
-                        searchStringInLog);
+        parserOutput = LogParserHelper.logParser(LogStringConf
+            .getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_REWARDED_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_REWARDED_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        searchStringInLog = "Request not being served because rewarded video is not supported";
+
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), searchStringInLog);
+
+        Reporter.log(parserOutput, true);
     }
 }

@@ -281,6 +281,10 @@ public class ThriftRequestParser {
             }
             params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
 
+            if (tObject.site.isSetRewarded()) {
+                params.setRewardedVideo(tObject.site.isRewarded());
+            }
+
             // Fill params for pub control - Media preferences json.
             final String mediaPreferencesJson =
                     tObject.site.isSetMediaPreferences()

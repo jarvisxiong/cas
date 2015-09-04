@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 
@@ -69,8 +68,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
 import com.inmobi.adserve.contracts.ix.request.App;
@@ -102,7 +101,6 @@ import com.inmobi.adserve.contracts.ix.response.BidResponse;
 import com.inmobi.adserve.contracts.ix.response.SeatBid;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.RequestBuilder;
@@ -112,7 +110,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -145,6 +142,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final List<Integer> VIDEO_PROTOCOLS = Arrays.asList(5); // VAST 2.0 Wrapper
     private static final List<String> VIDEO_MIMES = Arrays.asList("video/mp4"); // Supported video mimes
     private static final List<Short> VIDEO_SUPPORTED_SLOT_IDS = Arrays.asList((short) 14, (short) 32);
+    private static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
     @Inject
     protected static TemplateConfiguration templateConfiguration;
     @Inject
@@ -222,12 +220,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private boolean isExternalPersonaDeal;
     @Getter
+    private boolean isTrumpDeal = false;
+    @Getter
     private Set<Integer> usedCsIds;
     @Getter
     private List<Integer> packageIds;
     private List<String> iabCategories;
-    private final int minimumSdkVerForVAST;
-    private final int defaultTrafficPercentageForVAST;
     private final String sproutUniqueIdentifierRegex;
 
     private WapSiteUACEntity wapSiteUACEntity;
@@ -260,8 +258,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         accountId = config.getInt(advertiserName + ".accountId");
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
-        minimumSdkVerForVAST = config.getInt(advertiserName + ".vast.minimumSupportedSdkVersion", 450);
-        defaultTrafficPercentageForVAST = config.getInt(advertiserName + ".vast.defaultTrafficPercentage", 50);
         sproutUniqueIdentifierRegex =
                 config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
@@ -281,7 +277,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
 
-        isVideoRequest = isRequestQualifiedForVideo();
         if (sasParams.getWapSiteUACEntity() != null) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
             isWapSiteUACEntity = true;
@@ -616,49 +611,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         ext.setSkipdelay(5); // Default 5 secs.
         video.setExt(ext);
         return video;
-    }
-
-    /**
-     * Determines whether this request is selected to serve VIDEO Ad. Video serving capability is determined based on
-     * the following: <br>
-     * 1) The VIDEO serving prerequisites (OS, sdk version and slot) are met. <br>
-     * 2) This site support Video as per the SiteControls repository. <br>
-     * 3) Honor the video traffic % as defined in IXVideoTraffic Repository.
-     */
-    private boolean isRequestQualifiedForVideo() {
-        // Check the Video support prerequisites.
-        if (!sasParams.isVideoSupported() || !VIDEO_SUPPORTED_SLOT_IDS.contains(selectedSlotId)) {
-            return false;
-        }
-
-        // Check for minimum sdk version
-        if (!Formatter.isRequestFromSdkVersionOnwards(sasParams, minimumSdkVerForVAST)) {
-            return false;
-        }
-
-        boolean isQualifiedForVideo = false;
-        final List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
-        if (null != supportedAdTypes && supportedAdTypes.contains(AdTypeEnum.VIDEO)) {
-            // If this site supports only Video, qualify this request for video.
-            // No need to further look up in the VideoTraffic Repository.
-            if (supportedAdTypes.size() == 1) {
-                isQualifiedForVideo = true;
-            } else {
-                final String siteId = sasParams.getSiteId();
-                final Long countryId = sasParams.getCountryId();
-
-                final int videoTrafficPercentage =
-                        IXAdNetworkHelper.getIXVideoTrafficPercentage(siteId, countryId.intValue(), repositoryHelper,
-                                defaultTrafficPercentageForVAST);
-                LOG.debug("IX Video Traffic Percentage for siteId: {}, countryId: {} is {}", siteId, countryId,
-                        videoTrafficPercentage);
-                // Based on the traffic percentage, determine whether this request should be selected for VIDEO or not.
-                if (videoTrafficPercentage > ThreadLocalRandom.current().nextInt(0, 100)) {
-                    isQualifiedForVideo = true;
-                }
-            }
-        }
-        return isQualifiedForVideo;
     }
 
     private Geo createGeoObject() {
@@ -1157,9 +1109,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             } else {
                 final AdNetworkInterface highestBid = baseRequestHandler.getAuctionEngine().runAuctionEngine();
                 if (highestBid != null) {
-                    // Update Response ChannelSegment
-                    baseRequestHandler.getAuctionEngine().updateIXChannelSegment(dspChannelSegmentEntity);
-
                     LOG.debug(traceMarker, "Sending IX auction response of {}", highestBid.getName());
                     baseRequestHandler.sendAdResponse(highestBid, serverChannel);
                     // highestBid.impressionCallback();
@@ -1576,6 +1525,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     }
                 }
             }
+        }
+
+        // TODO: Clean up trump logic in ResponseSender
+        final String dealType =
+            matchedPackageEntity.getAccessTypes().size() > indexOfDealId ? matchedPackageEntity
+                .getAccessTypes().get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
+        if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
+            isTrumpDeal = true;
         }
 
         // Applying if agency rebate is applicable

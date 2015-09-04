@@ -23,7 +23,6 @@ import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
 import com.inmobi.adserve.channels.entity.IXBlocklistRepository;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
@@ -37,7 +36,6 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.IXBlocklistsQuery;
-import com.inmobi.adserve.channels.query.IXVideoTrafficQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
@@ -73,7 +71,6 @@ public class RepositoryHelper {
     private final NativeAdTemplateRepository nativeAdTemplateRepository;
     private final GeoZipRepository geoZipRepository;
     private final SlotSizeMapRepository slotSizeMapRepository;
-    private final IXVideoTrafficRepository ixVideoTrafficRepository;
     private final SdkMraidMapRepository sdkMraidMapRepository;
     private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private final CcidMapRepository ccidMapRepository;
@@ -99,7 +96,6 @@ public class RepositoryHelper {
         ixPackageRepository = builder.ixPackageRepository;
         geoZipRepository = builder.geoZipRepository;
         slotSizeMapRepository = builder.slotSizeMapRepository;
-        ixVideoTrafficRepository = builder.ixVideoTrafficRepository;
         sdkMraidMapRepository = builder.sdkMraidMapRepository;
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
         ccidMapRepository = builder.ccidMapRepository;
@@ -115,9 +111,9 @@ public class RepositoryHelper {
                 .addRepositoryToStats(siteEcpmRepository).addRepositoryToStats(currencyConversionRepository)
                 .addRepositoryToStats(wapSiteUACRepository).addRepositoryToStats(ixAccountMapRepository)
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
-                .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(ixVideoTrafficRepository)
-                .addRepositoryToStats(geoRegionFenceMapRepository).addRepositoryToStats(ccidMapRepository)
-                .addRepositoryToStats(ixBlocklistRepository).addRepositoryToStats(sdkMraidMapRepository);
+                .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(geoRegionFenceMapRepository)
+                .addRepositoryToStats(ccidMapRepository).addRepositoryToStats(ixBlocklistRepository)
+                .addRepositoryToStats(sdkMraidMapRepository);
     }
 
     public static Builder newBuilder() {
@@ -145,7 +141,6 @@ public class RepositoryHelper {
         private IXPackageRepository ixPackageRepository;
         private GeoZipRepository geoZipRepository;
         private SlotSizeMapRepository slotSizeMapRepository;
-        private IXVideoTrafficRepository ixVideoTrafficRepository;
         private SdkMraidMapRepository sdkMraidMapRepository;
         private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
         private CcidMapRepository ccidMapRepository;
@@ -171,7 +166,6 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixPackageRepository);
             Preconditions.checkNotNull(geoZipRepository);
             Preconditions.checkNotNull(slotSizeMapRepository);
-            Preconditions.checkNotNull(ixVideoTrafficRepository);
             Preconditions.checkNotNull(geoRegionFenceMapRepository);
             Preconditions.checkNotNull(ccidMapRepository);
             Preconditions.checkNotNull(ixBlocklistRepository);
@@ -397,12 +391,4 @@ public class RepositoryHelper {
         return (IXPackageEntity) ixPackageRepository.getPackageIndex().retrieve(query).uniqueResult();
     }
 
-    public IXVideoTrafficEntity queryIXVideoTrafficRepository(final String siteId, final Integer countryId) {
-            try {
-                return ixVideoTrafficRepository.query(new IXVideoTrafficQuery(siteId, countryId));
-            } catch (final RepositoryException ignored) {
-                LOG.debug("Exception while querying IX Video Traffic Repository, {}", ignored);
-            }
-        return null;
-    }
 }

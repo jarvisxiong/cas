@@ -17,7 +17,6 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.HOS
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY;
@@ -67,7 +66,6 @@ import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.IMEIAerospikeRepository;
 import com.inmobi.adserve.channels.repository.IXAccountMapRepository;
 import com.inmobi.adserve.channels.repository.IXPackageRepository;
-import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -135,7 +133,6 @@ public class ChannelServer {
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     private static GeoZipRepository geoZipRepository;
     private static SlotSizeMapRepository slotSizeMapRepository;
-    private static IXVideoTrafficRepository ixVideoTrafficRepository;
     private static SdkMraidMapRepository sdkMraidMapRepository;
     private static GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private static CcidMapRepository ccidMapRepository;
@@ -217,7 +214,6 @@ public class ChannelServer {
             ixPackageRepository = new IXPackageRepository();
             geoZipRepository = new GeoZipRepository();
             slotSizeMapRepository = new SlotSizeMapRepository();
-            ixVideoTrafficRepository = new IXVideoTrafficRepository();
             sdkMraidMapRepository = new SdkMraidMapRepository();
             geoRegionFenceMapRepository = new GeoRegionFenceMapRepository();
             ccidMapRepository = new CcidMapRepository();
@@ -243,7 +239,6 @@ public class ChannelServer {
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
             repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
-            repoHelperBuilder.setIxVideoTrafficRepository(ixVideoTrafficRepository);
             repoHelperBuilder.setSdkMraidMapRepository(sdkMraidMapRepository);
             repoHelperBuilder.setGeoRegionFenceMapRepository(geoRegionFenceMapRepository);
             repoHelperBuilder.setCcidMapRepository(ccidMapRepository);
@@ -378,7 +373,6 @@ public class ChannelServer {
             loadRepos(nativeAdTemplateRepository, NATIVE_AD_TEMPLATE_REPOSITORY, config, logger);
             loadRepos(geoZipRepository, GEO_ZIP_REPOSITORY, config, logger);
             loadRepos(slotSizeMapRepository, SLOT_SIZE_MAP_REPOSITORY, config, logger);
-            loadRepos(ixVideoTrafficRepository, IX_VIDEO_TRAFFIC_REPOSITORY, config, logger);
             loadRepos(sdkMraidMapRepository, SDK_MRAID_MAP_REPOSITORY, config, logger);
             loadRepos(geoRegionFenceMapRepository, GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
             loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);

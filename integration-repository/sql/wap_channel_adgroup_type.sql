@@ -1,4 +1,4 @@
-CREATE OR REPLACE TYPE wap_channel_adgroup_type_28012015 AS
+CREATE OR REPLACE TYPE wap_channel_adgroup_type_28082015 AS
 (
     adgroup_id               CHARACTER VARYING(128),
     ad_ids                   CHARACTER VARYING(128)[],
@@ -13,6 +13,7 @@ CREATE OR REPLACE TYPE wap_channel_adgroup_type_28012015 AS
     modified_on              TIMESTAMP WITHOUT TIME ZONE,
     campaign_id              CHARACTER VARYING(128),
     slot_ids                 BIGINT[],
+    ad_type_targeting        INT,
     ad_inc_ids               BIGINT[],
     all_tags                 BOOLEAN,
     pricing_model            character(3),
@@ -34,4 +35,4 @@ CREATE OR REPLACE TYPE wap_channel_adgroup_type_28012015 AS
     creative_types           INT[],
     automation_test_id       TEXT
 );
-ALTER TYPE wap_channel_adgroup_type_28012015 OWNER TO postgres;
+ALTER TYPE wap_channel_adgroup_type_28082015 OWNER TO postgres;

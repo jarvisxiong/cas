@@ -1,6 +1,5 @@
 package com.inmobi.castest.utils.common;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -105,7 +104,8 @@ public class AdserveBackfillRequest {
         final String def_contenttype = "PERFORMANCE";
         final String def_sitetags = "70,71";
         final String def_sitetaxonomies = "70,71";
-        final String def_enriched_media_attributes = "0"; // 0- Banner , 2 - Video
+        final String def_site_rewarded_video = "false";
+        final String def_enriched_media_attributes = "0,2"; // 0- Banner , 2 - Video
         final String def_media_preferences =
                 "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
 
@@ -189,29 +189,31 @@ public class AdserveBackfillRequest {
 
 
         final Long adpool_placementId =
-                Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_placementId"),
-                        def_adpool_placementId));
+                Long.parseLong(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("adpool_placementId"), def_adpool_placementId));
 
         final String adpool_requestid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_requestid"), def_adpool_requestid);
         final String adpool_remotehostip =
-                AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_remotehostip"),
-                        def_adpool_remotehostip);
+                AdserveBackfillRequest.defaultSetVariable(requestObject
+                    .get("adpool_remotehostip"), def_adpool_remotehostip);
         final Long adpool_guidanceBid =
-                Long.valueOf(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_guidanceBid"),
-                        def_adpool_guidanceBid));
+                Long.valueOf(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("adpool_guidanceBid"), def_adpool_guidanceBid));
 
         final Long site_siteincid =
-                Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteincid"),
-                        def_siteincid));
+                Long.parseLong(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("site_siteincid"), def_siteincid));
         final String site_siteurl =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteurl"), def_siteurl);
         final Double site_cpcfloor =
-                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_cpcflooor"),
-                        def_cpcfloor));
+                Double.parseDouble(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("site_cpcflooor"), def_cpcfloor));
         final Double site_ecpmfloor =
-                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_ecpmflooor"),
-                        def_ecpmfloor));
+                Double.parseDouble(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("site_ecpmflooor"), def_ecpmfloor));
+        final Boolean rewarded_video = Boolean.parseBoolean(AdserveBackfillRequest
+            .defaultSetVariable(requestObject.get("site_rewarded_video"), def_site_rewarded_video));
         final String site_siteid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteid"), def_siteid);
         final String site_publisherid =
@@ -225,14 +227,20 @@ public class AdserveBackfillRequest {
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_contenttype"), def_contenttype);
 
         final Set<Integer> site_sitetags =
-                AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                        requestObject.get("site_sitetags"), def_sitetags));
+                AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("site_sitetags"), def_sitetags));
         final Set<Integer> site_sitetaxonomies =
-                AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                        requestObject.get("site_sitetaxonomies"), def_sitetaxonomies));
-        final Integer site_enriched_media_attributes =
-                Integer.parseInt(defaultSetVariable(requestObject.get("site_enriched_media_attributes"),
-                        def_enriched_media_attributes));
+                AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest
+                    .defaultSetVariable(requestObject.get("site_sitetaxonomies"), def_sitetaxonomies));
+
+        String siteEnrichedMediaAttributesStr = requestObject.get("site_enriched_media_attributes");
+        if (StringUtils.isEmpty(siteEnrichedMediaAttributesStr)) {
+            siteEnrichedMediaAttributesStr = def_enriched_media_attributes;
+        }
+        final Set<Integer> site_enriched_media_attributes = new HashSet<>();
+        for (final String subSiteEnrichedMediaAttributesStr : siteEnrichedMediaAttributesStr.split(",")) {
+            site_enriched_media_attributes.add(Integer.parseInt(subSiteEnrichedMediaAttributesStr));
+        }
         final String site_media_preferences =
                 defaultSetVariable(requestObject.get("site_media_preferences"), def_media_preferences);
         final String device_useragent =
@@ -547,13 +555,14 @@ public class AdserveBackfillRequest {
         adPoolRequest.setGuidanceBid(adpool_guidanceBid);
         adPoolRequest.setIpFileVersion(adpool_ipfileversion);
         adPoolRequest.setIntegrationDetails(new IntegrationDetails().setIntegrationType(IntegrationType.IOS_SDK)
-                .setIntegrationVersion(450));
+            .setIntegrationVersion(450));
 
         final Site site = new Site();
         site.setSiteIncId(site_siteincid);
         site.setSiteUrl(site_siteurl);
         site.setCpcFloor(site_cpcfloor);
         site.setEcpmFloor(site_ecpmfloor);
+        site.setRewarded(rewarded_video);
         site.setSiteId(site_siteid);
         site.setPublisherId(site_publisherid);
         site.setInventoryType(AdserveBackfillRequest.getInventoryType(site_inventorytype));
@@ -561,7 +570,7 @@ public class AdserveBackfillRequest {
         site.setSiteTags(site_sitetags);
         site.setSiteTaxonomies(site_sitetaxonomies);
         site.setSiteContentType(AdserveBackfillRequest.getSiteContentType(site_contentType));
-        site.setEnrichedSiteAllowedMediaAttributes(new HashSet<Integer>(Arrays.asList(site_enriched_media_attributes)));
+        site.setEnrichedSiteAllowedMediaAttributes(site_enriched_media_attributes);
         site.setMediaPreferences(site_media_preferences);
 
         adPoolRequest.setSite(site);

@@ -20,6 +20,8 @@ public class WAPChannelAdgroupVitals {
         wapChannelAdGroup.put("carrier_country", "94");
         wapChannelAdGroup.put("new_category", "70,71");
         wapChannelAdGroup.put("adpool_responseformat", "imai");
+        wapChannelAdGroup.put("ad_type_targeting", "0");
+
         if (wapChannelAdGroup.get("dst").equals("8")) {
             wapChannelAdGroup.put("additional_params",
                     "'{\"mime\":\"html\",\"default\": \"160214\",\"site\": \"38132\"}'");

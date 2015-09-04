@@ -11,7 +11,6 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IMEI_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_VIDEO_TRAFFIC_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
@@ -144,10 +143,6 @@ public class ServletGetSegment implements Servlet {
                     entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(SLOT_SIZE_MAP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
-                } else if (repoName.equalsIgnoreCase(IX_VIDEO_TRAFFIC_REPOSITORY)) {
-                    entity =
-                            CasConfigUtil.repositoryHelper.queryIXVideoTrafficRepository(id.split("_")[0],
-                                    Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(IX_PACKAGE_REPOSITORY)) {
                     final ResultSet<IXPackageEntity> resultSet =
                             CasConfigUtil.repositoryHelper.queryIXPackageRepository(Integer.parseInt(id.split("_")[0]),

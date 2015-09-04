@@ -20,12 +20,13 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 
 
 /**
@@ -48,6 +49,7 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
         this.advertiserIdConfigMap = advertiserIdConfigMap;
     }
 
+    // TODO: Refactor
     @Override
     public void filter(final List<ChannelSegment> channelSegments, final SASRequestParameters sasParams,
             final CasContext casContext) {
@@ -56,7 +58,6 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
         for (final Entry<String, List<ChannelSegment>> entry : advertiserSegmentListMap.entrySet()) {
             final List<ChannelSegment> segmentListForAdvertiser = entry.getValue();
             final String advertiserId = entry.getKey();
-            boolean breakFromSlotLoop = false;
             final Integer maxSegmentSelectionCount =
                     advertiserIdConfigMap.get(advertiserId).getMaxSegmentSelectionCount();
             // Sort on base of ecpm
@@ -70,42 +71,25 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
                 final ChannelSegment channelSegment = iterator.next();
                 channelSegmentSlotIdMap.put(channelSegment,
                         Arrays.asList(channelSegment.getChannelSegmentEntity().getSlotIds()));
-                final long videoSlotInSegment =
-                        checkIfSegmentShortlistForVideo(channelSegmentSlotIdMap.get(channelSegment), sasParams);
-                // check if video supported, and pick it with priority
-                if (0l != videoSlotInSegment) {
-                    final boolean result =
-                            failedInFilter(selectedSegmentListForAdvertiser.size(), maxSegmentSelectionCount);
-                    if (result) {
-                        breakFromSlotLoop = true;
-                        break;
-                    } else {
-                        addChannelSegment(selectedSegmentListForAdvertiser, maxSegmentSelectionCount, channelSegment,
-                                iterator, advertiserId, traceMarker, videoSlotInSegment);
-                    }
-                }
             }
-            // Now choose all other ChannelSegment based on order of requested slot
+            // Choose ChannelSegments based on requested slot order
             final int slotListSize = sasParams.getProcessedMkSlot().size();
-            for (int i = 0; i < slotListSize && !breakFromSlotLoop; i++) {
+            for (int i = 0; i < slotListSize; i++) {
                 final Long slotIdFromUmp = Long.valueOf(sasParams.getProcessedMkSlot().get(i));
                 for (final Iterator<ChannelSegment> iterator = segmentListForAdvertiser.listIterator(); iterator
                         .hasNext();) {
                     final ChannelSegment channelSegment = iterator.next();
                     if (channelSegmentSlotIdMap.get(channelSegment).contains(slotIdFromUmp)) {
-                        final boolean result =
-                                failedInFilter(selectedSegmentListForAdvertiser.size(), maxSegmentSelectionCount);
-                        if (result) {
-                            breakFromSlotLoop = true;
-                            break;
-                        } else {
+                        final boolean result = failedInFilter(selectedSegmentListForAdvertiser, channelSegment
+                            .getChannelSegmentEntity(), maxSegmentSelectionCount);
+                        if (!result) {
                             addChannelSegment(selectedSegmentListForAdvertiser, maxSegmentSelectionCount,
                                     channelSegment, iterator, advertiserId, traceMarker, slotIdFromUmp);
                         }
                     }
                 }
             }
-            LOG.debug(traceMarker, "Number of segments {} failed in filter {}  , advertiser {}",
+            LOG.debug(traceMarker, "Number of segments {} failed in filter {}, advertiser {}",
                     segmentListForAdvertiser.size(), this.getClass().getSimpleName(), advertiserId);
             // These are the Channel Segments that could not pass the filter and hence have not been removed from
             // Channel Segment
@@ -131,22 +115,6 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
         iterator.remove();
     }
 
-    private long checkIfSegmentShortlistForVideo(final List<Long> channelSegmentSlotIdList,
-            final SASRequestParameters sasRequestParameters) {
-
-        // If we get multiple slots in the Ad pool request, give preference to video supported slots - 14 & 32.
-        if (DemandSourceType.IX.getValue() == sasRequestParameters.getDst()
-                && sasRequestParameters.isVideoSupported()) {
-            List<Short> processedSlots = sasRequestParameters.getProcessedMkSlot();
-            if (channelSegmentSlotIdList.contains(14L) && processedSlots.contains((short) 14)) {
-                return 14l;
-            } else if (channelSegmentSlotIdList.contains(32L) && processedSlots.contains((short) 32)) {
-                return 32l;
-            }
-        }
-        return 0;
-    }
-
     /**
      * @param channelSegments
      */
@@ -166,12 +134,23 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
     }
 
     /**
-     * @param segmentCountForAdvertiser
+     *
+     * @param currentSegmentsForAdvertiser
+     * @param channelSegmentEntity
      * @param maxSegmentSelectionCount
-     * @return boolean
+     * @return
      */
-    private boolean failedInFilter(final int segmentCountForAdvertiser, final int maxSegmentSelectionCount) {
-        return segmentCountForAdvertiser >= maxSegmentSelectionCount;
+    private boolean failedInFilter(final List<ChannelSegment> currentSegmentsForAdvertiser,
+        final ChannelSegmentEntity channelSegmentEntity, final int maxSegmentSelectionCount) {
+        final DemandAdFormatConstraints demandAdFormatConstraints = channelSegmentEntity.getDemandAdFormatConstraints();
+
+        long currentSegmentsWithMatchingDemandConstraints = 0L;
+        for (final ChannelSegment channelSegment : currentSegmentsForAdvertiser){
+            if (demandAdFormatConstraints == channelSegment.getChannelSegmentEntity().getDemandAdFormatConstraints()) {
+                ++currentSegmentsWithMatchingDemandConstraints;
+            }
+        }
+        return currentSegmentsWithMatchingDemandConstraints >= maxSegmentSelectionCount;
     }
 
     private void incrementStats(final String advertiserId, final int value) {

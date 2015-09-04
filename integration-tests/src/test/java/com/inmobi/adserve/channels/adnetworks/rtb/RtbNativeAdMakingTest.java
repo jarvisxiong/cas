@@ -26,6 +26,7 @@ import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.IPRepository;
@@ -163,6 +164,8 @@ public class RtbNativeAdMakingTest {
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(siteIncId).anyTimes();
         expect(mockSASRequestParameters.getSource()).andReturn("APP").anyTimes();
         expect(mockSASRequestParameters.getRFormat()).andReturn("native").anyTimes();
+        expect(mockSASRequestParameters.getRequestedAdType()).andReturn(RequestedAdType.NATIVE).anyTimes();
+        expect(mockSASRequestParameters.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();

@@ -1,8 +1,9 @@
 package com.inmobi.adserve.channels.server.auction;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.mockStaticNice;
+import static org.powermock.api.easymock.PowerMock.replay;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -13,8 +14,15 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.testng.PowerMockObjectFactory;
+import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
+import org.testng.IObjectFactory;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 
 import com.google.inject.Guice;
@@ -41,10 +49,11 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 
-public class AuctionEngineIXTest {
+@PowerMockIgnore("javax.management.*")
+@PrepareForTest(AuctionEngineHelper.class)
+public class AuctionEngineIXTest extends PowerMockTestCase {
 
     Configuration mockConfig;
-    Configuration mockAdapterConfig;
     Capture<String> encryptedBid1;
     Capture<Double> secondPrice1;
     CasInternalRequestParameters casInternalRequestParameters;
@@ -52,8 +61,16 @@ public class AuctionEngineIXTest {
     AuctionEngine auctionEngine;
     SASRequestParameters sasParams;
 
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new PowerMockObjectFactory();
+    }
+
     @BeforeMethod
     public void setUp() throws IOException, IllegalAccessException {
+        mockStaticNice(AuctionEngineHelper.class);
+        replay(AuctionEngineHelper.class);
+
         final ConfigurationLoader config = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(config, null);
 
@@ -105,7 +122,7 @@ public class AuctionEngineIXTest {
     @SuppressWarnings("deprecation")
     private ChannelSegment setBidder(final String advId, final String channelId, final String externalSiteKey,
             final String adNetworkName, final Double bidValue, final Long latencyValue,
-            final ADCreativeType adCreativeType) {
+            final ADCreativeType adCreativeType, final boolean isTrumpDeal) {
 
         final Long[] rcList = null;
         final Long[] tags = null;
@@ -147,6 +164,9 @@ public class AuctionEngineIXTest {
         expect(((IXAdNetwork) mockAdnetworkInterface).getAgencyRebatePercentage()).andReturn(null).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getOriginalBidPriceInUsd()).andReturn(bidValue).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).isTrumpDeal()).andReturn(isTrumpDeal).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).isVideoRequest()).andReturn(true).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).getDealId()).andReturn("dealId").anyTimes();
         expect(mockAdnetworkInterface.getCreativeType()).andReturn(adCreativeType).anyTimes();
         // responseBidObjCount
         // this is done, to track the encryptedBid variable getting set inside the AuctionEngine.
@@ -184,7 +204,7 @@ public class AuctionEngineIXTest {
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
-                ADCreativeType.BANNER));
+                ADCreativeType.BANNER, false));
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
         casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
@@ -212,7 +232,7 @@ public class AuctionEngineIXTest {
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
-                ADCreativeType.BANNER));
+                ADCreativeType.BANNER, false));
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
@@ -240,8 +260,8 @@ public class AuctionEngineIXTest {
         auctionEngine.sasParams = this.sasParams;
         final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
 
-        rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
-                ADCreativeType.BANNER));
+        rtbSegments
+            .add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1, ADCreativeType.BANNER, false));
 
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
@@ -294,7 +314,7 @@ public class AuctionEngineIXTest {
         final List<ChannelSegment> rtbSegments = new ArrayList<>();
 
         rtbSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", "A", bidInputVal1, latencyInputVal1,
-                ADCreativeType.INTERSTITIAL_VIDEO));
+                ADCreativeType.INTERSTITIAL_VIDEO, false));
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
 
         casInternalRequestParameters.setAuctionBidFloor(bidFloorInput);
@@ -305,5 +325,82 @@ public class AuctionEngineIXTest {
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceVal);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBAdNetworkName);
         Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), bidInputVal1);
+    }
+
+    // This function will provide the parameter data
+    @DataProvider(name = "DataProviderWith3Bidders")
+    public Object[][] paramDataProviderWith3Bidders() {
+        return new Object[][] {
+            // 1. 2 same first bids, higher than floor price
+            {"testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .80d, 100l, false, "C", .80d, 150l, false, "A", 1d},
+
+            // 2. 2 same first bids, with same latency, higher than floor price
+            {"testTwoSameSecondBidsWithSameLatencyHigherThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .80d, 100l, false, "C", .80d, 100l, false, "A", 1d},
+
+            // 3. 2 same first bids, lower than floor price
+            {"testTwoSameSecondBidsLowerThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .60d, 100l, false, "C", .60d, 150l, false, "A", 1d},
+
+            // 4. 2 same first bids, lower than 90% of Highest bid but more than floor price
+            {"testTwoSameSecondBidsLowerThan90PercentOfHighestBidButMoreThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .85d, 100l, false, "C", .85d, 150l, false, "A", 1d},
+
+            // 5. 2 same first bids, lower than 90% of Highest bid and lower than floor price
+            {"testTwoSameSecondBidsLowerThan90PercentOfHighestBidAndLowerThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .65d, 100l, false, "C", .65d, 150l, false, "A", 1d},
+
+            // 6. 2 same first bids, higher than 90% of Highest bid but more than floor price
+            {"testTwoSameSecondBidsHigherThan90PercentOfHighestBidButMoreThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .95d, 100l, false, "C", .95d, 150l, false, "A", 1d},
+
+            // 7. 2 same first bids, higher than 90% of Highest bid and lower than floor price
+            {"testTwoSameSecondBidsHigherThan90PercentOfHighestBidButLowerThanFloorPrice", .98d, "A", 1d, 120l, false, "B", .95d, 100l, false, "C", .95d, 150l, false, "A", 1d},
+
+            // 8. First and Second bid with .01 difference. He will be charged same Bid he auctioned
+            {"testFirstAndSecondBidWith01difference", .70d, "A", 1d, 100l, false, "B", .99d, 100l, false, "C", 0.99d, 100l, false, "A", 1d},
+
+            // 9. 2nd price same as floor price
+            {"testSecondPriceSameAsFloorPrice", .70d, "A", 1d, 100l, false, "B", .70d, 100l, false, "C", .70d, 100l, false, "A", 1d},
+
+            // 10. 2nd price same as floor price and 90% price
+            {"testSecondPriceSameAsFloorPriceAnd90PercentPrice", .90d, "A", 1d, 100l, false, "B", .90d, 100l, false, "C", .70d, 100l, false, "A", 1d},
+
+            // 11. 2 same first bids, higher than floor price. First has trump deal
+            {"testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, true, "B", .80d, 100l, false, "C", .80d, 150l, false, "A", 1d},
+
+            // 12. 2 same first bids, higher than floor price. Second has trump deal
+            {"testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .80d, 100l, true, "C", .80d, 150l, false, "B", .80d},
+
+            // 13. 2 same first bids, higher than floor price. Third has trump deal
+            {"testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, false, "B", .80d, 100l, false, "C", .80d, 150l, true, "C", .80d},
+
+            // 14. 3 different first bids, higher than floor price. First and Second have trump deal
+            {"testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, true, "B", 1.80d, 100l, true, "C", .80d, 150l, false, "B", 1.80d},
+
+            // 15. 2 same first bids, higher than floor price. All three have trump deal
+            {"testTwoSameBidsHigherThanFloorPrice", .70d, "A", 1d, 120l, true, "B", 1.80d, 190l, true, "C", 1.80d, 150l, true, "C", 1.80d}
+
+        };
+    }
+
+    @Test(dataProvider = "DataProviderWith3Bidders")
+    public void testAuctionEngineWith3BiddersExample(final String useCaseName, final Double floorPrice,
+        final String ixNameInput1, final Double bidInput1, final Long latencyInput1, final boolean hasTrumpDeal1, final String ixNameInput2,
+        final Double bidInput2, final Long latencyInput2, final boolean hasTrumpDeal2, final String ixNameInput3, final Double bidInput3,
+        final Long latencyInput3, final boolean hasTrumpDeal3, final String expectedIXName, final Double expectedWinnerBidValue) {
+
+        final AuctionEngine auctionEngine = new AuctionEngine();
+        auctionEngine.sasParams = new SASRequestParameters();
+        auctionEngine.sasParams.setDst(DemandSourceType.IX.getValue());
+        final List<ChannelSegment> ixSegments = new ArrayList<>();
+
+        ixSegments.add(setBidder("advId1", "channelId1", "externalSiteKey1", ixNameInput1, bidInput1, latencyInput1, ADCreativeType.INTERSTITIAL_VIDEO, hasTrumpDeal1));
+        ixSegments.add(setBidder("advId2", "channelId2", "externalSiteKey2", ixNameInput2, bidInput2, latencyInput2, ADCreativeType.INTERSTITIAL_VIDEO, hasTrumpDeal2));
+        ixSegments.add(setBidder("advId3", "channelId3", "externalSiteKey3", ixNameInput3, bidInput3, latencyInput3, ADCreativeType.INTERSTITIAL_VIDEO, hasTrumpDeal3));
+        auctionEngine.setUnfilteredChannelSegmentList(ixSegments);
+
+        casInternalRequestParameters.setAuctionBidFloor(floorPrice);
+        auctionEngine.casInternalRequestParameters = casInternalRequestParameters;
+
+        final AdNetworkInterface auctionEngineResponse = auctionEngine.runAuctionEngine();
+
+        Assert.assertEquals(auctionEngineResponse.getName(), expectedIXName);
+        Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBidValue);
     }
 }

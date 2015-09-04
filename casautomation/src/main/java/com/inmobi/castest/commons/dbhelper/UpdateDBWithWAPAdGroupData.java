@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.inmobi.castest.casconfenums.def.CasConf.ChannelPartners;
 import com.inmobi.castest.casconfenums.impl.CasPartnerConf;
@@ -72,11 +73,16 @@ public class UpdateDBWithWAPAdGroupData {
 
         WAPChannelAdgroupVitals.overrideTestValues(wapChannelAdGroup);
 
-        WAPGroupDBManipulation.UpdateWapChannelAdgroupInDB(wapChannelAdGroup, advertiserIdList);
-
         final String shortlistingAdgroup = wapChannelAdGroup.get("adgroup_id");
-
         System.out.println("shortlistingAdgroup " + shortlistingAdgroup);
+
+        WAPGroupDBManipulation.UpdateWapChannelAdgroupInDB(wapChannelAdGroup, advertiserIdList);
+        // Use with caution
+        if (null != wapChannelAdGroup.get("multiformat_request") && 2 == Integer.parseInt(wapChannelAdGroup.get("multiformat_request"))) {
+            wapChannelAdGroup.put("ad_type_targeting", wapChannelAdGroup.get("ad_type_targeting2"));
+            wapChannelAdGroup.put("adgroup_id", new UUID(0l, 0l).toString());
+            WAPGroupDBManipulation.UpdateWapChannelAdgroupInDB(wapChannelAdGroup, advertiserIdList);
+        }
 
         System.out.println(" *** update demand supply related data in database ***");
         WAPGroupDBManipulation.UpdateDemandSupplyData(wapChannelAdGroup, advertiserIdList);

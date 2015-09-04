@@ -110,6 +110,7 @@ public class HostedAdNetworkTest {
         expect(mockSasParams.getUserAgent()).andReturn(userAgent).anyTimes();
         expect(mockSasParams.getSiteId()).andReturn(siteId).anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
+        expect(mockSasParams.getDst()).andReturn(6).anyTimes();
 
         expect(mockCasInternalRequestParams.getLatLong()).andReturn(latLong).anyTimes();
         expect(mockCasInternalRequestParams.isTrackingAllowed()).andReturn(true).times(1).andReturn(false).times(1)

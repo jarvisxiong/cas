@@ -68,9 +68,7 @@ import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
-import com.inmobi.adserve.channels.entity.IXVideoTrafficEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.repository.IXVideoTrafficRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
@@ -496,41 +494,6 @@ public class IXAdNetworkHelper {
         }
 
         return blocklistBuilder.build();
-    }
-
-    /**
-     *
-     * @param siteId
-     * @param countryId
-     * @param repositoryHelper
-     * @param defaultTrafficPercentageForVAST
-     * @return
-     */
-    public static int getIXVideoTrafficPercentage(final String siteId, final Integer countryId,
-            final RepositoryHelper repositoryHelper, final int defaultTrafficPercentageForVAST) {
-        int trafficPercentage = defaultTrafficPercentageForVAST;
-        try {
-            // Query at site and country both
-            IXVideoTrafficEntity entity = repositoryHelper.queryIXVideoTrafficRepository(siteId, countryId);
-
-            if (entity == null) {
-                // Query at site level.
-                entity = repositoryHelper.queryIXVideoTrafficRepository(siteId, IXVideoTrafficRepository.ALL_COUNTRY);
-                if (entity == null) {
-                    // Query at country level.
-                    entity =
-                            repositoryHelper.queryIXVideoTrafficRepository(IXVideoTrafficRepository.ALL_SITES,
-                                    countryId);
-                }
-            }
-            if (entity != null) {
-                trafficPercentage = entity.getTrafficPercentage();
-            }
-
-        } catch (final Exception ignored) {
-            LOG.debug("Exception encountered while computing ix video traffic percentage, {}", ignored);
-        }
-        return trafficPercentage;
     }
 
     /**

@@ -44,16 +44,21 @@ public class IXPackageMatcher {
     public static final int PACKAGE_MAX_LIMIT = 30;
 
     public static List<Integer> findMatchingPackageIds(final SASRequestParameters sasParams,
-                                                      final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
+        final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
         LOG.debug("Inside IX Package Matcher");
         List<Integer> matchedPackageIds = new ArrayList<>();
 
+        // TODO: Do package matching on the intersection of ump selected slots and those present in the adgroup
         Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
-        ResultSet<IXPackageEntity> resultSet =
-                repositoryHelper.queryIXPackageRepository(sasParams.getOsId(), sasParams.getSiteId(), sasParams
-                        .getCountryId().intValue(), selectedSlotId);
+        ResultSet<IXPackageEntity> resultSet = repositoryHelper
+            .queryIXPackageRepository(sasParams.getOsId(), sasParams.getSiteId(), sasParams.getCountryId()
+                .intValue(), selectedSlotId);
 
-        LOG.debug("Number of packages selected after OS, Site, Country and Slot filtration: " + resultSet.size());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Number of packages selected after OS({}), Site({}), Country({}) and Slot({}) filtration: {}",
+                sasParams.getOsId(), sasParams.getSiteId(), sasParams.getCountryId().intValue(), selectedSlotId,
+                resultSet.size());
+        }
 
         int matchedPackagesCount = 0;
         int droppedInPackageDMPFilter = 0;
@@ -133,7 +138,7 @@ public class IXPackageMatcher {
         InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
                 InspectorStrings.DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER, droppedInPackageSegmentSubsetFilter);
 
-        LOG.debug("Packages selected: ", matchedPackageIds);
+        LOG.debug("Packages selected: ", matchedPackageIds.toArray().toString());
         return matchedPackageIds;
     }
 

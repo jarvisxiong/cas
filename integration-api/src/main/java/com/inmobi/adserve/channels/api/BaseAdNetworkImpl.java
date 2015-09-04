@@ -47,6 +47,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -129,6 +130,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
     protected boolean isHTMLResponseSupported = true;
     protected boolean isNativeResponseSupported = false;
+    @Getter
     protected boolean isVideoRequest = false;
     protected boolean isNativeRequest = false;
     protected boolean isRtbPartner = false;
@@ -556,10 +558,15 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        isNativeRequest =
-                APP.equalsIgnoreCase(sasParams.getSource())
-                        && (NATIVE_STRING.equals(sasParams.getRFormat()) || RequestedAdType.NATIVE == sasParams
-                                .getRequestedAdType());
+        // TODO: Move all supported ad type checks to ThriftRequestParser or AdGroupAdTypeTargetingFilter.
+        isNativeRequest = APP.equalsIgnoreCase(sasParams.getSource()) && (NATIVE_STRING.equals(sasParams.getRFormat())
+            || RequestedAdType.NATIVE == sasParams.getRequestedAdType());
+        if (DemandSourceType.IX.getValue() == sasParams.getDst() && RequestedAdType.INTERSTITIAL == sasParams
+            .getRequestedAdType() && DemandAdFormatConstraints.VAST_VIDEO == entity.getDemandAdFormatConstraints()) {
+            isVideoRequest = true;
+        } else {
+            isVideoRequest = false;
+        }
         isCpc = getPricingModel(entity);
         final boolean isConfigured = configureParameters();
         if (isConfigured) {

@@ -36,7 +36,7 @@ server.rtbOutGoingMaxConnections = 200
 server.incomingMaxConnections = 100
 
 # For DCP, both the ning and casTimeoutHandler timers cutoff at 600ms
-# For RTBD, the casTimeoutHandler timer cuts off at 190ms whereas the ning one cuts off at 500ms
+# For RTBD and IX, the casTimeoutHandler timer cuts off at 190ms whereas the ning one cuts off at 500ms
 server.casTimeoutHandler.timeoutMillisForRTB=<%= cas_timer_handler_timeout_rtbd %>
 server.casTimeoutHandler.timeoutMillisForDCP=<%= cas_timer_handler_timeout_dcp %>
 server.ning.timeoutMillisForRTB=<%= ning_timeout_rtbd %>
@@ -65,6 +65,8 @@ server.rtb.demandDensity=<%= rtbd_demand_density %>
 server.rtb.longTermRevenue=<%= rtbd_long_term_revenue %>
 server.rtb.publisherYield=<%= rtbd_publisher_yield %>
 server.enableAutomationTests=<%= automation_tests_enabled %>
+
+server.adtype.vast.minimumSupportedSdkVersion=450
 
 server.clickmaker.ipFileVersion = 1
 server.clickmaker.clickURLPrefix = http://c2.w.inmobi.com/c.asm
@@ -194,7 +196,7 @@ Cache.WapSiteUACRepository.dataSourceName = jdbc
 
 Cache.Name = ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.Manager = com.inmobi.adserve.channels.repository.ChannelAdGroupRepository
-Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_28012015('${last_update}')
+Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_28082015('${last_update}')
 Cache.ChannelAdGroupRepository.initialDelay = 300
 Cache.ChannelAdGroupRepository.refreshTime = 1483
 Cache.ChannelAdGroupRepository.isUpdatable = true
@@ -255,14 +257,6 @@ Cache.SiteEcpmRepository.initialDelay = 300
 Cache.SiteEcpmRepository.refreshTime = 1931
 Cache.SiteEcpmRepository.isUpdatable = true
 Cache.SiteEcpmRepository.dataSourceName = jdbc
-
-Cache.Name = IXVideoTrafficRepository
-Cache.IXVideoTrafficRepository.Manager = com.inmobi.adserve.channels.repository.IXVideoTrafficRepository
-Cache.IXVideoTrafficRepository.query = select site_id\, country_id\, traffic_percentage\, is_active\, modified_on from ix_video_traffic_percentage where modified_on >=('${last_update}')
-Cache.IXVideoTrafficRepository.initialDelay = 300
-Cache.IXVideoTrafficRepository.refreshTime = 1993
-Cache.IXVideoTrafficRepository.isUpdatable = true
-Cache.IXVideoTrafficRepository.dataSourceName = jdbc
 
 Cache.Name = GeoRegionFenceMapRepository
 Cache.GeoRegionFenceMapRepository.Manager = com.inmobi.adserve.channels.repository.GeoRegionFenceMapRepository
@@ -1715,8 +1709,6 @@ adapter.ix.accountId=11726
 adapter.ix.globalBlind=3522,2666,2179,3038,3107,3420,3002,3320,2853,3158,3560,3600,3542,3614,3101,3676,2893
 adapter.ix.excludeCircuitBreaker=true
 adapter.ix.bidFloorPercent=100
-adapter.ix.vast.minimumSupportedSdkVersion=450
-adapter.ix.vast.defaultTrafficPercentage=50
 adapter.ix.sprout.uniqueIdentifierRegex=(?s).*data-creative[iI]d.*
 
 adapter.EAHosted.isRtb=true

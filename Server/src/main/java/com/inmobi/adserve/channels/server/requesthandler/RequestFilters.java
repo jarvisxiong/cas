@@ -29,44 +29,53 @@ public class RequestFilters {
             return true;
         }
 
-        if (null == hrh.responseSender.getSasParams()) {
+        final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
+
+        if (null == sasParams) {
             LOG.error("Terminating request as sasParam is null");
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             return true;
         }
 
-        if (null == hrh.responseSender.getSasParams().getCategories()) {
+        if (null == sasParams.getCategories()) {
             LOG.error("Category field is not present in the request so sending noad");
-            hrh.responseSender.getSasParams().setCategories(new ArrayList<Long>());
+            sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(InspectorStrings.MISSING_CATEGORY, InspectorStrings.COUNT);
             return true;
         }
 
-        if (null == hrh.responseSender.getSasParams().getSiteId()) {
+        if (null == sasParams.getSiteId()) {
             LOG.error("Terminating request as site id was missing");
             hrh.setTerminationReason(CasConfigUtil.MISSING_SITE_ID);
             InspectorStats.incrementStatCount(InspectorStrings.MISSING_SITE_ID, InspectorStrings.COUNT);
             return true;
         }
 
-        if (!hrh.responseSender.getSasParams().getAllowBannerAds()) {
+        if (!sasParams.getAllowBannerAds()) {
             LOG.info("Request not being served because of banner not allowed.");
             InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER,
                     InspectorStrings.COUNT);
             return true;
         }
 
-        if (hrh.responseSender.getSasParams().getSiteContentType() != null
-                && !CasConfigUtil.allowedSiteTypes.contains(hrh.responseSender.getSasParams().getSiteContentType()
+        if (sasParams.isRewardedVideo()) {
+            LOG.info("Request not being served because rewarded video is not supported.");
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER,
+                InspectorStrings.COUNT);
+            return true;
+        }
+
+        if (sasParams.getSiteContentType() != null
+                && !CasConfigUtil.allowedSiteTypes.contains(sasParams.getSiteContentType()
                         .name())) {
             LOG.info("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
             InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
             return true;
         }
-        final String tempSdkVersion = hrh.responseSender.getSasParams().getSdkVersion();
+        final String tempSdkVersion = sasParams.getSdkVersion();
         if (null != tempSdkVersion) {
             try {
                 if (("i".equalsIgnoreCase(tempSdkVersion.substring(0, 1)) || "a".equalsIgnoreCase(tempSdkVersion
@@ -85,8 +94,8 @@ public class RequestFilters {
             }
         }
 
-        if (hrh.responseSender.getSasParams().getProcessedMkSlot().isEmpty()) {
-            incrementStats(hrh.responseSender.getSasParams());
+        if (sasParams.getProcessedMkSlot().isEmpty()) {
+            incrementStats(sasParams);
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }

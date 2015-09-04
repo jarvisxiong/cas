@@ -119,7 +119,7 @@ public class CasQueryConf {
 
             case INSERT_WAPCHANNEL_ADGROUP_SEGMENT: {
                 queryString =
-                        "insert into wap_channel_adgroup (adgroup_id, ad_id, channel_id, advertiser_id, external_site_key, platform_targeting_int , rc_list , tags, status, is_test_mode, modified_on, campaign_id, slot_ids, ad_inc_id, adgroup_inc_id, all_targeting_tags, pricing_model,targeting_platform,site_ratings, manuf_model_targeting, os_version_targeting, browser_version_targeting,device_types_targeting, category_taxomony, segment_flags, additional_params, impression_ceil, ecpm_boost, boost_date, tod, campaign_inc_id,dst,automation_test_id) values ('"
+                        "insert into wap_channel_adgroup (adgroup_id, ad_id, channel_id, advertiser_id, external_site_key, platform_targeting_int , rc_list , tags, status, is_test_mode, modified_on, campaign_id, slot_ids, ad_inc_id, adgroup_inc_id, all_targeting_tags, pricing_model,targeting_platform,site_ratings, manuf_model_targeting, os_version_targeting, browser_version_targeting,device_types_targeting, category_taxomony, segment_flags, additional_params, impression_ceil, ecpm_boost, boost_date, tod, campaign_inc_id,dst,ad_type_targeting,automation_test_id) values ('"
                                 + adGroup.get("adgroup_id")
                                 + "' , '"
                                 + adGroup.get("ad_id")
@@ -183,6 +183,8 @@ public class CasQueryConf {
                                 + adGroup.get("campaign_inc_id")
                                 + "' , '"
                                 + adGroup.get("dst")
+                                + "' , '"
+                                + adGroup.get("ad_type_targeting")
                                 + "' , '"
                                 + adGroup.get("automation_test_id") + "')";
 

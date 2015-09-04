@@ -197,6 +197,17 @@ public class Logging {
         }
         final List<Channel> channels = new ArrayList<>();
 
+
+        if (CollectionUtils.isNotEmpty(rankList) && rankList.get(0).getAdNetworkInterface() instanceof IXAdNetwork) {
+            if (rankList.size() > 1) {
+                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface()
+                    .getName(), InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS);
+            } else {
+                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface()
+                    .getName(), InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS);
+            }
+        }
+
         for (final ChannelSegment channelSegment : rankList) {
             final Channel channel = new Channel();
             final AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();

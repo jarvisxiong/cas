@@ -11,6 +11,7 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 
 @Singleton
 public class AuctionIdFilter extends AbstractAuctionFilter {
@@ -25,10 +26,15 @@ public class AuctionIdFilter extends AbstractAuctionFilter {
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
                                      final CasInternalRequestParameters casInternalRequestParameters) {
-        if (casInternalRequestParameters.getAuctionId().equalsIgnoreCase(
-                rtbSegment.getAdNetworkInterface().getAuctionId())) {
-            return false;
+        boolean failsInFilter = true;
+        final String requestAuctionId = casInternalRequestParameters.getAuctionId();
+        final String responseAuctionId = rtbSegment.getAdNetworkInterface().getAuctionId();
+
+        if (requestAuctionId.equalsIgnoreCase(responseAuctionId) ||
+            ImpressionIdGenerator.getInstance().areImpressionIdsSimilar(requestAuctionId, responseAuctionId)) {
+            failsInFilter = false;
         }
-        return true;
+
+        return failsInFilter;
     }
 }

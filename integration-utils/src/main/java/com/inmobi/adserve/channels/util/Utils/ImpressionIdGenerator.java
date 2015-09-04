@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.util.Utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 /**
@@ -9,6 +10,7 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
  */
 
 public class ImpressionIdGenerator {
+    private final int SIMILARITY_LIMIT = DemandAdFormatConstraints.values().length - 2;
     protected static final AtomicInteger COUNTER = new AtomicInteger();
     private static ImpressionIdGenerator instance = null;
     protected final short hostIdCode;
@@ -62,6 +64,21 @@ public class ImpressionIdGenerator {
      */
     public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
         return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
+    }
+
+    /**
+     * Checks whether two WilburyUUID strings are similar.
+     * Two WilburyUUID strings are said to be similar if all their sub components (except their int key) match and
+     * their int keys differ by no more than the SIMILARITY_LIMIT.
+     * @param impressionId1
+     * @param impressionId2
+     * @return
+     */
+    public boolean areImpressionIdsSimilar(final String impressionId1, final String impressionId2) {
+        return WilburyUUID.setIntKey(impressionId1, 0).toString()
+            .equals(WilburyUUID.setIntKey(impressionId2, 0).toString())
+            && Math.abs(WilburyUUID.getIntKey(impressionId1) - WilburyUUID.getIntKey(impressionId2))
+            <= SIMILARITY_LIMIT;
     }
 
 }

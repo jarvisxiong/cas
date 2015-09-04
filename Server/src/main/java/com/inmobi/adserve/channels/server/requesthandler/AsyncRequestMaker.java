@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.casthrift.DemandSourceType.DCP;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +27,9 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 
 import io.netty.channel.Channel;
-
-import static com.inmobi.casthrift.DemandSourceType.DCP;
 
 
 @Singleton
@@ -66,8 +67,7 @@ public class AsyncRequestMaker {
                 isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
         LOG.debug("Creative type is : {}", creativeType);
 
-
-
+        int index = 0;
         for (final ChannelSegment row : rows) {
             final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
             final AdNetworkInterface network =
@@ -94,7 +94,17 @@ public class AsyncRequestMaker {
             // Replacing int key in auction id to generate impression id
             sasParams.setImpressionId(
                     ImpressionIdGenerator.getInstance().resetWilburyIntKey(casInternalGlobal.getAuctionId(), incId));
+
             final CasInternalRequestParameters casInternal = getLocalCasInternal(sasParams, casInternalGlobal);
+
+            if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
+                casInternal.setAuctionId(ImpressionIdGenerator.getInstance()
+                    .resetWilburyIntKey(casInternalGlobal.getAuctionId(), sasParams.getSiteIncId() + index));
+                LOG.debug("IX Multi format: {} auction id is {}",
+                    channelSegmentEntity.getDemandAdFormatConstraints() + " " + sasParams
+                        .getRequestedAdType(), casInternal.getAuctionId());
+                ++index;
+            }
 
             controlEnrichment(casInternal, channelSegmentEntity);
             sasParams.setAdIncId(incId);

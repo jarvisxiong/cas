@@ -231,7 +231,6 @@ public class AuctionEngineTest {
         Assert.assertEquals(secondPrice1.getValue(), expectedSecondPriceValue);
         Assert.assertEquals(auctionEngineResponse.getName(), expectedRTBName);
         Assert.assertEquals(auctionEngineResponse.getBidPriceInUsd(), expectedWinnerBidValue);
-
     }
 
     // This function will provide the parameter data
