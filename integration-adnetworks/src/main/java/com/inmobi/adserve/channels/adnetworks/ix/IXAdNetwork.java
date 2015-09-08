@@ -1232,6 +1232,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             final App app = bidRequest.getApp();
             final Map<String, String> params = new HashMap<>();
+
             params.put("beaconUrl", getBeaconUrl());
             params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}${DEAL_GET_PARAM}");
             params.put("appId", app.getId());
@@ -1249,6 +1250,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
                 return;
             }
+
             responseContent = nativeResponseMaker.makeIXResponse(templateContext, params);
         } catch (final Exception e) {
             adStatus = TERM;
