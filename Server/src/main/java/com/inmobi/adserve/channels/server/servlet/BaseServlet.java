@@ -98,10 +98,6 @@ public abstract class BaseServlet implements Servlet {
         final AuctionEngine auctionEngine = hrh.responseSender.getAuctionEngine();
         final CasInternalRequestParameters casInternal = hrh.responseSender.casInternalRequestParameters;
 
-        final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
-        sasParams.setVideoSupported(isVideoSupported);
-        LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
-
         // Send NO_AD response, if not enabled.
         if (!isEnabled()) {
             LOG.debug("Servlet {} is disabled via server config. Sending NO_AD response.", getName());
@@ -114,6 +110,10 @@ public abstract class BaseServlet implements Servlet {
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
+
+        final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
+        sasParams.setVideoSupported(isVideoSupported);
+        LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
 
         // getting the selected third party site details
         final List<AdvertiserMatchedSegmentDetail> matchedSegmentDetails = matchSegments.matchSegments(sasParams);

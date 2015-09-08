@@ -84,7 +84,8 @@ public class CasUtils {
 
         LOG.debug("Checking for VAST video support");
         // TODO: Move to config
-        if (!(sasParams.getProcessedMkSlot().contains((short) 14) || sasParams.getProcessedMkSlot()
+        if (CollectionUtils.isEmpty(sasParams.getProcessedMkSlot()) || !(
+            sasParams.getProcessedMkSlot().contains((short) 14) || sasParams.getProcessedMkSlot()
                 .contains((short) 32))) {
             LOG.debug("Not qualified for VAST video as processed slots do not contain 14 or 32");
             return false;

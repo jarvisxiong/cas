@@ -33,6 +33,7 @@ public class InspectorStrings {
     public static final String SUCCESSFUL_REQUESTS = "success";
     public static final String JSON_PARSING_ERROR = "Terminated_JsonError";
     public static final String THRIFT_PARSING_ERROR = "Terminated_ThriftError";
+    public static final String THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST = "Terminated_ThriftError.EmptyAdPoolRequest";
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
     public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";

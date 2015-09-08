@@ -38,7 +38,7 @@ public class RequestFilters {
             return true;
         }
 
-        if (null == sasParams.getCategories()) {
+        if (CollectionUtils.isEmpty(sasParams.getCategories())) {
             LOG.error("Category field is not present in the request so sending noad");
             sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
