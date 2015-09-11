@@ -344,7 +344,12 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>casthrift</artifactId>
-				<version>2.16</version>
+				<version>2.18</version>
+			</dependency>
+			<dependency>
+				<groupId>com.inmobi.commons</groupId>
+				<artifactId>dcp</artifactId>
+				<version>2.18</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
