@@ -15,6 +15,7 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_GE
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.OPEN_LP_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.RECORD_EVENT_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSION_ID;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SITE_PREFERENCES_JSON;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
@@ -125,8 +126,8 @@ public class IXAdNetworkHelper {
     public static String replaceSproutMacros(final String adm, final CasInternalRequestParameters casInternal,
             final SASRequestParameters sasParams, final boolean isCoppaSet, final String clickUrl,
             final String beaconUrl) {
-        final List<String> macros = new ArrayList<>(8);
-        final List<String> substitutions = new ArrayList<>(8);
+        final List<String> macros = new ArrayList<>();
+        final List<String> substitutions = new ArrayList<>();
 
         addSproutMacroToList(macros, substitutions, JS_ESC_BEACON_URL,
                 StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
@@ -154,6 +155,10 @@ public class IXAdNetworkHelper {
         addSproutMacroToList(macros, substitutions, RECORD_EVENT_FUN, StringUtils.EMPTY);
         // No function is being provided
         addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
+
+        final String sitePreferences = null != sasParams.getPubControlPreferencesJson() ?
+            sasParams.getPubControlPreferencesJson() : StringUtils.EMPTY;
+        addSproutMacroToList(macros, substitutions, SITE_PREFERENCES_JSON, sitePreferences);
 
         final String userId =
                 StringUtils.isNotEmpty(casInternal.getUidIFA()) ? casInternal.getUidIFA() : StringUtils

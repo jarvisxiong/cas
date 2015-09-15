@@ -16,6 +16,7 @@ public class SproutTemplateConstants {
         public static final String GEO_ZIP = "GEO_ZIP";
         public static final String JS_ESC_GEO_CITY = "JS_ESC_GEO_CITY";
         public static final String OPEN_LP_FUN = "OPEN_LP_FUN";
+        public static final String SITE_PREFERENCES_JSON = "SITE_PREFERENCES_JSON";
 
         // Non sprout macros
         public static final String IMP_CB = "IMP_CB";
