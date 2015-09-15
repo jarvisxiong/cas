@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class SASRequestParameters {
+    private boolean secureSupported = false;
     private String allParametersJson;
     private String remoteHostIp;
     private String userAgent;

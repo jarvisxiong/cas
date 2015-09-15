@@ -113,6 +113,10 @@ public class ThriftRequestParser {
             setUserIdParams(casInternal, tObject.getUidParams());
             params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
         }
+        if(tObject.isSetRqSslEnabled()){
+            params.setSecureSupported(tObject.rqSslEnabled);
+        }
+
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
     }
 
