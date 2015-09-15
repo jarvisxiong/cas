@@ -347,18 +347,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
             return null;
         }
-
         if (!isNativeRequest()) {
             impression.setBanner(banner);
         }
         impression.setBidfloorcur(bidderCurrency);
         // Set interstitial or not
-        if (null != sasParams.getRequestedAdType() && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
-            impression.setInstl(1);
-        } else {
-            impression.setInstl(0);
-        }
-
+        impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
         forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
         forwardedBidGuidance = sasParams.getMarketRate();
         impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
@@ -770,6 +764,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
         if (2 == sasParams.getDst()) {
+            LOG.info("replaceRTBMacros for DST=2, URL->{}", url);
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
         }
@@ -861,7 +856,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         final int admSize = admContent.length();
         if (!templateWN) {
-            final String winUrl = beaconUrl + "?b=${WIN_BID}";
+            final String winUrl = beaconUrl + RTBCallbackMacros.WIN_BID_GET_PARAM;
             admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
         }
         final int admAfterMacroSize = admContent.length();
@@ -924,7 +919,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             final Map<String, String> params = new HashMap<String, String>();
             params.put("beaconUrl", getBeaconUrl());
-            params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}");
+            params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM);
             params.put("impressionId", impressionId);
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);

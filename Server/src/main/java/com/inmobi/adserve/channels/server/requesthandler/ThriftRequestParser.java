@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -24,9 +25,13 @@ import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
+import com.inmobi.adserve.adpool.Device;
+import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
+import com.inmobi.adserve.adpool.Site;
+import com.inmobi.adserve.adpool.SiteTemplateSettings;
 import com.inmobi.adserve.adpool.SupplyContentType;
 import com.inmobi.adserve.adpool.UidParams;
 import com.inmobi.adserve.adpool.UidType;
@@ -189,63 +194,76 @@ public class ThriftRequestParser {
 
     private void setDevice(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetDevice()) {
-            String userAgent = tObject.device.userAgent;
+            final Device tDevice = tObject.device;
+            String userAgent = tDevice.userAgent;
             try {
                 userAgent = userAgent != null ? URLDecoder.decode(userAgent, GlobalConstant.UTF_8) : null;
             } catch (final UnsupportedEncodingException e) {}
             params.setUserAgent(userAgent);
-            params.setOsId(new Long(tObject.device.osId).intValue());
-            params.setModelId(tObject.device.modelId);
-            params.setManufacturerId(tObject.device.manufacturerId);
-            params.setHandsetInternalId(tObject.device.getHandsetInternalId());
-            params.setOsMajorVersion(tObject.device.getOsMajorVersion());
-            if (tObject.device.isSetDeviceType()) {
-                params.setDeviceType(tObject.device.getDeviceType());
+            params.setOsId(new Long(tDevice.osId).intValue());
+            params.setModelId(tDevice.modelId);
+            params.setManufacturerId(tDevice.manufacturerId);
+            params.setHandsetInternalId(tDevice.getHandsetInternalId());
+            params.setOsMajorVersion(tDevice.getOsMajorVersion());
+            if (tDevice.isSetDeviceType()) {
+                params.setDeviceType(tDevice.getDeviceType());
             }
-            if (tObject.device.isSetModelName()) {
-                params.setDeviceModel(tObject.device.getModelName());
+            if (tDevice.isSetModelName()) {
+                params.setDeviceModel(tDevice.getModelName());
             }
-            if (tObject.device.isSetManufacturerName()) {
-                params.setDeviceMake(tObject.device.getManufacturerName());
+            if (tDevice.isSetManufacturerName()) {
+                params.setDeviceMake(tDevice.getManufacturerName());
             }
         }
     }
 
     private void setIntegrationDetails(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetIntegrationDetails()) {
-            params.setRqIframe(tObject.integrationDetails.iFrameId);
-            if (tObject.integrationDetails.isSetAdCodeType()) {
-                params.setAdcode(tObject.integrationDetails.adCodeType.toString());
+            final IntegrationDetails tIntDetails = tObject.integrationDetails;
+            params.setRqIframe(tIntDetails.iFrameId);
+            if (tIntDetails.isSetAdCodeType()) {
+                params.setAdcode(tIntDetails.adCodeType.toString());
             }
-            params.setSdkVersion(getSdkVersion(tObject.integrationDetails.integrationType,
-                    tObject.integrationDetails.integrationVersion));
-            params.setAdcode(getAdCode(tObject.integrationDetails.integrationType));
+            params.setSdkVersion(getSdkVersion(tIntDetails.integrationType, tIntDetails.integrationVersion));
+            params.setAdcode(getAdCode(tIntDetails.integrationType));
         }
     }
 
     private void setSiteObject(final AdPoolRequest tObject, final SASRequestParameters params, final int dst) {
         if (tObject.isSetSite()) {
-            params.setSiteId(tObject.site.siteId);
-            params.setSiteIncId(tObject.site.siteIncId);
-            params.setAppUrl(tObject.site.siteUrl);
-            params.setPubId(tObject.site.publisherId);
-            final boolean isApp = tObject.site.isSetInventoryType() && tObject.site.inventoryType == InventoryType.APP;
+            final Site tSite = tObject.site;
+            params.setSiteId(tSite.siteId);
+            params.setSiteIncId(tSite.siteIncId);
+            params.setAppUrl(tSite.siteUrl);
+            params.setPubId(tSite.publisherId);
+            final boolean isApp = tSite.isSetInventoryType() && tSite.inventoryType == InventoryType.APP;
             params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
 
+            params.setCustomTemplatesOnly(tSite.customTemplatesOnly);
+            final SiteTemplateSettings sts = tSite.siteTemplateSettings;
+            if (sts != null) {
+                final Set<Long> cauMetaDataSet = new HashSet<Long>();
+                if (CollectionUtils.isNotEmpty(sts.getCustomAdUnitStableList())) {
+                    cauMetaDataSet.addAll(sts.getCustomAdUnitStableList());
+                }
+                if (CollectionUtils.isNotEmpty(sts.getCustomAdUnitExperimentList())) {
+                    cauMetaDataSet.addAll(sts.getCustomAdUnitExperimentList());
+                }
+                params.setCauMetadataSet(cauMetaDataSet);
+            }
+            
             if (CasConfigUtil.repositoryHelper != null) {
-                params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper
-                        .queryWapSiteUACRepository(tObject.site.siteId));
-
-                params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tObject.site.siteId,
+                params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tSite.siteId));
+                params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tSite.siteId,
                         tObject.geo.countryId, (int) tObject.device.osId));
             }
-            params.setSiteContentType(tObject.site.isSetSiteContentType()
-                    ? tObject.site.getSiteContentType()
+            params.setSiteContentType(tSite.isSetSiteContentType()
+                    ? tSite.getSiteContentType()
                     : ContentType.FAMILY_SAFE);
-            params.setCategories(convertIntToLong(tObject.site.siteTaxonomies));
+            params.setCategories(convertIntToLong(tSite.siteTaxonomies));
 
             final DemandSourceType dstEnum = DemandSourceType.findByValue(dst);
-            double ecpmFloor = Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor);
+            double ecpmFloor = Math.max(tSite.ecpmFloor, tSite.cpmFloor);
             if (GlobalConstant.MIN_BID_FLOOR >= ecpmFloor) {
                 ecpmFloor = GlobalConstant.MIN_BID_FLOOR;
                 InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
@@ -266,8 +284,8 @@ public class ThriftRequestParser {
 
             // Fill params for Pub Control - Supported Ad Types.
             List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
-            if (tObject.site.isSetEnrichedSiteAllowedMediaAttributes()) {
-                for (final int i : tObject.site.getEnrichedSiteAllowedMediaAttributes()) {
+            if (tSite.isSetEnrichedSiteAllowedMediaAttributes()) {
+                for (final int i : tSite.getEnrichedSiteAllowedMediaAttributes()) {
                     if (i == AdAttributeType.VIDEO.getValue()) {
                         pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
                     } else if (i == AdAttributeType.DEFAULT.getValue()) {
@@ -280,16 +298,12 @@ public class ThriftRequestParser {
                 pubControlSupportedAdTypes = DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
             }
             params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
-
-            if (tObject.site.isSetRewarded()) {
-                params.setRewardedVideo(tObject.site.isRewarded());
+            if (tSite.isSetRewarded()) {
+                params.setRewardedVideo(tSite.isRewarded());
             }
-
             // Fill params for pub control - Media preferences json.
             final String mediaPreferencesJson =
-                    tObject.site.isSetMediaPreferences()
-                            ? tObject.site.mediaPreferences
-                            : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
+                    tSite.isSetMediaPreferences() ? tSite.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
             params.setPubControlPreferencesJson(mediaPreferencesJson);
         }
     }

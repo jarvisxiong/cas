@@ -3,13 +3,12 @@ package com.inmobi.adserve.channels.util;
 import lombok.Data;
 
 @Data
-public class VASTTemplateObject {
+public class GenericTemplateObject {
     public static final String AD_OBJECT_PREFIX = "ad";
     public static final String FIRST_OBJECT_PREFIX = "first";
     public static final String TOOL_OBJECT = "tool";
     
     public static final String VAST_CONTENT_JS_ESC = "VASTContentJSEsc";
-    public static final String IM_WIN_URL = "IMWinUrl";
     public static final String PARTNER_BEACON_URL = "PartnerBeaconUrl";
 
     private String beaconUrl;
@@ -21,5 +20,10 @@ public class VASTTemplateObject {
     private String sdkVersion;
     private String sitePreferencesJson;
     private String requestJson;
-
+    
+    //CAU AD Markup
+    private String cauElementJsonObject;
+    public static final String CAU_CONTENT_JS_ESC = "CAUContentJSEsc";
+    private int width;
+    private int height;
 }

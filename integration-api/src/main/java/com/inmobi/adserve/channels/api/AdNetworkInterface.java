@@ -188,8 +188,7 @@ public interface AdNetworkInterface {
      * @return
      */
     boolean configureParameters(final SASRequestParameters param, final CasInternalRequestParameters casParams,
-                                final ChannelSegmentEntity entity, final long SlotId,
-                                final RepositoryHelper repositoryHelper);
+            final ChannelSegmentEntity entity, final long SlotId, final RepositoryHelper repositoryHelper);
 
     /**
      * Makes asynchronous request to Ad Network server. Returns true on success.

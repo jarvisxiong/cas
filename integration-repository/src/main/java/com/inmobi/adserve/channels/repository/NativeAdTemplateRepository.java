@@ -28,8 +28,7 @@ import com.inmobi.template.formatter.TemplateManager;
 public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, Long>
         implements
             RepositoryManager {
-
-    private final static Gson gson = new Gson();
+    private final static Gson GSON = new Gson();
 
     @Override
     public DBEntity<NativeAdTemplateEntity, Long> buildObjectFromRow(final ResultSetRow resultSetRow)
@@ -67,7 +66,7 @@ public class NativeAdTemplateRepository extends AbstractStatsMaintainingDBReposi
             }
 
             try {
-                builder.contentJson(gson.fromJson(contentJson, NativeContentJsonObject.class));
+                builder.contentJson(GSON.fromJson(contentJson, NativeContentJsonObject.class));
             } catch (final JsonParseException jpe) {
                 // Ignored
             }

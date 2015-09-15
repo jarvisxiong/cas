@@ -1,5 +1,17 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.COUNT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_INVALID_SLOT_REQUEST_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.JSON_PARSING_ERROR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.LOW_SDK_VERSION;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_CATEGORY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_SITE_ID;
+import static com.inmobi.adserve.channels.util.InspectorStrings.THRIFT_PARSING_ERROR;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +23,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.casthrift.DemandSourceType;
 
 
@@ -22,19 +33,18 @@ public class RequestFilters {
         if (null != hrh.getTerminationReason()) {
             LOG.debug("Request not being served because of the termination reason {}", hrh.getTerminationReason());
             if (CasConfigUtil.JSON_PARSING_ERROR.equalsIgnoreCase(hrh.getTerminationReason())) {
-                InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
+                InspectorStats.incrementStatCount(JSON_PARSING_ERROR, COUNT);
             } else {
-                InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
+                InspectorStats.incrementStatCount(THRIFT_PARSING_ERROR, COUNT);
             }
             return true;
         }
 
         final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
-
         if (null == sasParams) {
             LOG.error("Terminating request as sasParam is null");
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
-            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(JSON_PARSING_ERROR, COUNT);
             return true;
         }
 
@@ -42,37 +52,42 @@ public class RequestFilters {
             LOG.error("Category field is not present in the request so sending noad");
             sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
-            InspectorStats.incrementStatCount(InspectorStrings.MISSING_CATEGORY, InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(MISSING_CATEGORY, COUNT);
             return true;
         }
 
         if (null == sasParams.getSiteId()) {
             LOG.error("Terminating request as site id was missing");
             hrh.setTerminationReason(CasConfigUtil.MISSING_SITE_ID);
-            InspectorStats.incrementStatCount(InspectorStrings.MISSING_SITE_ID, InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(MISSING_SITE_ID, COUNT);
             return true;
         }
 
         if (!sasParams.getAllowBannerAds()) {
             LOG.info("Request not being served because of banner not allowed.");
-            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER,
-                    InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, COUNT);
             return true;
         }
 
         if (sasParams.isRewardedVideo()) {
             LOG.info("Request not being served because rewarded video is not supported.");
-            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER,
-                InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER, COUNT);
+            return true;
+        }
+
+        // Field CustomTemplatesOnly = true, for both CAU and Custom Templates. If CustomTemplatesOnly = true & CAU Set
+        // is empty it infers request is for CT
+        if (sasParams.isCustomTemplatesOnly() && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())) {
+            LOG.info("Request not being served because Custom Template is not supported");
+            InspectorStats.incrementStatCount(DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER, COUNT);
             return true;
         }
 
         if (sasParams.getSiteContentType() != null
-                && !CasConfigUtil.allowedSiteTypes.contains(sasParams.getSiteContentType()
-                        .name())) {
+                && !CasConfigUtil.allowedSiteTypes.contains(sasParams.getSiteContentType().name())) {
             LOG.info("Terminating request as incompatible content type");
             hrh.setTerminationReason(CasConfigUtil.INCOMPATIBLE_SITE_TYPE);
-            InspectorStats.incrementStatCount(InspectorStrings.INCOMPATIBLE_SITE_TYPE, InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(INCOMPATIBLE_SITE_TYPE, COUNT);
             return true;
         }
         final String tempSdkVersion = sasParams.getSdkVersion();
@@ -82,7 +97,7 @@ public class RequestFilters {
                         .substring(0, 1))) && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
                     LOG.info("Terminating request as sdkVersion is less than 3");
                     hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
-                    InspectorStats.incrementStatCount(InspectorStrings.LOW_SDK_VERSION, InspectorStrings.COUNT);
+                    InspectorStats.incrementStatCount(LOW_SDK_VERSION, COUNT);
                     return true;
                 } else {
                     LOG.debug("sdk-version : {}", tempSdkVersion);
@@ -111,7 +126,7 @@ public class RequestFilters {
         final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
         final StringBuilder buildDst =
                 new StringBuilder(dst != null ? dst.name() : String.valueOf(sasParams.getDst())).append("-").append(
-                        InspectorStrings.DROPPED_IN_INVALID_SLOT_REQUEST_FILTER);
+                        DROPPED_IN_INVALID_SLOT_REQUEST_FILTER);
         // Increment stats for DST
         InspectorStats.incrementStatCount(buildDst.toString());
         // Increment stats all slots that were requested from UMP

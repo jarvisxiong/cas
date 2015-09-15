@@ -141,7 +141,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final Integer VIDEO_MAX_BITRATE = 2000;
     private static final List<Integer> VIDEO_PROTOCOLS = Arrays.asList(5); // VAST 2.0 Wrapper
     private static final List<String> VIDEO_MIMES = Arrays.asList("video/mp4"); // Supported video mimes
-    private static final List<Short> VIDEO_SUPPORTED_SLOT_IDS = Arrays.asList((short) 14, (short) 32);
     private static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
     @Inject
     protected static TemplateConfiguration templateConfiguration;
@@ -234,6 +233,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private ChannelSegmentEntity dspChannelSegmentEntity;
     private Map<Integer, Asset> mandatoryAssetMap;
     private Map<Integer, Asset> nonMandatoryAssetMap;
+    private IXSlotMatcher matchedCAU;
     private NativeAdTemplateEntity templateEntity;
 
     @SuppressWarnings("unchecked")
@@ -447,8 +447,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         forwardedBidGuidance = Math.max(sasParams.getMarketRate(), forwardedBidFloor);
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
-        impression.setInstl(null != sasParams.getRequestedAdType()
-                && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() || isVideoRequest ? 1 : 0);
+        final boolean isInterstitial = RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType();
+        impression.setInstl(isInterstitial || isVideoRequest ? 1 : 0);
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
@@ -485,8 +485,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final long startTime = System.currentTimeMillis();
         packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
         final long endTime = System.currentTimeMillis();
-        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst())
-            .name(), InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
+                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
         if (CollectionUtils.isNotEmpty(packageIds)) {
             final RPImpressionExtension rp =
@@ -500,7 +500,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             // Update the stats
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
         }
-
         return impExt;
     }
 
@@ -546,16 +545,34 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Presently only one banner object per impression object is being sent
         // When multiple banner objects will be supported,banner ids will begin at 1 and end at n for n banner objects
         banner.setId(ONE);
-        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
-        if (null != slotSizeMapEntity) {
-            final Dimension dim = slotSizeMapEntity.getDimension();
+
+        Dimension dim = null;
+        Integer rpSlot = null;
+        if (isCAURequest()) {
+            LOG.debug(traceMarker, "Request for CAU, so find matching slot");
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_UMP_CAU_REQUESTS);
+            matchedCAU = new IXSlotMatcher(repositoryHelper);
+            rpSlot = matchedCAU.getMatchingSlotForCAU(sasParams.getCauMetadataSet());
+            if (rpSlot != null) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_RP_CAU_REQUESTS);
+                dim = matchedCAU.getMatchedRPDimension();
+            }
+        } else {
+            rpSlot = SlotSizeMapping.getIXMappedSlotId(selectedSlotId);
+            final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+            if (null != slotSizeMapEntity) {
+                dim = slotSizeMapEntity.getDimension();
+            }
+        }
+
+        if (null != dim) {
             banner.setW((int) dim.getWidth());
             banner.setH((int) dim.getHeight());
         }
 
-        if (StringUtils.isNotBlank(sasParams.getSdkVersion())) {
+        // Don't send API for CAU and Lower SDK Versions to get static ads
+        if (!isCAURequest() && StringUtils.isNotBlank(sasParams.getSdkVersion())) {
             final int sdkVersion = Integer.parseInt(sasParams.getSdkVersion().substring(1));
-
             if (sdkVersion >= INMOBI_SDK_VERSION_370) {
                 banner.setApi(MRAID_FRAMEWORK_VALUES);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_RICH_MEDIA_REQUESTS);
@@ -564,20 +581,22 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final BannerExtension ext = new BannerExtension();
-        if (null != selectedSlotId) {
-            final Integer rpSlot = SlotSizeMapping.getIXMappedSlotId(selectedSlotId);
-            if (rpSlot != null) {
-                final RPBannerExtension rp = new RPBannerExtension();
-                rp.setMime(MIME_HTML);
-                rp.setSize_id(rpSlot);
-                ext.setRp(rp);
-            }
+        if (rpSlot != null) {
+            final RPBannerExtension rp = new RPBannerExtension();
+            rp.setMime(MIME_HTML);
+            rp.setSize_id(rpSlot);
+            ext.setRp(rp);
+        } else {
+            // We can't take risk of sending request without size id so return null
+            LOG.error("Dropping request as no matching RP Size ID is found for selectedSlotId {}", selectedSlotId);
+            return null;
         }
         banner.setExt(ext);
         return banner;
     }
 
     private Video createVideoObject() {
+        LOG.debug(traceMarker, "createVideoObject");
         boolean soundOn = false;
         boolean isSkippable = true;
         try {
@@ -590,7 +609,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         final Video video = new Video(VIDEO_MIMES, VIDEO_MIN_DURATION, VIDEO_MAX_DURATION);
-
         final List<Integer> playbackMethod = new ArrayList<>(1);
         playbackMethod.add(soundOn ? 1 : 2);
         video.setPlaybackmethod(playbackMethod);
@@ -991,7 +1009,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 LOG.info(traceMarker, "Could not return an Ad as parsing of ix response failed");
                 return;
             }
-
             buildInmobiAdTracker();
             responseContent = DEFAULT_EMPTY_STRING;
             adStatus = AdStatus.AD.name();
@@ -1000,14 +1017,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 nativeAdBuilding();
             } else if (isVideoRequest) {
                 videoAdBuilding();
+            } else if (isCAURequest()) {
+                cauAdBuilding();
             } else {
                 bannerAdBuilding();
             }
-
         }
         LOG.debug(traceMarker, "response content length is {}", responseContent.length());
         LOG.debug(traceMarker, "response content is {}", responseContent);
     }
+
 
 
     protected boolean isSproutAd() {
@@ -1127,34 +1146,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void bannerAdBuilding() {
+        LOG.debug(traceMarker, "bannerAdBuilding");
         final VelocityContext velocityContext = new VelocityContext();
         final String beaconUrl = getBeaconUrl();
         String admContent = getAdMarkUp();
-
         final int admSize = admContent.length();
         if (!templateWN) {
-            final String winUrl = beaconUrl + "?b=${WIN_BID}";
+            final String winUrl = beaconUrl + RTBCallbackMacros.WIN_BID_GET_PARAM;
             admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
         }
 
         if (WAP.equalsIgnoreCase(sasParams.getSource())) {
             if (isSproutAd()) {
-                LOG.debug(traceMarker, "Sprout Ads not supported on WAP");
-                InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP);
-                responseContent = DEFAULT_EMPTY_STRING;
-                adStatus = NO_AD;
+                sproutAdNotSupported(WAP);
                 return;
             }
             velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
         } else {
             if (isSproutAd()) {
                 if (!isSproutSupported) {
-                    LOG.debug(traceMarker, "Sprout Ads not supported on SDK < 370");
-                    InspectorStats.incrementStatCount(getName(),
-                            InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370);
-                    responseContent = DEFAULT_EMPTY_STRING;
-                    adStatus = NO_AD;
+                    sproutAdNotSupported("SDK<370");
                     return;
                 }
                 LOG.debug(traceMarker, "Sprout Ad Received");
@@ -1188,13 +1199,27 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
+            responseContent = DEFAULT_EMPTY_STRING;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
                     advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.BANNER_PARSE_RESPONSE_EXCEPTION);
         }
     }
 
+    private void sproutAdNotSupported(final String where) {
+        LOG.debug(traceMarker, "Sprout Ads not supported on {}", where);
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED + where);
+        responseContent = DEFAULT_EMPTY_STRING;
+        adStatus = NO_AD;
+        return;
+    }
+
     private void videoAdBuilding() {
+        LOG.debug(traceMarker, "videoAdBuilding");
+        if (isSproutAd()) {
+            sproutAdNotSupported("VAST");
+            return;
+        }
         try {
             responseContent =
                     IXAdNetworkHelper
@@ -1202,9 +1227,29 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                                 .getTemplateTool(), sasParams, repositoryHelper, selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
         } catch (final Exception e) {
             adStatus = NO_AD;
+            responseContent = DEFAULT_EMPTY_STRING;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
                     advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.VIDEO_PARSE_RESPONSE_EXCEPTION);
+        }
+    }
+
+    private void cauAdBuilding() {
+        LOG.debug(traceMarker, "cauAdBuilding");
+        if (isSproutAd()) {
+            sproutAdNotSupported("CAU");
+            return;
+        }
+        try {
+            responseContent =
+                    IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
+                            getAdMarkUp(), getWinUrl());
+        } catch (final Exception e) {
+            adStatus = NO_AD;
+            responseContent = DEFAULT_EMPTY_STRING;
+            LOG.info(traceMarker, "Some exception is caught while filling the CAU template for partner:{} {}",
+                    advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.CAU_PARSE_RESPONSE_EXCEPTION);
         }
     }
 
@@ -1228,17 +1273,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     protected void nativeAdBuilding() {
+        LOG.debug(traceMarker, "nativeAdBuilding");
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
             final App app = bidRequest.getApp();
-            final Map<String, String> params = new HashMap<>();
-
-            params.put("beaconUrl", getBeaconUrl());
-            params.put("winUrl", getBeaconUrl() + "?b=${WIN_BID}${DEAL_GET_PARAM}");
-            params.put("appId", app.getId());
-            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
-            params.put("nUrl", nurl);
-
             final com.inmobi.template.context.App templateContext =
                     IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
                             nonMandatoryAssetMap, impressionId);
@@ -1250,7 +1288,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
                 return;
             }
-
+            final Map<String, String> params = new HashMap<>();
+            params.put("beaconUrl", getBeaconUrl());
+            params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM
+                    + RTBCallbackMacros.DEAL_GET_PARAM);
+            params.put("appId", app.getId());
+            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
+            params.put("nUrl", nurl);
             responseContent = nativeResponseMaker.makeIXResponse(templateContext, params);
         } catch (final Exception e) {
             adStatus = TERM;
@@ -1531,8 +1575,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // TODO: Clean up trump logic in ResponseSender
         final String dealType =
-            matchedPackageEntity.getAccessTypes().size() > indexOfDealId ? matchedPackageEntity
-                .getAccessTypes().get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
+                matchedPackageEntity.getAccessTypes().size() > indexOfDealId ? matchedPackageEntity.getAccessTypes()
+                        .get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
         if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
             isTrumpDeal = true;
         }

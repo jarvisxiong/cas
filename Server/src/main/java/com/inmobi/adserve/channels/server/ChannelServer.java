@@ -16,6 +16,7 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.HOST_NAME_KEY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
@@ -52,6 +53,7 @@ import com.google.inject.util.Modules;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.IXBlocklistRepository;
+import com.inmobi.adserve.channels.repository.CAUMetaDataRepository;
 import com.inmobi.adserve.channels.repository.CcidMapRepository;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.repository.ChannelFeedbackRepository;
@@ -138,6 +140,7 @@ public class ChannelServer {
     private static CcidMapRepository ccidMapRepository;
     private static IMEIAerospikeRepository imeiAerospikeRepository;
     private static IXBlocklistRepository ixBlocklistRepository;
+    private static CAUMetaDataRepository cauMetaDataRepository;
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     private static String configFile;
 
@@ -218,6 +221,8 @@ public class ChannelServer {
             geoRegionFenceMapRepository = new GeoRegionFenceMapRepository();
             ccidMapRepository = new CcidMapRepository();
             ixBlocklistRepository = new IXBlocklistRepository();
+            cauMetaDataRepository = new CAUMetaDataRepository();
+            
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -243,6 +248,7 @@ public class ChannelServer {
             repoHelperBuilder.setGeoRegionFenceMapRepository(geoRegionFenceMapRepository);
             repoHelperBuilder.setCcidMapRepository(ccidMapRepository);
             repoHelperBuilder.setIxBlocklistRepository(ixBlocklistRepository);
+            repoHelperBuilder.setCauMetaDataRepository(cauMetaDataRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -377,6 +383,7 @@ public class ChannelServer {
             loadRepos(geoRegionFenceMapRepository, GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
             loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);
             loadRepos(ixBlocklistRepository, IX_BLOCKLIST_REPOSITORY, config, logger);
+            loadRepos(cauMetaDataRepository, CAU_METADATA_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY),
                     IX_PACKAGE_REPOSITORY);
             final DataCenter dc = getDataCenter();

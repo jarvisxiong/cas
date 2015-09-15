@@ -75,7 +75,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
 
-    public DCPTaboolaAdnetwork(final Configuration config, final Bootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+    public DCPTaboolaAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
 
@@ -93,8 +94,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         iconUrl = config.getString("taboola.icon");
         notificationUrl = config.getString("taboola.notification");
 
-        if (sasParams.getWapSiteUACEntity() != null
-                && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
+        if (sasParams.getWapSiteUACEntity() != null && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
         } else {
             LOG.info("Uac is not initialized for site {} in Taboola", sasParams.getSiteId());
@@ -110,7 +110,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public URI getRequestUri() throws Exception {
-        StringBuilder requestBuilder = new StringBuilder(host);
+        final StringBuilder requestBuilder = new StringBuilder(host);
 
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getAppTitle(), format), false);
@@ -126,13 +126,13 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         appendQueryParam(requestBuilder, USER_IP, sasParams.getRemoteHostIp(), false);
         appendQueryParam(requestBuilder, USER_AGENT, getURLEncode(sasParams.getUserAgent(), format), false);
-        String referralUrl = sasParams.getReferralUrl();
+        final String referralUrl = sasParams.getReferralUrl();
         if (StringUtils.isNotEmpty(referralUrl)) {
             appendQueryParam(requestBuilder, USER_REFERRER, referralUrl, false);
         }
         appendQueryParam(requestBuilder, THUMBNAIL_HEIGHT, thumbnailHeight, false);
         appendQueryParam(requestBuilder, THUMBNAIL_WIDTH, thumbnailWidth, false);
-        String udid = getUid(true);
+        final String udid = getUid(true);
         if (udid != null) {
             appendQueryParam(requestBuilder, USER_ID, udid, false);
         }
@@ -158,30 +158,30 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
     }
 
-    protected void nativeAdBuilding(String response) {
+    protected void nativeAdBuilding(final String response) {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
             final Map<String, String> params = new HashMap<String, String>();
             buildInmobiAdTracker();
-            String beacon = getBeaconUrl();
-            TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
+            final String beacon = getBeaconUrl();
+            final TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
             if (taboolaResponse.getList().length > 0) {
-                String nurl = String.format(notificationUrl,externalSiteId, taboolaResponse.getId());
+                final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId());
                 updateNativeParams(params, nurl, beacon);
-                App.Builder appBuilder = App.newBuilder();
-                NativeJson taboolaNative = taboolaResponse.getList()[0];
+                final App.Builder appBuilder = App.newBuilder();
+                final NativeJson taboolaNative = taboolaResponse.getList()[0];
                 String title = taboolaNative.getBranding();
                 String description = taboolaNative.getName();
-                if(null == title){
+                if (null == title) {
                     title = description;
                     description = taboolaNative.getDescription();
                 }
                 appBuilder.setTitle(title);
                 appBuilder.setOpeningLandingUrl(taboolaNative.getUrl());
                 appBuilder.setId(taboolaNative.getId());
-                List<Icon> icons = new ArrayList<>();
+                final List<Icon> icons = new ArrayList<>();
 
-                List<Screenshot> screenshotList = new ArrayList<>();
+                final List<Screenshot> screenshotList = new ArrayList<>();
 
                 if (isScreenshotResponse) {
                     setStaticIconForScreenshotResponse(icons);
@@ -196,12 +196,13 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 if (null != description) {
                     appBuilder.setDesc(description);
                 }
-                List<String> pixelUrls = new ArrayList<>();
+                final List<String> pixelUrls = new ArrayList<>();
                 pixelUrls.add(beacon);
                 appBuilder.setPixelUrls(pixelUrls);
-                App app = (App) appBuilder.build();
-                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params,
-                        repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+                final App app = (App) appBuilder.build();
+                responseContent =
+                        nativeResponseMaker.makeDCPNativeResponse(app, params,
+                                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 
@@ -212,8 +213,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
-                    + "exception = {}", sasParams.getPlacementId(), getName(), e);
+            LOG.error(
+                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
+                            + "exception = {}", sasParams.getPlacementId(), getName(), e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -223,24 +225,24 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
 
-            if(isNativeRequest && null != templateEntity) {
+            if (isNativeRequest && null != templateEntity) {
                 trackerBuilder.setNativeTemplateId(templateEntity.getId());
             }
         }
     }
 
-    private void setStaticIconForScreenshotResponse(List<Icon> icons) {
-        Icon.Builder iconBuilder = Icon.newBuilder();
-        //static icon url is 300x300 size
+    private void setStaticIconForScreenshotResponse(final List<Icon> icons) {
+        final Icon.Builder iconBuilder = Icon.newBuilder();
+        // static icon url is 300x300 size
         iconBuilder.setUrl(iconUrl);
         iconBuilder.setW(300);
         iconBuilder.setH(300);
         icons.add((Icon) iconBuilder.build());
     }
 
-    private void updateIconList(NativeJson taboolaNative, List<Icon> icons) {
-        Icon.Builder iconBuilder = Icon.newBuilder();
-        for (Thumbnail image : taboolaNative.getThumbnail()) {
+    private void updateIconList(final NativeJson taboolaNative, final List<Icon> icons) {
+        final Icon.Builder iconBuilder = Icon.newBuilder();
+        for (final Thumbnail image : taboolaNative.getThumbnail()) {
             iconBuilder.setH(image.getHeight());
             iconBuilder.setW(image.getWidth());
             iconBuilder.setUrl(image.getUrl());
@@ -248,19 +250,19 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
     }
 
-    private void updateScreenshotList(NativeJson taboolaNative, List<Screenshot> screenshotList) {
-        for (Thumbnail image : taboolaNative.getThumbnail()) {
-            Screenshot.Builder builder = Screenshot.newBuilder();
+    private void updateScreenshotList(final NativeJson taboolaNative, final List<Screenshot> screenshotList) {
+        for (final Thumbnail image : taboolaNative.getThumbnail()) {
+            final Screenshot.Builder builder = Screenshot.newBuilder();
             builder.setH(image.getHeight());
             builder.setW(image.getWidth());
-            final Double ar = ((double)image.getWidth()) /((double) image.getHeight()) ;
+            final Double ar = (double) image.getWidth() / (double) image.getHeight();
             builder.setAr(String.valueOf(ar));
             builder.setUrl(image.getUrl());
             screenshotList.add((Screenshot) builder.build());
         }
     }
 
-    private void updateNativeParams(Map<String, String> params, String nurl, String beacon) {
+    private void updateNativeParams(final Map<String, String> params, final String nurl, final String beacon) {
         params.put("beaconUrl", beacon);
         params.put("impressionId", impressionId);
         params.put("placementId", String.valueOf(sasParams.getPlacementId()));
@@ -281,13 +283,13 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (LOG.isDebugEnabled()) {
             LOG.debug(templateEntity.toString());
         }
-        NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-        if(nativeContentObject == null) {
+        final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
+        if (nativeContentObject == null) {
             setDimentionForHandwritenTemplate();
-        }else{
-            for (ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
-                CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
-                Dimension dimensions = imageAsset.getDimension();
+        } else {
+            for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
+                final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
+                final Dimension dimensions = imageAsset.getDimension();
                 thumbnailHeight = dimensions.getHeight();
                 thumbnailWidth = dimensions.getWidth();
 
@@ -301,8 +303,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void setDimentionForHandwritenTemplate() {
-        final List<NativeConstraints.Mandatory> mandatoryKeys = NativeConstraints.getDCPMandatoryList(
-                templateEntity.getMandatoryKey());
+        final List<NativeConstraints.Mandatory> mandatoryKeys =
+                NativeConstraints.getDCPMandatoryList(templateEntity.getMandatoryKey());
 
         for (final NativeConstraints.Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
@@ -315,8 +317,10 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                     thumbnailHeight = screen.getHmin();
                     thumbnailWidth = screen.getWmin();
                     break;
+                default:
+                    break;
             }
-            if(mandatory == NativeConstraints.Mandatory.SCREEN_SHOT) {
+            if (mandatory == NativeConstraints.Mandatory.SCREEN_SHOT) {
                 isScreenshotResponse = true;
                 break;
             }

@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.inmobi.adserve.channels.entity.CAUMetadataEntity;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -58,6 +59,8 @@ public class RepositoryHelperTest {
     public static NativeAdTemplateEntity mockNativeAdTemplateEntity = createMock(NativeAdTemplateEntity.class);
     public static SegmentAdGroupFeedbackEntity mockSegmentAdGroupFeedbackEntity =
             createMock(SegmentAdGroupFeedbackEntity.class);
+    public static CAUMetadataEntity mockCauMetadataEntity = createMock(CAUMetadataEntity.class);
+
     public static ChannelRepository mockChannelRepository = createMock(ChannelRepository.class);
     public static ChannelAdGroupRepository mockChannelAdGroupRepository = createMock(ChannelAdGroupRepository.class);
     public static ChannelFeedbackRepository mockChannelFeedbackRepository = createMock(ChannelFeedbackRepository.class);
@@ -77,6 +80,8 @@ public class RepositoryHelperTest {
     public static CreativeRepository mockCreativeRepository = createMock(CreativeRepository.class);
     public static NativeAdTemplateRepository mockNativeAdTemplateRepository =
             createMock(NativeAdTemplateRepository.class);
+    public static CAUMetaDataRepository mockCauMetaDataRepository = createMock(CAUMetaDataRepository.class);
+
     public static PricingEngineQuery mockPricingEngineQuery = createMock(PricingEngineQuery.class);
     public static CreativeQuery mockCreativeQuery = createMock(CreativeQuery.class);
     public static SiteFilterQuery mockSiteFilterQuery = createMock(SiteFilterQuery.class);
@@ -120,6 +125,8 @@ public class RepositoryHelperTest {
                 .andReturn(mockCurrencyConversionEntity).times(1);
         expect(mockWapSiteUACRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
                 .times(1).andReturn(mockWapSiteUACEntity).times(1);
+        expect(mockCauMetaDataRepository.query(query4)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockCauMetadataEntity).times(1);
         expect(mockIxAccountMapRepository.query(query4)).andThrow(new RepositoryException("Repository Exception"))
                 .times(1).andReturn(mockIxAccountMapEntity).times(1);
         expect(mockCreativeRepository.query(mockCreativeQuery))
@@ -156,7 +163,7 @@ public class RepositoryHelperTest {
         builder.setIxAccountMapRepository(mockIxAccountMapRepository);
         builder.setCreativeRepository(mockCreativeRepository);
         builder.setNativeAdTemplateRepository(mockNativeAdTemplateRepository);
-
+        builder.setCauMetaDataRepository(mockCauMetaDataRepository);
         tested = builder.build();
     }
 
@@ -177,6 +184,7 @@ public class RepositoryHelperTest {
         assertThat(tested.getIxAccountMapRepository(), is(equalTo(mockIxAccountMapRepository)));
         assertThat(tested.getCreativeRepository(), is(equalTo(mockCreativeRepository)));
         assertThat(tested.getNativeAdTemplateRepository(), is(equalTo(mockNativeAdTemplateRepository)));
+        assertThat(tested.getCauMetaDataRepository(), is(equalTo(mockCauMetaDataRepository)));
     }
 
     @Test
@@ -264,6 +272,12 @@ public class RepositoryHelperTest {
     public void testQueryWapSiteUACRepository() throws Exception {
         assertThat(tested.queryWapSiteUACRepository(query1), is(equalTo(null)));
         assertThat(tested.queryWapSiteUACRepository(query1), is(equalTo(mockWapSiteUACEntity)));
+    }
+
+    @Test
+    public void testQueryCauMetaDataRepository() throws Exception {
+        assertThat(tested.queryCauMetaDataRepository(query4), is(equalTo(null)));
+        assertThat(tested.queryCauMetaDataRepository(query4), is(equalTo(mockCauMetadataEntity)));
     }
 
     @Test

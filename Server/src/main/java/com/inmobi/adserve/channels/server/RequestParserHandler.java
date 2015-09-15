@@ -124,7 +124,6 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
 
                 if (StringUtils.isNotEmpty(rawContent)) {
                     final byte[] decodedContent = urlCodec.decode(rawContent.getBytes(CharsetUtil.UTF_8));
-                    LOG.debug("Decoded String : {}", decodedContent);
                     final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                     try {
                         tDeserializer.deserialize(adPoolRequest, decodedContent);

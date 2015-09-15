@@ -178,6 +178,14 @@ Cache.NativeAdTemplateRepository.refreshTime = 1277
 Cache.NativeAdTemplateRepository.isUpdatable = true
 Cache.NativeAdTemplateRepository.dataSourceName = jdbc
 
+Cache.Name = CAUMetaDataRepository
+Cache.CAUMetaDataRepository.Manager = com.inmobi.adserve.channels.repository.CAUMetaDataRepository
+Cache.CAUMetaDataRepository.query = select * from custom_ad_unit_metadata cau_out inner join(select id\, max(version) ver from custom_ad_unit_metadata group by id) cau_in on cau_out.id = cau_in.id and cau_out.version = cau_in.ver and cau_out.modified_on >=('${last_update}')
+Cache.CAUMetaDataRepository.initialDelay = 300
+Cache.CAUMetaDataRepository.refreshTime = 1277
+Cache.CAUMetaDataRepository.isUpdatable = true
+Cache.CAUMetaDataRepository.dataSourceName = jdbc
+
 Cache.Name = CurrencyConversionRepository
 Cache.CurrencyConversionRepository.Manager = com.inmobi.adserve.channels.repository.CurrencyConversionRepository
 Cache.CurrencyConversionRepository.query = select * from currency_conversion_fun('${last_update}')

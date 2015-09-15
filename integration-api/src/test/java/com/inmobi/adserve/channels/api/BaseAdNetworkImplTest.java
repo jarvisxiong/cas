@@ -236,7 +236,7 @@ public class BaseAdNetworkImplTest {
         assertTrue(baseAdNetwork.isRequestCompleted());
         assertEquals(baseAdNetwork.adStatus, "TIME_OUT");
         assertEquals(baseAdNetwork.statusCode, 0);
-        assertEquals(baseAdNetwork.responseContent, null);
+        assertEquals(baseAdNetwork.responseContent, "");
         verifyAll();
     }
 

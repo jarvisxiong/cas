@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,6 @@ import java.util.Map;
  *         Size ID 1: Banner (468x60)<br>
  *         Size ID 8: Skyscraper (120x600)<br>
  *         Size ID 67: Mobile App Portrait (320x480)<br>
- *         Size ID 43: Mobile Banner 1 (320x50)<br>
  *         Size ID 102: Tablet Interstitial Port (768x1024)<br>
  *         Size ID 9: Wide Skyscraper (160x600)<br>
  *         Size ID 50: Tablet Landscape Banner (1024x90)<br>
@@ -33,6 +33,7 @@ import java.util.Map;
  */
 public class SlotSizeMapping {
     private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
+    public static final Map<Integer, Dimension> RP_SLOT_DIMENSION = new HashMap<Integer, Dimension>();
 
     static {
         // Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
@@ -53,6 +54,25 @@ public class SlotSizeMapping {
         IX_SLOT_ID_MAP.put((short) 29, 14);
         IX_SLOT_ID_MAP.put((short) 32, 101);
         IX_SLOT_ID_MAP.put((short) 33, 53);
+
+        // Rubicon Slot Id to Dimension Map
+        RP_SLOT_DIMENSION.put(44, new Dimension(300, 50));
+        RP_SLOT_DIMENSION.put(43, new Dimension(320, 50));
+        RP_SLOT_DIMENSION.put(15, new Dimension(300, 250));
+        RP_SLOT_DIMENSION.put(2, new Dimension(728, 90));
+        RP_SLOT_DIMENSION.put(1, new Dimension(468, 60));
+        RP_SLOT_DIMENSION.put(8, new Dimension(120, 600));
+        RP_SLOT_DIMENSION.put(67, new Dimension(320, 480));
+        RP_SLOT_DIMENSION.put(102, new Dimension(768, 1024));
+        RP_SLOT_DIMENSION.put(9, new Dimension(160, 600));
+        RP_SLOT_DIMENSION.put(50, new Dimension(1024, 90));
+        RP_SLOT_DIMENSION.put(45, new Dimension(480, 75));
+        RP_SLOT_DIMENSION.put(46, new Dimension(480, 60));
+        RP_SLOT_DIMENSION.put(14, new Dimension(250, 250));
+        RP_SLOT_DIMENSION.put(101, new Dimension(480, 320));
+        RP_SLOT_DIMENSION.put(53, new Dimension(1024, 768));
+        RP_SLOT_DIMENSION.put(51, new Dimension(768, 900));
+        RP_SLOT_DIMENSION.put(61, new Dimension(1000, 1000));
     }
 
     /**

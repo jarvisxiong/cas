@@ -1,5 +1,27 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CCID_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.QUERY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_FILTER_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_METADATA_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -18,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.ChannelServer;
-import com.inmobi.adserve.channels.server.ChannelServerStringLiterals;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
@@ -66,143 +87,140 @@ public class ServletRepoRefresh implements Servlet {
             con = DriverManager.getConnection(connectionString, dbUser, dbPassword);
             statement = con.createStatement();
 
-            if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)) {
+            if (repoName.equalsIgnoreCase(CHANNEL_ADGROUP_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CHANNEL_ADGROUP_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelAdGroupRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(CHANNEL_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CHANNEL_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(CHANNEL_FEEDBACK_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CHANNEL_FEEDBACK_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelFeedbackRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CHANNEL_SEGMENT_FEEDBACK_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getChannelSegmentFeedbackRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(SITE_METADATA_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_METADATA_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(SITE_METADATA_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteMetaDataRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(SITE_TAXONOMY_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(SITE_TAXONOMY_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteTaxonomyRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(PRICING_ENGINE_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(PRICING_ENGINE_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getPricingEngineRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(SITE_FILTER_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_FILTER_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(SITE_FILTER_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteFilterRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(SITE_ECPM_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.SITE_ECPM_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(SITE_ECPM_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSiteEcpmRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(CURRENCY_CONVERSION_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CURRENCY_CONVERSION_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getCurrencyConversionRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(WAP_SITE_UAC_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(WAP_SITE_UAC_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getWapSiteUACRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(IX_ACCOUNT_MAP_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(IX_ACCOUNT_MAP_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getIxAccountMapRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CREATIVE_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(CREATIVE_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration().subset(ChannelServerStringLiterals.CREATIVE_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CREATIVE_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getCreativeRepository()
                         .newUpdateFromResultSetToOptimizeUpdate(resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(NATIVE_AD_TEMPLATE_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(NATIVE_AD_TEMPLATE_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getNativeAdTemplateRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(GEO_ZIP_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.GEO_ZIP_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(GEO_ZIP_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                CasConfigUtil.repositoryHelper.getGeoZipRepository().newUpdateFromResultSetToOptimizeUpdate(
-                        resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)) {
+                CasConfigUtil.repositoryHelper.getGeoZipRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
+            } else if (repoName.equalsIgnoreCase(CAU_METADATA_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CAU_METADATA_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
+                resultSet = statement.executeQuery(query);
+                CasConfigUtil.repositoryHelper.getCauMetaDataRepository().newUpdateFromResultSetToOptimizeUpdate(
+                        resultSet);
+            } else if (repoName.equalsIgnoreCase(SLOT_SIZE_MAP_REPOSITORY)) {
+                final String query =
+                        config.getCacheConfiguration().subset(SLOT_SIZE_MAP_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getSlotSizeMapRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(GEO_REGION_FENCE_MAP_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(GEO_REGION_FENCE_MAP_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getGeoRegionFenceMapRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.CCID_MAP_REPOSITORY)) {
+            } else if (repoName.equalsIgnoreCase(CCID_MAP_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.CCID_MAP_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(CCID_MAP_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
-                CasConfigUtil.repositoryHelper.getCcidMapRepository().newUpdateFromResultSetToOptimizeUpdate(
-                        resultSet);
-            } else if (repoName.equalsIgnoreCase(ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY)) {
+                CasConfigUtil.repositoryHelper.getCcidMapRepository().newUpdateFromResultSetToOptimizeUpdate(resultSet);
+            } else if (repoName.equalsIgnoreCase(IX_BLOCKLIST_REPOSITORY)) {
                 final String query =
-                        config.getCacheConfiguration()
-                                .subset(ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY)
-                                .getString(ChannelServerStringLiterals.QUERY).replace(LAST_UPDATE, REPLACE_STRING);
+                        config.getCacheConfiguration().subset(IX_BLOCKLIST_REPOSITORY).getString(QUERY)
+                                .replace(LAST_UPDATE, REPLACE_STRING);
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getIxBlocklistRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);

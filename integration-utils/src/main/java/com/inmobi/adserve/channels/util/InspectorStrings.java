@@ -38,6 +38,7 @@ public class InspectorStrings {
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
     public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
     public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";
+    public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(CAU)";
     public static final String NATIVE_VM_TEMPLATE_ERROR = "NativeVMTemplateError";
     public static final String PROCESSING_ERROR = "Terminated_ServerError";
     public static final String MISSING_SITE_ID = "Terminated_NoSite";
@@ -82,14 +83,14 @@ public class InspectorStrings {
     public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
     public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
     public static final String MISSING_CATEGORY = "MissingCategory";
-    
+
     public static final String IMEI_CACHE_MISS = "IMEICacheMiss";
     public static final String IMEI_CACHE_HIT = "IMEICacheHit";
     public static final String IMEI_REQUESTS_TO_AEROSPIKE = "IMEIRequestsToAerospike";
     public static final String IMEI_FAILED_TO_LOAD_FROM_AEROSPIKE = "IMEIFailedToLoadFromAerospike";
     public static final String IMEI_LATENCY = "IMEILatency";
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
-    
+
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
@@ -109,6 +110,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
     public static final String DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER = "DroppedInRewardedNotAllowedFilter";
+    public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
     public static final String DROPPED_IN_INVALID_SLOT_REQUEST_FILTER = "DroppedInInvalidSlotRequestFilter";
@@ -125,10 +127,9 @@ public class InspectorStrings {
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
     public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
-    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_WAP =
-            "DroppedAsSproutAdsAreNotSupportedOnWap";
-    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED_ON_SDK370 =
-            "DroppedAsSproutAdsAreNotSupportedOnSDK<370";
+    public static final String TOTAL_UMP_CAU_REQUESTS = "TotalUMPCAURequests";
+    public static final String TOTAL_RP_CAU_REQUESTS = "TotalRPCAURequests";
+    public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED = "DroppedAsSproutAdsAreNotSupportedOn";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
@@ -138,7 +139,8 @@ public class InspectorStrings {
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
     public static final String AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMissing";
     public static final String AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMismatch";
-    public static final String AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdIndeterminate";
+    public static final String AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE =
+            "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
 
     // Auction Level Stats

@@ -4,6 +4,12 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
 import static com.inmobi.adserve.channels.api.BaseAdNetworkImpl.getHashedValue;
+import static com.inmobi.adserve.channels.util.GenericTemplateObject.AD_OBJECT_PREFIX;
+import static com.inmobi.adserve.channels.util.GenericTemplateObject.CAU_CONTENT_JS_ESC;
+import static com.inmobi.adserve.channels.util.GenericTemplateObject.FIRST_OBJECT_PREFIX;
+import static com.inmobi.adserve.channels.util.GenericTemplateObject.PARTNER_BEACON_URL;
+import static com.inmobi.adserve.channels.util.GenericTemplateObject.TOOL_OBJECT;
+import static com.inmobi.adserve.channels.util.GenericTemplateObject.VAST_CONTENT_JS_ESC;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LAT;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LNG;
@@ -19,13 +25,8 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SITE_PREF
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
-import static com.inmobi.adserve.channels.util.VASTTemplateObject.AD_OBJECT_PREFIX;
-import static com.inmobi.adserve.channels.util.VASTTemplateObject.TOOL_OBJECT;
-import static com.inmobi.adserve.channels.util.VASTTemplateObject.FIRST_OBJECT_PREFIX;
-import static com.inmobi.adserve.channels.util.VASTTemplateObject.IM_WIN_URL;
-import static com.inmobi.adserve.channels.util.VASTTemplateObject.PARTNER_BEACON_URL;
-import static com.inmobi.adserve.channels.util.VASTTemplateObject.VAST_CONTENT_JS_ESC;
-import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_BEACON_URL;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_CLICK_URL;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
@@ -73,8 +74,8 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
+import com.inmobi.adserve.channels.util.GenericTemplateObject;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
-import com.inmobi.adserve.channels.util.VASTTemplateObject;
 import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image;
@@ -129,9 +130,9 @@ public class IXAdNetworkHelper {
         final List<String> macros = new ArrayList<>();
         final List<String> substitutions = new ArrayList<>();
 
+        final String subsBeaconUrl = beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}";
         addSproutMacroToList(macros, substitutions, JS_ESC_BEACON_URL,
-                StringEscapeUtils.escapeJavaScript(beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}"));
-
+                StringEscapeUtils.escapeJavaScript(subsBeaconUrl));
         addSproutMacroToList(macros, substitutions, JS_ESC_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
 
         final String sdkVersion = sasParams.getSdkVersion();
@@ -156,8 +157,10 @@ public class IXAdNetworkHelper {
         // No function is being provided
         addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
 
-        final String sitePreferences = null != sasParams.getPubControlPreferencesJson() ?
-            sasParams.getPubControlPreferencesJson() : StringUtils.EMPTY;
+        final String sitePreferences =
+                null != sasParams.getPubControlPreferencesJson()
+                        ? sasParams.getPubControlPreferencesJson()
+                        : StringUtils.EMPTY;
         addSproutMacroToList(macros, substitutions, SITE_PREFERENCES_JSON, sitePreferences);
 
         final String userId =
@@ -378,7 +381,7 @@ public class IXAdNetworkHelper {
                 // We need all of mandatory fields. And Requested type should be same as response
                 if (mandatoryAssetMap.containsKey(assetId)) {
                     final boolean isReqValid =
-                        areRequestResponseAssetsValid(mandatoryAssetMap.get(assetId), asset, contextBuilder);
+                            areRequestResponseAssetsValid(mandatoryAssetMap.get(assetId), asset, contextBuilder);
                     if (isReqValid) {
                         mandatoryAssetMap.remove(assetId);
                         continue;
@@ -390,7 +393,7 @@ public class IXAdNetworkHelper {
                 // We do not need all of mandatory fields. But Requested type should be same as response
                 if (nonMandatoryAssetMap.containsKey(assetId)) {
                     final boolean isReqValid =
-                        areRequestResponseAssetsValid(nonMandatoryAssetMap.get(assetId), asset, contextBuilder);
+                            areRequestResponseAssetsValid(nonMandatoryAssetMap.get(assetId), asset, contextBuilder);
                     if (!isReqValid) {
                         return null;
                     }
@@ -534,27 +537,25 @@ public class IXAdNetworkHelper {
     public static String videoAdBuilding(final TemplateTool tool, final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short selectedSlotId, final String beaconUrl,
             final String clickUrl, final String adMarkup, final String winUrl) throws Exception {
+        LOG.debug("videoAdBuilding");
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(VAST_CONTENT_JS_ESC, StringEscapeUtils.escapeJavaScript(adMarkup));
         // JS escaped WinUrl for partner.
         if (StringUtils.isNotEmpty(winUrl)) {
             velocityContext.put(PARTNER_BEACON_URL, StringEscapeUtils.escapeJavaScript(winUrl));
         }
-        // IMAIBaseUrl
-        velocityContext.put(IMAI_BASE_URL, sasParams.getImaiBaseUrl());
 
-        // JS escaped IMWinUrl
-        final String imWinUrl = beaconUrl + "?b=${WIN_BID}";
-        velocityContext.put(IM_WIN_URL, StringEscapeUtils.escapeJavaScript(imWinUrl));
+        // JS escaped BeaconUrl
+        velocityContext.put(IM_BEACON_URL, beaconUrl);
 
-        final VASTTemplateObject vastTemplFirst = new VASTTemplateObject();
+        final GenericTemplateObject vastTemplFirst = new GenericTemplateObject();
         // JS escaped IM beacon and click URLs.
         vastTemplFirst.setBeaconUrl(StringEscapeUtils.escapeJavaScript(beaconUrl));
         vastTemplFirst.setClickServerUrl(StringEscapeUtils.escapeJavaScript(clickUrl));
         // Namespace
-        vastTemplFirst.setNs(Formatter.getRTBDNamespace());
+        vastTemplFirst.setNs(Formatter.getIXNamespace());
 
-        final VASTTemplateObject vastTemplAd = new VASTTemplateObject();
+        final GenericTemplateObject vastTemplAd = new GenericTemplateObject();
         // SDK version
         vastTemplAd.setSdkVersion(sasParams.getSdkVersion());
         // Sprout related parameters.
@@ -580,4 +581,49 @@ public class IXAdNetworkHelper {
         return Formatter.getResponseFromTemplate(TemplateType.INTERSTITIAL_VIDEO, velocityContext, sasParams, null);
     }
 
+    /**
+     * ${first.ns} <br>
+     * $first.supplyWidth <br>
+     * $first.supplyHeight <br>
+     * $first.cauElementJsonObject <br>
+     * $CAUContentJSEsc
+     * 
+     * @param sasParams
+     * @param matchedSlot
+     * @param beaconUrl
+     * @param clickUrl
+     * @param adMarkup
+     * @param winUrl
+     * @return
+     * @throws Exception
+     */
+    public static String cauAdBuilding(final SASRequestParameters sasParams, final IXSlotMatcher matchedSlot,
+            final String beaconUrl, final String clickUrl, final String adMarkup, final String winUrl) throws Exception {
+        LOG.debug("cauAdBuilding");
+        final VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put(CAU_CONTENT_JS_ESC, adMarkup);
+        // JS escaped WinUrl for partner.
+        if (StringUtils.isNotEmpty(winUrl)) {
+            velocityContext.put(PARTNER_BEACON_URL, StringEscapeUtils.escapeJavaScript(winUrl));
+        }
+
+        // JS escaped IMWinUrl
+        velocityContext.put(IM_BEACON_URL, beaconUrl);
+        velocityContext.put(IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
+
+        final GenericTemplateObject templateFirst = new GenericTemplateObject();
+        // Set CAU Element JSON
+        templateFirst.setCauElementJsonObject(matchedSlot.getMatchedCau().getElementJson());
+        // JS escaped IM beacon and click URLs.
+        templateFirst.setClickServerUrl(StringEscapeUtils.escapeJavaScript(clickUrl));
+        // Set height and width
+        templateFirst.setHeight((int) matchedSlot.getMatchedRPDimension().getHeight());
+        templateFirst.setWidth((int) matchedSlot.getMatchedRPDimension().getWidth());
+        // Namespace
+        templateFirst.setNs(Formatter.getIXNamespace());
+        // Add object to velocityContext
+        velocityContext.put(FIRST_OBJECT_PREFIX, templateFirst);
+
+        return Formatter.getResponseFromTemplate(TemplateType.CAU, velocityContext, sasParams, null);
+    }
 }

@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.imp
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -20,10 +21,11 @@ import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 
 /**
  * This class can be extend to throttle request sent to the advertiser/partner on failures. Here failure means timeouts
- * and terminates.
- * If the success ratio for a partner falls below threshold(50%), then the circuit is opened and no request flows to the partner for next 5 minutes.
- * @author rajashekhar.c
+ * and terminates. If the success ratio for a partner falls below threshold(50%), then the circuit is opened and no
+ * request flows to the partner for next 5 minutes.
  * 
+ * @author rajashekhar.c
+ *
  */
 public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler {
     private final static Logger LOG = LoggerFactory.getLogger(AdvertiserFailureThrottler.class);
@@ -63,23 +65,25 @@ public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler
 
     /**
      * For every advertiser, failure counter is increased on every failure. Here failure means timeouts + terminates
-     * 
+     *
      * @param advertiserid: Name of the advertiser
      * @param startTime: It it the time at which the request was received to us by the UMP
      */
     public static void increamentRequestsThrottlerCounter(final String advertiserid, final long startTime) {
-        CircuitBreakerInterface circuitBreaker = circuitBreakerMap.get(advertiserid);
-        if (circuitBreaker == null) {
-            circuitBreaker = addCircuitBreakerEntryToMap(advertiserid);
-        }
-        if (circuitBreaker != null) {
-            circuitBreaker.increamentFailureCounter(startTime);
+        if (StringUtils.isNotEmpty(advertiserid)) {
+            CircuitBreakerInterface circuitBreaker = circuitBreakerMap.get(advertiserid);
+            if (circuitBreaker == null) {
+                circuitBreaker = addCircuitBreakerEntryToMap(advertiserid);
+            }
+            if (circuitBreaker != null) {
+                circuitBreaker.increamentFailureCounter(startTime);
+            }
         }
     }
 
     /**
      * For every advertiser, request counter is increased on every request sent to the advertiser
-     * 
+     *
      * @param advertiserid: Name of the advertiser
      * @param startTime: It it the time at which the request was received to us by the UMP
      */
@@ -99,15 +103,17 @@ public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler
             try {
                 final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserid);
                 final String advertiserName = adapterConfig.getAdapterName();
-                
+
                 @SuppressWarnings("unchecked")
                 final Class<CircuitBreakerInterface> circuitBreakerClass =
                         (Class<CircuitBreakerInterface>) Class.forName(CasConfigUtil.getServerConfig().getString(
                                 "circuitbreaker.class"));
-                circuitBreaker = circuitBreakerClass.getConstructor(new Class[] {String.class}).newInstance(advertiserName);
+                circuitBreaker =
+                        circuitBreakerClass.getConstructor(new Class[] {String.class}).newInstance(advertiserName);
                 circuitBreakerMap.put(advertiserid, circuitBreaker);
             } catch (final Exception ex) {
-                LOG.error("Error instantiating circuit breaker for AdvertiserId : " + advertiserid + " : " + ExceptionBlock.getStackTrace(ex));
+                LOG.error("Error instantiating circuit breaker for AdvertiserId ->" + advertiserid + "->"
+                        + ExceptionBlock.getStackTrace(ex));
             }
 
         }

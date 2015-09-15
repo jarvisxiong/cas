@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -124,7 +125,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected long startTime;
     protected int statusCode;
     @Getter
-    protected String responseContent;
+    protected String responseContent = DEFAULT_EMPTY_STRING;
     @Getter
     protected String adStatus = NO_AD;
     protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
@@ -559,14 +560,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
         // TODO: Move all supported ad type checks to ThriftRequestParser or AdGroupAdTypeTargetingFilter.
-        isNativeRequest = APP.equalsIgnoreCase(sasParams.getSource()) && (NATIVE_STRING.equals(sasParams.getRFormat())
-            || RequestedAdType.NATIVE == sasParams.getRequestedAdType());
-        if (DemandSourceType.IX.getValue() == sasParams.getDst() && RequestedAdType.INTERSTITIAL == sasParams
-            .getRequestedAdType() && DemandAdFormatConstraints.VAST_VIDEO == entity.getDemandAdFormatConstraints()) {
-            isVideoRequest = true;
-        } else {
-            isVideoRequest = false;
-        }
+        isNativeRequest =
+                APP.equalsIgnoreCase(sasParams.getSource())
+                        && (NATIVE_STRING.equals(sasParams.getRFormat()) || RequestedAdType.NATIVE == sasParams
+                                .getRequestedAdType());
+        isVideoRequest =
+                DemandSourceType.IX.getValue() == sasParams.getDst()
+                        && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()
+                        && DemandAdFormatConstraints.VAST_VIDEO == entity.getDemandAdFormatConstraints() ? true : false;
         isCpc = getPricingModel(entity);
         final boolean isConfigured = configureParameters();
         if (isConfigured) {
@@ -844,6 +845,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     public boolean isNativeRequest() {
         return isNativeRequest;
+    }
+
+    public boolean isCAURequest() {
+        return sasParams.isCustomTemplatesOnly() && CollectionUtils.isNotEmpty(sasParams.getCauMetadataSet());
     }
 
     @Override

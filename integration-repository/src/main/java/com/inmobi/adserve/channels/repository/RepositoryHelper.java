@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.resultset.ResultSet;
+import com.inmobi.adserve.channels.entity.CAUMetadataEntity;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -75,6 +76,7 @@ public class RepositoryHelper {
     private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
     private final CcidMapRepository ccidMapRepository;
     private final IXBlocklistRepository ixBlocklistRepository;
+    private final CAUMetaDataRepository cauMetaDataRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -100,6 +102,7 @@ public class RepositoryHelper {
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
         ccidMapRepository = builder.ccidMapRepository;
         ixBlocklistRepository = builder.ixBlocklistRepository;
+        cauMetaDataRepository = builder.cauMetaDataRepository;
 
 
         repositoryStatsProvider = new RepositoryStatsProvider();
@@ -113,7 +116,8 @@ public class RepositoryHelper {
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
                 .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(geoRegionFenceMapRepository)
                 .addRepositoryToStats(ccidMapRepository).addRepositoryToStats(ixBlocklistRepository)
-                .addRepositoryToStats(sdkMraidMapRepository);
+                .addRepositoryToStats(sdkMraidMapRepository).addRepositoryToStats(cauMetaDataRepository);
+
     }
 
     public static Builder newBuilder() {
@@ -145,6 +149,7 @@ public class RepositoryHelper {
         private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
         private CcidMapRepository ccidMapRepository;
         private IXBlocklistRepository ixBlocklistRepository;
+        private CAUMetaDataRepository cauMetaDataRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -170,8 +175,18 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ccidMapRepository);
             Preconditions.checkNotNull(ixBlocklistRepository);
             Preconditions.checkNotNull(sdkMraidMapRepository);
+            Preconditions.checkNotNull(cauMetaDataRepository);
             return new RepositoryHelper(this);
         }
+    }
+
+    public CAUMetadataEntity queryCauMetaDataRepository(final Long id) {
+        try {
+            return cauMetaDataRepository.query(id);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying CAU MetaData Repository, {}", ignored);
+        }
+        return null;
     }
 
     public GeoZipEntity queryGeoZipRepository(final Integer zipId) {

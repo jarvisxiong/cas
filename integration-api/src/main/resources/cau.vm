@@ -1,0 +1,354 @@
+<html>
+    <head>
+        #if($IMAIBaseUrl)
+            <meta name="viewport" content="width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
+            <script src='$IMAIBaseUrl'></script>
+        #end
+        <style type="text/css" id="${first.ns}adStyles">
+            #${first.ns}adContainer{
+                display: table;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                overflow: hidden;
+            }
+            #${first.ns}ad{
+                vertical-align: middle;
+                text-align: center;
+                position: relative;
+                display: none;
+            }
+            #${first.ns}frame{
+                position: absolute;
+                z-index: 5;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin-top: auto;
+                margin-bottom: auto;
+                margin-left: auto;
+                margin-right: auto;
+                pointer-events: none;
+            }
+            #${first.ns}thirdPartyAd{
+                display: inline-block;
+                position: relative;
+                vertical-align: middle;
+            }
+            #${first.ns}closeButton{
+                position: absolute;
+                top: 5px;
+                display: none;
+                z-index: 10;
+            }
+            .${first.ns}beacon{
+                display: none;
+                height: 1;
+                width: 1;
+                border: 0;
+            }
+            body {
+                margin:0;
+                padding:0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="${first.ns}adContainer">
+            <div id="${first.ns}ad" class="${first.ns}niuAnimate">
+                <img id="${first.ns}frame">
+                <img id="${first.ns}closeButton">
+                <div id="${first.ns}thirdPartyAd">
+                    $CAUContentJSEsc
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            (function() {
+                var mraid = window.mraid,
+                    count = 0,
+                    bodyStyle = document.body.style,
+                    htmlStyle = document.documentElement.style,
+                    hundredPercent = "100" + String.fromCharCode(37),
+
+                    isFrameAd = true,
+                    isMraid = false,
+                    useCustomClose = true,
+
+                    adNamespace = '${first.ns}',
+                    imgFrame = byId(adNamespace + "frame"),
+                    imgCloseButton = byId(adNamespace + "closeButton"),
+                    adFrameCont = byId(adNamespace + "ad"),
+                    thirdPartyAd = byId(adNamespace + "thirdPartyAd");
+
+                var innerFrameDimensions = {
+                };
+
+
+                function setBodyDimension(w,h){
+                    var width = w ? w : "auto",
+                        height = h ? h : "auto";
+
+                    htmlStyle.width = width;
+                    htmlStyle.height = height;
+                    bodyStyle.width = width;
+                    bodyStyle.height = height;
+                }
+
+
+                function byId(id) {
+                    return document.getElementById(id);
+                }
+
+
+                function byClass(className) {
+                    return document.getElementsByClassName(className);
+                }
+
+
+                function toggleVisibleState(element, state) {
+                    element.style.display = state ? "table-cell" : "none";
+                }
+
+
+                function scaleAd() {
+                    var screenSize, availableWidth, availableHeight;
+
+                    if (!(isMraid && typeof mraid.getScreenSize == 'function' && mraid.getScreenSize() !== undefined)) {
+                        availableWidth = document.body.clientWidth;
+                        availableHeight = document.body.clientHeight;
+                    } else {
+                        screenSize = mraid.getScreenSize();
+                        availableWidth = screenSize.width;
+                        availableHeight = screenSize.height;
+                    }
+
+                    var innerFrameWidth, innerFrameHeight,
+                        outerFrameWidth, outerFrameHeight,
+                        adWidth, adHeight;
+
+                    var scaleFrameW, scaleFrameH, scaleFrame = 1;
+                    var scaleAdW, scaleAdH, scaleAd = 1;
+
+                    if (isFrameAd) {
+                        outerFrameWidth = imgFrame.width;
+                        outerFrameHeight = imgFrame.height;
+                    } else {
+                        outerFrameWidth = availableWidth;
+                        outerFrameHeight = availableHeight;
+                    }
+
+                    scaleFrameW = availableWidth / outerFrameWidth;
+                    scaleFrameH = availableHeight / outerFrameHeight;
+                    scaleFrame = Math.min(scaleFrameW, scaleFrameH, 1);
+
+                    outerFrameWidth = outerFrameWidth * scaleFrame;
+                    outerFrameHeight = outerFrameHeight * scaleFrame;
+
+                    imgFrame.style.zoom = scaleFrame;
+
+                    adWidth = ${first.width};
+                    adHeight = ${first.height};
+
+                    if (isFrameAd) {
+                        innerFrameWidth = (innerFrameDimensions.width - 2*innerFrameDimensions.leftOffset) * scaleFrame;
+                        innerFrameHeight = (innerFrameDimensions.height - 2*innerFrameDimensions.topOffset) * scaleFrame;
+                    } else {
+                        innerFrameWidth = outerFrameWidth;
+                        innerFrameHeight = outerFrameHeight;
+                    }
+
+                    scaleAdW = innerFrameWidth / adWidth;
+                    scaleAdH = innerFrameHeight / adHeight;
+                    scaleAd = Math.min(scaleAdW, scaleAdH, 1);
+
+                    thirdPartyAd.style.zoom = scaleAd;
+                }
+
+
+                function onClose(event) {
+                    event.stopPropagation();
+                    if (!isMraid) {
+                        var adElem = byId(adNamespace + "adContainer");
+                        adElem.innerHTML = "";
+                        toggleVisibleState(adElem, false);
+                    } else {
+                        mraid.close();
+                    }
+                }
+
+
+                function lockOrientation() {
+                    mraid.setOrientationProperties({forceOrientation:'portrait', allowOrientationChange:false});
+                }
+
+
+                function showAd() {
+                    setBodyDimension(hundredPercent, hundredPercent);
+                    scaleAd();
+
+                    if (useCustomClose) {
+                        var close = byId(adNamespace + "closeButton");
+                        toggleVisibleState(close, true);
+                        close.addEventListener("click", onClose, false);
+                    }
+
+                    var ad = byId(adNamespace + "ad");
+                    toggleVisibleState(ad, true);
+                }
+
+
+                function parseAdJson() {
+                    try {
+                        var adJson = '$first.cauElementJsonObject';
+
+                        if ('' !== adJson) {
+                            adJson = adJson.replace('$' + '{first.ns}', adNamespace);
+                            adJson = JSON.parse(adJson);
+
+                            (function setFrameProperties() {
+                                if (null === adJson.frame) {
+                                    isFrameAd = false;
+                                } else {
+                                    var frameJson = adJson.frame;
+
+                                    if (null === frameJson.ad_area || null === frameJson.image_url || null === frameJson.width || null === frameJson.height) {
+                                            isFrameAd = false;
+                                    } else {
+                                        imgFrame.src = frameJson.image_url;
+
+                                        var outerFrameWidth = frameJson.width,
+                                            outerFrameHeight = frameJson.height,
+                                            adAreaJson = frameJson.ad_area;
+
+                                        if (null !== adAreaJson.percent_width) {
+                                            innerFrameDimensions.width = outerFrameWidth * parseFloat(adAreaJson.percent_width);
+                                            innerFrameDimensions.height = outerFrameHeight * parseFloat(adAreaJson.percent_height);
+                                            innerFrameDimensions.leftOffset = outerFrameWidth * parseFloat(adAreaJson.percent_offset_x) || 0;
+                                            innerFrameDimensions.topOffset = outerFrameHeight * parseFloat(adAreaJson.percent_offset_y) || 0;
+                                        } else {
+                                            innerFrameDimensions.width = parseFloat(adAreaJson.width);
+                                            innerFrameDimensions.height = parseFloat(adAreaJson.height);
+                                            innerFrameDimensions.leftOffset = parseFloat(adAreaJson.offset_x) || 0;
+                                            innerFrameDimensions.topOffset = parseFloat(adAreaJson.offset_y) || 0;
+                                        }
+                                    }
+                                }
+                            })();
+
+                            (function setCloseProperties() {
+                                if (null === adJson.close) {
+                                    useCustomClose = false;
+                                } else {
+                                    var closeJson = adJson.close;
+
+                                    if (closeJson.image_url) {
+                                        imgCloseButton.src = closeJson.image_url;
+
+                                        if ('TOP_LEFT' === closeJson.location) {
+                                            imgCloseButton.style.left = '5px';
+                                        } else {
+                                            imgCloseButton.style.right = '5px';
+                                        }
+                                    } else {
+                                        useCustomClose = false;
+                                    }
+                                }
+                            })();
+
+                            (function setAnimationProperties() {
+                                if (null !== adJson.animation) {
+
+                                    if (adJson.animation.css_style) {
+                                        var css = document.createElement("style");
+                                        css.type = "text/css";
+                                        css.innerHTML = adJson.animation.css_style;
+                                        document.body.appendChild(css);
+                                    }
+                                }
+                            })();
+                        }
+                    } catch (e) {
+                        isFrameAd = false;
+                        useCustomClose = false;
+                    }
+                }
+
+
+                function onMraidReady() {
+
+                    lockOrientation();
+
+                    mraid.useCustomClose(useCustomClose);
+
+                    if (typeof mraid.isViewable === "function" && mraid.isViewable()) {
+                        showAd();
+                    } else {
+                        mraid.addEventListener("viewableChange", function(viewable) {
+                            if (viewable) {
+                                mraid.removeEventListener("viewableChange", arguments.callee);
+                                showAd();
+                            }
+                        });
+                    }
+                }
+
+
+                function fireADReady() {
+                    var readyHandler=function(){
+                        _im_imai.fireAdReady();
+                        _im_imai.removeEventListener('ready', readyHandler);
+                    };
+                   _im_imai.addEventListener('ready',readyHandler);
+                }
+
+
+                function checkForMraid() {
+                    count++;
+                    #if ($SDK450Onwards && $isInterstitial)
+                        fireADReady();
+                    #end
+
+                    if (4 !== count) {
+                        if ("undefined" !== typeof mraid) {
+                            isMraid = true;
+                            if ("loading" === mraid.getState()) {
+                                mraid.addEventListener("ready", onMraidReady);
+                            } else {
+                                onMraidReady();
+                            }
+                        } else {
+                            setTimeout(checkForMraid, 500);
+                        }
+                    } else {
+                        showAd();
+                    }
+                }
+
+                parseAdJson();
+                checkForMraid();
+            })();
+        </script>
+        #if($IMClickUrl)
+            <script type="text/javascript">
+                function clickHandler(){
+                    var x = document.createElement("img");
+                    x.setAttribute("src", "${IMClickUrl}");
+                    x.className = "${first.ns}beacon";
+                    document.body.appendChild(x);
+                    document.removeEventListener('click',clickHandler);
+                };
+                document.addEventListener('click',clickHandler);
+            </script>
+        #end
+        <div>
+            #if($IMBeaconUrl)
+                <img src='${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}' class = "${first.ns}beacon"/>
+            #end
+            #if($PartnerBeaconUrl)
+                <img src='$PartnerBeaconUrl' class = "${first.ns}beacon"/>
+            #end
+        </div>
+    </body>
+</html>

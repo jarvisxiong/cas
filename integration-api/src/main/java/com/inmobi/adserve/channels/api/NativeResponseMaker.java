@@ -64,7 +64,7 @@ public class NativeResponseMaker {
     }
 
     public String makeDCPNativeResponse(final App app, final Map<String, String> params,
-                                        final NativeAdTemplateEntity templateEntity)throws Exception{
+            final NativeAdTemplateEntity templateEntity) throws Exception {
         validateResponse(app, templateEntity);
         final VelocityContext vc = getVelocityContext(app, params);
         vc.put("NAMESPACE", Formatter.getDCPNamespace());
@@ -157,7 +157,6 @@ public class NativeResponseMaker {
 
     private VelocityContext getVelocityContext(final App app, final Map<String, String> params) {
         final VelocityContext context = new VelocityContext();
-        context.put("IMP_ID", app.getAdImpressionId());
         context.put("LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("OLD_LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("TRACKING_CODE", getTrackingCode(params, app));
@@ -193,7 +192,6 @@ public class NativeResponseMaker {
                 bcu.append(constructBeaconUrl(purl));
             }
         }
-
         return bcu.toString();
     }
 
@@ -213,7 +211,8 @@ public class NativeResponseMaker {
         return ct.toString();
     }
 
-    public String makeNativeAd(String pubContent, final String contextCode, final String namespace) throws JSONException {
+    public String makeNativeAd(String pubContent, final String contextCode, final String namespace)
+            throws JSONException {
         pubContent = base64(pubContent);
         final NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
         return gson.toJson(nativeAd);
@@ -224,7 +223,7 @@ public class NativeResponseMaker {
         final Base64 base64 = new Base64();
         return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
     }
-    
+
     @Data
     private static class NativeAd {
         private final String pubContent;

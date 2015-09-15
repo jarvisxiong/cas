@@ -21,11 +21,10 @@ import com.inmobi.adserve.channels.util.config.GlobalConstant;
 
 
 public class Formatter {
-
     private static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
 
     public enum TemplateType {
-        HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML,ADBAY_HTML
+        HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML, ADBAY_HTML, CAU
     }
 
     private static VelocityEngine velocityEngine;
@@ -39,6 +38,7 @@ public class Formatter {
     private static Template velocityTemplateJsAdTag;
     private static Template velocityTemplateWapHtmlJsAdTag;
     private static Template velocityTemplateAdbay;
+    private static Template velocityTemplateCAU;
 
 
     public static void init() throws Exception {
@@ -55,6 +55,7 @@ public class Formatter {
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
         velocityTemplateAdbay = velocityEngine.getTemplate("adbayHtmlTag.vm");
+        velocityTemplateCAU = velocityEngine.getTemplate("cau.vm");
     }
 
     static void updateVelocityContext(final VelocityContext context, final SASRequestParameters sasParams,
@@ -70,8 +71,7 @@ public class Formatter {
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 context.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }
-            if (null != sasParams.getRequestedAdType() &&
-                    RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
+            if (RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
                 context.put(VelocityTemplateFieldConstants.IS_INTERSTITIAL, true);
             }
         }
@@ -110,9 +110,22 @@ public class Formatter {
         return false;
     }
 
+    /**
+     * 
+     * @param type
+     * @param context
+     * @param sasParams
+     * @param beaconUrl - Set Null if you have already updated in context
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws ParseErrorException
+     * @throws MethodInvocationException
+     * @throws IOException
+     */
     public static String getResponseFromTemplate(final TemplateType type, final VelocityContext context,
             final SASRequestParameters sasParams, final String beaconUrl) throws ResourceNotFoundException,
             ParseErrorException, MethodInvocationException, IOException {
+        LOG.debug("getResponseFromTemplate TemplateType->{} beaconUrl->{}", type, beaconUrl);
         updateVelocityContext(context, sasParams, beaconUrl);
         final StringWriter writer = new StringWriter();
         switch (type) {
@@ -144,7 +157,10 @@ public class Formatter {
                 velocityTemplateWapHtmlJsAdTag.merge(context, writer);
                 break;
             case ADBAY_HTML:
-                velocityTemplateAdbay.merge(context,writer);
+                velocityTemplateAdbay.merge(context, writer);
+                break;
+            case CAU:
+                velocityTemplateCAU.merge(context, writer);
                 break;
             default:
                 break;
