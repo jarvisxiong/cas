@@ -234,6 +234,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private ChannelSegmentEntity dspChannelSegmentEntity;
     private Map<Integer, Asset> mandatoryAssetMap;
     private Map<Integer, Asset> nonMandatoryAssetMap;
+    private NativeAdTemplateEntity templateEntity;
 
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -530,8 +531,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Native createNativeObject() {
-        final NativeAdTemplateEntity templateEntity =
-                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
                     String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
@@ -1198,8 +1198,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent =
                     IXAdNetworkHelper
-                            .videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams, repositoryHelper,
-                                    selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
+                            .videoAdBuilding(templateConfiguration
+                                .getTemplateTool(), sasParams, repositoryHelper, selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
         } catch (final Exception e) {
             adStatus = NO_AD;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
@@ -1285,8 +1285,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = AdStatus.TERM.name();
             return false;
         } catch (final Exception e) {
-            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
-                    e.toString());
+            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}", e
+                .toString());
             adStatus = AdStatus.TERM.name();
             return false;
         }
@@ -1607,12 +1607,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             // Setting agency rebate
             if (isAgencyRebateDeal) {
                 trackerBuilder.setAgencyRebatePercentage(agencyRebatePercentage);
-                trackerBuilder.setChargedBid(originalBidPriceInUsd);
             }
             if (CollectionUtils.isNotEmpty(usedCsIds) && null != dataVendorCost && dataVendorCost > 0) {
                 trackerBuilder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
                 trackerBuilder.setEnrichmentCost(dataVendorCost);
             }
+
+            if(isNativeRequest && null != templateEntity) {
+                trackerBuilder.setNativeTemplateId(templateEntity.getId());
+            }
+
+            //trackerBuilder.setChargedBid(originalBidPriceInUsd);
         }
     }
 

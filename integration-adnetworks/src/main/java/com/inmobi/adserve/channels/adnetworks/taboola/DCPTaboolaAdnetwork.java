@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.inmobi.adserve.channels.repository.NativeConstraints;
-import com.inmobi.adserve.contracts.ix.request.nativead.Image;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,10 +17,14 @@ import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.repository.NativeConstraints;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.contracts.ix.request.nativead.Image;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -213,6 +215,17 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
                     + "exception = {}", sasParams.getPlacementId(), getName(), e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
+        }
+    }
+
+    @Override
+    protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
+        if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+            final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
+
+            if(isNativeRequest && null != templateEntity) {
+                trackerBuilder.setNativeTemplateId(templateEntity.getId());
+            }
         }
     }
 

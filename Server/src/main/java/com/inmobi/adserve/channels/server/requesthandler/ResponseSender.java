@@ -56,6 +56,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
@@ -398,13 +399,22 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         final List<AdIdChain> adIdChains = new ArrayList<>();
         adIdChains.add(adIdChain);
-        rtbdAd.setAdIds(adIdChains);
+        rtbdAd.setDeprecatedAdIds(adIdChains);
 
         final long bid = (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
         rtbdAd.setPrice(bid);
         rtbdAd.setBid(bid);
-        final UUID uuid = UUID.fromString(getRtbResponse().getAdNetworkInterface().getImpressionId());
-        rtbdAd.setImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
+
+        final String impressionId = getRtbResponse().getAdNetworkInterface().getImpressionId();
+        final UUID uuid = UUID.fromString(impressionId);
+        rtbdAd.setDeprecatedImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
+
+        // Setting render unit id
+        final String renderUnitId = ImpressionIdGenerator.getInstance().resetWilburyIntKey(impressionId, 0L);
+        final UUID renderUnitUUID = UUID.fromString(renderUnitId);
+        rtbdAd.setRenderUnitId(new GUID(renderUnitUUID.getMostSignificantBits(),
+            renderUnitUUID.getLeastSignificantBits()));
+
         rtbdAd.setSlotServed(getRtbResponse().getAdNetworkInterface().getSelectedSlotId());
         final Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
@@ -412,7 +422,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         adPoolResponse.setAds(Arrays.asList(rtbdAd));
         adPoolResponse
                 .setMinChargedValue((long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math
-                        .pow(10, 6)));
+                    .pow(10, 6)));
         if (!GlobalConstant.USD.equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
             rtbdAd.setBidInOriginalCurrency((long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math

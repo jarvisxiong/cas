@@ -47,6 +47,8 @@ import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.RtbdNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
@@ -82,7 +84,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -171,6 +172,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private final List<String> blockedAdvertisers = Lists.newArrayList();
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
+    private NativeAdTemplateEntity templateEntity;
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -385,8 +387,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Native nat = new Native();
         // nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
         // nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
-        final NativeAdTemplateEntity templateEntity =
-                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
                     String.format("This site id %s doesn't have native template :", sasParams.getSiteId()));
@@ -928,10 +929,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
 
-            responseContent =
-                    nativeResponseMaker.makeResponse(bidResponse, params,
-                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
-
+            responseContent = nativeResponseMaker.makeResponse(bidResponse, params, templateEntity);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -971,8 +969,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             return true;
         } catch (final NullPointerException e) {
-            LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(),
-                    e);
+            LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(), e);
             return false;
         }
     }
@@ -1011,6 +1008,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getName() {
         return advertiserName;
+    }
+
+    @Override
+    protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
+        if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+            final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
+
+            if(isNativeRequest && null != templateEntity) {
+                trackerBuilder.setNativeTemplateId(templateEntity.getId());
+            }
+        }
     }
 
     @Override

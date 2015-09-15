@@ -24,6 +24,9 @@ import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
@@ -117,6 +120,8 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     // Logging specific parameters
     private final boolean logCreative = false;
+
+    private NativeAdTemplateEntity templateEntity;
 
     public HostedAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String urlBase,
@@ -430,11 +435,14 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
     }
 
     protected void nativeAdBuilding() {
+        // Template Entity must be set before the first call to getBeaconUrl/getClickUrl
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+
         // No WIN_BID Macro has been appended
         final String beaconUrl = getBeaconUrl();
         final String winUrl = beaconUrl;
 
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("beaconUrl", beaconUrl);
         params.put("winUrl", winUrl);
         params.put("impressionId", impressionId);
@@ -442,8 +450,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
         try {
             responseContent =
-                    nativeResponseMaker.makeHostedResponse(adm, params,
-                            repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+                    nativeResponseMaker.makeHostedResponse(adm, params, templateEntity);
         } catch (final Exception e) {
 
             adStatus = NO_AD;
@@ -461,6 +468,17 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         // No RTBMacros are replaced
         final ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.setResponse(responseContent);
+    }
+
+    @Override
+    protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
+        if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
+            final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
+
+            if(isNativeRequest && null != templateEntity) {
+                trackerBuilder.setNativeTemplateId(templateEntity.getId());
+            }
+        }
     }
 
     @Override

@@ -16,6 +16,7 @@ public class ImpressionIdGenerator {
     protected final short hostIdCode;
     protected final byte dataCenterIdCode;
 
+    // Constructor for easier testing
     protected ImpressionIdGenerator(final short hostIdCode, final byte dataCenterIdCode) {
         this.hostIdCode = hostIdCode;
         this.dataCenterIdCode = dataCenterIdCode;

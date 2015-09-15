@@ -1,14 +1,19 @@
 package com.inmobi.castest.ixtests;
 
+import java.util.UUID;
+
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
+import com.inmobi.castest.api.LogLines;
+import com.inmobi.castest.casconfenums.def.CasConf;
 import com.inmobi.castest.casconfenums.def.CasConf.LogStringParams;
 import com.inmobi.castest.casconfenums.impl.LogStringConf;
 import com.inmobi.castest.commons.generichelper.LogParserHelper;
 import com.inmobi.castest.dataprovider.FenderDataProvider;
 import com.inmobi.castest.utils.common.ResponseBuilder;
+import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 public class IXTest {
 
@@ -1261,9 +1266,9 @@ public class IXTest {
     // Assert.assertTrue(parserOutput.equals("PASS"));
     // }
 
-    // public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
-    // return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
-    // }
+    public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
+        return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
+    }
     //
     // @Test(testName = "Tests that the auction id can be regenerated from the new impression id", dataProvider =
     // "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
@@ -1627,5 +1632,27 @@ public class IXTest {
             LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), searchStringInLog);
 
         Reporter.log(parserOutput, true);
+    }
+
+    @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        final LogLines renderUnitInfo = LogParserHelper.queryForLogs("Impression Info Object");
+        final long renderUnitGuidHighBits = Long.parseLong(renderUnitInfo.applyRegex("id_high:[0-9/-]+", "[0-9/-]+"));
+        final long renderUnitGuidLowBits = Long.parseLong(renderUnitInfo.applyRegex("id_low:[0-9/-]+", "[0-9/-]+"));
+        final String renderUnitId = new UUID(renderUnitGuidHighBits, renderUnitGuidLowBits).toString();
+
+        final LogLines impressionInfo = LogParserHelper.queryForLogs("Replaced impression id to new value");
+        final String impressionId = impressionInfo.applyRegex(CasConf.LogLinesRegex.UUID.getRegex());
+        final String impressionIdWithResetIntKey = resetWilburyIntKey(impressionId, 0);
+
+        final LogLines adPoolResponse = LogParserHelper.queryForLogs("IX response json to RE is AdPoolResponse");
+        final long adPoolResponseRenderUnitGuidHighBits = Long.parseLong(adPoolResponse
+            .applyRegex("renderUnitId:GUID\\(id_high:[0-9/-]+", "[0-9/-]+"));
+        final long adPoolResponseRenderUnitGuidLowBits = Long.parseLong(adPoolResponse.applyRegex("renderUnitId:GUID\\(id_high:[0-9/-]+, id_low:[0-9/-]+", "id_low:[0-9/-]+","[0-9/-]+"));
+        final String adPoolResponseRenderUnitId = new UUID(adPoolResponseRenderUnitGuidHighBits, adPoolResponseRenderUnitGuidLowBits).toString();
+
+        Assert.assertTrue(impressionIdWithResetIntKey.equalsIgnoreCase(renderUnitId) , "RenderUnitId must equal impression id with empty int key");
+        Assert.assertTrue(adPoolResponseRenderUnitId.equalsIgnoreCase(renderUnitId) , "RenderUnitId in the beacon and AdPoolResponse must match");
     }
 }

@@ -115,6 +115,10 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
         builder.enrichmentCost(dataVenderEnrichmentCost);
     }
 
+    public void setNativeTemplateId(final Long nativeTemplateId) {
+        builder.nativeTemplateId(nativeTemplateId);
+    }
+
     @Override
     public DefaultLazyInmobiAdTracker buildInmobiAdTracker() {
         return builder.build();

@@ -8,6 +8,7 @@ import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.get
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,9 +22,13 @@ import org.slf4j.LoggerFactory;
 import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.util.Utils.CryptoHashGenerator;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.types.GUID;
 import com.inmobi.types.eventserver.IXSpecificInfo;
 import com.inmobi.types.eventserver.ImpressionInfo;
+import com.inmobi.types.eventserver.RenderInfo;
+import com.inmobi.types.eventserver.RenderUnitInfo;
 
 import io.netty.util.CharsetUtil;
 import lombok.Builder;
@@ -55,6 +60,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
             getIdBase36(CLICK_URL_HASHING_SECRET_KEY_TEST_MODE_VERSION);
     private static final String DEFAULT_UNUSED_PARAMETER = "-1";
     private static final String DEFAULT_BUNDLE_ID = "x";
+    private static final long DEFAULT_RENDER_UNIT_TEMPLATE_ID = -1L;
 
     private final Map<String, String> udIdVal;
     private final String testCryptoSecretKey;
@@ -96,6 +102,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
     private Long chargedBid;
     private Double enrichmentCost;
     private List<Integer> matchedCsids;
+    private Long nativeTemplateId;
 
     // State
     private boolean trackersHaveBeenGenerated = false;
@@ -172,7 +179,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         }
 
         // Creation of ImpressionInfo object (28th field)
-        ImpressionInfo impInfo = new ImpressionInfo();
+        final ImpressionInfo impInfo = new ImpressionInfo();
 
         // 15th siteSegmentId/placementSegmentId
         String segmentIdStr = Integer.toString(0);
@@ -267,7 +274,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         // 28th URL Component: encoded thrift serialized object with placementID, normalizedUserID and requestedAdType
         // placementId is set alongside the 15th field
         impInfo.setNormalizedUserId(normalizedUserId);
-        IXSpecificInfo ixSpecificInfo = new IXSpecificInfo();
+        final IXSpecificInfo ixSpecificInfo = new IXSpecificInfo();
         impInfo.setIxSpecificInfo(ixSpecificInfo);
         if (null != requestedAdType) {
             impInfo.setRequestedAdType(requestedAdType.toString());
@@ -282,10 +289,25 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
             impInfo.setEnrichment_cost(enrichmentCost);
             impInfo.setMatched_csids(matchedCsids);
         }
+        // Native Strand Changes
+        final RenderInfo renderInfo = new RenderInfo();
+        final RenderUnitInfo renderUnitInfo = new RenderUnitInfo();
+        final String renderUnitId = ImpressionIdGenerator.getInstance().resetWilburyIntKey(impressionId, 0L);
+        final UUID renderUnitUUID = UUID.fromString(renderUnitId);
+
+        renderUnitInfo.setRenderUnitId(new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID
+            .getLeastSignificantBits()));
+        if (null != nativeTemplateId) {
+            renderUnitInfo.setTemplateId(nativeTemplateId);
+        } else {
+            renderUnitInfo.setTemplateId(DEFAULT_RENDER_UNIT_TEMPLATE_ID);
+        }
+        renderInfo.setRenderUnitInfo(renderUnitInfo);
+        impInfo.setRenderInfo(renderInfo);
 
         LOG.debug("Impression Info Object: {}", impInfo);
 
-        TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
+        final TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
         String encodedString = StringUtils.EMPTY;
         try {
             byte[] bytes = serializer.serialize(impInfo);
@@ -293,7 +315,6 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         } catch (TException e) {
             LOG.error("Error while serializing impressionInfo object", e);
         }
-
 
         adUrlSuffix.append(appendSeparator(encodedString));
         beaconUrlSuffix.append(appendSeparator(encodedString));

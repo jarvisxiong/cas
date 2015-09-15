@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.support.membermodification.MemberModifier;
@@ -35,6 +36,7 @@ import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
@@ -45,6 +47,13 @@ import com.inmobi.types.PricingModel;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InspectorStats.class, Logging.class})
 public class ResponseSenderTest {
+
+    @BeforeClass
+    public static void setUp() {
+        final short hostIdCode = (short) 5;
+        final byte dataCenterIdCode = 1;
+        ImpressionIdGenerator.init(hostIdCode, dataCenterIdCode);
+    }
 
     @Test
     public void testGetResponseFormat() throws Exception {
@@ -193,7 +202,7 @@ public class ResponseSenderTest {
                 responseSender.createThriftResponse(adMarkup, mockRtbAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
-        AdIdChain adIdChain = adInfo.adIds.get(0);
+        AdIdChain adIdChain = adInfo.deprecatedAdIds.get(0);
 
         assertThat(adIdChain.adgroup_guid, is(equalTo(adGroupId)));
         assertThat(adIdChain.ad_guid, is(equalTo(adId)));
@@ -206,7 +215,7 @@ public class ResponseSenderTest {
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.SECOND_PRICE)));
         assertThat(adInfo.bid, is(equalTo(bid)));
         assertThat(adInfo.price, is(equalTo(bid)));
-        assertThat(adInfo.impressionId, is(equalTo(impression)));
+        assertThat(adInfo.deprecatedImpressionId, is(equalTo(impression)));
         assertThat(creative.getValue(), is(equalTo(adMarkup)));
         assertThat(adPoolResponse.minChargedValue, is(equalTo(minBid)));
     }
@@ -272,7 +281,7 @@ public class ResponseSenderTest {
                 responseSender.createThriftResponse(adMarkup, mockDCPAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
-        AdIdChain adIdChain = adInfo.adIds.get(0);
+        AdIdChain adIdChain = adInfo.deprecatedAdIds.get(0);
 
         assertThat(adIdChain.adgroup_guid, is(equalTo(adGroupId)));
         assertThat(adIdChain.ad_guid, is(equalTo(adId)));
@@ -285,7 +294,7 @@ public class ResponseSenderTest {
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.SECOND_PRICE)));
         assertThat(adInfo.bid, is(equalTo(bid)));
         assertThat(adInfo.price, is(equalTo(bid)));
-        assertThat(adInfo.impressionId, is(equalTo(impression)));
+        assertThat(adInfo.deprecatedImpressionId, is(equalTo(impression)));
         assertThat(adInfo.originalCurrencyName, is(equalTo(currency)));
         assertThat(adInfo.bidInOriginalCurrency, is(equalTo(localBid)));
         assertThat(creative.getValue(), is(equalTo(adMarkup)));
@@ -351,7 +360,7 @@ public class ResponseSenderTest {
                 responseSender.createThriftResponse(adMarkup, mockHostedAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
-        AdIdChain adIdChain = adInfo.adIds.get(0);
+        AdIdChain adIdChain = adInfo.deprecatedAdIds.get(0);
 
         assertThat(adIdChain.adgroup_guid, is(equalTo(adGroupId)));
         assertThat(adIdChain.ad_guid, is(equalTo(adId)));
@@ -364,7 +373,7 @@ public class ResponseSenderTest {
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.bid, is(equalTo(bid)));
         assertThat(adInfo.price, is(equalTo(bid)));
-        assertThat(adInfo.impressionId, is(equalTo(impression)));
+        assertThat(adInfo.deprecatedImpressionId, is(equalTo(impression)));
         assertThat(creative.getValue(), is(equalTo(adMarkup)));
         assertThat(adPoolResponse.minChargedValue, is(equalTo(minBid)));
     }
@@ -447,7 +456,7 @@ public class ResponseSenderTest {
                 responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         AdInfo adInfo = adPoolResponse.getAds().get(0);
         Creative creative = adInfo.creative;
-        AdIdChain adIdChain = adInfo.adIds.get(0);
+        AdIdChain adIdChain = adInfo.deprecatedAdIds.get(0);
 
         assertThat(adIdChain.adgroup_guid, is(equalTo(adGroupId)));
         assertThat(adIdChain.ad_guid, is(equalTo(adId)));
@@ -459,7 +468,7 @@ public class ResponseSenderTest {
         assertThat(adInfo.pricingModel, is(equalTo(PricingModel.CPM)));
         assertThat(adInfo.bid, is(equalTo(bid)));
         assertThat(adInfo.price, is(equalTo(bid)));
-        assertThat(adInfo.impressionId, is(equalTo(impression)));
+        assertThat(adInfo.deprecatedImpressionId, is(equalTo(impression)));
         assertThat(creative.getValue(), is(equalTo(adMarkup)));
         assertThat(adPoolResponse.minChargedValue, is(equalTo(minBid)));
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.FIRST_PRICE)));

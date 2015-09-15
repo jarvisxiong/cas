@@ -1671,3 +1671,6 @@ TEST_NATIVE_NON_NATIVE_SITE :
 
 TEST_REWARDED_NEGATIVE :
  - site_rewarded_video : 'true'
+
+TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
+ - testName: 'ix-happy'
