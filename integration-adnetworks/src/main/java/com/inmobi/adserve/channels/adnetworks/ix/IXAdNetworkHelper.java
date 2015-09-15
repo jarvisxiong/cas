@@ -360,42 +360,47 @@ public class IXAdNetworkHelper {
         LOG.debug("Starting building NativeResponseMaker interfacing object from response native object");
         final com.inmobi.template.context.App.Builder contextBuilder = com.inmobi.template.context.App.newBuilder();
 
-        contextBuilder.setOpeningLandingUrl(nativeObj.getLink().getUrl());
-        contextBuilder.setClickUrls(nativeObj.getLink().getClicktrackers());
-        contextBuilder.setPixelUrls(nativeObj.getImptrackers());
-        contextBuilder.setAdImpressionId(impressionId);
+        try {
+            contextBuilder.setOpeningLandingUrl(nativeObj.getLink().getUrl());
+            contextBuilder.setClickUrls(nativeObj.getLink().getClicktrackers());
+            contextBuilder.setPixelUrls(nativeObj.getImptrackers());
+            contextBuilder.setAdImpressionId(impressionId);
 
-        final List<com.inmobi.adserve.contracts.ix.response.nativead.Asset> assetList = nativeObj.getAssets();
-        for (final com.inmobi.adserve.contracts.ix.response.nativead.Asset asset : assetList) {
-            final int assetId = asset.getId();
+            final List<com.inmobi.adserve.contracts.ix.response.nativead.Asset> assetList = nativeObj.getAssets();
+            for (final com.inmobi.adserve.contracts.ix.response.nativead.Asset asset : assetList) {
+                final int assetId = asset.getId();
 
-            // We need all of mandatory fields. And Requested type should be same as response
-            if (mandatoryAssetMap.containsKey(assetId)) {
-                final boolean isReqValid =
+                // We need all of mandatory fields. And Requested type should be same as response
+                if (mandatoryAssetMap.containsKey(assetId)) {
+                    final boolean isReqValid =
                         areRequestResponseAssetsValid(mandatoryAssetMap.get(assetId), asset, contextBuilder);
-                if (isReqValid) {
-                    mandatoryAssetMap.remove(assetId);
-                    continue;
-                } else {
-                    return null;
+                    if (isReqValid) {
+                        mandatoryAssetMap.remove(assetId);
+                        continue;
+                    } else {
+                        return null;
+                    }
                 }
-            }
 
-            // We do not need all of mandatory fields. But Requested type should be same as response
-            if (nonMandatoryAssetMap.containsKey(assetId)) {
-                final boolean isReqValid =
+                // We do not need all of mandatory fields. But Requested type should be same as response
+                if (nonMandatoryAssetMap.containsKey(assetId)) {
+                    final boolean isReqValid =
                         areRequestResponseAssetsValid(nonMandatoryAssetMap.get(assetId), asset, contextBuilder);
-                if (!isReqValid) {
-                    return null;
+                    if (!isReqValid) {
+                        return null;
+                    }
                 }
             }
-        }
 
-        if (mandatoryAssetMap.isEmpty()) {
-            LOG.debug("NativeResponseMaker interfacing object built successfully");
-            return (App) contextBuilder.build();
-        } else {
-            LOG.error("Native Ad Building failed as all required assets were not present.");
+            if (mandatoryAssetMap.isEmpty()) {
+                LOG.debug("NativeResponseMaker interfacing object built successfully");
+                return (App) contextBuilder.build();
+            } else {
+                LOG.error("Native Ad Building failed as all required assets were not present.");
+                return null;
+            }
+        } catch (final Exception e) {
+            LOG.error("Exception encountered while building IX native template context. Exception: {}", e);
             return null;
         }
     }

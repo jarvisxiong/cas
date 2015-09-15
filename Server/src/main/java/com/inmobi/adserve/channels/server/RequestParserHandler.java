@@ -136,6 +136,12 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                         InspectorStats
                                 .incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
                     }
+                } else {
+                    terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
+                    LOG.error(traceMarker, "Error in de serializing thrift as adPoolRequest was empty.");
+                    InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
+                    InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST,
+                            InspectorStrings.COUNT);
                 }
             }
             LOG.debug("isTraceEnabled {} ", isTraceEnabled);
