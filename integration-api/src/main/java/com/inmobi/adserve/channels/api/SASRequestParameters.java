@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class SASRequestParameters {
-    private boolean secureSupported = false;
+    private boolean secureRequest = false;
     private String allParametersJson;
     private String remoteHostIp;
     private String userAgent;
@@ -107,7 +107,7 @@ public class SASRequestParameters {
     private String referralUrl;
     private String automationTestId;
     private Set<Long> cauMetadataSet;
-    private boolean customTemplatesOnly = false;
+    private Set<Long> customTemplateSet;
 
     // requestGuid is a unique identifier used for tracking purposes between ump and the SDK. This value was
     // earlier being set by ump only in case of Native Ads so DCP flow was unaffected, but due to response format

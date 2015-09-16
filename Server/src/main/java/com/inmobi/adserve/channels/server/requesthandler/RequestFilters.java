@@ -75,9 +75,9 @@ public class RequestFilters {
             return true;
         }
 
-        // Field CustomTemplatesOnly = true, for both CAU and Custom Templates. If CustomTemplatesOnly = true & CAU Set
-        // is empty it infers request is for CT
-        if (sasParams.isCustomTemplatesOnly() && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())) {
+        // CT Present and CAU not present, means it is CT request to drop it
+        if (CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
+                && CollectionUtils.isNotEmpty(sasParams.getCustomTemplateSet())) {
             LOG.info("Request not being served because Custom Template is not supported");
             InspectorStats.incrementStatCount(DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER, COUNT);
             return true;

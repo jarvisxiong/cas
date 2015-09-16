@@ -21,6 +21,7 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_GE
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.OPEN_LP_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.RECORD_EVENT_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSION_ID;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SECURE;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SITE_PREFERENCES_JSON;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
@@ -149,6 +150,7 @@ public class IXAdNetworkHelper {
         addSproutMacroToList(macros, substitutions, GEO_LNG, lng);
         addSproutMacroToList(macros, substitutions, GEO_ZIP, zip);
         addSproutMacroToList(macros, substitutions, GEO_CC, cc);
+        addSproutMacroToList(macros, substitutions, SECURE, String.valueOf(sasParams.isSecureRequest()));
 
         // JS_ESC_GEO_CITY is not currently being set
         addSproutMacroToList(macros, substitutions, JS_ESC_GEO_CITY, StringUtils.EMPTY);

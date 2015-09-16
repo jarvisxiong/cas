@@ -266,62 +266,6 @@ public class NewIXAdNetworkTest {
                 is(equalTo("<html><head><style type=\"text/css\">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}</style></head><body style=\"margin:0;padding:0;\"><div id=\"im_1011_ad\" style=\"width:100%;height:100%\"><div id=\"im_1011_p\" style=\"width:100%;height:100%\" class=\"im_1011_bg\"><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p><script>function clickHandler(){var x=document.createElement(\"img\");x.setAttribute(\"src\", \"ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/_DwcFv-_v-vf0qTbfRb_____3____3UAFgEAAEwAAA/1/242d80c6\");x.setAttribute(\"height\", \"1\");x.setAttribute(\"width\", \"1\");x.setAttribute(\"border\", \"0\");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script></div></div><div style=\"display: none;\"><img src='BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/_DwcFv-_v-vf0qTbfRb_____3____3UAFgEAAEwAAA/1/c7e1f87e?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 /><img src='http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}' height=1 width=1 border=0 /></div></body></html>")));
     }
 
-    // @Test
-    public void testCAUAdBuilding() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        mockStaticNice(IXPackageMatcher.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-
-        final JSONObject additionalParams = new JSONObject();
-        additionalParams.put("site", "12345");
-        additionalParams.put("default", "98766");
-
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getAdditionalParams()).andReturn(additionalParams).anyTimes();
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(
-                mockRepositoryHelper.queryIXBlocklistRepository(anyObject(String.class),
-                        anyObject(IXBlocklistKeyType.class), anyObject(IXBlocklistType.class))).andReturn(null)
-                .anyTimes();
-        replayAll();
-
-        final IXAdNetwork ixAdNetwork =
-                new IXAdNetwork(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
-                        advertiserName, true);
-
-        final WapSiteUACEntity.Builder wapBuild = new WapSiteUACEntity.Builder();
-        wapBuild.setTransparencyEnabled(true);
-
-        final SASRequestParameters sas = new SASRequestParameters();
-        sas.setRemoteHostIp("10.14.112.15");
-        sas.setUserAgent("userAgent");
-        sas.setSource("APP");
-        sas.setSiteIncId(1234L);
-        sas.setImpressionId("ImpressionId");
-        sas.setSiteId("siteId");
-        sas.setPlacementId(99L);
-        sas.setWapSiteUACEntity(wapBuild.build());
-        sas.setCountryId(1L);
-        sas.setDst(8);
-        sas.setSiteContentType(ContentType.PERFORMANCE);
-        sas.setCustomTemplatesOnly(true);
-
-        final CasInternalRequestParameters casInt = new CasInternalRequestParameters();
-        casInt.setImpressionId("ImpressionId");
-
-        ixAdNetwork.configureParameters(sas, casInt, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
-        // final BidRequest bidReq = ixAdNetwork.getBidRequest();
-
-        // assertThat(ixAdNetwork.isNativeRequest(), is(true));
-        // assertThat(bidReq.getImp().get(0).getNat().getRequestobj().getAssets().isEmpty(), is(false));
-        // assertThat(bidReq.getImp().get(0).getNat().getRequestobj().getAssets().size(), is(6));
-    }
-
     @Test
     public void testNativeAdBuilding() throws Exception {
         mockStaticNice(InspectorStats.class);

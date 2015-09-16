@@ -113,8 +113,8 @@ public class ThriftRequestParser {
             setUserIdParams(casInternal, tObject.getUidParams());
             params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
         }
-        if(tObject.isSetRqSslEnabled()){
-            params.setSecureSupported(tObject.rqSslEnabled);
+        if (tObject.isSetRqSslEnabled()) {
+            params.setSecureRequest(tObject.rqSslEnabled);
         }
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
@@ -243,9 +243,9 @@ public class ThriftRequestParser {
             final boolean isApp = tSite.isSetInventoryType() && tSite.inventoryType == InventoryType.APP;
             params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
 
-            params.setCustomTemplatesOnly(tSite.customTemplatesOnly);
             final SiteTemplateSettings sts = tSite.siteTemplateSettings;
             if (sts != null) {
+                // Set CAU
                 final Set<Long> cauMetaDataSet = new HashSet<Long>();
                 if (CollectionUtils.isNotEmpty(sts.getCustomAdUnitStableList())) {
                     cauMetaDataSet.addAll(sts.getCustomAdUnitStableList());
@@ -254,8 +254,18 @@ public class ThriftRequestParser {
                     cauMetaDataSet.addAll(sts.getCustomAdUnitExperimentList());
                 }
                 params.setCauMetadataSet(cauMetaDataSet);
+
+                // Set CT
+                final Set<Long> customTemplateSet = new HashSet<Long>();
+                if (CollectionUtils.isNotEmpty(sts.getCustomTemplateStableList())) {
+                    customTemplateSet.addAll(sts.getCustomTemplateStableList());
+                }
+                if (CollectionUtils.isNotEmpty(sts.getCustomTemplateExperimentList())) {
+                    customTemplateSet.addAll(sts.getCustomTemplateExperimentList());
+                }
+                params.setCustomTemplateSet(customTemplateSet);
             }
-            
+
             if (CasConfigUtil.repositoryHelper != null) {
                 params.setWapSiteUACEntity(CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(tSite.siteId));
                 params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tSite.siteId,

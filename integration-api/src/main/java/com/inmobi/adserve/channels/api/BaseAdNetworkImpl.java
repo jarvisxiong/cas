@@ -848,7 +848,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     public boolean isCAURequest() {
-        return sasParams.isCustomTemplatesOnly() && CollectionUtils.isNotEmpty(sasParams.getCauMetadataSet());
+        return CollectionUtils.isNotEmpty(sasParams.getCauMetadataSet());
     }
 
     @Override
