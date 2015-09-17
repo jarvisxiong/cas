@@ -21,6 +21,7 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -106,7 +107,7 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
-            if (null != sasParams.getRFormat() && GlobalConstant.NATIVE_STRING.equalsIgnoreCase(sasParams.getRFormat())) {
+            if (SASParamsUtils.isNativeRequest(sasParams)) {
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS);
                 if (rankList == null || rankList.isEmpty()) {
                     InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS + "-"
@@ -149,8 +150,8 @@ public class Logging {
             final AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
 
             // Log every new RTB or IX video ad creative.
-            if ((adNetworkInterface.isRtbPartner() || adNetworkInterface.isIxPartner()) &&
-                    adNetworkInterface.isLogCreative()) {
+            if ((adNetworkInterface.isRtbPartner() || adNetworkInterface.isIxPartner())
+                    && adNetworkInterface.isLogCreative()) {
                 String response = adNetworkInterface.getHttpResponseContent();
                 if (adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE) {
                     // adm is not populated for Native on IX. Use admobject instead
@@ -200,11 +201,11 @@ public class Logging {
 
         if (CollectionUtils.isNotEmpty(rankList) && rankList.get(0).getAdNetworkInterface() instanceof IXAdNetwork) {
             if (rankList.size() > 1) {
-                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface()
-                    .getName(), InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS);
+                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface().getName(),
+                        InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS);
             } else {
-                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface()
-                    .getName(), InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS);
+                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface().getName(),
+                        InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS);
             }
         }
 
@@ -222,10 +223,8 @@ public class Logging {
                 channel.setBid(bid);
             }
             /**
-             * Logging IX specific fields in ixAdInfo.
-             * Populating this only if,
-             *   1) we get an AD response from IX or,
-             *   2) forward any package to RP.
+             * Logging IX specific fields in ixAdInfo. Populating this only if, 1) we get an AD response from IX or, 2)
+             * forward any package to RP.
              */
             if (adNetwork instanceof IXAdNetwork) {
                 // Logging the original bid in case of agency rebate deals
@@ -383,16 +382,15 @@ public class Logging {
     }
 
     protected static AuctionInfo getAuctionInfo(final SASRequestParameters sasParams,
-                                                final CasInternalRequestParameters casParams) {
+            final CasInternalRequestParameters casParams) {
         AuctionInfo auctionInfo = null;
         if (null != sasParams && DemandSourceType.RTBD.getValue() == sasParams.getDst()) {
             final double bidGuidance = sasParams.getMarketRate();
 
             if (0 != bidGuidance) {
-                RTBDAuctionInfo rtbdAuctionInfo = new RTBDAuctionInfo(
-                        casParams.getDemandDensity()/bidGuidance,
-                        casParams.getLongTermRevenue()/bidGuidance,
-                        casParams.getPublisherYield());
+                RTBDAuctionInfo rtbdAuctionInfo =
+                        new RTBDAuctionInfo(casParams.getDemandDensity() / bidGuidance, casParams.getLongTermRevenue()
+                                / bidGuidance, casParams.getPublisherYield());
                 auctionInfo = new AuctionInfo();
                 auctionInfo.setRtbd_auction_info(rtbdAuctionInfo);
             }

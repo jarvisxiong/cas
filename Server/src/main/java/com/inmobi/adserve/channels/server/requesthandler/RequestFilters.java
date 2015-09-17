@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -74,9 +75,9 @@ public class RequestFilters {
             InspectorStats.incrementStatCount(DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER, COUNT);
             return true;
         }
-
-        // CT Present and CAU not present, means it is CT request to drop it
-        if (CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
+        final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
+        // CT Present and CAU not present, means it is CT request to drop it (For native CT has Native Template
+        if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
                 && CollectionUtils.isNotEmpty(sasParams.getCustomTemplateSet())) {
             LOG.info("Request not being served because Custom Template is not supported");
             InspectorStats.incrementStatCount(DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER, COUNT);

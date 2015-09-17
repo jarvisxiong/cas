@@ -86,7 +86,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String GENDER = "gender";
     protected static final String DEFAULT_EMPTY_STRING = StringUtils.EMPTY;
     protected static final String NO_AD = GlobalConstant.NO_AD;
-    protected static final String NATIVE_STRING = GlobalConstant.NATIVE_STRING;
     protected static final String AD_STRING = "AD";
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     protected static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
@@ -560,10 +559,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
         // TODO: Move all supported ad type checks to ThriftRequestParser or AdGroupAdTypeTargetingFilter.
-        isNativeRequest =
-                APP.equalsIgnoreCase(sasParams.getSource())
-                        && (NATIVE_STRING.equals(sasParams.getRFormat()) || RequestedAdType.NATIVE == sasParams
-                                .getRequestedAdType());
+        isNativeRequest = SASParamsUtils.isNativeRequest(sasParams);
         isVideoRequest =
                 DemandSourceType.IX.getValue() == sasParams.getDst()
                         && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()
