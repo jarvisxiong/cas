@@ -1661,7 +1661,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 trackerBuilder.setNativeTemplateId(templateEntity.getId());
             }
 
-            //trackerBuilder.setChargedBid(originalBidPriceInUsd);
+            trackerBuilder.setChargedBid(originalBidPriceInUsd);
         }
     }
 
