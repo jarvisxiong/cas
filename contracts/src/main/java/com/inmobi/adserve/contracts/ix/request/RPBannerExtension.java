@@ -12,4 +12,5 @@ public final class RPBannerExtension {
     private Integer size_id;
     private List<Integer> alt_size_ids;
     private String mime;
+    private Boolean usenurl;
 }

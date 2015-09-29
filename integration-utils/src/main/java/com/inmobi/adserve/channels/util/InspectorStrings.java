@@ -135,7 +135,7 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
-    public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing";
+    public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
     public static final String AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMissing";
@@ -147,6 +147,7 @@ public class InspectorStrings {
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
+    public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
     public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloor";

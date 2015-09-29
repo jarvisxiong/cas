@@ -1,1 +1,108 @@
-#if($Sprout)<!DOCTYPE html>#end<html><head>#if($IMAIBaseUrl)<meta name="viewport" content="width=device-width, height=device-height,user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/><base href="$IMAIBaseUrl"></base>#end<style type="text/css">#im_1011_ad{display: table;}#im_1011_p{vertical-align: middle; text-align: center;}#if($Sprout)body{overflow:hidden;}#end</style></head><body style="margin:0;padding:0;"><div id="im_1011_ad" style="width:100%;height:100%"><div id="im_1011_p" style="width:100%;height:100%" class="im_1011_bg">$PartnerHtmlCode#if($SDK450Onwards&&$isInterstitial)<script type="text/javascript">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script>#end#if($IMClickUrl)<script>function clickHandler(){var x=document.createElement("img");x.setAttribute("src", "${IMClickUrl}");x.setAttribute("height", "1");x.setAttribute("width", "1");x.setAttribute("border", "0");document.body.appendChild(x);document.removeEventListener('click',clickHandler);};document.addEventListener('click',clickHandler);</script>#end</div></div><div style="display: none;">#if($IMBeaconUrl)<img src='${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}' height=1 width=1 border=0 />#end#if($PartnerBeaconUrl)<img src='$PartnerBeaconUrl' height=1 width=1 border=0 />#end</div></body></html>
+#if($Sprout)
+    <!DOCTYPE html>
+#end
+<html>
+    <head>
+        #if($IMAIBaseUrl)
+            <meta name="viewport" content="width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
+            <base href="$IMAIBaseUrl"></base>
+        #end
+        <style type="text/css">
+            #im_1011_ad{
+                display: table;
+            }
+            #im_1011_p{
+                vertical-align: middle;
+                text-align: center;
+            }
+            #if($Sprout)
+                body{
+                    overflow:hidden;
+                }
+            #end
+            .im_1011_beacon{
+                display: none;
+            }
+        </style>
+    </head>
+    <body style="margin:0;padding:0;">
+        <div id="im_1011_ad" style="width:100%;height:100%">
+            <div id="im_1011_p" style="width:100%;height:100%">
+                $PartnerHtmlCode
+
+                <script type='text/javascript'>
+                    var events = {
+                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1' #end],
+                        renderBeacons : [
+                            #if($IMBeaconUrl) '${IMBeaconUrl}?m=18&b=${WIN_BID}${DEAL_GET_PARAM}' #end
+                            #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
+                        ],
+                        clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end]
+                    },
+                    eventHandler = {
+                        fireBeacon : function (beaconUrl) {
+                            if (undefined === beaconUrl) {
+                                return;
+                            }
+                            var x = document.createElement("img");
+                            x.setAttribute("src", beaconUrl);
+                            x.className = "im_1011_beacon";
+                            document.body.appendChild(x);
+                        },
+                        fireBeacons : function (beaconList) {
+                            for (var index = 0; index < beaconList.length; ++index) {
+                                var element = beaconList[index];
+                                if (undefined !== element) {
+                                    this.fireBeacon(beaconList[index]);
+                                }
+                            }
+                        },
+                        fireLoadBeacons : function () {
+                            this.fireBeacons(events.loadBeacons);
+                        },
+                        fireRenderBeacons : function () {
+                            this.fireBeacons(events.renderBeacons);
+                        },
+                        fireClickBeacons : function () {
+                            this.fireBeacons(events.clickBeacons);
+                        }
+                    };
+
+
+                    function fireADReady () {
+                        var readyHandler=function() {
+                            _im_imai.fireAdReady();
+                            _im_imai.removeEventListener('ready', readyHandler);
+                        };
+                        _im_imai.addEventListener('ready', readyHandler);
+                    }
+
+
+                    function setupRender () {
+                        var readyHandler=function() {
+                            document.removeEventListener('DOMContentLoaded', readyHandler);
+                            eventHandler.fireRenderBeacons();
+                        };
+                        document.addEventListener('DOMContentLoaded', readyHandler);
+                    }
+
+
+                    function setupClick() {
+                        function clickHandler() {
+                            document.removeEventListener('click', clickHandler);
+                            eventHandler.fireClickBeacons();
+                        }
+                        document.addEventListener('click', clickHandler);
+                    }
+
+                    eventHandler.fireLoadBeacons();
+                    setupClick();
+                    #if($SDK450Onwards&&$isInterstitial)
+                        fireAdReady();
+                    #end
+                    setupRender();
+                </script>
+            </div>
+        </div>
+    </body>
+</html>

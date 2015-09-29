@@ -208,12 +208,12 @@ public abstract class BaseServlet implements Servlet {
         String imaiBaseUrl = null;
         if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI
                 || hrh.responseSender.getResponseFormat() == ResponseFormat.JSON) {
+            final String sdkVersion = sasParams.getSdkVersion();
             final SdkMraidMapEntity sdkMraidMapEntity =
-                    CasConfigUtil.repositoryHelper.querySdkMraidMapRepository(sasParams.getSdkVersion());
+                    CasConfigUtil.repositoryHelper.querySdkMraidMapRepository(sdkVersion);
             if (null == sdkMraidMapEntity) {
-                LOG.error(traceMarkerProvider.get(), "Mraid Path not found for Sdk version: {}",
-                        sasParams.getSdkVersion());
-                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND);
+                LOG.error(traceMarkerProvider.get(), "Mraid Path not found for Sdk version: {}", sdkVersion);
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND + sdkVersion);
                 return false;
             }
             imaiBaseUrl = sdkMraidMapEntity.getMraidPath();

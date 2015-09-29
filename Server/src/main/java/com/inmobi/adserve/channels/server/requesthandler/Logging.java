@@ -102,9 +102,20 @@ public class Logging {
             final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+
+                // Detailed No Match Segment Counts
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
+                    dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-os" + sasParams.getOsId());
+                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
+                    dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-country" + sasParams.getCountryId());
+                for (Short slot : sasParams.getProcessedMkSlot()) {
+                    InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
+                        dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-umpSlot" + slot);
+                }
+
+                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
             if (SASParamsUtils.isNativeRequest(sasParams)) {

@@ -80,7 +80,44 @@
                     imgFrame = byId(adNamespace + "frame"),
                     imgCloseButton = byId(adNamespace + "closeButton"),
                     adFrameCont = byId(adNamespace + "ad"),
-                    thirdPartyAd = byId(adNamespace + "thirdPartyAd");
+                    thirdPartyAd = byId(adNamespace + "thirdPartyAd"),
+
+                    events = {
+                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1' #end],
+                        renderBeacons : [
+                            #if($IMBeaconUrl) '${IMBeaconUrl}?m=18&b=${WIN_BID}${DEAL_GET_PARAM}' #end
+                            #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
+                        ],
+                        clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end]
+                    },
+                    eventHandler = {
+                        fireBeacon : function (beaconUrl) {
+                            if (undefined === beaconUrl) {
+                                return;
+                            }
+                            var x = document.createElement("img");
+                            x.setAttribute("src", beaconUrl);
+                            x.className = "${first.ns}beacon";
+                            document.body.appendChild(x);
+                        },
+                        fireBeacons : function (beaconList) {
+                            for (var index = 0; index < beaconList.length; ++index) {
+                                var element = beaconList[index];
+                                if (undefined !== element) {
+                                    this.fireBeacon(beaconList[index]);
+                                }
+                            }
+                        },
+                        fireLoadBeacons : function () {
+                            this.fireBeacons(events.loadBeacons);
+                        },
+                        fireRenderBeacons : function () {
+                            this.fireBeacons(events.renderBeacons);
+                        },
+                        fireClickBeacons : function () {
+                            this.fireBeacons(events.clickBeacons);
+                        }
+                    };
 
                 var innerFrameDimensions = {
                 };
@@ -196,6 +233,7 @@
 
                     var ad = byId(adNamespace + "ad");
                     toggleVisibleState(ad, true);
+                    eventHandler.fireRenderBeacons();
                 }
 
 
@@ -326,29 +364,20 @@
                     }
                 }
 
+
+                function setupClick() {
+                    function clickHandler() {
+                        document.removeEventListener('click', clickHandler);
+                        eventHandler.fireClickBeacons();
+                    }
+                    document.addEventListener('click', clickHandler);
+                }
+
+                eventHandler.fireLoadBeacons();
+                setupClick();
                 parseAdJson();
                 checkForMraid();
             })();
         </script>
-        #if($IMClickUrl)
-            <script type="text/javascript">
-                function clickHandler(){
-                    var x = document.createElement("img");
-                    x.setAttribute("src", "${IMClickUrl}");
-                    x.className = "${first.ns}beacon";
-                    document.body.appendChild(x);
-                    document.removeEventListener('click',clickHandler);
-                };
-                document.addEventListener('click',clickHandler);
-            </script>
-        #end
-        <div>
-            #if($IMBeaconUrl)
-                <img src='${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}' class = "${first.ns}beacon"/>
-            #end
-            #if($PartnerBeaconUrl)
-                <img src='$PartnerBeaconUrl' class = "${first.ns}beacon"/>
-            #end
-        </div>
     </body>
 </html>

@@ -226,6 +226,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> packageIds;
     private List<String> iabCategories;
     private final String sproutUniqueIdentifierRegex;
+    private final String segmentForNurlTesting;
 
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
@@ -260,7 +261,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         sproutUniqueIdentifierRegex =
-            config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
+                config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
+        segmentForNurlTesting = config.getString(advertiserName + ".segmentForNurlTesting", null);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -532,6 +534,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Native createNativeObject() {
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
+            LOG.info(traceMarker, String
+                .format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             LOG.info(traceMarker,
                 String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             return null;
@@ -585,6 +589,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final RPBannerExtension rp = new RPBannerExtension();
             rp.setMime(MIME_HTML);
             rp.setSize_id(rpSlot);
+
+            if (StringUtils.isEmpty(segmentForNurlTesting) || entity.getAdgroupId()
+                .equalsIgnoreCase(segmentForNurlTesting)) {
+                rp.setUsenurl(true);
+            }
+
             ext.setRp(rp);
         } else {
             // We can't take risk of sending request without size id so return null

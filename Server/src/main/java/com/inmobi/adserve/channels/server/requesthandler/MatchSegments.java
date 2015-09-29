@@ -68,7 +68,7 @@ public class MatchSegments {
         channelEntityBuilder.setPriority(3);
         channelEntityBuilder.setRequestCap(Long.MAX_VALUE);
         channelEntityBuilder.setSiteInclusion(false);
-        channelEntityBuilder.setSitesIE(new HashSet<String>());
+        channelEntityBuilder.setSitesIE(new HashSet<>());
         defaultChannelEntity = channelEntityBuilder.build();
 
         final ChannelFeedbackEntity.Builder channelFeedbackEntityBuilder = ChannelFeedbackEntity.newBuilder();
@@ -92,7 +92,7 @@ public class MatchSegments {
     public List<AdvertiserMatchedSegmentDetail> matchSegments(final SASRequestParameters sasParams) {
 
         final Marker traceMarker = traceMarkerProvider.get();
-        final List<Long> slotIdsFromUmp = new ArrayList<Long>();
+        final List<Long> slotIdsFromUmp = new ArrayList<>();
         for (final Short s : sasParams.getProcessedMkSlot()) {
             slotIdsFromUmp.add(Long.valueOf(s));
         }
