@@ -26,8 +26,9 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
     private static String testCryptoSecretKey;
     private static String cryptoSecretKey;
     private static String rmBeaconURLPrefix;
-    private static String imageBeaconURLPrefix;
     private static String clickURLPrefix;
+    private static String clickSecureURLPrefix;
+    private static String rmBeaconSecureURLPrefix;
 
     // Constants
     private static final Boolean IS_BILLABLE_DEMOG = false;
@@ -52,7 +53,8 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
         testCryptoSecretKey  = clickmakerConfig.getString("key.2.value");
         rmBeaconURLPrefix    = clickmakerConfig.getString("beaconURLPrefix");
         clickURLPrefix       = clickmakerConfig.getString("clickURLPrefix");
-        imageBeaconURLPrefix = rmBeaconURLPrefix;
+        clickSecureURLPrefix = clickmakerConfig.getString("clickSecureURLPrefix", "https://c2.w.inmobi.com/c.asm");
+        rmBeaconSecureURLPrefix    = clickmakerConfig.getString("beaconSecureURLPrefix", "https://c2.w.inmobi.com/c.asm");
     }
 
     private final void buildHelper() {
@@ -82,9 +84,10 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
         // Config Constants
         builder.cryptoSecretKey(cryptoSecretKey);
         builder.testCryptoSecretKey(testCryptoSecretKey);
-        builder.rmBeaconURLPrefix(rmBeaconURLPrefix);
-        builder.clickURLPrefix(clickURLPrefix);
-        builder.imageBeaconURLPrefix(imageBeaconURLPrefix);
+        final String beaconUrlPrefix = sasParams.isSecureRequest() ? rmBeaconSecureURLPrefix : rmBeaconURLPrefix;
+        builder.rmBeaconURLPrefix(beaconUrlPrefix);
+        builder.clickURLPrefix(sasParams.isSecureRequest() ?  clickSecureURLPrefix : clickURLPrefix);
+        builder.imageBeaconURLPrefix(beaconUrlPrefix);
 
         // Constants
         builder.tierInfo(TIER_INFO);

@@ -37,6 +37,7 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDetailsInvalidFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserDroppedInRtbBalanceFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserNotSecureFilter;
 
 
 /**
@@ -110,6 +111,7 @@ public class ChannelSegmentFilterModule extends AbstractModule {
     List<AdvertiserLevelFilter> provideIxAdvertiserLevelFilters(final Injector injector) {
         final List<AdvertiserLevelFilter> advertiserLevelFilterList = Lists.newArrayList();
         advertiserLevelFilterList.add(injector.getInstance(AdvertiserDetailsInvalidFilter.class));
+        advertiserLevelFilterList.add(injector.getInstance(AdvertiserNotSecureFilter.class));
         advertiserLevelFilterList.add(injector.getInstance(AdvertiserDroppedInRtbBalanceFilter.class));
         return advertiserLevelFilterList;
     }

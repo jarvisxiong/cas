@@ -74,7 +74,8 @@ public class InspectorStrings {
     public static final String DROPPED_IN_HANDSET_TARGETING_FILTER = "DroppedinHandsetTargetingFilter";
     public static final String DROPPED_IN_AUTOMATION_FRAMEWORK_FILTER = "DroppedinAutomationFrameworkFilter";
     public static final String DROPPED_IN_AD_TYPE_TARGETING_FILTER = "DroppedInAdTypeTargetingFilter";
-    public static final String DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE = "DroppedInAdTypeTargetingFilter.UnknownAdTypeFormat";
+    public static final String DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE =
+        "DroppedInAdTypeTargetingFilter.UnknownAdTypeFormat";
     public static final String DROPPED_IN_PRICING_ENGINE_FILTER = "DroppedinPricingEngineFilter";
     public static final String DROPPED_IN_TOD_FILTER = "DroppedInTODFilter";
     public static final String SITE_FEEDBACK_CACHE_HIT = "SiteFeedbackCacheHit";
@@ -105,7 +106,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_AUCTION_IX_IMPRESSION_ID_FILTER = "DroppedInAuctionIxImpressionIdFilter";
     public static final String DROPPED_IN_ACCOUNT_SEGMENT_FILTER = "DroppedInAccountSegmentFilter";
     public static final String DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER =
-            "DroppedInSupplyDemandClassificationFilter";
+        "DroppedInSupplyDemandClassificationFilter";
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
@@ -140,8 +141,9 @@ public class InspectorStrings {
     public static final String AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMissing";
     public static final String AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMismatch";
     public static final String AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE =
-            "AgencyRebateDealResponse.AgencyIdIndeterminate";
+        "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
+    public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
@@ -151,8 +153,10 @@ public class InspectorStrings {
     public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
     public static final String MULTI_FORMAT_AUCTIONS_TOTAL = "IX-MultiFormatAuctions.TotalAuctions";
     public static final String MULTI_FORMAT_AUCTIONS_NO_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithNoTrumpDeals";
-    public static final String MULTI_FORMAT_AUCTIONS_SINGLE_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithOnlyOneTrumpDeal";
-    public static final String MULTI_FORMAT_AUCTIONS_MULTIPLE_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithMultipleTrumpDeals";
+    public static final String MULTI_FORMAT_AUCTIONS_SINGLE_TRUMP =
+        "IX-MultiFormatAuctions.TotalAuctionsWithOnlyOneTrumpDeal";
+    public static final String MULTI_FORMAT_AUCTIONS_MULTIPLE_TRUMP =
+        "IX-MultiFormatAuctions.TotalAuctionsWithMultipleTrumpDeals";
     public static final String MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS = "IX-MultiFormatAuctions.TotalVastVideoWins";
     public static final String MULTI_FORMAT_AUCTIONS_STATIC_WINS = "IX-MultiFormatAuctions.TotalStaticWins";
 
@@ -206,4 +210,5 @@ public class InspectorStrings {
     public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public static final String NULL_HOST_NAME = "NullHostName";
     public static final String NULL_IP_ADDRESS = "NullIPAddress";
+
 }

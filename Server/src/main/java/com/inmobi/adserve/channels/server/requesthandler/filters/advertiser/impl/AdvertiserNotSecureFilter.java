@@ -1,0 +1,38 @@
+package com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.slf4j.Marker;
+
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.api.config.AdapterConfig;
+import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
+import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.AbstractAdvertiserLevelFilter;
+import com.inmobi.adserve.channels.util.InspectorStrings;
+
+/**
+ *
+ */
+@Singleton
+public class AdvertiserNotSecureFilter extends AbstractAdvertiserLevelFilter {
+    private final Map<String, AdapterConfig> advertiserIdConfigMap;
+
+    @Inject
+    public AdvertiserNotSecureFilter(final Provider<Marker> traceMarkerProvider, final Map<String, AdapterConfig>
+        advertiserIdConfigMap) {
+        super(traceMarkerProvider, InspectorStrings.DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER);
+        this.advertiserIdConfigMap = advertiserIdConfigMap;
+    }
+
+    @Override
+    protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams) {
+        final AdapterConfig adapterConfig = advertiserIdConfigMap.get(channelSegment.getChannelEntity().getAccountId());
+        return sasParams.isSecureRequest() ? !adapterConfig.isSecureSupported() : false;
+    }
+
+}
+

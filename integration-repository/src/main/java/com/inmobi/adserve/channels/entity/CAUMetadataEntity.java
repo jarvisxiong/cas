@@ -23,7 +23,7 @@ public class CAUMetadataEntity implements IdentifiableEntity<Long> {
     private static final long serialVersionUID = 1L;
     private static final Gson GSON = new Gson();
     private Long id;
-    private String elementJson;
+    private String elementSecureJson;
     private Constraint constraint;
     private int version;
 

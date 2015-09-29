@@ -61,7 +61,7 @@ public class CAUMetaDataRepository extends AbstractStatsMaintainingDBRepository<
             final CAUMetadataEntity.Builder builder = CAUMetadataEntity.newBuilder();
             builder.id(id);
             builder.version(row.getInt("version"));
-            builder.elementJson(elementObject.toString());
+            builder.elementSecureJson(elementObject.toString().replaceAll("http:", "https:"));
             final Constraint constraint = GSON.fromJson(constraintObject.toString(), Constraint.class);
             builder.constraint(constraint);
 

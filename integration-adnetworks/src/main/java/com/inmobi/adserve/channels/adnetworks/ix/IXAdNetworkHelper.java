@@ -615,7 +615,7 @@ public class IXAdNetworkHelper {
 
         final GenericTemplateObject templateFirst = new GenericTemplateObject();
         // Set CAU Element JSON
-        templateFirst.setCauElementJsonObject(matchedSlot.getMatchedCau().getElementJson());
+        templateFirst.setCauElementJsonObject(matchedSlot.getMatchedCau().getElementSecureJson());
         // JS escaped IM beacon and click URLs.
         templateFirst.setClickServerUrl(StringEscapeUtils.escapeJavaScript(clickUrl));
         // Set height and width

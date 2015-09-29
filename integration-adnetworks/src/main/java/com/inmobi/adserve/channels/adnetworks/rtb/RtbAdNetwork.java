@@ -350,6 +350,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (!isNativeRequest()) {
             impression.setBanner(banner);
         }
+        impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
         impression.setBidfloorcur(bidderCurrency);
         // Set interstitial or not
         impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);

@@ -15,7 +15,6 @@ import lombok.EqualsAndHashCode;
 
 /**
  * @author abhishek.parwal
- *
  */
 @EqualsAndHashCode
 public class AdapterConfig implements CasConfig {
@@ -27,8 +26,8 @@ public class AdapterConfig implements CasConfig {
 
     @SuppressWarnings("unchecked")
     @AssistedInject
-    public AdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName,
-            @Nullable @Named("dcName") final String dcName, final ServerConfig serverConfig) {
+    public AdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName, @Nullable
+    @Named("dcName") final String dcName, final ServerConfig serverConfig) {
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
@@ -63,7 +62,7 @@ public class AdapterConfig implements CasConfig {
 
     /**
      * Status == on
-     * 
+     *
      * @return the isActive
      */
     public boolean isActive() {
@@ -87,12 +86,17 @@ public class AdapterConfig implements CasConfig {
 
     /**
      * Not blank and not equals to NA
-     * 
+     *
      * @return
      */
     public boolean isValidHost() {
         final String hostName = getAdapterHost();
         return StringUtils.isNotBlank(hostName) && !"NA".equalsIgnoreCase(hostName);
+    }
+
+
+    public boolean isSecureSupported() {
+        return adapterConfig.getBoolean("secureSupported", false);
     }
 
     /**
