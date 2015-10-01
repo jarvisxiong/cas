@@ -467,7 +467,7 @@ public class ThriftRequestParser {
 
     public List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
         if (selectedSlots == null) {
-            LOG.error("Emply selectedSlots received by CAS!!!");
+            LOG.info("Emply selectedSlots received by CAS !!!");
             return Collections.emptyList();
         }
         final List<Short> validSlots = new ArrayList<Short>();

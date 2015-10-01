@@ -43,14 +43,14 @@ public class RequestFilters {
 
         final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
         if (null == sasParams) {
-            LOG.error("Terminating request as sasParam is null");
+            LOG.info("Terminating request as sasParam is null");
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
             InspectorStats.incrementStatCount(JSON_PARSING_ERROR, COUNT);
             return true;
         }
 
         if (CollectionUtils.isEmpty(sasParams.getCategories())) {
-            LOG.error("Category field is not present in the request so sending noad");
+            LOG.info("Category field is not present in the request so sending noad");
             sasParams.setCategories(new ArrayList<Long>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(MISSING_CATEGORY, COUNT);
@@ -58,7 +58,7 @@ public class RequestFilters {
         }
 
         if (null == sasParams.getSiteId()) {
-            LOG.error("Terminating request as site id was missing");
+            LOG.info("Terminating request as site id was missing");
             hrh.setTerminationReason(CasConfigUtil.MISSING_SITE_ID);
             InspectorStats.incrementStatCount(MISSING_SITE_ID, COUNT);
             return true;
@@ -104,9 +104,9 @@ public class RequestFilters {
                     LOG.debug("sdk-version : {}", tempSdkVersion);
                 }
             } catch (final StringIndexOutOfBoundsException exception) {
-                LOG.error("Invalid sdk-version, Exception raised {}", exception);
+                LOG.info("Invalid sdk-version, Exception raised {}", exception);
             } catch (final NumberFormatException exception) {
-                LOG.error("Invalid sdk-version, Exception raised {}", exception);
+                LOG.info("Invalid sdk-version, Exception raised {}", exception);
             }
         }
 
