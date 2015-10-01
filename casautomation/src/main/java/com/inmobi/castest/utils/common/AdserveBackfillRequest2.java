@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -20,6 +19,8 @@ import com.inmobi.adserve.adpool.AdCodeType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.Carrier;
+import com.inmobi.adserve.adpool.ConnectionType;
+import com.inmobi.adserve.adpool.ContainerType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
@@ -35,6 +36,7 @@ import com.inmobi.adserve.adpool.LatLong;
 import com.inmobi.adserve.adpool.MaritalStatus;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.adpool.RequestedAdTypeDeprecated;
 import com.inmobi.adserve.adpool.ResponseFormat;
 import com.inmobi.adserve.adpool.SexualOrientation;
 import com.inmobi.adserve.adpool.Site;
@@ -45,13 +47,18 @@ import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.adpool.User;
 import com.inmobi.adserve.adpool.UserProfile;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
+import com.inmobi.types.AdPlacement;
+import com.inmobi.types.AdvInclType;
+import com.inmobi.types.ComplianceClass;
 import com.inmobi.types.ContentRating;
+import com.inmobi.types.Dimension;
 import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+import com.inmobi.types.VideoPrebufferPreference;
 
-public class AdserveBackfillRequest {
+public class AdserveBackfillRequest2 {
 
     public static String defaultSetVariable(final String reqString, final String default_val) {
         final String nullString = "NULL";
@@ -90,41 +97,44 @@ public class AdserveBackfillRequest {
         return finalVal;
     }
 
-    public static AdPoolRequest formulateNewBackFillRequest(final Map<String, String> requestObject) {
+    public static AdPoolRequest formulateNewBackFillRequest(final Map<String, String> requestObject) // ,
+    // mandatoryParams,
+    // inputObj)
+    {
+        System.out.println("Request Object:" + requestObject);
 
-        final String def_adpool_taskid = WilburyUUID.getUUID(System.nanoTime()).toString();
-        final String def_adpool_remotehostip = "10.14.100.205";
+        final String def_adpool_requestid = "requestId";
+        final String def_adpool_remotehostip = "3.0.119.0";
 
         final String def_siteincid = "34093";
-        final String def_cpcfloor = "2";
+        final String def_cpcfloor = "0.05";
         final String def_ecpmfloor = "0.04";
-        final String def_cpmfloor = "0";
         final String def_siteurl = "newsiteurl";
-        final String def_siteid = "479e420ee7d6422c9bedec33d82baecd";
+        final String def_siteid = "newsiteid";
         final String def_publisherid = "newpublisherid";
-        final String def_inventorytype = "APP";
-        final String def_contentrating = "PERFORMANCE";
+        final String def_inventorytype = "BROWSER";
+        final String def_contentrating = "MATURE";
         final String def_contenttype = "PERFORMANCE";
-        final String def_sitetags = "70,71";
+        final String def_sitetags = "70,71,1,23,24,41";
         final String def_sitetaxonomies = "70,71";
-        final String def_site_rewarded_video = "false";
-        final String def_enriched_media_attributes = "0,2"; // 0- Banner , 2 - Video
+        final String def_enriched_media_attributes = "0"; // 0- Banner , 2 - Video
         final String def_media_preferences =
                 "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": false,\"soundOn\": false }}";
 
-        final String def_device_useragent = "useragent";
-        final String def_device_modelid = "1234";
+        final String def_device_useragent =
+                "Mozilla/5.0 (Linux; U; Android 4.0.4; ko-kr; SHV-E210S Build/IMM76D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
+        final String def_device_modelid = "47287";
         final String def_device_manufacturerid = "12";
         final String def_device_osid = "3";
         final String def_device_osmajorversion = "0";
         final String def_device_browserid = "0";
         final String def_device_browsermajorversion = "0";
-        final String def_device_handsetinternalid = "46180";
+        final String def_device_handsetinternalid = "0";
         final String def_device_devicetype = "SMARTPHONE";
         final String def_device_manufacturername = "WHATEVER_MANUF_NAME";
         final String def_device_modelname = "WHATEVER_MODEL_NAME";
 
-        final String def_carrier_carrierid = "0";
+        final String def_carrier_carrierid = "406";
         final String def_carrier_networktype = "WIFI";
         final String def_requestadcount = "1";
         final String def_responseformat = "imai";
@@ -176,18 +186,18 @@ public class AdserveBackfillRequest {
         final String def_user_sexualorientation = null;
         final String def_user_haschildren = "true";
 
-        final String def_userprofile_csitags = null;
+        final String def_userprofile_csitags = "100,110";
 
-        final String def_adpool_selectedslots = "9";
-        final String def_adpool_demandtypesallowed = null;
+        final String def_adpool_selectedslots = "14,40";
+        final String def_adpool_demandtypesallowed = "PERFORMANCE";
 
         final String def_adpool_segmentid = "0";
         final String def_adpool_testrequest = "true";
         final String def_adpool_supplysource = null;
         final String def_adpool_ipfileversion = "0";
-        final String def_adpool_guidanceBid = "0";
+        final String def_adpool_guidanceBid = "3250000";
         // This is not the task id. It is a unique id used between adserving and the sdk.
-        final String def_adpool_requestGuid = WilburyUUID.getUUID(System.nanoTime()).toString();
+        final String def_adpool_requestGuid = "requestGuid";
         final String def_adpool_placementId = "1234";
 
 
@@ -195,8 +205,8 @@ public class AdserveBackfillRequest {
                 Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_placementId"),
                         def_adpool_placementId));
 
-        final String adpool_taskid =
-                AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_taskid"), def_adpool_taskid);
+        final String adpool_requestid =
+                AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_requestid"), def_adpool_requestid);
         final String adpool_remotehostip =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_remotehostip"),
                         def_adpool_remotehostip);
@@ -210,16 +220,11 @@ public class AdserveBackfillRequest {
         final String site_siteurl =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteurl"), def_siteurl);
         final Double site_cpcfloor =
-                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_cpcfloor"),
+                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_cpcflooor"),
                         def_cpcfloor));
         final Double site_ecpmfloor =
-                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_ecpmfloor"),
+                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_ecpmflooor"),
                         def_ecpmfloor));
-
-        final Double site_cpmfloor =
-                Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_cpmfloor"),
-                        def_cpmfloor));
-
         final String site_siteid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteid"), def_siteid);
         final String site_publisherid =
@@ -238,15 +243,9 @@ public class AdserveBackfillRequest {
         final Set<Integer> site_sitetaxonomies =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
                         requestObject.get("site_sitetaxonomies"), def_sitetaxonomies));
-
-        String siteEnrichedMediaAttributesStr = requestObject.get("site_enriched_media_attributes");
-        if (StringUtils.isEmpty(siteEnrichedMediaAttributesStr)) {
-            siteEnrichedMediaAttributesStr = def_enriched_media_attributes;
-        }
-        final Set<Integer> site_enriched_media_attributes = new HashSet<>();
-        for (final String subSiteEnrichedMediaAttributesStr : siteEnrichedMediaAttributesStr.split(",")) {
-            site_enriched_media_attributes.add(Integer.parseInt(subSiteEnrichedMediaAttributesStr));
-        }
+        final Integer site_enriched_media_attributes =
+                Integer.parseInt(defaultSetVariable(requestObject.get("site_enriched_media_attributes"),
+                        def_enriched_media_attributes));
         final String site_media_preferences =
                 defaultSetVariable(requestObject.get("site_media_preferences"), def_media_preferences);
         final String device_useragent =
@@ -510,6 +509,7 @@ public class AdserveBackfillRequest {
         final String user_nativelanguage =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("user_nativelanguage"),
                         def_user_nativelanguage);
+        System.out.println("User_Interest : " + requestObject.get("user_interests"));
         final List<String> user_interests =
                 AdserveBackfillRequest.getListOfString(AdserveBackfillRequest.defaultSetVariable(
                         requestObject.get("user_interests"), def_user_interests));
@@ -555,56 +555,83 @@ public class AdserveBackfillRequest {
         }
 
         final AdPoolRequest adPoolRequest = new AdPoolRequest();
+        adPoolRequest.putToRequestHeaders("x-inmobi-adserving-enable-trace", "true");
 
-        final IntegrationDetails integrationDetails = new IntegrationDetails();
-        integrationDetails.setIntegrationType(adpool_integration_integrationtype);
-        integrationDetails.setIntegrationVersion(adpool_integration_integrationversion);
-
-        // adPoolRequest.setRqSslEnabled(true);
-        adPoolRequest.setTaskId(adpool_taskid);
+        adPoolRequest.setTaskId(WilburyUUID.getUUID(System.nanoTime()).toString());
         adPoolRequest.setRemoteHostIp(adpool_remotehostip);
-        adPoolRequest.setGuidanceBid(adpool_guidanceBid);
-        adPoolRequest.setIpFileVersion(adpool_ipfileversion);
-        adPoolRequest.setIntegrationDetails(integrationDetails);
+        // adPoolRequest.setGuidanceBid(adpool_guidanceBid);
+        // adPoolRequest.setIpFileVersion(adpool_ipfileversion);
+        // adPoolRequest.setIntegrationDetails(new IntegrationDetails().setIntegrationType(IntegrationType.IOS_SDK)
+        // .setIntegrationVersion(450));
+
+
+        final List<Integer> expList = new LinkedList<Integer>();
+        expList.add(5099);
+        expList.add(8001);
+        expList.add(3999);
+        expList.add(10040);
+
+        adPoolRequest.setExperimentIds(expList);
+
+        final Set supplySet = new HashSet<Integer>();
+        supplySet.add(1);
+        supplySet.add(2);
+        supplySet.add(3);
+        supplySet.add(4);
+        supplySet.add(5);
+        supplySet.add(77);
+        adPoolRequest.setSupplyCapabilities(supplySet);
 
         final Site site = new Site();
         site.setSiteIncId(site_siteincid);
         site.setSiteUrl(site_siteurl);
         site.setCpcFloor(site_cpcfloor);
         site.setEcpmFloor(site_ecpmfloor);
-        site.setCpmFloor(site_cpmfloor);
-        site.setSiteId(site_siteid);
-        site.setPublisherId(site_publisherid);
+        site.setCpmFloor(0);
+        site.setSiteId("1be6c37b96d44bf98f57d9ca64d2a527");
+        site.setPublisherId("d70312bb04454481a78862288312aea0");
         site.setInventoryType(AdserveBackfillRequest.getInventoryType(site_inventorytype));
         site.setContentRatingDeprecated(AdserveBackfillRequest.getContentRating(site_contentrating));
         site.setSiteTags(site_sitetags);
         site.setSiteTaxonomies(site_sitetaxonomies);
         site.setSiteContentType(AdserveBackfillRequest.getSiteContentType(site_contentType));
-        site.setEnrichedSiteAllowedMediaAttributes(site_enriched_media_attributes);
+        site.setEnrichedSiteAllowedMediaAttributes(new HashSet<Integer>(Arrays.asList(site_enriched_media_attributes)));
         site.setMediaPreferences(site_media_preferences);
+        site.setSiteAllowedMediaAttributes(new HashSet<Integer>(2));
 
-        site.setCustomTemplatesOnly(false);
+
+        site.setCustomTemplatesOnly(true);
+        site.setDemogInfoExtractionAccepted(true);
+        site.setSiteComplianceClass(ComplianceClass.GOOD);
+        site.setAppMarketId("abcde");
+        site.setCpmAdsOnly(false);
+        site.setSelfServeAdsAllowed(true);
+        site.setSiteContentType(ContentType.MATURE);
+        site.addToContentTypePreferences(ContentType.PERFORMANCE);
+        site.addToContentTypePreferences(ContentType.MATURE);
+        site.addToContentTypePreferences(ContentType.FAMILY_SAFE);
+        site.setVideoPrebufferPreference(VideoPrebufferPreference.WIFI);
+        site.setRewarded(false);
+        site.setSslEnabled(false);
+        site.setBlindedSiteId("C4SHIH7U");
+        site.setSiteAppId("My_app_id");
+        site.setEnableStrands(true);
+
 
         final SiteTemplateSettings sts = new SiteTemplateSettings();
 
-        // sts.addToCustomAdUnitExperimentList(1234589);
-        // sts.addToCustomAdUnitExperimentList(6);
-        // sts.addToCustomTemplateExperimentList(6);
-        // sts.addToCustomTemplateStableList(10);
-        // sts.addToCustomAdUnitStableList(23);
-        // sts.setEnableAllDefaultTemplates(false);
-        // sts.setEnableSystemTemplateFallback(false);
-        // sts.setSiteCustomTemplatesExperimentEnabled(false);
-        // sts.addToDefaultTemplateInclusionList(908);
+        sts.setEnableAllDefaultTemplates(false);
+        sts.setEnableSystemTemplateFallback(false);
+        sts.setSiteCustomTemplatesExperimentEnabled(false);
+        sts.addToDefaultTemplateInclusionList(908);
 
         site.setSiteTemplateSettings(sts);
-        // site.setAdvInclType(AdvInclType.ADVERTISER);
+        site.setAdvInclType(AdvInclType.ADVERTISER);
 
 
-
-        // site.setRewarded(true);
 
         adPoolRequest.setSite(site);
+
 
         final Device device = new Device();
         device.setUserAgent(device_useragent);
@@ -614,18 +641,27 @@ public class AdserveBackfillRequest {
         device.setOsMajorVersion(device_osmajorversion);
         device.setBrowserId(device_browserid);
         device.setBrowserMajorVersion(device_browsermajorversion);
-        device.setHandsetInternalId(device_handsetinternalid);
+        device.setHandsetInternalId(46180);
         device.setDeviceTypeDeprecated(AdserveBackfillRequest.getDeviceTypeDeprecated(device_devicetype));
-
         device.setDeviceType(AdserveBackfillRequest.getDeviceType(device_devicetype));
         device.setManufacturerName(device_manufacturername);
         device.setModelName(device_modelname);
+        device.setExtraCapabilitiesMap((Map<String, String>) new HashMap<>()
+                .put("xhtml_make_phone_call_string", "none"));
+        device.setCapabilitiesBitMap(31);
+        device.setOsVersionId(23);
+        device.setDisplayName("Galaxy SIII");
+        device.setModelName("SHV-E210S");
+        device.setManufacturerName("Samsung");
+        device.setHandsetExternalId("galaxy_sIII_46180");
+        device.setDerivedDensity(1);
 
         adPoolRequest.setDevice(device);
 
         final Carrier carrier = new Carrier();
         carrier.setCarrierId(carrier_carrierid);
         carrier.setNetworkType(AdserveBackfillRequest.getNetworkType(carrier_networktype));
+        carrier.setConnectionType(ConnectionType.WIFI);
 
         adPoolRequest.setCarrier(carrier);
 
@@ -638,9 +674,10 @@ public class AdserveBackfillRequest {
                 .getListOfSupplyContentType(adpool_supplycapability));
 
         final Geo geo = new Geo();
-        geo.setCountryId(geo_countryid);
-        geo.setCountryCode(geo_countrycode);
+        geo.setCountryId(94);
+        geo.setCountryCode("US");
         geo.setLocationSource(LocationSource.NO_TARGETING);
+        geo.setGeoSegmentMap(new HashMap<>());
 
         final LatLong latLong = new LatLong();
         latLong.setLatitude(geo_latlong_latitude);
@@ -654,6 +691,19 @@ public class AdserveBackfillRequest {
         geo.setStateIds(geo_stateids);
 
         adPoolRequest.setGeo(geo);
+
+        final IntegrationDetails integrationDetails = new IntegrationDetails();
+        integrationDetails.setIntegrationType(adpool_integration_integrationtype);
+        integrationDetails.setIntegrationVersion(adpool_integration_integrationversion);
+        integrationDetails.setIntegrationMethod(IntegrationMethod.SDK);
+        integrationDetails.setIntegrationOrigin(IntegrationOrigin.UNKNOWN);
+        integrationDetails.setAdCodeType(AdCodeType.ADVANCED);
+        integrationDetails.setInmobiSdkId(70);
+        integrationDetails.setInmobiSdk("a450");
+        integrationDetails.setIntegrationThirdPartyName("dir");
+
+
+        adPoolRequest.setIntegrationDetails(integrationDetails);
 
         final UidParams uidParams = new UidParams();
 
@@ -695,16 +745,18 @@ public class AdserveBackfillRequest {
             rawUidValues.put(UidType.WC, adpool_uidparams_rawuidvalues_wc);
         }
 
+
         uidParams.setRawUidValues(rawUidValues);
         uidParams.setUdidFromRequest(adpool_uidparams_udidfromrequest);
         uidParams.setUuidFromUidCookie(adpool_uidparams_uuidfromuidcookie);
         uidParams.setLimitIOSAdTracking(Boolean.parseBoolean(adpool_uidparams_limitiosadtracking));
 
-        // uidParams.putToRawUidValues(UidType.UDID, "9f262f4a37ed060b4c500737c95ce90f4582a433");
-        // uidParams.putToRawUidValues(UidType.O1, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
-        // uidParams.putToLoggedUidParams(UidType.UDID, "61b6a7bfd92e9b767e508cd70a442f2a");
-        // uidParams.putToLoggedUidParams(UidType.O1, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
-
+        rawUidValues.put(UidType.O1, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
+        rawUidValues.put(UidType.UDID, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
+        final Map uidparamMap = new HashMap<UidType, String>();
+        uidparamMap.put(UidType.O1, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
+        uidparamMap.put(UidType.UDID, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
+        uidParams.setLoggedUidParams(uidparamMap);
 
         adPoolRequest.setUidParams(uidParams);
 
@@ -721,6 +773,7 @@ public class AdserveBackfillRequest {
         user.setEthnicity(user_ethnicity);
         user.setSexualOrientation(user_sexualorientation);
         user.setHasChildren(user_haschildren);
+        user.setUserBillable(false);
 
         final UserProfile userProfile = new UserProfile();
         userProfile.setCsiTags(userprofile_csitags);
@@ -729,7 +782,9 @@ public class AdserveBackfillRequest {
 
         adPoolRequest.setUser(user);
 
-        adPoolRequest.setSelectedSlots(adpool_selectedslots);
+        adPoolRequest.addToSelectedSlots((short) 14);
+        adPoolRequest.addToSelectedSlots((short) 40);
+        adPoolRequest.addToSelectedSlots((short) 2);
         adPoolRequest.setDemandTypesAllowed(adpool_demandtypesallowed);
 
         adPoolRequest.setSiteSegmentId(adpool_segmentid);
@@ -737,10 +792,46 @@ public class AdserveBackfillRequest {
         adPoolRequest.setSupplySource(adpool_supplySource);
         adPoolRequest.setIpFileVersion(adpool_ipfileversion);
         adPoolRequest.setIntegrationDetails(integrationDetails);
-        adPoolRequest.setRequestGuid(adpool_requestguid);
+        adPoolRequest.setRequestGuid(WilburyUUID.getUUID(System.nanoTime()).toString());
 
         // Placement related setters
         adPoolRequest.setPlacementId(adpool_placementId);
+
+
+
+        adPoolRequest.setRequestedAdCount(Short.parseShort("1"));
+        adPoolRequest.setResponseFormatDeprecated(ResponseFormat.IMAI);
+        adPoolRequest.setTranscoderIpDetected(false);
+        adPoolRequest.setRequestedAdTypeDeprecated(RequestedAdTypeDeprecated.BANNER);
+        // String taskId = WilburyUUID.getUUID(System.nanoTime());
+        // adPoolRequest.setTaskId("12312312");
+        // adPoolRequest.setTraceRequest(false)
+        adPoolRequest.setDeprecatedTraceRequest(false);
+        adPoolRequest.putToRequestHeaders("x-inmobi-adserving-enable-trace", "true");
+        adPoolRequest.playableRequest = false;
+        adPoolRequest.buildId = "1408cb37";
+        // adPoolRequest.requestGuid = adPoolRequest.getTaskId();
+        adPoolRequest.addToAdPlacements(AdPlacement.PAGE);
+        adPoolRequest.setPlacementId(12345);
+        adPoolRequest.containerType = ContainerType.IMAI;
+        // adPoolRequest.containerType = ContainerType.LEGACY
+        adPoolRequest.pingForUserData = false;
+        adPoolRequest.setTestRequestDeprecated(false);
+        adPoolRequest.supplySource = SupplySource.NETWORK_SUPPLY;
+        // adPoolRequest.slotDimension = getSlotDimension();
+        adPoolRequest.requestedAdType = RequestedAdType.INTERSTITIAL;
+        adPoolRequest.setValidBoltRequestDeprecated(true);
+        adPoolRequest.addToSlotDimension(new Dimension().setHeight((short) 480).setWidth((short) 320));
+        adPoolRequest.addToSlotDimension(new Dimension().setHeight((short) 300).setWidth((short) 250));
+        adPoolRequest.setRequestedAdCount((short) 1);
+        adPoolRequest.setTranscoderIpDetected(false);
+        adPoolRequest.setIpFileVersion(20);
+        adPoolRequest.addToSupplyAllowedContents(SupplyContentType.RICH_MEDIA);
+        adPoolRequest.addToSupplyAllowedContents(SupplyContentType.TEXT);
+        adPoolRequest.addToSupplyAllowedContents(SupplyContentType.JS);
+        adPoolRequest.setSupplySource(SupplySource.NETWORK_SUPPLY);
+        adPoolRequest.setPlayableRequest(false);
+        adPoolRequest.setPingForUserData(false);
 
         return adPoolRequest;
     }
@@ -1134,7 +1225,7 @@ public class AdserveBackfillRequest {
             final AdPoolResponse adPoolResponse = new AdPoolResponse();
             final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
             tDeserializer.deserialize(adPoolResponse, result);
-            System.out.println("AdPool Response is : " + adPoolResponse.toString());
+            System.out.println("AdPool Response is" + adPoolResponse.toString());
 
             return adPoolResponse;
 

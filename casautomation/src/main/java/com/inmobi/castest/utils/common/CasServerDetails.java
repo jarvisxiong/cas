@@ -6,14 +6,17 @@ public class CasServerDetails {
             .getProperty("cas_end_point") : "localhost";
 
     private final static String CAS_SERVER_ENDPOINT = "http://" + CAS_SERVER_IP + ":8800/";
-    //private final static String CAS_SERVER_ENDPOINT = "http://10.14.118.66:8800/";
+    // private final static String CAS_SERVER_ENDPOINT = "http://10.14.118.66:8800/";
 
     private final static String LOG_FILE_PATH = "/opt/mkhoj/logs/cas/debug/";
 
     private final static String LOG_PARSER_URL = CAS_SERVER_ENDPOINT + "logParser";
 
-    private final static String FENDER_DEBUGGER = System.getProperty("fender_debugger") != null ? System
-            .getProperty("fender_debugger") : "false";
+    private final static boolean FENDER_DEBUGGER = System.getProperty("fender_debugger") != null ? true : false;
+
+    public static boolean getFenderDebugger() {
+        return FENDER_DEBUGGER;
+    }
 
     private final static String GENERATE_DATA = System.getProperty("data_gen") != null
             ? System.getProperty("data_gen")

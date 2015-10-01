@@ -14,4 +14,11 @@ public class FenderTestIOHelper {
     public static String getPartnerDetails(final String testCaseName) throws FileNotFoundException {
         return YamlDataIOHelper.readTestIndex().get(testCaseName.toUpperCase());
     }
+
+    public static Map<String, String> setDGTestParams(final String testName, final String className) throws Exception {
+
+        return JsonDataIOHelper.readTestParams(testName, className);
+
+
+    }
 }

@@ -2,7 +2,6 @@ package com.inmobi.castest.suite;
 
 import org.testng.annotations.BeforeSuite;
 
-import com.inmobi.castest.utils.bidders.Main;
 import com.inmobi.castest.utils.common.DummyBidderDetails;
 
 public class ParentTest {
@@ -14,7 +13,7 @@ public class ParentTest {
                 {DummyBidderDetails.getDumbidPort(), DummyBidderDetails.getDumbidTimeOut(),
                         DummyBidderDetails.getDumbidPercentAds(), DummyBidderDetails.getDumbidBudget(),
                         DummyBidderDetails.getDumbidSeatId(), DummyBidderDetails.getDumbidToggleUnderstress()};
-        Main.hostDummyBidder(dummyBidderArguments);
+        // Main.hostDummyBidder(dummyBidderArguments);
         System.out.println("Hosting the Dummy Bidder");
         Thread.sleep(1000);
 

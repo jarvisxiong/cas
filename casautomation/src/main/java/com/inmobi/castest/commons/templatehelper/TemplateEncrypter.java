@@ -30,12 +30,13 @@ public class TemplateEncrypter {
 
         Spark.post("/eres", (req, res) -> {
             res.body(adResponseStr);
-            res.type("text/html");
-            res.status(200);
-            return res.toString();
-        });
+
+            // res.type("text/html");
+                res.status(200);
+                return res.body();
+            });
         System.out.println("Your encrypted response is now hosted for use !");
-        Thread.sleep(120000); // setting it for 2 minutes
+        Thread.sleep(Integer.MAX_VALUE);
 
     }
 

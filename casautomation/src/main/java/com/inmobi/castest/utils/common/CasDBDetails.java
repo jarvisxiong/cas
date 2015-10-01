@@ -7,9 +7,7 @@ public class CasDBDetails {
     private static final String DB_PORT = System.getProperty("db_port") != null
             ? System.getProperty("db_port")
             : "5499";
-    private static final String DB_NAME = System.getProperty("db_name") != null
-            ? System.getProperty("db_name")
-            : "ix";
+    private static final String DB_NAME = System.getProperty("db_name") != null ? System.getProperty("db_name") : "ix";
     private static final String DB_USERNAME = System.getProperty("db_uname") != null
             ? System.getProperty("db_uname")
             : "brand_user";

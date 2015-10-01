@@ -7,8 +7,10 @@ import java.util.Map;
 import org.testng.Reporter;
 
 import com.inmobi.adserve.adpool.AdPoolRequest;
+import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.castest.commons.iohelper.FenderTestIOHelper;
 import com.inmobi.castest.utils.common.AdserveBackfillRequest;
+import com.inmobi.castest.utils.common.AdserveBackfillRequest2;
 import com.inmobi.castest.utils.common.CasServerDetails;
 import com.inmobi.castest.utils.common.NewPostRequest;
 import com.inmobi.castest.utils.common.ResponseBuilder;
@@ -19,6 +21,7 @@ public class AdPoolRequestHelper {
     private static AdPoolRequest adpRequest = new AdPoolRequest();
     private static ResponseBuilder responseBuilder = new ResponseBuilder();
     private static ConfigChangeUtil chngConfigHelper = new ConfigChangeUtil();
+    private static AdPoolResponse adPoolResponse = new AdPoolResponse();
 
     public static ResponseBuilder fireAdPoolRequestForRTBD(String testName) throws FileNotFoundException,
             InterruptedException {
@@ -29,8 +32,11 @@ public class AdPoolRequestHelper {
 
         chngConfigHelper.checkChangeConfFlag(newRequestInput);
 
-        Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
-        Reporter.log("****** new Request param - user interest ***** \n" + newRequestInput.get("user_interests"), true);
+        if (CasServerDetails.getFenderDebugger()) {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
+        } else {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, false);
+        }
 
         adpRequest = AdserveBackfillRequest.formulateNewBackFillRequest(newRequestInput);
 
@@ -58,7 +64,11 @@ public class AdPoolRequestHelper {
 
         chngConfigHelper.checkChangeConfFlag(newRequestInput);
 
-        Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
+        if (CasServerDetails.getFenderDebugger()) {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
+        } else {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, false);
+        }
 
         adpRequest = AdserveBackfillRequest.formulateNewBackFillRequest(newRequestInput);
 
@@ -83,9 +93,13 @@ public class AdPoolRequestHelper {
         testName = testName.toUpperCase();
         newRequestInput = FenderTestIOHelper.setTestParams(testName);
 
-        Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
-
         chngConfigHelper.checkChangeConfFlag(newRequestInput);
+
+        if (CasServerDetails.getFenderDebugger()) {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
+        } else {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, false);
+        }
 
         adpRequest = AdserveBackfillRequest.formulateNewBackFillRequest(newRequestInput);
 
@@ -101,5 +115,33 @@ public class AdPoolRequestHelper {
 
         }
         return responseBuilder;
+    }
+
+    public static AdPoolResponse fireAdPoolRequestForBrand(String testName, final String className) throws Exception {
+
+        testName = testName.toUpperCase();
+        newRequestInput = FenderTestIOHelper.setDGTestParams(testName, className);
+
+        if (CasServerDetails.getFenderDebugger()) {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, true);
+        } else {
+            Reporter.log("****** new Request input ***** \n" + newRequestInput, false);
+        }
+
+
+        adpRequest = AdserveBackfillRequest2.formulateNewBackFillRequest(newRequestInput);
+
+        System.out.println("Adpoolrequest :- " + adpRequest.toString());
+
+        try {
+
+            adPoolResponse = NewPostRequest.sendPost(adpRequest, testName);
+
+        } catch (final Exception e) {
+
+            e.printStackTrace();
+
+        }
+        return adPoolResponse;
     }
 }

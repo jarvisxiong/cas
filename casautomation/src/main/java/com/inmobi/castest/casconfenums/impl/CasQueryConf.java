@@ -56,7 +56,7 @@ public class CasQueryConf {
                             "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                                     + "',(select max(inc_id) from wap_channel_ad)+1,9,'" + adGroup.get("advertiser_id")
                                     + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                                    + adGroup.get("adgroup_id") + "',1,now(),2)";
+                                    + adGroup.get("adgroup_id") + "',1,now(),8)";
                 } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
                         && adGroup.get("slot_ids").contains("14")) {
                     queryString =
@@ -64,13 +64,13 @@ public class CasQueryConf {
                                     + "',(select max(inc_id) from wap_channel_ad)+1,11,'"
                                     + adGroup.get("advertiser_id")
                                     + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                                    + adGroup.get("adgroup_id") + "',1,now(),2)";
+                                    + adGroup.get("adgroup_id") + "',1,now(),8)";
                 } else {
                     queryString =
                             "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                                     + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
                                     + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                                    + adGroup.get("adgroup_id") + "',1,now(),2)";
+                                    + adGroup.get("adgroup_id") + "',1,now(),8)";
                 }
 
                 System.out.println(queryString);
@@ -184,9 +184,7 @@ public class CasQueryConf {
                                 + "' , '"
                                 + adGroup.get("dst")
                                 + "' , '"
-                                + adGroup.get("ad_type_targeting")
-                                + "' , '"
-                                + adGroup.get("automation_test_id") + "')";
+                                + adGroup.get("ad_type_targeting") + "' , '" + adGroup.get("automation_test_id") + "')";
 
                 System.out.println(queryString);
                 break;

@@ -1,7 +1,7 @@
 # RTBD Test Cases
 TEST2_1_1:
  - adpool_responseformat : 'imai'
-   adpool_requestid: anotherreqid
+   adpool_taskid: anotherreqid
    uidparams_rawuidvalues_o1: '9e74e1b452e07afded40fd15b45aa9e6'
    device_osid: '3'
    site_contenttype: 'PERFORMANCE'
@@ -12,13 +12,13 @@ TEST2_1_1:
    adpool_selectedslots : '2'
 
 TEST2_2_1:
- - adpool_requestid : 'EMPTY'
+ - adpool_taskid : 'EMPTY'
    site_sitetaxonomies : '70,71'
    site_sitetags : '70,71'
 TEST2_2_2:
- - adpool_requestid : 'SPACE'
+ - adpool_taskid : 'SPACE'
 TEST2_2_3:
- - adpool_requestid : 'justlikethat'
+ - adpool_taskid : 'justlikethat'
 TEST2_3_1:
  - adpool_remotehostip : 'EMPTY'
 TEST2_3_2:
@@ -36,13 +36,13 @@ TEST2_5_3:
 TEST2_5_4:
  - site_siteurl : 'justlikethat'
 TEST2_6_4:
- - site_cpcflooor : '2'
+ - site_cpcfloor : '2'
 TEST2_6_5:
- - site_cpcflooor : '2.02'
+ - site_cpcfloor : '2.02'
 TEST2_7_4:
- - site_ecpmflooor : '2'
+ - site_ecpmfloor : '2'
 TEST2_7_5:
- - site_ecpmflooor : '2.02'
+ - site_ecpmfloor : '2.02'
 TEST2_8_1:
  - site_siteid : 'EMPTY'
 TEST2_8_2:
@@ -764,7 +764,7 @@ TEST1_SDK450_NATIVE_AD:
 
 # IX Test Cases
 TEST3_1_1:
- - adpool_requestid : 'anotherreqid'
+ - adpool_taskid : 'anotherreqid'
    u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName : 'SandBox_Test_1'
    os_id : '3'
@@ -780,7 +780,7 @@ TEST3_1_1:
    maxCasRequestCounter  : '1'
    adpool_selectedslots : '15'
 TEST3_1_2:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_2'
    os_id  : '3'
@@ -799,7 +799,7 @@ TEST3_1_2:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_1_3:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_3'
    os_id  : '3'
@@ -818,7 +818,7 @@ TEST3_1_3:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_1_4:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_4'
    os_id  : '5'
@@ -837,7 +837,7 @@ TEST3_1_4:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_1_5:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_5'
    os_id  : '5'
@@ -856,7 +856,7 @@ TEST3_1_5:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_2_1:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_5'
    os_id  : '3'
@@ -876,7 +876,7 @@ TEST3_2_1:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_2_2:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_5'
    os_id  : '3'
@@ -896,7 +896,7 @@ TEST3_2_2:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_2_3:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_5'
    os_id  : '5'
@@ -916,7 +916,7 @@ TEST3_2_3:
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
 TEST3_2_4:
- - adpool_requestid  : 'anotherreqid'
+ - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
    testName  :  'SandBox_Test_5'
    os_id  : '5'
@@ -969,7 +969,7 @@ TEST3_4_12:
 
 
 TEST3_3_1 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '3' #fordb
@@ -990,7 +990,7 @@ TEST3_3_1 :
   adpool_selectedslots : '15'
 
 TEST3_3_2 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '3' #fordb
@@ -1010,7 +1010,7 @@ TEST3_3_2 :
   adpool_selectedslots : '15'
 
 TEST3_3_3 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '5' #fordb
@@ -1031,7 +1031,7 @@ TEST3_3_3 :
   adpool_selectedslots : '15'
 
 TEST3_3_4 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '5' #fordb
@@ -1052,7 +1052,7 @@ TEST3_3_4 :
   adpool_selectedslots : '15'
 
 TEST3_5_1 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '3' #fordb
@@ -1123,7 +1123,7 @@ TEST3_5_8_4 :
   site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
 
 TEST3_5_15 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   device_osid : '3' #forreq
@@ -1140,7 +1140,7 @@ TEST3_5_15 :
   adpool_selectedslots : '15'
 
 TEST3_6_1 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '3' #fordb
@@ -1222,7 +1222,7 @@ TEST3_6_8_4 :
   site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
 
 TEST3_7_1 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '5' #fordb
@@ -1305,7 +1305,7 @@ TEST3_7_8_4 :
   site_publisherid : '4028cb97328f3f9e0132ac253c74054e' #trans
 
 TEST3_8_1 :
-- adpool_requestid : 'anotherreqid'
+- adpool_taskid : 'anotherreqid'
   u_id_params : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
   TESTName : 'SandBox_TEST_5'
   os_id : '5' #fordb
@@ -1503,14 +1503,14 @@ TEST3_NATIVE_LAYOUT_ADAPTER_FAIL :
   adpool_placementId: '1427434470773952'
 
 TEST_VAST_HAPPY :
-- adpool_selectedslots : '14'
+- adpool_selectedslots : '14,32'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
   site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
   device_osid : '3'
   device_osmajorversion : '6.0'
   adpool_requestedadtype : 'INTERSTITIAL'
   adpool_responseformat : 'IMAI'
-  site_enriched_media_attributes : '2'
+  #site_enriched_media_attributes : '0,2'
   ad_type_targeting : '1'
 
 TEST_VAST_SDKVERSION_440 : 
@@ -1521,11 +1521,11 @@ TEST_VAST_SDKVERSION_440 :
   device_osmajorversion : '6.0'
   adpool_requestedadtype : 'INTERSTITIAL'
   integration_version : '440'
-  site_enriched_media_attributes : '2'
+  site_enriched_media_attributes : '0'
   adpool_responseformat : 'IMAI'
-  ad_type_targeting : '1'
+  ad_type_targeting : '0'
   
-TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH :
+TEST_VAST_PUBCONTROLS_BANNER_450 : 
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
   site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
@@ -1534,7 +1534,7 @@ TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH :
   adpool_requestedadtype : 'INTERSTITIAL'
   site_enriched_media_attributes : '0'
   adpool_responseformat : 'IMAI'
-  ad_type_targeting : '1'
+  ad_type_targeting : '0'
 
 TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY :
 - adpool_selectedslots : '14'
@@ -1547,45 +1547,6 @@ TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY :
   adpool_responseformat : 'IMAI'
   ad_type_targeting : '0'
 
-#TEST_MULTI_FORMAT_BOTH_ADGROUPS_INTERSTITIAL :
-#- adpool_selectedslots : '14'
-#  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
-#  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
-#  device_osid : '3'
-#  device_osmajorversion : '6.0'
-#  adpool_requestedadtype : 'INTERSTITIAL'
-#  site_enriched_media_attributes : '0'
-#  adpool_responseformat : 'IMAI'
-#  ad_type_targeting : '0'
-#  ad_type_targeting2 : '0'
-#  multiformat_request : '2'
-#
-#TEST_MULTI_FORMAT_BOTH_ADGROUPS_VIDEO :
-#- adpool_selectedslots : '14'
-#  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
-#  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
-#  device_osid : '3'
-#  device_osmajorversion : '6.0'
-#  adpool_requestedadtype : 'INTERSTITIAL'
-#  site_enriched_media_attributes : '2'
-#  adpool_responseformat : 'IMAI'
-#  ad_type_targeting : '1'
-#  ad_type_targeting2 : '1'
-#  multiformat_request : '2'
-#
-#TEST_MULTI_FORMAT_INTERSTITIAL_PLUS_VIDEO_REQUEST :
-#- adpool_selectedslots : '14'
-#  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
-#  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
-#  device_osid : '3'
-#  device_osmajorversion : '6.0'
-#  adpool_requestedadtype : 'INTERSTITIAL'
-#  site_enriched_media_attributes : '0,2'
-#  adpool_responseformat : 'IMAI'
-#  ad_type_targeting : '0'
-#  ad_type_targeting2 : '1'
-#  multiformat_request : '2'
-  
 TEST_IX_JSAC_INTEGRATION_TYPE : 
 - integration_type : 'JSAC'
   adpool_selectedslots : '15'
@@ -1656,6 +1617,7 @@ TEST_ZONE_ID_FAIL :
   site_sitetags : '9'
   new_category : '9'
   additional_params : '{"mime":"html","70": "160214","site": "38132"}'
+
 TEST_NATIVE_NON_NATIVE_SITE :
 - testName:  IX adapter fails for non native placement id.
   device_osid : '5' #forreq
@@ -1668,6 +1630,17 @@ TEST_NATIVE_NON_NATIVE_SITE :
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
   adpool_placementId: '123456'
+
+TEST_KILOO : 
+- testName : 'Kiloo Happy'
+
+TESTIOS9 : 
+- testName : 'Kiloo Happy'
+  device_osid : '5'
+
+TESTIOS9_2 : 
+- testName : 'Kiloo Happy'
+  device_osid : '5'
 
 TEST_REWARDED_NEGATIVE :
  - site_rewarded_video : 'true'

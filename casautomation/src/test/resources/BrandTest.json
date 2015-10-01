@@ -1,0 +1,40 @@
+{
+    "TC_1": {
+        "Site_id": "e4e32354812a42f881aa9ccc335cd5fb",
+        "Adgroup_id": "ad4170da3e7f4539a7899f093f0456c6",
+        "Request_Params": {
+            "site_ratings": "0,2",
+            "targeting_platform": "APP",
+            "format": "html",
+            "adpool_responseformat": "HTML",
+            "new_category": "70,71",
+            "maxCasRequestCounter": "1",
+            "carriercountry": "1",
+            "geo_countryid": "1",
+            "adpool_selectedslots": "10",
+            "site_publisherid": "d70312bb04454481a78862288312aea0"
+        },
+        "Validations": {
+            "host": "nwadpool-qa1004.perf.corp"
+        }
+    },
+    "TC_2": {
+        "Site_id": "efgh",
+        "Adgroup_id": "4028cbff379738bf0137fe3892bd158a",
+        "Request_Params": {
+            "site_ratings": "0,2",
+            "targeting_platform": "APP",
+            "format": "html",
+            "adpool_responseformat": "HTML",
+            "new_category": "70,71",
+            "maxCasRequestCounter": "1",
+            "carriercountry": "1",
+            "geo_countryid": "1",
+            "adpool_selectedslots": "2"
+        },
+        "Validations": {
+            "geo_countryid": "1",
+            "adpool_selectedslots": "2"
+        }
+    }
+}

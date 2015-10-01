@@ -1,19 +1,14 @@
 package com.inmobi.castest.ixtests;
 
-import java.util.UUID;
-
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import com.inmobi.castest.api.LogLines;
-import com.inmobi.castest.casconfenums.def.CasConf;
 import com.inmobi.castest.casconfenums.def.CasConf.LogStringParams;
 import com.inmobi.castest.casconfenums.impl.LogStringConf;
 import com.inmobi.castest.commons.generichelper.LogParserHelper;
 import com.inmobi.castest.dataprovider.FenderDataProvider;
 import com.inmobi.castest.utils.common.ResponseBuilder;
-import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 public class IXTest {
 
@@ -1266,9 +1261,9 @@ public class IXTest {
     // Assert.assertTrue(parserOutput.equals("PASS"));
     // }
 
-    public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
-        return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
-    }
+    // public String resetWilburyIntKey(final String oldImpressionId, final long adId) {
+    // return WilburyUUID.setIntKey(oldImpressionId, (int) adId).toString();
+    // }
     //
     // @Test(testName = "Tests that the auction id can be regenerated from the new impression id", dataProvider =
     // "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
@@ -1447,49 +1442,38 @@ public class IXTest {
 
     @Test(testName = "TEST_VAST_SDKVERSION_440", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_VAST_SDKVERSION_440(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as request failed minimum SDK check");
+        /* Deriving the parser output to assert for */
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
         Reporter.log(parserOutput, true);
+        // System.out.println("ParserOutput : " + parserOutput);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertFalse(response.contains(responseString1), "Found " + responseString1 + "in the response");
+        Assert.assertFalse(response.contains(responseString2), "Found " + responseString2 + "in the response");
     }
 
-    @Test(testName = "TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_SUPPLY_DOES_NOT_MATCH_DEMAND_MATCH(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser(LogStringConf
-            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
-        Reporter.log(parserOutput, true);
-    }
+    @Test(testName = "TEST_VAST_PUBCONTROLS_BANNER_450", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_PUBCONTROLS_BANNER_450(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        /* Deriving the parser output to assert for */
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
 
-    @Test(testName = "TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser(LogStringConf
-            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
-        Reporter.log(parserOutput, true);
-    }
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
 
-    /*@Test(testName = "TEST_MULTI_FORMAT_BOTH_ADGROUPS_INTERSTITIAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_MULTI_FORMAT_BOTH_ADGROUPS_INTERSTITIAL(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser(LogStringConf
-            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
         Reporter.log(parserOutput, true);
-    }
+        // System.out.println("ParserOutput : " + parserOutput);
 
-    @Test(testName = "TEST_MULTI_FORMAT_BOTH_ADGROUPS_VIDEO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_MULTI_FORMAT_BOTH_ADGROUPS_VIDEO(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser(LogStringConf
-            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
-        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertFalse(response.contains(responseString1), "Found " + responseString1 + "in the response");
+        Assert.assertFalse(response.contains(responseString2), "Found " + responseString2 + "in the response");
     }
-
-    @Test(testName = "TEST_MULTI_FORMAT_INTERSTITIAL_PLUS_VIDEO_REQUEST", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_MULTI_FORMAT_INTERSTITIAL_PLUS_VIDEO_REQUEST(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser(LogStringConf
-            .getLogString(LogStringParams.MSG_SENDING_NO_AD), "Not qualified for VAST video as publisher controls disallow video");
-        Reporter.log(parserOutput, true);
-    }*/
 
     @Test(testName = "TEST_IX_JSAC_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_JSAC_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder) throws Exception {
@@ -1617,8 +1601,10 @@ public class IXTest {
 
         searchStringInLog = "zone id not present, will say false";
 
-        parserOutput = LogParserHelper.logParser(LogStringConf
-            .getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL), searchStringInLog);
+        parserOutput =
+                LogParserHelper.logParser(
+                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
+                        searchStringInLog);
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -1628,31 +1614,75 @@ public class IXTest {
     public void TEST_REWARDED_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
         searchStringInLog = "Request not being served because rewarded video is not supported";
 
-        parserOutput =
-            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), searchStringInLog);
-
+        LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), searchStringInLog);
         Reporter.log(parserOutput, true);
     }
 
-    @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        final LogLines renderUnitInfo = LogParserHelper.queryForLogs("Impression Info Object");
-        final long renderUnitGuidHighBits = Long.parseLong(renderUnitInfo.applyRegex("id_high:[0-9/-]+", "[0-9/-]+"));
-        final long renderUnitGuidLowBits = Long.parseLong(renderUnitInfo.applyRegex("id_low:[0-9/-]+", "[0-9/-]+"));
-        final String renderUnitId = new UUID(renderUnitGuidHighBits, renderUnitGuidLowBits).toString();
+    @Test(testName = "TEST_KILOO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_KILOO(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        final LogLines impressionInfo = LogParserHelper.queryForLogs("Replaced impression id to new value");
-        final String impressionId = impressionInfo.applyRegex(CasConf.LogLinesRegex.UUID.getRegex());
-        final String impressionIdWithResetIntKey = resetWilburyIntKey(impressionId, 0);
+        // searchStringInLog = "zone id not present, will say false";
 
-        final LogLines adPoolResponse = LogParserHelper.queryForLogs("IX response json to RE is AdPoolResponse");
-        final long adPoolResponseRenderUnitGuidHighBits = Long.parseLong(adPoolResponse
-            .applyRegex("renderUnitId:GUID\\(id_high:[0-9/-]+", "[0-9/-]+"));
-        final long adPoolResponseRenderUnitGuidLowBits = Long.parseLong(adPoolResponse.applyRegex("renderUnitId:GUID\\(id_high:[0-9/-]+, id_low:[0-9/-]+", "id_low:[0-9/-]+","[0-9/-]+"));
-        final String adPoolResponseRenderUnitId = new UUID(adPoolResponseRenderUnitGuidHighBits, adPoolResponseRenderUnitGuidLowBits).toString();
 
-        Assert.assertTrue(impressionIdWithResetIntKey.equalsIgnoreCase(renderUnitId) , "RenderUnitId must equal impression id with empty int key");
-        Assert.assertTrue(adPoolResponseRenderUnitId.equalsIgnoreCase(renderUnitId) , "RenderUnitId in the beacon and AdPoolResponse must match");
+        String responseToEncrypt = new String();
+        final String grepFrom = "<html>";
+        final String grepUpto = "</html>";
+
+        final String response = new String(responseBuilder.getResponseData());
+        // System.out.println("\n\n***********************\n\n");
+        // System.out.println("RESPONSE IS : " + response);
+        // System.out.println("***********************\n\n");
+
+        if (response.contains("<html>")) {
+            responseToEncrypt =
+                    response.substring(response.indexOf(grepFrom), response.indexOf(grepUpto) + grepUpto.length());
+        }
+        System.out.println("\n\n***********************\n\n");
+        // System.out.println("RESPONSE IS : " + response);
+        System.out.println("***********************\n\n");
+        System.out.println(responseToEncrypt);
+        // else {
+        // System.out
+        // .println("The response received does not contain the expected String.Get a life (and another VAST xml)!");
+        // }
+        // System.out.println("-----\nENCRYPTED RESPONSE :\n" + responseToEncrypt);
+        //
+        // TemplateEncrypter.getEncryptedResponseHosted(responseToEncrypt);
     }
+
+    @Test(testName = "TESTIOS9", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TESTIOS9(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+
+    }
+
+    // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
+    // FenderDataProvider.class)
+    // public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder)
+    // throws Exception {
+    //
+    // final LogLines renderUnitInfo = LogParserHelper.queryForLogs("Impression Info Object");
+    // final long renderUnitGuidHighBits = Long.parseLong(renderUnitInfo.applyRegex("id_high:[0-9/-]+", "[0-9/-]+"));
+    // final long renderUnitGuidLowBits = Long.parseLong(renderUnitInfo.applyRegex("id_low:[0-9/-]+", "[0-9/-]+"));
+    // final String renderUnitId = new UUID(renderUnitGuidHighBits, renderUnitGuidLowBits).toString();
+    //
+    // final LogLines impressionInfo = LogParserHelper.queryForLogs("Replaced impression id to new value");
+    // final String impressionId = impressionInfo.applyRegex(CasConf.LogLinesRegex.UUID.getRegex());
+    // final String impressionIdWithResetIntKey = resetWilburyIntKey(impressionId, 0);
+    //
+    // final LogLines adPoolResponse = LogParserHelper.queryForLogs("IX response json to RE is AdPoolResponse");
+    // final long adPoolResponseRenderUnitGuidHighBits =
+    // Long.parseLong(adPoolResponse.applyRegex("renderUnitId:GUID\\(id_high:[0-9/-]+", "[0-9/-]+"));
+    // final long adPoolResponseRenderUnitGuidLowBits =
+    // Long.parseLong(adPoolResponse.applyRegex("renderUnitId:GUID\\(id_high:[0-9/-]+, id_low:[0-9/-]+",
+    // "id_low:[0-9/-]+", "[0-9/-]+"));
+    // final String adPoolResponseRenderUnitId =
+    // new UUID(adPoolResponseRenderUnitGuidHighBits, adPoolResponseRenderUnitGuidLowBits).toString();
+    //
+    // Assert.assertTrue(impressionIdWithResetIntKey.equalsIgnoreCase(renderUnitId),
+    // "RenderUnitId must equal impression id with empty int key");
+    // Assert.assertTrue(adPoolResponseRenderUnitId.equalsIgnoreCase(renderUnitId),
+    // "RenderUnitId in the beacon and AdPoolResponse must match");
+    // }
 }

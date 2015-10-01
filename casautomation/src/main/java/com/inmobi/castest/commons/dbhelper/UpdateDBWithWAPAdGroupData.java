@@ -78,7 +78,8 @@ public class UpdateDBWithWAPAdGroupData {
 
         WAPGroupDBManipulation.UpdateWapChannelAdgroupInDB(wapChannelAdGroup, advertiserIdList);
         // Use with caution
-        if (null != wapChannelAdGroup.get("multiformat_request") && 2 == Integer.parseInt(wapChannelAdGroup.get("multiformat_request"))) {
+        if (null != wapChannelAdGroup.get("multiformat_request")
+                && 2 == Integer.parseInt(wapChannelAdGroup.get("multiformat_request"))) {
             wapChannelAdGroup.put("ad_type_targeting", wapChannelAdGroup.get("ad_type_targeting2"));
             wapChannelAdGroup.put("adgroup_id", new UUID(0l, 0l).toString());
             WAPGroupDBManipulation.UpdateWapChannelAdgroupInDB(wapChannelAdGroup, advertiserIdList);

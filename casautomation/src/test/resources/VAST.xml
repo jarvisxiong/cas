@@ -1,38 +1,116 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:noNamespaceSchemaLocation="vast.xsd">
-<Ad id="3776076">
-<Wrapper>
-<AdSystem version="1">RubiconProject</AdSystem>
-<VASTAdTagURI><![CDATA[http://bid.g.doubleclick.net/xbbe/creative/vast?d=APEucNU4yG7GSN14gn91cAVYmfo28JewLB15ihznOSLTMl0EammSpC3nJV5HGGVeeSaNQlDuy0cgvQjFK0A2K-fqROL7FyosLf2Ljw9LLLogN3wY5-qjHC4AmOSPHD3eQZVfH7z8VoM6NA9Tup5aFyIRDWeaz_bdB20ohNBBk4v3tTgI-Ovb7uoVi29RLojNMpy1LftX-rn4v627lsAF9M03r6c8fiOUMIcV6ryaDs-HQizBASibvNFn99T7rgVkMnfEwnsON4bMtagyG9zoq951KDR8xV-3tvve3hUf0QGm3qWuxNuf_dx7A78DTnAnvPEv20d-RTrqheS_Xn3V3Bcmh3z111aWDTE9AVzuxfZI7ZpHJTmsFQKOZTe6ffubld9zEyJ1HnrNGsmjjjHluaflQPt-I9jpvQ&pr=E17B8AC89DA0B6F8]]></VASTAdTagURI>
-<Impression><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=CBADCB97774921C6F220776BCB42EE293838D7F57DB3271999691AAF848E146DCC30A92680297AF5F2E8271AD017B135BAD467818582DC674923C7A718D011330ADD1523441FF5B62EC17F96206B4604]]></Impression>
-<Error><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=6120898058972C4616D016827A05A08D1296378A0FBCBDF52655074B7A6E957235B80BF483C0A13FBFEFF7660F981A2C5FD5C1B593DA8E85E7BEC36BD9B59C706A4BBB3100ECE517]]></Error>
-<Creatives>
-<Creative>
-<Linear>
-<TrackingEvents>
-<Tracking event="creativeView"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=498E45A22EEBCA466723304C7E2DD80C16D016827A05A08D1296378A0FBCBDF52655074B7A6E957235B80BF483C0A13FBFEFF7660F981A2C5FD5C1B593DA8E85E7BEC36BD9B59C706A4BBB3100ECE517]]></Tracking>
-<Tracking event="start"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=323A6F566D9A526F16D016827A05A08D1296378A0FBCBDF52655074B7A6E957235B80BF483C0A13FBFEFF7660F981A2C5FD5C1B593DA8E85E7BEC36BD9B59C706A4BBB3100ECE517]]></Tracking>
-<Tracking event="midpoint"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=2D6EF7C7B3D881A9C905F422BDB46789DB5EDECB6D85616B8D0EECC357AE33988BDA63691B1DAFB6BCC86FFD5E18A14EB1B6C31FCF3BFC6C4C52A8D9F2606FDF836829DF7E445BC9]]></Tracking>
-<Tracking event="firstQuartile"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=C1A0864160A107F4B226FF0CA313975790DC5C64E10348B00F96E09B5240078C7CF96E88111649D3D4BD035EE7B266878AAF6EE142063FC23A5A21B909EA5F3D8CA474E2AEA09E07B1CDD50B590BA14B]]></Tracking>
-<Tracking event="thirdQuartile"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=3ADD8F99CD221680B226FF0CA313975790DC5C64E10348B00F96E09B5240078C7CF96E88111649D3D4BD035EE7B266878AAF6EE142063FC23A5A21B909EA5F3D8CA474E2AEA09E07B1CDD50B590BA14B]]></Tracking>
-<Tracking event="complete"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=EF05D8E5B84FFBB0C905F422BDB46789DB5EDECB6D85616B8D0EECC357AE33988BDA63691B1DAFB6BCC86FFD5E18A14EB1B6C31FCF3BFC6C4C52A8D9F2606FDF836829DF7E445BC9]]></Tracking>
-<Tracking event="mute"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=C1EF9A7ACD2CE027D8DB1B2D1C7C379EC01A50C0C1441CB2DDF665371CABFC7FF1ED3635DD56233D8E6B28F8AEBFA3B233CB06D7490F0C8AAB1509833AE14BD2DB2B871BCDBEC714]]></Tracking>
-<Tracking event="unmute"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=1B24E58C8E04147390DC5C64E10348B00F96E09B5240078C7CF96E88111649D3D4BD035EE7B266878AAF6EE142063FC23A5A21B909EA5F3D8CA474E2AEA09E07B1CDD50B590BA14B]]></Tracking>
-<Tracking event="pause"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=C126B25ED76556CE16D016827A05A08D1296378A0FBCBDF52655074B7A6E957235B80BF483C0A13FBFEFF7660F981A2C5FD5C1B593DA8E85E7BEC36BD9B59C706A4BBB3100ECE517]]></Tracking>
-<Tracking event="rewind"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=3C51A362CE1A282290DC5C64E10348B00F96E09B5240078C7CF96E88111649D3D4BD035EE7B266878AAF6EE142063FC23A5A21B909EA5F3D8CA474E2AEA09E07B1CDD50B590BA14B]]></Tracking>
-<Tracking event="resume"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=E166B0840251226290DC5C64E10348B00F96E09B5240078C7CF96E88111649D3D4BD035EE7B266878AAF6EE142063FC23A5A21B909EA5F3D8CA474E2AEA09E07B1CDD50B590BA14B]]></Tracking>
-<Tracking event="fullscreen"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=FB78FA73384AC4F637A5C9E568F2755E3838D7F57DB3271999691AAF848E146DCC30A92680297AF5F2E8271AD017B135BAD467818582DC674923C7A718D011330ADD1523441FF5B62EC17F96206B4604]]></Tracking>
-<Tracking event="expand"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=2F2D60639426C85090DC5C64E10348B00F96E09B5240078C7CF96E88111649D3D4BD035EE7B266878AAF6EE142063FC23A5A21B909EA5F3D8CA474E2AEA09E07B1CDD50B590BA14B]]></Tracking>
-<Tracking event="collapse"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=C140A0DE32AE5E44C905F422BDB46789DB5EDECB6D85616B8D0EECC357AE33988BDA63691B1DAFB6BCC86FFD5E18A14EB1B6C31FCF3BFC6C4C52A8D9F2606FDF836829DF7E445BC9]]></Tracking>
-<Tracking event="acceptInvitation"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=CB7F724D5631BC92B5E2858846470B46A863FB3B68CAC6830A1E6D5A88A76A04E74A783DE7B935A64E6C3261B8685C667183DA10401C2D23F295CE4C8D805D9DECF049C1BBEDD93A72533CCF23894F7C843D61C4C293BAD1]]></Tracking>
-<Tracking event="close"><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=11F74E138A4437A116D016827A05A08D1296378A0FBCBDF52655074B7A6E957235B80BF483C0A13FBFEFF7660F981A2C5FD5C1B593DA8E85E7BEC36BD9B59C706A4BBB3100ECE517]]></Tracking>
-</TrackingEvents>
-<VideoClicks>
-<ClickTracking><![CDATA[http://beacon-us-east.rubiconproject.com/beacon/v?accountId=11726&siteId=38310&zoneId=161002&e=BE7AC75245C0764516D016827A05A08D1296378A0FBCBDF52655074B7A6E957235B80BF483C0A13FBFEFF7660F981A2C5FD5C1B593DA8E85E7BEC36BD9B59C706A4BBB3100ECE517]]></ClickTracking>
-</VideoClicks>
-</Linear>
-</Creative>
-</Creatives>
-</Wrapper>
-</Ad>
+<?xml version="1.0" encoding="utf-8"?>
+<VAST version="2.0">
+	<Ad id="539893">
+		<InLine>
+			<AdSystem version="1.0">Phunware</AdSystem>
+			<AdTitle>
+        <![CDATA[Copy of Coke]]>
+			</AdTitle>
+			<Description>
+        <![CDATA[ ]]>
+			</Description>
+			<Impression id="PW">
+        <![CDATA[http://i.tapit.com/pixel.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&lat=33.369&long=-117.219&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&extcpm=${AUCTION_PRICE:BF}&rt=2&mapper_id=4]]>
+			</Impression>
+			<Error>
+        <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=error_[ERRORCODE]]]>
+			</Error>
+			<Creatives>
+				<Creative sequence="1" id="539893">
+					<Linear>
+						<Duration>00:00:15</Duration>
+						<TrackingEvents>
+							<Tracking event="firstQuartile">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=firstQuartile]]>
+							</Tracking>
+							<Tracking event="midpoint">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=midpoint]]>
+							</Tracking>
+							<Tracking event="thirdQuartile">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=thirdQuartile]]>
+							</Tracking>
+							<Tracking event="complete">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=complete]]>
+							</Tracking>
+							<Tracking event="mute">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=mute]]>
+							</Tracking>
+							<Tracking event="unmute">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=unmute]]>
+							</Tracking>
+							<Tracking event="pause">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=pause]]>
+							</Tracking>
+							<Tracking event="resume">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=resume]]>
+							</Tracking>
+							<Tracking event="fullscreen">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=fullscreen]]>
+							</Tracking>
+							<Tracking event="close">
+                <![CDATA[http://i.tapit.com/trackevent.php?zone=54197&cid=539893&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&udid=&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&adnetwork=1&evt=close]]>
+							</Tracking>
+						</TrackingEvents>
+						<MediaFiles>
+							<MediaFile delivery="streaming" bitrate="200"
+								maxBitrate="300" minBitrate="200" width="480" height="320"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_240k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="400"
+								maxBitrate="600" minBitrate="400" width="480" height="320"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_440k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="600"
+								maxBitrate="900" minBitrate="600" width="480" height="320"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_640k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="1500"
+								maxBitrate="1800" minBitrate="1500" width="480" height="320"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_1540k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="1500"
+								maxBitrate="1800" minBitrate="1500" width="640" height="480"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_B1540k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="1800"
+								maxBitrate="2250" minBitrate="1800" width="960" height="540"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_1840k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="4500"
+								maxBitrate="4660" minBitrate="4500" width="1280" height="720"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_4040k.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="0"
+								maxBitrate="0" minBitrate="0" width="0" height="0" type="video/mp4"
+								apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_playlist.m3u8]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="1500"
+								maxBitrate="0" minBitrate="1500" width="480" height="320"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_480x320.mp4]]>
+							</MediaFile>
+							<MediaFile delivery="streaming" bitrate="1500"
+								maxBitrate="0" minBitrate="1500" width="640" height="480"
+								type="video/mp4" apiFramework="TapIt">
+                        <![CDATA[http://d2bgg7rjywcwsy.cloudfront.net/videos/104873/539893/encoded/320_480_640x480.mp4]]>
+							</MediaFile>
+						</MediaFiles>
+						<VideoClicks>
+							<ClickThrough>
+                <![CDATA[http://c.tapit.com/adclick.php?zone=54197&cid=539893&adtype=6&w=320&h=50&xid=635d57ce06fc3bf5833b00e483995ec2&ip=76.176.81.236&lat=33.369&long=-117.219&udid=&adnetwork=1&ua=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+8_1_3+like+Mac+OS+X%29+AppleWebKit%2F600.1.4+%28KHTML%2C+like+Gecko%29+Mobile%2F12B466+%5BFBAN%2FFBIOS%3BFBAV%2F29.0.0.9.13%3BFBBV%2F9374459%3BFBDV%2FiPhone6%2C1%3BFBMD%2FiPhone%3BFBSN%2FiPhone+OS%3BFBSV%2F8.1.3%3BFBSS%2F2%3B+FBCR%2FVerizon%3BFBID%2Fphone%3BFBLC%2Fen_US%3BFBOP%2F5%5D&extcpm=${AUCTION_PRICE:BF}&rt=2&mapper_id=4]]>
+							</ClickThrough>
+						</VideoClicks>
+					</Linear>
+				</Creative>
+			</Creatives>
+		</InLine>
+	</Ad>
 </VAST>
