@@ -43,7 +43,7 @@ import com.inmobi.segment.impl.ZipCodePresent;
 
 public class IXPackageMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(IXPackageMatcher.class);
-    public static final int PACKAGE_MAX_LIMIT = 30;
+    public static final int PACKAGE_MAX_LIMIT = 35;
 
     public static List<Integer> findMatchingPackageIds(final SASRequestParameters sasParams,
         final RepositoryHelper repositoryHelper, final Short selectedSlotId, final ChannelSegmentEntity adGroupEntity) {
