@@ -485,10 +485,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Find matching packages
         final long startTime = System.currentTimeMillis();
-        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId);
+        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId, entity);
         final long endTime = System.currentTimeMillis();
-        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
-                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+        InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst())
+            .name(), InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
         if (CollectionUtils.isNotEmpty(packageIds)) {
             final RPImpressionExtension rp =
@@ -534,10 +534,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Native createNativeObject() {
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
-            LOG.info(traceMarker,
-                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-            LOG.info(traceMarker,
-                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+            LOG.info(traceMarker, String
+                .format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+            LOG.info(traceMarker, String
+                .format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
@@ -848,8 +848,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
 
-        String marketId = wapSiteUACEntity.getMarketId();
-        marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
+        final String marketId;
+        if (wapSiteUACEntity.isIOS()) {
+            marketId = StringUtils.defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
+        } else {
+            marketId = StringUtils.defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
+        }
+
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
         }
@@ -1233,8 +1238,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent =
                     IXAdNetworkHelper
-                            .videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams, repositoryHelper,
-                                    selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
+                            .videoAdBuilding(templateConfiguration
+                                .getTemplateTool(), sasParams, repositoryHelper, selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1253,8 +1258,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_CAU_RESPONSES);
         try {
             responseContent =
-                    IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
-                            getAdMarkUp(), getWinUrl());
+                    IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;

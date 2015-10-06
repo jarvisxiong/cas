@@ -1,4 +1,4 @@
-CREATE TYPE ix_package_type_06072015 AS
+CREATE TYPE ix_package_type_07092015 AS
 (
     id                          INTEGER,
     name                        CHARACTER VARYING(128),
@@ -27,8 +27,8 @@ CREATE TYPE ix_package_type_06072015 AS
     cs_ids                      INTEGER[],
     min_bid                     NUMERIC(10,6),
     scheduled_tods              SMALLINT[],
-    placement_ad_types          CHARACTER VARYING(16)[],
     placement_slot_ids          SMALLINT[],
+    ad_type_targeting           INTEGER,
     is_active                   BOOLEAN,
     start_date                  TIMESTAMP WITHOUT TIME ZONE,
     end_date                    TIMESTAMP WITHOUT TIME ZONE,
@@ -42,6 +42,6 @@ CREATE TYPE ix_package_type_06072015 AS
     rp_agency_ids               INTEGER[],
     agency_rebate_percentages   DOUBLE PRECISION[]
 );
-ALTER TYPE ix_package_type_06072015 OWNER TO postgres;
+ALTER TYPE ix_package_type_07092015 OWNER TO postgres;
 
 

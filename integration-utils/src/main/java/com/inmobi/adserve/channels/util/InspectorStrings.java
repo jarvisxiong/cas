@@ -170,6 +170,7 @@ public class InspectorStrings {
     public static final String PACKAGE_FILTER_STATS = "PackageFilterStats";
     public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
     public static final String DROPPED_IN_PACKAGE_DMP_FILTER = "DroppedInPackageDMPFilter";
+    public static final String DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER = "DroppedInPackageAdTypeTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER = "DroppedInPackageManufModelTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_OS_VERSION_FILTER = "DroppedInPackageOSVersionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";

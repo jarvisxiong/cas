@@ -44,6 +44,7 @@ import com.googlecode.cqengine.attribute.MultiValueAttribute;
 import com.googlecode.cqengine.attribute.MultiValueNullableAttribute;
 import com.googlecode.cqengine.index.hash.HashIndex;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.data.repository.DBReaderDelegate;
 import com.inmobi.data.repository.ScheduledDbReader;
 import com.inmobi.segment.Segment;
@@ -222,6 +223,7 @@ public class IXPackageRepository {
                 final String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
                 String[] geoSourceTypes = null;
                 final String geoFenceRegion = rs.getString("geo_fence_region");
+                final int adTypeTargeting = rs.getInt("ad_type_targeting");
 
                 if (null != rs.getArray("geo_source_types")) {
                     geoSourceTypes = (String[]) rs.getArray("geo_source_types").getArray();
@@ -436,6 +438,8 @@ public class IXPackageRepository {
                 entityBuilder.osVersionTargeting(osVersionTargeting);
                 entityBuilder.manufModelTargeting(manufModelTargeting);
                 entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
+                entityBuilder.demandAdFormatConstraints(DemandAdFormatConstraints
+                    .getDemandAdFormatConstraintsByValue(adTypeTargeting));
 
                 if (null != dealIds) {
                     entityBuilder.dealIds(Arrays.asList(dealIds));

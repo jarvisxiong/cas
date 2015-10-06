@@ -1,9 +1,9 @@
-CREATE FUNCTION ix_package_fun_06072015()
+CREATE FUNCTION ix_package_fun_07092015()
 RETURNS
-    SETOF ix_package_type_06072015 AS
+    SETOF ix_package_type_07092015 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_06072015%ROWTYPE;
+    row1    ix_package_type_07092015%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -35,8 +35,8 @@ SELECT
                 ix_packages.cs_ids AS cs_ids,
                 ix_packages.min_bid AS min_bid,
                 ix_packages.scheduled_tods AS scheduled_tods,
-                ix_packages.placement_ad_types AS placement_ad_types,
                 ix_packages.placement_slot_ids AS placement_slot_ids,
+                ix_packages.ad_type_targeting,
                 ix_packages.is_active AS is_active,
                 ix_packages.start_date AS start_date,
                 ix_packages.end_date AS end_date,

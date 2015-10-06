@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.Range;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.segment.Segment;
 
 import lombok.Builder;
@@ -31,4 +32,5 @@ public class IXPackageEntity {
     private Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
     private Double dataVendorCost;
     private String geoFenceRegion;
+    private final DemandAdFormatConstraints demandAdFormatConstraints;
 }

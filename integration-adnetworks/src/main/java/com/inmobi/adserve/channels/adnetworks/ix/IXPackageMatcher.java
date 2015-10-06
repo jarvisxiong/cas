@@ -15,12 +15,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Range;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
@@ -44,7 +46,7 @@ public class IXPackageMatcher {
     public static final int PACKAGE_MAX_LIMIT = 30;
 
     public static List<Integer> findMatchingPackageIds(final SASRequestParameters sasParams,
-        final RepositoryHelper repositoryHelper, final Short selectedSlotId) {
+        final RepositoryHelper repositoryHelper, final Short selectedSlotId, final ChannelSegmentEntity adGroupEntity) {
         LOG.debug("Inside IX Package Matcher");
         List<Integer> matchedPackageIds = new ArrayList<>();
 
@@ -66,10 +68,20 @@ public class IXPackageMatcher {
         int droppedInPackageOsVersionFilter = 0;
         int droppedInPackageGeoRegionFilter = 0;
         int droppedInPackageSegmentSubsetFilter = 0;
+        int droppedInPackageAdTypeTargetingFilter = 0;
 
         // TODO: Refactor into proper filters
         for (IXPackageEntity packageEntity : resultSet) {
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
+
+                final boolean failsAdTypeTargetingFilter = !checkForAdTypeTargeting(
+                    adGroupEntity.getDemandAdFormatConstraints(), packageEntity.getDemandAdFormatConstraints());
+
+                if (failsAdTypeTargetingFilter) {
+                    LOG.debug("Package {} dropped in Ad Type Targeting Filter", packageEntity.getId());
+                    droppedInPackageAdTypeTargetingFilter += 1;
+                    continue;
+                }
 
                 // Add to matchedPackageIds only if csId's match
                 if (CollectionUtils.isNotEmpty(packageEntity.getDmpFilterSegmentExpression())
@@ -128,6 +140,8 @@ public class IXPackageMatcher {
         }
 
         InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
+                InspectorStrings.DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER, droppedInPackageAdTypeTargetingFilter);
+        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
                 InspectorStrings.DROPPED_IN_PACKAGE_DMP_FILTER, droppedInPackageDMPFilter);
         InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
                 InspectorStrings.DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER, droppedInPackageManufModelFilter);
@@ -142,7 +156,8 @@ public class IXPackageMatcher {
         return matchedPackageIds;
     }
 
-    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
+    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags,
+        final Set<Set<Integer>> dmpFilterExpression) {
         if (CollectionUtils.isEmpty(csiReqTags)) {
             return false;
         } else {
@@ -155,7 +170,10 @@ public class IXPackageMatcher {
         return true;
     }
 
-
+    protected static boolean checkForAdTypeTargeting(final DemandAdFormatConstraints adgroupDemandConstraints,
+        final DemandAdFormatConstraints packageDemandConstraints) {
+        return adgroupDemandConstraints == packageDemandConstraints;
+    }
 
     /**
      * Checks whether Os Version Targeting is satisfied.

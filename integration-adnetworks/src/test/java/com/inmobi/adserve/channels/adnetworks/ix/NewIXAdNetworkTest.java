@@ -108,6 +108,8 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getString("key.2.value")).andReturn("Secret Key").anyTimes();
         expect(mockConfig.getString("beaconURLPrefix")).andReturn("BeaconPrefix").anyTimes();
         expect(mockConfig.getString("clickURLPrefix")).andReturn("ClickPrefix").anyTimes();
+        expect(mockConfig.getString("beaconSecureURLPrefix", "https://c2.w.inmobi.com/c.asm")).andReturn("BeaconPrefix").anyTimes();
+        expect(mockConfig.getString("clickSecureURLPrefix", "https://c2.w.inmobi.com/c.asm")).andReturn("ClickPrefix").anyTimes();
         replayAll();
     }
 
@@ -255,8 +257,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -277,10 +278,10 @@ public class NewIXAdNetworkTest {
                     + "                <style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p>\n"
                     + "\n" + "                <script type='text/javascript'>\n"
                     + "                    var events = {\n"
-                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/_DwcFv-_v-vf0qTbfRb_____3____3UAFgEAAEwAAA/1/c7e1f87e?m=1' ],\n"
+                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=1' ],\n"
                     + "                        renderBeacons : [\n"
-                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/_DwcFv-_v-vf0qTbfRb_____3____3UAFgEAAEwAAA/1/c7e1f87e?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/_DwcFv-_v-vf0qTbfRb_____3____3UAFgEAAEwAAA/1/242d80c6' ]\n"
+                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
+                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/49c8c14b' ]\n"
                     + "                    },\n" + "                    eventHandler = {\n"
                     + "                        fireBeacon : function (beaconUrl) {\n"
                     + "                            if (undefined === beaconUrl) {\n"
@@ -293,26 +294,33 @@ public class NewIXAdNetworkTest {
                     + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
                     + "                                var element = beaconList[index];\n"
                     + "                                if (undefined !== element) {\n"
-                    + "                                    fireBeacon(beaconList[index]);\n"
+                    + "                                    this.fireBeacon(beaconList[index]);\n"
                     + "                                }\n" + "                            }\n"
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                    + "                            fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                    + "                        fireRenderBeacons : function () {\n"
-                    + "                            fireBeacons(events.renderBeacons);\n"
+                    + "                            this.fireBeacons(events.loadBeacons);\n"
+                    + "                        },\n" + "                        fireRenderBeacons : function () {\n"
+                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
-                    + "                            fireBeacons(events.clickBeacons);\n" + "                        }\n"
-                    + "                    };\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                            this.fireBeacons(events.clickBeacons);\n"
+                    + "                        }\n" + "                    };\n" + "\n" + "\n"
+                    + "                    function fireADReady () {\n"
                     + "                        var readyHandler=function() {\n"
-                    + "                                                        document.removeEventListener('ready', readyHandler);\n"
+                    + "                            _im_imai.fireAdReady();\n"
+                    + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
+                    + "                        };\n"
+                    + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                        var readyHandler=function() {\n"
+                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('ready', readyHandler);\n"
+                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                    + "                    setupClick();\n" + "                    setupRender();\n"
+                    + "                    setupClick();\n" + "                                        setupRender();\n"
                     + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
                     + "</html>\n")));
     }
@@ -463,13 +471,13 @@ public class NewIXAdNetworkTest {
                     + "    <body style=\"margin:0;padding:0;\">\n"
                     + "        <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
                     + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
-                    + "                <script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA\\/1\\/ab0e03eb?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA\\/1\\/82970ec2\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"123.45\",geo_lng:\"678.9\",geo_cc:\"55\",geo_zip:\"560103\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script>\n"
+                    + "                <script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/f72421f7?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/81965087\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"123.45\",geo_lng:\"678.9\",geo_cc:\"55\",geo_zip:\"560103\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script>\n"
                     + "\n" + "                <script type='text/javascript'>\n"
                     + "                    var events = {\n"
-                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/ab0e03eb?m=1' ],\n"
+                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=1' ],\n"
                     + "                        renderBeacons : [\n"
-                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/ab0e03eb?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/82970ec2' ]\n"
+                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
+                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81965087' ]\n"
                     + "                    },\n" + "                    eventHandler = {\n"
                     + "                        fireBeacon : function (beaconUrl) {\n"
                     + "                            if (undefined === beaconUrl) {\n"
@@ -482,26 +490,33 @@ public class NewIXAdNetworkTest {
                     + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
                     + "                                var element = beaconList[index];\n"
                     + "                                if (undefined !== element) {\n"
-                    + "                                    fireBeacon(beaconList[index]);\n"
+                    + "                                    this.fireBeacon(beaconList[index]);\n"
                     + "                                }\n" + "                            }\n"
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                    + "                            fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                    + "                        fireRenderBeacons : function () {\n"
-                    + "                            fireBeacons(events.renderBeacons);\n"
+                    + "                            this.fireBeacons(events.loadBeacons);\n"
+                    + "                        },\n" + "                        fireRenderBeacons : function () {\n"
+                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
-                    + "                            fireBeacons(events.clickBeacons);\n" + "                        }\n"
-                    + "                    };\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                            this.fireBeacons(events.clickBeacons);\n"
+                    + "                        }\n" + "                    };\n" + "\n" + "\n"
+                    + "                    function fireADReady () {\n"
                     + "                        var readyHandler=function() {\n"
-                    + "                                                        document.removeEventListener('ready', readyHandler);\n"
+                    + "                            _im_imai.fireAdReady();\n"
+                    + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
+                    + "                        };\n"
+                    + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                        var readyHandler=function() {\n"
+                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('ready', readyHandler);\n"
+                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                    + "                    setupClick();\n" + "                    setupRender();\n"
+                    + "                    setupClick();\n" + "                                        setupRender();\n"
                     + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
                     + "</html>\n")));
     }
@@ -586,13 +601,13 @@ public class NewIXAdNetworkTest {
                     + "    <body style=\"margin:0;padding:0;\">\n"
                     + "        <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
                     + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
-                    + "                <script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA\\/1\\/ab0e03eb?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA\\/1\\/82970ec2\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"\",geo_lng:\"\",geo_cc:\"\",geo_zip:\"\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script>\n"
+                    + "                <script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/f72421f7?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/81965087\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"\",geo_lng:\"\",geo_cc:\"\",geo_zip:\"\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script>\n"
                     + "\n" + "                <script type='text/javascript'>\n"
                     + "                    var events = {\n"
-                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/ab0e03eb?m=1' ],\n"
+                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=1' ],\n"
                     + "                        renderBeacons : [\n"
-                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/ab0e03eb?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AZCQU5ORVIcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/82970ec2' ]\n"
+                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
+                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81965087' ]\n"
                     + "                    },\n" + "                    eventHandler = {\n"
                     + "                        fireBeacon : function (beaconUrl) {\n"
                     + "                            if (undefined === beaconUrl) {\n"
@@ -605,26 +620,33 @@ public class NewIXAdNetworkTest {
                     + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
                     + "                                var element = beaconList[index];\n"
                     + "                                if (undefined !== element) {\n"
-                    + "                                    fireBeacon(beaconList[index]);\n"
+                    + "                                    this.fireBeacon(beaconList[index]);\n"
                     + "                                }\n" + "                            }\n"
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                    + "                            fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                    + "                        fireRenderBeacons : function () {\n"
-                    + "                            fireBeacons(events.renderBeacons);\n"
+                    + "                            this.fireBeacons(events.loadBeacons);\n"
+                    + "                        },\n" + "                        fireRenderBeacons : function () {\n"
+                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
-                    + "                            fireBeacons(events.clickBeacons);\n" + "                        }\n"
-                    + "                    };\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                            this.fireBeacons(events.clickBeacons);\n"
+                    + "                        }\n" + "                    };\n" + "\n" + "\n"
+                    + "                    function fireADReady () {\n"
                     + "                        var readyHandler=function() {\n"
-                    + "                                                        document.removeEventListener('ready', readyHandler);\n"
+                    + "                            _im_imai.fireAdReady();\n"
+                    + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
+                    + "                        };\n"
+                    + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                        var readyHandler=function() {\n"
+                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('ready', readyHandler);\n"
+                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                    + "                    setupClick();\n" + "                    setupRender();\n"
+                    + "                    setupClick();\n" + "                                        setupRender();\n"
                     + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
                     + "</html>\n")));
     }
@@ -808,8 +830,7 @@ public class NewIXAdNetworkTest {
         replayAll();
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -819,22 +840,22 @@ public class NewIXAdNetworkTest {
                 ixAdNetwork.getResponseContent(),
                 is(equalTo("<html>\n" + "    <head>\n"
                     + "                    <meta name=\"viewport\" content=\"width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/>\n"
-                    + "            <base href=\"imaiBaseUrl\"></base>\n"
-                    + "                <style type=\"text/css\">\n" + "            #im_1011_ad{\n"
-                    + "                display: table;\n" + "            }\n" + "            #im_1011_p{\n"
-                    + "                vertical-align: middle;\n" + "                text-align: center;\n"
-                    + "            }\n" + "                        .im_1011_beacon{\n"
-                    + "                display: none;\n" + "            }\n" + "        </style>\n" + "    </head>\n"
+                    + "            <base href=\"imaiBaseUrl\"></base>\n" + "                <style type=\"text/css\">\n"
+                    + "            #im_1011_ad{\n" + "                display: table;\n" + "            }\n"
+                    + "            #im_1011_p{\n" + "                vertical-align: middle;\n"
+                    + "                text-align: center;\n" + "            }\n"
+                    + "                        .im_1011_beacon{\n" + "                display: none;\n"
+                    + "            }\n" + "        </style>\n" + "    </head>\n"
                     + "    <body style=\"margin:0;padding:0;\">\n"
                     + "        <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
                     + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
                     + "                <script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p>\n"
                     + "\n" + "                <script type='text/javascript'>\n"
                     + "                    var events = {\n"
-                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AxJTlRFUlNUSVRJQUwcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/2a9c304e?m=1' ],\n"
+                    + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=1' ],\n"
                     + "                        renderBeacons : [\n"
-                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AxJTlRFUlNUSVRJQUwcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/2a9c304e?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/6AxJTlRFUlNUSVRJQUwcPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/fe832cb2' ]\n"
+                    + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
+                    + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/b156f9ea' ]\n"
                     + "                    },\n" + "                    eventHandler = {\n"
                     + "                        fireBeacon : function (beaconUrl) {\n"
                     + "                            if (undefined === beaconUrl) {\n"
@@ -847,29 +868,36 @@ public class NewIXAdNetworkTest {
                     + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
                     + "                                var element = beaconList[index];\n"
                     + "                                if (undefined !== element) {\n"
-                    + "                                    fireBeacon(beaconList[index]);\n"
+                    + "                                    this.fireBeacon(beaconList[index]);\n"
                     + "                                }\n" + "                            }\n"
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                    + "                            fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                    + "                        fireRenderBeacons : function () {\n"
-                    + "                            fireBeacons(events.renderBeacons);\n"
+                    + "                            this.fireBeacons(events.loadBeacons);\n"
+                    + "                        },\n" + "                        fireRenderBeacons : function () {\n"
+                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
-                    + "                            fireBeacons(events.clickBeacons);\n" + "                        }\n"
-                    + "                    };\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                            this.fireBeacons(events.clickBeacons);\n"
+                    + "                        }\n" + "                    };\n" + "\n" + "\n"
+                    + "                    function fireADReady () {\n"
                     + "                        var readyHandler=function() {\n"
-                    + "                                                            _im_imai.fireAdReady();\n"
-                    + "                                                        document.removeEventListener('ready', readyHandler);\n"
+                    + "                            _im_imai.fireAdReady();\n"
+                    + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
+                    + "                        };\n"
+                    + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
+                    + "                        var readyHandler=function() {\n"
+                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('ready', readyHandler);\n"
+                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                    + "                    setupClick();\n" + "                    setupRender();\n"
-                    + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
-                    + "</html>\n")));
+                    + "                    setupClick();\n"
+                    + "                                            fireAdReady();\n"
+                    + "                                        setupRender();\n" + "                </script>\n"
+                    + "            </div>\n" + "        </div>\n" + "    </body>\n" + "</html>\n")));
     }
 
     @Test
@@ -932,8 +960,7 @@ public class NewIXAdNetworkTest {
         ixAdNetwork.setHost("http://localhost:8080/getIXBid");
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         ImpressionIdGenerator.init((short) 123, (byte) 10);
 
         boolean result;
@@ -1327,8 +1354,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
@@ -1380,8 +1406,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.setDealRelatedMetadata();
@@ -1434,8 +1459,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.setDealRelatedMetadata();
@@ -1489,8 +1513,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.setDealRelatedMetadata();
@@ -1544,8 +1567,7 @@ public class NewIXAdNetworkTest {
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         MemberModifier.field(IXAdNetwork.class, "seatId").set(ixAdNetwork, "2");
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.setDealRelatedMetadata();
@@ -1596,8 +1618,7 @@ public class NewIXAdNetworkTest {
 
         MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
         setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork
-                .configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
         Formatter.init();
 
         ixAdNetwork.setDealRelatedMetadata();
