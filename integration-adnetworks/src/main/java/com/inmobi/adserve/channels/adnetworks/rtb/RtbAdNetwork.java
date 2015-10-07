@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -32,6 +33,7 @@ import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -640,6 +642,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         device.setIp(sasParams.getRemoteHostIp());
         device.setUa(sasParams.getUserAgent());
         device.setGeo(geo);
+
+        if(sasParams.getTUidParams().containsKey(UidType.IEM.toString())){
+            final String value = sasParams.getTUidParams().get(UidType.IEM.toString());
+            device.setDidsha1(DigestUtils.sha1Hex(value));
+            device.setDidmd5(DigestUtils.md5Hex(value));
+            device.setDidraw(value);
+
+        }
 
         final CcidMapEntity ccidMapEntity = repositoryHelper.queryCcidMapRepository(sasParams.getCarrierId());
         if (null != ccidMapEntity) {
