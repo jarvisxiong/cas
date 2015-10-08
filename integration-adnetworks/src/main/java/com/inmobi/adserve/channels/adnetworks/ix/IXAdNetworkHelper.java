@@ -18,6 +18,7 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.IMP_CB;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_BEACON_URL;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_CLICK_URL;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_GEO_CITY;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_SITE_PREFERENCES_JSON;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.OPEN_LP_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.RECORD_EVENT_FUN;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSION_ID;
@@ -164,6 +165,7 @@ public class IXAdNetworkHelper {
                         ? sasParams.getPubControlPreferencesJson()
                         : StringUtils.EMPTY;
         addSproutMacroToList(macros, substitutions, SITE_PREFERENCES_JSON, sitePreferences);
+        addSproutMacroToList(macros, substitutions, JS_ESC_SITE_PREFERENCES_JSON, javascriptEscape(sitePreferences));
 
         final String userId =
                 StringUtils.isNotEmpty(casInternal.getUidIFA()) ? casInternal.getUidIFA() : StringUtils
@@ -184,6 +186,10 @@ public class IXAdNetworkHelper {
         final String[] macroArray = macros.toArray(new String[macros.size()]);
         final String[] substitutionsArray = substitutions.toArray(new String[substitutions.size()]);
         return StringUtils.replaceEach(adm, macroArray, substitutionsArray);
+    }
+
+    private static String javascriptEscape(Object string) {
+        return string == null ? null : StringEscapeUtils.escapeJavaScript(String.valueOf(string));
     }
 
     /**
