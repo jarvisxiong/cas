@@ -333,8 +333,6 @@ public class IXAdNetworkHelper {
                     }
                     screenshotBuilder.setW(width);
                     screenshotBuilder.setH(height);
-                    final Double ar = (double) width / height;
-                    screenshotBuilder.setAr(String.valueOf(ar));
                     contextBuilder.setScreenshots(Arrays.asList(new Screenshot[] {(Screenshot) screenshotBuilder
                             .build()}));
                 }

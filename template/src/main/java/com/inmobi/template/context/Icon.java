@@ -11,13 +11,12 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Icon extends AbstractContext {
-
     private final int w;
     private final int width;
     private final int height;
     private final int h;
     private final String ar;
-    private final String aspectRatio;
+    private final double aspectRatio;
     private final String url;
 
     private Icon(final Builder builder) {
@@ -26,8 +25,8 @@ public class Icon extends AbstractContext {
         height = builder.h;
         width = builder.w;
         url = builder.url;
-        ar = String.valueOf(((double) w) / ((double)h));
-        aspectRatio = ar;
+        aspectRatio = (double) w / (double) h;
+        ar = String.valueOf(aspectRatio);
         setValues(params);
     }
 
@@ -38,7 +37,7 @@ public class Icon extends AbstractContext {
         params.put(KeyConstants.AR, ar);
         params.put(KeyConstants.WIDTH_FULL_TEXT, w);
         params.put(KeyConstants.HEIGHT_FULL_TEXT, h);
-        params.put(KeyConstants.AR_FULL_TEXT, ar);
+        params.put(KeyConstants.AR_FULL_TEXT, aspectRatio);
         params.put(KeyConstants.URL, url);
     }
 
@@ -48,7 +47,6 @@ public class Icon extends AbstractContext {
 
     @Setter
     public static class Builder {
-
         private int w;
         private int h;
         private String url;

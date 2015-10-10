@@ -17,7 +17,7 @@ public final class Screenshot extends AbstractContext {
     private final int width;
     private final int height;
     private final String ar;
-    private final String aspectRatio;
+    private final double aspectRatio;
     private final String url;
 
     private Screenshot(final Builder builder) {
@@ -26,20 +26,20 @@ public final class Screenshot extends AbstractContext {
         width = w;
         height = h;
         url = builder.url;
-        ar = builder.ar;
-        aspectRatio = builder.ar;
+        aspectRatio = (double) w / (double) h;
+        ar = String.valueOf(aspectRatio);
         setValues(params);
     }
 
     @Override
     public void setValues(final Map<String, Object> params) {
-        params.put("w", w);
-        params.put("h", h);
-        params.put("width", w);
-        params.put("height", h);
-        params.put("ar", ar);
-        params.put("aspectRatio", ar);
-        params.put("url", url);
+        params.put(KeyConstants.WIDTH, w);
+        params.put(KeyConstants.HEIGHT, h);
+        params.put(KeyConstants.WIDTH_FULL_TEXT, w);
+        params.put(KeyConstants.HEIGHT_FULL_TEXT, h);
+        params.put(KeyConstants.AR, ar);
+        params.put(KeyConstants.AR_FULL_TEXT, aspectRatio);
+        params.put(KeyConstants.URL, url);
     }
 
     public static Builder newBuilder() {
@@ -50,7 +50,6 @@ public final class Screenshot extends AbstractContext {
     public static class Builder {
         private int w;
         private int h;
-        private String ar;
         private String url;
 
         public Context build() {
