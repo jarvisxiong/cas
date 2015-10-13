@@ -69,7 +69,7 @@
                     };
 
 
-                    function fireADReady () {
+                    function fireAdReady () {
                         var readyHandler=function() {
                             _im_imai.fireAdReady();
                             _im_imai.removeEventListener('ready', readyHandler);
@@ -77,13 +77,41 @@
                         _im_imai.addEventListener('ready', readyHandler);
                     }
 
+                    var count = 0,
+                        mraid = window.mraid;
+
+                    function checkForMraid() {
+                        count++;
+
+                        if (4 !== count) {
+                            if ("undefined" !== typeof mraid) {
+                                if (typeof mraid.isViewable === "function" && mraid.isViewable()) {
+                                    eventHandler.fireRenderBeacons();
+                                } else {
+                                    mraid.addEventListener("viewableChange", function(viewable) {
+                                        if (viewable) {
+                                            mraid.removeEventListener("viewableChange", arguments.callee);
+                                            eventHandler.fireRenderBeacons();
+                                        }
+                                    });
+                                }
+                            }
+                        } else {
+                            setTimeout(checkForMraid, 500);
+                        }
+                    }
+
 
                     function setupRender () {
-                        var readyHandler=function() {
-                            document.removeEventListener('DOMContentLoaded', readyHandler);
+                        #if($isInterstitial)
+                            #if($SDK)
+                                checkForMraid();
+                            #else
+                                eventHandler.fireRenderBeacons();
+                            #end
+                        #else
                             eventHandler.fireRenderBeacons();
-                        };
-                        document.addEventListener('DOMContentLoaded', readyHandler);
+                        #end
                     }
 
 
@@ -97,7 +125,7 @@
 
                     eventHandler.fireLoadBeacons();
                     setupClick();
-                    #if($SDK450Onwards&&$isInterstitial)
+                    #if($SDK450Onwards && $isInterstitial)
                         fireAdReady();
                     #end
                     setupRender();

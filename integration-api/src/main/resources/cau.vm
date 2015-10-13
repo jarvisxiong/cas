@@ -222,6 +222,7 @@
 
 
                 function showAd() {
+                    eventHandler.fireRenderBeacons();
                     setBodyDimension(hundredPercent, hundredPercent);
                     scaleAd();
 
@@ -233,7 +234,6 @@
 
                     var ad = byId(adNamespace + "ad");
                     toggleVisibleState(ad, true);
-                    eventHandler.fireRenderBeacons();
                 }
 
 
@@ -333,7 +333,7 @@
                 }
 
 
-                function fireADReady() {
+                function fireAdReady() {
                     var readyHandler=function(){
                         _im_imai.fireAdReady();
                         _im_imai.removeEventListener('ready', readyHandler);
@@ -345,7 +345,7 @@
                 function checkForMraid() {
                     count++;
                     #if ($SDK450Onwards && $isInterstitial)
-                        fireADReady();
+                        fireAdReady();
                     #end
 
                     if (4 !== count) {
