@@ -173,6 +173,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInLocal;
     private boolean templateWN = true;
     protected boolean isSproutSupported = false;
+    private boolean nurlFlagSet = false;
 
     private final String unknownAdvertiserId;
     private final String advertiserId;
@@ -593,6 +594,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (StringUtils.isEmpty(segmentForNurlTesting)
                     || entity.getAdgroupId().equalsIgnoreCase(segmentForNurlTesting)) {
                 rp.setUsenurl(true);
+                nurlFlagSet = true;
             }
 
             ext.setRp(rp);
@@ -1344,8 +1346,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = AdStatus.TERM.name();
             return false;
         } catch (final Exception e) {
-            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
-                    e.toString());
+            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}", e.toString());
             adStatus = AdStatus.TERM.name();
             return false;
         }
@@ -1461,6 +1462,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             setDealRelatedMetadata();
         }
         nurl = bid.getNurl();
+
+        if (nurlFlagSet && StringUtils.isEmpty(nurl)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.NURL_NOT_RECEIVED);
+        }
+
         // creativeId = bid.getCrid(); // Replaced with aqid
         aqid = bid.getAqid();
         adjustbid = bid.getAdjustbid();

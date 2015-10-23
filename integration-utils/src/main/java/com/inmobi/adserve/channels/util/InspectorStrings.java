@@ -145,6 +145,7 @@ public class InspectorStrings {
         "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
+    public static final String NURL_NOT_RECEIVED = "NurlNotReceived";
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
