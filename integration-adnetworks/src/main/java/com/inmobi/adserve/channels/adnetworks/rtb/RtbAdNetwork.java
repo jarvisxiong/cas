@@ -643,11 +643,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         device.setUa(sasParams.getUserAgent());
         device.setGeo(geo);
 
-        if(sasParams.getTUidParams().containsKey(UidType.IEM.toString())){
-            final String value = sasParams.getTUidParams().get(UidType.IEM.toString());
-            device.setDidsha1(DigestUtils.sha1Hex(value));
-            device.setDidmd5(DigestUtils.md5Hex(value));
-            device.setDidraw(value);
+        if(sasParams.getTUidParams() != null){
+            if (sasParams.getTUidParams().containsKey(UidType.IEM.toString())) {
+                final String value = sasParams.getTUidParams().get(UidType.IEM.toString());
+                device.setDidsha1(DigestUtils.sha1Hex(value));
+                device.setDidmd5(DigestUtils.md5Hex(value));
+                device.setDidraw(value);
+            }
         }
 
         final CcidMapEntity ccidMapEntity = repositoryHelper.queryCcidMapRepository(sasParams.getCarrierId());
