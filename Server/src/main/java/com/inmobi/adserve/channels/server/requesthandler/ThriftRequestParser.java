@@ -472,10 +472,6 @@ public class ThriftRequestParser {
         }
         final List<Short> validSlots = new ArrayList<Short>();
         for (final Short slotId : selectedSlots) {
-            if (validSlots.size() >= 5) {
-                // Keep at most 5 slots in the list
-                break;
-            }
             final boolean toAdd =
                     isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper
                             .querySlotSizeMapRepository(slotId) != null;

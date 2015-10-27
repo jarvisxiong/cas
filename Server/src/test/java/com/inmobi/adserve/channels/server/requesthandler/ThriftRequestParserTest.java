@@ -343,7 +343,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 8);
 
         assertEquals(sasRequestParameters.getDst(), 8);
-        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 4, (short) 9, (short) 10, (short) 11, (short) 12));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 4, (short) 9, (short) 10, (short) 11, (short) 12, (short) 13));
         selectedSlots.clear();
 
         //List in sasParams should contain only the slots present in SLOT_MAP
@@ -365,7 +365,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 8);
 
         assertEquals(sasRequestParameters.getDst(), 8);
-        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 9, (short) 10, (short) 4, (short) 12, (short) 11));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList( (short) 9, (short) 10, (short) 4, (short) 12, (short) 11, (short) 14, (short) 13) );
         selectedSlots.clear();
     }
 
@@ -457,7 +457,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 9));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4, (short) 9, (short) 10 ));
         selectedSlots.clear();
 
         //List in sasParams should contain only the slots present in SLOT_MAP
@@ -479,7 +479,7 @@ public class ThriftRequestParserTest extends TestCase {
                 .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
 
         assertEquals(sasRequestParameters.getDst(), 6);
-        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10, (short) 9));
+        assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10, (short) 9, (short) 11, (short) 12));
         selectedSlots.clear();
 
 
