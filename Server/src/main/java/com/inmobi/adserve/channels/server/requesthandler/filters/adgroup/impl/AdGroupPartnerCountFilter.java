@@ -26,7 +26,7 @@ import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 
 
 /**
@@ -142,11 +142,13 @@ public class AdGroupPartnerCountFilter implements AdGroupLevelFilter {
      */
     private boolean failedInFilter(final List<ChannelSegment> currentSegmentsForAdvertiser,
         final ChannelSegmentEntity channelSegmentEntity, final int maxSegmentSelectionCount) {
-        final DemandAdFormatConstraints demandAdFormatConstraints = channelSegmentEntity.getDemandAdFormatConstraints();
+        final SecondaryAdFormatConstraints
+            secondaryAdFormatConstraints = channelSegmentEntity.getSecondaryAdFormatConstraints();
 
         long currentSegmentsWithMatchingDemandConstraints = 0L;
         for (final ChannelSegment channelSegment : currentSegmentsForAdvertiser){
-            if (demandAdFormatConstraints == channelSegment.getChannelSegmentEntity().getDemandAdFormatConstraints()) {
+            if (secondaryAdFormatConstraints
+                == channelSegment.getChannelSegmentEntity().getSecondaryAdFormatConstraints()) {
                 ++currentSegmentsWithMatchingDemandConstraints;
             }
         }

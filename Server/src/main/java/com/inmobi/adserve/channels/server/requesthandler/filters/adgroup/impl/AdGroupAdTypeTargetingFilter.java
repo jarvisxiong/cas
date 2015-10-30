@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.RequestedAdType;
@@ -28,6 +29,9 @@ import com.inmobi.segment.impl.AdTypeEnum;
 @Singleton
 public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilter {
     private static final Logger LOG = LoggerFactory.getLogger(AdGroupAdTypeTargetingFilter.class);
+    // Only interstitial slots 10 and 40 are not supported.
+    private static final List<Long> slotsSupportedByVASTTemplates =
+        ImmutableList.of(14L, 16L, 17L, 31L, 32L, 33L, 34L, 39L);
 
     @Inject
     protected AdGroupAdTypeTargetingFilter(final Provider<Marker> traceMarkerProvider) {
@@ -42,13 +46,16 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
 
         if (RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
             final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-            switch (channelSegmentEntity.getDemandAdFormatConstraints()) {
+            switch (channelSegmentEntity.getSecondaryAdFormatConstraints()) {
                 case VAST_VIDEO:
-                    final boolean videoSupplyConstraintsMatch = sasParams.isVideoSupported();
-                    final boolean videoDemandConstraintsMatch = checkVideoDemandConstraints(
-                        Arrays.asList(channelSegment.getChannelSegmentEntity().getSlotIds()));
-
-                    returnValue = !(videoSupplyConstraintsMatch && videoDemandConstraintsMatch) ;
+                    returnValue =
+                        sasParams.isRewardedVideo() || !checkVideoEligibility(channelSegment.getChannelSegmentEntity()
+                            .getSlotIds(), sasParams);
+                    break;
+                case REWARDED_VAST_VIDEO:
+                    returnValue =
+                        !(sasParams.isRewardedVideo() && checkVideoEligibility(channelSegment.getChannelSegmentEntity()
+                            .getSlotIds(), sasParams));
                     break;
                 case STATIC:
                     // Not enforcing interstitial slots. Assuming that this is correctly handled in UMP.
@@ -65,8 +72,12 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
         return returnValue;
     }
 
-    // TODO: Move to config
-    private boolean checkVideoDemandConstraints(final List<Long> channelSegmentSlotIds) {
-        return channelSegmentSlotIds.contains(14L) || channelSegmentSlotIds.contains(32L);
+
+    private boolean checkVideoEligibility(final Long[] channelSegmentSlotIds, final SASRequestParameters sasParams) {
+        final boolean videoSupplyConstraintsMatch = sasParams.isVideoSupported();
+        final boolean videoDemandConstraintsMatch =
+            CollectionUtils.containsAny(Arrays.asList(channelSegmentSlotIds), slotsSupportedByVASTTemplates);
+
+        return (videoSupplyConstraintsMatch && videoDemandConstraintsMatch);
     }
 }

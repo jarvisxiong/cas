@@ -53,6 +53,7 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -262,6 +263,7 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getUserAgent()).andReturn("test-user-agent");
@@ -311,6 +313,7 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getDst()).andReturn(6).anyTimes();
+        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getCarrierId()).andReturn(0);
@@ -371,6 +374,7 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
         expect(mockEntity.getCategoryTaxonomy()).andReturn(new Long[] {31L, 32L, 33L}).times(4);
         expect(mockEntity.isAllTags()).andReturn(true).times(1).andReturn(false).times(3);
+        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -449,6 +453,7 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(2);
         expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(2);
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(2);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(2);
         expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
@@ -500,10 +505,11 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(1);
         expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(1);
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(1);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(1);
         expect(mockSasParam.getAge()).andReturn((short) 11).times(3);
-        expect(mockSasParam.getDst()).andReturn(2).times(2).andReturn(6).times(1).andReturn(8).times(1);
+        expect(mockSasParam.getDst()).andReturn(2).times(1).andReturn(6).times(1).andReturn(8).times(1);
         expect(mockSasParam.getOsId()).andReturn(3).times(1).andReturn(5).times(1);
         expect(mockSasParam.getSource()).andReturn("WAP").times(1).andReturn(null).times(1).andReturn("WAP").times(2)
                 .andReturn("APP").times(2);
@@ -585,6 +591,7 @@ public class BaseAdNetworkImplTest {
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(1);
         expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(1);
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParam.getSiteIncId()).andReturn(10L).times(1);
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(1);
         expect(mockSasParam.getSource()).andReturn("APP").anyTimes();

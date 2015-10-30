@@ -14,7 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.EntityError;
@@ -130,7 +130,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setModified_on(modifyTime);
             builder.setCampaignId(campaignId);
             builder.setSlotIds(slotIds);
-            builder.setDemandAdFormatConstraints(DemandAdFormatConstraints
+            builder.setSecondaryAdFormatConstraints(SecondaryAdFormatConstraints
                 .getDemandAdFormatConstraintsByValue(adTypeTargeting));
             builder.setIncIds(adIncIds);
             builder.setPricingModel(pricingModel.toUpperCase());

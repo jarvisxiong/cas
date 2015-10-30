@@ -59,7 +59,7 @@ import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
@@ -230,6 +230,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
 
@@ -362,6 +363,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdditionalParams()).andReturn(additionalParams).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockNativeBuilderfactory.create(entity)).andReturn(new IxNativeBuilderImpl(entity));
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository(99L)).andReturn(entity);
         expect(
@@ -434,6 +436,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -577,6 +580,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -720,6 +724,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -783,6 +788,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
@@ -847,7 +853,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getDemandAdFormatConstraints()).andReturn(DemandAdFormatConstraints.STATIC)
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC)
                 .anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
@@ -987,6 +993,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(1234L).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
 
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
@@ -1383,6 +1390,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
@@ -1440,6 +1448,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1491,6 +1500,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1545,6 +1555,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1598,6 +1609,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1652,6 +1664,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();

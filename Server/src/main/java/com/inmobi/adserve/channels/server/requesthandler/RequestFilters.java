@@ -4,7 +4,6 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.COUNT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_INVALID_SLOT_REQUEST_FILTER;
-import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.JSON_PARSING_ERROR;
 import static com.inmobi.adserve.channels.util.InspectorStrings.LOW_SDK_VERSION;
@@ -70,11 +69,6 @@ public class RequestFilters {
             return true;
         }
 
-        if (sasParams.isRewardedVideo()) {
-            LOG.info("Request not being served because rewarded video is not supported.");
-            InspectorStats.incrementStatCount(DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER, COUNT);
-            return true;
-        }
         final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
         // CT Present and CAU not present, means it is CT request to drop it (For native CT has Native Template
         if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())

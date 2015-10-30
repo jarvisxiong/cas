@@ -372,7 +372,7 @@ public class ThriftRequestParser {
         if (null == intList) {
             return Collections.emptyList();
         }
-        final List<Long> longList = new ArrayList<Long>();
+        final List<Long> longList = new ArrayList<>();
         for (final Integer obj : intList) {
             longList.add(Long.valueOf(obj));
         }
@@ -380,7 +380,7 @@ public class ThriftRequestParser {
     }
 
     private Map<String, String> getUserIdMap(final Map<UidType, String> uidMap) {
-        final Map<String, String> userIdMap = new HashMap<String, String>();
+        final Map<String, String> userIdMap = new HashMap<>();
         for (final Entry<UidType, String> entry : uidMap.entrySet()) {
             final UidType uidType = entry.getKey();
             userIdMap.put(uidType.toString().toUpperCase(), entry.getValue());
@@ -470,7 +470,7 @@ public class ThriftRequestParser {
             LOG.info("Emply selectedSlots received by CAS !!!");
             return Collections.emptyList();
         }
-        final List<Short> validSlots = new ArrayList<Short>();
+        final List<Short> validSlots = new ArrayList<>();
         for (final Short slotId : selectedSlots) {
             final boolean toAdd =
                     isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper

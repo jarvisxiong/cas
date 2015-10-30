@@ -110,7 +110,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
-    public static final String DROPPED_IN_REWARDED_NOT_ALLOWED_FILTER = "DroppedInRewardedNotAllowedFilter";
     public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
@@ -133,7 +132,11 @@ public class InspectorStrings {
     public static final String TOTAL_CAU_RESPONSES = "TotalCAUResponses";
     public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED = "DroppedAsSproutAdsAreNotSupportedOn";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
+    public static final String TOTAL_VAST_VIDEO_REQUESTS = "TotalVASTVideoRequests";
+    public static final String TOTAL_REWARDED_VAST_VIDEO_REQUESTS = "TotalRewardedVASTVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
+    public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
+    public static final String TOTAL_REWARDED_VAST_VIDEO_RESPONSES = "TotalRewardedVASTVideoResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
     public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";

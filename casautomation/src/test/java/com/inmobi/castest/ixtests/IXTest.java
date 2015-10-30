@@ -1440,6 +1440,74 @@ public class IXTest {
         Assert.assertTrue(response.contains(responseString2), "Did not find " + responseString2 + "in the response");
     }
 
+    @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES1(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        /* Deriving the parser output to assert for */
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
+        Reporter.log(parserOutput, true);
+        // System.out.println("ParserOutput : " + parserOutput);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertTrue(response.contains(responseString1), "Did not find " + responseString1 + "in the response");
+        Assert.assertTrue(response.contains(responseString2), "Did not find " + responseString2 + "in the response");
+    }
+
+    @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES2", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES2(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        /* Deriving the parser output to assert for */
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
+        Reporter.log(parserOutput, true);
+        // System.out.println("ParserOutput : " + parserOutput);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertTrue(response.contains(responseString1), "Did not find " + responseString1 + "in the response");
+        Assert.assertTrue(response.contains(responseString2), "Did not find " + responseString2 + "in the response");
+    }
+
+    @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES3", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES3(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        /* Deriving the parser output to assert for */
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
+        Reporter.log(parserOutput, true);
+        // System.out.println("ParserOutput : " + parserOutput);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertTrue(response.contains(responseString1), "Did not find " + responseString1 + "in the response");
+        Assert.assertTrue(response.contains(responseString2), "Did not find " + responseString2 + "in the response");
+    }
+
+    @Test(testName = "TEST_REWARDED_HAPPY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_REWARDED_HAPPY(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        /* Deriving the parser output to assert for */
+        final String responseString1 = "<VASTAdTagURI>";
+        final String responseString2 = "<\\/VASTAdTagURI>";
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
+        response = new String(responseBuilder.getResponseData());
+
+        Reporter.log(parserOutput, true);
+        // System.out.println("ParserOutput : " + parserOutput);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+        Assert.assertTrue(response.contains(responseString1), "Did not find " + responseString1 + "in the response");
+        Assert.assertTrue(response.contains(responseString2), "Did not find " + responseString2 + "in the response");
+    }
+
     @Test(testName = "TEST_VAST_SDKVERSION_440", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_VAST_SDKVERSION_440(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
@@ -1609,15 +1677,6 @@ public class IXTest {
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
-
-    @Test(testName = "TEST_REWARDED_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_REWARDED_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        searchStringInLog = "Request not being served because rewarded video is not supported";
-
-        LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD), searchStringInLog);
-        Reporter.log(parserOutput, true);
-    }
-
 
     @Test(testName = "TEST_KILOO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_KILOO(final String x, final ResponseBuilder responseBuilder) throws Exception {

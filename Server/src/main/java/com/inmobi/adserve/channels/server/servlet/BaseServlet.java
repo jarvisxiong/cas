@@ -137,7 +137,7 @@ public abstract class BaseServlet implements Servlet {
         // Incrementing Adapter Specific Total Selected Segments Stats
         incrementTotalSelectedSegmentStats(filteredSegments);
 
-        if (!commonEnrichment(hrh, sasParams, casInternal, serverChannel)) {
+        if (!commonEnrichment(hrh, sasParams, casInternal)) {
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
         }
@@ -146,7 +146,7 @@ public abstract class BaseServlet implements Servlet {
         auctionEngine.sasParams = sasParams;
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());
-        final List<ChannelSegment> rtbSegments = new ArrayList<ChannelSegment>();
+        final List<ChannelSegment> rtbSegments = new ArrayList<>();
         List<ChannelSegment> dcpSegments;
 
         dcpSegments =
@@ -202,7 +202,7 @@ public abstract class BaseServlet implements Servlet {
      * @param casInternal
      */
     protected final boolean commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
-            final CasInternalRequestParameters casInternal, final Channel serverChannel) {
+            final CasInternalRequestParameters casInternal) {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
         // Set imai content if r-format is imai
         String imaiBaseUrl = null;

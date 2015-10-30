@@ -24,7 +24,18 @@ public class Formatter {
     private static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
 
     public enum TemplateType {
-        HTML, PLAIN, RICH, IMAGE, RTB_HTML, INTERSTITIAL_VIDEO, NEXAGE_JS_AD_TAG, WAP_HTML_JS_AD_TAG, IX_HTML, ADBAY_HTML, CAU
+        HTML,
+        PLAIN,
+        RICH,
+        IMAGE,
+        RTB_HTML,
+        INTERSTITIAL_VAST_VIDEO,
+        INTERSTITIAL_REWARDED_VAST_VIDEO,
+        NEXAGE_JS_AD_TAG,
+        WAP_HTML_JS_AD_TAG,
+        IX_HTML,
+        ADBAY_HTML,
+        CAU
     }
 
     private static VelocityEngine velocityEngine;
@@ -34,7 +45,8 @@ public class Formatter {
     private static Template velocityTemplateImg;
     private static Template velocityTemplateRtb;
     private static Template velocityTemplateIx;
-    private static Template velocityTemplateInterstitialVideo;
+    private static Template velocityTemplateInterstitialRewardedVideo;
+    private static Template velocityTemplateInterstitialNonRewardedVideo;
     private static Template velocityTemplateJsAdTag;
     private static Template velocityTemplateWapHtmlJsAdTag;
     private static Template velocityTemplateAdbay;
@@ -51,7 +63,8 @@ public class Formatter {
         velocityTemplateImg = velocityEngine.getTemplate("ImageAdFormat.vm");
         velocityTemplateRtb = velocityEngine.getTemplate("rtbHtmlAdFormat.vm");
         velocityTemplateIx = velocityEngine.getTemplate("ixHtmlAdFormat.vm");
-        velocityTemplateInterstitialVideo = velocityEngine.getTemplate("interstitialVideoAdFormat.vm");
+        velocityTemplateInterstitialRewardedVideo = velocityEngine.getTemplate("ixRewardedVastVideoAdFormat.vm");
+        velocityTemplateInterstitialNonRewardedVideo = velocityEngine.getTemplate("ixNonRewardedVastVideoAdFormat.vm");
         velocityTemplateJsAdTag = velocityEngine.getTemplate("nexageJsAdTag.vm");
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
         velocityTemplateAdbay = velocityEngine.getTemplate("adbayHtmlTag.vm");
@@ -147,8 +160,11 @@ public class Formatter {
             case IX_HTML:
                 velocityTemplateIx.merge(context, writer);
                 break;
-            case INTERSTITIAL_VIDEO:
-                velocityTemplateInterstitialVideo.merge(context, writer);
+            case INTERSTITIAL_VAST_VIDEO:
+                velocityTemplateInterstitialNonRewardedVideo.merge(context, writer);
+                break;
+            case INTERSTITIAL_REWARDED_VAST_VIDEO:
+                velocityTemplateInterstitialRewardedVideo.merge(context, writer);
                 break;
             case NEXAGE_JS_AD_TAG:
                 velocityTemplateJsAdTag.merge(context, writer);

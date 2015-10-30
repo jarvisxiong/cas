@@ -20,6 +20,7 @@ public class GenericTemplateObject {
     private String sdkVersion;
     private String sitePreferencesJson;
     private String requestJson;
+    private boolean secure;
     
     //CAU AD Markup
     private String cauElementJsonObject;

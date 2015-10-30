@@ -1513,6 +1513,39 @@ TEST_VAST_HAPPY :
   #site_enriched_media_attributes : '0,2'
   ad_type_targeting : '1'
 
+TEST_VAST_HAPPY_ALTERNATE_SIZES1 :
+- adpool_selectedslots : '17,34'
+  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+  device_osid : '3'
+  device_osmajorversion : '6.0'
+  adpool_requestedadtype : 'INTERSTITIAL'
+  adpool_responseformat : 'IMAI'
+  #site_enriched_media_attributes : '0,2'
+  ad_type_targeting : '1'
+
+TEST_VAST_HAPPY_ALTERNATE_SIZES2 :
+- adpool_selectedslots : '31,39'
+  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+  device_osid : '3'
+  device_osmajorversion : '6.0'
+  adpool_requestedadtype : 'INTERSTITIAL'
+  adpool_responseformat : 'IMAI'
+  #site_enriched_media_attributes : '0,2'
+  ad_type_targeting : '1'
+
+TEST_VAST_HAPPY_ALTERNATE_SIZES3 :
+- adpool_selectedslots : '16,33'
+  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+  device_osid : '3'
+  device_osmajorversion : '6.0'
+  adpool_requestedadtype : 'INTERSTITIAL'
+  adpool_responseformat : 'IMAI'
+  #site_enriched_media_attributes : '0,2'
+  ad_type_targeting : '1'
+
 TEST_VAST_SDKVERSION_440 : 
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
@@ -1547,10 +1580,22 @@ TEST_INTERSTITIAL_ON_VIDEO_ONLY_SUPPLY :
   adpool_responseformat : 'IMAI'
   ad_type_targeting : '0'
 
+TEST_REWARDED_HAPPY :
+- adpool_selectedslots : '14,32'
+  site_rewarded_video : 'true'
+  site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
+  site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
+  device_osid : '3'
+  device_osmajorversion : '6.0'
+  adpool_requestedadtype : 'INTERSTITIAL'
+  adpool_responseformat : 'IMAI'
+  ad_type_targeting : '1'
+
 TEST_IX_JSAC_INTEGRATION_TYPE : 
 - integration_type : 'JSAC'
   adpool_selectedslots : '15'
   adpool_responseformat : 'HTML'
+
 TEST_IX_API_ANDROID_INTEGRATION_TYPE : 
 - integration_type : 'ANDROID_API'
   adpool_selectedslots : '15'
@@ -1641,9 +1686,6 @@ TESTIOS9 :
 TESTIOS9_2 : 
 - testName : 'Kiloo Happy'
   device_osid : '5'
-
-TEST_REWARDED_NEGATIVE :
- - site_rewarded_video : 'true'
 
 TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
  - testName: 'ix-happy'

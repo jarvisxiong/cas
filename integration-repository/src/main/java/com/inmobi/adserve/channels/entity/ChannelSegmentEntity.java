@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.types.AdFormatType;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
@@ -39,7 +39,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final Timestamp modified_on;
     private final String campaignId;
     private final Long[] slotIds;
-    private final DemandAdFormatConstraints demandAdFormatConstraints;
+    private final SecondaryAdFormatConstraints secondaryAdFormatConstraints;
     private final Long[] incIds;
     private final long adgroupIncId;
     private final boolean allTags;
@@ -85,7 +85,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         modified_on = builder.modified_on;
         campaignId = builder.campaignId;
         slotIds = builder.slotIds;
-        demandAdFormatConstraints = builder.demandAdFormatConstraints;
+        secondaryAdFormatConstraints = builder.secondaryAdFormatConstraints;
         incIds = builder.incIds;
         adgroupIncId = builder.adgroupIncId;
         allTags = builder.allTags;
@@ -144,7 +144,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private Timestamp modified_on;
         private String campaignId;
         private Long[] slotIds;
-        private DemandAdFormatConstraints demandAdFormatConstraints;
+        private SecondaryAdFormatConstraints secondaryAdFormatConstraints;
         private Long[] incIds;
         private long adgroupIncId;
         private boolean allTags;

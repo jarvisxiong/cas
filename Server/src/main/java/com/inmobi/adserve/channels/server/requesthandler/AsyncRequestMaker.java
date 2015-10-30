@@ -100,7 +100,7 @@ public class AsyncRequestMaker {
             if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
                 casInternal.setAuctionId(ImpressionIdGenerator.getInstance().resetWilburyIntKey(
                         casInternalGlobal.getAuctionId(), sasParams.getSiteIncId() + index));
-                LOG.debug("IX Multi format: {} auction id is {}", channelSegmentEntity.getDemandAdFormatConstraints()
+                LOG.debug("IX Multi format: {} auction id is {}", channelSegmentEntity.getSecondaryAdFormatConstraints()
                         + " " + sasParams.getRequestedAdType(), casInternal.getAuctionId());
                 ++index;
             }

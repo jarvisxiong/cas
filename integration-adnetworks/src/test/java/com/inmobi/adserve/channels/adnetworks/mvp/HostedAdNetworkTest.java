@@ -32,6 +32,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -95,6 +96,7 @@ public class HostedAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adGroupIncId).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPC).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(2).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockChannelSegmentEntity.getAdditionalParams())
                 .andReturn(additionalParams).times(2)
                 .andReturn(null).times(1);

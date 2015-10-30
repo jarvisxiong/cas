@@ -417,10 +417,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
         // Set Banner OR Video OR Native object.
-        if (isVideoRequest) {
+        if (isVideoRequest || isRewardedVideoRequest) {
             final Video video = createVideoObject();
             impression.setVideo(video);
             if (video != null) {
+                final String statName = isVideoRequest ?
+                    InspectorStrings.TOTAL_VAST_VIDEO_REQUESTS :
+                    InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_REQUESTS;
+                InspectorStats.incrementStatCount(getName(), statName);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
             }
         } else if (isNativeRequest) {
@@ -451,7 +455,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
         final boolean isInterstitial = RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType();
-        impression.setInstl(isInterstitial || isVideoRequest ? 1 : 0);
+        impression.setInstl(isInterstitial || isVideoRequest || isRewardedVideoRequest ? 1 : 0);
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
@@ -486,7 +490,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Find matching packages
         final long startTime = System.currentTimeMillis();
-        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId, entity);
+        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity);
         final long endTime = System.currentTimeMillis();
         InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst())
             .name(), InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
@@ -564,8 +568,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 dim = matchedCAU.getMatchedRPDimension();
             }
         } else {
-            rpSlot = SlotSizeMapping.getIXMappedSlotId(selectedSlotId);
-            final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+            rpSlot = SlotSizeMapping.getIXMappedSlotId(processedSlotId);
+            final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(processedSlotId);
             if (null != slotSizeMapEntity) {
                 dim = slotSizeMapEntity.getDimension();
             }
@@ -613,7 +617,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             ext.setRp(rp);
         } else {
             // We can't take risk of sending request without size id so return null
-            LOG.error("Dropping request as no matching RP Size ID is found for selectedSlotId {}", selectedSlotId);
+            LOG.error("Dropping request as no matching RP Size ID is found for processedSlotId {}", processedSlotId);
             return null;
         }
         banner.setExt(ext);
@@ -642,7 +646,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         video.setProtocols(VIDEO_PROTOCOLS);
         video.setMaxbitrate(VIDEO_MAX_BITRATE);
 
-        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
+        final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(processedSlotId);
         if (null != slotSizeMapEntity) {
             final Dimension dim = slotSizeMapEntity.getDimension();
             video.setW((int) dim.getWidth());
@@ -1045,7 +1049,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             if (isNativeRequest()) {
                 nativeAdBuilding();
-            } else if (isVideoRequest) {
+            } else if (isVideoRequest || isRewardedVideoRequest) {
                 videoAdBuilding();
             } else if (isCAURequest()) {
                 cauAdBuilding();
@@ -1251,10 +1255,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         try {
-            responseContent =
-                IXAdNetworkHelper
-                    .videoAdBuilding(templateConfiguration
-                        .getTemplateTool(), sasParams, repositoryHelper, selectedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl());
+            responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration
+                .getTemplateTool(), sasParams, repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(), isRewardedVideoRequest);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1500,8 +1502,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // For video requests, validate that a valid XML is received.
-        if (isVideoRequest) {
+        if (isVideoRequest || isRewardedVideoRequest) {
             if (IXAdNetworkHelper.isAdmValidXML(getAdMarkUp())) {
+                final String statName = isVideoRequest ?
+                    InspectorStrings.TOTAL_VAST_VIDEO_RESPONSES :
+                    InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_RESPONSES;
+                InspectorStats.incrementStatCount(getName(), statName);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_RESPONSES);
             } else {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_VIDEO_RESPONSE_COUNT);
