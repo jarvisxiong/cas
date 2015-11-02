@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -520,7 +522,14 @@ public class Logging {
             if (null != sasParams.getGender()) {
                 user.setGender(getGender(sasParams));
             }
-            user.setUids(sasParams.getTUidParams());
+
+            Map<String, String> uidParam = sasParams.getTUidParams();
+            if(null != uidParam){
+                if(uidParam.containsKey(UidType.IEM.name())) {
+                    uidParam.remove(UidType.IEM.name());
+                }
+            }
+            user.setUids(uidParam);
         }
         return user;
     }

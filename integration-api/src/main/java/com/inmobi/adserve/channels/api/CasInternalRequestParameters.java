@@ -39,4 +39,5 @@ public class CasInternalRequestParameters {
     private String latLong;
     private String appUrl;
     private double siteFloor;
+    private String iem;
 }

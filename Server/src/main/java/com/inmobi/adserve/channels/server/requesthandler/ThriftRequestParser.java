@@ -428,6 +428,9 @@ public class ThriftRequestParser {
                 case GPID:
                     parameter.setGpid(uidValue);
                     break;
+                case IEM:
+                    parameter.setIem(uidValue);
+                    break;
                 default:
                     break;
             }

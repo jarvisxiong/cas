@@ -643,15 +643,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         device.setUa(sasParams.getUserAgent());
         device.setGeo(geo);
 
-        if(sasParams.getTUidParams() != null){
-            if (sasParams.getTUidParams().containsKey(UidType.IEM.toString())) {
-                final String value = sasParams.getTUidParams().get(UidType.IEM.toString());
-                device.setDidsha1(DigestUtils.sha1Hex(value));
-                device.setDidmd5(DigestUtils.md5Hex(value));
-                device.setDidraw(value);
-            }
-        }
-
         final CcidMapEntity ccidMapEntity = repositoryHelper.queryCcidMapRepository(sasParams.getCarrierId());
         if (null != ccidMapEntity) {
             device.setCarrier(ccidMapEntity.getCarrier());
@@ -687,6 +678,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if (null != casInternalRequestParameters.getUid()) {
             device.setDidsha1(casInternalRequestParameters.getUid());
             device.setDpidsha1(casInternalRequestParameters.getUid());
+        } else if(null != casInternalRequestParameters.getIem()) {
+            final String value = casInternalRequestParameters.getIem();
+            if(StringUtils.isNotBlank(value)) {
+                device.setDidsha1(DigestUtils.sha1Hex(value));
+                device.setDidmd5(DigestUtils.md5Hex(value));
+                device.setDidraw(value);
+            }
         }
 
         // Setting platform id as imei
