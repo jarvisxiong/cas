@@ -33,6 +33,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
+import com.inmobi.types.LocationSource;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -104,10 +105,10 @@ public class HostedAdNetworkTest {
         expect(mockSasParams.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(siteIncId).anyTimes();
         expect(mockSasParams.getRFormat()).andReturn("native").anyTimes();
-        expect(mockSasParams.getLocSrc())
-                .andReturn("LATLON").times(1)
-                .andReturn("NO_TARGETING").times(7)
-                .andReturn("LATLON").times(1);
+        expect(mockSasParams.getLocationSource())
+                .andReturn(LocationSource.LATLON).times(1)
+                .andReturn(LocationSource.NO_TARGETING).times(7)
+                .andReturn(LocationSource.LATLON).times(1);
         expect(mockSasParams.getRemoteHostIp()).andReturn(ip).anyTimes();
         expect(mockSasParams.getUserAgent()).andReturn(userAgent).anyTimes();
         expect(mockSasParams.getSiteId()).andReturn(siteId).anyTimes();

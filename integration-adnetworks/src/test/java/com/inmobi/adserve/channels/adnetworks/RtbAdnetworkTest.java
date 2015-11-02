@@ -51,6 +51,7 @@ import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.casthrift.rtb.Bid;
 import com.inmobi.casthrift.rtb.BidResponse;
 import com.inmobi.casthrift.rtb.SeatBid;
+import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 
@@ -411,7 +412,7 @@ public class RtbAdnetworkTest {
         catLong[0] = (long) 1;
         catLong[1] = (long) 2;
         sasParams.setCategories(Arrays.asList(catLong));
-        sasParams.setLocSrc("wifi");
+        sasParams.setLocationSource(LocationSource.WIFI);
         sasParams.setGender("Male");
         casInternalRequestParameters.setUid("1234");
         sasParams.setAge((short) 26);

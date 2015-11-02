@@ -47,6 +47,7 @@ import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.InventoryType;
+import com.inmobi.types.LocationSource;
 
 import io.netty.util.CharsetUtil;
 
@@ -169,9 +170,11 @@ public class ThriftRequestParser {
 
     private void setGeo(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetGeo()) {
-            params.setLocSrc(tObject.geo.isSetLocationSource()
-                    ? tObject.geo.locationSource.name()
-                    : GlobalConstant.LATLON);
+            // params.setLocSrc(tObject.geo.isSetLocationSource() ? tObject.geo.locationSource.name() :
+            // GlobalConstant.LATLON);
+            params.setLocationSource(tObject.geo.isSetLocationSource()
+                    ? tObject.geo.getLocationSource()
+                    : LocationSource.LATLON);
             // TODO Change format in dcp
             String latLong = StringUtils.EMPTY;
             if (tObject.geo.latLong != null) {
@@ -190,7 +193,6 @@ public class ThriftRequestParser {
                 null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
 
             params.setGeoFenceIds(tObject.geo.getFenceIds());
-            params.setLocationSource(tObject.geo.getLocationSource());
         }
     }
 

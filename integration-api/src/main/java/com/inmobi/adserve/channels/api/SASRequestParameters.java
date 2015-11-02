@@ -29,7 +29,6 @@ public class SASRequestParameters {
     private String source; // WAP/APP
     private Short age;
     private String gender;
-    private String locSrc; // wifi/ip
     private String postalCode;
     // User location parameters
     private String latLong;

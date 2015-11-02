@@ -75,6 +75,7 @@ import com.inmobi.casthrift.rtb.Native;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
 import com.inmobi.types.DeviceType;
+import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
@@ -84,6 +85,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -446,9 +448,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         geo.setZip(casInternalRequestParameters.getZipCode());
         // Setting type of geo data
-        if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
+        if (LocationSource.DERIVED_LAT_LON == sasParams.getLocationSource()) {
             geo.setType(1);
-        } else if (LATLON.equalsIgnoreCase(sasParams.getLocSrc())) {
+        } else if (LocationSource.LATLON == sasParams.getLocationSource()) {
             geo.setType(2);
         }
         return geo;

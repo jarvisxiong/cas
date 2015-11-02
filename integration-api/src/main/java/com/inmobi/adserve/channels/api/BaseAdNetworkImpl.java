@@ -91,9 +91,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     protected static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     protected static final String TERM = "TERM";
-    protected static final String LATLON = GlobalConstant.LATLON;
-    protected static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
-    protected static final String CCID = "CCID";
     protected static final String GET = "GET";
     protected static final String POST = "POST";
 

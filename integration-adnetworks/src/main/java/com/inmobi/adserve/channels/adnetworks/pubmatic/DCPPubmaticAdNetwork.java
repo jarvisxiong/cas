@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.types.LocationSource;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -50,7 +51,6 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
     private String nettype;
     private int udidtype;
     private int udidhash;
-    private static final String CELLTOWER = "CELLTOWER";
 
     public DCPPubmaticAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
@@ -140,10 +140,10 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
         if (!StringUtils.isEmpty(latlong)) {
             params.append("&loc=").append(latlong);
 
-            if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
+            if (LocationSource.DERIVED_LAT_LON == sasParams.getLocationSource()) {
                 params.append("&loc_source=2");
-            } else if (LATLON.equalsIgnoreCase(sasParams.getLocSrc())
-                    || CELLTOWER.equalsIgnoreCase(sasParams.getLocSrc())) {
+            } else if (LocationSource.LATLON == sasParams.getLocationSource()
+                    || LocationSource.CELL_TOWER == sasParams.getLocationSource()) {
                 params.append("&loc_source=1");
             } else {
                 params.append("&loc_source=0");
@@ -244,8 +244,8 @@ public class DCPPubmaticAdNetwork extends AbstractDCPAdNetworkImpl {
             buildInmobiAdTracker();
 
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
-                        getBeaconUrl());
+                responseContent =
+                        Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

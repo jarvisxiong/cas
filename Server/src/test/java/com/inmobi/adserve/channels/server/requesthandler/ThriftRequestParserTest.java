@@ -216,7 +216,7 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSource(), "APP");
         assertEquals(sasRequestParameters.getAge(), new Short("85"));
         assertEquals(sasRequestParameters.getGender(), "M");
-        assertEquals(sasRequestParameters.getLocSrc(), "LATLON");
+        assertEquals(sasRequestParameters.getLocationSource(), LocationSource.LATLON);
         assertEquals(sasRequestParameters.getCountryCode(), "US");
         assertEquals(sasRequestParameters.getCountryId(), new Long(94));
         assertEquals(sasRequestParameters.getImpressionId(), null); // Internal, Populated in cas

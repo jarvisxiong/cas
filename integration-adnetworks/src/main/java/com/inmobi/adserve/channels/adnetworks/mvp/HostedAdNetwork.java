@@ -1,7 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.mvp;
 
-import static com.inmobi.adserve.channels.util.config.GlobalConstant.WIFI;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -31,6 +29,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.casthrift.hosted.HostedBidRequest;
+import com.inmobi.types.LocationSource;
 import com.ning.http.client.RequestBuilder;
 
 import io.netty.bootstrap.Bootstrap;
@@ -56,9 +55,6 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
 
     // Constants used while creating Bid Request
     @Getter
-    private static final String BSSID_DERIVED = "BSSID_DERIVED";
-    private static final String VISIBLE_BSSID = "VISIBLE_BSSID";
-    private static final String CELL_TOWER = "CELL_TOWER";
     private static final String CLT = "INMB_SERVER_NATIVE_1.0.0";
     private static final String RTYP = "nativejson";
     private static final short TYP_NATIVE = 4; // Denotes Native Ad
@@ -217,11 +213,12 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Null check is not required as default value is LATLON
-        if (LATLON.equals(sasParams.getLocSrc()) || BSSID_DERIVED.equals(sasParams.getLocSrc())
-                || VISIBLE_BSSID.equals(sasParams.getLocSrc())) {
+        final LocationSource locSrc = sasParams.getLocationSource();
+        if (LocationSource.LATLON == locSrc || LocationSource.BSSID_DERIVED == locSrc
+                || LocationSource.VISIBLE_BSSID == locSrc) {
             bidRequest.setLtyp(LTYP_GPS);
-        } else if (CCID.equals(sasParams.getLocSrc()) || WIFI.equals(sasParams.getLocSrc())
-                || DERIVED_LAT_LON.equals(sasParams.getLocSrc()) || CELL_TOWER.equals(sasParams.getLocSrc())) {
+        } else if (LocationSource.CCID == locSrc || LocationSource.WIFI == locSrc
+                || LocationSource.DERIVED_LAT_LON == locSrc || LocationSource.CELL_TOWER == locSrc) {
             bidRequest.setLtyp(LTYP_IP);
         } // else Location Source is equal to 'NO_TARGETING'
 
@@ -449,8 +446,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         params.put("placementId", String.valueOf(sasParams.getPlacementId()));
 
         try {
-            responseContent =
-                    nativeResponseMaker.makeHostedResponse(adm, params, templateEntity);
+            responseContent = nativeResponseMaker.makeHostedResponse(adm, params, templateEntity);
         } catch (final Exception e) {
 
             adStatus = NO_AD;
@@ -475,7 +471,7 @@ public class HostedAdNetwork extends BaseAdNetworkImpl {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
 
-            if(isNativeRequest && null != templateEntity) {
+            if (isNativeRequest && null != templateEntity) {
                 trackerBuilder.setNativeTemplateId(templateEntity.getId());
             }
         }
