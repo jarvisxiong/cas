@@ -137,6 +137,8 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
     public static final String TOTAL_REWARDED_VAST_VIDEO_RESPONSES = "TotalRewardedVASTVideoResponses";
+    public static final String TOTAL_ALT_SLOT_SIZE_REQUESTS = "TotalAltSizeRequests";
+    public static final String TOTAL_ALT_SLOT_SIZE_RESPONSES = "TotalAltSizeResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
     public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";
@@ -148,7 +150,10 @@ public class InspectorStrings {
         "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
-    public static final String NURL_NOT_RECEIVED = "NurlNotReceived";
+
+    // Request metrics
+    public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
+    public static final String PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT = "PubControlsAlsoContainsBannerForRewardedPlacement(Approx)";
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";

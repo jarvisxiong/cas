@@ -173,7 +173,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInLocal;
     private boolean templateWN = true;
     protected boolean isSproutSupported = false;
-    private boolean nurlFlagSet = false;
+    private boolean altSizeIdsSet = false;
 
     private final String unknownAdvertiserId;
     private final String advertiserId;
@@ -227,7 +227,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> packageIds;
     private List<String> iabCategories;
     private final String sproutUniqueIdentifierRegex;
-    private final String segmentForNurlTesting;
 
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
@@ -263,7 +262,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         sproutUniqueIdentifierRegex =
             config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
-        segmentForNurlTesting = config.getString(advertiserName + ".segmentForNurlTesting", null);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -605,13 +603,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final RPBannerExtension rp = new RPBannerExtension();
             rp.setMime(MIME_HTML);
             rp.setSize_id(rpSlot);
+            rp.setUsenurl(true);
+
             if (rpSlots.size() > 0) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_REQUESTS);
+                altSizeIdsSet = true;
                 rp.setAlt_size_ids(rpSlots);
-            }
-            if (StringUtils.isEmpty(segmentForNurlTesting)
-                || entity.getAdgroupId().equalsIgnoreCase(segmentForNurlTesting)) {
-                rp.setUsenurl(true);
-                nurlFlagSet = true;
             }
 
             ext.setRp(rp);
@@ -1190,6 +1187,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
         }
 
+        if (altSizeIdsSet) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_RESPONSES);
+        }
+
         if (WAP.equalsIgnoreCase(sasParams.getSource())) {
             if (isSproutAd()) {
                 sproutAdNotSupported(WAP);
@@ -1477,10 +1478,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             setDealRelatedMetadata();
         }
         nurl = bid.getNurl();
-
-        if (nurlFlagSet && StringUtils.isEmpty(nurl)) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.NURL_NOT_RECEIVED);
-        }
 
         // creativeId = bid.getCrid(); // Replaced with aqid
         aqid = bid.getAqid();

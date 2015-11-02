@@ -61,7 +61,8 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
                     // Not enforcing interstitial slots. Assuming that this is correctly handled in UMP.
                     final List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
                     returnValue =
-                        CollectionUtils.isEmpty(supportedAdTypes) || !supportedAdTypes.contains(AdTypeEnum.BANNER);
+                        CollectionUtils.isEmpty(supportedAdTypes) || !supportedAdTypes.contains(AdTypeEnum.BANNER)
+                            || sasParams.isRewardedVideo();
                     break;
                 default:
                     InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE);

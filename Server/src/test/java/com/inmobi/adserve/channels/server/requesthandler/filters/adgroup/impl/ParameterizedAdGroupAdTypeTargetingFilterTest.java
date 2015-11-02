@@ -40,6 +40,7 @@ public class ParameterizedAdGroupAdTypeTargetingFilterTest {
             {"Interstitial-PubControlsNull", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, null, null, false, false, true},
             {"Interstitial-PubControlsAreVideoOnly", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.VIDEO), null, false, false, true},
             {"Interstitial-Positive", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, false, false},
+            {"Interstitial-Negative-Rewarded", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, true, true},
             {"Interstitial-Vast-SupplyConstraintsDontMatch", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{14L}, false, false, true},
             {"Interstitial-Vast-DemandConstraintsDontMatch", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{13L}, true, false, true},
             {"Interstitial-Vast-Positive14", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{14L}, true, false, false},

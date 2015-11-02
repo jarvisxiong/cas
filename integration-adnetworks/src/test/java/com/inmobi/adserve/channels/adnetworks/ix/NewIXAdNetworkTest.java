@@ -93,7 +93,6 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getString(advertiserName + ".userName")).andReturn("userName").anyTimes();
         expect(mockConfig.getString(advertiserName + ".password")).andReturn("password").anyTimes();
-        expect(mockConfig.getString(advertiserName + ".segmentForNurlTesting", null)).andReturn(null).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".isWnRequired")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(true).anyTimes();

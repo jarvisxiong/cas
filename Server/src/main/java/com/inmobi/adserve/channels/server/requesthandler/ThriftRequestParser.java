@@ -181,15 +181,13 @@ public class ThriftRequestParser {
             params.setCountryCode(tObject.geo.countryCode);
             params.setCountryId((long) tObject.geo.getCountryId()); // TODO: Evaluate if int->long casting is needed?
             final Set<Integer> cities = tObject.geo.getCityIds();
-            params.setCity(null != cities && cities.iterator().hasNext()
-                    ? tObject.geo.getCityIds().iterator().next()
-                    : null);
+            params.setCity(
+                null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
 
             params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
-            params.setState(null != states && states.iterator().hasNext()
-                    ? tObject.geo.getStateIds().iterator().next()
-                    : null);
+            params.setState(
+                null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
 
             params.setGeoFenceIds(tObject.geo.getFenceIds());
             params.setLocationSource(tObject.geo.getLocationSource());
@@ -315,6 +313,13 @@ public class ThriftRequestParser {
             if (tSite.isSetRewarded()) {
                 params.setRewardedVideo(tSite.isRewarded());
             }
+
+            if (params.isRewardedVideo() && pubControlSupportedAdTypes.contains(AdTypeEnum.BANNER)) {
+                InspectorStats
+                    .incrementStatCount(InspectorStrings.ADPOOL_REQUEST_STATS,
+                        InspectorStrings.PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT);
+            }
+
             // Fill params for pub control - Media preferences json.
             final String mediaPreferencesJson =
                     tSite.isSetMediaPreferences() ? tSite.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
