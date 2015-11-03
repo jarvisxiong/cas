@@ -524,10 +524,8 @@ public class Logging {
             }
 
             Map<String, String> uidParam = sasParams.getTUidParams();
-            if(null != uidParam){
-                if(uidParam.containsKey(UidType.IEM.name())) {
-                    uidParam.remove(UidType.IEM.name());
-                }
+            if (null != uidParam) {
+                uidParam.remove(UidType.IEM.name());
             }
             user.setUids(uidParam);
         }
