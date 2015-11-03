@@ -32,6 +32,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.types.LocationSource;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -280,7 +281,7 @@ public class DCPxAdAdNetworkTest {
         casInternalRequestParameters.setUidO1("202cb962ac59075b964b07152d234b70");
         sasParams.setOsId(5);
         sasParams.setSiteId("12345");
-        sasParams.setLocSrc("derived-lat-lon");
+        sasParams.setLocationSource(LocationSource.DERIVED_LAT_LON);
         final String externalKey = "1324";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(xAdAdvId, null, null, null, 0,

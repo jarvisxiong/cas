@@ -22,7 +22,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
@@ -75,7 +75,7 @@ public class IXPackageMatcher {
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
 
                 final boolean failsAdTypeTargetingFilter = !checkForAdTypeTargeting(
-                    adGroupEntity.getDemandAdFormatConstraints(), packageEntity.getDemandAdFormatConstraints());
+                    adGroupEntity.getSecondaryAdFormatConstraints(), packageEntity.getSecondaryAdFormatConstraints());
 
                 if (failsAdTypeTargetingFilter) {
                     LOG.debug("Package {} dropped in Ad Type Targeting Filter", packageEntity.getId());
@@ -170,9 +170,12 @@ public class IXPackageMatcher {
         return true;
     }
 
-    protected static boolean checkForAdTypeTargeting(final DemandAdFormatConstraints adgroupDemandConstraints,
-        final DemandAdFormatConstraints packageDemandConstraints) {
-        return adgroupDemandConstraints == packageDemandConstraints;
+    protected static boolean checkForAdTypeTargeting(
+        final SecondaryAdFormatConstraints adgroupSecondaryAdFormatConstraints,
+        final Set<SecondaryAdFormatConstraints> packageSecondaryAdFormatConstraintsSet) {
+
+        return packageSecondaryAdFormatConstraintsSet.contains(SecondaryAdFormatConstraints.ALL)
+            || packageSecondaryAdFormatConstraintsSet.contains(adgroupSecondaryAdFormatConstraints);
     }
 
     /**

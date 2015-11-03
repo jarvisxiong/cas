@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.util.Utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 
 /**
@@ -10,7 +10,7 @@ import com.inmobi.phoenix.batteries.util.WilburyUUID;
  */
 
 public class ImpressionIdGenerator {
-    private final int SIMILARITY_LIMIT = DemandAdFormatConstraints.values().length - 2;
+    private final int SIMILARITY_LIMIT = SecondaryAdFormatConstraints.values().length - 2;
     protected static final AtomicInteger COUNTER = new AtomicInteger();
     private static ImpressionIdGenerator instance = null;
     protected final short hostIdCode;

@@ -47,6 +47,7 @@ import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.InventoryType;
+import com.inmobi.types.LocationSource;
 
 import io.netty.util.CharsetUtil;
 
@@ -169,9 +170,11 @@ public class ThriftRequestParser {
 
     private void setGeo(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetGeo()) {
-            params.setLocSrc(tObject.geo.isSetLocationSource()
-                    ? tObject.geo.locationSource.name()
-                    : GlobalConstant.LATLON);
+            // params.setLocSrc(tObject.geo.isSetLocationSource() ? tObject.geo.locationSource.name() :
+            // GlobalConstant.LATLON);
+            params.setLocationSource(tObject.geo.isSetLocationSource()
+                    ? tObject.geo.getLocationSource()
+                    : LocationSource.LATLON);
             // TODO Change format in dcp
             String latLong = StringUtils.EMPTY;
             if (tObject.geo.latLong != null) {
@@ -181,18 +184,15 @@ public class ThriftRequestParser {
             params.setCountryCode(tObject.geo.countryCode);
             params.setCountryId((long) tObject.geo.getCountryId()); // TODO: Evaluate if int->long casting is needed?
             final Set<Integer> cities = tObject.geo.getCityIds();
-            params.setCity(null != cities && cities.iterator().hasNext()
-                    ? tObject.geo.getCityIds().iterator().next()
-                    : null);
+            params.setCity(
+                null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
 
             params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
-            params.setState(null != states && states.iterator().hasNext()
-                    ? tObject.geo.getStateIds().iterator().next()
-                    : null);
+            params.setState(
+                null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
 
             params.setGeoFenceIds(tObject.geo.getFenceIds());
-            params.setLocationSource(tObject.geo.getLocationSource());
         }
     }
 
@@ -315,6 +315,13 @@ public class ThriftRequestParser {
             if (tSite.isSetRewarded()) {
                 params.setRewardedVideo(tSite.isRewarded());
             }
+
+            if (params.isRewardedVideo() && pubControlSupportedAdTypes.contains(AdTypeEnum.BANNER)) {
+                InspectorStats
+                    .incrementStatCount(InspectorStrings.ADPOOL_REQUEST_STATS,
+                        InspectorStrings.PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT);
+            }
+
             // Fill params for pub control - Media preferences json.
             final String mediaPreferencesJson =
                     tSite.isSetMediaPreferences() ? tSite.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
@@ -372,7 +379,7 @@ public class ThriftRequestParser {
         if (null == intList) {
             return Collections.emptyList();
         }
-        final List<Long> longList = new ArrayList<Long>();
+        final List<Long> longList = new ArrayList<>();
         for (final Integer obj : intList) {
             longList.add(Long.valueOf(obj));
         }
@@ -380,7 +387,7 @@ public class ThriftRequestParser {
     }
 
     private Map<String, String> getUserIdMap(final Map<UidType, String> uidMap) {
-        final Map<String, String> userIdMap = new HashMap<String, String>();
+        final Map<String, String> userIdMap = new HashMap<>();
         for (final Entry<UidType, String> entry : uidMap.entrySet()) {
             final UidType uidType = entry.getKey();
             userIdMap.put(uidType.toString().toUpperCase(), entry.getValue());
@@ -473,12 +480,8 @@ public class ThriftRequestParser {
             LOG.info("Emply selectedSlots received by CAS !!!");
             return Collections.emptyList();
         }
-        final List<Short> validSlots = new ArrayList<Short>();
+        final List<Short> validSlots = new ArrayList<>();
         for (final Short slotId : selectedSlots) {
-            if (validSlots.size() >= 5) {
-                // Keep at most 5 slots in the list
-                break;
-            }
             final boolean toAdd =
                     isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper
                             .querySlotSizeMapRepository(slotId) != null;

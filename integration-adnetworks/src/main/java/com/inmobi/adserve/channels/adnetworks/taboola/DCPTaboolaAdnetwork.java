@@ -255,8 +255,6 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             final Screenshot.Builder builder = Screenshot.newBuilder();
             builder.setH(image.getHeight());
             builder.setW(image.getWidth());
-            final Double ar = (double) image.getWidth() / (double) image.getHeight();
-            builder.setAr(String.valueOf(ar));
             builder.setUrl(image.getUrl());
             screenshotList.add((Screenshot) builder.build());
         }

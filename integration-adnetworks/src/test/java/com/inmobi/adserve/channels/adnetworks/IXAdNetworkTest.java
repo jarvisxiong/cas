@@ -89,7 +89,6 @@ public class IXAdNetworkTest {
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getString(advertiserName + ".userName")).andReturn("test").anyTimes();
         expect(mockConfig.getString(advertiserName + ".password")).andReturn("api").anyTimes();
-        expect(mockConfig.getString(advertiserName + ".segmentForNurlTesting", null)).andReturn(null).anyTimes();
         expect(mockConfig.getInt(advertiserName + ".accountId")).andReturn(11726).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(false).anyTimes();

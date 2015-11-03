@@ -32,8 +32,9 @@ import java.util.Map;
  *         wap_prod_adserve=> select id, width, height, ad_type from serving_unit;<br>
  */
 public class SlotSizeMapping {
-    private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<Short, Integer>();
-    public static final Map<Integer, Dimension> RP_SLOT_DIMENSION = new HashMap<Integer, Dimension>();
+    private static final Map<Short, Integer> IX_SLOT_ID_MAP = new HashMap<>();
+    public static final Map<Integer, Dimension> RP_SLOT_DIMENSION = new HashMap<>();
+    private static final Map<Short, Short> OPTIMISED_VAST_SLOT_ID_MAP = new HashMap<>();
 
     static {
         // Adding IX_SLOT_ID_MAP, which is a map from InMobi slot id's to Rubicon slot id's
@@ -73,6 +74,18 @@ public class SlotSizeMapping {
         RP_SLOT_DIMENSION.put(53, new Dimension(1024, 768));
         RP_SLOT_DIMENSION.put(51, new Dimension(768, 900));
         RP_SLOT_DIMENSION.put(61, new Dimension(1000, 1000));
+
+        // Mapped to 480*320 (width*height)
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 14, (short) 32);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 31, (short) 32);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 32, (short) 32);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 39, (short) 32);
+
+        // Mapped to 1024*768 (width*height)
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 16, (short) 33);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 17, (short) 33);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 33, (short) 33);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 34, (short) 33);
     }
 
     /**
@@ -91,5 +104,9 @@ public class SlotSizeMapping {
      */
     public static Integer getIXMappedSlotId(final short inmobiSlot) {
         return IX_SLOT_ID_MAP.get(inmobiSlot);
+    }
+
+    public static Short getOptimisedVideoSlot(final int videoSlotId) {
+        return OPTIMISED_VAST_SLOT_ID_MAP.get(videoSlotId);
     }
 }

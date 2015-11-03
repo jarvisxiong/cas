@@ -26,7 +26,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.NullAsZeroResultSetRow;
 import com.inmobi.phoenix.batteries.data.rdbmsrow.ResultSetRow;
@@ -150,7 +150,7 @@ public class ChannelAdGroupRepositoryTest {
         assertThat(output.getSiteRatings(), is(equalTo(siteRatings)));
         assertThat(output.getRcList(), is(equalTo(rcList)));
         assertThat(output.getSlotIds(), is(equalTo(slotIds)));
-        assertThat(output.getDemandAdFormatConstraints(), is(equalTo(DemandAdFormatConstraints
+        assertThat(output.getSecondaryAdFormatConstraints(), is(equalTo(SecondaryAdFormatConstraints
             .getDemandAdFormatConstraintsByValue(adTypeTargeting))));
         assertThat(output.getAdFormatIds(), is(equalTo(creativeTypes)));
         assertThat(output.getTags(), is(equalTo(tags)));

@@ -48,7 +48,6 @@ public class DCPStartMeAppAdnetworkTest {
     private static final String StartMeappAdvId = "StartMeAppadv1";
     private static final String StartMeAppTest = "1";
     private static final String pubId = "1q2w3e";
-    private static final String fsPlacementId = "230";
     private static Configuration mockConfig = null;
     private static DCPStartMeAppAdnetwork dcpStartMeAppAdnetwork;
     private static String StartMeAppHost = "http://api.rtb.startmeapp.net/request";

@@ -59,7 +59,7 @@ import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
@@ -93,7 +93,6 @@ public class NewIXAdNetworkTest {
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getString(advertiserName + ".userName")).andReturn("userName").anyTimes();
         expect(mockConfig.getString(advertiserName + ".password")).andReturn("password").anyTimes();
-        expect(mockConfig.getString(advertiserName + ".segmentForNurlTesting", null)).andReturn(null).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".isWnRequired")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(true).anyTimes();
@@ -230,6 +229,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
 
@@ -303,18 +303,32 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
                     + "                            this.fireBeacons(events.clickBeacons);\n"
                     + "                        }\n" + "                    };\n" + "\n" + "\n"
-                    + "                    function fireADReady () {\n"
+                    + "                    function fireAdReady () {\n"
                     + "                        var readyHandler=function() {\n"
                     + "                            _im_imai.fireAdReady();\n"
                     + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
                     + "                        };\n"
                     + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "                    var count = 0,\n"
+                    + "                        mraid = window.mraid;\n" + "\n"
+                    + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
+                    + "                        if (4 !== count) {\n"
+                    + "                            if (\"undefined\" !== typeof mraid) {\n"
+                    + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
+                    + "                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                } else {\n"
+                    + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
+                    + "                                        if (viewable) {\n"
+                    + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
+                    + "                                            eventHandler.fireRenderBeacons();\n"
+                    + "                                        }\n" + "                                    });\n"
+                    + "                                }\n" + "                            }\n"
+                    + "                        } else {\n"
+                    + "                            setTimeout(checkForMraid, 500);\n" + "                        }\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
-                    + "                        var readyHandler=function() {\n"
-                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
+                    + "                                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                            }\n" + "\n" + "\n"
+                    + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
@@ -348,6 +362,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdditionalParams()).andReturn(additionalParams).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockNativeBuilderfactory.create(entity)).andReturn(new IxNativeBuilderImpl(entity));
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository(99L)).andReturn(entity);
         expect(
@@ -420,6 +435,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -499,18 +515,32 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
                     + "                            this.fireBeacons(events.clickBeacons);\n"
                     + "                        }\n" + "                    };\n" + "\n" + "\n"
-                    + "                    function fireADReady () {\n"
+                    + "                    function fireAdReady () {\n"
                     + "                        var readyHandler=function() {\n"
                     + "                            _im_imai.fireAdReady();\n"
                     + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
                     + "                        };\n"
                     + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "                    var count = 0,\n"
+                    + "                        mraid = window.mraid;\n" + "\n"
+                    + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
+                    + "                        if (4 !== count) {\n"
+                    + "                            if (\"undefined\" !== typeof mraid) {\n"
+                    + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
+                    + "                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                } else {\n"
+                    + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
+                    + "                                        if (viewable) {\n"
+                    + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
+                    + "                                            eventHandler.fireRenderBeacons();\n"
+                    + "                                        }\n" + "                                    });\n"
+                    + "                                }\n" + "                            }\n"
+                    + "                        } else {\n"
+                    + "                            setTimeout(checkForMraid, 500);\n" + "                        }\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
-                    + "                        var readyHandler=function() {\n"
-                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
+                    + "                                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                            }\n" + "\n" + "\n"
+                    + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
@@ -549,6 +579,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -629,18 +660,32 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
                     + "                            this.fireBeacons(events.clickBeacons);\n"
                     + "                        }\n" + "                    };\n" + "\n" + "\n"
-                    + "                    function fireADReady () {\n"
+                    + "                    function fireAdReady () {\n"
                     + "                        var readyHandler=function() {\n"
                     + "                            _im_imai.fireAdReady();\n"
                     + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
                     + "                        };\n"
                     + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "                    var count = 0,\n"
+                    + "                        mraid = window.mraid;\n" + "\n"
+                    + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
+                    + "                        if (4 !== count) {\n"
+                    + "                            if (\"undefined\" !== typeof mraid) {\n"
+                    + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
+                    + "                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                } else {\n"
+                    + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
+                    + "                                        if (viewable) {\n"
+                    + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
+                    + "                                            eventHandler.fireRenderBeacons();\n"
+                    + "                                        }\n" + "                                    });\n"
+                    + "                                }\n" + "                            }\n"
+                    + "                        } else {\n"
+                    + "                            setTimeout(checkForMraid, 500);\n" + "                        }\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
-                    + "                        var readyHandler=function() {\n"
-                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
+                    + "                                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                            }\n" + "\n" + "\n"
+                    + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
@@ -678,6 +723,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
@@ -741,6 +787,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
@@ -805,7 +852,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getDemandAdFormatConstraints()).andReturn(DemandAdFormatConstraints.STATIC)
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC)
                 .anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
                 .anyTimes();
@@ -877,18 +924,32 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireClickBeacons : function () {\n"
                     + "                            this.fireBeacons(events.clickBeacons);\n"
                     + "                        }\n" + "                    };\n" + "\n" + "\n"
-                    + "                    function fireADReady () {\n"
+                    + "                    function fireAdReady () {\n"
                     + "                        var readyHandler=function() {\n"
                     + "                            _im_imai.fireAdReady();\n"
                     + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
                     + "                        };\n"
                     + "                        _im_imai.addEventListener('ready', readyHandler);\n"
+                    + "                    }\n" + "\n" + "                    var count = 0,\n"
+                    + "                        mraid = window.mraid;\n" + "\n"
+                    + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
+                    + "                        if (4 !== count) {\n"
+                    + "                            if (\"undefined\" !== typeof mraid) {\n"
+                    + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
+                    + "                                    eventHandler.fireRenderBeacons();\n"
+                    + "                                } else {\n"
+                    + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
+                    + "                                        if (viewable) {\n"
+                    + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
+                    + "                                            eventHandler.fireRenderBeacons();\n"
+                    + "                                        }\n" + "                                    });\n"
+                    + "                                }\n" + "                            }\n"
+                    + "                        } else {\n"
+                    + "                            setTimeout(checkForMraid, 500);\n" + "                        }\n"
                     + "                    }\n" + "\n" + "\n" + "                    function setupRender () {\n"
-                    + "                        var readyHandler=function() {\n"
-                    + "                            document.removeEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                            eventHandler.fireRenderBeacons();\n" + "                        };\n"
-                    + "                        document.addEventListener('DOMContentLoaded', readyHandler);\n"
-                    + "                    }\n" + "\n" + "\n" + "                    function setupClick() {\n"
+                    + "                                                                                    checkForMraid();\n"
+                    + "                                                                        }\n" + "\n" + "\n"
+                    + "                    function setupClick() {\n"
                     + "                        function clickHandler() {\n"
                     + "                            document.removeEventListener('click', clickHandler);\n"
                     + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
@@ -931,6 +992,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(1234L).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
 
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
@@ -1327,6 +1389,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
@@ -1384,6 +1447,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1435,6 +1499,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1489,6 +1554,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1542,6 +1608,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
@@ -1596,6 +1663,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();

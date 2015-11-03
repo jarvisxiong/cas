@@ -33,6 +33,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.types.LocationSource;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -278,7 +279,7 @@ public class DCPVerveAdapterTest {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setOsId(HandSetOS.iOS.getValue());
-        sasParams.setLocSrc("true-lat-lon");
+        sasParams.setLocationSource(LocationSource.LATLON);
         final String externalKey = "1324";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(verveAdvId, null, null, null, 0,
@@ -305,7 +306,7 @@ public class DCPVerveAdapterTest {
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setOsId(HandSetOS.iOS.getValue());
-        sasParams.setLocSrc("derived-lat-lon");
+        sasParams.setLocationSource(LocationSource.LATLON);
         final String externalKey = "1324";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(verveAdvId, null, null, null, 0,
@@ -332,7 +333,7 @@ public class DCPVerveAdapterTest {
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setOsId(HandSetOS.Android.getValue());
         final String externalKey = "1324";
-        sasParams.setLocSrc("true-lat-lon");
+        sasParams.setLocationSource(LocationSource.LATLON);
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(verveAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
@@ -358,7 +359,7 @@ public class DCPVerveAdapterTest {
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSource("wap");
         final String externalKey = "1324";
-        sasParams.setLocSrc("true-lat-lon");
+        sasParams.setLocationSource(LocationSource.DERIVED_LAT_LON);
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(verveAdvId, null, null, null, 0,
                         null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,

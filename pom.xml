@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.inmobi.channels</groupId>
 	<artifactId>cas</artifactId>
-	<version>5.65-SNAPSHOT</version>
+	<version>5.71-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<url>https://github.corp.inmobi.com/channel-adserve</url>
 	<parent>
@@ -20,11 +20,9 @@
 		<scribe.version>2.1.0</scribe.version>
 		<logback.version>1.0.10</logback.version>
 		<yammer.version>2.2.0</yammer.version>
-		<guice.version>3.0</guice.version>
-		<guice-multibindings.version>3.0</guice-multibindings.version>
-		<guice-servlet.version>3.0</guice-servlet.version>
+		<guice.version>4.0</guice.version>
+		<governator.version>1.10.5</governator.version>
 		<creative-validator>5.0.90</creative-validator>
-		<guice-assistedinject.version>3.0</guice-assistedinject.version>
 		<commons.pool.version>2.2</commons.pool.version>
 		<phoenix.batteries.version>2.3.31</phoenix.batteries.version>
 		<segments.version>1.1.7</segments.version>
@@ -60,11 +58,6 @@
 				<groupId>org.apache.velocity</groupId>
 				<artifactId>velocity</artifactId>
 				<version>1.7</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.inject.extensions</groupId>
-				<artifactId>guice-assistedinject</artifactId>
-				<version>${guice-assistedinject.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.inmobi.channels</groupId>
@@ -109,17 +102,22 @@
 			<dependency>
 				<groupId>com.netflix.governator</groupId>
 				<artifactId>governator</artifactId>
-				<version>1.2.7</version>
+				<version>${governator.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.inject.extensions</groupId>
 				<artifactId>guice-multibindings</artifactId>
-				<version>${guice-multibindings.version}</version>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-assistedinject</artifactId>
+				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.inject.extensions</groupId>
 				<artifactId>guice-servlet</artifactId>
-				<version>${guice-servlet.version}</version>
+				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.reflections</groupId>

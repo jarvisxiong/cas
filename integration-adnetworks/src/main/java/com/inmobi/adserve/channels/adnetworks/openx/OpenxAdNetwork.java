@@ -69,11 +69,14 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
     // get URI
     @Override
     public URI getRequestUri() throws Exception {
-    	//af,c.gender for gen
+        // af,c.gender for gen
         final StringBuilder finalUrl = new StringBuilder(config.getString("openx.host"));
         finalUrl.append(externalSiteId).append("&cnt=").append(sasParams.getCountryCode().toLowerCase())
                 .append("&dma=").append(sasParams.getState());
-        finalUrl.append("&net=").append(sasParams.getLocSrc()).append("&age=").append(sasParams.getAge());
+        if (sasParams.getLocationSource() != null) {
+            finalUrl.append("&net=").append(sasParams.getLocationSource().name());
+        }
+        finalUrl.append("&age=").append(sasParams.getAge());
         if (sasParams.getGender() != null) {
             finalUrl.append("&gen=").append(sasParams.getGender().toUpperCase());
         }
@@ -96,10 +99,10 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             finalUrl.append("&did.ai.sha1=").append(casInternalRequestParameters.getUidO1());
         }
         String gpid = getGPID(true);
-        if(null != gpid){
-        	finalUrl.append("&did.adid=").append(gpid);
+        if (null != gpid) {
+            finalUrl.append("&did.adid=").append(gpid);
         }
-        
+
 
         finalUrl.append("&did=").append(casInternalRequestParameters.getUid());
 
@@ -142,8 +145,8 @@ public class OpenxAdNetwork extends AbstractDCPAdNetworkImpl {
             buildInmobiAdTracker();
 
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
-                        getBeaconUrl());
+                responseContent =
+                        Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, getBeaconUrl());
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from openx: {}", response, exception);

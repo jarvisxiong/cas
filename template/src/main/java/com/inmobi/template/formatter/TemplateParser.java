@@ -60,7 +60,7 @@ public class TemplateParser {
             template.merge(velocityContext, writer);
             return writer.toString();
         } catch (final Exception e) {
-            LOG.error(String.format("Error while fetching template for %s", templateName));
+            LOG.error(String.format("Error while merging template for %s", templateName));
             throw new TemplateException("Exception occurred for placementId " + templateName, e);
         }
 

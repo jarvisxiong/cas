@@ -1,10 +1,13 @@
 package com.inmobi.adserve.channels.api;
 
 
+import static com.inmobi.adserve.channels.api.SlotSizeMapping.getOptimisedVideoSlot;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CHINA_COUNTRY_CODE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.TIME_OUT;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -23,6 +26,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +34,6 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
-import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTracker;
@@ -48,7 +51,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -64,7 +66,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -90,9 +91,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected static final String MRAID = "<script src=\"mraid.js\" ></script>";
     protected static final String CONTENT_TYPE_VALUE = "application/json; charset=utf-8";
     protected static final String TERM = "TERM";
-    protected static final String LATLON = GlobalConstant.LATLON;
-    protected static final String DERIVED_LAT_LON = "DERIVED_LAT_LON";
-    protected static final String CCID = "CCID";
     protected static final String GET = "GET";
     protected static final String POST = "POST";
 
@@ -132,6 +130,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean isNativeResponseSupported = false;
     @Getter
     protected boolean isVideoRequest = false;
+    protected boolean isRewardedVideoRequest = false;
     protected boolean isNativeRequest = false;
     protected boolean isRtbPartner = false;
     protected boolean isIxPartner = false;
@@ -148,6 +147,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String source;
     protected String blindedSiteId;
     protected Short selectedSlotId;
+    protected Short processedSlotId;
     protected RepositoryHelper repositoryHelper;
     protected String format = UTF_8;
     protected final Channel serverChannel;
@@ -552,7 +552,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         sasParams = param;
         casInternalRequestParameters = casParams;
         externalSiteId = entity.getExternalSiteKey();
-        selectedSlotId = (short) slotId;
         this.repositoryHelper = repositoryHelper;
         impressionId = param.getImpressionId();
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
@@ -560,10 +559,18 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         this.entity = entity;
         // TODO: Move all supported ad type checks to ThriftRequestParser or AdGroupAdTypeTargetingFilter.
         isNativeRequest = SASParamsUtils.isNativeRequest(sasParams);
-        isVideoRequest =
-                DemandSourceType.IX.getValue() == sasParams.getDst()
-                        && RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()
-                        && DemandAdFormatConstraints.VAST_VIDEO == entity.getDemandAdFormatConstraints() ? true : false;
+
+        // Checking the appropriate SecondaryAdFormatConstraints of an adgroup is a sufficient check for determining
+        // vast video, rewarded video, etc support as the selected adgroup by this point, would have already had all
+        // supply constraints checked in AdGroupAdTypeTargetingFilter
+        isVideoRequest = (VAST_VIDEO == entity.getSecondaryAdFormatConstraints());
+        isRewardedVideoRequest = (REWARDED_VAST_VIDEO == entity.getSecondaryAdFormatConstraints());
+
+        selectedSlotId = (short) slotId;
+        processedSlotId = (isVideoRequest || isRewardedVideoRequest)?
+            ObjectUtils.defaultIfNull(getOptimisedVideoSlot((short) slotId), (short) slotId) :
+            (short) slotId;
+
         isCpc = getPricingModel(entity);
         final boolean isConfigured = configureParameters();
         if (isConfigured) {
@@ -851,7 +858,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public ADCreativeType getCreativeType() {
         if (isNativeRequest()) {
             return ADCreativeType.NATIVE;
-        } else if (isVideoRequest) {
+        } else if (isVideoRequest || isRewardedVideoRequest) {
             return ADCreativeType.INTERSTITIAL_VIDEO;
         } else {
             return ADCreativeType.BANNER;

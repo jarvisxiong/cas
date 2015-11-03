@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.types.LocationSource;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -81,7 +82,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (null != casInternalRequestParameters.getLatLong()
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
+            if (LocationSource.DERIVED_LAT_LON == sasParams.getLocationSource()) {
                 // isLocSourceDerived = true;
             } else {
                 final String[] latlong = casInternalRequestParameters.getLatLong().split(",");

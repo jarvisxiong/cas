@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.repository;
 
 
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -15,9 +16,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,7 +48,7 @@ import com.googlecode.cqengine.attribute.MultiValueAttribute;
 import com.googlecode.cqengine.attribute.MultiValueNullableAttribute;
 import com.googlecode.cqengine.index.hash.HashIndex;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.util.demand.enums.DemandAdFormatConstraints;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.data.repository.DBReaderDelegate;
 import com.inmobi.data.repository.ScheduledDbReader;
 import com.inmobi.segment.Segment;
@@ -187,12 +191,7 @@ public class IXPackageRepository {
         packageIndex.addIndex(HashIndex.onAttribute(SLOT_ID));
         packageIndex.addIndex(HashIndex.onAttribute(DEAL_IDS));
 
-        metricsRegistry.register(MetricRegistry.name(this.getClass(), "size"), new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return packageSet.size();
-            }
-        });
+        metricsRegistry.register(MetricRegistry.name(this.getClass(), "size"), (Gauge<Integer>) () -> packageSet.size());
         start();
     }
 
@@ -223,7 +222,20 @@ public class IXPackageRepository {
                 final String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
                 String[] geoSourceTypes = null;
                 final String geoFenceRegion = rs.getString("geo_fence_region");
-                final int adTypeTargeting = rs.getInt("ad_type_targeting");
+
+                final Array adTypeTargetingArray = rs.getArray("ad_types");
+                Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints = null;
+                if (null != adTypeTargetingArray) {
+                    final Stream<Integer> adTypesStream = Arrays.stream((Integer[])adTypeTargetingArray.getArray());
+                    secondaryAdFormatConstraints = ImmutableSet.copyOf(adTypesStream
+                        .distinct()
+                        .map(adType -> SecondaryAdFormatConstraints.getDemandAdFormatConstraintsByValue(adType))
+                        .filter(demandConstraint -> SecondaryAdFormatConstraints.UNKNOWN != demandConstraint)
+                        .collect(Collectors.toSet()));
+                }
+                if (CollectionUtils.isEmpty(secondaryAdFormatConstraints)) {
+                    secondaryAdFormatConstraints = ImmutableSet.of(SecondaryAdFormatConstraints.ALL);
+                }
 
                 if (null != rs.getArray("geo_source_types")) {
                     geoSourceTypes = (String[]) rs.getArray("geo_source_types").getArray();
@@ -438,8 +450,7 @@ public class IXPackageRepository {
                 entityBuilder.osVersionTargeting(osVersionTargeting);
                 entityBuilder.manufModelTargeting(manufModelTargeting);
                 entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
-                entityBuilder.demandAdFormatConstraints(DemandAdFormatConstraints
-                    .getDemandAdFormatConstraintsByValue(adTypeTargeting));
+                entityBuilder.secondaryAdFormatConstraints(secondaryAdFormatConstraints);
 
                 if (null != dealIds) {
                     entityBuilder.dealIds(Arrays.asList(dealIds));

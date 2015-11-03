@@ -21,6 +21,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.types.LocationSource;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -73,7 +74,7 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         if (sendTrueLatLongOnly) {
-            if (DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())) {
+            if (LocationSource.DERIVED_LAT_LON == sasParams.getLocationSource()) {
                 LOG.info("Configure parameters inside verve returned false");
                 return false;
             } else if (casInternalRequestParameters.getLatLong() != null
@@ -89,10 +90,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
                 LOG.info("Configure parameters inside verve returned false");
                 return false;
             }
-        } else if (!DERIVED_LAT_LON.equalsIgnoreCase(sasParams.getLocSrc())
-                && StringUtils.isNotBlank(sasParams.getLocSrc())) { // request
-            // has true
-            // lat-long
+        } else if (sasParams.getLocationSource() != null
+                && LocationSource.DERIVED_LAT_LON != sasParams.getLocationSource()) {
+            // request has true lat-long
             LOG.info("Configure parameters inside verve returned false");
             return false;
         }
@@ -102,9 +102,9 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             final Dimension dim = slotSizeMapEntity.getDimension();
             width = (int) Math.ceil(dim.getWidth());
             height = (int) Math.ceil(dim.getHeight());
-            if (selectedSlotId == (short)11) {
+            if (selectedSlotId == (short) 11) {
                 adUnit = BANNER;
-            } else if (selectedSlotId == (short)10 || selectedSlotId == (short)14) {
+            } else if (selectedSlotId == (short) 10 || selectedSlotId == (short) 14) {
                 adUnit = INTER;
             }
         }
@@ -121,7 +121,8 @@ public class DCPVerveAdNetwork extends AbstractDCPAdNetworkImpl {
             }
             portalKeyword = ANDROID_KEYWORD;
         } else {
-            LOG.info("Configure parameters inside verve returned false as unsupported source: {}", sasParams.getSource());
+            LOG.info("Configure parameters inside verve returned false as unsupported source: {}",
+                    sasParams.getSource());
             return false;
         }
 

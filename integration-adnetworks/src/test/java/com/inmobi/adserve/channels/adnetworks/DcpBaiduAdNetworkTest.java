@@ -259,7 +259,7 @@ public class DcpBaiduAdNetworkTest {
                                 "{\"slot\":\"123\"}"),
                         new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         assertTrue(dcpBaiduAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
-        final String actualString = dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
+        dcpBaiduAdNetwork.getNingRequestBuilder().build().getStringData();
         BidRequest
                 bidRequest = Whitebox.<BidRequest>invokeMethod(dcpBaiduAdNetwork, "getRequest");
         assertEquals(bidRequest.getApp().getId(), debug);

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
+import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
@@ -22,6 +23,7 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 
 import io.netty.handler.codec.http.HttpHeaders;
@@ -83,11 +85,13 @@ public class CasUtils {
         boolean isSupported = false;
 
         LOG.debug("Checking for VAST video support");
-        // TODO: Move to config
-        if (CollectionUtils.isEmpty(sasParams.getProcessedMkSlot()) || !(
-            sasParams.getProcessedMkSlot().contains((short) 14) || sasParams.getProcessedMkSlot()
-                .contains((short) 32))) {
-            LOG.debug("Not qualified for VAST video as processed slots do not contain 14 or 32");
+        if (DemandSourceType.IX.getValue() != sasParams.getDst()) {
+            LOG.debug("Not qualified for VAST video as DST was not IX");
+            return false;
+        }
+
+        if (RequestedAdType.INTERSTITIAL != sasParams.getRequestedAdType()) {
+            LOG.debug("Not qualified for VAST video as RequestAdType was not INTERSTITIAL");
             return false;
         }
 
