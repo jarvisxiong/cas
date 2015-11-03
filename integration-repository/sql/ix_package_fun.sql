@@ -1,9 +1,9 @@
-CREATE FUNCTION ix_package_fun_15102015()
+CREATE FUNCTION ix_package_fun_02112015()
 RETURNS
-    SETOF ix_package_type_15102015 AS
+    SETOF ix_package_type_02112015 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_15102015%ROWTYPE;
+    row1    ix_package_type_02112015%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -17,6 +17,9 @@ SELECT
                 ix_packages.os_ids AS os_ids,
                 ix_packages.os_version_targeting AS os_version_targeting,
                 ix_packages.manuf_model_targeting AS manuf_model_targeting,
+                ix_packages.viewable,
+                ix_packages.language_targeting_list,
+                ix_packages.sdk_version_targeting,
                 ix_packages.carrier_ids AS carrier_ids,
                 ix_packages.site_categories AS site_categories,
                 ix_packages.connection_types AS connection_types,
@@ -56,6 +59,7 @@ SELECT
                         makeList(access_type) AS access_types,
                         makeList(rp_agency_id) AS rp_agency_ids,
                         makeList(agency_rebate_percentage) AS agency_rebate_percentages,
+                        makeList(viewability_tracker) AS viewability_trackers,
                         package_id
                     from ix_package_deals
                     where (start_date is null or start_date <= now()+interval '1 minute')

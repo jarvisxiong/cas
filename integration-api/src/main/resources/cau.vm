@@ -88,7 +88,15 @@
                             #if($IMBeaconUrl) '${IMBeaconUrl}?m=18&b=${WIN_BID}${DEAL_GET_PARAM}' #end
                             #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
                         ],
-                        clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end]
+                        clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end],
+                        viewabilityBeacon1Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second' #end],
+                        viewabilityBeacon2Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_two_second' #end],
+                        viewabilityBeacon1SecSimple: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second_simple' #end],
+                        viewabilityBeacon2SecSimple: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_two_second_simple' #end]
+                    },
+                    state = {
+                        viewability1SecBeaconsFired: false,
+                        viewability2SecBeaconsFired: false
                     },
                     eventHandler = {
                         fireBeacon : function (beaconUrl) {
@@ -113,9 +121,38 @@
                         },
                         fireRenderBeacons : function () {
                             this.fireBeacons(events.renderBeacons);
+                            var self = this;
+                            window.setTimeout(
+                                function () {
+                                    if (!state.viewability1SecBeaconsFired) {
+                                        state.viewability1SecBeaconsFired = true;
+                                        self.fireBeacons(events.viewabilityBeacon1Sec);
+                                    }
+                                    self.fireBeacons(events.viewabilityBeacon1SecSimple);
+                                },
+                                1000
+                            );
+                            window.setTimeout(
+                                function() {
+                                    if (!state.viewability2SecBeaconsFired) {
+                                        state.viewability2SecBeaconsFired = true;
+                                        self.fireBeacons(events.viewabilityBeacon2Sec);
+                                    }
+                                    self.fireBeacons(events.viewabilityBeacon2SecSimple);
+                                },
+                                2000
+                            );
                         },
                         fireClickBeacons : function () {
                             this.fireBeacons(events.clickBeacons);
+                            if (!state.viewability2SecBeaconsFired) {
+                                state.viewability2SecBeaconsFired = true;
+                                this.fireBeacons(events.viewabilityBeacon2Sec);
+                            }
+                            if (!state.viewability1SecBeaconsFired) {
+                                state.viewability1SecBeaconsFired = true;
+                                this.fireBeacons(events.viewabilityBeacon1Sec);
+                            }
                         }
                     };
 
