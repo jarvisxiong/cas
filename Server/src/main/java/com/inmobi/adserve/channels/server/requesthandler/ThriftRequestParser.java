@@ -442,6 +442,8 @@ public class ThriftRequestParser {
                     break;
             }
         }
+
+        LOG.debug("CasInternalParams are {}", parameter);
     }
 
     public String MD5(final String md5) {

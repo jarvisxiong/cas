@@ -1436,4 +1436,13 @@ public class RTBD_NewTest {
     public void TESTIOS9_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
     }
+    @Test(testName = "TEST_IEM", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IEM(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+            LogParserHelper.logParser("IEM=123456789123456", "iem=123456789123456", "RTB request json is", "\"didraw"
+                + "\":\"123456789123456\"");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
 }

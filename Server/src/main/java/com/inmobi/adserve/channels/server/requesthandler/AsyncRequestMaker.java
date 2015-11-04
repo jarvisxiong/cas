@@ -152,6 +152,7 @@ public class AsyncRequestMaker {
         casInternal.setAppUrl(sasParams.getAppUrl());
         casInternal.setTraceEnabled(casGlobal.isTraceEnabled());
         casInternal.setSiteAccountType(casGlobal.getSiteAccountType());
+        casInternal.setIem(casGlobal.getIem());
         return casInternal;
     }
 
@@ -169,6 +170,7 @@ public class AsyncRequestMaker {
             casInternal.setUidIDUS1(null);
             casInternal.setUidSO1(null);
             casInternal.setTrackingAllowed(false);
+            casInternal.setIem(null);
         }
         if (csEntity.isStripZipCode()) {
             LOG.debug("Stripping ZIP Codes");
