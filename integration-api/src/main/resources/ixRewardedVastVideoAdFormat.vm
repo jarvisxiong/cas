@@ -5,19 +5,32 @@
     <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
     <style type="text/css">
         body {margin: 0; overflow: hidden;}
+        .${first.ns}beacon{
+            display: none;
+            height: 1;
+            width: 1;
+            border: 0;
+        }
     </style>
 </head>
 <body>
 <script type="text/javascript" src="${IMAIBaseUrl}"> </script>
 <div style="display:none; position:absolute;" id="${first.ns}clickTarget"></div>
 <script type="text/javascript">
+    var playBeaconsFired = false;
+    window['${first.ns}fireBeacon'] = function (url) {
+        var x = document.createElement("img");
+            x.setAttribute("src", url);
+            x.className = "${first.ns}beacon";
+            document.body.appendChild(x);
+    };
     window['${first.ns}clickCallback'] = function() {
         _im_imai.onUserInteraction();
-        _im_imai.pingInWebView('${first.clickServerUrl}');
+        window['${first.ns}fireBeacon']('${first.clickServerUrl}');
     };
 	window['${first.ns}impressionCallback'] = function() {
-        _im_imai.pingInWebView('${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}');
-        #if($PartnerBeaconUrl)_im_imai.pingInWebView('${PartnerBeaconUrl}');#end
+        window['${first.ns}fireBeacon']('${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}');
+        #if($PartnerBeaconUrl)window['${first.ns}fireBeacon']('${PartnerBeaconUrl}');#end
     };
     window['${first.ns}LandingPageEvent'] = function() {
     };
@@ -51,12 +64,26 @@
             }
         }
         firePixel(beacon, 1000, 5);
-
-        if (id == 9) {
-            window['${first.ns}impressionCallback']();
-        }
         if (id == 8) {
             window['${first.ns}clickCallback'](event);
+        }
+        if (id == 9 || id == 10) {
+            if (!playBeaconsFired) {
+                playBeaconsFired = true;
+                window['${first.ns}impressionCallback']();
+                window.setTimeout(
+                    function () {
+                        window['${first.ns}recordEvent'](99, {'action': 'viewability_one_second'});
+                    },
+                    1000
+                );
+                window.setTimeout(
+                    function () {
+                        window['${first.ns}recordEvent'](99, {'action': 'viewability_two_second'});
+                    },
+                    2000
+                );
+            }
         }
     };
 #if(${SDK450Onwards})
