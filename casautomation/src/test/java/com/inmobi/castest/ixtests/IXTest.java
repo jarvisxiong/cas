@@ -1716,6 +1716,15 @@ public class IXTest {
 
     }
 
+    @Test(testName = "TEST_RP_ALT_SLOT_IDS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_RP_ALT_SLOT_IDS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+            LogParserHelper.logParser("SAS params are", "selectedSlots:[9, 4]", "IX request json is",
+                "\"size_id\":43", "\"alt_size_ids\":[44]");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)
     // public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder)

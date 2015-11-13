@@ -217,11 +217,11 @@ TEST2_63_4:
 TEST2_RTBD_SIGNALS_NULLCHECK:
  - device_manufacturername: 'NULL'
    device_modelname: 'NULL'
-TEST2_RTBD_SIGNALS_VALIDATIONS_POSITIVE: 
+TEST2_RTBD_SIGNALS_VALIDATIONS_POSITIVE:
  - device_manufacturername: 'WHATEVER_MANUF_NAME !@#$12345'
    device_modelname: 'WHATEVER_MODEL_NAME !@#$12345'
    user_yearofbirth: '1995'
-TEST2_RTBD_SIGNALS_VALIDATIONS_NEGATIVE: 
+TEST2_RTBD_SIGNALS_VALIDATIONS_NEGATIVE:
  - device_manufacturername: 'WHATEVER_MANUF_NAME !@#$12345'
    device_modelname: 'WHATEVER_MODEL_NAME !@#$12345'
    user_yearofbirth: '1995'
@@ -1402,7 +1402,7 @@ TEST3_8_8_4 :
 TEST3_IMPRESSIONIDCHANGE_PROG382 :
 - testName: ImpressionIdChange
 
-VAST_TEMPLATE_TEST: 
+VAST_TEMPLATE_TEST:
  - adpool_selectedslots : '14'
    site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
    site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
@@ -1410,7 +1410,7 @@ VAST_TEMPLATE_TEST:
    device_osmajorversion : '6.0'
    adpool_requestedadtype : 'INTERSTITIAL'
    site_enriched_media_attributes : '2'
-   
+
 TEST3_NATIVE_LAYOUT_1 :
 - testName: Native Layout 1 checks.
   device_osid : '5' #forreq
@@ -1475,7 +1475,7 @@ TEST3_NATIVE_LAYOUT_5 :
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
   adpool_placementId : '1431975540151941'
-  
+
 TEST3_NATIVE_LAYOUT_6 :
 - testName: Native Layout 6 checks.
   device_osid : '5' #forreq
@@ -1488,7 +1488,7 @@ TEST3_NATIVE_LAYOUT_6 :
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
   adpool_placementId : '1431975540397297'
-  
+
 TEST3_NATIVE_LAYOUT_ADAPTER_FAIL :
 - testName:  IX adapter disabled for native checks.
   device_osid : '5' #forreq
@@ -1546,7 +1546,7 @@ TEST_VAST_HAPPY_ALTERNATE_SIZES3 :
   #site_enriched_media_attributes : '0,2'
   ad_type_targeting : '1'
 
-TEST_VAST_SDKVERSION_440 : 
+TEST_VAST_SDKVERSION_440 :
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
   site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
@@ -1557,8 +1557,8 @@ TEST_VAST_SDKVERSION_440 :
   site_enriched_media_attributes : '0'
   adpool_responseformat : 'IMAI'
   ad_type_targeting : '0'
-  
-TEST_VAST_PUBCONTROLS_BANNER_450 : 
+
+TEST_VAST_PUBCONTROLS_BANNER_450 :
 - adpool_selectedslots : '14'
   site_siteid : 'cab0db94fc7b434a8424a84966a781f5'
   site_publisherid : '2ab4a1d8d70841f6ba1dd52fc482b017'
@@ -1591,12 +1591,12 @@ TEST_REWARDED_HAPPY :
   adpool_responseformat : 'IMAI'
   ad_type_targeting : '1'
 
-TEST_IX_JSAC_INTEGRATION_TYPE : 
+TEST_IX_JSAC_INTEGRATION_TYPE :
 - integration_type : 'JSAC'
   adpool_selectedslots : '15'
   adpool_responseformat : 'HTML'
 
-TEST_IX_API_ANDROID_INTEGRATION_TYPE : 
+TEST_IX_API_ANDROID_INTEGRATION_TYPE :
 - integration_type : 'ANDROID_API'
   adpool_selectedslots : '15'
   adpool_responseformat : 'HTML'
@@ -1604,7 +1604,7 @@ TEST_IX_API_IOS_INTEGRATION_TYPE :
 - integration_type : 'IOS_API'
   adpool_selectedslots : '15'
   adpool_responseformat : 'HTML'
-  
+
 TEST_STUDIO_POSITIVE :
 - os_id : '3'
   site_type : 'PERFORMANCE'
@@ -1632,27 +1632,27 @@ TEST_STUDIO_NEGATIVE :
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.sprout.uniqueIdentifierRegex'
   change_config_val : 'AbraKaDabra'
-  
-TEST_IX_PACKAGES_NORMALDEAL : 
+
+TEST_IX_PACKAGES_NORMALDEAL :
 - geo_countryid : '150'
 
-TEST_IX_PACKAGES_CSIDDEAL : 
+TEST_IX_PACKAGES_CSIDDEAL :
 - geo_countryid : '200'
   userprofile_csitags : '1,4'
-  
-TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE : 
+
+TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE :
 - geo_countryid : '200'
   userprofile_csitags : '4'
-  
-TEST_IX_PACKAGES_MANUFDEAL : 
+
+TEST_IX_PACKAGES_MANUFDEAL :
 - geo_countryid : '250'
   device_modelid : '7'
   device_manufacturerid : '129'
-  
-TEST_IX_PACKAGES_MODELID_WIFI_DEAL : 
+
+TEST_IX_PACKAGES_MODELID_WIFI_DEAL :
 - geo_countryid : '300'
   userprofile_csitags : '1,2'
-  
+
 TEST_ZONE_ID_FAIL :
 - adpool_selectedslots : '15'
   site_inventorytype : 'WAP' #forreq
@@ -1676,16 +1676,19 @@ TEST_NATIVE_NON_NATIVE_SITE :
   change_config_val : 'true'
   adpool_placementId: '123456'
 
-TEST_KILOO : 
+TEST_KILOO :
 - testName : 'Kiloo Happy'
 
-TESTIOS9 : 
+TESTIOS9 :
 - testName : 'Kiloo Happy'
   device_osid : '5'
 
-TESTIOS9_2 : 
+TESTIOS9_2 :
 - testName : 'Kiloo Happy'
   device_osid : '5'
 
 TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
  - testName: 'ix-happy'
+
+TEST_RP_ALT_SLOT_IDS:
+- adpool_selectedslots : '9,4'
