@@ -24,8 +24,6 @@ prod:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'sjc.ads.nexage.com'
       mondemand_address:
          - 'tzns4003.grid.uj1.inmobi.com'
       mondemand_port:
@@ -104,8 +102,6 @@ prod:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'bos.ads.nexage.com'
       mondemand_address:
          - 'krvm4102.grid.uh1.inmobi.com'
       mondemand_port:
@@ -184,8 +180,6 @@ prod:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'bos.ads.nexage.com'
       mondemand_address:
          - 'erns4003.grid.lhr1.inmobi.com'
       mondemand_port:
@@ -264,8 +258,6 @@ prod:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'sjc.ads.nexage.com'
       mondemand_address:
          - 'opns4006.grid.hkg1.inmobi.com'
       mondemand_port:
@@ -345,8 +337,6 @@ pilot:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'sjc.ads.nexage.com'
       mondemand_address:
          - 'tzns4003.grid.uj1.inmobi.com'
       mondemand_port:
@@ -425,8 +415,6 @@ pilot:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'bos.ads.nexage.com'
       mondemand_address:
          - 'krvm4102.grid.uh1.inmobi.com'
       mondemand_port:
@@ -505,8 +493,6 @@ pilot:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'bos.ads.nexage.com'
       mondemand_address:
          - 'erns4003.grid.lhr1.inmobi.com'
       mondemand_port:
@@ -585,8 +571,6 @@ pilot:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'sjc.ads.nexage.com'
       mondemand_address:
          - 'opns4006.grid.hkg1.inmobi.com'
       mondemand_port:
@@ -668,8 +652,6 @@ nonprod:
          - 500
       cas_timer_handler_timeout_rtbd:
          - 190
-      nexage_host:
-         - 'bos.non_prod'
       mondemand_address:
          - 'erns4003.grid.lhr1.inmobi.com'
       mondemand_port:
@@ -714,8 +696,6 @@ nonprod:
           - 'http://10.14.118.66:8889/getIXBid'
       taboola_default_url:
           - 'http://10.14.118.66:8100/taboola_resp.html'
-      nexage_host:
-         - 'bos.ads.nexage.com'
       mondemand_address:
          - 'localhost'
       mondemand_port:
@@ -786,8 +766,6 @@ nonprod:
          - "off"
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'bos.ads.nexage.com'
       mondemand_address:
          - 'gsmon2000.red.ua2.inmobi.com'
       mondemand_port:
@@ -864,8 +842,6 @@ skyhookprod:
          - 'NA'
       taboola_default_url:
          - 'http://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
-      nexage_host:
-         - 'sjc.ads.nexage.com'
       mondemand_address:
          - 'tzns4003.grid.uj1.inmobi.com'
       mondemand_port:
