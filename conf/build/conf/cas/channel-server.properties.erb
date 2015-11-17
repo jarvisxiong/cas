@@ -255,10 +255,17 @@ Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = IXPackageRepository
 Cache.IXPackageRepository.Manager = com.inmobi.adserve.channels.repository.IXPackageRepository
-Cache.IXPackageRepository.query = select * from ix_package_fun_15102015()
+Cache.IXPackageRepository.query = select * from ix_package_fun_05112015()
 Cache.IXPackageRepository.initialDelay = 300
 Cache.IXPackageRepository.refreshTime = 1867
 Cache.IXPackageRepository.dataSourceName = jdbc
+
+Cache.Name = SdkViewabilityEligibilityRepository
+Cache.SdkViewabilityEligibilityRepository.Manager = com.inmobi.adserve.channels.repository.SdkViewabilityEligibilityRepository
+Cache.SdkViewabilityEligibilityRepository.query = select * from sdk_viewability_eligibility where modified_on >=('${last_update}')
+Cache.SdkViewabilityEligibilityRepository.initialDelay = 300
+Cache.SdkViewabilityEligibilityRepository.refreshTime = 2131
+Cache.SdkViewabilityEligibilityRepository.dataSourceName = jdbc
 
 Cache.Name = SiteEcpmRepository
 Cache.SiteEcpmRepository.Manager = com.inmobi.adserve.channels.repository.SiteEcpmRepository
@@ -1753,15 +1760,3 @@ adapter.ix.globalBlind=3522,3038,3107,3420,3002,3320,2853,3158,3560,3600,3542,36
 adapter.ix.excludeCircuitBreaker=true
 adapter.ix.bidFloorPercent=100
 adapter.ix.sprout.uniqueIdentifierRegex=(?s).*data-creative[iI]d.*
-
-adapter.EAHosted.isRtb=true
-adapter.EAHosted.status=on
-adapter.EAHosted.templateWinNotification=false
-adapter.EAHosted.isWnRequired=true
-adapter.EAHosted.advertiserId=b3f84a58b98b48a0b51116dc09f773f2
-adapter.EAHosted.host.default=https://mrp.rubiconproject.com/ad_request
-adapter.EAHosted.partnerSegmentNo=1
-adapter.EAHosted.class=com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork
-adapter.EAHosted.userName=inmobi
-adapter.EAHosted.password=h0sted1@#
-adapter.EAHosted.bidToUmpInUSD=10.0

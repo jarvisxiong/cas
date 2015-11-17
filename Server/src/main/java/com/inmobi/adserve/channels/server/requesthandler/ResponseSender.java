@@ -40,7 +40,6 @@ import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -215,18 +214,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
 
-        Boolean isHASAdResponse = false;
-        if (selectedAdNetwork instanceof HostedAdNetwork) {
-            isHASAdResponse = true;
-        }
-
         sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(),
-                selectedAdNetwork.getRepositoryHelper(), isHASAdResponse);
+                selectedAdNetwork.getRepositoryHelper());
     }
 
     // send Ad Response
     private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel,
-            final Short selectedSlotId, final RepositoryHelper repositoryHelper, final Boolean isHASAdResponse) {
+            final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
@@ -259,7 +253,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         if (sasParams.getDst() == DCP.getValue()) {
             sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
-            incrementStatsForFills(sasParams.getDst(), isHASAdResponse);
+            incrementStatsForFills(sasParams.getDst());
         } else {
             final String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
             final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse(), repositoryHelper);
@@ -272,7 +266,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     final byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
                     sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(),
                             serverChannel);
-                    incrementStatsForFills(sasParams.getDst(), isHASAdResponse);
+                    incrementStatsForFills(sasParams.getDst());
                 } catch (final TException e) {
                     LOG.error("Error in serializing the adPool response ", e);
                     sendNoAdResponse(serverChannel);
@@ -281,13 +275,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    private void incrementStatsForFills(final int dst, final Boolean isHASAdResponse) {
+    private void incrementStatsForFills(final int dst) {
         if (dst == DemandSourceType.DCP.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.DCP_FILLS);
         } else if (dst == DemandSourceType.RTBD.getValue()) {
-            if (isHASAdResponse) {
-                InspectorStats.incrementStatCount(InspectorStrings.HOSTED_FILLS);
-            }
             InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_FILLS);
         } else if (dst == DemandSourceType.IX.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.IX_FILLS);
@@ -383,14 +374,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 break;
 
             case RTBD:
-                // If Hosted Ad Server response then Auction Type is set to PREFERRED_DEAL
-                if (getRtbResponse().getAdNetworkInterface() instanceof HostedAdNetwork) {
-                    rtbdAd.setPricingModel(PricingModel.CPC);
-                    rtbdAd.setAuctionType(AuctionType.TRUMP);
-                } else {
-                    // For normal RTBD responses, auction type is set to SECOND_PRICE
-                    rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-                }
+                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
                 break;
             default: // For DCP, auction type is set to SECOND_PRICE
                 rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);

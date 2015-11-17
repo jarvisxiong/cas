@@ -1,4 +1,4 @@
-CREATE FUNCTION ix_package_fun_02112015()
+CREATE FUNCTION ix_package_fun_05112015()
 RETURNS
     SETOF ix_package_type_02112015 AS
 $BODY$
@@ -26,7 +26,6 @@ SELECT
                 ix_packages.geo_source_types AS geo_source_types,
                 ix_packages.geo_fence_region AS geo_fence_region,
                 ix_packages.app_store_categories AS app_store_categories,
-                ix_packages.sdk_versions AS sdk_versions,
                 ix_packages.lat_long_only AS lat_long_only,
                 ix_packages.zip_code_only AS zip_code_only,
                 ix_packages.ifa_only AS ifa_only,
@@ -51,7 +50,8 @@ SELECT
                 deals.deal_ids AS deal_ids,
                 deals.deal_floors AS deal_floors,
                 deals.rp_agency_ids AS rp_agency_ids,
-                deals.agency_rebate_percentages AS agency_rebate_percentages
+                deals.agency_rebate_percentages AS agency_rebate_percentages,
+                deals.viewability_trackers AS viewability_trackers
                 from ix_packages JOIN (
                     select
                         makeList(rp_deal_id) AS deal_ids,

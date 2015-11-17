@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server;
 
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.AEROSPIKE_FEEDBACK;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CCID_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY;
@@ -16,11 +17,11 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.HOST_NAME_KEY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_FILTER_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_METADATA_REPOSITORY;
@@ -71,6 +72,7 @@ import com.inmobi.adserve.channels.repository.IXPackageRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SdkViewabilityEligibilityRepository;
 import com.inmobi.adserve.channels.repository.SdkMraidMapRepository;
 import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
@@ -141,6 +143,7 @@ public class ChannelServer {
     private static IMEIAerospikeRepository imeiAerospikeRepository;
     private static IXBlocklistRepository ixBlocklistRepository;
     private static CAUMetaDataRepository cauMetaDataRepository;
+    private static SdkViewabilityEligibilityRepository sdkViewabilityEligibilityRepository;
     private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
     private static String configFile;
 
@@ -222,7 +225,7 @@ public class ChannelServer {
             ccidMapRepository = new CcidMapRepository();
             ixBlocklistRepository = new IXBlocklistRepository();
             cauMetaDataRepository = new CAUMetaDataRepository();
-            
+            sdkViewabilityEligibilityRepository = new SdkViewabilityEligibilityRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -249,6 +252,7 @@ public class ChannelServer {
             repoHelperBuilder.setCcidMapRepository(ccidMapRepository);
             repoHelperBuilder.setIxBlocklistRepository(ixBlocklistRepository);
             repoHelperBuilder.setCauMetaDataRepository(cauMetaDataRepository);
+            repoHelperBuilder.setSdkViewabilityEligibilityRepository(sdkViewabilityEligibilityRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
@@ -384,6 +388,7 @@ public class ChannelServer {
             loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);
             loadRepos(ixBlocklistRepository, IX_BLOCKLIST_REPOSITORY, config, logger);
             loadRepos(cauMetaDataRepository, CAU_METADATA_REPOSITORY, config, logger);
+            loadRepos(sdkViewabilityEligibilityRepository, SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY),
                     IX_PACKAGE_REPOSITORY);
             final DataCenter dc = getDataCenter();

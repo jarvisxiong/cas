@@ -19,7 +19,6 @@ public class AuctionNoAdFilter extends AbstractAuctionFilter {
         super(traceMarkerProvider, null, serverConfiguration);
         isApplicableRTBD = true;
         isApplicableIX = true;
-        isApplicableHosted = true;
     }
 
     @Override

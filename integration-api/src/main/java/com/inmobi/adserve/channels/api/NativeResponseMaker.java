@@ -81,20 +81,6 @@ public class NativeResponseMaker {
         return createNativeAd(vc, app, params.get("placementId"));
     }
 
-    public String makeHostedResponse(final String adm, final Map<String, String> params,
-            final NativeAdTemplateEntity templateEntity) throws Exception {
-        checkPreconditions(params, templateEntity);
-        Preconditions.checkNotNull(adm, ERROR_STR, "AdMarkup");
-
-        final String placementId = params.get("placementId");
-        final App app = createNativeAppObject(adm, params);
-        validateResponse(app, templateEntity);
-        final VelocityContext vc = getVelocityContext(app, params);
-        vc.put("NAMESPACE", Formatter.getRTBDNamespace());
-
-        return createNativeAd(vc, app, placementId);
-    }
-
     private String createNativeAd(final VelocityContext vc, final App app, final String placementId) throws Exception {
         final String namespace = (String) vc.get("NAMESPACE");
         final String pubContent = templateParser.format(app, placementId);

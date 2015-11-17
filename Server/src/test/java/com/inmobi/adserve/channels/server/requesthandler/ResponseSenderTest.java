@@ -26,7 +26,6 @@ import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.AuctionType;
 import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -302,83 +301,6 @@ public class ResponseSenderTest {
     }
 
     @Test
-    public void testCreateThriftResponseHostedAdServer() throws Exception {
-        String adMarkup = "<AD Content>";
-        String adGroupId = "adGroupId";
-        String adId = "adId";
-        String campaignId = "campaignId";
-        String advertiserId = "advertiserId";
-        String impressionId = TestUtils.SampleStrings.impressionId;
-        String currency = "USD";
-        long incId = 123L;
-        long adGroupIncId = 456L;
-        long campaignIncId = 789L;
-        Double bidPriceInUSD = 5.5;
-        Double secondBidPriceInUSD = 4.5;
-        short selectedSlot = 5;
-        ADCreativeType creativeType = ADCreativeType.BANNER;
-        DemandSourceType dst = DemandSourceType.RTBD;
-
-        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
-        AuctionEngine mockAuctionEngine = createMock(AuctionEngine.class);
-        ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
-        ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        HostedAdNetwork mockHostedAdNetwork = createMock(HostedAdNetwork.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-
-        expect(mockAuctionEngine.getAuctionResponse()).andReturn(mockChannelSegment).anyTimes();
-        expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
-        expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockHostedAdNetwork).anyTimes();
-        expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adGroupId).anyTimes();
-        expect(mockChannelSegmentEntity.getAdId(creativeType)).andReturn(adId).anyTimes();
-        expect(mockChannelSegmentEntity.getCampaignId()).andReturn(campaignId).anyTimes();
-        expect(mockChannelSegmentEntity.getIncId(creativeType)).andReturn(incId).anyTimes();
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adGroupIncId).anyTimes();
-        expect(mockChannelSegmentEntity.getCampaignIncId()).andReturn(campaignIncId).anyTimes();
-        expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn(advertiserId).anyTimes();
-        expect(mockHostedAdNetwork.getDst()).andReturn(dst).anyTimes();
-        expect(mockHostedAdNetwork.getCreativeType()).andReturn(ADCreativeType.BANNER).anyTimes();
-        expect(mockHostedAdNetwork.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
-        expect(mockHostedAdNetwork.getImpressionId()).andReturn(impressionId).anyTimes();
-        expect(mockHostedAdNetwork.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
-        expect(mockHostedAdNetwork.getSecondBidPriceInUsd()).andReturn(secondBidPriceInUSD).anyTimes();
-        expect(mockHostedAdNetwork.getCurrency()).andReturn(currency).anyTimes();
-        expect(mockHostedAdNetwork.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
-
-        replayAll();
-
-        ResponseSender responseSender = new ResponseSender();
-        MemberModifier.field(ResponseSender.class, "auctionEngine").set(responseSender, mockAuctionEngine);
-        responseSender.setSasParams(mockSASRequestParameters);
-
-        long bid = (long) (bidPriceInUSD * Math.pow(10, 6));
-        long minBid = (long) (secondBidPriceInUSD * Math.pow(10, 6));
-        UUID uuid = UUID.fromString(impressionId);
-        GUID impression = new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
-
-        AdPoolResponse adPoolResponse =
-                responseSender.createThriftResponse(adMarkup, mockHostedAdNetwork.getRepositoryHelper());
-        AdInfo adInfo = adPoolResponse.getAds().get(0);
-        Creative creative = adInfo.creative;
-        AdIdChain adIdChain = adInfo.deprecatedAdIds.get(0);
-
-        assertThat(adIdChain.adgroup_guid, is(equalTo(adGroupId)));
-        assertThat(adIdChain.ad_guid, is(equalTo(adId)));
-        assertThat(adIdChain.campaign_guid, is(equalTo(campaignId)));
-        assertThat(adIdChain.ad, is(equalTo(incId)));
-        assertThat(adIdChain.group, is(equalTo(adGroupIncId)));
-        assertThat(adIdChain.campaign, is(equalTo(campaignIncId)));
-        assertThat(adIdChain.advertiser_guid, is(equalTo(advertiserId)));
-        assertThat(adInfo.pricingModel, is(equalTo(PricingModel.CPC)));
-        assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
-        assertThat(adInfo.bid, is(equalTo(bid)));
-        assertThat(adInfo.price, is(equalTo(bid)));
-        assertThat(adInfo.deprecatedImpressionId, is(equalTo(impression)));
-        assertThat(creative.getValue(), is(equalTo(adMarkup)));
-        assertThat(adPoolResponse.minChargedValue, is(equalTo(minBid)));
-    }
-
-    @Test
     public void testCreateThriftResponseIX() throws Exception {
         String adMarkup = "<AD Content>";
         String adGroupId = "adGroupId";
@@ -398,10 +320,10 @@ public class ResponseSenderTest {
         ADCreativeType creativeType = ADCreativeType.BANNER;
         DemandSourceType dst = DemandSourceType.IX;
         IXPackageEntity.Builder builder = IXPackageEntity.newBuilder();
-        List<String> accessTypes = new ArrayList<String>(); 
+        List<String> accessTypes = new ArrayList<>();
         accessTypes.add(ResponseSender.RIGHT_TO_FIRST_REFUSAL_DEAL);
         builder.accessTypes(accessTypes);
-        List<String> dealIds = new ArrayList<String>();
+        List<String> dealIds = new ArrayList<>();
         dealIds.add("dealId");
         builder.dealIds(dealIds);
         IXPackageEntity ixPackageEntity = builder.build();

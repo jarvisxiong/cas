@@ -218,6 +218,9 @@ public class ThriftRequestParser {
             if (tDevice.isSetManufacturerName()) {
                 params.setDeviceMake(tDevice.getManufacturerName());
             }
+            if (tDevice.isSetDisplayName()) {
+                params.setHandsetName(tDevice.getDisplayName());
+            }
         }
     }
 

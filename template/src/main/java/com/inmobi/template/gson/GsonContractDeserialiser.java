@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -18,6 +16,7 @@ import com.google.gson.JsonParseException;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 /**
  * Custom Deserialiser for classes annotated with @GsonContract. This deserialiser enforces @Required and @DefaultValue.
@@ -43,7 +42,7 @@ public class GsonContractDeserialiser<T> implements JsonDeserializer<T> {
 
         final List<Pair<Object, Field>> fields = new ArrayList<>();
         for (final Field field : pojo.getClass().getDeclaredFields()) {
-            fields.add(new Pair<Object, Field>(pojo, field));
+            fields.add(new Pair<>(pojo, field));
         }
 
         final ListIterator<Pair<Object, Field>> iterator = fields.listIterator();

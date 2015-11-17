@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.server.auction;
 
 import static com.inmobi.adserve.channels.server.auction.AuctionEngineHelper.mapRPChannelSegmentsToDSPChannelSegments;
 import static com.inmobi.adserve.channels.server.auction.AuctionEngineHelper.updateChannelSegmentWithDSPFields;
-import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_AUCTION;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
-import com.inmobi.adserve.channels.adnetworks.mvp.HostedAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.AuctionEngineInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -27,7 +25,7 @@ import com.inmobi.casthrift.DemandSourceType;
 
 
 /***
- * Auction Engine to run different types of auctions in rtbd, ix and hosted.
+ * Auction Engine to run different types of auctions in rtbd, ix.
  * 
  * @author Devi Chand
  * @author Ishan Bhatnagar
@@ -48,7 +46,7 @@ public class AuctionEngine implements AuctionEngineInterface {
     private static Random random = new Random();
 
     /**
-     * Runs the auction for RTBD (Second Price), IX (First Price) & Hosted (Trump)
+     * Runs the auction for RTBD (Second Price), IX (First Price)
      */
     @Override
     public synchronized AdNetworkInterface runAuctionEngine() {
@@ -117,33 +115,17 @@ public class AuctionEngine implements AuctionEngineInterface {
                     lowestLatency = latency;
                 }
             }
+            Double clearingPrice = getClearingPrice(highestBid, casInternalRequestParameters);
+            LOG.debug("Clearing Price: " + clearingPrice);
+            clearingPrice = clearingPrice * (0.98 + random.nextDouble() * 0.02);
+            LOG.debug("Clearing Price +  Random(0.98, 1.00): " + clearingPrice);
 
-            // Hack for Hosted
-            if (filteredChannelSegmentList.get(0).getAdNetworkInterface() instanceof HostedAdNetwork) {
-                if (filteredChannelSegmentList.size() > 1) {
-                    auctionResponse = null;
-                    InspectorStats.incrementStatCount(
-                            filteredChannelSegmentList.get(0).getAdNetworkInterface().getName(), INVALID_AUCTION);
-                    LOG.debug("Returning from auction engine, as more than one segment was selected for hosted. "
-                            + "No winner.");
-                    return null;
-                } else {
-                    secondBidPrice = ((HostedAdNetwork) filteredChannelSegmentList.get(0).getAdNetworkInterface())
-                            .getBidToUmpInUSD();
-                }
+            if (clearingPrice >= secondHighestDistinctBid) {
+                secondBidPrice = clearingPrice;
+                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
+                        InspectorStrings.CLEARING_PRICE_WON);
             } else {
-                Double clearingPrice = getClearingPrice(highestBid, casInternalRequestParameters);
-                LOG.debug("Clearing Price: " + clearingPrice);
-                clearingPrice = clearingPrice * (0.98 + random.nextDouble() * 0.02);
-                LOG.debug("Clearing Price +  Random(0.98, 1.00): " + clearingPrice);
-
-                if (clearingPrice >= secondHighestDistinctBid) {
-                    secondBidPrice = clearingPrice;
-                    InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
-                            InspectorStrings.CLEARING_PRICE_WON);
-                } else {
-                    secondBidPrice = secondHighestDistinctBid;
-                }
+                secondBidPrice = secondHighestDistinctBid;
             }
         } else if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
             /*

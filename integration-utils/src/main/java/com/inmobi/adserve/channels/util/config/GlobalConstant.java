@@ -15,6 +15,7 @@ public class GlobalConstant {
     public static final String TIME_OUT = "TIME_OUT";
     public static final String ZERO = "0";
     public static final String ONE = "1";
+    public static final Integer ALL = -1;
     public static final String GENDER_MALE = "M";
     public static final String GENDER_FEMALE = "F";
     public static final String CPC = "cpc";

@@ -265,6 +265,9 @@ public class TemplateTool extends EscapeTool {
      * @return
      */
     public Object evalJsonPath(final Object jsonObject, final String jsonPathExpression) {
+        if (jsonObject == null) {
+            return null;
+        }
         final JsonPath jsonPath = JsonPath.compile(jsonPathExpression);
         try {
             return jsonPath.read(jsonObject);

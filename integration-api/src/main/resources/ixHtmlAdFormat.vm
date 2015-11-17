@@ -69,8 +69,17 @@
                             this.fireBeacons(events.loadBeacons);
                         },
                         fireRenderBeacons : function () {
-                            this.fireBeacons(events.renderBeacons);
                             var self = this;
+                            #if($Viewable)
+                                window.setTimeout(
+                                    function() {
+                                        self.fireBeacons(events.renderBeacons);
+                                    },
+                                    1000
+                                );
+                            #else
+                                self.fireBeacons(events.renderBeacons);
+                            #end
                             window.setTimeout(
                                 function () {
                                     if (!state.viewability1SecBeaconsFired) {
@@ -167,6 +176,8 @@
                     #end
                     setupRender();
                 </script>
+                ## ViewabilityTrackers have been added at the end to prevent the rest of the ad from failing for faulty viewability trackers
+                #if($Viewable && $ViewabilityTracker) $ViewabilityTracker #end
             </div>
         </div>
     </body>
