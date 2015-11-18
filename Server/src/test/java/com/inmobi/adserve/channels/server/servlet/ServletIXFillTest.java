@@ -89,8 +89,6 @@ public class ServletIXFillTest {
         expect(mockCasUtils.isVideoSupported(sasRequestParameters)).andReturn(false).anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
-        InspectorStats.incrementYammerMeter(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().anyTimes();
         mockResponseSender.sendNoAdResponse(null);
@@ -150,8 +148,6 @@ public class ServletIXFillTest {
         expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
-        InspectorStats.incrementYammerMeter(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().anyTimes();
 
@@ -228,8 +224,6 @@ public class ServletIXFillTest {
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
-        InspectorStats.incrementYammerMeter(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().anyTimes();
 
@@ -321,8 +315,6 @@ public class ServletIXFillTest {
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
-        InspectorStats.incrementYammerMeter(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().anyTimes();
 

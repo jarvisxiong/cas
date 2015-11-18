@@ -61,8 +61,6 @@ public class ServletRtbdTest {
         expect(mockServerConfig.getBoolean("isRtbEnabled", true)).andReturn(true).anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_REQUESTS);
         expectLastCall().times(1);
-        InspectorStats.incrementYammerMeter(InspectorStrings.TOTAL_REQUESTS);
-        expectLastCall().times(1);
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
         expectLastCall().times(1);
         mockResponseSender.sendNoAdResponse(null);
