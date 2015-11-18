@@ -253,6 +253,7 @@ public class Logging {
             channels.add(channel);
 
             // Incrementing inspectors
+            InspectorStats.incrementYammerMeter(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.getLatency());
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,

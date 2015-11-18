@@ -94,6 +94,7 @@ public abstract class BaseServlet implements Servlet {
         final CasContext casContext = new CasContext();
         final Marker traceMarker = traceMarkerProvider.get();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
+        InspectorStats.incrementYammerMeter(InspectorStrings.TOTAL_REQUESTS);
         final SASRequestParameters sasParams = hrh.responseSender.getSasParams();
         final AuctionEngine auctionEngine = hrh.responseSender.getAuctionEngine();
         final CasInternalRequestParameters casInternal = hrh.responseSender.casInternalRequestParameters;

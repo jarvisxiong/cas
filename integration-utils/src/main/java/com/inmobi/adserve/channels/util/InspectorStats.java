@@ -31,9 +31,7 @@ public class InspectorStats extends BaseStats {
     private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats =
             new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
 
-    
-    private InspectorStats() {
-    }
+    private InspectorStats() {}
 
     /**
      * Init graphite and Stats metrics. Graphite Interval is set in minutes.
@@ -49,26 +47,47 @@ public class InspectorStats extends BaseStats {
         shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
         INSTANCE.baseInit(graphiteServer, graphitePort, graphiteInterval, hostName, INSTANCE.REGISTRY);
     }
-    
+
     /**
-    *
-    * @param hostName
-    * @return
-    */
-   public static String getMetricProducer(final String hostName) {
-       return INSTANCE._getMetricProducer(hostName);
-   }
-   
-   /**
-    * Use this to increment only yammer.
-    *
-    * @param key - A new key apart from WORKFLOW
-    * @param parameter - Parameter will go under key
-    * @param value
-    */
-   public static void incrementYammerCount(final String key, final String parameter, final long value) {
-       INSTANCE._incrementYammerCount(key, parameter, value);
-   }
+     *
+     * @param hostName
+     * @return
+     */
+    public static String getMetricProducer(final String hostName) {
+        return INSTANCE._getMetricProducer(hostName);
+    }
+
+    /**
+     * Use this to increment only yammer.
+     *
+     * @param key - A new key apart from WORKFLOW
+     * @param parameter - Parameter will go under key
+     * @param value
+     */
+    public static void incrementYammerCount(final String key, final String parameter, final long value) {
+        INSTANCE._incrementYammerCount(key, parameter, value);
+    }
+
+    /**
+     * Use this to increment only yammer meter by 1.
+     *
+     * @param key - A new key apart from WORKFLOW
+     * @param parameter - Parameter will go under key
+     * @param value
+     */
+    public static void incrementYammerMeter(final String key, final String parameter) {
+        INSTANCE._incrementYammerMeter(key, parameter, 1L);
+    }
+
+    /**
+     * Use this to increment yammer meter under WORKFLOW by 1.
+     *
+     * @param parameter - Parameter will go under WORKFLOW
+     * @param value
+     */
+    public static void incrementYammerMeter(final String parameter) {
+        INSTANCE._incrementYammerMeter(WORK_FLOW, parameter, 1L);
+    }
 
     /**
      * Use this to increment yammer and stats page by value
@@ -109,7 +128,7 @@ public class InspectorStats extends BaseStats {
     public static void incrementStatCount(final String key, final String parameter, final long value) {
         INSTANCE._incrementStatCount(key, parameter, value);
     }
-    
+
     private void _incrementStatCount(final String key, final String parameter, final long value) {
         if (ingrapherCounterStats.get(key) == null) {
             synchronized (parameter) {
@@ -166,7 +185,7 @@ public class InspectorStats extends BaseStats {
     public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
         INSTANCE._updateYammerTimerStats(dst, parameter, value);
     }
-    
+
     private void _updateYammerTimerStats(final String dst, final String parameter, final long value) {
         if (yammerTimerStats.get(dst) == null) {
             synchronized (parameter) {
@@ -194,7 +213,7 @@ public class InspectorStats extends BaseStats {
     public static void resetTimers() {
         INSTANCE._resetTimers();
     }
-    
+
     private void _resetTimers() {
         final Iterator<Entry<String, ConcurrentHashMap<String, Histogram>>> dstIterator =
                 yammerTimerStats.entrySet().iterator();
