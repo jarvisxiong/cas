@@ -11,6 +11,7 @@ public class GlobalConstant {
     public static final String APP = "APP";
     public static final String NO_AD = "NO_AD";
     public static final String NATIVE_STRING = "native";
+    public static final String BANNER = "BANNER";
     public static final String AD_STRING = "AD";
     public static final String TIME_OUT = "TIME_OUT";
     public static final String ZERO = "0";

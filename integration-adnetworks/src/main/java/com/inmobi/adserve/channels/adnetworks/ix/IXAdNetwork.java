@@ -1251,10 +1251,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         try {
-            responseContent =
-                    IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
-                            repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(),
-                            getWinUrl(), isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
+            responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
+                repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
+                isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
