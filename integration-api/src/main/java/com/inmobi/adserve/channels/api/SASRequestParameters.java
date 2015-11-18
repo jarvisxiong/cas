@@ -72,6 +72,7 @@ public class SASRequestParameters {
     private Short rqMkAdcount;
     private String tid;
     private long handsetInternalId;
+    private String handsetName;
     private Integer carrierId;
     private Integer city;
     private Integer state;

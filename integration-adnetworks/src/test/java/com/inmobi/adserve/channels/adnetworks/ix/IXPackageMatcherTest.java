@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import static com.inmobi.adserve.channels.adnetworks.ix.IXPackageMatcher.checkForManufModelTargeting;
 import static com.inmobi.adserve.channels.adnetworks.ix.IXPackageMatcher.checkForOsVersionTargeting;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXPackageMatcher.checkForSDKVersionTargeting;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -100,5 +101,71 @@ public class IXPackageMatcherTest {
             final long manufacturerId, final long modelId,
             final boolean expectedOutcome) throws Exception {
         Assert.assertEquals(expectedOutcome, checkForManufModelTargeting(metaData, manufacturerId, modelId));
+    }
+
+    @DataProvider(name = "Sdk Version Targeting DP")
+    public Object[][] paramDataProviderForSdkVersionTargeting() {
+        final Pair<Boolean, Set<Integer>> emptyExclusion = ImmutablePair.of(true, ImmutableSet.of());
+        final Pair<Boolean, Set<Integer>> emptyInclusion = ImmutablePair.of(false, ImmutableSet.of());
+        final Pair<Boolean, Set<Integer>> filledExclusion = ImmutablePair.of(true, ImmutableSet.of(400, 600));
+        final Pair<Boolean, Set<Integer>> filledInclusion = ImmutablePair.of(false, ImmutableSet.of(400, 600));
+
+        return new Object[][] {
+            {"testNullSdkWithEmptyExclusion", null, emptyExclusion, false, emptyExclusion, true},
+            {"testNullSdkWithFilledExclusion", null, filledExclusion, false, emptyExclusion, true},
+            {"testNullSdkWithEmptyInclusion", null, emptyInclusion, false, emptyExclusion, true},
+            {"testNullSdkWithFilledInclusion", null, filledInclusion, false, emptyExclusion, true},
+            {"testEmptySdkWithEmptyExclusion", null, emptyExclusion, false, emptyExclusion, true},
+            {"testEmptySdkWithFilledExclusion", null, filledExclusion, false, emptyExclusion, true},
+            {"testEmptySdkWithEmptyInclusion", null, emptyInclusion, false, emptyExclusion, true},
+            {"testEmptySdkWithFilledInclusion", null, filledInclusion, false, emptyExclusion, true},
+            {"testNullSdkWithEmptyExclusionViewabilityOn", null, emptyExclusion, true, emptyExclusion, false},
+            {"testNullSdkWithFilledExclusionViewabilityOn", null, filledExclusion, true, emptyExclusion, false},
+            {"testNullSdkWithEmptyInclusionViewabilityOn", null, emptyInclusion, true, emptyExclusion, false},
+            {"testNullSdkWithFilledInclusionViewabilityOn", null, filledInclusion, true, emptyExclusion, false},
+            {"testFaultySdkWithEmptyExclusion", "asds", emptyExclusion, false, emptyExclusion, false},
+            {"testFaultySdkWithFilledExclusion", "asds", filledExclusion, false, emptyExclusion, false},
+            {"testFaultySdkWithEmptyInclusion", "asds", emptyInclusion, false, emptyExclusion, false},
+            {"testFaultySdkWithFilledInclusion", "asds", filledInclusion, false, emptyExclusion, false},
+            {"testFaultySdkWithEmptyExclusionViewabilityOn", "asds", emptyExclusion, true, emptyExclusion, false},
+            {"testFaultySdkWithFilledExclusionViewabilityOn", "asds", filledExclusion, true, emptyExclusion, false},
+            {"testFaultySdkWithEmptyInclusionViewabilityOn", "asds", emptyInclusion, true, emptyExclusion, false},
+            {"testFaultySdkWithFilledInclusionViewabilityOn", "asds", filledInclusion, true, emptyExclusion, false},
+            {"testSaneSdkWithEmptyExclusion", "a400", emptyExclusion, false, emptyExclusion, true},
+            {"testSaneSdkWithFilledExclusion", "a400", filledExclusion, false, emptyExclusion, false},
+            {"testSaneSdkWithEmptyInclusion", "a400", emptyInclusion, false, emptyExclusion, false},
+            {"testSaneSdkWithFilledInclusion", "a400", filledInclusion, false, emptyExclusion, true},
+            {"testSaneSdkWithEmptyExclusionViewabilityOnNullEligibility", "a400", emptyExclusion, true, null, false},
+            {"testSaneSdkWithFilledExclusionViewabilityOnNullEligibility", "a400", filledExclusion, true, null, false},
+            {"testSaneSdkWithEmptyInclusionViewabilityOnNullEligibility", "a400", emptyInclusion, true, null, false},
+            {"testSaneSdkWithFilledInclusionViewabilityOnNullEligibility", "a400", filledInclusion, true, null, false},
+            {"testSaneSdkWithEmptyExclusionViewabilityOnEmptyExclusionEligibility", "a400", emptyExclusion, true, emptyExclusion, true},
+            {"testSaneSdkWithFilledExclusionViewabilityOnEmptyExclusionEligibility", "a400", filledExclusion, true, emptyExclusion, false},
+            {"testSaneSdkWithEmptyInclusionViewabilityOnEmptyExclusionEligibility", "a400", emptyInclusion, true, emptyExclusion, false},
+            {"testSaneSdkWithFilledInclusionViewabilityOnEmptyExclusionEligibility", "a400", filledInclusion, true, emptyExclusion, true},
+            {"testSaneSdkWithEmptyExclusionViewabilityOnFilledExclusionEligibility", "a400", emptyExclusion, true, filledExclusion, false},
+            {"testSaneSdkWithFilledExclusionViewabilityOnFilledExclusionEligibility", "a400", filledExclusion, true, filledExclusion, false},
+            {"testSaneSdkWithEmptyInclusionViewabilityOnFilledExclusionEligibility", "a400", emptyInclusion, true, filledExclusion, false},
+            {"testSaneSdkWithFilledInclusionViewabilityOnFilledExclusionEligibility", "a400", filledInclusion, true, filledExclusion, false},
+            {"testSaneSdkWithEmptyExclusionViewabilityOnEmptyInclusionEligibility", "a400", emptyExclusion, true, emptyInclusion, false},
+            {"testSaneSdkWithFilledExclusionViewabilityOnEmptyInclusionEligibility", "a400", filledExclusion, true, emptyInclusion, false},
+            {"testSaneSdkWithEmptyInclusionViewabilityOnEmptyInclusionEligibility", "a400", emptyInclusion, true, emptyInclusion, false},
+            {"testSaneSdkWithFilledInclusionViewabilityOnEmptyInclusionEligibility", "a400", filledInclusion, true, emptyInclusion, false},
+            {"testSaneSdkWithEmptyExclusionViewabilityOnFilledInclusionEligibility", "a400", emptyExclusion, true, filledInclusion, true},
+            {"testSaneSdkWithFilledExclusionViewabilityOnFilledInclusionEligibility", "a400", filledExclusion, true, filledInclusion, false},
+            {"testSaneSdkWithEmptyInclusionViewabilityOnFilledInclusionEligibility", "a400", emptyInclusion, true, filledInclusion, false},
+            {"testSaneSdkWithFilledInclusionViewabilityOnFilledInclusionEligibility", "a400", filledInclusion, true, filledInclusion, true},
+            {"testSaneSdkWithEmptyExclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", emptyExclusion, true, filledInclusion, false},
+            {"testSaneSdkWithFilledExclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", filledExclusion, true, filledInclusion, false},
+            {"testSaneSdkWithEmptyInclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", emptyInclusion, true, filledInclusion, false},
+            {"testSaneSdkWithFilledInclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", filledInclusion, true, filledInclusion, false},
+        };
+    }
+
+    @Test(dataProvider = "Sdk Version Targeting DP")
+    public void testCheckForSDKVersionTargeting(final String useCaseName, final String sdkVersionStr,
+        final Pair<Boolean, Set<Integer>> sdkVersionTargeting, final boolean checkForViewability,
+        final Pair<Boolean, Set<Integer>> sdkViewabilityEligibility, final boolean expectedOutcome) throws Exception {
+        Assert.assertEquals(expectedOutcome, checkForSDKVersionTargeting(sdkVersionStr, sdkVersionTargeting, checkForViewability, sdkViewabilityEligibility));
     }
 }

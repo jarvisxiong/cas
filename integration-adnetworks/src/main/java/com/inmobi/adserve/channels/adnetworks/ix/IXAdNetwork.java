@@ -202,6 +202,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private String aqid;
     private String nurl;
+    private String viewabilityTracker;
     protected boolean isCoppaSet = false;
     private String sampleImageUrl;
     private List<String> advertiserDomains;
@@ -217,6 +218,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean isAgencyRebateDeal;
     @Getter
     private boolean isExternalPersonaDeal;
+    private boolean hasViewabilityDeal;
     @Getter
     private boolean isTrumpDeal = false;
     @Getter
@@ -302,7 +304,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         impresssionlist.add(impression);
         impressionObjCount = impresssionlist.size();
 
-
         // Creating BidRequest Object using unique auction id per auction
         bidRequest = createBidRequestObject(impresssionlist);
         if (null == bidRequest) {
@@ -310,12 +311,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     advertiserName);
             return false;
         }
-        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_TRANSPARENT);
-        } else {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_BLIND);
-        }
-
         // Serializing the bidRequest Object
         bidRequestJson = serializeBidRequest();
         if (null == bidRequestJson) {
@@ -554,7 +549,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         Dimension dim = null;
         Integer rpSlot = null;
-        List<Integer> rpSlots = new ArrayList<Integer>();
+        final List<Integer> rpSlots = new ArrayList<Integer>();
         if (isCAURequest()) {
             LOG.debug(traceMarker, "Request for CAU, so find matching slot");
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_UMP_CAU_REQUESTS);
@@ -573,7 +568,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             final List<Short> sasParamSlotList = sasParams.getProcessedMkSlot();
             if (null != sasParamSlotList) {
-                for (short slot : sasParamSlotList) {
+                for (final short slot : sasParamSlotList) {
                     final Integer mappedSlot = SlotSizeMapping.getIXMappedSlotId(slot);
                     if (null != mappedSlot && !mappedSlot.equals(new Integer(rpSlot))) {
                         rpSlots.add(mappedSlot);
@@ -687,7 +682,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return geo;
     }
 
-
     private User createUserObject() {
         final User user = new User();
         user.setId(getUid(false));
@@ -788,28 +782,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private AdQuality createAdQuality() {
         final AdQuality adQuality = new AdQuality();
-        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
-            adQuality.setSensitivity("low");
-        } else {
-            adQuality.setSensitivity("high");
-        }
+        adQuality.setSensitivity(ContentType.PERFORMANCE == sasParams.getSiteContentType() ? "low" : "high");
         return adQuality;
     }
 
     private Transparency createTransparency() {
         final Transparency transparency = new Transparency();
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_TRANSPARENT);
             transparency.setBlind(0);
             if (null != wapSiteUACEntity.getBlindList()) {
                 transparency.setBlindbuyers(wapSiteUACEntity.getBlindList());
             } else if (!globalBlindFromConfig.isEmpty() && !globalBlindFromConfig.get(0).isEmpty()) {
                 final List<Integer> globalBlind = Lists.newArrayList();
-                for (final String s : globalBlindFromConfig) {
-                    globalBlind.add(Integer.valueOf(s));
+                for (final String gbConfig : globalBlindFromConfig) {
+                    globalBlind.add(Integer.valueOf(gbConfig));
                 }
                 transparency.setBlindbuyers(globalBlind);
             }
         } else {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_BLIND);
             transparency.setBlind(1);
         }
         return transparency;
@@ -1057,8 +1049,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response content is {}", responseContent);
     }
 
-
-
     protected boolean isSproutAd() {
         final String adm = getAdMarkUp();
         boolean isSproutAd = false;
@@ -1185,7 +1175,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final String winUrl = beaconUrl + RTBCallbackMacros.WIN_BID_GET_PARAM;
             admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
         }
-
         if (altSizeIdsSet) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_RESPONSES);
         }
@@ -1229,6 +1218,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
             velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
         }
+
+        // Viewability Tracker
+        if (StringUtils.isNotBlank(viewabilityTracker)) {
+            velocityContext.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
+        }
+        velocityContext.put(VelocityTemplateFieldConstants.VIEWABILE, hasViewabilityDeal);
+
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
@@ -1258,7 +1254,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             responseContent =
                     IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
                             repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(),
-                            getWinUrl(), isRewardedVideoRequest);
+                            getWinUrl(), isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1278,7 +1274,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent =
                     IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
-                            getAdMarkUp(), getWinUrl());
+                            getAdMarkUp(), getWinUrl(), viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1304,8 +1300,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         return winUrl;
     }
-
-
 
     protected void nativeAdBuilding() {
         LOG.debug(traceMarker, "nativeAdBuilding");
@@ -1437,7 +1431,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = AdStatus.TERM.name();
             return false;
         }
-
         return true;
     }
 
@@ -1620,6 +1613,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                         .get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
         if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
             isTrumpDeal = true;
+        }
+
+        hasViewabilityDeal = matchedPackageEntity.isViewable();
+        if (hasViewabilityDeal) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIEWABILITY_RESPONSES);
+            LOG.debug("Viewability enabled for this request.");
+        }
+
+        if (matchedPackageEntity.getViewabilityTrackers().size() > indexOfDealId) {
+            viewabilityTracker = matchedPackageEntity.getViewabilityTrackers().get(indexOfDealId);
+            if (StringUtils.isNotBlank(viewabilityTracker)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Viewability Trackers detected.");
+                    LOG.debug("Viewability Trackers before substitution: {}", viewabilityTracker);
+                }
+                viewabilityTracker =
+                        IXAdNetworkHelper.replaceViewabilityTrackerMacros(viewabilityTracker,
+                                casInternalRequestParameters, sasParams);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Viewability Trackers after substitution: {}", viewabilityTracker);
+                }
+                InspectorStats.incrementStatCount(getName(),
+                        InspectorStrings.TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS);
+            }
         }
 
         // Applying if agency rebate is applicable

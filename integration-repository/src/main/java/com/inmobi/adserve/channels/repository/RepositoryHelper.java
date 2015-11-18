@@ -26,6 +26,7 @@ import com.inmobi.adserve.channels.entity.IXBlocklistRepository;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
+import com.inmobi.adserve.channels.entity.SdkViewabilityEligibilityEntity;
 import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
@@ -38,6 +39,7 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.IXBlocklistsQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
+import com.inmobi.adserve.channels.query.SdkViewabilityEligibilityQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
@@ -77,6 +79,7 @@ public class RepositoryHelper {
     private final CcidMapRepository ccidMapRepository;
     private final IXBlocklistRepository ixBlocklistRepository;
     private final CAUMetaDataRepository cauMetaDataRepository;
+    private final SdkViewabilityEligibilityRepository sdkViewabilityEligibilityRepository;
 
     public RepositoryHelper(final Builder builder) {
         channelRepository = builder.channelRepository;
@@ -103,7 +106,7 @@ public class RepositoryHelper {
         ccidMapRepository = builder.ccidMapRepository;
         ixBlocklistRepository = builder.ixBlocklistRepository;
         cauMetaDataRepository = builder.cauMetaDataRepository;
-
+        sdkViewabilityEligibilityRepository = builder.sdkViewabilityEligibilityRepository;
 
         repositoryStatsProvider = new RepositoryStatsProvider();
         repositoryStatsProvider.addRepositoryToStats(nativeAdTemplateRepository)
@@ -116,8 +119,8 @@ public class RepositoryHelper {
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
                 .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(geoRegionFenceMapRepository)
                 .addRepositoryToStats(ccidMapRepository).addRepositoryToStats(ixBlocklistRepository)
-                .addRepositoryToStats(sdkMraidMapRepository).addRepositoryToStats(cauMetaDataRepository);
-
+                .addRepositoryToStats(sdkMraidMapRepository).addRepositoryToStats(cauMetaDataRepository)
+                .addRepositoryToStats(sdkViewabilityEligibilityRepository);
     }
 
     public static Builder newBuilder() {
@@ -150,6 +153,7 @@ public class RepositoryHelper {
         private CcidMapRepository ccidMapRepository;
         private IXBlocklistRepository ixBlocklistRepository;
         private CAUMetaDataRepository cauMetaDataRepository;
+        private SdkViewabilityEligibilityRepository sdkViewabilityEligibilityRepository;
 
         public RepositoryHelper build() {
             Preconditions.checkNotNull(channelRepository);
@@ -176,6 +180,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixBlocklistRepository);
             Preconditions.checkNotNull(sdkMraidMapRepository);
             Preconditions.checkNotNull(cauMetaDataRepository);
+            Preconditions.checkNotNull(sdkViewabilityEligibilityRepository);
             return new RepositoryHelper(this);
         }
     }
@@ -382,6 +387,17 @@ public class RepositoryHelper {
             return ixBlocklistRepository.query(new IXBlocklistsQuery(key, keyType, blocklistType));
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying IX Blocklist Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public SdkViewabilityEligibilityEntity querySDKViewabilityEligibilityRepository(final Integer countryId,
+            final String adType, final Integer dst) {
+        try {
+            return sdkViewabilityEligibilityRepository
+                .query(new SdkViewabilityEligibilityQuery(countryId, adType, dst));
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying SDK Viewability Eligibility Repository, {}", ignored);
         }
         return null;
     }

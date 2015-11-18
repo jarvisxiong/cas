@@ -18,6 +18,7 @@ public final class ChannelServerStringLiterals {
     public static final String NATIVE_AD_TEMPLATE_REPOSITORY = "NativeAdTemplateRepository";
     public static final String GEO_ZIP_REPOSITORY = "GeoZipRepository";
     public static final String CAU_METADATA_REPOSITORY = "CAUMetaDataRepository";
+    public static final String SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY = "SdkViewabilityEligibilityRepository";
     public static final String SLOT_SIZE_MAP_REPOSITORY = "SlotSizeMapRepository";
     public static final String SDK_MRAID_MAP_REPOSITORY = "SdkMraidMapRepository";
     public static final String GEO_REGION_FENCE_MAP_REPOSITORY = "GeoRegionFenceMapRepository";

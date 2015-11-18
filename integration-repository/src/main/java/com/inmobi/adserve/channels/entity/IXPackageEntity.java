@@ -21,6 +21,7 @@ public class IXPackageEntity {
 
     private int dmpId;
     private int dmpVendorId;
+    private boolean viewable;
     private Set<Set<Integer>> dmpFilterSegmentExpression;
     private Integer[][] scheduledTimeOfDays;
     private List<String> dealIds;
@@ -28,8 +29,10 @@ public class IXPackageEntity {
     private List<Double> dealFloors;
     private List<Integer> rpAgencyIds;
     private List<Double> agencyRebatePercentages;
+    private List<String> viewabilityTrackers;
     private Map<Integer, Range<Double>> osVersionTargeting;
     private Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
+    private Pair<Boolean, Set<Integer>> sdkVersionTargeting;
     private Double dataVendorCost;
     private String geoFenceRegion;
     private Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints;
