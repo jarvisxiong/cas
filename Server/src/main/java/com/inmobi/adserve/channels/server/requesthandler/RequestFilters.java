@@ -1,7 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import static com.inmobi.adserve.channels.util.InspectorStrings.COUNT;
-import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER;
+// import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_INVALID_SLOT_REQUEST_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
@@ -18,7 +18,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.api.SASParamsUtils;
+// import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -70,13 +70,13 @@ public class RequestFilters {
         }
 
         // CT Present and CAU not present, means it is CT request to drop it (For native CT has Native Template
-        final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
-        if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
-                && CollectionUtils.isNotEmpty(sasParams.getCustomTemplateSet())) {
-            LOG.info("Request not being served because Custom Template is not supported");
-            InspectorStats.incrementStatCount(DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER, COUNT);
-            return true;
-        }
+        // final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
+        // if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
+        // && CollectionUtils.isNotEmpty(sasParams.getCustomTemplateSet())) {
+        // LOG.info("Request not being served because Custom Template is not supported");
+        // InspectorStats.incrementStatCount(DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER, COUNT);
+        // return true;
+        // }
 
         if (sasParams.getSiteContentType() != null
                 && !CasConfigUtil.allowedSiteTypes.contains(sasParams.getSiteContentType().name())) {

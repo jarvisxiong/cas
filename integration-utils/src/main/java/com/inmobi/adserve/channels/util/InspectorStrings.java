@@ -110,7 +110,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
-    public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
+    // public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
     public static final String DROPPED_IN_INVALID_SLOT_REQUEST_FILTER = "DroppedInInvalidSlotRequestFilter";
