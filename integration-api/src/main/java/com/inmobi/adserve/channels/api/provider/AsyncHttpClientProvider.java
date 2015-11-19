@@ -19,7 +19,6 @@ import com.ning.http.client.AsyncHttpClientConfig;
  * 
  */
 public class AsyncHttpClientProvider {
-
     private final ServerConfig serverConfig;
     private final ExecutorService executorService;
     private AsyncHttpClient dcpAsyncHttpClient;

@@ -105,15 +105,16 @@ public class Logging {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
 
+                /* Commenting to reduce stats, un-comment on need basis */
                 // Detailed No Match Segment Counts
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
-                    dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-os" + sasParams.getOsId());
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
-                    dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-country" + sasParams.getCountryId());
-                for (Short slot : sasParams.getProcessedMkSlot()) {
-                    InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
-                        dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-umpSlot" + slot);
-                }
+                // InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS, dst + "_"
+                // + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-os" + sasParams.getOsId());
+                // InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS, dst + "_"
+                // + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-country" + sasParams.getCountryId());
+                // for (final Short slot : sasParams.getProcessedMkSlot()) {
+                // InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS, dst + "_"
+                // + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-umpSlot" + slot);
+                // }
 
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
@@ -399,7 +400,7 @@ public class Logging {
             final double bidGuidance = sasParams.getMarketRate();
 
             if (0 != bidGuidance) {
-                RTBDAuctionInfo rtbdAuctionInfo =
+                final RTBDAuctionInfo rtbdAuctionInfo =
                         new RTBDAuctionInfo(casParams.getDemandDensity() / bidGuidance, casParams.getLongTermRevenue()
                                 / bidGuidance, casParams.getPublisherYield());
                 auctionInfo = new AuctionInfo();

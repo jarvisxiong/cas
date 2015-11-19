@@ -159,7 +159,7 @@ public class InspectorStrings {
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
-    public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
+    // public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
     public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloor";

@@ -105,7 +105,8 @@ public class RequestFilters {
         }
 
         if (sasParams.getProcessedMkSlot().isEmpty()) {
-            incrementStats(sasParams);
+            /* Commenting to reduce stats, un-comment on need basis */
+            // incrementStats(sasParams);
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
@@ -117,7 +118,7 @@ public class RequestFilters {
      * 
      * @param sasParams
      */
-    private void incrementStats(final SASRequestParameters sasParams) {
+    protected void incrementStats(final SASRequestParameters sasParams) {
         final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
         final StringBuilder buildDst =
                 new StringBuilder(dst != null ? dst.name() : String.valueOf(sasParams.getDst())).append("-").append(
