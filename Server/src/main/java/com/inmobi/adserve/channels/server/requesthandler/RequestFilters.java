@@ -69,8 +69,8 @@ public class RequestFilters {
             return true;
         }
 
-        final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
         // CT Present and CAU not present, means it is CT request to drop it (For native CT has Native Template
+        final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
         if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
                 && CollectionUtils.isNotEmpty(sasParams.getCustomTemplateSet())) {
             LOG.info("Request not being served because Custom Template is not supported");
@@ -115,7 +115,7 @@ public class RequestFilters {
 
     /**
      * Increment stats for DST Level and also for all slots that were requested from UMP
-     * 
+     *
      * @param sasParams
      */
     protected void incrementStats(final SASRequestParameters sasParams) {
