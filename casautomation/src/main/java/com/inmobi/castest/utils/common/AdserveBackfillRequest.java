@@ -1,8 +1,5 @@
 package com.inmobi.castest.utils.common;
 
-import io.netty.util.CharsetUtil;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,7 +13,6 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
-import com.inmobi.adserve.adpool.AdCodeType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.Carrier;
@@ -28,8 +24,6 @@ import com.inmobi.adserve.adpool.Education;
 import com.inmobi.adserve.adpool.Ethnicity;
 import com.inmobi.adserve.adpool.Geo;
 import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationMethod;
-import com.inmobi.adserve.adpool.IntegrationOrigin;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.LatLong;
 import com.inmobi.adserve.adpool.MaritalStatus;
@@ -50,6 +44,8 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+
+import io.netty.util.CharsetUtil;
 
 public class AdserveBackfillRequest {
 
@@ -100,7 +96,7 @@ public class AdserveBackfillRequest {
         final String def_ecpmfloor = "0.04";
         final String def_cpmfloor = "0";
         final String def_siteurl = "newsiteurl";
-        final String def_siteid = "479e420ee7d6422c9bedec33d82baecd";
+        final String def_siteid = "newsiteid";
         final String def_publisherid = "newpublisherid";
         final String def_inventorytype = "APP";
         final String def_contentrating = "PERFORMANCE";

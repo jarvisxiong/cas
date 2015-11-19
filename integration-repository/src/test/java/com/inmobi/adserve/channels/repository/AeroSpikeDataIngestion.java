@@ -7,16 +7,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
+import com.aerospike.client.Record;
 import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.google.common.collect.Lists;
 
@@ -36,7 +40,8 @@ public class AeroSpikeDataIngestion {
     private static final int NO_OF_THREADS = 300;
 
     private final AerospikeClient aerospikeClient;
-    private final WritePolicy policy;
+    private final WritePolicy writePolicy;
+    private final Policy readPolicy;
     private final String namespace;
     private final String setName;
     private static int totalCount = 0;
@@ -57,8 +62,10 @@ public class AeroSpikeDataIngestion {
         clientPolicy.maxThreads = NO_OF_THREADS;
         aerospikeClient = new AerospikeClient(clientPolicy, host, port);
 
-        policy = new WritePolicy();
-        policy.expiration = -1;
+        writePolicy = new WritePolicy();
+        writePolicy.expiration = -1;
+
+        readPolicy = new Policy();
     }
 
     /**
@@ -69,7 +76,7 @@ public class AeroSpikeDataIngestion {
      * @throws AerospikeException
      */
     public void writeBin(final String key, final String binName, final String binValue) throws AerospikeException {
-        aerospikeClient.put(policy, new Key(namespace, setName, key), new Bin(binName, binValue));
+        aerospikeClient.put(writePolicy, new Key(namespace, setName, key), new Bin(binName, binValue));
     }
 
     /**
@@ -79,7 +86,7 @@ public class AeroSpikeDataIngestion {
      * @throws AerospikeException
      */
     public void deleteBin(final String binName, final String key) throws AerospikeException {
-        aerospikeClient.put(policy, new Key(namespace, setName, key), Bin.asNull(binName));
+        aerospikeClient.put(writePolicy, new Key(namespace, setName, key), Bin.asNull(binName));
     }
 
     /**
@@ -93,7 +100,7 @@ public class AeroSpikeDataIngestion {
         for (final String keyStr : keySet) {
             keys[count++] = new Key(namespace, setName, keyStr);
         }
-        final boolean[] bool = aerospikeClient.exists(policy, keys);
+        final boolean[] bool = aerospikeClient.exists(writePolicy, keys);
         for (int i = 0; i < bool.length; i++) {
             if (!bool[i]) {
                 System.out.println(keys[i].userKey);
@@ -130,16 +137,53 @@ public class AeroSpikeDataIngestion {
     /**
      * @param args
      * @throws IOException
-     * @throws InitializationException
+     * @throws AerospikeException
      */
     public static void main(final String[] args) throws IOException, AerospikeException {
+        System.out.println("Enter your choice : \n1 Insert Data \n2 Read Data");
         final BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Enter Full File path to read :");
-        final String filename = bufferRead.readLine();
-        final List<String> lines = FileUtils.readLines(new File(filename));
-
         final AeroSpikeDataIngestion aeroSpike = new AeroSpikeDataIngestion(HOST, PORT, NAMESPACE, SET);
-        aeroSpike.insertData(lines);
+
+        final String queryType = bufferRead.readLine();
+        switch (queryType) {
+            case "1":
+                System.out.println("Enter Full File path to read:");
+                final String filename = bufferRead.readLine();
+                final List<String> lines = FileUtils.readLines(new File(filename));
+
+                aeroSpike.insertData(lines);
+                break;
+            case "2":
+                System.out.println("Enter keys (Enter empty key to stop): ");
+
+                List<String> keyList = new ArrayList<>();
+                String key;
+                do {
+                    key = bufferRead.readLine();
+                    if (StringUtils.isNotBlank(key)) {
+                        keyList.add(key);
+                    }
+
+                } while (StringUtils.isNotBlank(key));
+
+                aeroSpike.getFromAerospike(keyList, BIN_NAME);
+                break;
+            default:
+                System.err.println("Wrong input !!!");
+                break;
+        }
+    }
+
+    private void getFromAerospike(final List<String> keys, final String binName) {
+        final Key key;
+        try {
+            for (final String _key : keys) {
+                final Record record = aerospikeClient.get(readPolicy, new Key(NAMESPACE, SET, _key), binName);
+                System.out.println(_key + " -> " + record.bins.get(binName));
+            }
+        } catch (AerospikeException e) {
+            e.printStackTrace();
+        }
     }
 
     @AllArgsConstructor

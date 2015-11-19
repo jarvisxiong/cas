@@ -115,9 +115,11 @@ public class IXPackageMatcher {
 
                 // SDK Version Targeting
                 final String adType =
-                        SecondaryAdFormatConstraints.STATIC != adGroupEntity.getSecondaryAdFormatConstraints()
-                                ? SecondaryAdFormatConstraints.VAST_VIDEO.name().toUpperCase()
-                                : sasParams.getRequestedAdType().name().toUpperCase();
+                    SecondaryAdFormatConstraints.STATIC != adGroupEntity.getSecondaryAdFormatConstraints() ?
+                        SecondaryAdFormatConstraints.VAST_VIDEO.name().toUpperCase() :
+                        (null == sasParams.getRequestedAdType() ?
+                            GlobalConstant.BANNER :
+                            sasParams.getRequestedAdType().name().toUpperCase());
 
                 SdkViewabilityEligibilityEntity sdkViewabilityEligibilityEntity =
                         repositoryHelper.querySDKViewabilityEligibilityRepository(sasParams.getCountryId().intValue(),
