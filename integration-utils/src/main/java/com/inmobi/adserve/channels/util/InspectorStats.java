@@ -26,14 +26,11 @@ public class InspectorStats extends BaseStats {
     private static boolean shouldLog = false;
 
     private Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
+            new ConcurrentHashMap<>();
 
-    private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
+    private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats = new ConcurrentHashMap<>();
 
-    
-    private InspectorStats() {
-    }
+    private InspectorStats() {}
 
     /**
      * Init graphite and Stats metrics. Graphite Interval is set in minutes.
@@ -49,26 +46,27 @@ public class InspectorStats extends BaseStats {
         shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
         INSTANCE.baseInit(graphiteServer, graphitePort, graphiteInterval, hostName, INSTANCE.REGISTRY);
     }
-    
+
     /**
-    *
-    * @param hostName
-    * @return
-    */
-   public static String getMetricProducer(final String hostName) {
-       return INSTANCE._getMetricProducer(hostName);
-   }
-   
-   /**
-    * Use this to increment only yammer.
-    *
-    * @param key - A new key apart from WORKFLOW
-    * @param parameter - Parameter will go under key
-    * @param value
-    */
-   public static void incrementYammerCount(final String key, final String parameter, final long value) {
-       INSTANCE._incrementYammerCount(key, parameter, value);
-   }
+     *
+     * @param hostName
+     * @return
+     */
+    public static String getMetricProducer(final String hostName) {
+        return INSTANCE._getMetricProducer(hostName);
+    }
+
+    /**
+     * Use this to increment only yammer.
+     *
+     * @param key - A new key apart from WORKFLOW
+     * @param parameter - Parameter will go under key
+     * @param value
+     */
+    public static void incrementYammerCountAndMeter(final String key, final String parameter, final long value) {
+        INSTANCE._incrementYammerCount(key, parameter, value);
+        INSTANCE._incrementYammerMeter(key, parameter, value);
+    }
 
     /**
      * Use this to increment yammer and stats page by value
@@ -107,9 +105,66 @@ public class InspectorStats extends BaseStats {
      * @param value
      */
     public static void incrementStatCount(final String key, final String parameter, final long value) {
+        incrementYammerCountAndMeter(key, parameter, value);
         INSTANCE._incrementStatCount(key, parameter, value);
     }
-    
+
+    /**
+     * @param dst
+     * @param value
+     * @param isGood
+     */
+    public static void updateYammerTimerStats(final String dst, final long value, final boolean isGood) {
+        if (!shouldLog) {
+            return;
+        }
+        if (isGood) {
+            updateYammerTimerStats(dst, GOOD, value);
+        } else {
+            updateYammerTimerStats(dst, BAD, value);
+        }
+    }
+
+    /**
+     * @param dst
+     * @param parameter
+     * @param value
+     */
+    public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
+        INSTANCE._updateYammerTimerStats(dst, parameter, value);
+    }
+
+    /**
+     * Resets only Yammer Timer Stats
+     */
+    public static void resetTimers() {
+        INSTANCE._resetTimers();
+    }
+
+    /**
+     * @return JsnonObject of ingrapherCounterStats
+     */
+    public static JSONObject getStatsObj() {
+        return new JSONObject(INSTANCE.ingrapherCounterStats);
+    }
+
+
+    // ----------------------------------------------- Private methods -----------------------------------------------
+
+    private void _resetTimers() {
+        final Iterator<Entry<String, ConcurrentHashMap<String, Histogram>>> dstIterator =
+                yammerTimerStats.entrySet().iterator();
+        while (dstIterator.hasNext()) {
+            final Entry<String, ConcurrentHashMap<String, Histogram>> dstPair = dstIterator.next();
+            final Iterator<Entry<String, Histogram>> timerIterator = dstPair.getValue().entrySet().iterator();
+            while (timerIterator.hasNext()) {
+                timerIterator.next().getValue().clear();
+                timerIterator.remove();
+            }
+            dstIterator.remove();
+        }
+    }
+
     private void _incrementStatCount(final String key, final String parameter, final long value) {
         if (ingrapherCounterStats.get(key) == null) {
             synchronized (parameter) {
@@ -137,36 +192,8 @@ public class InspectorStats extends BaseStats {
             }
         }
         ingrapherCounterStats.get(key).get(STATS).get(parameter).getAndAdd(value);
-        incrementYammerCount(key, parameter, value);
     }
 
-
-
-    /**
-     * @param dst
-     * @param value
-     * @param isGood
-     */
-    public static void updateYammerTimerStats(final String dst, final long value, final boolean isGood) {
-        if (!shouldLog) {
-            return;
-        }
-        if (isGood) {
-            updateYammerTimerStats(dst, GOOD, value);
-        } else {
-            updateYammerTimerStats(dst, BAD, value);
-        }
-    }
-
-    /**
-     * @param dst
-     * @param parameter
-     * @param value
-     */
-    public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
-        INSTANCE._updateYammerTimerStats(dst, parameter, value);
-    }
-    
     private void _updateYammerTimerStats(final String dst, final String parameter, final long value) {
         if (yammerTimerStats.get(dst) == null) {
             synchronized (parameter) {
@@ -186,34 +213,6 @@ public class InspectorStats extends BaseStats {
             }
         }
         yammerTimerStats.get(dst).get(parameter).update(value);
-    }
-
-    /**
-     * Resets only Yammer Timer Stats
-     */
-    public static void resetTimers() {
-        INSTANCE._resetTimers();
-    }
-    
-    private void _resetTimers() {
-        final Iterator<Entry<String, ConcurrentHashMap<String, Histogram>>> dstIterator =
-                yammerTimerStats.entrySet().iterator();
-        while (dstIterator.hasNext()) {
-            final Entry<String, ConcurrentHashMap<String, Histogram>> dstPair = dstIterator.next();
-            final Iterator<Entry<String, Histogram>> timerIterator = dstPair.getValue().entrySet().iterator();
-            while (timerIterator.hasNext()) {
-                timerIterator.next().getValue().clear();
-                timerIterator.remove();
-            }
-            dstIterator.remove();
-        }
-    }
-
-    /**
-     * @return JsnonObject of ingrapherCounterStats
-     */
-    public static JSONObject getStatsObj() {
-        return new JSONObject(INSTANCE.ingrapherCounterStats);
     }
 
 }

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -230,8 +229,7 @@ public class IXAdNetworkTest {
         expect(serverConfig.getMaxDcpOutGoingConnections()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxRtbOutGoingConnections()).andReturn(200).anyTimes();
         replay(serverConfig);
-        final AsyncHttpClientProvider asyncHttpClientProvider =
-                new AsyncHttpClientProvider(serverConfig, Executors.newCachedThreadPool());
+        final AsyncHttpClientProvider asyncHttpClientProvider = new AsyncHttpClientProvider(serverConfig);
         asyncHttpClientProvider.setup();
         asyncHttpClientProviderField.set(null, asyncHttpClientProvider);
 

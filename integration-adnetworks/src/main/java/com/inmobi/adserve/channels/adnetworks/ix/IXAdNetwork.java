@@ -1377,7 +1377,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final Integer responseStatusCode = bidResponse.getStatuscode();
         if (null != responseStatusCode && 0 != responseStatusCode) {
-            handleResponseStatusCode(responseStatusCode);
+            final String responseReason = handleResponseStatusCode(responseStatusCode);
+            LOG.debug("NO_AD from RP with responseStatusCode={}, and reason={}", responseStatusCode, responseReason);
+            /* Commenting to reduce stats, un-comment on need basis */
+            // InspectorStats.incrementStatCount(getName(), responseReason);
             return true;
         }
         return false;
@@ -1524,51 +1527,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private void handleResponseStatusCode(final Integer responseStatusCode) {
+    private String handleResponseStatusCode(final Integer responseStatusCode) {
         // TODO: Remove Magic numbers
         switch (responseStatusCode) {
             case 3:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_INVALID_REQUEST);
-                LOG.debug("RP returned NO_AD as request was invalid");
-                break;
+                return InspectorStrings.IX_INVALID_REQUEST;
             case 10:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_NO_MATCH);
-                LOG.debug("RP returned NO_AD as no ad matched the request criteria");
-                break;
+                return InspectorStrings.IX_NO_MATCH;
             case 15:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_REFERRER_NOT_ALLOWED);
-                LOG.debug("RP returned NO_AD as referrer was not allowed on this request");
-                break;
+                return InspectorStrings.IX_REFERRER_NOT_ALLOWED;
             case 16:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_INVENTORY_IDENTIFIER_INVALID);
-                LOG.debug("RP returned NO_AD as combination of inventory identifiers was not valid. This generally "
-                        + "occurs if there is a mismatch between account_id, site_id, zone_id and size_id fields");
-                break;
+                return InspectorStrings.IX_INVENTORY_IDENTIFIER_INVALID;
             case 17:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SUSPECTED_SPIDER);
-                LOG.debug("RP returned NO_AD as the user agent indicated a suspected spider");
-                break;
+                return InspectorStrings.IX_SUSPECTED_SPIDER;
             case 18:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SUSPECTED_BOTNET);
-                LOG.debug("RP returned NO_AD as the IP indicated a suspected botnet");
-                break;
+                return InspectorStrings.IX_SUSPECTED_BOTNET;
             case 21:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_REFERRER_BLOCKED);
-                LOG.debug("RP returned NO_AD as referrer was blocked due to suspected bad traffic");
-                break;
+                return InspectorStrings.IX_REFERRER_BLOCKED;
             case 27:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_NOT_AUTHORIZED);
-                LOG.debug("RP returned NO_AD as request was not authorized");
-                break;
+                return InspectorStrings.IX_NOT_AUTHORIZED;
             case 32:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_PROXY_BID_WINS);
-                LOG.debug("RP returned NO_AD as proxy bid won");
-                break;
+                return InspectorStrings.IX_PROXY_BID_WINS;
             default:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_OTHER_ERRORS);
-                LOG.debug("RP returned NO_AD. Refer to status code: {} for more info", statusCode);
-                break;
-        };
+                return InspectorStrings.IX_OTHER_ERRORS;
+        }
     }
 
 

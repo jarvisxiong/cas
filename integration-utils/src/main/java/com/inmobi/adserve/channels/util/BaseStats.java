@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.yammer.metrics.core.Counter;
 import com.yammer.metrics.core.Gauge;
+import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricsRegistry;
 import com.yammer.metrics.reporting.GraphiteReporter;
@@ -32,13 +33,15 @@ public abstract class BaseStats {
     protected String boxName = "CASTestBox";
 
     private final Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>>();
+            new ConcurrentHashMap<>();
 
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Gauge<Long>>>> yammerGaugeStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Gauge<Long>>>>();
+            new ConcurrentHashMap<>();
+
+    private final Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Meter>>> yammerMeterStats =
+            new ConcurrentHashMap<>();
 
     protected final MetricsRegistry REGISTRY = new MetricsRegistry();
-
 
     /**
      * Init graphite and Stats metrics
@@ -122,6 +125,39 @@ public abstract class BaseStats {
             }
         }
         yammerCounterStats.get(key).get(STATS).get(parameter).inc(value);
+    }
+
+    /**
+     *
+     * @param key
+     * @param parameter
+     * @param value
+     */
+    protected void _incrementYammerMeter(final String key, final String parameter, final long value) {
+        if (yammerMeterStats.get(key) == null) {
+            synchronized (parameter) {
+                if (yammerMeterStats.get(key) == null) {
+                    yammerMeterStats.put(key, new ConcurrentHashMap<String, ConcurrentHashMap<String, Meter>>());
+                }
+            }
+        }
+        if (yammerMeterStats.get(key).get(STATS) == null) {
+            synchronized (parameter) {
+                if (yammerMeterStats.get(key).get(STATS) == null) {
+                    yammerMeterStats.get(key).put(STATS, new ConcurrentHashMap<String, Meter>());
+                }
+            }
+        }
+        if (yammerMeterStats.get(key).get(STATS).get(parameter) == null) {
+            synchronized (parameter) {
+                if (yammerMeterStats.get(key).get(STATS).get(parameter) == null) {
+                    final MetricName metricName = new MetricName(boxName, "meterRate." + key, parameter);
+                    yammerMeterStats.get(key).get(STATS)
+                            .put(parameter, REGISTRY.newMeter(metricName, parameter, TimeUnit.MINUTES));
+                }
+            }
+        }
+        yammerMeterStats.get(key).get(STATS).get(parameter).mark(value);
     }
 
 
