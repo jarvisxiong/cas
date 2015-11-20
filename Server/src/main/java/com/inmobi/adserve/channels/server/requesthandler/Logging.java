@@ -104,18 +104,6 @@ public class Logging {
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-
-                /* Commenting to reduce stats, un-comment on need basis */
-                // Detailed No Match Segment Counts
-                // InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS, dst + "_"
-                // + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-os" + sasParams.getOsId());
-                // InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS, dst + "_"
-                // + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-country" + sasParams.getCountryId());
-                // for (final Short slot : sasParams.getProcessedMkSlot()) {
-                // InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS, dst + "_"
-                // + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-umpSlot" + slot);
-                // }
-
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }

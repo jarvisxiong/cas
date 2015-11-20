@@ -26,10 +26,9 @@ public class InspectorStats extends BaseStats {
     private static boolean shouldLog = false;
 
     private Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
+            new ConcurrentHashMap<>();
 
-    private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
+    private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats = new ConcurrentHashMap<>();
 
     private InspectorStats() {}
 

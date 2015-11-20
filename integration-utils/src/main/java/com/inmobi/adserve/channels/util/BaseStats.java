@@ -33,13 +33,13 @@ public abstract class BaseStats {
     protected String boxName = "CASTestBox";
 
     private final Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>>();
+            new ConcurrentHashMap<>();
 
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Gauge<Long>>>> yammerGaugeStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Gauge<Long>>>>();
+            new ConcurrentHashMap<>();
 
     private final Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Meter>>> yammerMeterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Meter>>>();
+            new ConcurrentHashMap<>();
 
     protected final MetricsRegistry REGISTRY = new MetricsRegistry();
 

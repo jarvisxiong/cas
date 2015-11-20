@@ -68,7 +68,7 @@ public class RequestFilters {
             InspectorStats.incrementStatCount(DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, COUNT);
             return true;
         }
-
+        /* Commented as UMP is blocking CT with Default_fallback=false & sending CT where Default_fallback=true */
         // CT Present and CAU not present, means it is CT request to drop it (For native CT has Native Template
         // final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
         // if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
