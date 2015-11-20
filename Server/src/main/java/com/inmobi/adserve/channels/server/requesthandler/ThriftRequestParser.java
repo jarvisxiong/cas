@@ -27,6 +27,7 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -232,6 +233,12 @@ public class ThriftRequestParser {
                 params.setAdcode(tIntDetails.adCodeType.toString());
             }
             params.setSdkVersion(getSdkVersion(tIntDetails.integrationType, tIntDetails.integrationVersion));
+
+            if (tIntDetails.isSetIntegrationMethod() && IntegrationMethod.SDK != tIntDetails.getIntegrationMethod() &&
+                (IntegrationType.IOS_SDK == tIntDetails.getIntegrationType()
+                    || IntegrationType.ANDROID_SDK == tIntDetails.getIntegrationType())) {
+                InspectorStats.incrementStatCount(InspectorStrings.INTEGRATION_METHOD_AND_TYPE_MISMATCH);
+            }
             params.setAdcode(getAdCode(tIntDetails.integrationType));
         }
     }
