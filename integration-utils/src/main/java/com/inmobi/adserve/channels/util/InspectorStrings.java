@@ -152,6 +152,7 @@ public class InspectorStrings {
         "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
+    public static final String INTEGRATION_METHOD_AND_TYPE_MISMATCH = "IntegrationMethodAndTypeMismatch";
 
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
