@@ -151,7 +151,7 @@ public abstract class BaseStats {
         if (yammerMeterStats.get(key).get(STATS).get(parameter) == null) {
             synchronized (parameter) {
                 if (yammerMeterStats.get(key).get(STATS).get(parameter) == null) {
-                    final MetricName metricName = new MetricName(boxName, "Metrics." + key, parameter);
+                    final MetricName metricName = new MetricName(boxName, "meterRate." + key, parameter);
                     yammerMeterStats.get(key).get(STATS)
                             .put(parameter, REGISTRY.newMeter(metricName, parameter, TimeUnit.MINUTES));
                 }
