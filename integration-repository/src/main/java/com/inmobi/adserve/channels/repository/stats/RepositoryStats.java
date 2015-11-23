@@ -21,15 +21,12 @@ public class RepositoryStats extends BaseStats {
     /**
      * Init graphite and Stats metrics. Graphite Interval is set in minutes.
      *
-     * @param serverConfiguration
-     * @param hostName
+     * @param metricsConfiguration
+     * @param containerName
      */
-    public static void init(final Configuration serverConfiguration, final String hostName) {
-        final String graphiteServer =
-                serverConfiguration.getString("graphiteServer.host", "cas-metrics-relay.uj1.inmobi.com");
-        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 2020);
-        final int graphiteInterval = serverConfiguration.getInt("graphiteServer.repostat.intervalInMinutes", 15);
-        INSTANCE.baseInit(graphiteServer, graphitePort, graphiteInterval, hostName, INSTANCE.REGISTRY);
+    public static void init(final Configuration metricsConfiguration, final String containerName) {
+        final int graphiteInterval = metricsConfiguration.getInt("repostat.intervalInMinutes", 15);
+        INSTANCE.baseInit(metricsConfiguration, graphiteInterval, containerName, INSTANCE.REGISTRY);
     }
 
     /**

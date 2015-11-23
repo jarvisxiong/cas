@@ -1,9 +1,14 @@
+{{! CAS Config File Template}}
+{{! note: Comments like this will not be present in the final config file but comments like '# Something' will }}
+{{! Please use triple curly braces for urls and html content }}
+
+{{#cas}}
 logger.debug=debug
 logger.advertiser=advertiser
 logger.sampledadvertiser=sampledadvertiser
 logger.repository=repository
 logger.sampledadvertisercount=5
-logger.loggerConf = /opt/mkhoj/conf/cas/logger.xml
+logger.loggerConf={{CAS_BASE_DIRECTORY}}/conf/logger.xml
 
 server.smtpServer=mail.mkhoj.com
 server.sender=ankur.jain@inmobi.com
@@ -24,20 +29,22 @@ server.incomingMaxConnections = 100
 
 # For DCP, both the ning and casTimeoutHandler timers cutoff at 600ms
 # For RTBD and IX, the casTimeoutHandler timer cuts off at 190ms whereas the ning one cuts off at 500ms
-server.casTimeoutHandler.timeoutMillisForRTB=<%= cas_timer_handler_timeout_rtbd %>
-server.casTimeoutHandler.timeoutMillisForDCP=<%= cas_timer_handler_timeout_dcp %>
-server.ning.timeoutMillisForRTB=<%= ning_timeout_rtbd %>
-server.ning.timeoutMillisForDCP=<%= ning_timeout_dcp %>
+{{#timeout}}
+server.casTimeoutHandler.timeoutMillisForRTB={{cas_timer_handler_timeout_rtbd}}
+server.casTimeoutHandler.timeoutMillisForDCP={{cas_timer_handler_timeout_dcp}}
+server.ning.timeoutMillisForRTB={{ning_timeout_rtbd}}
+server.ning.timeoutMillisForDCP={{ning_timeout_dcp}}
+{{/timeout}}
 
 server.partnerSegmentNo=1
-server.totalSegmentNo=<%= t_segmentno %>
+server.totalSegmentNo={{t_segmentno}}
 server.default.ecpm=1.00
 server.default.fillratio=0.0
 server.revenueWindow=3
 server.ecpmShift=0.01
 server.feedbackPower=4
 server.sampledadvertisercount=1
-server.logParserScript=/opt/bin/mkhoj/grepLog.sh
+server.logParserScript={{CAS_BASE_DIRECTORY}}/scripts/grepLog.sh
 server.rtbBalanceFilterAmount=200
 server.guaranteedDelivery=false
 server.normalizingFactor=0.02
@@ -46,13 +53,7 @@ server.defaultDemandClass=0
 server.supplyClassFloors=2.916,2.041,1.429,1.0,0.7,0.49,0.343,0.24,0.168
 server.servletChangeLogLevel.timerDelay=15000
 server.repoLoadRetryCount=3
-server.rtb.networkEcpmFactor=0.5
-server.rtb.bidFloorPercent=100
-server.rtb.demandDensity=<%= rtbd_demand_density %>
-server.rtb.longTermRevenue=<%= rtbd_long_term_revenue %>
-server.rtb.publisherYield=<%= rtbd_publisher_yield %>
-server.enableAutomationTests=<%= automation_tests_enabled %>
-
+server.enableAutomationTests={{automation_tests_enabled}}
 server.adtype.vast.minimumSupportedSdkVersion=450
 
 server.clickmaker.ipFileVersion = 1
@@ -71,23 +72,6 @@ server.tickDuration=100
 server.enableDatabusLogging=true
 server.enableFileLogging=true
 
-server.aerospike.host=<%= aerospike_host %>
-server.aerospike.port=3000
-server.aerospike.namespace=dcp_site_segment
-server.aerospike.set=feedback2.0
-server.aerospike.refreshTime=300000
-server.aerospike.feedbackTimeFrame=11
-server.aerospike.boostTimeFrame=3
-server.aerospike.imeiNamespae=device_imei
-server.aerospike.imeiSet=imei
-
-graphite.host=<%= graphite_host %>
-graphite.port=2020
-graphite.intervalInMinutes=1
-graphite.repostat.intervalInMinutes=15
-graphite.shouldLogAdapterLatencies=true
-graphite.prefix=<%= graphite_prefix %>
-
 server.circuitbreaker.disable=true
 server.circuitbreaker.failureThreshold=0.5
 server.circuitbreaker.lengthOfMovingWindowCounterInSeconds=300
@@ -96,7 +80,6 @@ server.circuitbreaker.numberOfSecondsUnderObservation=10
 server.circuitbreaker.class=com.inmobi.adserve.channels.server.circuitbreaker.CircuitBreakerImpl
 
 server.isIPRepositoryDisabled=false
-server.isRtbEnabled=<%= rtb_enabled %>
 
 server.auction.exclude.AuctionAdvertiserDomainFilter = 50235b3b4d2a41ffb4130b0987d2ee39, b7010bce3e964616ab2775288e2f8eca, bbdad206402443e99ae37e2c95a45c2e, c2ab586eb0d446ccad0634eacbec47a4, 1dc7bc3327d047f6a9dba3732c769bc4, 351d8374d8a44c71bcf2e19675a59425, fa9a7988fcd3471fbc7f5dccaea4bc0a, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, a3d59e47436d47cab83847b29404e246, 0c5b79a8ad1447b198ad592513683495, 0c4f8ddcb5bd4b5a93c374f9f03b18c1, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, a6f21fc7eab34171973326aec9f77fd8, 22bf326a5caf4dd2b3de42309ff93a91, 762e9098f2184f28ba744da17636dd77, e58b07358148433c99f7392ffe2e205f, 7a97096d81a2428ab95006f134d6b13d, 107bef2f2d5c4e12a678c75425ea2202, e513e32147c94e69b44035f679f4ed13, e7b63e58f5a242a187570bb2f4b5a086, fad2f318acef40059d936c8f0027089c, da976f5ba3764d8faf5755a132d620b9, 1588c61fe51b4c7c87426604e9c0ef00, 8c2b31b2fdaa41b9a18bb84cdd602854, 5fcfcfa708ef4743bcb4cef209bda91a, 00c4041269f244f2946d5f1e6262610c, a46da64258ea447483e3c8e80cb84267, 315297cac52b4fc39634301f5299228e, 094c438f2ce24f8588552afe9ba6a89d, 4f0b93a0735a4690a596365a803ec2cf, b36a6caeac5c483d9b6f57d4c6a6925a, 8adb9a3da01a4a5c93acb7d7f131880b, 5c18a08659cf4aef8235a9d6b447de3f, a40b50983bd34c0e8b3f4be98cf0da7b, c9cfbaf73e61446587036a2293d14e43, 9db590e96fc3445e8f4a20b16f1ac84d, 2ebed517d2be4a05b329c8489c1aad52, 2e628a9993014c2c829747cb7342d61b, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c,a5a42efdf5684fa184f8c6051437c266,82771c11ed31497bb542e6ad44c75dc3,90cc6670d7a541b69a47cd906fcf5503,dd6e3a39adb4483892601d69f180f66e,774f560ccc9c40839ea6360feaaaf0f0,6435edf6c25244e18d2f5f709972fae6,e0e4a367dd2b477491c246505f532390,b03cee175dca452bb3b02033d1dacbe6,0b5e28b49b654f4a9e658405fa48a74e,f3ac392a56674543a83d46c99ccb98f6,a95447eafff74c3c8613e341522700cd,570e0454c6314889b18486fb71186ca8,75f70122644b4d9499801b3936b03dfb,d8dc94dac84e42ceb75de5e8565a9df6,fc56e2b620874561960767c39427298c,768b588e30b44843a06168221f772c4b,fffdba729a194ab2a8cdcb37572df33e,96ff268b1d654cefabbf28aba4db6334,9a151336f867432199a9a329791686a0,aa1bb7f2ca634a9fabb38aebd25352fd,ec6cf772fa234e2584805291e141ad7f,8c473223f7e8444bb3be7d5f3e0feeef,50c1c9114a6a4c3c8e492a24ddac0de6,e84b681ba4e64a04b9986dbbd4c93deb,a646b9b3830343f7a7d0df6939e0ab8b
 server.auction.exclude.AuctionCreativeAttributeFilter = 50235b3b4d2a41ffb4130b0987d2ee39, b7010bce3e964616ab2775288e2f8eca, bbdad206402443e99ae37e2c95a45c2e, c2ab586eb0d446ccad0634eacbec47a4, 1dc7bc3327d047f6a9dba3732c769bc4, 351d8374d8a44c71bcf2e19675a59425, fa9a7988fcd3471fbc7f5dccaea4bc0a, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, a3d59e47436d47cab83847b29404e246, 0c5b79a8ad1447b198ad592513683495, 0c4f8ddcb5bd4b5a93c374f9f03b18c1, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, a6f21fc7eab34171973326aec9f77fd8, 22bf326a5caf4dd2b3de42309ff93a91, 762e9098f2184f28ba744da17636dd77, e58b07358148433c99f7392ffe2e205f, 7a97096d81a2428ab95006f134d6b13d, 107bef2f2d5c4e12a678c75425ea2202, e513e32147c94e69b44035f679f4ed13, e7b63e58f5a242a187570bb2f4b5a086, fad2f318acef40059d936c8f0027089c, da976f5ba3764d8faf5755a132d620b9, 1588c61fe51b4c7c87426604e9c0ef00, 8c2b31b2fdaa41b9a18bb84cdd602854, 5fcfcfa708ef4743bcb4cef209bda91a, 00c4041269f244f2946d5f1e6262610c, a46da64258ea447483e3c8e80cb84267, 315297cac52b4fc39634301f5299228e, 094c438f2ce24f8588552afe9ba6a89d, 4f0b93a0735a4690a596365a803ec2cf, b36a6caeac5c483d9b6f57d4c6a6925a, 8adb9a3da01a4a5c93acb7d7f131880b, 5c18a08659cf4aef8235a9d6b447de3f, a40b50983bd34c0e8b3f4be98cf0da7b, c9cfbaf73e61446587036a2293d14e43, 9db590e96fc3445e8f4a20b16f1ac84d, 2ebed517d2be4a05b329c8489c1aad52, 2e628a9993014c2c829747cb7342d61b, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c,a5a42efdf5684fa184f8c6051437c266,82771c11ed31497bb542e6ad44c75dc3,90cc6670d7a541b69a47cd906fcf5503,dd6e3a39adb4483892601d69f180f66e,774f560ccc9c40839ea6360feaaaf0f0,6435edf6c25244e18d2f5f709972fae6,e0e4a367dd2b477491c246505f532390,b03cee175dca452bb3b02033d1dacbe6,0b5e28b49b654f4a9e658405fa48a74e,f3ac392a56674543a83d46c99ccb98f6,a95447eafff74c3c8613e341522700cd,570e0454c6314889b18486fb71186ca8,75f70122644b4d9499801b3936b03dfb,d8dc94dac84e42ceb75de5e8565a9df6,fc56e2b620874561960767c39427298c,768b588e30b44843a06168221f772c4b,fffdba729a194ab2a8cdcb37572df33e,96ff268b1d654cefabbf28aba4db6334,9a151336f867432199a9a329791686a0,aa1bb7f2ca634a9fabb38aebd25352fd,ec6cf772fa234e2584805291e141ad7f,8c473223f7e8444bb3be7d5f3e0feeef,50c1c9114a6a4c3c8e492a24ddac0de6,e84b681ba4e64a04b9986dbbd4c93deb,bbc4d78d22da484db35de5fb6f839dc5,a646b9b3830343f7a7d0df6939e0ab8b
@@ -107,13 +90,21 @@ server.auction.exclude.AuctionIUrlFilter = 50235b3b4d2a41ffb4130b0987d2ee39, b70
 server.adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter = ab8677d5210241a091da3e0f94a1b425,f797f299338e4bb8b645351528a9b401,86490ae2c95a4fae9f6036317da740d3
 
 # Scribe config
-server.scribePublisherConf=/opt/mkhoj/conf/cas/messaging-publisher-conf.properties
+server.scribePublisherConf={{CAS_BASE_DIRECTORY}}/conf/messaging-publisher-conf.properties
 
-database.host=<%= db_host %>
-database.port=<%= db_port %>
-database.database=<%= database %>
-database.username=<%= cas_user %>
-database.password=<%= cas_pass %>
+graphite.host=cas-metrics-relay.{{COLO}}.inmobi.com
+graphite.port=2020
+graphite.intervalInMinutes=1
+graphite.repostat.intervalInMinutes=15
+graphite.shouldLogAdapterLatencies=true
+graphite.prefix={{IDP_ENVIRONMENT}}.{{COLO}}.{{IDP_SERVICE}}-1.app
+
+{{#database}}
+database.host={{db_host}}
+database.port={{db_port}}
+database.database={{database}}
+database.username={{cas_user}}
+database.password={{cas_pass}}
 database.validationQuery=select version();
 database.testWhileIdle=true
 database.testOnBorrow=true
@@ -122,6 +113,19 @@ database.maxIdle=20
 database.maxWait=-1
 database.socketTimeout=900
 
+{{#aerospike}}
+server.aerospike.host={{aerospike_host}}
+server.aerospike.port={{aerospike_port}}
+server.aerospike.namespace=dcp_site_segment
+server.aerospike.set=feedback2.0
+server.aerospike.refreshTime=300000
+server.aerospike.feedbackTimeFrame=11
+server.aerospike.boostTimeFrame=3
+server.aerospike.imeiNamespae=device_imei
+server.aerospike.imeiSet=imei
+{{/aerospike}}
+    
+{{/database}}
 
 #refreshTime is set as different prime numbers to avoid refresh of all repos at their LCM.
 #To add new Repo take last refreshTime + 60, and then find next prime number
@@ -212,7 +216,7 @@ Cache.SiteMetaDataRepository.query = select * from channel_site_metadata_fun_sel
 Cache.SiteMetaDataRepository.initialDelay = 300
 Cache.SiteMetaDataRepository.refreshTime = 1607
 Cache.SiteMetaDataRepository.isUpdatable = true
-Cache.SiteMetaDataRepository.dataSourceName = jdbc 
+Cache.SiteMetaDataRepository.dataSourceName = jdbc
 
 Cache.Name = SiteTaxonomyRepository
 Cache.SiteTaxonomyRepository.Manager = com.inmobi.adserve.channels.repository.SiteTaxonomyRepository
@@ -308,6 +312,7 @@ Cache.IXBlocklistRepository.refreshTime = 601
 Cache.IXBlocklistRepository.isUpdatable = true
 Cache.IXBlocklistRepository.dataSourceName = jdbc
 
+{{#dcp}}
 adapter.adbaydcp.status=on
 adapter.adbaydcp.host=http://ad.about.co.kr/mad/json/InMobi/total01/bottom_middle
 adapter.adbaydcp.advertiserId=7f7edb117307402fa89afeadb56174d7
@@ -356,7 +361,6 @@ adapter.huntmads.advertiserId=62bdf93ca0684da7854614b48665b641
 adapter.huntmads.partnerSegmentNo=1
 adapter.huntmads.class=com.inmobi.adserve.channels.adnetworks.mocean.DCPMoceanAdNetwork
 
-
 adapter.httpool.host=http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&
 adapter.httpool.status=on
 adapter.httpool.test=0
@@ -366,13 +370,11 @@ adapter.httpool.host.hkg1=NA
 adapter.httpool.host.uj1=NA
 adapter.httpool.class=com.inmobi.adserve.channels.adnetworks.httpool.DCPHttPoolAdNetwork
 
-
 adapter.xad.host=http://display.xad.com/rest/banner
 adapter.xad.status=on
 adapter.xad.advertiserId=08bf2bc17a0e421daa9e53e316862893
 adapter.xad.partnerSegmentNo=2
 adapter.xad.class=com.inmobi.adserve.channels.adnetworks.xad.DCPxAdAdNetwork
-
 
 adapter.verve.host=http://adcel.vrvm.com/htmlad
 adapter.verve.host.hkg1=NA
@@ -383,7 +385,6 @@ adapter.verve.partnerSegmentNo=2
 adapter.verve.gauranteedDelivery=true
 adapter.verve.class=com.inmobi.adserve.channels.adnetworks.verve.DCPVerveAdNetwork
 
-
 adapter.lomark.status=off
 adapter.lomark.advertiserId=151e8e277749416b80a9a3e57b58acc3
 adapter.lomark.key=bbb1182edea1408a8497dc84bdefab79
@@ -393,14 +394,12 @@ adapter.lomark.host.uj1=NA
 adapter.lomark.partnerSegmentNo=1
 adapter.lomark.class=com.inmobi.adserve.channels.adnetworks.lomark.DCPLomarkAdNetwork
 
-
 adapter.pubmatic.status=on
 adapter.pubmatic.advertiserId=883b4f10a4304a8b90351912a66f04b4
 adapter.pubmatic.host=http://showads.pubmatic.com/AdServer/AdServerServlet
 adapter.pubmatic.pubId=33161
 adapter.pubmatic.partnerSegmentNo=1
 adapter.pubmatic.class=com.inmobi.adserve.channels.adnetworks.pubmatic.DCPPubmaticAdNetwork
-
 
 adapter.nexage.status=on
 adapter.nexage.advertiserId=72cd0cbf-a1eb-4905-b6d5-de28acb72dc8
@@ -444,7 +443,6 @@ adapter.amobee.host.uj1=NA
 adapter.amobee.partnerSegmentNo=1
 adapter.amobee.class=com.inmobi.adserve.channels.adnetworks.amobeeplatform.DCPAmobeePlatformAdnetwork
 
-
 adapter.ybrant.status=off
 adapter.ybrant.advertiserId=3a2b1cefce7448e5ae7cbba936950820
 adapter.ybrant.host=http://ad.ajillionmax.com/ad/%s/4
@@ -458,7 +456,6 @@ adapter.ybrant.slot_15_fs=1121
 adapter.ybrant.partnerSegmentNo=1
 adapter.ybrant.class=com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork
 
-
 adapter.mable.status=on
 adapter.mable.advertiserId=ed623515c506471686af6ec93811edd6
 adapter.mable.host=http://ad.parrot.mable-inc.com/inmobi/ad_call
@@ -466,7 +463,6 @@ adapter.mable.host.uj1=
 adapter.mable.authKey=335eaf2639079ffa40b5f7d69f3051fb
 adapter.mable.partnerSegmentNo=1
 adapter.mable.class=com.inmobi.adserve.channels.adnetworks.mable.DCPMableAdnetwork
-
 
 adapter.placeiq.status=on
 adapter.placeiq.advertiserId=f797f299338e4bb8b645351528a9b401
@@ -479,7 +475,6 @@ adapter.placeiq.responseFormat=html
 adapter.placeiq.partnerSegmentNo=2
 adapter.placeiq.class=com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork
 
-
 adapter.wapstart.status=on
 adapter.wapstart.advertiserId=59039ca912c44e4c8a0f3e2097e2a5e4
 adapter.wapstart.host=http://api.plus1.wapstart.ru/v1/ads/%s.json
@@ -487,7 +482,6 @@ adapter.wapstart.host.hkg1=NA
 adapter.wapstart.host.uj1=
 adapter.wapstart.partnerSegmentNo=1
 adapter.wapstart.class=com.inmobi.adserve.channels.adnetworks.wapstart.DCPWapStartAdNetwork
-
 
 adapter.crimzo.status=off
 adapter.crimzo.advertiserId=ebcc5c4060064e62b5465c5316c53c59
@@ -521,7 +515,6 @@ adapter.mobfox.host=http://my.mobfox.com/request.php
 adapter.mobfox.host.uj1=NA
 adapter.mobfox.partnerSegmentNo=1
 adapter.mobfox.class=com.inmobi.adserve.channels.adnetworks.mobfox.DCPMobFoxAdnetwork
-
 
 adapter.smaato.status=on
 adapter.smaato.advertiserId=bb6186801d5a4fc58f40220b8c15f643
@@ -582,7 +575,6 @@ adapter.webmedia.slot_10_p=1078
 adapter.webmedia.partnerSegmentNo=1
 adapter.webmedia.class=com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork
 
-
 adapter.inneractive.status=off
 adapter.inneractive.advertiserId=4832c9ceb55c482cae27601998d7733b
 adapter.inneractive.host=http://ad.ajillionmax.com/ad/%s/4
@@ -619,12 +611,12 @@ adapter.motivefeed.class=com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjil
 
 adapter.taboola.advertiserId=86490ae2c95a4fae9f6036317da740d3
 adapter.taboola.status=on
-adapter.taboola.host=<%= taboola_default_url %>
+{{! Please use triple curly braces for urls and html content }}
+adapter.taboola.host={{{taboola_default_url}}}
 adapter.taboola.notification=http://api.taboola.com/json/%s/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s
 adapter.taboola.partnerSegmentNo=1
 adapter.taboola.icon=http://inmobitr-a.akamaihd.net/dcpnative/Sponsored-icon.png
 adapter.taboola.class=com.inmobi.adserve.channels.adnetworks.taboola.DCPTaboolaAdnetwork
-
 
 adapter.googleadx.advertiserId=ab8677d5210241a091da3e0f94a1b425
 adapter.googleadx.googleAdXPublisherID=ca-pub-4422296448758371
@@ -666,6 +658,14 @@ adapter.local.test=0
 adapter.local.advertiserId=5cc86c3a19fc46028b4bb7265fc9c308
 adapter.local.partnerSegmentNo=1
 adapter.local.class=com.inmobi.adserve.channels.adnetworks.mocean.DCPMoceanAdNetwork
+{{/dcp}}
+
+{{#rtbd}}
+server.isRtbEnabled={{rtb_enabled}}
+server.rtb.bidFloorPercent=100
+server.rtb.demandDensity={{rtbd_demand_density}}
+server.rtb.longTermRevenue={{rtbd_long_term_revenue}}
+server.rtb.publisherYield={{rtbd_publisher_yield}}
 
 adapter.inmobiRtb1.isRtb=true
 adapter.inmobiRtb1.status=off
@@ -683,8 +683,9 @@ adapter.inmobiRtb1.host.default=http://ec2-23-23-18-252.compute-1.amazonaws.com/
 adapter.inmobiRtb1.wnUrlback=http://ec2-23-23-18-252.compute-1.amazonaws.com/callback/${AUCTION_PRICE}
 adapter.inmobiRtb1.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
+
 adapter.inmobiRtb2.isRtb=true
-adapter.inmobiRtb2.status=<%= rtb2_status %>
+adapter.inmobiRtb2.status={{rtb2_status}}
 adapter.inmobiRtb2.siteBlinded=true
 adapter.inmobiRtb2.rtbVer=2.0
 adapter.inmobiRtb2.advertiserId=9ab79acef8764348a36a07b05fc3ee64
@@ -716,7 +717,6 @@ adapter.drawbridgeRTB.host.uh1=
 adapter.drawbridgeRTB.host.default=http://rtbe.adsymptotic.com/rtb/13/11106/4df26a09629899c674a033a8db163311
 adapter.drawbridgeRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
-
 adapter.madnetRTB.status=on
 adapter.madnetRTB.advertiserId=c9cfbaf73e61446587036a2293d14e43
 adapter.madnetRTB.partnerSegmentNo=1
@@ -732,8 +732,6 @@ adapter.madnetRTB.host.hkg1=NA
 adapter.madnetRTB.host.uh1=http://dsp2.madnet.ru/inmobi
 adapter.madnetRTB.host.default=
 adapter.madnetRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
-
 
 adapter.appierRTB.status=off
 adapter.appierRTB.advertiserId=a40b50983bd34c0e8b3f4be98cf0da7b
@@ -751,7 +749,6 @@ adapter.appierRTB.host.uh1=
 adapter.appierRTB.host.default=http://ed9.rtb.appier.net/ortb/inmobi_ortb_hk
 adapter.appierRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
-
 adapter.adxperienceRTB.isRtb=true
 adapter.adxperienceRTB.status=off
 adapter.adxperienceRTB.siteBlinded=true
@@ -766,7 +763,6 @@ adapter.adxperienceRTB.host.hkg1=NA
 adapter.adxperienceRTB.host.uh1=
 adapter.adxperienceRTB.host.default=http://rtb.adxperience.com/openrtb/get_bid/520b5c9d-8d54-4a64-a9d5-7907adf66677
 adapter.adxperienceRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
 
 adapter.mdotmRTB.isRtb=true
 adapter.mdotmRTB.status=on
@@ -783,8 +779,6 @@ adapter.mdotmRTB.host.uh1=http://rtb-inmobi-east.mdotm.co/ads/inmobibid.php
 adapter.mdotmRTB.host.default=http://rtb-inmobi-west.mdotm.co/ads/inmobibid.php
 adapter.mdotmRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
-
-
 adapter.manageRTB.isRtb=true
 adapter.manageRTB.status=on
 adapter.manageRTB.siteBlinded=true
@@ -799,7 +793,6 @@ adapter.manageRTB.host.hkg1=http://inmobi-apac-bidder.manage.com/2/bid
 adapter.manageRTB.host.uh1=
 adapter.manageRTB.host.default=http://inmobi-east-bidder.manage.com/2/bid
 adapter.manageRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
 
 adapter.lyfemobileRTB.isRtb=true
 adapter.lyfemobileRTB.status=on
@@ -817,7 +810,6 @@ adapter.lyfemobileRTB.host.default=http://inmobi-us-east.lyfemobile.net/receiver
 adapter.lyfemobileRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.lyfemobileRTB.nativeSupported=true
 
-
 adapter.incrowdadsRTB.isRtb=true
 adapter.incrowdadsRTB.status=on
 adapter.incrowdadsRTB.siteBlinded=true
@@ -833,7 +825,6 @@ adapter.incrowdadsRTB.host.uh1=
 adapter.incrowdadsRTB.host.default=http://inmobi.incrowdads.net:80/rtb/bid/inmobi/bid
 adapter.incrowdadsRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
-
 adapter.vizuryRTB.isRtb=true
 adapter.vizuryRTB.status=on
 adapter.vizuryRTB.siteBlinded=true
@@ -848,7 +839,6 @@ adapter.vizuryRTB.host.hkg1=http://rtb-ap.vizury.com/rtb/rtbinmobi
 adapter.vizuryRTB.host.uh1=http://rtb-useast-1.vizury.com/rtb/rtbinmobi
 adapter.vizuryRTB.host.default=NA
 adapter.vizuryRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
 
 adapter.mediasmartRTB.isRtb=true
 adapter.mediasmartRTB.status=on
@@ -927,7 +917,7 @@ adapter.limeiRTB.host.uj1=NA
 adapter.limeiRTB.host.lhr1=NA
 adapter.limeiRTB.host.hkg1=http://inmobi.bid.limei.com/
 adapter.limeiRTB.host.uh1=NA
-adapter.limeiRTB.host.default=NA 
+adapter.limeiRTB.host.default=NA
 adapter.limeiRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.limeiRTB.nativeSupported=true
 
@@ -1133,7 +1123,6 @@ adapter.tukeRTB.host.uh1=NA
 adapter.tukeRTB.host.default=NA
 adapter.tukeRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
-
 adapter.humandemandRTB.isRtb=true
 adapter.humandemandRTB.status=off
 adapter.humandemandRTB.siteBlinded=true
@@ -1148,7 +1137,6 @@ adapter.humandemandRTB.host.hkg1=NA
 adapter.humandemandRTB.host.uh1=http://inmobi.mobiadserv.com/api/inmobi/request
 adapter.humandemandRTB.host.default=http://inmobi.mobiadserv.com/api/inmobi/request
 adapter.humandemandRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
 
 adapter.wqmobileRTB.isRtb=true
 adapter.wqmobileRTB.status=on
@@ -1285,7 +1273,6 @@ adapter.pocketmathRTB.host.hkg1=NA
 adapter.pocketmathRTB.host.uh1=http://inmobi-us-east-1.posumeads.com:8080/inmobi/bid
 adapter.pocketmathRTB.host.default=NA
 adapter.pocketmathRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
 
 adapter.hdtRTB.isRtb=true
 adapter.hdtRTB.status=on
@@ -1717,14 +1704,16 @@ adapter.diapingRTB.host.hkg1=http://dsp.dianping.com/bid
 adapter.diapingRTB.host.uh1=NA
 adapter.diapingRTB.host.default=NA
 adapter.diapingRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+{{/rtbd}}
 
+{{#ix}}
 adapter.ix.isIx=true
 adapter.ix.secureSupported=false
 adapter.ix.status=on
 adapter.ix.templateWinNotification=false
 adapter.ix.siteBlinded=false
 adapter.ix.rtbVer=2.0
-adapter.ix.advertiserId=<%= ix_advertise_id %>
+adapter.ix.advertiserId={{ix_advertiser_id}}
 adapter.ix.unknownAdvId=87f709998f254179a61a30a0f435bf08
 adapter.ix.urlArg=query
 adapter.ix.ixMethod=post
@@ -1733,7 +1722,7 @@ adapter.ix.host.uj1=http://exapi-us-west.rubiconproject.com/a/api/exchange.json?
 adapter.ix.host.lhr1=http://exapi-eu.rubiconproject.com/a/api/exchange.json?tk_sdc=eu
 adapter.ix.host.hkg1=http://exapi-apac.rubiconproject.com/a/api/exchange.json?tk_sdc=apac
 adapter.ix.host.uh1=http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east
-adapter.ix.host.default=<%= ix_default_url %>
+adapter.ix.host.default={{ix_default_url}}
 adapter.ix.partnerSegmentNo=1
 adapter.ix.class=com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork
 adapter.ix.nativeSupported=true
@@ -1745,3 +1734,7 @@ adapter.ix.globalBlind=3522,3038,3107,3420,3002,3320,2853,3158,3560,3600,3542,36
 adapter.ix.excludeCircuitBreaker=true
 adapter.ix.bidFloorPercent=100
 adapter.ix.sprout.uniqueIdentifierRegex=(?s).*data-creative[iI]d.*
+{{/ix}}
+
+{{/cas}}
+

@@ -18,7 +18,6 @@ import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.adnetworks.module.AdapterConfigModule;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.server.ChannelServer;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.auction.AuctionFilterApplier;
@@ -44,12 +43,15 @@ public class ServerModule extends AbstractModule {
     private final Configuration adapterConfiguration;
     private final Configuration serverConfiguration;
     private final Configuration rtbConfiguration;
+    private final String dataCentreName;
 
-    public ServerModule(final ConfigurationLoader configurationLoader, final RepositoryHelper repositoryHelper) {
+    public ServerModule(final ConfigurationLoader configurationLoader, final RepositoryHelper repositoryHelper,
+        final String dataCentreName) {
         adapterConfiguration = configurationLoader.getAdapterConfiguration();
         serverConfiguration = configurationLoader.getServerConfiguration();
         rtbConfiguration = configurationLoader.getRtbConfiguration();
         this.repositoryHelper = repositoryHelper;
+        this.dataCentreName = dataCentreName;
         reflections = new Reflections("com.inmobi.adserve.channels", new TypeAnnotationsScanner(),
                 new SubTypesScanner());
     }
@@ -73,7 +75,7 @@ public class ServerModule extends AbstractModule {
         install(new NativeModule());
         install(new InmobiAdTrackerModule());
         install(new TemplateModule());
-        install(new AdapterConfigModule(adapterConfiguration, ChannelServer.dataCentreName));
+        install(new AdapterConfigModule(adapterConfiguration, dataCentreName));
         install(new ChannelSegmentFilterModule());
         install(new ScopeModule());
         install(new AuctionFilterModule());

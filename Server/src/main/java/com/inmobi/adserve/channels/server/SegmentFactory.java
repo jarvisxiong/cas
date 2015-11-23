@@ -39,7 +39,7 @@ public class SegmentFactory {
 
         final Class<AdNetworkInterface> adNetworkInterfaceClass = adapterConfig.getAdNetworkInterfaceClass();
         if (adapterConfig.isRtb() || adapterConfig.isIx()) {
-            LOG.debug("dcname is {} and urlBase is {}", ChannelServer.dataCentreName, adapterConfig.getAdapterHost());
+            LOG.debug("urlBase is {}", adapterConfig.getAdapterHost());
             try {
                 LOG.debug("adapterConfig.templateWinNotification() {}", adapterConfig.templateWinNotification());
                 final AdNetworkInterface rtbAdNetwork =

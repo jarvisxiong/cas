@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
@@ -50,6 +48,8 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.Adve
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserExcludedFilter;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+
+import junit.framework.TestCase;
 
 public class ChannelSegmentFilterApplierTest extends TestCase {
     private ChannelEntity cE1;
@@ -260,7 +260,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setSiteId("siteid");
 
         injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
                         new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
@@ -817,7 +817,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setOsId(2);
 
         final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
                         new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         final AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter =
@@ -843,7 +843,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setOsId(2);
 
         final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
                         new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         final AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter =
@@ -878,7 +878,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setOsId(2);
 
         final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
                         new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         final AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter =
@@ -919,7 +919,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         replay(repositoryHelper);
 
         final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
                         new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         sasParams.setSiteId("siteid");
@@ -966,7 +966,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setOsId(2);
 
         final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
                         new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
 
         final CasContext casContext = new CasContext();

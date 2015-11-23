@@ -9,8 +9,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.testng.annotations.Test;
 
@@ -24,6 +22,8 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
+
+import junit.framework.TestCase;
 
 
 public class MatchSegmentsTest extends TestCase {
@@ -42,7 +42,7 @@ public class MatchSegmentsTest extends TestCase {
 
         final Injector injector =
                 Guice.createInjector(new CasNettyModule(configurationLoder.getServerConfiguration()), new ServerModule(
-                        configurationLoder, repositoryHelper));
+                        configurationLoder, repositoryHelper, "containerName"));
 
         matchSegments = injector.getInstance(MatchSegments.class);
 

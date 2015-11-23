@@ -1,0 +1,156 @@
+#!/usr/bin/ruby
+
+# == Synopsis
+#
+# get_scribe_stats: gets the scribe stats from the thrift server and posts them to lwes channel
+#
+# == Usage
+#
+# get_scribe_stats [OPTION]
+#
+# -h, --help:
+#    show help
+#
+# --thrift_host HOST, -l x:
+#    HOST is the server where thrift server is running [localhost]
+#
+# --thrift_port PORT, -p PORT:
+#    PORT is the port where thrift server is running [7463]
+# 
+# --event_name NAME, -e NAME:
+#   use NAME for the lwes event_name [ScribeStats]
+# 
+# --mcaddress ADDR, -a ADDR:
+#   use ADDR as the multicast address [224.1.1.11]
+#
+# --mcport PORT, -c PORT:
+#   use PORT as the multicast port to publish to [12345]
+#
+# --mcttl TTL, -t TTL:
+#   set multicast ttl to TTL [1]
+#
+# --interval SECONDS, -i SECONDS:
+#   poll thrift server every SECONDS seconds [1]
+#
+# --scribe_type [collector|producer], -s [collector|producer]:
+#   the scribe server we are polling for stats is a collector or producer, this is the only required option
+#
+# --get , -g:
+#   just get the stats and print on screen, don't emit
+# 
+# Author: Pradeep Jindal <pradeep.jindal@inmobi.com>
+
+require 'rubygems'
+require 'fb303'
+require 'lwes'
+require 'socket'
+require 'getoptlong'
+require 'rdoc/usage'
+
+# stderr is unbuffered by default
+STDOUT.sync = true
+
+Stats = {"lost" => 0,
+    "retries" => 0,
+    "received good" => 0,
+    "received bad" => 0,
+    "requeue" => 0,
+    "bytes lost" => 0,
+    "denied for queue size" => 0,
+    "read_timeouts" => 0,
+    "eofs" => 0,
+    "ignored" => 0}
+
+ScribeOverallStats = Stats.merge({"denied for rate" => 0,
+    "sent" => 0,
+    "received blank category" => 0})
+
+thrift_host = "0.0.0.0"
+thrift_port = 7463
+event_name = "ScribeStats"
+mcaddress = "224.1.1.11"
+mcport = 12345
+mcttl = 1
+scribe_type = nil
+interval = 1
+get = false
+
+opts = GetoptLong.new(
+    [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    [ '--thrift_host', '-l', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--thrift_port', '-p', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--event_name', '-e', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--mcaddress', '-a', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--mcport', '-c', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--mcttl', '-t', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--interval', '-i', GetoptLong::OPTIONAL_ARGUMENT ],
+    [ '--get', '-g', GetoptLong::NO_ARGUMENT ],
+    [ '--scribe_type', '-s', GetoptLong::REQUIRED_ARGUMENT ])
+
+opts.each do |opt, arg|
+    case opt
+    when '--help'
+        RDoc::usage
+    when '--thrift_host'
+        thrift_host = arg
+    when '--thrift_port'
+        thrift_port = arg.to_i
+    when '--event_name'
+        event_name = arg
+    when '--mcaddress'
+        if /\A(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\Z/ =~ arg
+          mcaddress = arg
+        else
+          mcaddress = Socket::getaddrinfo(arg, nil)[0][3]
+        end
+    when '--mcport'
+        mcport = arg.to_i
+    when '--mcttl'
+        mcttl = arg.to_i
+    when '--scribe_type'
+        scribe_type = arg
+    when '--interval'
+        interval = arg.to_i
+    when '--get'
+        get = true
+    end
+end
+
+s = Thrift::Socket.new(thrift_host, thrift_port)
+t = Thrift::FramedTransport.new(s)
+p = Thrift::BinaryProtocol.new(t, false)
+f = FacebookService::Client.new(p)
+t.open()
+
+if get
+    counters = f.getCounters
+    puts counters.inspect
+    exit
+end
+
+emitter = LWES::Emitter.new(:address => mcaddress,
+                            :port => mcport,
+                            :heartbeat => 30,
+                            :ttl => mcttl)
+
+while true do
+    t.open() unless t.open?
+    counters = f.getCounters
+    category_hash = Hash.new { |h,k| k == "scribe_overall" ? h[k] = ScribeOverallStats : h[k] = Stats }
+    counters.each do |k,v|
+        cat, name = k.split(":")
+        category_hash[cat] = category_hash[cat].merge({name => v})
+    end
+    category_hash.each do |k,v|
+        event = {"category" => k}
+        v.each do |n,m|
+            n = n.split(/\s/).join("_")
+            event[n] = [:int64, m]
+        end
+        event["hostname"] = Socket.gethostname
+        event["scribe_type"] = scribe_type
+        emitter.emit event_name, event
+        puts "Emitted #{event_name} #{event.size} metrics to #{mcaddress}:#{mcport}"
+    end
+    sleep(interval)
+end

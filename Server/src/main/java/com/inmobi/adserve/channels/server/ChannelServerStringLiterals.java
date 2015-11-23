@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChannelServerStringLiterals {
     public static final String CHANNEL_REPOSITORY = "ChannelRepository";
     public static final String CHANNEL_ADGROUP_REPOSITORY = "ChannelAdGroupRepository";
@@ -28,9 +32,4 @@ public final class ChannelServerStringLiterals {
     public static final String IMEI_REPOSITORY = "IMEIRepository";
     public static final String DATABASE = "database";
     public static final String QUERY = "query";
-    public static final String DATA_CENTER_ID_KEY = "dc.id";
-    public static final String HOST_NAME_KEY = "host.name";
-    public static final String DATA_CENTRE_NAME_KEY = "dc.name";
-
-    private ChannelServerStringLiterals () { }
 }

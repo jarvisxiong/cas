@@ -61,7 +61,7 @@ public class Logging {
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static final String BANNER = "BANNER";
     private static final String NO = "NO";
-    private static String hostName;
+    private static String containerName;
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
     private static String sampledAdvertisementLogKey;
@@ -76,7 +76,7 @@ public class Logging {
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
             final String advertisementLogKey, final String umpAdsLogKey, final Configuration config,
-            final String hostNameStr) {
+            final String containerNameStr) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -84,7 +84,7 @@ public class Logging {
         enableFileLogging = config.getBoolean("enableFileLogging");
         enableDatabusLogging = config.getBoolean("enableDatabusLogging");
         totalCount = config.getInt("sampledadvertisercount");
-        hostName = hostNameStr;
+        containerName = containerNameStr;
     }
 
     // Writing Request Response Logs
@@ -345,11 +345,6 @@ public class Logging {
             terminationReason = NO;
         }
 
-        if (null == hostName) {
-            LOG.info("Host cant be empty, abandoning rr logging");
-            return null;
-        }
-
         short adsServed = 0;
         List<Impression> impressions = null;
         final Impression impression = getImpressionObject(channelSegment, sasParams);
@@ -373,7 +368,8 @@ public class Logging {
         final Request request = getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
-        adRR = new AdRR(hostName, timestamp, request, impressions, isTerminated, terminationReason);
+        // Container name must equal the hostname for now.
+        adRR = new AdRR(containerName, timestamp, request, impressions, isTerminated, terminationReason);
         adRR.setAuction_info(getAuctionInfo(sasParams, casInternalRequestParameters));
         adRR.setTime_stamp(new Date().getTime());
         adRR.setChannels(channels);

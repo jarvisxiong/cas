@@ -31,6 +31,8 @@ public class ConfigurationLoader {
     @Getter
     private final Configuration serverConfiguration;
     @Getter
+    private final Configuration metricsConfiguration;
+    @Getter
     private final Configuration loggerConfiguration;
     @Getter
     private final Configuration rtbConfiguration;
@@ -58,6 +60,7 @@ public class ConfigurationLoader {
         adapterConfiguration = configuration.subset("adapter");
         databaseConfiguration = configuration.subset("database");
         serverConfiguration = configuration.subset("server");
+        metricsConfiguration = configuration.subset("graphite");
         loggerConfiguration = configuration.subset("logger");
         rtbConfiguration = configuration.subset("rtb");
     }

@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.util;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -78,46 +77,4 @@ public class LoggerUtils {
         }
     }
 
-    /**
-     * Check if all log folders exist
-     */
-    public static boolean checkLogFolders(final Configuration config) {
-        String debugLogFolder = config.getString("debug.File");
-        String advertiserLogFolder = config.getString("advertiser.File");
-        String sampledAdvertiserLogFolder = config.getString("sampledadvertiser.File");
-        String repositoryLogFolder = config.getString("repository.File");
-        String traceLogFolder = config.getString("trace.File");
-        File debugFolder = null;
-        File advertiserFolder = null;
-        File sampledAdvertiserFolder = null;
-        File repositoryFolder = null;
-        File traceFolder = null;
-        if (repositoryLogFolder != null) {
-            repositoryLogFolder = repositoryLogFolder.substring(0, repositoryLogFolder.lastIndexOf('/') + 1);
-            repositoryFolder = new File(repositoryLogFolder);
-        }
-        if (debugLogFolder != null) {
-            debugLogFolder = debugLogFolder.substring(0, debugLogFolder.lastIndexOf('/') + 1);
-            debugFolder = new File(debugLogFolder);
-        }
-        if (advertiserLogFolder != null) {
-            advertiserLogFolder = advertiserLogFolder.substring(0, advertiserLogFolder.lastIndexOf('/') + 1);
-            advertiserFolder = new File(advertiserLogFolder);
-        }
-        if (sampledAdvertiserLogFolder != null) {
-            sampledAdvertiserLogFolder =
-                    sampledAdvertiserLogFolder.substring(0, sampledAdvertiserLogFolder.lastIndexOf('/') + 1);
-            sampledAdvertiserFolder = new File(sampledAdvertiserLogFolder);
-        }
-        if (traceLogFolder != null) {
-            traceLogFolder = traceLogFolder.substring(0, traceLogFolder.lastIndexOf('/') + 1);
-            traceFolder = new File(traceLogFolder);
-        }
-        if (debugFolder != null && debugFolder.exists() && advertiserFolder != null && advertiserFolder.exists() &&
-                sampledAdvertiserFolder != null && sampledAdvertiserFolder.exists() && repositoryFolder != null &&
-                repositoryFolder.exists() && traceFolder != null && traceFolder.exists()) {
-            return true;
-        }
-        return false;
-    }
 }
