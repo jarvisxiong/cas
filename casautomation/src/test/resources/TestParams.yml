@@ -1690,5 +1690,32 @@ TESTIOS9_2 :
 TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
  - testName: 'ix-happy'
 
+TEST_DEVICE_LANGUAGE:
+ - locale: 'en'
+ - geo_countryid : '125' #for req
+
+TEST_DEVICE_LANGUAGE_NULL :
+ - locale: ''
+ - geo_countryid : '125' #for req
+
+TEST_DEVICE_LANGUAGE_RTB:
+ - locale: 'en'
+ - geo_countryid : '125' #for req
+
+ TEST_DEVICE_LANGUAGE_API:
+  - locale: 'en'
+  - geo_countryid : '125' #for req
+  - integration_type : 'ANDROID_API'
+
+ TEST_DEVICE_LANGUAGE_NULL_API :
+  - locale: ''
+  - geo_countryid : '125' #for req
+  - integration_type : 'ANDROID_API'
+
+ TEST_DEVICE_LANGUAGE_RTB_API:
+  - locale: 'en'
+  - geo_countryid : '125' #for req
+  - integration_type : 'ANDROID_API'
+
 TEST_RP_ALT_SLOT_IDS:
 - adpool_selectedslots : '9,4'

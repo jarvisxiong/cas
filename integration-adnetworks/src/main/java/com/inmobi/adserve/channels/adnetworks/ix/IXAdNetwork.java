@@ -67,8 +67,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
 import com.inmobi.adserve.contracts.ix.request.App;
@@ -110,7 +110,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -360,6 +359,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Geo geo = createGeoObject();
         // Creating Device Object
         final Device device = createDeviceObject(geo);
+        //creating extentsion
         // Creating User Object
         final User user = createUserObject();
         tempBidRequest.setDevice(device);

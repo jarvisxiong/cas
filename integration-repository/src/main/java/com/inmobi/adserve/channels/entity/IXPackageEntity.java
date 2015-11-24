@@ -18,7 +18,6 @@ import lombok.Getter;
 public class IXPackageEntity {
     private int id;
     private Segment segment;
-
     private int dmpId;
     private int dmpVendorId;
     private boolean viewable;
@@ -36,4 +35,5 @@ public class IXPackageEntity {
     private Double dataVendorCost;
     private String geoFenceRegion;
     private Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints;
+    private final Set<String> languageTargetingSet;
 }

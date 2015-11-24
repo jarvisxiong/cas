@@ -221,8 +221,17 @@ public class IXPackageRepository {
                 final String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
                 String[] geoSourceTypes = null;
                 final String geoFenceRegion = rs.getString("geo_fence_region");
+                final Array languageArray = rs.getArray("language_targeting_list");
+                final Set<String> languageTargetingSet = new HashSet<String>();;
+                if (null != languageArray) {
+                    if (null != languageArray.getArray()) {
+                        final String[] languageTargetingList = (String[]) languageArray.getArray();
+                        for (String language : languageTargetingList) {
+                            languageTargetingSet.add(language);
+                        }
+                    }
+                }
                 final boolean viewable = rs.getBoolean("viewable");
-
                 final Array adTypeTargetingArray = rs.getArray("ad_types");
                 Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints = null;
                 if (null != adTypeTargetingArray) {
@@ -466,6 +475,7 @@ public class IXPackageRepository {
                 entityBuilder.manufModelTargeting(manufModelTargeting);
                 entityBuilder.sdkVersionTargeting(sdkVersionTargeting);
                 entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
+                entityBuilder.languageTargetingSet(languageTargetingSet);
                 entityBuilder.secondaryAdFormatConstraints(secondaryAdFormatConstraints);
 
                 if (null != dealIds) {

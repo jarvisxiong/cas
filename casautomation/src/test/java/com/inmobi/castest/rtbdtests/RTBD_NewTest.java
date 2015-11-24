@@ -1432,6 +1432,28 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
+    @Test(testName = "TEST_DEVICE_LANGUAGE_RTB", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE_RTB(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+
+        parserOutput =
+            LogParserHelper.logParser("RTB request json is", "\"language\":\"en\"");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_DEVICE_LANGUAGE_RTB_API", dataProvider = "fender_rtbd_dp", dataProviderClass =
+        FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE_RTB_API(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+
+        parserOutput =
+            LogParserHelper.logParser("RTB request json is", "\"language\":\"en\"");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+
     @Test(testName = "TESTIOS9_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void TESTIOS9_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 

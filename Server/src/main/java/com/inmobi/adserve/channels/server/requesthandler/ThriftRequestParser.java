@@ -219,6 +219,9 @@ public class ThriftRequestParser {
             if (tDevice.isSetManufacturerName()) {
                 params.setDeviceMake(tDevice.getManufacturerName());
             }
+            if (tDevice.isSetLocale()) {
+                params.setLanguage(tDevice.getLocale());
+            }
             if (tDevice.isSetDisplayName()) {
                 params.setHandsetName(tDevice.getDisplayName());
             }
