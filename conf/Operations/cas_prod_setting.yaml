@@ -40,6 +40,8 @@ prod:
          - 2020
       graphite_prefix:
          - 'prod.uj1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.uj1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       ning_timeout_dcp:
@@ -118,6 +120,8 @@ prod:
          - 2020
       graphite_prefix:
          - 'prod.uh1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.uh1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
       ning_timeout_dcp:
@@ -196,6 +200,8 @@ prod:
          - 2020
       graphite_prefix:
          - 'prod.lhr1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.lhr1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
       ning_timeout_dcp:
@@ -274,6 +280,8 @@ prod:
          - 2020
       graphite_prefix:
          - 'prod.hkg1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.hkg1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       ning_timeout_dcp:
@@ -353,6 +361,8 @@ pilot:
          - 2020
       graphite_prefix:
          - 'prod.uj1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.uj1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       ning_timeout_dcp:
@@ -431,6 +441,8 @@ pilot:
          - 2020
       graphite_prefix:
          - 'prod.uh1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.uh1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.uh1.inmobi.com'
       ning_timeout_dcp:
@@ -509,6 +521,8 @@ pilot:
          - 2020
       graphite_prefix:
          - 'prod.lhr1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.lhr1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.lhr1.inmobi.com'
       ning_timeout_dcp:
@@ -587,6 +601,8 @@ pilot:
          - 2020
       graphite_prefix:
          - 'prod.hkg1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.hkg1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.hkg1.inmobi.com'
       ning_timeout_dcp:
@@ -712,6 +728,8 @@ nonprod:
          - 2020
       graphite_prefix:
          - 'prod.corp.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.corp.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.nonprod.inmobi.com'
       ning_timeout_dcp:
@@ -782,6 +800,8 @@ nonprod:
          - 2020
       graphite_prefix:
          - 'prod.ua2.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.ua2.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.nnprod.inmobi.com'
       ning_timeout_dcp:
@@ -858,6 +878,8 @@ skyhookprod:
          - 2020
       graphite_prefix:
          - 'prod.uj1.cas-1.app'
+      sys_graphite_prefix:
+         - 'prod.uj1.cas-1.sys'
       scribe_endpoint1:
          - 'databus.vip.uj1.inmobi.com'
       ning_timeout_dcp:
