@@ -45,6 +45,7 @@ SELECT
                 ix_packages.last_modified AS last_modified,
                 ix_packages.data_vendor_cost AS data_vendor_cost,
                 ix_packages.city_ids AS city_ids,
+                ix_packages.language_targeting_list AS language_targeting_list,
                 ix_packages.modified_by AS modified_by,
                 deals.access_types as access_types,
                 deals.deal_ids AS deal_ids,
@@ -76,5 +77,3 @@ LOOP
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE;
-
-

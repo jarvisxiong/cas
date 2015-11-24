@@ -114,7 +114,7 @@ public class UpdateDBWithWAPAdGroupData {
         final HashMap<String, String> ixPackageData = new HashMap<String, String>();
         ixPackageData.put("package_id", "10001");
         WAPGroupDBManipulation.DeleteIXPackageData(ixPackageData, "");
-        while (Integer.parseInt(ixPackageData.get("package_id")) <= 10005) {
+        while (Integer.parseInt(ixPackageData.get("package_id")) <= 10010) {
             WAPGroupDBManipulation.InsertIXPackageData(ixPackageData, "");
         }
 

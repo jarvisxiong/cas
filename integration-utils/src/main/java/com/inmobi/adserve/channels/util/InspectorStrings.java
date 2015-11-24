@@ -187,6 +187,13 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_OS_VERSION_FILTER = "DroppedInPackageOSVersionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
+    public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
+
+
+
+    // More than one segments were present during the IX/Hosted auctions
+    // (This will never be incremented as extra segments will be dropped in partner count filter)
+    public static final String INVALID_AUCTION = "InvalidAuction";
     public static final String DROPPED_IN_PACKAGE_SDK_VERSION_FILTER = "DroppedInPackageSDKVersionTargetingFilter";
 
     // IX Response Object Status Code Strings

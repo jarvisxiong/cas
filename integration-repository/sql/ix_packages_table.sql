@@ -37,6 +37,7 @@ CREATE TABLE ix_packages
   start_date            timestamp without time zone,
   end_date              timestamp without time zone,
   last_modified         timestamp without time zone  DEFAULT now(),
+  language_targeting_list character(2)[],
   CONSTRAINT ix_packages_pkey PRIMARY KEY (id),
   CONSTRAINT ix_packages_rp_data_segment_id_key UNIQUE (rp_data_segment_id)
 );
@@ -103,6 +104,7 @@ COMMENT ON COLUMN ix_packages.is_active IS 'Whether the package is active or not
 COMMENT ON COLUMN ix_packages.start_date IS 'Start time of this package.';
 COMMENT ON COLUMN ix_packages.end_date IS 'End time of this package';
 COMMENT ON COLUMN ix_packages.last_modified IS 'Last modified time';
+COMMENT ON COLUMN ix_packages.language_targeting_list IS 'language list';
 
 --
 -- Seed data in the ix_packages table.

@@ -1638,6 +1638,48 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
 
+    @Test(testName = "TEST_DEVICE_LANGUAGE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider
+        .class)
+    public void TEST_DEVICE_LANGUAGE(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser("locale:en", "language=en", "Package 10007 dropped in Language Targeting Filter", "Packages selected:"
+            + "  10006");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_DEVICE_LANGUAGE_NULL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider
+        .class)
+    public void TEST_DEVICE_LANGUAGE_NULL(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
+            + "Targeting Filter");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_DEVICE_LANGUAGE_API", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider
+        .class)
+    public void TEST_DEVICE_LANGUAGE_API(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser("locale:en", "language=en", "Package 10007 dropped in Language Targeting Filter", "Packages selected:"
+            + "  10006");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_DEVICE_LANGUAGE_NULL_API", dataProvider = "fender_ix_dp", dataProviderClass =
+        FenderDataProvider
+        .class)
+    public void TEST_DEVICE_LANGUAGE_NULL_API(final String x, final ResponseBuilder responseBuilder)
+        throws Exception {
+        parserOutput = LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
+            + "Targeting Filter");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+
     // @Test(testName = "TEST_IX_PACKAGES_MANUFDEAL", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)
     // public void TEST_IX_PACKAGES_MANUFDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {

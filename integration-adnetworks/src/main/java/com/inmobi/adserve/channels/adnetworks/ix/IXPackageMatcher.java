@@ -74,6 +74,7 @@ public class IXPackageMatcher {
         int droppedInPackageGeoRegionFilter = 0;
         int droppedInPackageSegmentSubsetFilter = 0;
         int droppedInPackageAdTypeTargetingFilter = 0;
+        int droppedInPackageLanguageTargetingFilter = 0;
         int droppedInSdkVersionFilter = 0;
 
         // TODO: Refactor into proper filters
@@ -86,6 +87,14 @@ public class IXPackageMatcher {
                 if (failsAdTypeTargetingFilter) {
                     LOG.debug("Package {} dropped in Ad Type Targeting Filter", packageEntity.getId());
                     droppedInPackageAdTypeTargetingFilter += 1;
+                    continue;
+                }
+
+                final boolean failedInLanguageTargetingFilter =
+                    !checkForLanguageTargeting(sasParams.getLanguage(), packageEntity);
+                if (failedInLanguageTargetingFilter) {
+                    LOG.debug("Package {} dropped in Language Targeting Filter", packageEntity.getId());
+                    droppedInPackageLanguageTargetingFilter += 1;
                     continue;
                 }
 
@@ -185,12 +194,24 @@ public class IXPackageMatcher {
                 InspectorStrings.DROPPED_IN_PACKAGE_GEO_REGION_FILTER, droppedInPackageGeoRegionFilter);
         InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
                 InspectorStrings.DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER, droppedInPackageSegmentSubsetFilter);
+        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS, InspectorStrings
+            .DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER, droppedInPackageLanguageTargetingFilter);
         InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
                 InspectorStrings.DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
-
-        LOG.debug("Packages selected: ", matchedPackageIds.toArray().toString());
+        String matchedPackageIdStr = "";
+        for (Integer i : matchedPackageIds){
+            matchedPackageIdStr += " " + i;
+        }
+        LOG.debug("Packages selected: {}", matchedPackageIdStr);
         return matchedPackageIds;
     }
+
+    private static boolean checkForLanguageTargeting(final String reqLanguage , final IXPackageEntity packageEntity) {
+        final Set<String> languageTargetingSet = packageEntity.getLanguageTargetingSet();
+        return ((null == languageTargetingSet) ? true : (languageTargetingSet.isEmpty() ? true : languageTargetingSet
+            .contains(reqLanguage)));
+    }
+
 
     private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
         if (CollectionUtils.isEmpty(csiReqTags)) {

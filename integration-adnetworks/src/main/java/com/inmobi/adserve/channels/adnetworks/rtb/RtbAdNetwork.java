@@ -700,6 +700,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(gpId)) {
             deviceExtensions.put("gpid", gpId);
         }
+        if (StringUtils.isNotBlank(sasParams.getLanguage())) {
+            device.setLanguage(sasParams.getLanguage());
+        }
         return device;
     }
 
