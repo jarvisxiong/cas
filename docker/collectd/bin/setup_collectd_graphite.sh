@@ -10,6 +10,6 @@ then
     exit -1;
 fi;
 
-export CONCISE_CONTAINER_NAME=${CONTAINER_NAME:0:7}
+export CONCISE_CONTAINER_NAME=`echo {CONTAINER_NAME} | cut -f1 -d "."`
 
 /opt/inmobi/commons/mustache-util/render-template --addenvvars=True --template $TEMPLATE_DIR/collectd_graphite.conf.mustache --output $TARGET_FILE
