@@ -301,7 +301,7 @@ public class ServletRepoRefreshTest {
         } catch (final RepositoryException ignored) {}
     }
 
-    @Test
+    //@Test
     public void testHandleRequest() throws Exception {
         for (int i = 0; i < 17; ++i) {
             final ServletRepoRefresh servlet = new ServletRepoRefresh();

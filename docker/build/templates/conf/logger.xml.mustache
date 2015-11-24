@@ -1,0 +1,112 @@
+{{#logging}}
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <turboFilter class="com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter">
+        <Level>{{debug_log_type}}</Level>
+        <ExcludedTurboFilteringLogs>advertiser,sampledadvertiser,repository</ExcludedTurboFilteringLogs>
+    </turboFilter>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout>
+            <pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</pattern>
+        </layout>
+    </appender>
+
+    <appender name="debugAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>{{CAS_BASE_DIRECTORY}}/logs/debug/debug.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>{{CAS_BASE_DIRECTORY}}/logs/debug/debug.log.%d{yyyy-MM-dd-HH}
+            </FileNamePattern>
+            <maxHistory>2</maxHistory> <!--Keep logs for 2 hours-->
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex{6}</Pattern>
+            <immediateFlush>{{flush_debug_log}}</immediateFlush>
+        </encoder>
+    </appender>
+
+    <appender name="advertiserAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>{{CAS_BASE_DIRECTORY}}/logs/advertiser/advertiser.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>{{CAS_BASE_DIRECTORY}}/logs/advertiser/advertiser.log.%d{yyyy-MM-dd-HH}
+            </FileNamePattern>
+            <maxHistory>2</maxHistory> <!--Keep logs for 2 hours-->
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</Pattern>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+    </appender>
+
+    <appender name="sampledadvertiserAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>{{CAS_BASE_DIRECTORY}}/logs/sampledadvertiser/sampledadvertiser.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>{{CAS_BASE_DIRECTORY}}/logs/sampledadvertiser/sampledadvertiser.log.%d{yyyy-MM-dd-HH}
+            </FileNamePattern>
+            <maxHistory>2</maxHistory> <!--Keep logs for 2 hours-->
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</Pattern>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+    </appender>
+
+    <appender name="repositoryAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>{{CAS_BASE_DIRECTORY}}/logs/repository/repository.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>{{CAS_BASE_DIRECTORY}}/logs/repository/repository.%d{yyyy-MM-dd-HH}.log
+            </FileNamePattern>
+            <maxHistory>2</maxHistory> <!--Keep logs for 2 hours-->
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d %-5p - %M - %m%n</pattern>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+    </appender>
+
+    <appender name="TRACELOG"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>{{CAS_BASE_DIRECTORY}}/logs/trace/trace.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>{{CAS_BASE_DIRECTORY}}/logs/trace/trace.log.%d{yyyy-MM-dd-HH}
+            </FileNamePattern>
+            <maxHistory>2</maxHistory> <!--Keep logs for 2 hours-->
+        </rollingPolicy>
+        <filter class="com.inmobi.adserve.channels.server.logging.TraceFilter"/>
+
+        <encoder>
+            <pattern>%d %-5p [%X{requestId}] %c{36}: %m\n%ex</pattern>
+            <immediateFlush>true</immediateFlush>
+        </encoder>
+    </appender>
+
+    <root level="ERROR">
+        <appender-ref ref="debugAppender"/>
+    </root>
+
+    <logger name="com.inmobi.adserve.channels" level="DEBUG" additivity="false">
+        <appender-ref ref="TRACELOG"/>
+        <appender-ref ref="debugAppender"/>
+    </logger>
+
+    <logger name="advertiser" level="{{log_type}}" additivity="false">
+        <appender-ref ref="advertiserAppender"/>
+    </logger>
+
+    <logger name="sampledadvertiser" level="{{log_type}}" additivity="false">
+        <appender-ref ref="sampledadvertiserAppender"/>
+    </logger>
+
+    <logger name="repository" level="{{log_type}}" additivity="false">
+        <appender-ref ref="repositoryAppender"/>
+    </logger>
+
+</configuration>
+{{/logging}}

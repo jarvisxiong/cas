@@ -12,12 +12,16 @@ import org.json.JSONObject;
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.MetricName;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 
 /**
  * 
  * @author ritwik.kumar
  *
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InspectorStats extends BaseStats {
     private static final InspectorStats INSTANCE = new InspectorStats();
     private static final String WORK_FLOW = "WorkFlow";
@@ -30,30 +34,16 @@ public class InspectorStats extends BaseStats {
 
     private Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats = new ConcurrentHashMap<>();
 
-    private InspectorStats() {}
-
     /**
      * Init graphite and Stats metrics. Graphite Interval is set in minutes.
      * 
-     * @param serverConfiguration
-     * @param hostName
+     * @param metricsConfiguration
+     * @param containerName
      */
-    public static void init(final Configuration serverConfiguration, final String hostName) {
-        final String graphiteServer =
-                serverConfiguration.getString("graphiteServer.host", "cas-metrics-relay.uj1.inmobi.com");
-        final int graphitePort = serverConfiguration.getInt("graphiteServer.port", 2020);
-        final int graphiteInterval = serverConfiguration.getInt("graphiteServer.intervalInMinutes", 1);
-        shouldLog = serverConfiguration.getBoolean("graphiteServer.shouldLogAdapterLatencies", false);
-        INSTANCE.baseInit(graphiteServer, graphitePort, graphiteInterval, hostName, INSTANCE.REGISTRY);
-    }
-
-    /**
-     *
-     * @param hostName
-     * @return
-     */
-    public static String getMetricProducer(final String hostName) {
-        return INSTANCE._getMetricProducer(hostName);
+    public static void init(final Configuration metricsConfiguration, final String containerName) {
+        final int graphiteInterval = metricsConfiguration.getInt("intervalInMinutes", 1);
+        shouldLog = metricsConfiguration.getBoolean("shouldLogAdapterLatencies", false);
+        INSTANCE.baseInit(metricsConfiguration, graphiteInterval, containerName, INSTANCE.REGISTRY);
     }
 
     /**
@@ -169,8 +159,7 @@ public class InspectorStats extends BaseStats {
         if (ingrapherCounterStats.get(key) == null) {
             synchronized (parameter) {
                 if (ingrapherCounterStats.get(key) == null) {
-                    ingrapherCounterStats.put(key,
-                            new ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>());
+                    ingrapherCounterStats.put(key, new ConcurrentHashMap<>());
                 }
 
             }
@@ -178,7 +167,7 @@ public class InspectorStats extends BaseStats {
         if (ingrapherCounterStats.get(key).get(STATS) == null) {
             synchronized (parameter) {
                 if (ingrapherCounterStats.get(key).get(STATS) == null) {
-                    ingrapherCounterStats.get(key).put(STATS, new ConcurrentHashMap<String, AtomicLong>());
+                    ingrapherCounterStats.get(key).put(STATS, new ConcurrentHashMap<>());
                 }
 
             }
@@ -198,7 +187,7 @@ public class InspectorStats extends BaseStats {
         if (yammerTimerStats.get(dst) == null) {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst) == null) {
-                    yammerTimerStats.put(dst, new ConcurrentHashMap<String, Histogram>());
+                    yammerTimerStats.put(dst, new ConcurrentHashMap<>());
                 }
             }
         }
@@ -207,7 +196,7 @@ public class InspectorStats extends BaseStats {
                 if (yammerTimerStats.get(dst).get(parameter) == null) {
                     // MetricName(group,type,name) to which the group belongs, according to the format specified, type
                     // is null
-                    final MetricName metricName = new MetricName(boxName, dst, parameter);
+                    final MetricName metricName = new MetricName(containerName, dst, parameter);
                     yammerTimerStats.get(dst).put(parameter, INSTANCE.REGISTRY.newHistogram(metricName, true));
                 }
             }

@@ -29,4 +29,6 @@ public class GlobalConstant {
     public static final String CHINA_COUNTRY_CODE = "CN";
     public static final String WIFI = "WIFI";
     public static final String NON_WIFI = "NON_WIFI";
+    public static final String PROD = "prod";
+    public static final String NON_PROD = "non_prod";
 }

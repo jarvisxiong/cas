@@ -1,9 +1,3 @@
-logger.advertiser.File=/opt/mkhoj/logs/cas/advertiser/advertiser.log
-logger.debug.File=/opt/mkhoj/logs/cas/debug/debug.log
-logger.sampledadvertiser.File=/opt/mkhoj/logs/cas/sampledadvertiser/sampledadvertiser.log
-logger.repository.File=/opt/mkhoj/logs/cas/repository/repository.log
-logger.trace.File=/opt/mkhoj/logs/cas/trace/trace.log
-
 logger.debug=debug
 logger.advertiser=advertiser
 logger.sampledadvertiser=sampledadvertiser
@@ -11,13 +5,6 @@ logger.repository=repository
 logger.sampledadvertisercount=5
 logger.loggerConf = /opt/mkhoj/conf/cas/logger.xml
 
-log4j.appender.scribe=org.apache.log4j.ConsoleAppender
-log4j.logger.com.inmobi.messaging.netty.ScribeTopicPublisher=WARN,scribe
-log4j.logger.com.inmobi.messaging.netty.ScribeHandler=WARN,scribe
-log4j.category.scribe=WARN,scribe
-log4j.appender.scribe.EmitterConfig=/opt/mkhoj/conf/cas/emit_mondemand.properties
-
-statemitter.filename=/opt/mkhoj/conf/common/statemitter.properties
 server.smtpServer=mail.mkhoj.com
 server.sender=ankur.jain@inmobi.com
 server.sleepTime=2
@@ -94,11 +81,12 @@ server.aerospike.boostTimeFrame=3
 server.aerospike.imeiNamespae=device_imei
 server.aerospike.imeiSet=imei
 
-server.graphiteServer.host=<%= graphite_host %>
-server.graphiteServer.port=2020
-server.graphiteServer.intervalInMinutes=1
-server.graphiteServer.repostat.intervalInMinutes=15
-server.graphiteServer.shouldLogAdapterLatencies=true
+graphite.host=<%= graphite_host %>
+graphite.port=2020
+graphite.intervalInMinutes=1
+graphite.repostat.intervalInMinutes=15
+graphite.shouldLogAdapterLatencies=true
+graphite.prefix=<%= graphite_prefix %>
 
 server.circuitbreaker.disable=true
 server.circuitbreaker.failureThreshold=0.5
@@ -118,11 +106,8 @@ server.auction.exclude.AuctionIUrlFilter = 50235b3b4d2a41ffb4130b0987d2ee39, b70
 
 server.adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter = ab8677d5210241a091da3e0f94a1b425,f797f299338e4bb8b645351528a9b401,86490ae2c95a4fae9f6036317da740d3
 
-publisher.classname=com.inmobi.messaging.netty.ScribeMessagePublisher
-scribe.host=localhost
-scribe.port=12000
-scribe.timeoutSeconds=300
-audit.enabled=true
+# Scribe config
+server.scribePublisherConf=/opt/mkhoj/conf/cas/messaging-publisher-conf.properties
 
 database.host=<%= db_host %>
 database.port=<%= db_port %>

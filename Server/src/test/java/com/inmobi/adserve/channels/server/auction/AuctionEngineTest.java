@@ -86,7 +86,7 @@ public class AuctionEngineTest {
         replay(repositoryHelper);
 
         final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(config, repositoryHelper),
+                Guice.createInjector(Modules.override(new ServerModule(config, repositoryHelper, "containerName"),
                         new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
         auctionFilterApplier = injector.getInstance(AuctionFilterApplier.class);
         auctionEngine = injector.getInstance(AuctionEngine.class);
