@@ -47,7 +47,7 @@
 			<dependency>
 				<groupId>com.inmobi.commons</groupId>
 				<artifactId>datatypes-java-0.8</artifactId>
-				<version>1.6.97</version>
+				<version>1.6.105</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
