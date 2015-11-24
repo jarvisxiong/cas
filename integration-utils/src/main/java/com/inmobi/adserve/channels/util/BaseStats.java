@@ -55,7 +55,12 @@ public abstract class BaseStats {
         final String metricsPrefix = metricsConfiguration.getString("prefix");
 
         // This must be changed when unique container name logic has been decided
-        this.containerName = containerName.substring(0, 7);
+        final int splitIndex = containerName.indexOf('.');
+        if (-1 == splitIndex) {
+            this.containerName = containerName;
+        } else {
+            this.containerName = containerName.substring(0, splitIndex);
+        }
 
         LOG.error("graphiteServer:{}, graphitePort:{}, graphiteInterval:{}", graphiteServer, graphitePort,
             graphiteInterval);

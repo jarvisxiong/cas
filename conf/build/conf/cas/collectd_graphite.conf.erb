@@ -5,7 +5,7 @@ LoadPlugin write_graphite
     Port "<%= graphite_port %>"
     Protocol "tcp"
     LogSendErrors true
-    Prefix "<%= graphite_prefix %>.sys."
+    Prefix "<%= sys_graphite_prefix %>."
     StoreRates true
     AlwaysAppendDS false
     EscapeCharacter "_"

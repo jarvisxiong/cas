@@ -37,7 +37,6 @@ CREATE TABLE ix_packages
   start_date            timestamp without time zone,
   end_date              timestamp without time zone,
   last_modified         timestamp without time zone  DEFAULT now(),
-  language_targeting_list character(2)[],
   CONSTRAINT ix_packages_pkey PRIMARY KEY (id),
   CONSTRAINT ix_packages_rp_data_segment_id_key UNIQUE (rp_data_segment_id)
 );

@@ -75,7 +75,7 @@ ${CAS_BASE_DIRECTORY}/bin/scribe-emitter/cas-emit-scribe-agent-stats "$@" &
 SCRIBE_STATS_PID=$!
 
 # Graceful shutdown for only prod environments
-if [ "$IDP_ENVIRONMENT" == "prod" ];
+if ! [ "$IDP_ENVIRONMENT" == "non_prod" ];
 then
     echo Graceful Shutdown enabled;
     trap "echo Disabling lbstatus and waiting 20 seconds for the Load Balancer;\
