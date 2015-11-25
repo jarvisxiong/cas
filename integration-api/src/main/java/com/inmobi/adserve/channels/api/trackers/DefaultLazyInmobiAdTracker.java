@@ -31,6 +31,7 @@ import com.inmobi.types.eventserver.RenderInfo;
 import com.inmobi.types.eventserver.RenderUnitInfo;
 
 import io.netty.util.CharsetUtil;
+
 import lombok.Builder;
 
 /**
@@ -94,15 +95,15 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
     private final String budgetBucketId;
     private final String dst;
     private final Long placementId;
-    private IntegrationDetails integrationDetails;
-    private String appBundleId;
-    private String normalizedUserId;
-    private RequestedAdType requestedAdType;
-    private Double agencyRebatePercentage;
-    private Long chargedBid;
-    private Double enrichmentCost;
-    private List<Integer> matchedCsids;
-    private Long nativeTemplateId;
+    private final IntegrationDetails integrationDetails;
+    private final String appBundleId;
+    private final String normalizedUserId;
+    private final RequestedAdType requestedAdType;
+    private final Double agencyRebatePercentage;
+    private final Long chargedBid;
+    private final Double enrichmentCost;
+    private final List<Integer> matchedCsids;
+    private final Long nativeTemplateId;
 
     // State
     private boolean trackersHaveBeenGenerated = false;
@@ -192,6 +193,13 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         }
         adUrlSuffix.append(appendSeparator(segmentIdStr));
 
+        if (siteSegmentId != null) {
+            impInfo.setSiteSegmentId(siteSegmentId);
+        }
+        if (placementSegmentId != null) {
+            impInfo.setPlacementSegmentId(placementSegmentId);
+        }
+
         // 16the field for tier info
         adUrlSuffix.append(appendSeparator(tierInfo));
 
@@ -265,8 +273,8 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         if (StringUtils.isBlank(bundleId)) {
             bundleId = DEFAULT_BUNDLE_ID;
         }
-        String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes(CharsetUtil.UTF_8)));
-        String finalBundleId = encodedBundleId.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
+        final String encodedBundleId = new String(Base64.encodeBase64(bundleId.getBytes(CharsetUtil.UTF_8)));
+        final String finalBundleId = encodedBundleId.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "~");
 
         adUrlSuffix.append(appendSeparator(finalBundleId));
         beaconUrlSuffix.append(appendSeparator(finalBundleId));
@@ -296,7 +304,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         final UUID renderUnitUUID = UUID.fromString(renderUnitId);
 
         renderUnitInfo.setRenderUnitId(new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID
-            .getLeastSignificantBits()));
+                .getLeastSignificantBits()));
         if (null != nativeTemplateId) {
             renderUnitInfo.setTemplateId(nativeTemplateId);
         } else {
@@ -305,14 +313,15 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         renderInfo.setRenderUnitInfo(renderUnitInfo);
         impInfo.setRenderInfo(renderInfo);
 
+
         LOG.debug("Impression Info Object: {}", impInfo);
 
         final TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
         String encodedString = StringUtils.EMPTY;
         try {
-            byte[] bytes = serializer.serialize(impInfo);
+            final byte[] bytes = serializer.serialize(impInfo);
             encodedString = new String(Base64.encodeBase64URLSafe(bytes));
-        } catch (TException e) {
+        } catch (final TException e) {
             LOG.error("Error while serializing impressionInfo object", e);
         }
 
@@ -356,6 +365,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         LOG.debug("Generated Beacon Url: {}", beaconUrl);
     }
 
+    @Override
     public String getClickUrl() {
         if (!trackersHaveBeenGenerated) {
             generateInmobiAdTrackers();
@@ -363,6 +373,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         return clickUrl;
     }
 
+    @Override
     public String getBeaconUrl() {
         if (!trackersHaveBeenGenerated) {
             generateInmobiAdTrackers();
