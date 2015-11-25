@@ -236,12 +236,6 @@ public class ThriftRequestParser {
                 params.setAdcode(tIntDetails.adCodeType.toString());
             }
             params.setSdkVersion(getSdkVersion(tIntDetails.integrationType, tIntDetails.integrationVersion));
-
-            if (tIntDetails.isSetIntegrationMethod() && IntegrationMethod.SDK != tIntDetails.getIntegrationMethod() &&
-                (IntegrationType.IOS_SDK == tIntDetails.getIntegrationType()
-                    || IntegrationType.ANDROID_SDK == tIntDetails.getIntegrationType())) {
-                InspectorStats.incrementStatCount(InspectorStrings.INTEGRATION_METHOD_AND_TYPE_MISMATCH);
-            }
             params.setAdcode(getAdCode(tIntDetails.integrationType));
         }
     }
