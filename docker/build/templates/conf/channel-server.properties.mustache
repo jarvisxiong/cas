@@ -97,7 +97,7 @@ graphite.port=2020
 graphite.intervalInMinutes=1
 graphite.repostat.intervalInMinutes=15
 graphite.shouldLogAdapterLatencies=true
-graphite.prefix={{IDP_ENVIRONMENT}}.{{COLO}}.{{IDP_SERVICE}}-1.app
+graphite.prefix={{graphite_prefix_base}}.{{COLO}}.{{IDP_SERVICE}}-1.app
 
 {{#database}}
 database.host={{db_host}}

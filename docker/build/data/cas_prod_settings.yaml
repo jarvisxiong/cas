@@ -41,6 +41,8 @@ prod:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_prefix_base: 'prod'
+
     uh1:
         cas:
             database:
@@ -81,6 +83,8 @@ prod:
             log_type: 'ERROR'
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
+
+        graphite_prefix_base: 'prod'
 
     lhr1:
         cas:
@@ -123,6 +127,8 @@ prod:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_prefix_base: 'prod'
+
     hkg1:
         cas:
             database:
@@ -163,6 +169,8 @@ prod:
             log_type: 'ERROR'
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
+
+        graphite_prefix_base: 'prod'
 
 non_prod:
     corp:
@@ -206,6 +214,8 @@ non_prod:
             debug_log_type: 'DEBUG'
             flush_debug_log: 'true'
 
+        graphite_prefix_base: 'non_prod'
+
 skyhookprod:
     uj1:
         cas:
@@ -247,3 +257,5 @@ skyhookprod:
             log_type: 'ERROR'
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
+
+        graphite_prefix_base: 'prod'

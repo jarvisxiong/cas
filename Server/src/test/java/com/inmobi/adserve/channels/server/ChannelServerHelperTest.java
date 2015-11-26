@@ -97,7 +97,7 @@ public class ChannelServerHelperTest {
             {"NoEnvironment", "anything", null, NON_PROD_CONTAINER_NAME},
             {"NonProdEnvironment", "anything", NON_PROD, NON_PROD_CONTAINER_NAME},
             {"ProdEnvironmentContainerNameSet", "anything", PROD, "anything"},
-            {"ProdEnvironmentContainerNameNull", null, PROD, null},
+            {"ProdEnvironmentContainerNameNull", null, PROD, null}
         };
     }
 
@@ -127,6 +127,8 @@ public class ChannelServerHelperTest {
             {"ProdEnvironmentDataCentreSet", "cas1001", PROD, Short.parseShort("1001")},
             {"ProdEnvironmentDataCentreNull", null, PROD, null},
             {"ProdEnvironmentDataCentreNumberStringIndexOutOfBoundsException", "cas100", PROD, null},
+            {"ProductionPositive", "cas1001.ads.hkg1.inmobi.com", PROD, Short.parseShort("1001")},
+            {"SkyhookProductionPositive", "skyhook-cas-prod4002.ads.uj1.inmobi.com", PROD, Short.parseShort("4002")},
         };
     }
 

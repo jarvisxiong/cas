@@ -4,6 +4,9 @@ import static com.inmobi.adserve.channels.util.LoggerUtils.sendMail;
 import static com.inmobi.adserve.channels.util.Utils.ExceptionBlock.getStackTrace;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_PROD;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,10 +116,14 @@ final class ChannelServerHelper {
         } else {
             try {
                 if (StringUtils.isNotEmpty(containerName)) {
-                    containerId = Short.parseShort(containerName.substring(3, 7));
+                    final Pattern pattern = Pattern.compile(".*([0-9]{4}).*");
+                    final Matcher matcher = pattern.matcher(containerName);
+                    if (matcher.find()) {
+                        containerId = Short.parseShort(matcher.group(1));
+                    }
                 }
             } catch (final Exception e) {
-                LOG.error("Exception extracting containerId from containerName({}); Exception raised: {}",
+                LOG.error("Please ensure that the containerName is of the form .{3}[0-9]{4}.* .Exception extracting containerId from containerName({}); Exception raised: {}",
                     containerName, e);
             }
         }

@@ -6,7 +6,7 @@ LoadPlugin write_graphite
     Port "2020"
     Protocol "tcp"
     LogSendErrors true
-    Prefix "{{IDP_ENVIRONMENT}}.{{COLO}}.{{IDP_SERVICE}}-1.sys."
+    Prefix "{{graphite_prefix_base}}.{{COLO}}.{{IDP_SERVICE}}-1.sys."
     StoreRates true
     AlwaysAppendDS false
     EscapeCharacter "_"
