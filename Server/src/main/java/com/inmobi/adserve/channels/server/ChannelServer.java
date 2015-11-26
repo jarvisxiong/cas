@@ -1,6 +1,11 @@
 package com.inmobi.adserve.channels.server;
 
+import static com.inmobi.adserve.channels.server.ChannelServerErrorMessages.CONTAINER_ID_COULD_NOT_BE_EXTRACTED_IN_PROD_ENVIRONMENT;
+import static com.inmobi.adserve.channels.server.ChannelServerErrorMessages.CONTAINER_NAME_MISSING_IN_PROD_ENVIRONMENT;
+import static com.inmobi.adserve.channels.server.ChannelServerErrorMessages.DATA_CENTRE_ID_MISSING_IN_PROD_ENVIRONMENT;
+import static com.inmobi.adserve.channels.server.ChannelServerErrorMessages.DATA_CENTRE_NAME_MISSING_IN_PROD_ENVIRONMENT;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.AEROSPIKE_FEEDBACK;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CCID_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY;
@@ -9,27 +14,22 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHA
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATABASE;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATA_CENTER_ID_KEY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATA_CENTRE_NAME_KEY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.HOST_NAME_KEY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_FILTER_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_TAXONOMY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SLOT_SIZE_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.WAP_SITE_UAC_REPOSITORY;
-import static com.inmobi.adserve.channels.util.LoggerUtils.checkLogFolders;
 import static com.inmobi.adserve.channels.util.LoggerUtils.configureApplicationLoggers;
-import static com.inmobi.adserve.channels.util.LoggerUtils.sendMail;
 import static com.inmobi.adserve.channels.util.Utils.ExceptionBlock.getStackTrace;
 
 import java.util.Properties;
@@ -71,6 +71,7 @@ import com.inmobi.adserve.channels.repository.IXPackageRepository;
 import com.inmobi.adserve.channels.repository.NativeAdTemplateRepository;
 import com.inmobi.adserve.channels.repository.PricingEngineRepository;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.repository.SdkViewabilityEligibilityRepository;
 import com.inmobi.adserve.channels.repository.SdkMraidMapRepository;
 import com.inmobi.adserve.channels.repository.SiteAerospikeFeedbackRepository;
 import com.inmobi.adserve.channels.repository.SiteEcpmRepository;
@@ -108,13 +109,10 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
  * <br>
  *         If these are not specified server will pick these values from channel-server.properties config file. <br>
  *         If configFile is not specified, it takes the DEFAULT_CONFIG_FILE from location
- *         "/opt/mkhoj/conf/cas/channel-server.properties"
+ *         "/opt/inmobi/cas/conf/channel-server.properties"
  */
 public class ChannelServer {
     private static int repoLoadRetryCount;
-    public static byte dataCenterIdCode;
-    public static short hostIdCode;
-    public static String dataCentreName;
 
     private static org.slf4j.Logger LOG;
     private static ChannelAdGroupRepository channelAdGroupRepository;
@@ -141,7 +139,9 @@ public class ChannelServer {
     private static IMEIAerospikeRepository imeiAerospikeRepository;
     private static IXBlocklistRepository ixBlocklistRepository;
     private static CAUMetaDataRepository cauMetaDataRepository;
-    private static final String DEFAULT_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
+    private static SdkViewabilityEligibilityRepository sdkViewabilityEligibilityRepository;
+    private static final String DEFAULT_CONFIG_FILE = "/opt/inmobi/cas/conf/channel-server.properties";
+    private static final String SCRIBE_MESSAGE_PUBLISHER_CONFIG_KEY = "scribePublisherConf";
     private static String configFile;
 
     public static void main(final String[] args) throws Exception {
@@ -152,11 +152,6 @@ public class ChannelServer {
         try {
             final ConfigurationLoader configurationLoader = ConfigurationLoader.getInstance(configFile);
 
-            if (!checkLogFolders(configurationLoader.getLoggerConfiguration())) {
-                ServerStatusInfo.setStatusCodeAndString(404, "StackTrace is: one or more log folders missing");
-                System.out.println("Log folders are not available so exiting..");
-                return;
-            }
             // Set the status code for load balancer status.
             ServerStatusInfo.setStatusCodeAndString(200, "OK");
 
@@ -169,22 +164,43 @@ public class ChannelServer {
 
             Formatter.init();
 
-            // parsing the data center id given in the vm parameters
             final ChannelServerHelper channelServerHelper = new ChannelServerHelper();
-            dataCenterIdCode = channelServerHelper.getDataCenterId(DATA_CENTER_ID_KEY);
-            final String hostName = channelServerHelper.getHostName(HOST_NAME_KEY);
-            hostIdCode = channelServerHelper.getHostId(hostName);
-            dataCentreName = channelServerHelper.getDataCentreName(DATA_CENTRE_NAME_KEY);
+
+            // Parsing environment variables
+            final String dataCentreName = channelServerHelper.getDataCentreName();
+            if (null == dataCentreName) {
+                ChannelServerHelper.handleChannelServerFailure(DATA_CENTRE_NAME_MISSING_IN_PROD_ENVIRONMENT);
+                return;
+            }
+
+            final Byte dataCenterIdCode = channelServerHelper.getDataCentreId();
+            if (null == dataCenterIdCode) {
+                ChannelServerHelper.handleChannelServerFailure(DATA_CENTRE_ID_MISSING_IN_PROD_ENVIRONMENT);
+                return;
+            }
+
+            final String containerName = channelServerHelper.getContainerName();
+            if (null == containerName) {
+                ChannelServerHelper.handleChannelServerFailure(CONTAINER_NAME_MISSING_IN_PROD_ENVIRONMENT);
+                return;
+            }
+
+            final Short containerId = channelServerHelper.getContainerId(containerName);
+            if (null == containerId) {
+                ChannelServerHelper.handleChannelServerFailure(CONTAINER_ID_COULD_NOT_BE_EXTRACTED_IN_PROD_ENVIRONMENT);
+                return;
+            }
+
 
             // Initialising Internal logger factory for Netty
             InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 
-            // Initialising logging - Write to databus
-            final AbstractMessagePublisher dataBusPublisher =
-                    (AbstractMessagePublisher) MessagePublisherFactory.create(configFile);
+            // Initialising databus logging
+            final AbstractMessagePublisher dataBusPublisher = (AbstractMessagePublisher) MessagePublisherFactory
+                .create(configurationLoader.getServerConfiguration().getString(SCRIBE_MESSAGE_PUBLISHER_CONFIG_KEY));
 
             // Initialising ImpressionIdGenerator
-            ImpressionIdGenerator.init(ChannelServer.hostIdCode, ChannelServer.dataCenterIdCode);
+            ImpressionIdGenerator.init(containerId, dataCenterIdCode);
 
             // Initialising InmobiAdTracker Builders
             DefaultLazyInmobiAdTrackerBuilder.init(configurationLoader.getServerConfiguration().subset("clickmaker"));
@@ -193,11 +209,11 @@ public class ChannelServer {
             final String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
             final String umpAdsLogKey = configurationLoader.getServerConfiguration().getString("umpAdsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey,
-                    configurationLoader.getServerConfiguration(), hostName);
+                    configurationLoader.getServerConfiguration(), containerName);
 
             // Initializing graphite stats
-            RepositoryStats.init(configurationLoader.getServerConfiguration(), hostName);
-            InspectorStats.init(configurationLoader.getServerConfiguration(), hostName);
+            RepositoryStats.init(configurationLoader.getMetricsConfiguration(), containerName);
+            InspectorStats.init(configurationLoader.getMetricsConfiguration(), containerName);
             channelAdGroupRepository = new ChannelAdGroupRepository();
             channelRepository = new ChannelRepository();
             channelFeedbackRepository = new ChannelFeedbackRepository();
@@ -222,7 +238,7 @@ public class ChannelServer {
             ccidMapRepository = new CcidMapRepository();
             ixBlocklistRepository = new IXBlocklistRepository();
             cauMetaDataRepository = new CAUMetaDataRepository();
-            
+            sdkViewabilityEligibilityRepository = new SdkViewabilityEligibilityRepository();
 
             final RepositoryHelper.Builder repoHelperBuilder = RepositoryHelper.newBuilder();
             repoHelperBuilder.setChannelRepository(channelRepository);
@@ -249,10 +265,11 @@ public class ChannelServer {
             repoHelperBuilder.setCcidMapRepository(ccidMapRepository);
             repoHelperBuilder.setIxBlocklistRepository(ixBlocklistRepository);
             repoHelperBuilder.setCauMetaDataRepository(cauMetaDataRepository);
+            repoHelperBuilder.setSdkViewabilityEligibilityRepository(sdkViewabilityEligibilityRepository);
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
-            instantiateRepository(Logger.getLogger("repository"), configurationLoader);
+            instantiateRepository(Logger.getLogger("repository"), configurationLoader, dataCentreName);
             CasConfigUtil.init(configurationLoader, repositoryHelper);
 
             // Configure the netty server.
@@ -261,7 +278,7 @@ public class ChannelServer {
                             .builder()
                             .withModules(
                                     Modules.combine(new CasNettyModule(configurationLoader.getServerConfiguration()),
-                                            new ServerModule(configurationLoader, repositoryHelper)))
+                                            new ServerModule(configurationLoader, repositoryHelper, dataCentreName)))
                             .usingBasePackages("com.inmobi.adserve.channels.server.netty",
                                     "com.inmobi.adserve.channels.api.provider").build().createInjector();
 
@@ -279,18 +296,8 @@ public class ChannelServer {
             });
 
             System.out.close();
-            // If client bootstrap is not present throwing exception which will set lbStatus as NOT_OK.
         } catch (final Exception exception) {
-            ServerStatusInfo.setStatusCodeAndString(404, getStackTrace(exception));
-            if (null != LOG) {
-                LOG.error("Exception in Channel Server " + exception);
-                LOG.error("Stack trace is " + getStackTrace(exception));
-            } else {
-                System.out.println("Error in loading config file or logger config");
-                System.out.println("Exception in Channel Server " + exception);
-                System.out.println("Stack trace is " + getStackTrace(exception));
-            }
-            sendMail(exception.getMessage(), getStackTrace(exception), CasConfigUtil.getServerConfig());
+            ChannelServerHelper.handleChannelServerFailure(exception);
         }
     }
 
@@ -306,8 +313,8 @@ public class ChannelServer {
     }
 
 
-    private static void instantiateRepository(final Logger logger, final ConfigurationLoader config)
-            throws ClassNotFoundException {
+    private static void instantiateRepository(final Logger logger, final ConfigurationLoader config,
+        final String dataCentreName) throws ClassNotFoundException {
         try {
             logger.debug("Starting to instantiate repositories");
             final Configuration databaseConfig = config.getDatabaseConfiguration();
@@ -384,9 +391,10 @@ public class ChannelServer {
             loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);
             loadRepos(ixBlocklistRepository, IX_BLOCKLIST_REPOSITORY, config, logger);
             loadRepos(cauMetaDataRepository, CAU_METADATA_REPOSITORY, config, logger);
+            loadRepos(sdkViewabilityEligibilityRepository, SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY, config, logger);
             ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY),
                     IX_PACKAGE_REPOSITORY);
-            final DataCenter dc = getDataCenter();
+            final DataCenter dc = getDataCentre(dataCentreName);
             siteAerospikeFeedbackRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
             imeiAerospikeRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
             logger.error("* * * * Instantiating repository completed * * * *");
@@ -432,15 +440,15 @@ public class ChannelServer {
         return;
     }
 
-    private static DataCenter getDataCenter() {
+    private static DataCenter getDataCentre(final String dataCentreName) {
         DataCenter colo = DataCenter.ALL;
-        if (DataCenter.UJ1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        if (DataCenter.UJ1.toString().equalsIgnoreCase(dataCentreName)) {
             colo = DataCenter.UJ1;
-        } else if (DataCenter.UH1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.UH1.toString().equalsIgnoreCase(dataCentreName)) {
             colo = DataCenter.UH1;
-        } else if (DataCenter.LHR1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.LHR1.toString().equalsIgnoreCase(dataCentreName)) {
             colo = DataCenter.LHR1;
-        } else if (DataCenter.HKG1.toString().equalsIgnoreCase(ChannelServer.dataCentreName)) {
+        } else if (DataCenter.HKG1.toString().equalsIgnoreCase(dataCentreName)) {
             colo = DataCenter.HKG1;
         }
         return colo;

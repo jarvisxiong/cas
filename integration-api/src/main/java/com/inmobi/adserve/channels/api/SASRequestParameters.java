@@ -72,6 +72,7 @@ public class SASRequestParameters {
     private Short rqMkAdcount;
     private String tid;
     private long handsetInternalId;
+    private String handsetName;
     private Integer carrierId;
     private Integer city;
     private Integer state;
@@ -113,6 +114,7 @@ public class SASRequestParameters {
     // unification introduced in SDK 500, DCP will be setting this value directly in the wrapped DCP response.
     // note: requestGuid is different from the task id (the unique id between ump and other adpools)
     private String requestGuid;
+    private String language;
 
     public enum HandSetOS {
         OTHERS(1), Linux_Smartphone_OS(2), Android(3), Nokia_OS(4), iOS(5), RIM_OS(6), MTK_Nucleus_OS(7), Symbian_OS(8), Windows_Mobile_OS(

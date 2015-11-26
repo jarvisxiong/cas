@@ -38,7 +38,9 @@ public class CasConf {
     public enum PackageDeals {
         TEST_10001(150, "NormalDeal"), TEST_10002(200, "CSIDDeal", "[[1],[2,4]]"), TEST_10003(200, "CSIDDeal2",
                 "[[1,2],[4]]"), TEST_10004(250, "ManufDeal", "",
-                "[{“manufId”:7, “modelIds”:[129,567,789], “incl”:”true”}]"), TEST_10005(300, "ModelIdWifi", "fummy");
+                "[{“manufId”:7, “modelIds”:[129,567,789], “incl”:”true”}]"), TEST_10005(300, "ModelIdWifi", "fummy"),
+        TEST_10006(125, "abc"),TEST_10007(125, "def" ),TEST_10008(125, "jhi"),TEST_10009(125,
+            "jkl"),TEST_10010(125, "mno");
         private int countryId;
         private String csidParam;
         private String dealName;

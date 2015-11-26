@@ -63,7 +63,7 @@ public class Logging {
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static final String BANNER = "BANNER";
     private static final String NO = "NO";
-    private static String hostName;
+    private static String containerName;
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
     private static String sampledAdvertisementLogKey;
@@ -78,7 +78,7 @@ public class Logging {
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
             final String advertisementLogKey, final String umpAdsLogKey, final Configuration config,
-            final String hostNameStr) {
+            final String containerNameStr) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -86,7 +86,7 @@ public class Logging {
         enableFileLogging = config.getBoolean("enableFileLogging");
         enableDatabusLogging = config.getBoolean("enableDatabusLogging");
         totalCount = config.getInt("sampledadvertisercount");
-        hostName = hostNameStr;
+        containerName = containerNameStr;
     }
 
     // Writing Request Response Logs
@@ -106,17 +106,6 @@ public class Logging {
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-
-                // Detailed No Match Segment Counts
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
-                    dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-os" + sasParams.getOsId());
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
-                    dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-country" + sasParams.getCountryId());
-                for (Short slot : sasParams.getProcessedMkSlot()) {
-                    InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_STATS,
-                        dst + "_" + InspectorStrings.NO_MATCH_SEGMENT_COUNT + "-umpSlot" + slot);
-                }
-
                 InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
                 InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
@@ -358,11 +347,6 @@ public class Logging {
             terminationReason = NO;
         }
 
-        if (null == hostName) {
-            LOG.info("Host cant be empty, abandoning rr logging");
-            return null;
-        }
-
         short adsServed = 0;
         List<Impression> impressions = null;
         final Impression impression = getImpressionObject(channelSegment, sasParams);
@@ -386,7 +370,8 @@ public class Logging {
         final Request request = getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
-        adRR = new AdRR(hostName, timestamp, request, impressions, isTerminated, terminationReason);
+        // Container name must equal the hostname for now.
+        adRR = new AdRR(containerName, timestamp, request, impressions, isTerminated, terminationReason);
         adRR.setAuction_info(getAuctionInfo(sasParams, casInternalRequestParameters));
         adRR.setTime_stamp(new Date().getTime());
         adRR.setChannels(channels);
@@ -401,7 +386,7 @@ public class Logging {
             final double bidGuidance = sasParams.getMarketRate();
 
             if (0 != bidGuidance) {
-                RTBDAuctionInfo rtbdAuctionInfo =
+                final RTBDAuctionInfo rtbdAuctionInfo =
                         new RTBDAuctionInfo(casParams.getDemandDensity() / bidGuidance, casParams.getLongTermRevenue()
                                 / bidGuidance, casParams.getPublisherYield());
                 auctionInfo = new AuctionInfo();

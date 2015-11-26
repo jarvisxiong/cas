@@ -306,9 +306,9 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
                     + "                            this.fireBeacons(events.loadBeacons);\n"
                     + "                        },\n" + "                        fireRenderBeacons : function () {\n"
-                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                            var self = this;\n"
-                    + "                            window.setTimeout(\n"
+                    + "                                                            self.fireBeacons(events.renderBeacons);\n"
+                    + "                                                        window.setTimeout(\n"
                     + "                                function () {\n"
                     + "                                    if (!state.viewability1SecBeaconsFired) {\n"
                     + "                                        state.viewability1SecBeaconsFired = true;\n"
@@ -367,8 +367,8 @@ public class NewIXAdNetworkTest {
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
                     + "                    setupClick();\n" + "                                        setupRender();\n"
-                    + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
-                    + "</html>\n")));
+                    + "                </script>\n" + "                                            </div>\n"
+                    + "        </div>\n" + "    </body>\n" + "</html>\n")));
     }
 
     @Test
@@ -550,9 +550,9 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
                     + "                            this.fireBeacons(events.loadBeacons);\n"
                     + "                        },\n" + "                        fireRenderBeacons : function () {\n"
-                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                            var self = this;\n"
-                    + "                            window.setTimeout(\n"
+                    + "                                                            self.fireBeacons(events.renderBeacons);\n"
+                    + "                                                        window.setTimeout(\n"
                     + "                                function () {\n"
                     + "                                    if (!state.viewability1SecBeaconsFired) {\n"
                     + "                                        state.viewability1SecBeaconsFired = true;\n"
@@ -611,8 +611,8 @@ public class NewIXAdNetworkTest {
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
                     + "                    setupClick();\n" + "                                        setupRender();\n"
-                    + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
-                    + "</html>\n")));
+                    + "                </script>\n" + "                                            </div>\n"
+                    + "        </div>\n" + "    </body>\n" + "</html>\n")));
     }
 
     @Test
@@ -727,9 +727,9 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
                     + "                            this.fireBeacons(events.loadBeacons);\n"
                     + "                        },\n" + "                        fireRenderBeacons : function () {\n"
-                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                            var self = this;\n"
-                    + "                            window.setTimeout(\n"
+                    + "                                                            self.fireBeacons(events.renderBeacons);\n"
+                    + "                                                        window.setTimeout(\n"
                     + "                                function () {\n"
                     + "                                    if (!state.viewability1SecBeaconsFired) {\n"
                     + "                                        state.viewability1SecBeaconsFired = true;\n"
@@ -788,8 +788,8 @@ public class NewIXAdNetworkTest {
                     + "                        document.addEventListener('click', clickHandler);\n"
                     + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
                     + "                    setupClick();\n" + "                                        setupRender();\n"
-                    + "                </script>\n" + "            </div>\n" + "        </div>\n" + "    </body>\n"
-                    + "</html>\n")));
+                    + "                </script>\n" + "                                            </div>\n"
+                    + "        </div>\n" + "    </body>\n" + "</html>\n")));
     }
 
     @Test
@@ -1023,9 +1023,9 @@ public class NewIXAdNetworkTest {
                     + "                        },\n" + "                        fireLoadBeacons : function () {\n"
                     + "                            this.fireBeacons(events.loadBeacons);\n"
                     + "                        },\n" + "                        fireRenderBeacons : function () {\n"
-                    + "                            this.fireBeacons(events.renderBeacons);\n"
                     + "                            var self = this;\n"
-                    + "                            window.setTimeout(\n"
+                    + "                                                            self.fireBeacons(events.renderBeacons);\n"
+                    + "                                                        window.setTimeout(\n"
                     + "                                function () {\n"
                     + "                                    if (!state.viewability1SecBeaconsFired) {\n"
                     + "                                        state.viewability1SecBeaconsFired = true;\n"
@@ -1086,7 +1086,8 @@ public class NewIXAdNetworkTest {
                     + "                    setupClick();\n"
                     + "                                            fireAdReady();\n"
                     + "                                        setupRender();\n" + "                </script>\n"
-                    + "            </div>\n" + "        </div>\n" + "    </body>\n" + "</html>\n")));
+                    + "                                            </div>\n" + "        </div>\n" + "    </body>\n"
+                    + "</html>\n")));
     }
 
     @Test
@@ -1588,6 +1589,8 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(0.0)).anyTimes();
+        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
+        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
         replayAll();
 
         final Object[] constructerArgs =
@@ -1642,6 +1645,8 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
         expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(101.0)).anyTimes();
+        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
+        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
         replayAll();
 
         final Object[] constructerArgs =
@@ -1698,6 +1703,8 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(integerListWithNull).anyTimes();
+        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
+        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
         replayAll();
 
         final Object[] constructerArgs =
@@ -1752,6 +1759,8 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
+        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
+        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
         replayAll();
 
         final Object[] constructerArgs =
@@ -1805,6 +1814,8 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
+        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
+        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
         replayAll();
 
         final Object[] constructerArgs =

@@ -1,8 +1,5 @@
 package com.inmobi.castest.utils.common;
 
-import io.netty.util.CharsetUtil;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,7 +13,6 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
-import com.inmobi.adserve.adpool.AdCodeType;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.AdPoolResponse;
 import com.inmobi.adserve.adpool.Carrier;
@@ -28,8 +24,6 @@ import com.inmobi.adserve.adpool.Education;
 import com.inmobi.adserve.adpool.Ethnicity;
 import com.inmobi.adserve.adpool.Geo;
 import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationMethod;
-import com.inmobi.adserve.adpool.IntegrationOrigin;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.LatLong;
 import com.inmobi.adserve.adpool.MaritalStatus;
@@ -50,6 +44,8 @@ import com.inmobi.types.Gender;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 import com.inmobi.types.SupplySource;
+
+import io.netty.util.CharsetUtil;
 
 public class AdserveBackfillRequest {
 
@@ -100,7 +96,7 @@ public class AdserveBackfillRequest {
         final String def_ecpmfloor = "0.04";
         final String def_cpmfloor = "0";
         final String def_siteurl = "newsiteurl";
-        final String def_siteid = "479e420ee7d6422c9bedec33d82baecd";
+        final String def_siteid = "newsiteid";
         final String def_publisherid = "newpublisherid";
         final String def_inventorytype = "APP";
         final String def_contentrating = "PERFORMANCE";
@@ -123,6 +119,7 @@ public class AdserveBackfillRequest {
         final String def_device_devicetype = "SMARTPHONE";
         final String def_device_manufacturername = "WHATEVER_MANUF_NAME";
         final String def_device_modelname = "WHATEVER_MODEL_NAME";
+        final String def_device_locale = "";
 
         final String def_carrier_carrierid = "0";
         final String def_carrier_networktype = "WIFI";
@@ -194,20 +191,20 @@ public class AdserveBackfillRequest {
 
         final Long adpool_placementId =
                 Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_placementId"),
-                        def_adpool_placementId));
+                    def_adpool_placementId));
 
         final String adpool_taskid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_taskid"), def_adpool_taskid);
         final String adpool_remotehostip =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_remotehostip"),
-                        def_adpool_remotehostip);
+                    def_adpool_remotehostip);
         final Long adpool_guidanceBid =
                 Long.valueOf(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_guidanceBid"),
-                        def_adpool_guidanceBid));
+                    def_adpool_guidanceBid));
 
         final Long site_siteincid =
                 Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteincid"),
-                        def_siteincid));
+                    def_siteincid));
         final String site_siteurl =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteurl"), def_siteurl);
         final Double site_cpcfloor =
@@ -215,11 +212,11 @@ public class AdserveBackfillRequest {
                         def_cpcfloor));
         final Double site_ecpmfloor =
                 Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_ecpmfloor"),
-                        def_ecpmfloor));
+                    def_ecpmfloor));
 
         final Double site_cpmfloor =
                 Double.parseDouble(AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_cpmfloor"),
-                        def_cpmfloor));
+                    def_cpmfloor));
 
         final String site_siteid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_siteid"), def_siteid);
@@ -234,8 +231,8 @@ public class AdserveBackfillRequest {
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("site_contenttype"), def_contenttype);
 
         final Set<Integer> site_sitetags =
-                AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
-                        requestObject.get("site_sitetags"), def_sitetags));
+                AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(requestObject.get
+                    ("site_sitetags"), def_sitetags));
         final Set<Integer> site_sitetaxonomies =
                 AdserveBackfillRequest.getListOfIntegers(AdserveBackfillRequest.defaultSetVariable(
                         requestObject.get("site_sitetaxonomies"), def_sitetaxonomies));
@@ -290,6 +287,9 @@ public class AdserveBackfillRequest {
         if (temp_device_browserid != null) {
             device_browserid = Long.parseLong(temp_device_browserid);
         }
+
+        final String device_locale =  AdserveBackfillRequest.defaultSetVariable(requestObject.get("locale"),
+            def_device_locale);
 
         final String temp_device_browsermajorversion =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("device_browsermajorversion"),
@@ -624,6 +624,9 @@ public class AdserveBackfillRequest {
         device.setDeviceType(AdserveBackfillRequest.getDeviceType(device_devicetype));
         device.setManufacturerName(device_manufacturername);
         device.setModelName(device_modelname);
+        if (StringUtils.isNotBlank(device_locale)) {
+            device.setLocale(device_locale);
+        }
 
         adPoolRequest.setDevice(device);
 

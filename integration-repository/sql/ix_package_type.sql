@@ -18,7 +18,6 @@ CREATE TYPE ix_package_type_02112015 AS
     geo_source_types            CHARACTER VARYING(16)[],
     geo_fence_region            CHARACTER VARYING(255),
     app_store_categories        SMALLINT[],
-    sdk_versions                CHARACTER VARYING(16)[],
     lat_long_only               BOOLEAN,
     zip_code_only               BOOLEAN,
     ifa_only                    BOOLEAN,

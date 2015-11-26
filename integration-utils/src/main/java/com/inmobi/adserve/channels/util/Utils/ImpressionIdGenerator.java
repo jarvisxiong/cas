@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.util.Utils;
 
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
@@ -13,12 +15,12 @@ public class ImpressionIdGenerator {
     private final int SIMILARITY_LIMIT = SecondaryAdFormatConstraints.values().length - 2;
     protected static final AtomicInteger COUNTER = new AtomicInteger();
     private static ImpressionIdGenerator instance = null;
-    protected final short hostIdCode;
+    protected final short containerIdCode;
     protected final byte dataCenterIdCode;
 
     // Constructor for easier testing
-    protected ImpressionIdGenerator(final short hostIdCode, final byte dataCenterIdCode) {
-        this.hostIdCode = hostIdCode;
+    protected ImpressionIdGenerator(final short containerIdCode, final byte dataCenterIdCode) {
+        this.containerIdCode = containerIdCode;
         this.dataCenterIdCode = dataCenterIdCode;
     }
 
@@ -29,11 +31,11 @@ public class ImpressionIdGenerator {
         return instance;
     }
 
-    public static void init(final short hostIdCode, final byte dataCenterIdCode) {
+    public static void init(final short containerIdCode, final byte dataCenterIdCode) {
         if (instance == null) {
             synchronized (ImpressionIdGenerator.class) {
                 if (instance == null) {
-                    instance = new ImpressionIdGenerator(hostIdCode, dataCenterIdCode);
+                    instance = new ImpressionIdGenerator(containerIdCode, dataCenterIdCode);
                 }
             }
         }
@@ -41,7 +43,7 @@ public class ImpressionIdGenerator {
 
     public String getImpressionId(final long adId) {
         final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId).toString();
-        final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, hostIdCode).toString();
+        final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, containerIdCode).toString();
         final String uuidWithCyclicCounter =
                 WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128))
                         .toString();
@@ -50,7 +52,7 @@ public class ImpressionIdGenerator {
 
     public long getUniqueId(final long adId) {
         final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId).toString();
-        final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, hostIdCode).toString();
+        final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, containerIdCode).toString();
         final String uuidWithCyclicCounter =
                 WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128))
                         .toString();
@@ -80,6 +82,25 @@ public class ImpressionIdGenerator {
             .equals(WilburyUUID.setIntKey(impressionId2, 0).toString())
             && Math.abs(WilburyUUID.getIntKey(impressionId1) - WilburyUUID.getIntKey(impressionId2))
             <= SIMILARITY_LIMIT;
+    }
+
+    private static Date extractDateFromImpId(String uuid) {
+        UUID u = UUID.fromString(uuid);
+        long lsig = u.getLeastSignificantBits();
+        long msig = u.getMostSignificantBits();
+        lsig &= 0xff00ffff000000ffL;
+        return new Date(new UUID(msig, lsig).timestamp());
+    }
+
+    public static void main(String[] args) {
+        String impressionId = "d688ba4f-014f-1000-d715-3e90392b0064";
+
+        System.out.println("UUID = " + WilburyUUID.extractUUID(impressionId));
+        System.out.println("Impression Time = " + extractDateFromImpId(impressionId));
+        System.out.println("Ad Version = " + WilburyUUID.getIntKey(impressionId));
+        System.out.println("DataCenter Id = " + WilburyUUID.getDataCenterId(impressionId));
+        System.out.println("Machine Id = " + WilburyUUID.getMachineId(impressionId));
+        System.out.println("CyclicCounter = " + WilburyUUID.getCyclicCounter(impressionId));
     }
 
 }

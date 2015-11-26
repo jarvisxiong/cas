@@ -4,6 +4,9 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * @author ishanbhatnagar
+ * Please refer:
+ * 1) https://github.corp.inmobi.com/adserving/network-adpool/blob/develop/network-adpool-runtimes/src/main/java/com/inmobi/adserve/networkadpool/utils/MacroDataCreator.java
+ * 2) https://github.corp.inmobi.com/adserving/adserve-commons-phoenix_components-urlbuilder/blob/master/src/main/java/com/inmobi/adserve/macros/MacroValueFinder.java
  */
 public class SproutTemplateConstants {
     public static final String JS_ESC_BEACON_URL = "JS_ESC_BEACON_URL";
@@ -25,6 +28,10 @@ public class SproutTemplateConstants {
     public static final String USER_ID = "USER_ID";
     public static final String USER_ID_MD5_HASHED = "USER_ID_MD5_HASHED";
     public static final String USER_ID_SHA1_HASHED = "USER_ID_SHA1_HASHED";
+    public static final String HANDSET_NAME = "HANDSET_NAME";
+    public static final String HANDSET_TYPE = "HANDSET_TYPE";
+    public static final String SI_BLIND = "SI_BLIND";
+
 
     public static final ImmutableList<Character> escapeCharacterList = ImmutableList.of('$', '#');
 }

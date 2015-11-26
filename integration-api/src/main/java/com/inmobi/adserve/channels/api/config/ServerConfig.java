@@ -19,11 +19,17 @@ import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 public class ServerConfig implements CasConfig {
 
     private final Configuration serverConfiguration;
+    @SuppressWarnings("unused")
     private final Configuration rtbConfiguration;
+    @SuppressWarnings("rawtypes")
     private final List auctionAdvertiserDomainFilterExcludedList;
+    @SuppressWarnings("rawtypes")
     private final List auctionCreativeAttributeFilterExcludedList;
+    @SuppressWarnings("rawtypes")
     private final List auctionCreativeIdFilterExcludedList;
+    @SuppressWarnings("rawtypes")
     private final List auctionCreativeValidatorFilterExcludedList;
+    @SuppressWarnings("rawtypes")
     private final List auctionIUrlFilterExcludedList;
 
     @Inject
@@ -110,6 +116,7 @@ public class ServerConfig implements CasConfig {
         return serverConfiguration.getInt("casTimeoutHandler.timeoutMillisForDCP", 600);
     }
 
+    @SuppressWarnings("rawtypes")
     public List getExcludedAdvertisers(final String filter) {
         switch (filter) {
             case "AuctionAdvertiserDomainFilter":

@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.repository;
 
 import static com.inmobi.adserve.channels.repository.IXPackageRepository.extractManufModelTargeting;
 import static com.inmobi.adserve.channels.repository.IXPackageRepository.extractOsVersionTargeting;
+import static com.inmobi.adserve.channels.repository.IXPackageRepository.extractSdkVersionTargeting;
 import static org.powermock.api.easymock.PowerMock.createMock;
 
 import java.sql.Array;
@@ -291,14 +292,17 @@ public class IXPackageRepositoryTest {
         Set<Long> emptySet = (new ImmutableSet.Builder<Long>()).build();
 
         mapWithSingleEntryWithNoTargetingInclusionIsTrue.put(32L, ImmutablePair.of(true, emptySet));
-        mapWithSingleEntryWithTargetingInclusionIsTrue.put(32L, ImmutablePair.of(true, ImmutableSet.of(129L ,169L)));
+        mapWithSingleEntryWithTargetingInclusionIsTrue.put(32L, ImmutablePair.of(true, ImmutableSet.of(129L, 169L)));
 
-        mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne.put(32L, ImmutablePair.of(true, ImmutableSet.of(129L ,169L)));
+        mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne.put(32L, ImmutablePair.of(true, ImmutableSet
+            .of(129L, 169L)));
         mapWithTwoEntryWithTargetingSetForTwoAndInclusionSetForOne.put(7L, ImmutablePair.of(false, ImmutableSet.of(64L)));
 
-        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(32L, ImmutablePair.of(true, ImmutableSet.of(64L)));
+        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(32L, ImmutablePair.of(true, ImmutableSet
+            .of(64L)));
         mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(7L, ImmutablePair.of(true, emptySet));
-        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(75L, ImmutablePair.of(false, ImmutableSet.of(129L, 169L)));
+        mapWithThreeEntriesWithTargetingSetForTwoAndInclusionSetForOne.put(75L, ImmutablePair.of(false, ImmutableSet
+            .of(129L, 169L)));
 
         return new Object[][] {
                 {"testNull", null, new HashMap<Short, Range<Double>>()},
@@ -316,5 +320,33 @@ public class IXPackageRepositoryTest {
     public void testExtractManufModelTargeting(final String useCaseName, String manufModelTargetingJson,
                                                final Map<Long, Map<Boolean, Set<Long>>> metaData) throws Exception {
         Assert.assertTrue(metaData.equals(extractManufModelTargeting(manufModelTargetingJson)));
+    }
+
+    @DataProvider(name = "Sdk Version Targeting JSONs")
+    public Object[][] paramDataProviderForSdkVersionTargeting() {
+        Pair<Boolean, Set<Integer>> emptyExclusion = ImmutablePair.of(true, ImmutableSet.of());
+        Pair<Boolean, Set<Integer>> emptyInclusion = ImmutablePair.of(false, ImmutableSet.of());
+        Pair<Boolean, Set<Integer>> filledExclusion = ImmutablePair.of(true, ImmutableSet.of(400, 600));
+        Pair<Boolean, Set<Integer>> filledInclusion = ImmutablePair.of(false, ImmutableSet.of(400, 600));
+
+        return new Object[][] {
+            {"testNull", null, emptyExclusion},
+            {"testEmpty", "", emptyExclusion},
+            {"testBlank", " ", emptyExclusion},
+            {"testInclusion", "{inclusion:[400, 600]}", filledInclusion},
+            {"testEmptyInclusion", "{inclusion:[]}", emptyInclusion},
+            {"testExclusion", "{exclusion:[400, 600]}", filledExclusion},
+            {"testEmptyExclusion", "{exclusion:[]}", emptyExclusion},
+            {"testInclusionPriority", "{inclusion:[], exclusion:[400,600]}", emptyInclusion},
+            {"testMalformed", "{incl:[], exon:[400,600]}", emptyExclusion},
+            {"testExceptionThrown", "{incl:[, exon[400,600]}", emptyExclusion},
+            {"testInclusionWithFaultyValues", "{inclusion:[400, poop, 600]}", filledInclusion}
+        };
+    }
+
+    @Test(dataProvider = "Sdk Version Targeting JSONs")
+    public void testExtractSdkVersionTargeting(final String useCaseName, String sdkVersionTargetingJson,
+        final Pair<Boolean, Set<Integer>> metaData) throws Exception {
+        Assert.assertTrue(metaData.equals(extractSdkVersionTargeting(sdkVersionTargetingJson)));
     }
 }

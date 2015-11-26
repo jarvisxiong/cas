@@ -1,0 +1,98 @@
+#!/bin/bash
+
+exec 2>&1
+
+echo "Setting net.* properties of the host. This is currently not possible at the container level. See https://github.com/docker/docker/issues/4717 and # http://stackoverflow.com/questions/26177059/refresh-net-core-somaxcomm-or-any-sysctl-property-for-docker-containers for more details."
+sysctl -w net.ipv4.tcp_tw_recycle=1
+sysctl -w net.ipv4.tcp_fin_timeout=2
+sysctl -w net.ipv4.tcp_tw_reuse=1
+
+# Constants
+HOST_MAX_MEMORY_USAGE_PERCENTAGE=75
+JAVA_EXEC=/usr/bin/java
+
+# Get container memory limits
+# Warning: Default max container memory limit is 1.8*10^19 which cannot be manipulated using bash's signed arithmetics
+CONTAINER_MEMORY_LIMIT_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
+CONTAINER_MEMORY_LIMIT_IN_MB=`python -c "print $CONTAINER_MEMORY_LIMIT_IN_BYTES/1048576"`
+echo "Container memory limit detected (in MB)(this may be infinite): $CONTAINER_MEMORY_LIMIT_IN_MB"
+
+# Get host memory limits
+HOST_MEMORY_LIMIT_IN_KB=`grep 'MemTotal' /proc/meminfo | awk '{print $2}'`
+HOST_MEMORY_LIMIT_IN_MB=$(($HOST_MEMORY_LIMIT_IN_KB/1024))
+echo "Host memory limit detected (in MB): $HOST_MEMORY_LIMIT_IN_MB"
+
+ADJUSTED_HOST_MEMORY_LIMIT=$((HOST_MEMORY_LIMIT_IN_MB*$HOST_MAX_MEMORY_USAGE_PERCENTAGE/100))
+echo "Adjusting applicable host memory limit to ${HOST_MAX_MEMORY_USAGE_PERCENTAGE}%"
+
+# Application Memory limit (note: CONTAINER_MEMORY_LIMIT_IN_MB can be infinite while HOST_MEMORY_LIMIT_IN_MB can't)
+MEMORY_LIMIT_IN_MB=$((CONTAINER_MEMORY_LIMIT_IN_MB>HOST_MEMORY_LIMIT_IN_MB?$ADJUSTED_HOST_MEMORY_LIMIT:CONTAINER_MEMORY_LIMIT_IN_MB))
+MEMORY_LIMIT_IN_MB=$((MEMORY_LIMIT_IN_MB>8192?8192:MEMORY_LIMIT_IN_MB))
+echo "Setting CAS JVM memory limit to: ${MEMORY_LIMIT_IN_MB}M"
+
+if [ ! "$COLO" ];
+then
+    DATA_CENTRE_ID=0
+    echo "Setting Data Centre Id to: 0 (as COLO was not set)";
+else
+    DATA_CENTRE_ID=`grep $COLO: ${CAS_BASE_DIRECTORY}/conf/other/dc_info.cfg | awk -F':' '{print $2}'`;
+    echo "Setting Data Centre Id to: $DATA_CENTRE_ID";
+fi;
+
+if [ ! "$CONTAINER_NAME" ];
+then
+    echo "Environment variable CONTAINER_NAME was not set. Exiting; Please rerun the docker run command with -e CONTAINER_NAME=Suitable_Value";
+    exit -1;
+fi;
+
+# NOTE: HOST NAME must be passed as the container name for now. When the unique container name logic is finalised, please
+# make appropriate changes in ChannelServerHelper.getContainerId, Logging.getAdRR, BaseStats.baseInit and setup_collectd_graphite.sh
+# JMX will be broken if correct HOST_NAME is not present.
+
+# Determining JVM parameters
+JAVA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Dcom.sun.management.jmxremote.rmi.port=9004 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=$HOST_NAME"
+
+if [ ! "$HOST_NAME" ];
+then
+    echo "Environment variable $HOST_NAME was not set. JMX will be broken";
+    JAVA_JMX_OPTS=""
+fi;
+
+JAVA_PERF_OPTS="-Dio.netty.noResourceLeakDetection -server -Xms${MEMORY_LIMIT_IN_MB}M -Xmx${MEMORY_LIMIT_IN_MB}M -XX:CMSInitiatingOccupancyFraction=65 -XX:-OmitStackTraceInFastThrow -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseConcMarkSweepGC -XX:NewRatio=4 -XX:SurvivorRatio=6"
+JAVA_SYSTEM_PROPERTIES="-Ddc.id=$DATA_CENTRE_ID -Ddc.name=$COLO -Drun.environment=$IDP_ENVIRONMENT -Dcontainer.name=$CONTAINER_NAME"
+JAVA_OPTS="$JAVA_JMX_OPTS $JAVA_PERF_OPTS $JAVA_SYSTEM_PROPERTIES -Djava.security.properties=${CAS_BASE_DIRECTORY}/conf/java.security -DconfigFile=${CAS_BASE_DIRECTORY}/conf/channel-server.properties -Djava.net.preferIPv4Stack=true -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.timezone=UTC"
+
+# Starting CAS
+$JAVA_EXEC $JAVA_OPTS -jar ${CAS_BASE_DIRECTORY}/bin/cas.jar "$@" &
+CAS_PID=$!
+
+# Starting scribe
+. ${CAS_BASE_DIRECTORY}/bin/start_scribe.bash "$@" &
+SCRIBE_PID=$!
+
+# Scribe stats
+${CAS_BASE_DIRECTORY}/bin/scribe-emitter/cas-emit-scribe-agent-stats "$@" &
+SCRIBE_STATS_PID=$!
+
+# Graceful shutdown for only prod environments
+if ! [ "$IDP_ENVIRONMENT" == "non_prod" ];
+then
+    echo Graceful Shutdown enabled;
+    trap "echo Disabling lbstatus and waiting 20 seconds for the Load Balancer;\
+        wget --output-document=/dev/null --quiet --timeout=5 http://localhost:8800/disablelbstatus;\
+        sleep 20;\
+        echo Sending SIGTERM to CAS;\
+        kill $CAS_PID;\
+        echo Waiting 5 more seconds for SCRIBE to finish;\
+        sleep 5;\
+        echo Sending SIGTERM to SCRIBE;\
+        kill $SCRIBE_PID;\
+        echo Waiting 5 more seconds for SCRIBE_STATS to finish;\
+        sleep 5;\
+        kill $SCRIBE_STATS_PID;" SIGTERM SIGINT
+else
+    echo Graceful Shutdown disabled;
+fi
+
+# Now wait for signals
+read < /tmp/fifo & wait

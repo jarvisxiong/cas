@@ -14,6 +14,8 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LAT;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LNG;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_ZIP;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.HANDSET_NAME;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.HANDSET_TYPE;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.IMP_CB;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_BEACON_URL;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.JS_ESC_CLICK_URL;
@@ -24,11 +26,13 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.RECORD_EV
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SDK_VERSION_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SECURE;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SITE_PREFERENCES_JSON;
+import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SI_BLIND;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_BEACON_URL;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_CLICK_URL;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.VIEWABILITY_TRACKER;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
@@ -46,7 +50,7 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +60,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +83,7 @@ import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.GenericTemplateObject;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image;
@@ -105,6 +111,8 @@ public class IXAdNetworkHelper {
     private static final String IX_FS_ADVERTISER_BLOCKLIST_ID = "InMobiFSAdv";
     private static final String IX_FS_INDUSTRY_BLOCKLIST_ID = "InMobiFSInd";
     private static final String IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID = "InMobiFSCre";
+
+    private static final long RANDOM_SALT = 41768l;
 
     private static final ImmutableMap<IXBlocklistType, String> inmobiPerfBlocklistMap = ImmutableMap.of(
             IXBlocklistType.ADVERTISERS, IX_PERF_ADVERTISER_BLOCKLIST_ID, IXBlocklistType.INDUSTRY_IDS,
@@ -188,7 +196,39 @@ public class IXAdNetworkHelper {
         return StringUtils.replaceEach(adm, macroArray, substitutionsArray);
     }
 
-    private static String javascriptEscape(Object string) {
+    public static String replaceViewabilityTrackerMacros(final String viewabilityTracker,
+            final CasInternalRequestParameters casInternal, final SASRequestParameters sasParams) {
+        final List<String> macros = new ArrayList<>();
+        final List<String> substitutions = new ArrayList<>();
+
+        addSproutMacroToList(macros, substitutions, SDK_VERSION_ID,
+                ObjectUtils.defaultIfNull(sasParams.getSdkVersion(), StringUtils.EMPTY));
+        addSproutMacroToList(macros, substitutions, IMP_CB, casInternal.getAuctionId());
+        addSproutMacroToList(macros, substitutions, HANDSET_NAME,
+                ObjectUtils.defaultIfNull(sasParams.getHandsetName(), StringUtils.EMPTY));
+        addSproutMacroToList(macros, substitutions, HANDSET_TYPE, ObjectUtils.defaultIfNull(
+                getHandSetTypeNameFromId(sasParams.getDeviceType().getValue()), StringUtils.EMPTY));
+        addSproutMacroToList(macros, substitutions, SI_BLIND, String.valueOf(sasParams.getSiteIncId() + RANDOM_SALT));
+
+        final String[] macroArray = macros.toArray(new String[macros.size()]);
+        final String[] substitutionsArray = substitutions.toArray(new String[substitutions.size()]);
+        return StringUtils.replaceEach(viewabilityTracker, macroArray, substitutionsArray);
+    }
+
+    private static String getHandSetTypeNameFromId(final int deviceTypeId) {
+        switch (deviceTypeId) {
+            case 1:
+                return "smart_phone";
+            case 2:
+                return "feature_phone";
+            case 3:
+                return "tablet";
+            default:
+                return "connected_device";
+        }
+    }
+
+    private static String javascriptEscape(final Object string) {
         return string == null ? null : StringEscapeUtils.escapeJavaScript(String.valueOf(string));
     }
 
@@ -323,7 +363,7 @@ public class IXAdNetworkHelper {
                     iconbuilder.setUrl(img.getUrl());
                     iconbuilder.setW(width);
                     iconbuilder.setH(height);
-                    contextBuilder.setIcons(Arrays.asList(new Icon[] {(Icon) iconbuilder.build()}));
+                    contextBuilder.setIcons(Collections.singletonList((Icon) iconbuilder.build()));
                 } else if (Image.ImageAssetType.MAIN.getId() == requestAsset.getImg().getType()) {
                     final Screenshot.Builder screenshotBuilder = Screenshot.newBuilder();
                     screenshotBuilder.setUrl(img.getUrl());
@@ -333,8 +373,7 @@ public class IXAdNetworkHelper {
                     }
                     screenshotBuilder.setW(width);
                     screenshotBuilder.setH(height);
-                    contextBuilder.setScreenshots(Arrays.asList(new Screenshot[] {(Screenshot) screenshotBuilder
-                            .build()}));
+                    contextBuilder.setScreenshots(Collections.singletonList((Screenshot) screenshotBuilder.build()));
                 }
                 break;
             case VIDEO:
@@ -541,9 +580,9 @@ public class IXAdNetworkHelper {
      * @throws Exception
      */
     public static String videoAdBuilding(final TemplateTool tool, final SASRequestParameters sasParams,
-        final RepositoryHelper repositoryHelper, final Short processedSlotId, final String beaconUrl,
-        final String clickUrl, final String adMarkup, final String winUrl, final boolean isRewardedVideoRequest)
-        throws Exception {
+            final RepositoryHelper repositoryHelper, final Short processedSlotId, final String beaconUrl,
+            final String clickUrl, final String adMarkup, final String winUrl, final boolean isRewardedVideoRequest,
+            final String viewabilityTracker, final boolean isViewabilityDeal) throws Exception {
         LOG.debug("videoAdBuilding");
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(VAST_CONTENT_JS_ESC, StringEscapeUtils.escapeJavaScript(adMarkup));
@@ -554,6 +593,11 @@ public class IXAdNetworkHelper {
 
         // JS escaped BeaconUrl
         velocityContext.put(IM_BEACON_URL, beaconUrl);
+
+        // Viewability Tracker
+        if (StringUtils.isNotBlank(viewabilityTracker)) {
+            velocityContext.put(VIEWABILITY_TRACKER, viewabilityTracker);
+        }
 
         final GenericTemplateObject vastTemplFirst = new GenericTemplateObject();
         // JS escaped IM beacon and click URLs.
@@ -583,15 +627,17 @@ public class IXAdNetworkHelper {
 
         // iOS-9 ATS
         vastTemplAd.setSecure(sasParams.isSecureRequest());
+        vastTemplAd.setViewability(isViewabilityDeal);
 
         // Add object to velocityContext
         velocityContext.put(FIRST_OBJECT_PREFIX, vastTemplFirst);
         velocityContext.put(AD_OBJECT_PREFIX, vastTemplAd);
         velocityContext.put(TOOL_OBJECT, tool);
 
-        final TemplateType templateType = isRewardedVideoRequest ?
-            TemplateType.INTERSTITIAL_REWARDED_VAST_VIDEO :
-            TemplateType.INTERSTITIAL_VAST_VIDEO;
+        final TemplateType templateType =
+                isRewardedVideoRequest
+                        ? TemplateType.INTERSTITIAL_REWARDED_VAST_VIDEO
+                        : TemplateType.INTERSTITIAL_VAST_VIDEO;
 
         return Formatter.getResponseFromTemplate(templateType, velocityContext, sasParams, null);
     }
@@ -602,7 +648,7 @@ public class IXAdNetworkHelper {
      * $first.supplyHeight <br>
      * $first.cauElementJsonObject <br>
      * $CAUContentJSEsc
-     * 
+     *
      * @param sasParams
      * @param matchedSlot
      * @param beaconUrl
@@ -613,7 +659,8 @@ public class IXAdNetworkHelper {
      * @throws Exception
      */
     public static String cauAdBuilding(final SASRequestParameters sasParams, final IXSlotMatcher matchedSlot,
-            final String beaconUrl, final String clickUrl, final String adMarkup, final String winUrl) throws Exception {
+            final String beaconUrl, final String clickUrl, final String adMarkup, final String winUrl,
+            final String viewabilityTracker, final boolean isViewabilityDeal) throws Exception {
         LOG.debug("cauAdBuilding");
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(CAU_CONTENT_JS_ESC, adMarkup);
@@ -625,6 +672,12 @@ public class IXAdNetworkHelper {
         // JS escaped IMWinUrl
         velocityContext.put(IM_BEACON_URL, beaconUrl);
         velocityContext.put(IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
+
+        // Viewability Tracker
+        if (StringUtils.isNotBlank(viewabilityTracker)) {
+            velocityContext.put(VIEWABILITY_TRACKER, viewabilityTracker);
+        }
+        velocityContext.put(VelocityTemplateFieldConstants.VIEWABILE, isViewabilityDeal);
 
         final GenericTemplateObject templateFirst = new GenericTemplateObject();
         // Set CAU Element JSON

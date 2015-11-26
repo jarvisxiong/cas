@@ -1,101 +1,146 @@
 package com.inmobi.adserve.channels.server;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.CONTAINER_NAME_KEY;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.DATA_CENTRE_ID_KEY;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.DATA_CENTRE_NAME_KEY;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.NON_PROD_CONTAINER_ID;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.NON_PROD_CONTAINER_NAME;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.NON_PROD_DATA_CENTRE_ID;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.NON_PROD_DATA_CENTRE_NAME;
+import static com.inmobi.adserve.channels.server.ChannelServerHelper.RUN_ENVIRONMENT_KEY;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_PROD;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.PROD;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import org.apache.commons.configuration.Configuration;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
+/**
+ * Created by ishan.bhatnagar on 08/10/15.
+ */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ChannelServerHelper.class, InetAddress.class})
+@PrepareForTest({ChannelServerHelper.class})
 public class ChannelServerHelperTest {
-
-    private static ChannelServerHelper channelServerHelper;
-    private static Configuration mockConfig;
-
-    private static void prepareMockConfig() {
-        mockConfig = createMock(Configuration.class);
-        expect(mockConfig.getString("rr")).andReturn("rr").anyTimes();
-        expect(mockConfig.getString("channel")).andReturn("channel").anyTimes();
-        expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
-        expect(mockConfig.getString("advertiser")).andReturn("advertiser").anyTimes();
-        expect(mockConfig.getString("sampledadvertiser")).andReturn("sampledadvertiser").anyTimes();
-        expect(mockConfig.getString("repository")).andReturn("repository").anyTimes();
-        expect(mockConfig.getString(" logger.sampledadvertisercount")).andReturn("5").anyTimes();
-        expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
-        expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
-        replay(mockConfig);
-    }
+    private ChannelServerHelper channelServerHelper;
 
     @BeforeClass
-    public static void setUp() {
-        prepareMockConfig();
-
+    public void setUp() {
         channelServerHelper = new ChannelServerHelper();
     }
 
-    @Test
-    public void testGetDataCentreIdNotSet() {
-        assertThat(channelServerHelper.getDataCenterId("dc.id"), is(equalTo((byte) 0)));
+    @DataProvider(name = "DataProviderForDataCentreName")
+    public Object[][] paramDataProviderForDataCentreName() {
+        return new Object[][] {
+            {"NoEnvironment", "anything", null, NON_PROD_DATA_CENTRE_NAME},
+            {"NonProdEnvironment", "anything", NON_PROD, NON_PROD_DATA_CENTRE_NAME},
+            {"ProdEnvironmentDataCentreSet", "anything", PROD, "anything"},
+            {"ProdEnvironmentDataCentreNull", null, PROD, null},
+        };
     }
 
-    @Test
-    public void testGetDataCentreIdAlreadySet() {
-        System.setProperty("dc.id", "2");
-        assertThat(channelServerHelper.getDataCenterId("dc.id"), is(equalTo((byte) 2)));
-        System.clearProperty("dc.id");
+    @Test(dataProvider = "DataProviderForDataCentreName")
+    public void testGetDataCentreName(final String testCaseName, final String dataCentreName,
+        final String runEnvironment, final String expectedDataCentreName) throws Exception {
+
+        if (null != dataCentreName) {
+            System.setProperty(DATA_CENTRE_NAME_KEY, dataCentreName);
+        } else {
+            System.clearProperty(DATA_CENTRE_NAME_KEY);
+        }
+        if (null != runEnvironment) {
+            System.setProperty(RUN_ENVIRONMENT_KEY, runEnvironment);
+        } else {
+            System.clearProperty(RUN_ENVIRONMENT_KEY);
+        }
+
+        assertThat(channelServerHelper.getDataCentreName(), is(equalTo(expectedDataCentreName)));
     }
 
-    @Test
-    public void testGetHostIdNotSet() throws UnknownHostException {
-        mockStatic(InetAddress.class);
-        expect(InetAddress.getLocalHost()).andThrow(new UnknownHostException("Unknown Host")).times(1);
-        PowerMock.replay(InetAddress.class);
-
-        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
+    @DataProvider(name = "DataProviderForDataCentreId")
+    public Object[][] paramDataProviderForDataCentreId() {
+        return new Object[][] {
+            {"NoEnvironment", "anything", null, NON_PROD_DATA_CENTRE_ID},
+            {"NonProdEnvironment", "anything", NON_PROD, NON_PROD_DATA_CENTRE_ID},
+            {"ProdEnvironmentDataCentreSet", "5", PROD, Byte.parseByte("5")},
+            {"ProdEnvironmentDataCentreNull", null, PROD, null},
+            {"ProdEnvironmentDataCentreNumberFormatException", "anything", PROD, null},
+        };
     }
 
-    @Test
-    public void testGetHostDataCenterOutOfBoundException() {
-        System.setProperty("host.name", "web200");
-        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
-        System.clearProperty("host.name");
+    @Test(dataProvider = "DataProviderForDataCentreId")
+    public void testGetDataCentreId(final String testCaseName, final String dataCentreId,
+        final String runEnvironment, final Byte expectedDataCentreId) throws Exception {
+
+        if (null != dataCentreId) {
+            System.setProperty(DATA_CENTRE_ID_KEY, dataCentreId);
+        } else {
+            System.clearProperty(DATA_CENTRE_ID_KEY);
+        }
+        if (null != runEnvironment) {
+            System.setProperty(RUN_ENVIRONMENT_KEY, runEnvironment);
+        } else {
+            System.clearProperty(RUN_ENVIRONMENT_KEY);
+        }
+
+        assertThat(channelServerHelper.getDataCentreId(), is(equalTo(expectedDataCentreId)));
+    }
+    
+    @DataProvider(name = "DataProviderForContainerName")
+    public Object[][] paramDataProviderForContainerName() {
+        return new Object[][] {
+            {"NoEnvironment", "anything", null, NON_PROD_CONTAINER_NAME},
+            {"NonProdEnvironment", "anything", NON_PROD, NON_PROD_CONTAINER_NAME},
+            {"ProdEnvironmentContainerNameSet", "anything", PROD, "anything"},
+            {"ProdEnvironmentContainerNameNull", null, PROD, null},
+        };
     }
 
-    @Test
-    public void testGetHostDataCenterNumberFormatException() {
-        System.setProperty("host.name", "web200abcd");
-        assertThat(channelServerHelper.getHostId("host.name"), is(equalTo((short) 0)));
-        System.clearProperty("host.name");
+    @Test(dataProvider = "DataProviderForContainerName")
+    public void testGetContainerName(final String testCaseName, final String ContainerName,
+        final String runEnvironment, final String expectedContainerName) throws Exception {
+
+        if (null != ContainerName) {
+            System.setProperty(CONTAINER_NAME_KEY, ContainerName);
+        } else {
+            System.clearProperty(CONTAINER_NAME_KEY);
+        }
+        if (null != runEnvironment) {
+            System.setProperty(RUN_ENVIRONMENT_KEY, runEnvironment);
+        } else {
+            System.clearProperty(RUN_ENVIRONMENT_KEY);
+        }
+
+        assertThat(channelServerHelper.getContainerName(), is(equalTo(expectedContainerName)));
     }
 
-    @Test
-    public void testgetHostDataCenterPositive() {
-        System.setProperty("host.name", "web2004.ads.lhr1.inmobi.com");
-        final short expected = 2004;
-        final String hostName = channelServerHelper.getHostName("host.name");
-        assertThat(channelServerHelper.getHostId(hostName), is(equalTo(expected)));
-        System.clearProperty("host.name");
+    @DataProvider(name = "DataProviderForContainerId")
+    public Object[][] paramDataProviderForContainerId() {
+        return new Object[][] {
+            {"NoEnvironment", "anything", null, NON_PROD_CONTAINER_ID},
+            {"NonProdEnvironment", "anything", NON_PROD, NON_PROD_CONTAINER_ID},
+            {"ProdEnvironmentDataCentreSet", "cas1001", PROD, Short.parseShort("1001")},
+            {"ProdEnvironmentDataCentreNull", null, PROD, null},
+            {"ProdEnvironmentDataCentreNumberStringIndexOutOfBoundsException", "cas100", PROD, null},
+        };
     }
 
-    @Test
-    public void testGetDataCentreName() {
-        final String dummyHostName = "test";
-        System.setProperty("host.name", dummyHostName);
-        assertThat(channelServerHelper.getDataCentreName("host.name"), is(equalTo(dummyHostName)));
-        System.clearProperty("host.name");
-    }
+    @Test(dataProvider = "DataProviderForContainerId")
+    public void testGetContainerId(final String testCaseName, final String containerName,
+        final String runEnvironment, final Short expectedContainerId) throws Exception {
+
+        if (null != runEnvironment) {
+            System.setProperty(RUN_ENVIRONMENT_KEY, runEnvironment);
+        } else {
+            System.clearProperty(RUN_ENVIRONMENT_KEY);
+        }
+
+        assertThat(channelServerHelper.getContainerId(containerName), is(equalTo(expectedContainerId)));
+    }    
+    
 }

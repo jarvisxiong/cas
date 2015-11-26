@@ -110,7 +110,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
-    public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
+    // public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
     public static final String DROPPED_IN_INVALID_SLOT_REQUEST_FILTER = "DroppedInInvalidSlotRequestFilter";
@@ -137,6 +137,8 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
     public static final String TOTAL_REWARDED_VAST_VIDEO_RESPONSES = "TotalRewardedVASTVideoResponses";
+    public static final String TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS = "TotalResponsesWithThirdPartyViewabilityTrackers";
+    public static final String TOTAL_VIEWABILITY_RESPONSES = "TotalViewabilityResponses";
     public static final String TOTAL_ALT_SLOT_SIZE_REQUESTS = "TotalAltSizeRequests";
     public static final String TOTAL_ALT_SLOT_SIZE_RESPONSES = "TotalAltSizeResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
@@ -157,7 +159,7 @@ public class InspectorStrings {
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
-    public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
+    // public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
     public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloor";
@@ -184,11 +186,14 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_OS_VERSION_FILTER = "DroppedInPackageOSVersionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
+    public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
+
 
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)
     public static final String INVALID_AUCTION = "InvalidAuction";
+    public static final String DROPPED_IN_PACKAGE_SDK_VERSION_FILTER = "DroppedInPackageSDKVersionTargetingFilter";
 
     // IX Response Object Status Code Strings
     public static final String IX_INVALID_REQUEST = "NO_AD.InvalidRequest";
@@ -204,18 +209,6 @@ public class InspectorStrings {
 
     // TestStrings
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
-
-    // Hosted Ad Server Specific Stats
-    public static final String TOTAL_HOSTED_REQUESTS = "HostedRequests";
-    public static final String RFM_PLACEMENT_IDENTIFIER_ERROR = "PlacementIdentifierErrors";
-    public static final String HOSTED_RESPONSES = "HostedResponsesReceivedFromRP";
-    public static final String DROPPED_IN_HOSTED_AUCTION_ID_FILTER = "DroppedInHostedAuctionIdFilter";
-    public static final String DESERIALISATION_ERROR = "DeserialisationErrors";
-    public static final String HOSTED_FILLS = "HostedFills";
-    // Hosted Ad Server RFM Error Codes
-    public static final String RFM_INVALID_CREDENTIALS = "HostedInvalidCredentials";
-    public static final String RFM_AD_SELECTION_ERROR = "RFM_AD_SELECTION_ERROR. ";
-    public static final String RFM_ERROR = "RFM_ERROR. ";
 
     // IP repository Strings
     public static final String URI_SYNTAX_EXCEPTION = "URISyntaxException";

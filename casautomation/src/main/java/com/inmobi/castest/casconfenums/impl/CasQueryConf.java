@@ -312,15 +312,36 @@ public class CasQueryConf {
                         CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getManufModelParamName() != null
                                 ? CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id"))
                                         .getManufModelParamName() : "[]";
+
+                String language_targeting_list = "{}";
+                String placement_slot_ids = "{}";
+                String site_ids = "{}";
+                if ( Integer.parseInt(adGroup.get("package_id")) >= 10005) {
+                    if (Integer.parseInt(adGroup.get("package_id")) == 10006) {
+                        language_targeting_list = "{en,ar}";
+                    } else  {
+                        language_targeting_list = "{ch}";
+                    }
+                    placement_slot_ids = "{9}";
+                    site_ids = "{479e420ee7d6422c9bedec33d82baecd}";
+                }
                 queryString =
-                        "insert into ix_packages(id, name, description,rp_data_segment_id,pmp_class,country_ids, inventory_types, os_ids, carrier_ids,site_categories,connection_types,app_store_categories, sdk_versions,site_ids, zip_codes, cs_ids, scheduled_tods, placement_slot_ids,is_active,data_vendor_cost,city_ids, geo_source_types,os_version_targeting , dmp_filter_expression , manuf_model_targeting) values ("
-                                + adGroup.get("package_id")
-                                + ",'Fender_Deal','Fender_Driven','"
-                                + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName()
-                                + "','RIGHT_TO_FIRST_REFUSAL','{"
-                                + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getCountryId()
-                                + "}','{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','{}','{}','{}','{}','{}','{}','t',1,'{}','{}', '[{\"osId\":3, \"range\":[]},{\"osId\":5, \"range\":[]}]' , '"
-                                + csidParam + "','" + manufParam + "')";
+                        "insert into ix_packages(id, name, description,rp_data_segment_id,pmp_class,country_ids, "
+                            + "inventory_types, os_ids, carrier_ids,site_categories,connection_types,"
+                            + "app_store_categories,site_ids, zip_codes, cs_ids, scheduled_tods, "
+                            + "placement_slot_ids,is_active,data_vendor_cost,city_ids, "
+                            + "geo_source_types,os_version_targeting , manuf_model_targeting,"
+                            + " language_targeting_list) values (" + adGroup.get("package_id") + ",'Fender_Deal',"
+                            + "'Fender_Driven','"
+                            + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName() + "','RIGHT_TO_FIRST_REFUSAL','{"
+                            + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getCountryId() + "}',"
+                            + "'{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','" + site_ids +"',"
+                            + "'{}','{}','{}','" + placement_slot_ids + "','t',1,'{}','{}', '[{\"osId\":3, "
+                    + "\"range\":[]},{\"osId\":5, "
+                            + "\"range\":[]}]' , '"
+                            + manufParam + "', '" + language_targeting_list + "')";
+
+
                 System.out.println(queryString);
                 break;
             }

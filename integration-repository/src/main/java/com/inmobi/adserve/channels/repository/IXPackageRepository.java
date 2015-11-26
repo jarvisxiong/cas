@@ -205,7 +205,6 @@ public class IXPackageRepository {
 
         @Override
         public Timestamp readRow(final ResultSet rs) throws SQLException {
-
             Timestamp ts;
             try {
                 final int id = rs.getInt("id");
@@ -222,14 +221,24 @@ public class IXPackageRepository {
                 final String[] connectionTypes = (String[]) rs.getArray("connection_types").getArray();
                 String[] geoSourceTypes = null;
                 final String geoFenceRegion = rs.getString("geo_fence_region");
-
+                final Array languageArray = rs.getArray("language_targeting_list");
+                final Set<String> languageTargetingSet = new HashSet<String>();;
+                if (null != languageArray) {
+                    if (null != languageArray.getArray()) {
+                        final String[] languageTargetingList = (String[]) languageArray.getArray();
+                        for (String language : languageTargetingList) {
+                            languageTargetingSet.add(language);
+                        }
+                    }
+                }
+                final boolean viewable = rs.getBoolean("viewable");
                 final Array adTypeTargetingArray = rs.getArray("ad_types");
                 Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints = null;
                 if (null != adTypeTargetingArray) {
                     final Stream<Integer> adTypesStream = Arrays.stream((Integer[])adTypeTargetingArray.getArray());
                     secondaryAdFormatConstraints = ImmutableSet.copyOf(adTypesStream
                         .distinct()
-                        .map(adType -> SecondaryAdFormatConstraints.getDemandAdFormatConstraintsByValue(adType))
+                        .map(SecondaryAdFormatConstraints::getDemandAdFormatConstraintsByValue)
                         .filter(demandConstraint -> SecondaryAdFormatConstraints.UNKNOWN != demandConstraint)
                         .collect(Collectors.toSet()));
                 }
@@ -248,6 +257,11 @@ public class IXPackageRepository {
                 final String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
                 final String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
                 final Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
+
+                String[] viewabilityTrackers = null;
+                if (null != rs.getArray("viewability_trackers")) {
+                    viewabilityTrackers = (String[]) rs.getArray("viewability_trackers").getArray();
+                }
 
                 Integer[] rpAgencyIds = null;
                 Double[] agencyRebatePercentages = null;
@@ -281,6 +295,15 @@ public class IXPackageRepository {
                     manufModelTargeting = extractManufModelTargeting(rs.getString("manuf_model_targeting"));
                 } catch (final JSONException e) {
                     logger.error("Invalid ManufModelTargeting Json in IXPackageRepository for id " + id, e);
+                    // Skip this record.
+                    return rs.getTimestamp("last_modified");
+                }
+
+                Pair<Boolean, Set<Integer>> sdkVersionTargeting;
+                try {
+                    sdkVersionTargeting = extractSdkVersionTargeting(rs.getString("sdk_version_targeting"));
+                } catch (final JSONException e) {
+                    logger.error("Invalid SdkVersionTargeting Json in IXPackageRepository for id " + id, e);
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
                 }
@@ -443,13 +466,16 @@ public class IXPackageRepository {
                 // Entity builder
                 final IXPackageEntity.Builder entityBuilder = IXPackageEntity.newBuilder();
                 entityBuilder.id(id);
+                entityBuilder.viewable(viewable);
                 entityBuilder.segment(segment);
                 entityBuilder.dmpId(dmpId);
                 entityBuilder.dmpVendorId(dataVendorId);
                 entityBuilder.dmpFilterSegmentExpression(dmpFilterSegmentExpression);
                 entityBuilder.osVersionTargeting(osVersionTargeting);
                 entityBuilder.manufModelTargeting(manufModelTargeting);
+                entityBuilder.sdkVersionTargeting(sdkVersionTargeting);
                 entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
+                entityBuilder.languageTargetingSet(languageTargetingSet);
                 entityBuilder.secondaryAdFormatConstraints(secondaryAdFormatConstraints);
 
                 if (null != dealIds) {
@@ -470,10 +496,12 @@ public class IXPackageRepository {
                 if (null != geoFenceRegion) {
                     entityBuilder.geoFenceRegion(geoFenceRegion);
                 }
+                if (null != viewabilityTrackers) {
+                    entityBuilder.viewabilityTrackers(Arrays.asList(viewabilityTrackers));
+                }
                 entityBuilder.dataVendorCost(dataVendorCost);
 
                 final IXPackageEntity entity = entityBuilder.build();
-
                 final boolean active = rs.getBoolean("is_active");
                 if (active) {
                     newIXPackageSet.put(id, entity);
@@ -487,7 +515,6 @@ public class IXPackageRepository {
                     }
                 }
                 ts = rs.getTimestamp("last_modified");
-
             } catch (final Exception e) {
                 logger.error("Error while reading row in IXPackageRepository.", e);
                 ts = new Timestamp(0);
@@ -616,7 +643,7 @@ public class IXPackageRepository {
             for (int manufIndex = 0; manufIndex < jsonArray.length(); ++manufIndex) {
                 final JSONObject manufEntry = (JSONObject) jsonArray.get(manufIndex);
 
-                final Builder<Long> modelIds = new Builder<Long>();
+                final Builder<Long> modelIds = new Builder<>();
                 final JSONArray modelIdsJsonArray = manufEntry.getJSONArray("modelIds");
 
                 // Iterate over all the device model ids and add them to the modelIds Set
@@ -637,5 +664,40 @@ public class IXPackageRepository {
         }
 
         return manufModelTargeting.build();
+    }
+
+    static Pair<Boolean, Set<Integer>> extractSdkVersionTargeting(final String sdkVersionTargetingJson)
+            throws JSONException {
+        final ImmutableSet.Builder<Integer> sdkVersionSet = new ImmutableSet.Builder<>();
+        boolean exclusion = true;
+
+        if (StringUtils.isNotBlank(sdkVersionTargetingJson)) {
+            try {
+                final JSONObject sdkVersionTargetingJsonObject = new JSONObject(sdkVersionTargetingJson);
+                JSONArray sdkVersionJsonArray = null;
+
+                // Inclusion has higher priority in case of faulty jsons
+                if (sdkVersionTargetingJsonObject.has("inclusion")) {
+                    exclusion = false;
+                    sdkVersionJsonArray = sdkVersionTargetingJsonObject.getJSONArray("inclusion");
+                } else if (sdkVersionTargetingJsonObject.has("exclusion")) {
+                    sdkVersionJsonArray = sdkVersionTargetingJsonObject.getJSONArray("exclusion");
+                }
+
+                if (null != sdkVersionJsonArray) {
+                    for (int index = 0; index < sdkVersionJsonArray.length(); ++index) {
+                        try {
+                            sdkVersionSet.add(sdkVersionJsonArray.getInt(index));
+                        } catch (final Exception e) {
+                            // Ignore entry
+                        }
+                    }
+                }
+            } catch (final JSONException je) {
+                // Ignore list
+            }
+        }
+
+        return ImmutablePair.of(exclusion, sdkVersionSet.build());
     }
 }

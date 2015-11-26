@@ -103,6 +103,7 @@ COMMENT ON COLUMN ix_packages.is_active IS 'Whether the package is active or not
 COMMENT ON COLUMN ix_packages.start_date IS 'Start time of this package.';
 COMMENT ON COLUMN ix_packages.end_date IS 'End time of this package';
 COMMENT ON COLUMN ix_packages.last_modified IS 'Last modified time';
+COMMENT ON COLUMN ix_packages.language_targeting_list IS 'language list';
 
 --
 -- Seed data in the ix_packages table.

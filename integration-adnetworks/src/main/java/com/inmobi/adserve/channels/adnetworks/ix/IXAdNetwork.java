@@ -67,8 +67,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
 import com.inmobi.adserve.contracts.ix.request.App;
@@ -110,7 +110,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -202,6 +201,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private String aqid;
     private String nurl;
+    private String viewabilityTracker;
     protected boolean isCoppaSet = false;
     private String sampleImageUrl;
     private List<String> advertiserDomains;
@@ -217,6 +217,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private boolean isAgencyRebateDeal;
     @Getter
     private boolean isExternalPersonaDeal;
+    private boolean hasViewabilityDeal;
     @Getter
     private boolean isTrumpDeal = false;
     @Getter
@@ -302,7 +303,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         impresssionlist.add(impression);
         impressionObjCount = impresssionlist.size();
 
-
         // Creating BidRequest Object using unique auction id per auction
         bidRequest = createBidRequestObject(impresssionlist);
         if (null == bidRequest) {
@@ -310,12 +310,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     advertiserName);
             return false;
         }
-        if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_TRANSPARENT);
-        } else {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_BLIND);
-        }
-
         // Serializing the bidRequest Object
         bidRequestJson = serializeBidRequest();
         if (null == bidRequestJson) {
@@ -365,6 +359,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Geo geo = createGeoObject();
         // Creating Device Object
         final Device device = createDeviceObject(geo);
+        //creating extentsion
         // Creating User Object
         final User user = createUserObject();
         tempBidRequest.setDevice(device);
@@ -554,7 +549,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         Dimension dim = null;
         Integer rpSlot = null;
-        List<Integer> rpSlots = new ArrayList<Integer>();
+        final List<Integer> rpSlots = new ArrayList<Integer>();
         if (isCAURequest()) {
             LOG.debug(traceMarker, "Request for CAU, so find matching slot");
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_UMP_CAU_REQUESTS);
@@ -573,7 +568,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             final List<Short> sasParamSlotList = sasParams.getProcessedMkSlot();
             if (null != sasParamSlotList) {
-                for (short slot : sasParamSlotList) {
+                for (final short slot : sasParamSlotList) {
                     final Integer mappedSlot = SlotSizeMapping.getIXMappedSlotId(slot);
                     if (null != mappedSlot && !mappedSlot.equals(new Integer(rpSlot))) {
                         rpSlots.add(mappedSlot);
@@ -687,7 +682,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return geo;
     }
 
-
     private User createUserObject() {
         final User user = new User();
         user.setId(getUid(false));
@@ -788,28 +782,26 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private AdQuality createAdQuality() {
         final AdQuality adQuality = new AdQuality();
-        if (ContentType.PERFORMANCE == sasParams.getSiteContentType()) {
-            adQuality.setSensitivity("low");
-        } else {
-            adQuality.setSensitivity("high");
-        }
+        adQuality.setSensitivity(ContentType.PERFORMANCE == sasParams.getSiteContentType() ? "low" : "high");
         return adQuality;
     }
 
     private Transparency createTransparency() {
         final Transparency transparency = new Transparency();
         if (isWapSiteUACEntity && wapSiteUACEntity.isTransparencyEnabled()) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_TRANSPARENT);
             transparency.setBlind(0);
             if (null != wapSiteUACEntity.getBlindList()) {
                 transparency.setBlindbuyers(wapSiteUACEntity.getBlindList());
             } else if (!globalBlindFromConfig.isEmpty() && !globalBlindFromConfig.get(0).isEmpty()) {
                 final List<Integer> globalBlind = Lists.newArrayList();
-                for (final String s : globalBlindFromConfig) {
-                    globalBlind.add(Integer.valueOf(s));
+                for (final String gbConfig : globalBlindFromConfig) {
+                    globalBlind.add(Integer.valueOf(gbConfig));
                 }
                 transparency.setBlindbuyers(globalBlind);
             }
         } else {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SENT_AS_BLIND);
             transparency.setBlind(1);
         }
         return transparency;
@@ -1057,8 +1049,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response content is {}", responseContent);
     }
 
-
-
     protected boolean isSproutAd() {
         final String adm = getAdMarkUp();
         boolean isSproutAd = false;
@@ -1185,7 +1175,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final String winUrl = beaconUrl + RTBCallbackMacros.WIN_BID_GET_PARAM;
             admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
         }
-
         if (altSizeIdsSet) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_RESPONSES);
         }
@@ -1229,6 +1218,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
             velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
         }
+
+        // Viewability Tracker
+        if (StringUtils.isNotBlank(viewabilityTracker)) {
+            velocityContext.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
+        }
+        velocityContext.put(VelocityTemplateFieldConstants.VIEWABILE, hasViewabilityDeal);
+
         try {
             responseContent = Formatter.getResponseFromTemplate(TemplateType.IX_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
@@ -1255,10 +1251,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         try {
-            responseContent =
-                    IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
-                            repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(),
-                            getWinUrl(), isRewardedVideoRequest);
+            responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
+                repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
+                isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1278,7 +1273,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent =
                     IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
-                            getAdMarkUp(), getWinUrl());
+                            getAdMarkUp(), getWinUrl(), viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1304,8 +1299,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         return winUrl;
     }
-
-
 
     protected void nativeAdBuilding() {
         LOG.debug(traceMarker, "nativeAdBuilding");
@@ -1384,7 +1377,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final Integer responseStatusCode = bidResponse.getStatuscode();
         if (null != responseStatusCode && 0 != responseStatusCode) {
-            handleResponseStatusCode(responseStatusCode);
+            final String responseReason = handleResponseStatusCode(responseStatusCode);
+            LOG.debug("NO_AD from RP with responseStatusCode={}, and reason={}", responseStatusCode, responseReason);
+            /* Commenting to reduce stats, un-comment on need basis */
+            // InspectorStats.incrementStatCount(getName(), responseReason);
             return true;
         }
         return false;
@@ -1437,7 +1433,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = AdStatus.TERM.name();
             return false;
         }
-
         return true;
     }
 
@@ -1532,51 +1527,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private void handleResponseStatusCode(final Integer responseStatusCode) {
+    private String handleResponseStatusCode(final Integer responseStatusCode) {
         // TODO: Remove Magic numbers
         switch (responseStatusCode) {
             case 3:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_INVALID_REQUEST);
-                LOG.debug("RP returned NO_AD as request was invalid");
-                break;
+                return InspectorStrings.IX_INVALID_REQUEST;
             case 10:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_NO_MATCH);
-                LOG.debug("RP returned NO_AD as no ad matched the request criteria");
-                break;
+                return InspectorStrings.IX_NO_MATCH;
             case 15:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_REFERRER_NOT_ALLOWED);
-                LOG.debug("RP returned NO_AD as referrer was not allowed on this request");
-                break;
+                return InspectorStrings.IX_REFERRER_NOT_ALLOWED;
             case 16:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_INVENTORY_IDENTIFIER_INVALID);
-                LOG.debug("RP returned NO_AD as combination of inventory identifiers was not valid. This generally "
-                        + "occurs if there is a mismatch between account_id, site_id, zone_id and size_id fields");
-                break;
+                return InspectorStrings.IX_INVENTORY_IDENTIFIER_INVALID;
             case 17:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SUSPECTED_SPIDER);
-                LOG.debug("RP returned NO_AD as the user agent indicated a suspected spider");
-                break;
+                return InspectorStrings.IX_SUSPECTED_SPIDER;
             case 18:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_SUSPECTED_BOTNET);
-                LOG.debug("RP returned NO_AD as the IP indicated a suspected botnet");
-                break;
+                return InspectorStrings.IX_SUSPECTED_BOTNET;
             case 21:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_REFERRER_BLOCKED);
-                LOG.debug("RP returned NO_AD as referrer was blocked due to suspected bad traffic");
-                break;
+                return InspectorStrings.IX_REFERRER_BLOCKED;
             case 27:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_NOT_AUTHORIZED);
-                LOG.debug("RP returned NO_AD as request was not authorized");
-                break;
+                return InspectorStrings.IX_NOT_AUTHORIZED;
             case 32:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_PROXY_BID_WINS);
-                LOG.debug("RP returned NO_AD as proxy bid won");
-                break;
+                return InspectorStrings.IX_PROXY_BID_WINS;
             default:
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.IX_OTHER_ERRORS);
-                LOG.debug("RP returned NO_AD. Refer to status code: {} for more info", statusCode);
-                break;
-        };
+                return InspectorStrings.IX_OTHER_ERRORS;
+        }
     }
 
 
@@ -1620,6 +1594,30 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                         .get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
         if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
             isTrumpDeal = true;
+        }
+
+        hasViewabilityDeal = matchedPackageEntity.isViewable();
+        if (hasViewabilityDeal) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIEWABILITY_RESPONSES);
+            LOG.debug("Viewability enabled for this request.");
+        }
+
+        if (matchedPackageEntity.getViewabilityTrackers().size() > indexOfDealId) {
+            viewabilityTracker = matchedPackageEntity.getViewabilityTrackers().get(indexOfDealId);
+            if (StringUtils.isNotBlank(viewabilityTracker)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Viewability Trackers detected.");
+                    LOG.debug("Viewability Trackers before substitution: {}", viewabilityTracker);
+                }
+                viewabilityTracker =
+                        IXAdNetworkHelper.replaceViewabilityTrackerMacros(viewabilityTracker,
+                                casInternalRequestParameters, sasParams);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Viewability Trackers after substitution: {}", viewabilityTracker);
+                }
+                InspectorStats.incrementStatCount(getName(),
+                        InspectorStrings.TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS);
+            }
         }
 
         // Applying if agency rebate is applicable

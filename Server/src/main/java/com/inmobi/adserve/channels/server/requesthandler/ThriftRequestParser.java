@@ -27,6 +27,7 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -217,6 +218,12 @@ public class ThriftRequestParser {
             }
             if (tDevice.isSetManufacturerName()) {
                 params.setDeviceMake(tDevice.getManufacturerName());
+            }
+            if (tDevice.isSetLocale()) {
+                params.setLanguage(tDevice.getLocale());
+            }
+            if (tDevice.isSetDisplayName()) {
+                params.setHandsetName(tDevice.getDisplayName());
             }
         }
     }

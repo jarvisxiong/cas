@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+{{#scribe}}
+port = {{mondemand_port}}
+addr = "{{mondemand_address}}"
+
+emit_cmd = "${CAS_BASE_DIRECTORY}/bin/scribe-emitter/emit-scribe-stats -e Cas::Stats::ScribeAgent "\
+   "-a #{addr} -c #{port} -p 12000 -s producer -i 60"
+
+puts "+ executing #{emit_cmd}"
+exec emit_cmd
+{{/scribe}}

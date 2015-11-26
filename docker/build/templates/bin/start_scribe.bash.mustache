@@ -1,0 +1,8 @@
+#!/bin/bash
+
+exec 2>&1
+
+SCRIBE_EXEC=/usr/bin/scribed
+CONFIG_FILE=${CAS_BASE_DIRECTORY}/conf/scribe/scribe.conf
+
+exec $SCRIBE_EXEC -c $CONFIG_FILE

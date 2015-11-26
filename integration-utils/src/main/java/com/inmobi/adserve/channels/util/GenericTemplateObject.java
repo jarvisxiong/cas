@@ -21,7 +21,8 @@ public class GenericTemplateObject {
     private String sitePreferencesJson;
     private String requestJson;
     private boolean secure;
-    
+    private boolean viewability;
+
     //CAU AD Markup
     private String cauElementJsonObject;
     public static final String CAU_CONTENT_JS_ESC = "CAUContentJSEsc";
