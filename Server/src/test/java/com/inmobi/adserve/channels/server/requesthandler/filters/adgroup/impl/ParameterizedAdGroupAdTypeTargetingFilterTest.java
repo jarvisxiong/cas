@@ -35,12 +35,20 @@ public class ParameterizedAdGroupAdTypeTargetingFilterTest {
     @DataProvider(name = "DataProviderForAdTypeTargetingFilter")
     public Object[][] paramDataProviderForAdTypeTargetingFilter() {
         return new Object[][] {
-            {"RequestedAdTypeIsBanner", RequestedAdType.BANNER, SecondaryAdFormatConstraints.STATIC, null, null, false, false, false},
-            {"RequestedAdTypeIsNative", RequestedAdType.NATIVE, SecondaryAdFormatConstraints.STATIC, null, null, false, false, false},
+            {"Banner-PubControlsNull", RequestedAdType.BANNER, SecondaryAdFormatConstraints.STATIC, null, null, false, false, true},
             {"Interstitial-PubControlsNull", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, null, null, false, false, true},
+            {"Native-PubControlsNull", RequestedAdType.NATIVE, SecondaryAdFormatConstraints.STATIC, null, null, false, false, true},
+            {"Banner-PubControlsAreVideoOnly", RequestedAdType.BANNER, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.VIDEO), null, false, false, true},
             {"Interstitial-PubControlsAreVideoOnly", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.VIDEO), null, false, false, true},
+            {"Native-PubControlsAreVideoOnly", RequestedAdType.NATIVE, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.VIDEO), null, false, false, true},
+            {"Banner-Positive", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, false, false},
             {"Interstitial-Positive", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, false, false},
+            {"Native-Positive", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, false, false},
+            {"Banner-Negative-Rewarded", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, true, true},
             {"Interstitial-Negative-Rewarded", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, true, true},
+            {"Native-Negative-Rewarded", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), null, false, true, true},
+
+            // Video checks take into account that requested ad type must be INTERSTITIAL so video related tests for banner and native are redundant
             {"Interstitial-Vast-SupplyConstraintsDontMatch", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{14L}, false, false, true},
             {"Interstitial-Vast-DemandConstraintsDontMatch", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{13L}, true, false, true},
             {"Interstitial-Vast-Positive14", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{14L}, true, false, false},
