@@ -13,7 +13,6 @@ import org.slf4j.Marker;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.beans.CasContext;
@@ -42,33 +41,30 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
         final CasContext casContext) {
 
-        boolean returnValue = false;
-
-        if (RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType()) {
-            final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
-            switch (channelSegmentEntity.getSecondaryAdFormatConstraints()) {
-                case VAST_VIDEO:
-                    returnValue =
-                        sasParams.isRewardedVideo() || !checkVideoEligibility(channelSegment.getChannelSegmentEntity()
-                            .getSlotIds(), sasParams);
-                    break;
-                case REWARDED_VAST_VIDEO:
-                    returnValue =
-                        !(sasParams.isRewardedVideo() && checkVideoEligibility(channelSegment.getChannelSegmentEntity()
-                            .getSlotIds(), sasParams));
-                    break;
-                case STATIC:
-                    // Not enforcing interstitial slots. Assuming that this is correctly handled in UMP.
-                    final List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
-                    returnValue =
-                        CollectionUtils.isEmpty(supportedAdTypes) || !supportedAdTypes.contains(AdTypeEnum.BANNER)
-                            || sasParams.isRewardedVideo();
-                    break;
-                default:
-                    InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE);
-                    LOG.info("Dropped as unknown demand constraint was encountered");
-                    returnValue = true;
-            }
+        final boolean returnValue;
+        final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
+        switch (channelSegmentEntity.getSecondaryAdFormatConstraints()) {
+            case VAST_VIDEO:
+                returnValue =
+                    sasParams.isRewardedVideo() || !checkVideoEligibility(channelSegment.getChannelSegmentEntity()
+                        .getSlotIds(), sasParams);
+                break;
+            case REWARDED_VAST_VIDEO:
+                returnValue =
+                    !(sasParams.isRewardedVideo() && checkVideoEligibility(channelSegment.getChannelSegmentEntity()
+                        .getSlotIds(), sasParams));
+                break;
+            case STATIC:
+                // Not enforcing interstitial slots. Assuming that this is correctly handled in UMP.
+                final List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
+                returnValue =
+                    CollectionUtils.isEmpty(supportedAdTypes) || !supportedAdTypes.contains(AdTypeEnum.BANNER)
+                        || sasParams.isRewardedVideo();
+                break;
+            default:
+                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE);
+                LOG.info("Dropped as unknown demand constraint was encountered");
+                returnValue = true;
         }
         return returnValue;
     }

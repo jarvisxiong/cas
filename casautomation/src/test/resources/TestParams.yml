@@ -1688,37 +1688,37 @@ TESTIOS9_2 :
   device_osid : '5'
 
 TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
- - testName: 'ix-happy'
+- testName: 'ix-happy'
 
 TEST_IEM:
 - uidparams_rawuidvalues_iem: '123456789123456'
 
 TEST_DEVICE_LANGUAGE:
- - locale: 'en'
- - geo_countryid : '125' #for req
+- locale : 'en'
+  geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_NULL :
- - locale: ''
- - geo_countryid : '125' #for req
+- locale : ''
+  geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_RTB:
- - locale: 'en'
- - geo_countryid : '125' #for req
+- locale : 'en'
+  geo_countryid : '125' #for req
 
- TEST_DEVICE_LANGUAGE_API:
-  - locale: 'en'
-  - geo_countryid : '125' #for req
-  - integration_type : 'ANDROID_API'
+TEST_DEVICE_LANGUAGE_API:
+- locale : 'en'
+  geo_countryid : '125' #for req
+  integration_type : 'ANDROID_API'
 
- TEST_DEVICE_LANGUAGE_NULL_API :
-  - locale: ''
-  - geo_countryid : '125' #for req
-  - integration_type : 'ANDROID_API'
+TEST_DEVICE_LANGUAGE_NULL_API :
+- locale : ''
+  geo_countryid : '125' #for req
+  integration_type : 'ANDROID_API'
 
- TEST_DEVICE_LANGUAGE_RTB_API:
-  - locale: 'en'
-  - geo_countryid : '125' #for req
-  - integration_type : 'ANDROID_API'
+TEST_DEVICE_LANGUAGE_RTB_API:
+- locale : 'en'
+  geo_countryid : '125' #for req
+  integration_type : 'ANDROID_API'
 
 TEST_RP_ALT_SLOT_IDS:
 - adpool_selectedslots : '9,4'

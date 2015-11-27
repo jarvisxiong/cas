@@ -55,7 +55,7 @@ public class InspectorStats extends BaseStats {
      */
     public static void incrementYammerCountAndMeter(final String key, final String parameter, final long value) {
         INSTANCE._incrementYammerCount(key, parameter, value);
-        INSTANCE._incrementYammerMeter(key, parameter, value);
+        //INSTANCE._incrementYammerMeter(key, parameter, value);
     }
 
     /**
