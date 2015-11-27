@@ -33,7 +33,6 @@ import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -87,7 +86,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -680,7 +678,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if (null != casInternalRequestParameters.getUid()) {
             device.setDidsha1(casInternalRequestParameters.getUid());
             device.setDpidsha1(casInternalRequestParameters.getUid());
-        } else if(null != casInternalRequestParameters.getIem()) {
+        } else if (null != casInternalRequestParameters.getIem()) {
             final String value = casInternalRequestParameters.getIem();
             if(StringUtils.isNotBlank(value)) {
                 device.setDidsha1(DigestUtils.sha1Hex(value));

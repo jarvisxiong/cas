@@ -508,7 +508,7 @@ public class Logging {
                 user.setGender(getGender(sasParams));
             }
 
-            Map<String, String> uidParam = sasParams.getTUidParams();
+            final Map<String, String> uidParam = sasParams.getTUidParams();
             if (null != uidParam) {
                 uidParam.remove(UidType.IEM.name());
             }
