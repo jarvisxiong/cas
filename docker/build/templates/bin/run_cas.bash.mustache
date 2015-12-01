@@ -30,36 +30,30 @@ MEMORY_LIMIT_IN_MB=$((CONTAINER_MEMORY_LIMIT_IN_MB>HOST_MEMORY_LIMIT_IN_MB?$ADJU
 MEMORY_LIMIT_IN_MB=$((MEMORY_LIMIT_IN_MB>8192?8192:MEMORY_LIMIT_IN_MB))
 echo "Setting CAS JVM memory limit to: ${MEMORY_LIMIT_IN_MB}M"
 
-if [ ! "$COLO" ];
+if [ ! "$IDP_CLUSTER" ];
 then
     DATA_CENTRE_ID=0
-    echo "Setting Data Centre Id to: 0 (as COLO was not set)";
+    echo "Setting Data Centre Id to: 0 (as IDP_CLUSTER was not set)";
 else
-    DATA_CENTRE_ID=`grep $COLO: ${CAS_BASE_DIRECTORY}/conf/other/dc_info.cfg | awk -F':' '{print $2}'`;
+    DATA_CENTRE_ID=`grep $IDP_CLUSTER: ${CAS_BASE_DIRECTORY}/conf/other/dc_info.cfg | awk -F':' '{print $2}'`;
     echo "Setting Data Centre Id to: $DATA_CENTRE_ID";
 fi;
 
-if [ ! "$CONTAINER_NAME" ];
+if [ ! "$IDP_NODE" ];
 then
-    echo "Environment variable CONTAINER_NAME was not set. Exiting; Please rerun the docker run command with -e CONTAINER_NAME=Suitable_Value";
+    echo "Environment variable IDP_NODE was not set. Exiting; Please rerun the docker run command with -e IDP_NODE=Suitable_Value";
     exit -1;
 fi;
 
 # NOTE: HOST NAME must be passed as the container name for now. When the unique container name logic is finalised, please
 # make appropriate changes in ChannelServerHelper.getContainerId, Logging.getAdRR, BaseStats.baseInit and setup_collectd_graphite.sh
-# JMX will be broken if correct HOST_NAME is not present.
+# JMX will be broken if IDP_NODE is not equal to the boxes' externally accessible IP or hostname.
 
 # Determining JVM parameters
-JAVA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Dcom.sun.management.jmxremote.rmi.port=9004 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=$HOST_NAME"
-
-if [ ! "$HOST_NAME" ];
-then
-    echo "Environment variable $HOST_NAME was not set. JMX will be broken";
-    JAVA_JMX_OPTS=""
-fi;
+JAVA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Dcom.sun.management.jmxremote.rmi.port=9004 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=$IDP_NODE"
 
 JAVA_PERF_OPTS="-Dio.netty.noResourceLeakDetection -server -Xms${MEMORY_LIMIT_IN_MB}M -Xmx${MEMORY_LIMIT_IN_MB}M -XX:CMSInitiatingOccupancyFraction=65 -XX:-OmitStackTraceInFastThrow -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseConcMarkSweepGC -XX:NewRatio=4 -XX:SurvivorRatio=6"
-JAVA_SYSTEM_PROPERTIES="-Ddc.id=$DATA_CENTRE_ID -Ddc.name=$COLO -Drun.environment=$IDP_ENVIRONMENT -Dcontainer.name=$CONTAINER_NAME"
+JAVA_SYSTEM_PROPERTIES="-Ddc.id=$DATA_CENTRE_ID -Ddc.name=$IDP_CLUSTER -Drun.environment=$IDP_ENVIRONMENT -Dcontainer.name=$IDP_NODE"
 JAVA_OPTS="$JAVA_JMX_OPTS $JAVA_PERF_OPTS $JAVA_SYSTEM_PROPERTIES -Djava.security.properties=${CAS_BASE_DIRECTORY}/conf/java.security -DconfigFile=${CAS_BASE_DIRECTORY}/conf/channel-server.properties -Djava.net.preferIPv4Stack=true -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.timezone=UTC"
 
 # Starting CAS

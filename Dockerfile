@@ -48,14 +48,16 @@ CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 # AirBnB Nerve Watcher for Service Registry
 
 # Assumptions
-# 1) CONTAINER_NAME must be of the form [a-zA-Z]{3}[0-9]{4}.* for now.
+# 1) IDP_NODE must be of the form [a-zA-Z]{3}[0-9]{4}.* for now.
 # 2) HOST_NAME is optional but it will break JMX reporting
+
+#note: IDP_NODE is equivalent to the CONTAINER_NAME
 
 # Useful Docker run Commands:
 # 1) Build: docker built -t cas_image .
-# 2) Run: docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e COLO=corp -e HOST_NAME=localhost -e CONTAINER_NAME=cas1234 -e IDP_SERVICE=cas --name=cas_container cas_image
-# 3) All in one: docker build -t cas_image .; docker rm cas_container; docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e COLO=corp -e HOST_NAME=localhost -e CONTAINER_NAME=cas1234 -e IDP_SERVICE=cas --name=cas_container cas_image
+# 2) Run: docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e HOST_NAME=localhost -e IDP_NODE=cas1234 --name=cas_container cas_image
+# 3) All in one: docker build -t cas_image .; docker rm cas_container; docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e HOST_NAME=localhost -e IDP_NODE=cas1234 --name=cas_container cas_image
 # 4) ssh into running container: docker exec -it cas_container /bin/bash
 # 5) To override the default supervisord setup add -it just before the image name and /bin/bash just after the image name
 
-# sudo docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=prod -e COLO=hkg1 -e HOST_NAME=cas1000.ads.hkg1.inmobi.com -e CONTAINER_NAME=cas1000.ads.hkg1.inmobi.com -e IDP_SERVICE=cas --name=cas dockerhub.corp.inmobi.com/ishan_bhatnagar/cas:5b88be33c4c1
+# sudo docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=prod -e IDP_CLUSTER=hkg1 -e HOST_NAME=cas1000.ads.hkg1.inmobi.com -e IDP_NODE=cas1000.ads.hkg1.inmobi.com --name=cas dockerhub.corp.inmobi.com/ishan_bhatnagar/cas:5b88be33c4c1
