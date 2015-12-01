@@ -678,21 +678,25 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if (null != casInternalRequestParameters.getUid()) {
             device.setDidsha1(casInternalRequestParameters.getUid());
             device.setDpidsha1(casInternalRequestParameters.getUid());
-        } else if (null != casInternalRequestParameters.getIem()) {
+        }
+
+
+        if (null != casInternalRequestParameters.getIem()) {
             final String value = casInternalRequestParameters.getIem();
             if(StringUtils.isNotBlank(value)) {
                 device.setDidsha1(DigestUtils.sha1Hex(value));
                 device.setDidmd5(DigestUtils.md5Hex(value));
-                device.setDidraw(value);
+            }
+        } else if(StringUtils.isBlank(casInternalRequestParameters.getIem())) {
+            final String imei = getIMEI();
+            if (imei != null) {
+                device.setDidmd5(imei);
+                device.setDpidmd5(imei);
             }
         }
 
         // Setting platform id as imei
-        final String imei = getIMEI();
-        if (imei != null) {
-            device.setDidmd5(imei);
-            device.setDpidmd5(imei);
-        }
+
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
         final String ifa = getUidIFA(false);
