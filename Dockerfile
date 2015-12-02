@@ -60,4 +60,4 @@ CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 # 4) ssh into running container: docker exec -it cas_container /bin/bash
 # 5) To override the default supervisord setup add -it just before the image name and /bin/bash just after the image name
 
-# sudo docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=prod -e IDP_CLUSTER=hkg1 -e HOST_NAME=cas1000.ads.hkg1.inmobi.com -e IDP_NODE=cas1000.ads.hkg1.inmobi.com --name=cas dockerhub.corp.inmobi.com/ishan_bhatnagar/cas:5b88be33c4c1
+# sudo docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=prod -e IDP_CLUSTER=hkg1 -e IDP_NODE=cas1000.ads.hkg1.inmobi.com --name=cas dockerhub.corp.inmobi.com/channel_adserve/cas:1681a0affb94
