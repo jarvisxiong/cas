@@ -389,7 +389,7 @@ non_prod:
 
         graphite_prefix_base: 'non_prod'
 
-skyhookprod:
+skyhook:
     uj1:
         cas:
             database:
