@@ -18,6 +18,7 @@ RUN chmod +x bin/scribe-emitter/emit-scribe-stats
 
 # IDP health check
 COPY docker/bin/health_check.sh /opt/inmobi/usr/deployment/validate
+RUN chmod +x /opt/inmobi/usr/deployment/validate
 
 # Scribe Setup
 RUN apt-get update && apt-get -y install inmobi-scribe-ctrl python-scribe scribe-scripts scribe-server-orig
