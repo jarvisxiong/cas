@@ -683,9 +683,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         if (null != casInternalRequestParameters.getIem()) {
             final String value = casInternalRequestParameters.getIem();
-            if(StringUtils.isNotBlank(value)) {
+            if (StringUtils.isNotBlank(value)) {
                 device.setDidsha1(DigestUtils.sha1Hex(value));
                 device.setDidmd5(DigestUtils.md5Hex(value));
+                device.setDpidsha1(null);
             }
         } else if(StringUtils.isBlank(casInternalRequestParameters.getIem())) {
             final String imei = getIMEI();
@@ -694,9 +695,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 device.setDpidmd5(imei);
             }
         }
-
-        // Setting platform id as imei
-
+        
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
         final String ifa = getUidIFA(false);
