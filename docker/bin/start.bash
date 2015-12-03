@@ -13,15 +13,15 @@ else
     exit -1;
 fi;
 
-if [ "$COLO" ];
+if [ "$IDP_CLUSTER" ];
 then
-    echo "Detected colo: $COLO";
+    echo "Detected colo: $IDP_CLUSTER";
 else
-    echo "Environment variable COLO was not set. Exiting; Please rerun the docker run command with -e COLO=<Suitable Value>.";
+    echo "Environment variable IDP_CLUSTER was not set. Exiting; Please rerun the docker run command with -e IDP_CLUSTER=<Suitable Value>.";
     exit -1;
 fi;
 
-YAML_DATA_SECTION=$IDP_ENVIRONMENT.$COLO
+YAML_DATA_SECTION=$IDP_ENVIRONMENT.$IDP_CLUSTER
 echo "Generating configs using data file: ${DATA_FILE} and yaml data section: ${YAML_DATA_SECTION}"
 
 # Turning on globstar. This will enable no directory and recursive directory matching for **
