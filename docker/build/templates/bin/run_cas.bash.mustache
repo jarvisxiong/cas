@@ -52,9 +52,17 @@ fi;
 # Determining JVM parameters
 JAVA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Dcom.sun.management.jmxremote.rmi.port=9004 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=$IDP_NODE"
 
+JAVA_EXTRA_OPTS=""
+# Enable Jacoco instrumentation for automation
+if [ "$IDP_ENVIRONMENT" == "non_prod" ] && [ "$IDP_CLUSTER" == "automation" ];
+then
+    mkdir -p ${CAS_BASE_DIRECTORY}/reports
+    JAVA_EXTRA_OPTS="-javaagent:${CAS_BASE_DIRECTORY}/bin/jacocoagent.jar=destfile=${CAS_BASE_DIRECTORY}/reports/jacoco.exec,includes=com/inmobi/*,append=false"
+fi
+
 JAVA_PERF_OPTS="-Dio.netty.noResourceLeakDetection -server -Xms${MEMORY_LIMIT_IN_MB}M -Xmx${MEMORY_LIMIT_IN_MB}M -XX:CMSInitiatingOccupancyFraction=65 -XX:-OmitStackTraceInFastThrow -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseConcMarkSweepGC -XX:NewRatio=4 -XX:SurvivorRatio=6"
 JAVA_SYSTEM_PROPERTIES="-Ddc.id=$DATA_CENTRE_ID -Ddc.name=$IDP_CLUSTER -Drun.environment=$IDP_ENVIRONMENT -Dcontainer.name=$IDP_NODE"
-JAVA_OPTS="$JAVA_JMX_OPTS $JAVA_PERF_OPTS $JAVA_SYSTEM_PROPERTIES -Djava.security.properties=${CAS_BASE_DIRECTORY}/conf/java.security -DconfigFile=${CAS_BASE_DIRECTORY}/conf/channel-server.properties -Djava.net.preferIPv4Stack=true -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.timezone=UTC"
+JAVA_OPTS="$JAVA_JMX_OPTS $JAVA_PERF_OPTS $JAVA_SYSTEM_PROPERTIES $JAVA_EXTRA_OPTS -Djava.security.properties=${CAS_BASE_DIRECTORY}/conf/java.security -DconfigFile=${CAS_BASE_DIRECTORY}/conf/channel-server.properties -Djava.net.preferIPv4Stack=true -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.timezone=UTC"
 
 # Starting CAS
 $JAVA_EXEC $JAVA_OPTS -jar ${CAS_BASE_DIRECTORY}/bin/cas.jar "$@" &

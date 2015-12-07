@@ -128,7 +128,7 @@ public class InspectorStrings {
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
     public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
     public static final String TOTAL_UMP_CAU_REQUESTS = "TotalUMPCAURequests";
-    public static final String TOTAL_RP_CAU_REQUESTS = "TotalRPCAURequests";
+    public static final String TOTAL_CAU_REQUESTS = "TotalCAURequests";
     public static final String TOTAL_CAU_RESPONSES = "TotalCAUResponses";
     public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED = "DroppedAsSproutAdsAreNotSupportedOn";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";

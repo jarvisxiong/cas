@@ -556,7 +556,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             matchedCAU = new IXSlotMatcher(repositoryHelper);
             rpSlot = matchedCAU.getMatchingSlotForCAU(sasParams.getCauMetadataSet());
             if (rpSlot != null) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_RP_CAU_REQUESTS);
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_CAU_REQUESTS);
                 dim = matchedCAU.getMatchedRPDimension();
             }
         } else {

@@ -2,7 +2,7 @@
 set -e
 
 EXPECTED_RESPONSE="1"
-RESPONSE=`wget --output-document=/dev/null --quiet --server-response --retry-connrefused --tries=100 --waitretry=1 http://localhost:8800/lbstatus 2>&1 | grep -c '200 OK'`
+RESPONSE=`wget --output-document=/dev/null --quiet --server-response --retry-connrefused --tries=180 --waitretry=1 http://localhost:8800/lbstatus 2>&1 | grep -c '200 OK'`
 
 if [ "$EXPECTED_RESPONSE" = "$RESPONSE" ] && [ $? -eq 0 ] ; then
     exit 0

@@ -389,6 +389,49 @@ non_prod:
 
         graphite_prefix_base: 'non_prod'
 
+    automation:
+        cas:
+            database:
+               db_host: 10.14.118.77
+               db_port: 5499
+               database: ix
+               cas_user: brand_user
+               cas_pass: brand@123
+
+               aerospike:
+                   aerospike_host: as.corp.inmobi.com
+                   aerospike_port: 3000
+            timeout:
+                ning_timeout_dcp: 5000
+                ning_timeout_rtbd: 5000
+                cas_timer_handler_timeout_dcp: 5000
+                cas_timer_handler_timeout_rtbd: 5000
+            rtbd:
+                rtb_enabled: 'true'
+                rtbd_demand_density: '0'
+                rtbd_long_term_revenue: '0'
+                rtbd_publisher_yield: '12'
+                rtb2_status: 'on'
+            dcp:
+                taboola_default_url: 'http://10.14.118.66:8100/taboola_resp.html'
+            ix:
+                ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
+                ix_default_url: 'http://10.14.118.66:8889/getIXBid'
+            t_segmentno: '-1'
+            automation_tests_enabled: 'true'
+
+        scribe:
+            mondemand_address: 'localhost'
+            mondemand_port: '12555'
+            scribe_endpoint1: 'databus.vip.nonprod.inmobi.com'
+
+        logging:
+            log_type: 'ERROR'
+            debug_log_type: 'DEBUG'
+            flush_debug_log: 'true'
+
+        graphite_prefix_base: 'non_prod'
+
 skyhook:
     uj1:
         cas:
