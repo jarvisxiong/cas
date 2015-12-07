@@ -111,6 +111,24 @@ public class WAPGroupDBManipulation {
                     wapChannelAdgroupObject));
         }
 
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_SITE_UAC,
+            wapChannelAdgroupObject));
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_SITE_UAC,
+            wapChannelAdgroupObject));
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_SITE,
+            wapChannelAdgroupObject));
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_SITE,
+            wapChannelAdgroupObject));
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_PUBLISHER_IX,
+            wapChannelAdgroupObject));
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_PUBLISHER_IX,
+            wapChannelAdgroupObject));
+
     }
 
     public static void UpdateDemandSupplyData(final Map<String, String> wapChannelAdgroupObject,

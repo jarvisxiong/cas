@@ -27,20 +27,18 @@ public class WAPChannelAdgroupVitals {
                     "'{\"mime\":\"html\",\"default\": \"160214\",\"site\": \"38132\"}'");
 
         }
+        wapChannelAdGroup.put("site_url", "www.test.com");
+        wapChannelAdGroup.put("site_type_id", "1");
+        wapChannelAdGroup.put("coppa_enabled", "false");
         return wapChannelAdGroup;
-
     }
 
     public static Map<String, String> overrideTestValues(final Map<String, String> wapChannelAdGroup) {
-
         wapChannelAdGroup.put("ad_id", wapChannelAdGroup.get("fender_test_case_id"));
         wapChannelAdGroup.put("automation_test_id", wapChannelAdGroup.get("fender_test_case_id"));
         wapChannelAdGroup.put("adgroup_id", wapChannelAdGroup.get("fender_test_case_id"));
         wapChannelAdGroup.put("status", "true");
-
-
-
+        wapChannelAdGroup.put("site_siteid", wapChannelAdGroup.get("fender_test_case_id"));
         return wapChannelAdGroup;
-
     }
 }
