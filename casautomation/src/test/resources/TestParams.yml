@@ -1690,6 +1690,9 @@ TESTIOS9_2 :
 TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
 - testName: 'ix-happy'
 
+TEST_IEM:
+- uidparams_rawuidvalues_iem: '123456789123456'
+
 TEST_DEVICE_LANGUAGE:
 - locale : 'en'
   geo_countryid : '125' #for req

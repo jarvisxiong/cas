@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -85,7 +86,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -680,12 +680,24 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setDpidsha1(casInternalRequestParameters.getUid());
         }
 
-        // Setting platform id as imei
-        final String imei = getIMEI();
-        if (imei != null) {
-            device.setDidmd5(imei);
-            device.setDpidmd5(imei);
+
+        if (null != casInternalRequestParameters.getIem()) {
+            final String value = casInternalRequestParameters.getIem();
+            if (StringUtils.isNotBlank(value)) {
+                device.setDidsha1(DigestUtils.sha1Hex(value));
+                device.setDidmd5(DigestUtils.md5Hex(value));
+                device.setDpidsha1(null);
+            }
+        } else if(StringUtils.isBlank(casInternalRequestParameters.getIem())) {
+            final String imei = getIMEI();
+            if (imei != null) {
+                device.setDidmd5(imei);
+                device.setDpidmd5(imei);
+                device.setDidsha1(null);
+                device.setDpidsha1(null);
+            }
         }
+        
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
         final String ifa = getUidIFA(false);

@@ -442,10 +442,15 @@ public class ThriftRequestParser {
                 case GPID:
                     parameter.setGpid(uidValue);
                     break;
+                case IEM:
+                    parameter.setIem(uidValue);
+                    break;
                 default:
                     break;
             }
         }
+
+        LOG.debug("CasInternalParams are {}", parameter);
     }
 
     public String MD5(final String md5) {
