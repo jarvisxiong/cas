@@ -849,6 +849,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return app;
     }
 
+    public String getAppBundleId(){
+        if (null != wapSiteUACEntity) {
+            if (wapSiteUACEntity.isIOS()) {
+                return StringUtils.defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
+            } else {
+                return StringUtils.defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
+            }
+        } else {
+            return sasParams.getAppBundleId();
+        }
+    }
+
     private void setParamsForTransparentApp(final App app, final CommonExtension ext) {
         app.setId(sasParams.getSiteId());
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
@@ -861,7 +873,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             marketId = StringUtils.defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
         }
-
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
         }

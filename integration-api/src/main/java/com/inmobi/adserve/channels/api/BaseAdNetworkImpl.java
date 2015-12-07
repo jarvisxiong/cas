@@ -138,6 +138,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected CasInternalRequestParameters casInternalRequestParameters;
     protected HttpRequestHandlerBase baseRequestHandler = null;
     protected String requestUrl = DEFAULT_EMPTY_STRING;
+    @Getter
     protected ChannelSegmentEntity entity;
     protected String externalSiteId;
     @Getter

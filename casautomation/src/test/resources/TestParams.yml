@@ -1719,3 +1719,34 @@ TEST_DEVICE_LANGUAGE_RTB_API:
 
 TEST_RP_ALT_SLOT_IDS:
 - adpool_selectedslots : '9,4'
+
+
+TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS:
+- adpool_selectedslots : '9,4'
+  adgroup_inc_id : '123456789'
+  site_siteid : 'TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS'
+  is_site_transparent : 'true'
+  site_inventorytype : 'APP'
+  site_status : 'activated'
+  app_bundle_id : 'TEST_APP_BUNDLE_ID_IOS'
+  site_market_id : 'TEST_MARKET_ID_IOS'
+  site_type_id : '21' #for IOS
+
+TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS:
+- adpool_selectedslots : '9,4'
+  adgroup_inc_id : '123456790'
+  site_siteid : 'TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS'
+  is_site_transparent : 'true'
+  site_inventorytype : 'APP'
+  site_status : 'activated'
+  app_bundle_id : 'TEST_APP_BUNDLE_ID_NOT_IOS'
+  site_market_id : 'TEST_MARKET_ID_NOT_IOS'
+  site_type_id : '22' #for IOS
+
+TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID:
+- adpool_selectedslots : '9,4'
+  adgroup_inc_id : '123456791'
+  site_siteid : 'TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID'
+  is_site_transparent : 'true'
+  site_inventorytype : 'APP'
+  site_status : 'rejected'

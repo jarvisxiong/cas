@@ -91,6 +91,7 @@ public class AdserveBackfillRequest {
         final String def_adpool_taskid = WilburyUUID.getUUID(System.nanoTime()).toString();
         final String def_adpool_remotehostip = "10.14.100.205";
 
+        final String def_appbundleid = "testAppBundleId";
         final String def_siteincid = "34093";
         final String def_cpcfloor = "2";
         final String def_ecpmfloor = "0.04";
@@ -459,6 +460,7 @@ public class AdserveBackfillRequest {
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_limitiosadtracking"),
                         def_uidparams_limitiosadtracking);
 
+
         final String temp_user_datavendorid =
                 AdserveBackfillRequest
                         .defaultSetVariable(requestObject.get("user_datavendorid"), def_user_datavendorid);
@@ -559,13 +561,17 @@ public class AdserveBackfillRequest {
         final IntegrationDetails integrationDetails = new IntegrationDetails();
         integrationDetails.setIntegrationType(adpool_integration_integrationtype);
         integrationDetails.setIntegrationVersion(adpool_integration_integrationversion);
-
+        final String app_bundle_id = requestObject.get("app_bundle_id");
         // adPoolRequest.setRqSslEnabled(true);
         adPoolRequest.setTaskId(adpool_taskid);
         adPoolRequest.setRemoteHostIp(adpool_remotehostip);
         adPoolRequest.setGuidanceBid(adpool_guidanceBid);
         adPoolRequest.setIpFileVersion(adpool_ipfileversion);
         adPoolRequest.setIntegrationDetails(integrationDetails);
+        if(StringUtils.isNotBlank(app_bundle_id)) {
+            adPoolRequest.setAppBundleId(app_bundle_id);
+        }
+
 
         final Site site = new Site();
         site.setSiteIncId(site_siteincid);

@@ -305,6 +305,13 @@ public class Logging {
             ixAd.setSeatId(ixAdNetwork.getSeatId());
         }
 
+        final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
+        if (null != channelSegmentEntity && null != ixAdNetwork) {
+            ixAd.setRpAdgroupIncId(channelSegmentEntity.getAdgroupIncId());
+            final long adIncId = channelSegmentEntity.getIncId(ixAdNetwork.getCreativeType());
+            ixAd.setRpAdIncId(adIncId);
+            LOG.debug("AdGroupIncId {} adIncId {}", channelSegmentEntity.getAdgroupIncId(), adIncId);
+        }
         // Log all the package Ids which were sent to RP.
         if (CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
             ixAd.setPackageIds(ixAdNetwork.getPackageIds());
@@ -444,6 +451,15 @@ public class Logging {
                 }
                 if (null != adNetworkInterface.getForwardedBidGuidance()) {
                     request.setBidGuidance(adNetworkInterface.getForwardedBidGuidance());
+                }
+                if (adNetworkInterface instanceof IXAdNetwork) {
+                    final String appBundleId = ((IXAdNetwork) adNetworkInterface).getAppBundleId();
+                    if (StringUtils.isNotBlank(appBundleId)) {
+                        request.setAppBundleId(appBundleId);
+                        LOG.debug("AppBundleId is : {}", appBundleId);
+                    } else {
+                        LOG.debug("AppBundleId is : null");
+                    }
                 }
             }
 

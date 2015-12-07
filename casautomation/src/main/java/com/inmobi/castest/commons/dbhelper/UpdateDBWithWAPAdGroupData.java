@@ -53,6 +53,7 @@ public class UpdateDBWithWAPAdGroupData {
         System.out.println("*** wapChannelAdGroup ***" + wapChannelAdGroup);
 
         wapChannelAdGroup.putAll(map);
+        System.out.println("params : " + map);
         System.out.println("wap channel adgroup advertiser Id : " + wapChannelAdGroup.get("advertiser_id"));
 
         final String advertiserIdList =
