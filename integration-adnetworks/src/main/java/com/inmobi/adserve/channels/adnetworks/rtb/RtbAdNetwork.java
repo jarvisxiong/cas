@@ -693,6 +693,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             if (imei != null) {
                 device.setDidmd5(imei);
                 device.setDpidmd5(imei);
+                device.setDidsha1(null);
+                device.setDpidsha1(null);
             }
         }
         
