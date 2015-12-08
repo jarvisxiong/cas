@@ -93,9 +93,9 @@ public class InspectorStrings {
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
 
     public static final String IMEI = "Imei";
-    public static final String IMEI_IN_IX_COUNT = "ImeiInIxCount";
-    public static final String IMEI_IN_RTBD_COUNT = "ImeiInRtbdCount";
-    public static final String IMEI_IN_DCP_COUNT = "ImeiInDcpCount";
+    public static final String IMEI_BEING_SENT_FOR_IX = "ImeiBeingSentForIx";
+    public static final String IMEI_BEING_SENT_FOR_RTBD = "ImeiBeingSentForRtbd";
+    public static final String IMEI_BEING_SENT_FOR_DCP = "ImeiBeingSentForDCP";
 
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
