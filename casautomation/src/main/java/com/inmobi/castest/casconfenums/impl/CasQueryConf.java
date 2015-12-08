@@ -323,7 +323,7 @@ public class CasQueryConf {
                         language_targeting_list = "{ch}";
                     }
                     placement_slot_ids = "{9}";
-                    site_ids = "{479e420ee7d6422c9bedec33d82baecd}";
+                    site_ids = "{newsiteid}";
                 }
                 queryString =
                         "insert into ix_packages(id, name, description,rp_data_segment_id,pmp_class,country_ids, "

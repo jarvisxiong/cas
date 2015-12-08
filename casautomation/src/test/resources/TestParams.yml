@@ -1695,34 +1695,43 @@ TEST_IEM:
 
 TEST_DEVICE_LANGUAGE:
 - locale : 'en'
+  site_siteid : 'newsiteid'
   geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_NULL :
 - locale : ''
+  site_siteid : 'newsiteid'
   geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_RTB:
 - locale : 'en'
+  site_siteid : 'newsiteid'
   geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_API:
 - locale : 'en'
+  site_siteid : 'newsiteid'
   geo_countryid : '125' #for req
   integration_type : 'ANDROID_API'
+  adpool_responseformat : 'html'
 
 TEST_DEVICE_LANGUAGE_NULL_API :
 - locale : ''
+  site_siteid : 'newsiteid'
   geo_countryid : '125' #for req
   integration_type : 'ANDROID_API'
+  adpool_responseformat : 'html'
 
 TEST_DEVICE_LANGUAGE_RTB_API:
 - locale : 'en'
+  site_siteid : 'newsiteid'
   geo_countryid : '125' #for req
   integration_type : 'ANDROID_API'
+  adpool_responseformat : 'html'
 
 TEST_RP_ALT_SLOT_IDS:
 - adpool_selectedslots : '9,4'
-
+  site_siteid : 'newsiteid'
 
 TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS:
 - adpool_selectedslots : '9,4'

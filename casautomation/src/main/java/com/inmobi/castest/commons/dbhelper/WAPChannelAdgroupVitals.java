@@ -30,6 +30,8 @@ public class WAPChannelAdgroupVitals {
         wapChannelAdGroup.put("site_url", "www.test.com");
         wapChannelAdGroup.put("site_type_id", "1");
         wapChannelAdGroup.put("coppa_enabled", "false");
+        wapChannelAdGroup.put("is_site_transparent", "false");
+
         return wapChannelAdGroup;
     }
 

@@ -27,7 +27,6 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -113,7 +112,24 @@ public class ThriftRequestParser {
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
-            params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+            if (tObject.getUidParams().isSetRawUidValues()) {
+                params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+                if (null != tObject.getUidParams().getRawUidValues().get(UidType.IEM)) {
+                    String parameterInspector;
+                    switch (dst) {
+                        case 6:
+                            parameterInspector = InspectorStrings.IMEI_BEING_SENT_FOR_RTBD;
+                            break;
+                        case 8:
+                            parameterInspector = InspectorStrings.IMEI_BEING_SENT_FOR_IX;
+                            break;
+                        default:
+                            parameterInspector = InspectorStrings.IMEI_BEING_SENT_FOR_DCP;
+                            break;
+                    }
+                    InspectorStats.incrementStatCount(InspectorStrings.IMEI, parameterInspector);
+                }
+            }
         }
         if (tObject.isSetRqSslEnabled()) {
             params.setSecureRequest(tObject.rqSslEnabled);
@@ -403,7 +419,7 @@ public class ThriftRequestParser {
     }
 
     private void setUserIdParams(final CasInternalRequestParameters parameter, final UidParams uidParams) {
-        final Map<UidType, String> uidMap = uidParams.getRawUidValues();
+        final Map<UidType, String> uidMap = uidParams.isSetRawUidValues() ? uidParams.getRawUidValues() : new HashMap<>();
         if (uidParams.isSetLimitIOSAdTracking()) {
             parameter.setTrackingAllowed(!uidParams.isLimitIOSAdTracking());
         }
