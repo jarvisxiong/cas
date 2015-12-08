@@ -92,6 +92,13 @@ public class InspectorStrings {
     public static final String IMEI_LATENCY = "IMEILatency";
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
 
+    public static final String IMEI = "Imei";
+    public static final String IMEI_IN_IX_COUNT = "ImeiInIXCount";
+    public static final String IMEI_IN_RTBD_COUNT = "ImeiInIXCount";
+    public static final String IMEI_IN_DCP_COUNT = "ImeiInIXCount";
+
+
+
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";

@@ -27,7 +27,6 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -114,6 +113,18 @@ public class ThriftRequestParser {
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
             params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+            if(null != tObject.getUidParams().getRawUidValues().get(UidType.IEM)) {
+                String parameterInspector;
+                switch (dst){
+                    case 6:     parameterInspector =  InspectorStrings.IMEI_IN_RTBD_COUNT;
+                                break;
+                    case 8:     parameterInspector =  InspectorStrings.IMEI_IN_IX_COUNT;
+                                break;
+                    default:    parameterInspector =  InspectorStrings.IMEI_IN_DCP_COUNT;
+                                break;
+                }
+                InspectorStats.incrementStatCount(InspectorStrings.IMEI, parameterInspector);
+            }
         }
         if (tObject.isSetRqSslEnabled()) {
             params.setSecureRequest(tObject.rqSslEnabled);
