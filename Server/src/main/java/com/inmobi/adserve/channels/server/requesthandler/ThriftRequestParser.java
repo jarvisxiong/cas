@@ -112,7 +112,7 @@ public class ThriftRequestParser {
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
-            if(tObject.getUidParams().isSetRawUidValues()) {
+            if (tObject.getUidParams().isSetRawUidValues()) {
                 params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
                 if (null != tObject.getUidParams().getRawUidValues().get(UidType.IEM)) {
                     String parameterInspector;
