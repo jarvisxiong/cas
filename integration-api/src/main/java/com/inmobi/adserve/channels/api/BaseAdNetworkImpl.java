@@ -34,6 +34,9 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
+import com.inmobi.adserve.channels.api.natives.NativeBuilder;
+import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTracker;
@@ -41,6 +44,7 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IMEIEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.CategoryList;
@@ -51,6 +55,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -158,6 +163,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private long connectionLatency;
     private ThirdPartyAdResponse responseStruct;
     private String adapterName;
+    private NativeAdTemplateEntity templateEntity;
+    @Inject
+    @IxNativeBuilderFactory
+    private static NativeBuilderFactory nativeBuilderfactory;
+
 
     protected Double forwardedBidFloor;
     protected Double forwardedBidGuidance;
@@ -1082,4 +1092,19 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         ningRequestBuilder.setVirtualHost(publicHostName);
     }
+
+    public Native createNativeObject() {
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+        if (templateEntity == null) {
+            LOG.info(traceMarker,
+                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+            LOG.info(traceMarker,
+                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+            return null;
+        }
+        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
+        return (Native) nb.buildNative();
+    }
+
+
 }

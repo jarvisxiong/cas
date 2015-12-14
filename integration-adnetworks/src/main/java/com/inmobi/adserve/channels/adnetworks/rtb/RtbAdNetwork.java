@@ -4,7 +4,7 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
@@ -40,9 +41,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.attribute.BAttrNativeType;
-import com.inmobi.adserve.channels.api.attribute.BTypeNativeAttributeType;
-import com.inmobi.adserve.channels.api.attribute.SuggestedNativeAttributeType;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.RtbdNativeBuilderFactory;
@@ -61,6 +59,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.casthrift.rtb.App;
 import com.inmobi.casthrift.rtb.AppExt;
 import com.inmobi.casthrift.rtb.AppStore;
@@ -72,7 +71,6 @@ import com.inmobi.casthrift.rtb.Device;
 import com.inmobi.casthrift.rtb.Geo;
 import com.inmobi.casthrift.rtb.Impression;
 import com.inmobi.casthrift.rtb.ImpressionExtensions;
-import com.inmobi.casthrift.rtb.Native;
 import com.inmobi.casthrift.rtb.Site;
 import com.inmobi.casthrift.rtb.User;
 import com.inmobi.types.DeviceType;
@@ -232,15 +230,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Creating Geo Object for device Object
         final Geo geo = createGeoObject();
-        // Creating Banner object
-        final Banner banner = createBannerObject();
         // Creating Device Object
         final Device device = createDeviceObject(geo);
         // Creating User Object
         final User user = createUserObject();
         // Creating Impression Object
         final List<Impression> impresssionlist = new ArrayList<Impression>();
-        final Impression impression = createImpressionObject(banner);
+        final Impression impression = createImpressionObject();
         if (null == impression) {
             LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
                     advertiserName);
@@ -257,6 +253,66 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Serializing the bidRequest Object
         return serializeBidRequest();
     }
+
+    private Impression createImpressionObject(){
+        Impression impression;
+        if (null != casInternalRequestParameters.getImpressionId()) {
+            impression = new Impression(casInternalRequestParameters.getImpressionId());
+        } else {
+            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
+            return null;
+        }
+
+        if (isNativeRequest) {
+            Native nativeRtb = createNativeObject();
+            if(null != nativeRtb){
+                final Gson gson = new Gson();
+                final String nativeRtbJson = gson.toJson(nativeRtb);
+                impression.setNativeObject(nativeRtbJson);
+            }
+        }
+        else {
+            final Banner banner = createBannerObject();
+            impression.setBanner(banner);
+        }
+        impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
+        impression.setBidfloorcur(bidderCurrency);
+        // Set interstitial or not
+        impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
+        forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+        forwardedBidGuidance = sasParams.getMarketRate();
+        impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
+        LOG.debug(traceMarker, "Bid floor is {} {}", impression.getBidfloor(), impression.getBidfloorcur());
+
+        if (null != sasParams.getSdkVersion()) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
+            impression.setDisplaymanagerver(sasParams.getSdkVersion());
+        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
+        }
+
+        if (isNativeResponseSupported && isNativeRequest()) {
+            final ImpressionExtensions impExt = createNativeExtensionObject();
+            if (impExt == null) {
+                return null;
+            }
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
+            impression.setExt(impExt);
+        }
+        return impression;
+    }
+
+    private com.inmobi.casthrift.rtb.Native createRtbNative() {
+        final com.inmobi.casthrift.rtb.Native nativeRtb;
+        final Native nativeIx = createNativeObject();
+        Gson gson = new GsonBuilder().create();
+        final String jsonStr = gson.toJson(nativeIx);
+        nativeRtb = gson.fromJson(jsonStr, com.inmobi.casthrift.rtb.Native.class);
+        return nativeRtb;
+
+    }
+
+
 
     private boolean checkIfBasicParamsAvailable() {
         if (null == casInternalRequestParameters || null == sasParams) {
@@ -340,50 +396,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return true;
     }
 
-    private Impression createImpressionObject(final Banner banner) {
-        // nullcheck for casInternalRequestParams and sasParams done while configuring adapter
-        Impression impression;
-        if (null != casInternalRequestParameters.getImpressionId()) {
-            impression = new Impression(casInternalRequestParameters.getImpressionId());
-        } else {
-            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
-            return null;
-        }
-        if (!isNativeRequest()) {
-            impression.setBanner(banner);
-        }
-        impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
-        impression.setBidfloorcur(bidderCurrency);
-        // Set interstitial or not
-        impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
-        forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
-        forwardedBidGuidance = sasParams.getMarketRate();
-        impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
-        LOG.debug(traceMarker, "Bid floor is {} {}", impression.getBidfloor(), impression.getBidfloorcur());
-
-        if (null != sasParams.getSdkVersion()) {
-            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
-            impression.setDisplaymanagerver(sasParams.getSdkVersion());
-        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
-            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
-        }
-
-        if (isNativeResponseSupported && isNativeRequest()) {
-            final ImpressionExtensions impExt = createNativeExtensionObject();
-            if (impExt == null) {
-                return null;
-            }
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
-            impression.setExt(impExt);
-        }
-        return impression;
-    }
-
 
     private ImpressionExtensions createNativeExtensionObject() {
         // Native nat = new Native();
         // nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
         // nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
+
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
@@ -396,12 +414,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // if(StringUtils.isNotEmpty(sasParams.getSdkVersion())){
         // nat.api.add(3);
         // }
-        nat.setBattr(nativeTemplateAttributeFinder.findAttribute(new BAttrNativeType()));
-        nat.setSuggested(nativeTemplateAttributeFinder.findAttribute(new SuggestedNativeAttributeType()));
-        nat.setBtype(nativeTemplateAttributeFinder.findAttribute(new BTypeNativeAttributeType()));
+//        nat.setBattr(nativeTemplateAttributeFinder.findAttribute(new BAttrNativeType()));
+//        nat.setSuggested(nativeTemplateAttributeFinder.findAttribute(new SuggestedNativeAttributeType()));
+//        nat.setBtype(nativeTemplateAttributeFinder.findAttribute(new BTypeNativeAttributeType()));
 
         final ImpressionExtensions iext = new ImpressionExtensions();
-        iext.setNativeObject(nat);
+//        iext.setNativeObject(nat);
 
         return iext;
     }
@@ -691,9 +709,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if(StringUtils.isBlank(casInternalRequestParameters.getIem())) {
             final String imei = getIMEI();
             if (imei != null) {
-                device.setDidmd5(imei);
-                device.setDpidmd5(imei);
-                device.setDidsha1(null);
+                device.setDidmd5(DigestUtils.md5Hex(imei));
+                device.setDidsha1(DigestUtils.sha1Hex(imei));
+                device.setDpidmd5(null);
                 device.setDpidsha1(null);
             }
         }

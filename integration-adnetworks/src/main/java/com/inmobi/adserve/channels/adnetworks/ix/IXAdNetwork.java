@@ -5,7 +5,7 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MAN
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -51,7 +51,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
-import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
@@ -528,18 +527,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return categoryZoneId;
     }
 
-    private Native createNativeObject() {
-        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
-        if (templateEntity == null) {
-            LOG.info(traceMarker,
-                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-            LOG.info(traceMarker,
-                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-            return null;
-        }
-        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        return (Native) nb.buildNative();
-    }
+//    private Native createNativeObject() {
+//        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+//        if (templateEntity == null) {
+//            LOG.info(traceMarker,
+//                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+//            LOG.info(traceMarker,
+//                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+//            return null;
+//        }
+//        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
+//        return (Native) nb.buildNative();
+//    }
 
     private Banner createBannerObject() {
         final Banner banner = new Banner();
