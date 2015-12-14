@@ -11,7 +11,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,7 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.channels.adnetworks.rtb.NativeAd;
 import com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -93,7 +93,6 @@ import com.inmobi.adserve.contracts.ix.request.User;
 import com.inmobi.adserve.contracts.ix.request.Video;
 import com.inmobi.adserve.contracts.ix.request.VideoExtension;
 import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
-import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.adserve.contracts.ix.response.Bid;
 import com.inmobi.adserve.contracts.ix.response.BidResponse;
 import com.inmobi.adserve.contracts.ix.response.SeatBid;
@@ -419,20 +418,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
             }
         } else if (isNativeRequest) {
-            final Native nativeIx = createNativeObject();
-            impression.setNat(nativeIx);
-            if (nativeIx != null) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
-                mandatoryAssetMap = new HashMap<>();
-                nonMandatoryAssetMap = new HashMap<>();
-                for (final Asset asset : nativeIx.getRequestobj().getAssets()) {
-                    if (1 == asset.getRequired()) {
-                        mandatoryAssetMap.put(asset.getId(), asset);
-                    } else {
-                        nonMandatoryAssetMap.put(asset.getId(), asset);
-                    }
-                }
-            }
+            impression.setNat(createNativeObject());
         } else {
             impression.setBanner(createBannerObject());
         }
@@ -526,19 +512,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         return categoryZoneId;
     }
-
-//    private Native createNativeObject() {
-//        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
-//        if (templateEntity == null) {
-//            LOG.info(traceMarker,
-//                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-//            LOG.info(traceMarker,
-//                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-//            return null;
-//        }
-//        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-//        return (Native) nb.buildNative();
-//    }
 
     private Banner createBannerObject() {
         final Banner banner = new Banner();
@@ -1311,37 +1284,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     protected void nativeAdBuilding() {
-        LOG.debug(traceMarker, "nativeAdBuilding");
-        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
-        try {
-            final App app = bidRequest.getApp();
-            final com.inmobi.template.context.App templateContext =
-                    IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
-                            nonMandatoryAssetMap, impressionId);
-            if (null == templateContext) {
-                adStatus = TERM;
-                responseContent = DEFAULT_EMPTY_STRING;
-                LOG.debug(traceMarker, "Native Ad Building failed as native object failed validation");
-                // Raising exception in parse response if native object failed validation.
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
-                return;
-            }
-            final Map<String, String> params = new HashMap<>();
-            params.put("beaconUrl", getBeaconUrl());
-            params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM
-                    + RTBCallbackMacros.DEAL_GET_PARAM);
-            params.put("appId", app.getId());
-            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
-            params.put("nUrl", nurl);
-            responseContent = nativeResponseMaker.makeIXResponse(templateContext, params);
-        } catch (final Exception e) {
-            adStatus = TERM;
-            responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error(
-                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
-                            + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
-        }
+        NativeAd.NativeAdBuilder nativeAdBuilder = NativeAd.builder();
+        final NativeAd nativeAd = nativeAdBuilder.adStatus(adStatus)
+            .nativeObj(nativeObj)
+            .nativeResponseMaker(nativeResponseMaker)
+            .advertiserName(advertiserName)
+            .beaconUrl(getBeaconUrl())
+            .impressionId(impressionId)
+            .mandatoryAssetMap(mandatoryAssetMap)
+            .nonMandatoryAssetMap(nonMandatoryAssetMap)
+            .nurl(nurl)
+            .placementId(sasParams.getPlacementId()).build();
+        responseContent = nativeAd.generateResponseContent();
     }
 
     /**

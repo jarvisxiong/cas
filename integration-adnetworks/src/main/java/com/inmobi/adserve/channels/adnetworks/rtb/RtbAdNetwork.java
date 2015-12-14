@@ -21,7 +21,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
@@ -60,19 +59,19 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ix.request.nativead.Native;
-import com.inmobi.casthrift.rtb.App;
-import com.inmobi.casthrift.rtb.AppExt;
-import com.inmobi.casthrift.rtb.AppStore;
-import com.inmobi.casthrift.rtb.Banner;
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidRequest;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.Device;
-import com.inmobi.casthrift.rtb.Geo;
-import com.inmobi.casthrift.rtb.Impression;
+import com.inmobi.adserve.contracts.rtb.request.App;
+import com.inmobi.adserve.contracts.rtb.request.AppExt;
+import com.inmobi.adserve.contracts.rtb.request.AppStore;
+import com.inmobi.adserve.contracts.rtb.request.Banner;
+import com.inmobi.adserve.contracts.rtb.request.BidRequest;
+import com.inmobi.adserve.contracts.rtb.request.Device;
+import com.inmobi.adserve.contracts.rtb.request.Geo;
+import com.inmobi.adserve.contracts.rtb.request.Impression;
+import com.inmobi.adserve.contracts.rtb.request.Site;
+import com.inmobi.adserve.contracts.rtb.request.User;
+import com.inmobi.adserve.contracts.rtb.response.Bid;
+import com.inmobi.adserve.contracts.rtb.response.BidResponse;
 import com.inmobi.casthrift.rtb.ImpressionExtensions;
-import com.inmobi.casthrift.rtb.Site;
-import com.inmobi.casthrift.rtb.User;
 import com.inmobi.types.DeviceType;
 import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
@@ -173,6 +172,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
     private NativeAdTemplateEntity templateEntity;
+    private com.inmobi.adserve.contracts.ix.response.nativead.Native nativeObj;
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -264,16 +264,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         if (isNativeRequest) {
-            Native nativeRtb = createNativeObject();
-            if(null != nativeRtb){
-                final Gson gson = new Gson();
-                final String nativeRtbJson = gson.toJson(nativeRtb);
-                impression.setNativeObject(nativeRtbJson);
-            }
+            impression.setNat(createNativeObject());
         }
         else {
-            final Banner banner = createBannerObject();
-            impression.setBanner(banner);
+            impression.setBanner(createBannerObject());
         }
         impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
         impression.setBidfloorcur(bidderCurrency);
@@ -291,14 +285,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
         }
 
-        if (isNativeResponseSupported && isNativeRequest()) {
-            final ImpressionExtensions impExt = createNativeExtensionObject();
-            if (impExt == null) {
-                return null;
-            }
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
-            impression.setExt(impExt);
-        }
         return impression;
     }
 
@@ -381,18 +367,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private boolean serializeBidRequest() {
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-        try {
-            bidRequestJson = serializer.toString(bidRequest);
-            if (isNativeRequest()) {
-                bidRequestJson = bidRequestJson.replaceFirst("nativeObject", GlobalConstant.NATIVE_STRING);
-            }
-            LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
-        } catch (final TException e) {
-            LOG.debug(traceMarker, "Could not create json from bidrequest for partner {}", advertiserName);
-            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, exception raised {}",
-                    advertiserName, e);
-            return false;
+        final Gson gson = new Gson();
+        bidRequestJson = gson.toJson(bidRequest);
+        if (isNativeRequest()) {
+            bidRequestJson = bidRequestJson.replaceFirst("nativeObject", GlobalConstant.NATIVE_STRING);
         }
+        LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
         return true;
     }
 
@@ -564,9 +544,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         String category = null;
 
-        if (!app.isSetName() && isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+        if (StringUtils.isBlank(app.getName()) && isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
             app.setName(wapSiteUACEntity.getAppType());
-        } else if (!app.isSetName() && (category = getCategories(',', false)) != null) {
+        } else if (StringUtils.isBlank(app.getName()) && (category = getCategories(',', false)) != null) {
             app.setName(category);
         }
 
@@ -760,10 +740,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         final StringBuilder content = new StringBuilder();
-        content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
-                .append(bidResponse.seatbid.get(0).getSeat());
-        content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"adid\"=")
-                .append(bidResponse.seatbid.get(0).bid.get(0).adid).append("}");
+        content.append("{\"bidid\"=").append(bidResponse.getBidid()).append(",\"seat\"=")
+                .append(bidResponse.getSeatbid().get(0).getSeat());
+        content.append(",\"bid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getId()).append(",\"adid\"=")
+                .append(bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()).append("}");
 
         final byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
@@ -787,15 +767,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @SuppressWarnings("unused")
     private void setCallbackContent() {
         final StringBuilder content = new StringBuilder();
-        content.append("{\"bidid\"=").append(bidResponse.bidid).append(",\"seat\"=")
-                .append(bidResponse.seatbid.get(0).getSeat());
-        content.append(",\"bid\"=").append(bidResponse.seatbid.get(0).bid.get(0).id).append(",\"price\"=")
-                .append(secondBidPriceInUsd).append(",\"adid\"=").append(bidResponse.seatbid.get(0).bid.get(0).adid)
+        content.append("{\"bidid\"=").append(bidResponse.getBidid()).append(",\"seat\"=")
+                .append(bidResponse.getSeatbid().get(0).getSeat());
+        content.append(",\"bid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getId()).append(",\"price\"=")
+                .append(secondBidPriceInUsd).append(",\"adid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getAdid())
                 .append("}");
     }
 
     public String replaceRTBMacros(String url) {
-        url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.id);
+        url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
 
         // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
@@ -809,8 +789,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     url.replaceAll(RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
                             .getBid().get(0).getAdid());
         }
-        if (null != bidResponse.bidid) {
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.bidid);
+        if (null != bidResponse.getBidid()) {
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
             url =
@@ -934,7 +914,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             // Win notification is required
             String nUrl = null;
             try {
-                nUrl = bidResponse.seatbid.get(0).getBid().get(0).getNurl();
+                nUrl = bidResponse.getSeatbid().get(0).getBid().get(0).getNurl();
             } catch (final Exception e) {
                 LOG.debug(traceMarker, "Exception while parsing response {}", e);
             }
@@ -951,25 +931,18 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     protected void nativeAdBuilding() {
-        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
-        try {
-            final Map<String, String> params = new HashMap<String, String>();
-            params.put("beaconUrl", getBeaconUrl());
-            params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM);
-            params.put("impressionId", impressionId);
-            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
-            params.put("nUrl", nurl);
-
-            responseContent = nativeResponseMaker.makeResponse(bidResponse, params, templateEntity);
-        } catch (final Exception e) {
-            adStatus = NO_AD;
-            responseContent = DEFAULT_EMPTY_STRING;
-
-            LOG.error(
-                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
-                            + "exception = {}", sasParams.getPlacementId(), advertiserName, e);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
-        }
+        NativeAd.NativeAdBuilder nativeAdBuilder = NativeAd.builder();
+        final NativeAd nativeAd = nativeAdBuilder.adStatus(adStatus)
+            .nativeObj(nativeObj)
+            .nativeResponseMaker(nativeResponseMaker)
+            .advertiserName(advertiserName)
+            .beaconUrl(getBeaconUrl())
+            .impressionId(impressionId)
+            .mandatoryAssetMap(mandatoryAssetMap)
+            .nonMandatoryAssetMap(nonMandatoryAssetMap)
+            .nurl(nurl)
+            .placementId(sasParams.getPlacementId()).build();
+        responseContent = nativeAd.generateResponseContent();
     }
 
 
@@ -978,7 +951,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
             LOG.debug(traceMarker, "Done with parsing of bidresponse");
-            if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbidSize() == 0) {
+            if (null == bidResponse || null == bidResponse.getSeatbid() || bidResponse.getSeatbid().size() == 0) {
                 LOG.debug(traceMarker, "BidResponse does not have seat bid object");
                 return false;
             }
@@ -997,6 +970,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             advertiserDomains = bid.getAdomain();
             creativeAttributes = bid.getAttr();
             responseAuctionId = bidResponse.getId();
+            if (null != bid.getAdmobject()) {
+                nativeObj = bid.getAdmobject().getNativeObj();
+            }
+            if (null != nativeObj) {
+                // TODO: who consumes sampleAdvertiser log data
+                // Done to maintain consistency in logging (See sampleAdvertiserLogging)
+                adm = nativeObj.toString();
+            }
 
             return true;
         } catch (final NullPointerException e) {

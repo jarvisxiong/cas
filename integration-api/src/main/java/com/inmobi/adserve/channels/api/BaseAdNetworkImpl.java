@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -55,6 +56,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
 import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
@@ -73,6 +75,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
+
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -177,6 +180,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean isIPResolutionDisabled = true;
     private String publicHostName;
     protected boolean isByteResponseSupported = false;
+
+    protected Map<Integer, Asset> mandatoryAssetMap;
+    protected Map<Integer, Asset> nonMandatoryAssetMap;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -1094,6 +1100,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     public Native createNativeObject() {
+        final Native nativeObj;
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
@@ -1103,8 +1110,19 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        return (Native) nb.buildNative();
+        nativeObj = (Native) nb.buildNative();
+        if (nativeObj != null) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
+            mandatoryAssetMap = new HashMap<>();
+            nonMandatoryAssetMap = new HashMap<>();
+            for (final Asset asset : nativeObj.getRequestobj().getAssets()) {
+                if (1 == asset.getRequired()) {
+                    mandatoryAssetMap.put(asset.getId(), asset);
+                } else {
+                    nonMandatoryAssetMap.put(asset.getId(), asset);
+                }
+            }
+        }
+        return nativeObj;
     }
-
-
 }
