@@ -1,12 +1,13 @@
 Hostname "{{CONCISE_CONTAINER_NAME}}"
+
 LoadPlugin write_graphite
 <Plugin write_graphite>
-    <Node "graphite_prod">
+    <Node graphite_prod>
     Host "cas-metrics-relay.{{IDP_CLUSTER}}.inmobi.com"
     Port "2020"
     Protocol "tcp"
     LogSendErrors true
-    Prefix "{{graphite_prefix_base}}.{{IDP_CLUSTER}}.cas-1.sys."
+    Prefix "{{graphite_prefix_base}}.{{IDP_CLUSTER}}.cas-1.sys.container-metrics."
     StoreRates true
     AlwaysAppendDS false
     EscapeCharacter "_"
