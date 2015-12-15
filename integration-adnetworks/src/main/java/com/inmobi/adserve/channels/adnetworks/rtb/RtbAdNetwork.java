@@ -4,7 +4,7 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
