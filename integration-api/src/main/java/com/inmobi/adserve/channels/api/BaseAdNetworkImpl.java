@@ -18,7 +18,6 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,9 +34,6 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
-import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
-import com.inmobi.adserve.channels.api.natives.NativeBuilder;
-import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTracker;
@@ -45,7 +41,6 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IMEIEntity;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.CategoryList;
@@ -56,8 +51,6 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
-import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
-import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -75,7 +68,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
-
 
 
 // This abstract class have base functionality of TPAN adapters.
@@ -166,11 +158,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private long connectionLatency;
     private ThirdPartyAdResponse responseStruct;
     private String adapterName;
-    private NativeAdTemplateEntity templateEntity;
-    @Inject
-    @IxNativeBuilderFactory
-    private static NativeBuilderFactory nativeBuilderfactory;
-
 
     protected Double forwardedBidFloor;
     protected Double forwardedBidGuidance;
@@ -180,9 +167,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean isIPResolutionDisabled = true;
     private String publicHostName;
     protected boolean isByteResponseSupported = false;
-
-    protected Map<Integer, Asset> mandatoryAssetMap;
-    protected Map<Integer, Asset> nonMandatoryAssetMap;
 
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
@@ -237,7 +221,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
         LOG.debug("Generating tracker urls for {} with impressionId: {}", getName(), impressionId);
         final InmobiAdTrackerBuilder builder =
-                getInmobiAdTrackerBuilderFactory().getBuilder(sasParams, impressionId, isCpc);
+            getInmobiAdTrackerBuilderFactory().getBuilder(sasParams, impressionId, isCpc);
         overrideInmobiAdTracker(builder);
         inmobiAdTracker = builder.buildInmobiAdTracker();
     }
@@ -359,7 +343,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                         final String responseStr = response.getResponseBody(UTF_8);
                         final HttpResponseStatus httpResponseStatus =
-                                HttpResponseStatus.valueOf(response.getStatusCode());
+                            HttpResponseStatus.valueOf(response.getStatusCode());
 
                         LOG.debug(traceMarker, "{} status code is {}", getName(), httpResponseStatus);
                         if (isByteResponseSupported) {
@@ -382,7 +366,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
                     } else if (!(t instanceof java.util.concurrent.TimeoutException)) {
                         InspectorStats.incrementStatCount(InspectorStrings.UNCAUGHT_EXCEPTIONS, t.getClass()
-                                .getSimpleName());
+                            .getSimpleName());
                         InspectorStats.incrementStatCount(getName(), t.getClass().getSimpleName());
                         if (LOG.isDebugEnabled()) {
                             final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(t);
@@ -449,11 +433,11 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
 
         return new RequestBuilder().setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost());
+            .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+            .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+            .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+            .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+            .setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
     /**
@@ -526,8 +510,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         responseStruct = new ThirdPartyAdResponse();
         responseStruct.setResponseFormat(isNativeRequest()
-                ? ThirdPartyAdResponse.ResponseFormat.JSON
-                : ThirdPartyAdResponse.ResponseFormat.HTML);
+            ? ThirdPartyAdResponse.ResponseFormat.JSON
+            : ThirdPartyAdResponse.ResponseFormat.HTML);
         responseStruct.setResponse(getHttpResponseContent());
         responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
@@ -565,7 +549,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public boolean configureParameters(final SASRequestParameters param, final CasInternalRequestParameters casParams,
-            final ChannelSegmentEntity entity, final long slotId, final RepositoryHelper repositoryHelper) {
+                                       final ChannelSegmentEntity entity, final long slotId, final RepositoryHelper repositoryHelper) {
         sasParams = param;
         casInternalRequestParameters = casParams;
         externalSiteId = entity.getExternalSiteKey();
@@ -710,8 +694,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     if (cat == segmentCategories[i]) {
                         if (isIABCategory) {
                             category =
-                                    getValueFromListAsString(IABCategoriesMap.getIABCategories(segmentCategories[i]),
-                                            seperator);
+                                getValueFromListAsString(IABCategoriesMap.getIABCategories(segmentCategories[i]),
+                                    seperator);
                         } else {
                             category = CategoryList.getCategory(cat);
                         }
@@ -821,13 +805,13 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
             } catch (final UnsupportedEncodingException uee) {
                 LOG.debug("Error during decode in getURLEncode() for {} for string {}, exception raised {}", getName(),
-                        param, uee);
+                    param, uee);
             }
             try {
                 encodedString = URLEncoder.encode(decoded.trim(), format);
             } catch (final UnsupportedEncodingException e) {
                 LOG.debug("Error during encode in getURLEncode() for {} for string {}, exception raised {}", getName(),
-                        param, e);
+                    param, e);
             }
         }
         return encodedString;
@@ -898,17 +882,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName, final int paramValue,
-            final boolean isFirstParam) {
+                                             final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-            final String paramValue, final boolean isFirstParam) {
+                                             final String paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
     protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-            final double paramValue, final boolean isFirstParam) {
+                                             final double paramValue, final boolean isFirstParam) {
         return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
     }
 
@@ -970,12 +954,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     protected boolean isInterstitial() {
         if (10 == selectedSlotId // 300X250
-                || 14 == selectedSlotId // 320X480
-                || 16 == selectedSlotId // 768X1024
-                || 17 == selectedSlotId /* 800x1280 */
-                || 32 == selectedSlotId // 480x320
-                || 33 == selectedSlotId // 1024x768
-                || 34 == selectedSlotId) /* 1280x800 */{
+            || 14 == selectedSlotId // 320X480
+            || 16 == selectedSlotId // 768X1024
+            || 17 == selectedSlotId /* 800x1280 */
+            || 32 == selectedSlotId // 480x320
+            || 33 == selectedSlotId // 1024x768
+            || 34 == selectedSlotId) /* 1280x800 */{
             return true;
         }
         return false;
@@ -1019,8 +1003,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getGPID(final boolean considerDnt) {
         final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
         return StringUtils.isNotBlank(casInternalRequestParameters.getGpid()) && trackIFA
-                ? casInternalRequestParameters.getGpid()
-                : null;
+            ? casInternalRequestParameters.getGpid()
+            : null;
     }
 
     /**
@@ -1047,8 +1031,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getUidIFA(final boolean considerDnt) {
         final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
         return StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA()) && trackIFA
-                ? casInternalRequestParameters.getUidIFA()
-                : null;
+            ? casInternalRequestParameters.getUidIFA()
+            : null;
     }
 
     @Override
@@ -1085,7 +1069,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             } catch (final URISyntaxException e) {
                 if (LOG.isErrorEnabled()) {
                     LOG.error(traceMarker, "URISyntaxException " + ExceptionBlock.getStackTrace(e), this.getClass()
-                            .getSimpleName());
+                        .getSimpleName());
                 }
             }
         }
@@ -1097,32 +1081,5 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return;
         }
         ningRequestBuilder.setVirtualHost(publicHostName);
-    }
-
-    public Native createNativeObject() {
-        final Native nativeObj;
-        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
-        if (templateEntity == null) {
-            LOG.info(traceMarker,
-                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-            LOG.info(traceMarker,
-                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-            return null;
-        }
-        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        nativeObj = (Native) nb.buildNative();
-        if (nativeObj != null) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
-            mandatoryAssetMap = new HashMap<>();
-            nonMandatoryAssetMap = new HashMap<>();
-            for (final Asset asset : nativeObj.getRequestobj().getAssets()) {
-                if (1 == asset.getRequired()) {
-                    mandatoryAssetMap.put(asset.getId(), asset);
-                } else {
-                    nonMandatoryAssetMap.put(asset.getId(), asset);
-                }
-            }
-        }
-        return nativeObj;
     }
 }

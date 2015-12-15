@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -40,9 +40,9 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
+import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
-import com.inmobi.adserve.channels.api.natives.RtbdNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
@@ -58,6 +58,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
 import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.adserve.contracts.rtb.request.App;
 import com.inmobi.adserve.contracts.rtb.request.AppExt;
@@ -71,7 +72,6 @@ import com.inmobi.adserve.contracts.rtb.request.Site;
 import com.inmobi.adserve.contracts.rtb.request.User;
 import com.inmobi.adserve.contracts.rtb.response.Bid;
 import com.inmobi.adserve.contracts.rtb.response.BidResponse;
-import com.inmobi.casthrift.rtb.ImpressionExtensions;
 import com.inmobi.types.DeviceType;
 import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
@@ -124,7 +124,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
 
     @Inject
-    @RtbdNativeBuilderFactory
+    @IxNativeBuilderFactory
     private static NativeBuilderFactory nativeBuilderfactory;
 
     @Inject
@@ -173,6 +173,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private boolean isWapSiteUACEntity = false;
     private NativeAdTemplateEntity templateEntity;
     private com.inmobi.adserve.contracts.ix.response.nativead.Native nativeObj;
+    private Map<Integer, Asset> mandatoryAssetMap;
+    private Map<Integer, Asset> nonMandatoryAssetMap;
 
     @Override
     protected AsyncHttpClient getAsyncHttpClient() {
@@ -264,7 +266,20 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         if (isNativeRequest) {
-            impression.setNat(createNativeObject());
+            final Native nativeRtb = createNativeObject();
+            impression.setNat(nativeRtb);
+            if (nativeRtb != null) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
+                mandatoryAssetMap = new HashMap<>();
+                nonMandatoryAssetMap = new HashMap<>();
+                for (final Asset asset : nativeRtb.getRequestobj().getAssets()) {
+                    if (1 == asset.getRequired()) {
+                        mandatoryAssetMap.put(asset.getId(), asset);
+                    } else {
+                        nonMandatoryAssetMap.put(asset.getId(), asset);
+                    }
+                }
+            }
         }
         else {
             impression.setBanner(createBannerObject());
@@ -287,18 +302,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         return impression;
     }
-
-    private com.inmobi.casthrift.rtb.Native createRtbNative() {
-        final com.inmobi.casthrift.rtb.Native nativeRtb;
-        final Native nativeIx = createNativeObject();
-        Gson gson = new GsonBuilder().create();
-        final String jsonStr = gson.toJson(nativeIx);
-        nativeRtb = gson.fromJson(jsonStr, com.inmobi.casthrift.rtb.Native.class);
-        return nativeRtb;
-
-    }
-
-
 
     private boolean checkIfBasicParamsAvailable() {
         if (null == casInternalRequestParameters || null == sasParams) {
@@ -374,34 +377,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
         return true;
-    }
-
-
-    private ImpressionExtensions createNativeExtensionObject() {
-        // Native nat = new Native();
-        // nat.setMandatory(nativeTemplateAttributeFinder.findAttribute(new MandatoryNativeAttributeType()));
-        // nat.setImage(nativeTemplateAttributeFinder.findAttribute(new ImageNativeAttributeType()));
-
-        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
-        if (templateEntity == null) {
-            LOG.info(traceMarker,
-                    String.format("This site id %s doesn't have native template :", sasParams.getSiteId()));
-            return null;
-        }
-        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
-        final Native nat = (Native) nb.buildNative();
-        // TODO: for native currently there is no way to identify MRAID traffic/container supported by publisher.
-        // if(StringUtils.isNotEmpty(sasParams.getSdkVersion())){
-        // nat.api.add(3);
-        // }
-//        nat.setBattr(nativeTemplateAttributeFinder.findAttribute(new BAttrNativeType()));
-//        nat.setSuggested(nativeTemplateAttributeFinder.findAttribute(new SuggestedNativeAttributeType()));
-//        nat.setBtype(nativeTemplateAttributeFinder.findAttribute(new BTypeNativeAttributeType()));
-
-        final ImpressionExtensions iext = new ImpressionExtensions();
-//        iext.setNativeObject(nat);
-
-        return iext;
     }
 
     private Banner createBannerObject() {
@@ -930,22 +905,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return winUrl;
     }
 
-    protected void nativeAdBuilding() {
-        NativeAd.NativeAdBuilder nativeAdBuilder = NativeAd.builder();
-        final NativeAd nativeAd = nativeAdBuilder.adStatus(adStatus)
-            .nativeObj(nativeObj)
-            .nativeResponseMaker(nativeResponseMaker)
-            .advertiserName(advertiserName)
-            .beaconUrl(getBeaconUrl())
-            .impressionId(impressionId)
-            .mandatoryAssetMap(mandatoryAssetMap)
-            .nonMandatoryAssetMap(nonMandatoryAssetMap)
-            .nurl(nurl)
-            .placementId(sasParams.getPlacementId()).build();
-        responseContent = nativeAd.generateResponseContent();
-    }
-
-
     private boolean deserializeResponse(final String response) {
         final Gson gson = new Gson();
         try {
@@ -1044,6 +1003,53 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final ThirdPartyAdResponse adResponse = getResponseAd();
         adResponse.setResponse(responseContent);
         LOG.debug(traceMarker, "responseContent after replaceMacros is {}", getResponseAd().getResponse());
+    }
+
+    private Native createNativeObject() {
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+        if (templateEntity == null) {
+            LOG.info(traceMarker,
+                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+            LOG.info(traceMarker,
+                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+            return null;
+        }
+        final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
+        return (Native) nb.buildNative();
+    }
+
+    protected void nativeAdBuilding() {
+        LOG.debug(traceMarker, "nativeAdBuilding");
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
+        try {
+            final App app = bidRequest.getApp();
+            final com.inmobi.template.context.App templateContext =
+                IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
+                    nonMandatoryAssetMap, impressionId);
+            if (null == templateContext) {
+                adStatus = TERM;
+                responseContent = DEFAULT_EMPTY_STRING;
+                LOG.debug(traceMarker, "Native Ad Building failed as native object failed validation");
+                // Raising exception in parse response if native object failed validation.
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
+                return;
+            }
+            final Map<String, String> params = new HashMap<>();
+            params.put("beaconUrl", getBeaconUrl());
+            params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM
+                + RTBCallbackMacros.DEAL_GET_PARAM);
+            params.put("appId", app.getId());
+            params.put("placementId", String.valueOf(sasParams.getPlacementId()));
+            params.put("nUrl", nurl);
+            responseContent = nativeResponseMaker.makeIXResponse(templateContext, params);
+        } catch (final Exception e) {
+            adStatus = TERM;
+            responseContent = DEFAULT_EMPTY_STRING;
+            LOG.error(
+                "Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
+                    + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
+        }
     }
 
     @Override

@@ -10,8 +10,7 @@ import lombok.NonNull;
  * Created by avinash.kumar on 12/14/15.
  */
 @Data
-public class BidRequest {
-    @NonNull
+public final class BidRequest {
     private final String id;
     @NonNull
     private final List<Impression> imp;

@@ -8,7 +8,7 @@ import static org.easymock.EasyMock.isA;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.replay;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -29,6 +29,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
@@ -47,9 +48,9 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.SeatBid;
+import com.inmobi.adserve.contracts.rtb.response.Bid;
+import com.inmobi.adserve.contracts.rtb.response.BidResponse;
+import com.inmobi.adserve.contracts.rtb.response.SeatBid;
 import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
@@ -178,26 +179,25 @@ public class RtbAdnetworkTest {
         asyncHttpClientProviderField.set(null, asyncHttpClientProvider);
 
         final Bid bid2 = new Bid();
-        bid2.id = "ab73dd4868a0bbadf8fd7527d95136b4";
-        bid2.adid = "1335571993285";
-        bid2.price = 0.2;
-        bid2.cid = "cid";
-        bid2.crid = "crid";
-        bid2.adm =
-                "<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>";
-        bid2.impid = "impressionId";
+        bid2.setId("ab73dd4868a0bbadf8fd7527d95136b4");
+        bid2.setAdid("1335571993285");
+        bid2.setPrice(0.2);
+        bid2.setCid("cid");
+        bid2.setCrid("crid");
+        bid2.setAdm("<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
+        bid2.setImpid("impressionId");
         final List<Bid> bidList = new ArrayList<Bid>();
         bidList.add(bid2);
         final SeatBid seatBid = new SeatBid();
-        seatBid.seat = "TO-BE-DETERMINED";
-        seatBid.bid = bidList;
+        seatBid.setSeat("TO-BE-DETERMINED");
+        seatBid.setBid(bidList);
         final List<SeatBid> seatBidList = new ArrayList<SeatBid>();
         seatBidList.add(seatBid);
         bidResponse = new BidResponse();
         bidResponse.setSeatbid(seatBidList);
-        bidResponse.id = "SGu1Jpq1IO";
-        bidResponse.bidid = "ac1a2c944cff0a176643079625b0cad4a1bbe4a3";
-        bidResponse.cur = "USD";
+        bidResponse.setId("SGu1Jpq1IO");
+        bidResponse.setBidid("ac1a2c944cff0a176643079625b0cad4a1bbe4a3");
+        bidResponse.setCur("USD");
         rtbAdNetwork.setBidResponse(bidResponse);
     }
 
@@ -494,8 +494,8 @@ public class RtbAdnetworkTest {
         AdapterTestHelper.setBeaconAndClickStubs();
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
-        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-        rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
+        final Gson gson = new Gson();
+        rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
@@ -524,8 +524,8 @@ public class RtbAdnetworkTest {
         AdapterTestHelper.setBeaconAndClickStubs();
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
-        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-        rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
+        final Gson gson = new Gson();
+        rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
@@ -538,7 +538,7 @@ public class RtbAdnetworkTest {
     @Test
     public void testParseResponseWithRMD() throws TException {
         bidResponse.setCur("RMD");
-        bidResponse.getSeatbid().get(0).getBidIterator().next().setNurl("${AUCTION_PRICE}${AUCTION_CURRENCY}");
+        bidResponse.getSeatbid().get(0).getBid().get(0).setNurl("${AUCTION_PRICE}${AUCTION_CURRENCY}");
         final StringBuilder responseAdm = new StringBuilder();
         responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
         responseAdm
@@ -557,7 +557,8 @@ public class RtbAdnetworkTest {
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
         final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-        rtbAdNetwork.parseResponse(serializer.toString(bidResponse), HttpResponseStatus.OK);
+        final Gson gson = new Gson();
+        rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
         rtbAdNetwork.setEncryptedBid("0.23");
         rtbAdNetwork.setSecondBidPrice(0.23);
@@ -725,5 +726,23 @@ public class RtbAdnetworkTest {
         assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
         assertEquals("com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getBundle());
         assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getId());
+    }
+
+    @Test
+    public void testCreateNativeObject(){
+        final String externalSiteKey = "f6wqjq1r5v";
+        final ChannelSegmentEntity entity =
+            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
+                null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
+                0, null, false, false, false, false, false, false, false, false, false, false, null,
+                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+
+        sas.setSource("APP");
+        sas.setRFormat("NATIVE_STRING");
+        sas.setRequestedAdType(RequestedAdType.NATIVE);
+
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short)15, repositoryHelper);
+
     }
 }
