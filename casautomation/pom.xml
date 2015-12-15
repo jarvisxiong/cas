@@ -1,15 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>com.inmobi</groupId>
+		<artifactId>inmobi-parent</artifactId>
+		<version>1.2.1</version>
+	</parent>
 
 	<groupId>com.inmobi.castest</groupId>
 	<artifactId>casautomation</artifactId>
 	<version>1.1-SNAPSHOT</version>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<phoenix.batteries.version>2.3.31</phoenix.batteries.version>
+		<project.build.targetJdk>1.8</project.build.targetJdk>
 	</properties>
 
 	<dependencies>
@@ -30,8 +35,6 @@
 			<artifactId>casthrift</artifactId>
 			<version>2.24-SNAPSHOT</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.inmobi.commons</groupId> <artifactId>datatypes-java-0.8</artifactId> 
-			<version>1.6.66</version> </dependency -->
 		<dependency>
 			<groupId>com.inmobi.commons</groupId>
 			<artifactId>datatypes-java-0.8</artifactId>
@@ -120,9 +123,6 @@
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>com.codesnippets4all</groupId> <artifactId>quick-json</artifactId> 
-			<version>1.0.4</version> </dependency> -->
 	</dependencies>
 
 	<build>
@@ -140,15 +140,6 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>src/test/resources/testall.xml</suiteXmlFile>
 					</suiteXmlFiles>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
 				</configuration>
 			</plugin>
 		</plugins>

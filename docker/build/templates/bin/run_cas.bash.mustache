@@ -2,10 +2,10 @@
 
 exec 2>&1
 
-echo "Setting net.* properties of the host. This is currently not possible at the container level. See https://github.com/docker/docker/issues/4717 and # http://stackoverflow.com/questions/26177059/refresh-net-core-somaxcomm-or-any-sysctl-property-for-docker-containers for more details."
-sysctl -w net.ipv4.tcp_tw_recycle=1
-sysctl -w net.ipv4.tcp_fin_timeout=2
-sysctl -w net.ipv4.tcp_tw_reuse=1
+#echo "Setting net.* properties of the host. This is currently not possible at the container level. See https://github.com/docker/docker/issues/4717 and # http://stackoverflow.com/questions/26177059/refresh-net-core-somaxcomm-or-any-sysctl-property-for-docker-containers for more details."
+#sysctl -w net.ipv4.tcp_tw_recycle=1
+#sysctl -w net.ipv4.tcp_fin_timeout=2
+#sysctl -w net.ipv4.tcp_tw_reuse=1
 
 # Constants
 HOST_MAX_MEMORY_USAGE_PERCENTAGE=75
@@ -94,6 +94,10 @@ then
         kill $SCRIBE_STATS_PID;" SIGTERM SIGINT
 else
     echo Graceful Shutdown disabled;
+    trap "echo Killing cas and scribe indiscriminantly;\
+        kill $CAS_PID;\
+        kill $SCRIBE_PID;\
+        kill $SCRIBE_STATS_PID;" SIGTERM SIGINT
 fi
 
 # Now wait for signals
