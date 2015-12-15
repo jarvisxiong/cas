@@ -21,8 +21,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -369,14 +367,17 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean serializeBidRequest() {
-        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
-        final Gson gson = new Gson();
-        bidRequestJson = gson.toJson(bidRequest);
-        if (isNativeRequest()) {
-            bidRequestJson = bidRequestJson.replaceFirst("nativeObject", GlobalConstant.NATIVE_STRING);
+        try {
+            final Gson gson = new Gson();
+            bidRequestJson = gson.toJson(bidRequest);
+            LOG.info(traceMarker, "RTB request json is: {}", bidRequestJson);
+            return true;
+        } catch (final Exception e) {
+            LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
+            LOG.info(traceMarker, "Configure parameters inside RTB returned false {} , exception thrown {}",
+                advertiserName, e);
+            return false;
         }
-        LOG.info(traceMarker, "RTB request json is : {}", bidRequestJson);
-        return true;
     }
 
     private Banner createBannerObject() {
@@ -664,9 +665,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if(StringUtils.isBlank(casInternalRequestParameters.getIem())) {
             final String imei = getIMEI();
             if (imei != null) {
-                device.setDidmd5(DigestUtils.md5Hex(imei));
-                device.setDidsha1(DigestUtils.sha1Hex(imei));
-                device.setDpidmd5(null);
+                device.setDidmd5(imei);
+                device.setDpidmd5(imei);
+                device.setDidsha1(null);
                 device.setDpidsha1(null);
             }
         }
