@@ -8,13 +8,15 @@ import static org.easymock.EasyMock.isA;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.replay;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -27,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -40,14 +43,25 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
+import com.inmobi.adserve.channels.api.natives.IxNativeBuilderImpl;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
+import com.inmobi.adserve.contracts.ix.request.nativead.*;
+import com.inmobi.adserve.contracts.ix.request.nativead.Image;
+import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
+import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
+import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
+import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
+import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
+import com.inmobi.adserve.contracts.misc.contentjson.OtherAsset;
+import com.inmobi.adserve.contracts.misc.contentjson.TextAsset;
 import com.inmobi.adserve.contracts.rtb.response.Bid;
 import com.inmobi.adserve.contracts.rtb.response.BidResponse;
 import com.inmobi.adserve.contracts.rtb.response.SeatBid;
@@ -60,7 +74,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(BaseAdNetworkImpl.class)
+@PrepareForTest({BaseAdNetworkImpl.class, NativeAdTemplateEntity.class})
 public class RtbAdnetworkTest {
     private final String debug = "debug";
     private final String loggerConf = "/tmp/channel-server.properties";
@@ -88,6 +102,7 @@ public class RtbAdnetworkTest {
         expect(mockConfig.getBoolean(advertiserName + ".siteBlinded")).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".htmlSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(false).anyTimes();
+        expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported", false)).andReturn(true).once();
         expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(
                 new String[] {"king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com",
@@ -728,21 +743,288 @@ public class RtbAdnetworkTest {
         assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getId());
     }
 
-    @Test
-    public void testCreateNativeObject(){
-        final String externalSiteKey = "f6wqjq1r5v";
-        final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                0, null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+    @DataProvider(name = "DataProviderForRtbNative")
+    public Object[][] paramDataProviderForRtbNative() {
 
-        sas.setSource("APP");
-        sas.setRFormat("NATIVE_STRING");
-        sas.setRequestedAdType(RequestedAdType.NATIVE);
+        return new Object[][] {
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
 
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short)15, repositoryHelper);
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
 
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+
+        };
+    }
+
+    @org.testng.annotations.Test(dataProvider = "DataProviderForRtbNative")
+    public void verifyNativeOnRtb(final String testCaseName, final Integer w, final Integer h,
+                                  final NativeAdContentAsset imageContentAsset, final boolean isImageOptional,
+                                  final NativeAdContentAsset textContentAsset, final boolean isTitleOptional,
+                                  Integer titleMaxLen, final NativeAdContentAsset otherContentAsset,
+                                  final boolean isOtherOptional, final NativeAdContentUILayoutType layoutType) throws Exception {
+
+        NativeContentJsonObject nativeContentJsonObject = new NativeContentJsonObject();
+        com.inmobi.adserve.contracts.misc.contentjson.Dimension dimension =
+            new com.inmobi.adserve.contracts.misc.contentjson.Dimension();
+        dimension.setHeight(h);
+        dimension.setWidth(w);
+        ImageAsset imageAsset = new ImageAsset();
+        CommonAssetAttributes commonAssetAttributes = new CommonAssetAttributes();
+        commonAssetAttributes.setAdContentAsset(imageContentAsset);
+        commonAssetAttributes.setOptional(isImageOptional);
+        imageAsset.setCommonAttributes(commonAssetAttributes);
+        imageAsset.setDimension(dimension);
+        nativeContentJsonObject.setImageAssets(Arrays.asList(imageAsset));
+
+        CommonAssetAttributes commonAssetAttributesText = new CommonAssetAttributes();
+        commonAssetAttributesText.setAdContentAsset(textContentAsset);
+        commonAssetAttributesText.setOptional(isTitleOptional);
+        TextAsset textAsset = new TextAsset();
+        textAsset.setCommonAttributes(commonAssetAttributesText);
+        textAsset.setMaxChars(titleMaxLen);
+        nativeContentJsonObject.setTextAssets(Arrays.asList(textAsset));
+
+        CommonAssetAttributes commonAssetAttributesOther = new CommonAssetAttributes();
+        commonAssetAttributesOther.setAdContentAsset(otherContentAsset);
+        commonAssetAttributesOther.setOptional(isOtherOptional);
+        OtherAsset otherAsset = new OtherAsset();
+        otherAsset.setCommonAttributes(commonAssetAttributesOther);
+        nativeContentJsonObject.setOtherAssets(Arrays.asList(otherAsset));
+
+        final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
+            .nativeTemplateId(4408950071453012585l)
+            .contentJson(nativeContentJsonObject)
+            .imageKey("imageKey")
+            .mandatoryKey("mandatoryKey")
+            .modifiedOn(new Timestamp(new Date().getTime()))
+            .placementId(1431975537983742l)
+            .template("template")
+            .nativeUILayout(layoutType)
+            .build();
+        IxNativeBuilderImpl ixNativeBuilder = new IxNativeBuilderImpl(nativeAdTemplateEntity);
+        Native natObj = ixNativeBuilder.buildNative();
+
+        Integer imageType;
+        if (imageContentAsset == NativeAdContentAsset.SCREENSHOT) {
+            imageType = Image.ImageAssetType.MAIN.getId();
+        } else if (imageContentAsset == NativeAdContentAsset.ICON){
+            imageType = Image.ImageAssetType.ICON.getId();
+        } else {
+            imageType = null;
+        }
+        assertEquals(w, natObj.getRequestobj().getAssets().get(0).getImg().getWmin());
+        assertEquals(h, natObj.getRequestobj().getAssets().get(0).getImg().getHmin());
+        assertEquals(imageType, natObj.getRequestobj().getAssets().get(0).getImg().getType());
+        assertEquals((Integer) (!isImageOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(0).getRequired());
+
+        titleMaxLen = titleMaxLen == 0 ? 100 : titleMaxLen;
+        if(textContentAsset == NativeAdContentAsset.TITLE) {
+            assertEquals(titleMaxLen, natObj.getRequestobj().getAssets().get(1).getTitle().getLen());
+        } else if (textContentAsset == NativeAdContentAsset.DESCRIPTION) {
+            assertEquals(titleMaxLen, natObj.getRequestobj().getAssets().get(1).getData().getLen());
+        }
+        assertEquals((Integer) (!isTitleOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(1).getRequired());
+        Integer type;
+        if(otherContentAsset == NativeAdContentAsset.CTA){
+            type = (Integer)Data.DataAssetType.CTA_TEXT.getId();
+        } else if (otherContentAsset == NativeAdContentAsset.STAR_RATING){
+            type = (Integer)Data.DataAssetType.RATING.getId();
+        }else{
+            type = null;
+        }
+        assertEquals(type, natObj.getRequestobj().getAssets().get(2).getData().getType());
+        assertEquals((Integer) (!isOtherOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(2).getRequired());
     }
 }

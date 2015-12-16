@@ -7,7 +7,6 @@ import lombok.Data;
 /**
  * Created by avinash.kumar on 12/14/15.
  */
-
 @Data
 public final class Device {
     private Integer dnt;

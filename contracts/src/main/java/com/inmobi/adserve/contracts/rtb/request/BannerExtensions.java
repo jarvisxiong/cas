@@ -1,6 +1,5 @@
 package com.inmobi.adserve.contracts.rtb.request;
 
-
 import lombok.Data;
 
 /**

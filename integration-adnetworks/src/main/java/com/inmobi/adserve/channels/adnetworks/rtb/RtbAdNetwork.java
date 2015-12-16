@@ -196,7 +196,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.advertiserName = advertiserName;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
-        isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
+        isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", true);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
         bidderCurrency = config.getString(advertiserName + ".currency", USD);
     }
@@ -254,7 +254,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return serializeBidRequest();
     }
 
-    private Impression createImpressionObject(){
+    private Impression createImpressionObject() {
         Impression impression;
         if (null != casInternalRequestParameters.getImpressionId()) {
             impression = new Impression(casInternalRequestParameters.getImpressionId());
@@ -297,7 +297,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
             impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
         }
-
         return impression;
     }
 
@@ -1011,7 +1010,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (templateEntity == null) {
             LOG.info(traceMarker,
                 String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
-            LOG.info(traceMarker,
+                LOG.info(traceMarker,
                 String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             return null;
         }

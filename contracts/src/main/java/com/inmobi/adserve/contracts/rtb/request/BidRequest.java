@@ -2,7 +2,6 @@ package com.inmobi.adserve.contracts.rtb.request;
 
 import java.util.List;
 
-
 import lombok.Data;
 import lombok.NonNull;
 
