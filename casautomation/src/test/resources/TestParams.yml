@@ -1762,3 +1762,29 @@ TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID:
   is_site_transparent : 'true'
   site_inventorytype : 'APP'
   site_status : 'rejected'
+
+TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL:
+- device_osid : '5' #forreq
+  adpool_requestedadtype : 'NATIVE'
+  adpool_selectedslots : '0'
+  site_inventorytype : 'APP' #forreq
+  site_siteid : 'ad1b334e3bdf4d2ba02b43596011d2bb' #blind
+  site_publisherid : '49260e6dff8747f992266858d65d9668' #trans
+  adpool_responseformat : 'NATIVE'
+  enable_change_conf : 'true'
+  adpool_placementId : '1431976048482536'
+  source : 'APP'
+
+TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL:
+- device_osid : '5' #forreq
+  adpool_requestedadtype : 'NATIVE'
+  adpool_selectedslots : '0'
+  site_inventorytype : 'APP' #forreq
+  site_siteid : 'ad1b334e3bdf4d2ba02b43596011d2bb' #blind
+  site_publisherid : '49260e6dff8747f992266858d65d9668' #trans
+  adpool_responseformat : 'NATIVE'
+  enable_change_conf : 'true'
+  adpool_placementId : '1431975537983742'
+  source : 'APP'
+
+

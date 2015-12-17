@@ -1,5 +1,7 @@
 package com.inmobi.castest.rtbdtests;
 
+import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
@@ -1462,6 +1464,32 @@ public class RTBD_NewTest {
     public void TEST_IEM(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput =
             LogParserHelper.logParser("IEM=123456789123456");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
+        final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":3,\"wmin\":480,\"hmin\":320}";
+        final String logLine2 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
+        final String logLine3 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
+        final String logLine4 = "\"native\":{\"requestobj\":{\"layout\":1,\"adunit\":500,\"plcmtcnt\":1,\"seq\":0";
+
+        parserOutput =
+            LogParserHelper.logParser("RTB request json is", logLine1, logLine2, logLine3, logLine4);
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
+        final String logLine0 = "\"native\":{\"requestobj\":{\"layout\":6,\"adunit\":500,\"plcmtcnt\":1,\"seq\":0";
+        final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":1,\"wmin\":300,\"hmin\":300}}";
+        final String logLine2 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
+        final String logLine3 = "{\"id\":3,\"required\":1,\"data\":{\"type\":2}}";
+        final String logLine4 = "{\"id\":4,\"required\":1,\"img\":{\"type\":3,\"wmin\":300,\"hmin\":250}}";
+        parserOutput =
+            LogParserHelper.logParser("RTB request json is", logLine0, logLine1, logLine2, logLine3, logLine4);
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }

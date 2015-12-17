@@ -53,8 +53,10 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.adserve.contracts.ix.request.nativead.*;
+import com.inmobi.adserve.contracts.iab.NativeLayoutId;
+import com.inmobi.adserve.contracts.ix.request.nativead.Data;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image;
+import com.inmobi.adserve.contracts.ix.request.nativead.Native;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -745,211 +747,210 @@ public class RtbAdnetworkTest {
 
     @DataProvider(name = "DataProviderForRtbNative")
     public Object[][] paramDataProviderForRtbNative() {
-
         return new Object[][] {
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
 
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
 
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
 
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
 
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {"type1", 75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {"type2", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {"type3", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {"type4", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {"type5", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {"type6", 480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
+            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
+                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
+            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
                 NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
 
         };
     }
 
     @org.testng.annotations.Test(dataProvider = "DataProviderForRtbNative")
-    public void verifyNativeOnRtb(final String testCaseName, final Integer w, final Integer h,
+    public void verifyNativeOnRtb(final Integer w, final Integer h,
                                   final NativeAdContentAsset imageContentAsset, final boolean isImageOptional,
                                   final NativeAdContentAsset textContentAsset, final boolean isTitleOptional,
                                   Integer titleMaxLen, final NativeAdContentAsset otherContentAsset,
@@ -989,7 +990,7 @@ public class RtbAdnetworkTest {
             .imageKey("imageKey")
             .mandatoryKey("mandatoryKey")
             .modifiedOn(new Timestamp(new Date().getTime()))
-            .placementId(1431975537983742l)
+            .placementId(1431975538797857l)
             .template("template")
             .nativeUILayout(layoutType)
             .build();
@@ -1026,5 +1027,92 @@ public class RtbAdnetworkTest {
         }
         assertEquals(type, natObj.getRequestobj().getAssets().get(2).getData().getType());
         assertEquals((Integer) (!isOtherOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(2).getRequired());
+    }
+
+    @DataProvider(name = "DataProviderForRtbNativeWhenEntityNull")
+    public Object[][] paramDataProviderForRtbNativeWhenEntityNull() {
+        return new Object[][] {
+            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.1", null},
+            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.2", null},
+            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.3", "inmTag.a083"},
+            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.3", "inmTag.a067"},
+            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.3", "inmTag.a64"},
+            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.1", null},
+            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.2", null},
+            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.3", "inmTag.a083"},
+            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.3", "inmTag.a067"},
+            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.3", "inmTag.a64"},
+            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.1", null},
+            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.2", null},
+            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.3", "inmTag.a083"},
+            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.3", "inmTag.a067"},
+            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.3", "inmTag.a64"},
+            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.1", null},
+            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.2", null},
+            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.3", "inmTag.a083"},
+            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.3", "inmTag.a067"},
+            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.3", "inmTag.a64"},
+            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.1", null},
+            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.2", null},
+            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.3", "inmTag.a083"},
+            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.3", "inmTag.a067"},
+            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.3", "inmTag.a64"},
+            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.1", null},
+            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.2", null},
+            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.3", "inmTag.a083"},
+            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.3", "inmTag.a067"},
+            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.3", "inmTag.a64"},
+        };
+    }
+
+
+    @org.testng.annotations.Test(dataProvider = "DataProviderForRtbNativeWhenEntityNull")
+    public void verifyNativeOnRtbWhenEntityNull(final NativeAdContentUILayoutType layoutType, final String mandatoryKey,
+                                                final String imageKey) throws Exception {
+        final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
+            .nativeTemplateId(4408950071453012585l)
+            .contentJson(null)
+            .imageKey(imageKey)
+            .mandatoryKey(mandatoryKey)
+            .modifiedOn(new Timestamp(new Date().getTime()))
+            .placementId(1431975538797857l)
+            .template("template")
+            .nativeUILayout(layoutType)
+            .build();
+        IxNativeBuilderImpl ixNativeBuilder = new IxNativeBuilderImpl(nativeAdTemplateEntity);
+        Native natObj = ixNativeBuilder.buildNative();
+
+        assertEquals((Integer)Image.ImageAssetType.ICON.getId(), natObj.getRequestobj().getAssets().get(0).getImg().getType());
+        assertEquals((Integer)300, natObj.getRequestobj().getAssets().get(0).getImg().getWmin());
+        assertEquals((Integer)300, natObj.getRequestobj().getAssets().get(0).getImg().getHmin());
+        assertEquals((Integer) 1, natObj.getRequestobj().getAssets().get(0).getRequired());
+        assertEquals(NativeLayoutId.findByInmobiNativeUILayoutType(layoutType).getKey(), natObj.getRequestobj().getLayout().intValue());
+
+        assertEquals((Integer)100, natObj.getRequestobj().getAssets().get(1).getTitle().getLen());
+        assertEquals((Integer)1, natObj.getRequestobj().getAssets().get(1).getRequired());
+
+
+        assertEquals((Integer)2, natObj.getRequestobj().getAssets().get(2).getData().getType());
+        assertEquals((Integer)1, natObj.getRequestobj().getAssets().get(2).getRequired());
+
+        int index = 3;
+        if(null != imageKey){
+            Integer wMin=0, hMin=0;
+            if(imageKey.equals("inmTag.a083")){
+                wMin = 250; hMin = 300;
+            } else if(imageKey.equals("inmTag.a067")){
+                wMin = 320 ; hMin = 480;
+            } else if(imageKey.equals("inmTag.a64")){
+                wMin = 320; hMin = 50;
+            }
+            index += 1;
+            assertEquals((Integer) Image.ImageAssetType.MAIN.getId(), natObj.getRequestobj().getAssets().get(3).getImg().getType());
+            assertEquals(wMin, natObj.getRequestobj().getAssets().get(3).getImg().getWmin());
+            assertEquals(hMin, natObj.getRequestobj().getAssets().get(3).getImg().getHmin());
+        }
+
+        assertEquals((Integer)12, natObj.getRequestobj().getAssets().get(index).getData().getType());
+        assertEquals((Integer)5, natObj.getRequestobj().getAssets().get(index+1).getData().getType());
+        assertEquals((Integer)3, natObj.getRequestobj().getAssets().get(index+2).getData().getType());
     }
 }
