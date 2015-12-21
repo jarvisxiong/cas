@@ -92,6 +92,11 @@ public class InspectorStrings {
     public static final String IMEI_LATENCY = "IMEILatency";
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
 
+    public static final String IMEI = "Imei";
+    public static final String IMEI_BEING_SENT_FOR_IX = "ImeiBeingSentForIx";
+    public static final String IMEI_BEING_SENT_FOR_RTBD = "ImeiBeingSentForRtbd";
+    public static final String IMEI_BEING_SENT_FOR_DCP = "ImeiBeingSentForDCP";
+
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
@@ -128,7 +133,7 @@ public class InspectorStrings {
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
     public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
     public static final String TOTAL_UMP_CAU_REQUESTS = "TotalUMPCAURequests";
-    public static final String TOTAL_RP_CAU_REQUESTS = "TotalRPCAURequests";
+    public static final String TOTAL_CAU_REQUESTS = "TotalCAURequests";
     public static final String TOTAL_CAU_RESPONSES = "TotalCAUResponses";
     public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED = "DroppedAsSproutAdsAreNotSupportedOn";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
@@ -152,7 +157,6 @@ public class InspectorStrings {
         "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
-    public static final String INTEGRATION_METHOD_AND_TYPE_MISMATCH = "IntegrationMethodAndTypeMismatch";
 
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";

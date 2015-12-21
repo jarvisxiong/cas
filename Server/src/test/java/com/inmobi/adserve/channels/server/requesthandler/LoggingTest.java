@@ -179,6 +179,7 @@ public class LoggingTest {
         Double secondBidPriceInUsd = 4.5;
         Double marketRate = 567.98;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
+        final String appBundleId = "testAppBundleId";
 
         mockStaticNice(InspectorStats.class);
         mockStaticNice(InetAddress.class);
@@ -227,6 +228,7 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getOsId()).andReturn(osId).anyTimes();
         expect(mockSASRequestParameters.getSdkVersion()).andReturn("0").anyTimes();
         expect(mockSASRequestParameters.getSiteSegmentId()).andReturn(siteSegmentIds).anyTimes();
+        expect(mockSASRequestParameters.getAppBundleId()).andReturn(appBundleId).anyTimes();
         expect(mockCasInternalRequestParameters.getDemandDensity()).andReturn(demandDensity).anyTimes();
         expect(mockCasInternalRequestParameters.getLongTermRevenue()).andReturn(longTermRevenue).anyTimes();
         expect(mockCasInternalRequestParameters.getPublisherYield()).andReturn(publisherYield).anyTimes();
@@ -272,6 +274,7 @@ public class LoggingTest {
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
         assertThat(request.isSetAuctionBidFloor(), is(false));
         assertThat(request.isSetBidGuidance(), is(false));
+
 
         assertThat(geo.getCarrier(), is(carrierId));
         assertThat(geo.getCountry(), is(countryId.shortValue()));
@@ -435,7 +438,7 @@ public class LoggingTest {
 
         mockStaticNice(InspectorStats.class);
         PowerMock.suppress(AdvertiserFailureThrottler.class.getDeclaredMethod("increamentRequestsThrottlerCounter", String.class, long.class));
-        
+
         AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
@@ -527,6 +530,7 @@ public class LoggingTest {
         AdNetworkInterface mockAdNetworkInterface = mockIXAdNetwork;
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
+        ChannelSegmentEntity mockChannelSegmentEntityForIncId = createMock(ChannelSegmentEntity.class);
         ThirdPartyAdResponse mockThirdPartyAdResponse = createMock(ThirdPartyAdResponse.class);
 
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
@@ -564,6 +568,9 @@ public class LoggingTest {
 
         expect(mockAdNetworkInterface.getCreativeType())
                 .andReturn(adCreativeType).anyTimes();
+        expect(mockIXAdNetwork.getEntity()).andReturn(mockChannelSegmentEntityForIncId).anyTimes();
+        expect(mockChannelSegmentEntityForIncId.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
+        expect(mockChannelSegmentEntityForIncId.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
 
         replayAll();
 
@@ -588,6 +595,8 @@ public class LoggingTest {
         assertThat(ixAd.getPackageIds(), is(equalTo(packageIds)));
         assertThat(ixAd.getWinningPackageId(), is(equalTo(winningPackageId)));
         assertThat(ixAd.getWinningDealId(), is(equalTo(dealId)));
+        assertThat(ixAd.getRpAdgroupIncId(), is(equalTo(adgroupIncId)));
+        assertThat(ixAd.getRpAdIncId(), is(equalTo(adIncId)));
     }
 
     @Test
@@ -619,6 +628,7 @@ public class LoggingTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         ThirdPartyAdResponse mockThirdPartyAdResponse = createMock(ThirdPartyAdResponse.class);
+        ChannelSegmentEntity mockChannelSegmentEntityForIncId = createMock(ChannelSegmentEntity.class);
 
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
@@ -655,6 +665,9 @@ public class LoggingTest {
 
         expect(mockAdNetworkInterface.getCreativeType())
                 .andReturn(adCreativeType).anyTimes();
+        expect(mockIXAdNetwork.getEntity()).andReturn(mockChannelSegmentEntityForIncId).anyTimes();
+        expect(mockChannelSegmentEntityForIncId.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
+        expect(mockChannelSegmentEntityForIncId.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
 
         replayAll();
 
@@ -962,6 +975,7 @@ public class LoggingTest {
         int dst = DemandSourceType.IX.getValue();
         Double auctionBidFloor = 455.98;
         Double marketRate = 567.98;
+        final String appBundleId = "testAppBundleId";
 
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         IXAdNetwork mockIXAdNetwork = createMock(IXAdNetwork.class);
@@ -969,6 +983,7 @@ public class LoggingTest {
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockIXAdNetwork).anyTimes();
         expect(mockIXAdNetwork.getForwardedBidFloor()).andReturn(auctionBidFloor).anyTimes();
         expect(mockIXAdNetwork.getForwardedBidGuidance()).andReturn(marketRate).anyTimes();
+        expect(mockIXAdNetwork.getAppBundleId()).andReturn(appBundleId).anyTimes();
         expect(mockSASRequestParameters.getSiteId()).andReturn(siteId).anyTimes();
         expect(mockSASRequestParameters.getTid()).andReturn(taskId).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(dst).anyTimes();
@@ -987,6 +1002,7 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getHandsetInternalId()).andReturn(handsetInternalId).anyTimes();
         expect(mockSASRequestParameters.getOsId()).andReturn(osId).anyTimes();
         expect(mockSASRequestParameters.getMarketRate()).andReturn(marketRate).anyTimes();
+        expect(mockSASRequestParameters.getAppBundleId()).andReturn(appBundleId).anyTimes();
 
         replayAll();
         List<ChannelSegment> rankList = Arrays.asList(mockChannelSegment);
@@ -999,6 +1015,9 @@ public class LoggingTest {
         assertThat(request.getSlot_requested(), is(equalTo(requestSlot)));
         assertThat(request.isSetSegmentId(), is(false));
         assertThat(request.isSetRequestDst(), is(false));
+        assertThat(request.getAppBundleId(), is(equalTo(null)));
+
+
 
         // sasParams is present, slotServed and requestSlot are null, siteSegment  is null
         request = Logging.getRequestObject(mockSASRequestParameters, adsServed, null, null, rankList);

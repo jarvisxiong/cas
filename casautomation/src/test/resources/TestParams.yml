@@ -1688,34 +1688,77 @@ TESTIOS9_2 :
   device_osid : '5'
 
 TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
- - testName: 'ix-happy'
+- testName: 'ix-happy'
+
+TEST_IEM:
+- uidparams_rawuidvalues_iem: '123456789123456'
 
 TEST_DEVICE_LANGUAGE:
- - locale: 'en'
- - geo_countryid : '125' #for req
+- locale : 'en'
+  site_siteid : 'newsiteid'
+  geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_NULL :
- - locale: ''
- - geo_countryid : '125' #for req
+- locale : ''
+  site_siteid : 'newsiteid'
+  geo_countryid : '125' #for req
 
 TEST_DEVICE_LANGUAGE_RTB:
- - locale: 'en'
- - geo_countryid : '125' #for req
+- locale : 'en'
+  site_siteid : 'newsiteid'
+  geo_countryid : '125' #for req
 
- TEST_DEVICE_LANGUAGE_API:
-  - locale: 'en'
-  - geo_countryid : '125' #for req
-  - integration_type : 'ANDROID_API'
+TEST_DEVICE_LANGUAGE_API:
+- locale : 'en'
+  site_siteid : 'newsiteid'
+  geo_countryid : '125' #for req
+  integration_type : 'ANDROID_API'
+  adpool_responseformat : 'html'
 
- TEST_DEVICE_LANGUAGE_NULL_API :
-  - locale: ''
-  - geo_countryid : '125' #for req
-  - integration_type : 'ANDROID_API'
+TEST_DEVICE_LANGUAGE_NULL_API :
+- locale : ''
+  site_siteid : 'newsiteid'
+  geo_countryid : '125' #for req
+  integration_type : 'ANDROID_API'
+  adpool_responseformat : 'html'
 
- TEST_DEVICE_LANGUAGE_RTB_API:
-  - locale: 'en'
-  - geo_countryid : '125' #for req
-  - integration_type : 'ANDROID_API'
+TEST_DEVICE_LANGUAGE_RTB_API:
+- locale : 'en'
+  site_siteid : 'newsiteid'
+  geo_countryid : '125' #for req
+  integration_type : 'ANDROID_API'
+  adpool_responseformat : 'html'
 
 TEST_RP_ALT_SLOT_IDS:
 - adpool_selectedslots : '9,4'
+  site_siteid : 'newsiteid'
+
+TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS:
+- adpool_selectedslots : '9,4'
+  adgroup_inc_id : '123456789'
+  site_siteid : 'TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS'
+  is_site_transparent : 'true'
+  site_inventorytype : 'APP'
+  site_status : 'activated'
+  app_bundle_id : 'TEST_APP_BUNDLE_ID_IOS'
+  site_market_id : 'TEST_MARKET_ID_IOS'
+  site_type_id : '21' #for IOS
+
+TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS:
+- adpool_selectedslots : '9,4'
+  adgroup_inc_id : '123456790'
+  site_siteid : 'TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS'
+  is_site_transparent : 'true'
+  site_inventorytype : 'APP'
+  site_status : 'activated'
+  app_bundle_id : 'TEST_APP_BUNDLE_ID_NOT_IOS'
+  site_market_id : 'TEST_MARKET_ID_NOT_IOS'
+  site_type_id : '22' #for IOS
+
+TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID:
+- adpool_selectedslots : '9,4'
+  adgroup_inc_id : '123456791'
+  site_siteid : 'TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID'
+  is_site_transparent : 'true'
+  site_inventorytype : 'APP'
+  site_status : 'rejected'

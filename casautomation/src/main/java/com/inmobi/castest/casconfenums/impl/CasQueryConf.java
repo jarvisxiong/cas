@@ -323,7 +323,7 @@ public class CasQueryConf {
                         language_targeting_list = "{ch}";
                     }
                     placement_slot_ids = "{9}";
-                    site_ids = "{479e420ee7d6422c9bedec33d82baecd}";
+                    site_ids = "{newsiteid}";
                 }
                 queryString =
                         "insert into ix_packages(id, name, description,rp_data_segment_id,pmp_class,country_ids, "
@@ -351,6 +351,112 @@ public class CasQueryConf {
                                 + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName()
                                 + "'," + adGroup.get("package_id")
                                 + ",'Fender','RIGHT_TO_FIRST_REFUSAL_DEAL',1, now())";
+                System.out.println(queryString);
+                break;
+            }
+            case SELECT_WAP_SITE_UAC: {
+                queryString =
+                    "select * from wap_site_uac where id = '" + adGroup.get("site_id") + "'";
+                System.out.println(queryString);
+                break;
+            }
+            case INSERT_WAP_SITE_UAC: {
+                queryString =
+                    "insert into wap_site_uac (id, site_url, site_type_id, market_id, content_rating, app_type, categories,"
+                        + " currency, downloads, price, rating, rating_count, created_on,\n"
+                        + "  site_mod_on, uac_mod_on, coppa_enabled, gpm_mod_on, modified_on, block_mod_on, title, bundle_id) values ('"
+                        + adGroup.get("site_siteid")
+                        + "' , '"
+                        + adGroup.get("site_url")
+                        + "' , "
+                        + Integer.valueOf(adGroup.get("site_type_id"))
+                        + " , '"
+                        + adGroup.get("site_market_id")
+                        + "' , '"
+                        + adGroup.get("content_rating")
+                        + "' , '"
+                        + adGroup.get("app_type")
+                        + "' , '"
+                        + adGroup.get("categories")
+                        + "' , '"
+                        + adGroup.get("currency")
+                        + "' , '"
+                        + adGroup.get("downloads")
+                        + "' , '"
+                        + adGroup.get("price")
+                        + "' , '"
+                        + adGroup.get("rating")
+                        + "' , '"
+                        + adGroup.get("rating_count")
+                        + "' , "
+                        + "now()"
+                        + " , "
+                        + "now()"
+                        + " , "
+                        + "now()"
+                        + " , "
+                        + adGroup.get("coppa_enabled")
+                        + " , "
+                        + "now()"
+                        + " , "
+                        + "now()"
+                        + " , "
+                        + "now()"
+                        + " , '"
+                        + adGroup.get("title")
+                        + "' , '"
+                        + adGroup.get("bundle_id")
+                        + "')";
+
+                System.out.println(queryString);
+                break;
+            }
+            case DELETE_WAP_SITE_UAC: {
+
+                queryString = "delete from wap_site_uac where id = '" + adGroup.get("site_siteid") + "'";
+                System.out.println(queryString);
+                break;
+            }
+            case SELECT_WAP_SITE: {
+                queryString =
+                    "select * from wap_site where id = '" + adGroup.get("site_id") + "'";
+                System.out.println(queryString);
+                break;
+            }
+            case INSERT_WAP_SITE: {
+                queryString =
+                    "insert into wap_site (id, status, pub_id, site_type_id, modified_on, is_site_transparent) values ('"
+                        + adGroup.get("site_siteid")
+                        + "' , '"
+                        + adGroup.get("site_status")
+                        + "' , '"
+                        + adGroup.get("site_siteid")
+                        + "' , "
+                        + Integer.valueOf(adGroup.get("site_type_id"))
+                        + ", "
+                        + "now()"
+                        + " , "
+                        + adGroup.get("is_site_transparent")
+                        + ")";
+                System.out.println(queryString);
+                break;
+            }
+            case DELETE_WAP_SITE: {
+                queryString = "delete from wap_site where id = '" + adGroup.get("site_siteid") + "'";
+                System.out.println(queryString);
+                break;
+            }
+            case INSERT_WAP_PUBLISHER_IX: {
+                queryString =
+                    "insert into wap_publisher_ix (id) values ('"
+                        + adGroup.get("site_siteid")
+                        + "')";
+
+                System.out.println(queryString);
+                break;
+            }
+            case DELETE_WAP_PUBLISHER_IX: {
+                queryString = "delete from wap_publisher_ix where id = '" + adGroup.get("site_siteid") + "'";
                 System.out.println(queryString);
                 break;
             }

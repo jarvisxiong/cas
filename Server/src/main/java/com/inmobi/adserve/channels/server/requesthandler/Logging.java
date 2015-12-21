@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -305,6 +307,13 @@ public class Logging {
             ixAd.setSeatId(ixAdNetwork.getSeatId());
         }
 
+        final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
+        if (null != channelSegmentEntity && null != ixAdNetwork) {
+            ixAd.setRpAdgroupIncId(channelSegmentEntity.getAdgroupIncId());
+            final long adIncId = channelSegmentEntity.getIncId(ixAdNetwork.getCreativeType());
+            ixAd.setRpAdIncId(adIncId);
+            LOG.debug("AdGroupIncId {} adIncId {}", channelSegmentEntity.getAdgroupIncId(), adIncId);
+        }
         // Log all the package Ids which were sent to RP.
         if (CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
             ixAd.setPackageIds(ixAdNetwork.getPackageIds());
@@ -445,6 +454,15 @@ public class Logging {
                 if (null != adNetworkInterface.getForwardedBidGuidance()) {
                     request.setBidGuidance(adNetworkInterface.getForwardedBidGuidance());
                 }
+                if (adNetworkInterface instanceof IXAdNetwork) {
+                    final String appBundleId = ((IXAdNetwork) adNetworkInterface).getAppBundleId();
+                    if (StringUtils.isNotBlank(appBundleId)) {
+                        request.setAppBundleId(appBundleId);
+                        LOG.debug("AppBundleId is : {}", appBundleId);
+                    } else {
+                        LOG.debug("AppBundleId is : null");
+                    }
+                }
             }
 
             // Currently only populating the siteSegmentId
@@ -505,7 +523,12 @@ public class Logging {
             if (null != sasParams.getGender()) {
                 user.setGender(getGender(sasParams));
             }
-            user.setUids(sasParams.getTUidParams());
+
+            final Map<String, String> uidParam = sasParams.getTUidParams();
+            if (null != uidParam) {
+                uidParam.remove(UidType.IEM.name());
+            }
+            user.setUids(uidParam);
         }
         return user;
     }

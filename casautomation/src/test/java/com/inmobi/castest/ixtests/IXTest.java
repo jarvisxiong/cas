@@ -1767,6 +1767,30 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
+    @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+            LogParserHelper.logParser("AdGroupIncId 123456789", "AppBundleId is : TEST_MARKET_ID_IOS");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+            LogParserHelper.logParser("AdGroupIncId 123456790", "AppBundleId is : TEST_APP_BUNDLE_ID_NOT_IOS");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+            LogParserHelper.logParser("AdGroupIncId 123456791", "AppBundleId is : null");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)
     // public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder)

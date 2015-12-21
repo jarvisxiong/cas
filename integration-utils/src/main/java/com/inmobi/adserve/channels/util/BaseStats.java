@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.inmobi.adserve.channels.util;
 
 import java.util.Map;
