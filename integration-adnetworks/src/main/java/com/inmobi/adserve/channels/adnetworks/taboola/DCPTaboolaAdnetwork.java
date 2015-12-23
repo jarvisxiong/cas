@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.NativeConstraints;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.request.nativead.Image;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
@@ -161,7 +162,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     protected void nativeAdBuilding(final String response) {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
-            final Map<String, String> params = new HashMap<String, String>();
+            final Map<String, String> params = new HashMap<>();
             buildInmobiAdTracker();
             final String beacon = getBeaconUrl();
             final TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
@@ -265,6 +266,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         params.put("impressionId", impressionId);
         params.put("placementId", String.valueOf(sasParams.getPlacementId()));
         params.put("nUrl", nurl);
+        params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
     }
 
     @Override

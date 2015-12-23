@@ -137,6 +137,7 @@ public class RtbNativeAdMakingTest {
         expect(mockSASRequestParameters.getRFormat()).andReturn("native").anyTimes();
         expect(mockSASRequestParameters.getRequestedAdType()).andReturn(RequestedAdType.NATIVE).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(8).anyTimes();
+        expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
