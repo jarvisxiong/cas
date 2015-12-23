@@ -1334,6 +1334,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             params.put("appId", app.getId());
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
+            params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             responseContent = nativeResponseMaker.makeIXResponse(templateContext, params);
         } catch (final Exception e) {
             adStatus = TERM;

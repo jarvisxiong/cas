@@ -1,4 +1,4 @@
-<script type="text/javascript" src="mraid.js"></script>
+#if($IMAIBaseUrl)<script type="text/javascript" src="${IMAIBaseUrl}"></script>#end
 <div style="display:none; position:absolute;" id="${NAMESPACE}clickTarget"></div>
 <script type="text/javascript">
 (function() {

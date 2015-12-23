@@ -941,6 +941,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             params.put("impressionId", impressionId);
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
+            params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
 
             responseContent = nativeResponseMaker.makeResponse(bidResponse, params, templateEntity);
         } catch (final Exception e) {
