@@ -329,7 +329,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return true;
         } catch (final Exception e) {
             LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
-            LOG.info(traceMarker, "Configure parameters inside RTB returned false {} , exception thrown {}",
+            LOG.info(traceMarker, "Configure parameters inside RTB returned false advertiserName {} , exception thrown {}",
                 advertiserName, e);
             return false;
         }
@@ -1010,9 +1010,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
-                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+                "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
                 LOG.info(traceMarker,
-                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+                "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);

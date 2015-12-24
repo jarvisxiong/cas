@@ -8,7 +8,7 @@ import static org.easymock.EasyMock.isA;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.replay;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
