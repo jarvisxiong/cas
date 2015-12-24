@@ -1,4 +1,6 @@
-package com.inmobi.adserve.contracts.ix.response.nativead;
+package com.inmobi.adserve.contracts.common.response.nativead;
+
+import java.util.List;
 
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.template.gson.GsonContract;
@@ -15,7 +17,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @GsonContract
-public class Title {
-    @Required private String text;
+public class Link {
+    @Required private String url;
+    private List<String> clicktrackers;
+    private String fallback;
     private CommonExtension ext;
 }

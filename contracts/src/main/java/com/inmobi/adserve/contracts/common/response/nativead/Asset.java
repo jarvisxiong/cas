@@ -1,4 +1,4 @@
-package com.inmobi.adserve.contracts.ix.response.nativead;
+package com.inmobi.adserve.contracts.common.response.nativead;
 
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.template.gson.DefaultValue;

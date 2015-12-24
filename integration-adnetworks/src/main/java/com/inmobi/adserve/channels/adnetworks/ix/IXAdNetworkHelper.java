@@ -37,14 +37,14 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.WIFI;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.DATA;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.IMAGE;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.TITLE;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Asset.AssetType.VIDEO;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType.CTA_TEXT;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType.DESC;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType.DOWNLOADS;
-import static com.inmobi.adserve.contracts.ix.request.nativead.Data.DataAssetType.RATING;
+import static com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType.DATA;
+import static com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType.IMAGE;
+import static com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType.TITLE;
+import static com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType.VIDEO;
+import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAssetType.CTA_TEXT;
+import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAssetType.DESC;
+import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAssetType.DOWNLOADS;
+import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAssetType.RATING;
 
 import java.awt.Dimension;
 import java.io.IOException;
@@ -85,9 +85,9 @@ import com.inmobi.adserve.channels.util.GenericTemplateObject;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.ix.request.Geo;
-import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
-import com.inmobi.adserve.contracts.ix.request.nativead.Image;
-import com.inmobi.adserve.contracts.ix.response.nativead.Native;
+import com.inmobi.adserve.contracts.common.request.nativead.Asset;
+import com.inmobi.adserve.contracts.common.request.nativead.Image;
+import com.inmobi.adserve.contracts.common.response.nativead.Native;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
@@ -297,7 +297,7 @@ public class IXAdNetworkHelper {
      * @return
      */
     public static boolean areRequestResponseAssetsValid(final Asset requestAsset,
-            final com.inmobi.adserve.contracts.ix.response.nativead.Asset responseAsset,
+            final com.inmobi.adserve.contracts.common.response.nativead.Asset responseAsset,
             final com.inmobi.template.context.App.Builder contextBuilder) {
         int requestAssetCount = 0;
         int responseAssetCount = 0;
@@ -355,7 +355,7 @@ public class IXAdNetworkHelper {
                 contextBuilder.setTitle(responseAsset.getTitle().getText());
                 break;
             case IMAGE:
-                final com.inmobi.adserve.contracts.ix.response.nativead.Image img = responseAsset.getImg();
+                final com.inmobi.adserve.contracts.common.response.nativead.Image img = responseAsset.getImg();
                 final Integer width = img.getW() == null ? requestAsset.getImg().getWmin() : img.getW();
                 final Integer height = img.getH() == null ? requestAsset.getImg().getHmin() : img.getH();
                 if (Image.ImageAssetType.ICON.getId() == requestAsset.getImg().getType()) {
@@ -419,8 +419,8 @@ public class IXAdNetworkHelper {
             contextBuilder.setPixelUrls(nativeObj.getImptrackers());
             contextBuilder.setAdImpressionId(impressionId);
 
-            final List<com.inmobi.adserve.contracts.ix.response.nativead.Asset> assetList = nativeObj.getAssets();
-            for (final com.inmobi.adserve.contracts.ix.response.nativead.Asset asset : assetList) {
+            final List<com.inmobi.adserve.contracts.common.response.nativead.Asset> assetList = nativeObj.getAssets();
+            for (final com.inmobi.adserve.contracts.common.response.nativead.Asset asset : assetList) {
                 final int assetId = asset.getId();
 
                 // We need all of mandatory fields. And Requested type should be same as response

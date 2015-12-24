@@ -1,4 +1,4 @@
-package com.inmobi.adserve.contracts.ix.response.nativead;
+package com.inmobi.adserve.contracts.common.response.nativead;
 
 import java.util.List;
 

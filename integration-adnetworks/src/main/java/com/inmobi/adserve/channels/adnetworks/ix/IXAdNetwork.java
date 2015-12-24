@@ -93,8 +93,8 @@ import com.inmobi.adserve.contracts.ix.request.Transparency;
 import com.inmobi.adserve.contracts.ix.request.User;
 import com.inmobi.adserve.contracts.ix.request.Video;
 import com.inmobi.adserve.contracts.ix.request.VideoExtension;
-import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
-import com.inmobi.adserve.contracts.ix.request.nativead.Native;
+import com.inmobi.adserve.contracts.common.request.nativead.Asset;
+import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.ix.response.Bid;
 import com.inmobi.adserve.contracts.ix.response.BidResponse;
 import com.inmobi.adserve.contracts.ix.response.SeatBid;
@@ -208,7 +208,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    private com.inmobi.adserve.contracts.ix.response.nativead.Native nativeObj;
+    private com.inmobi.adserve.contracts.common.response.nativead.Native nativeObj;
     @Getter
     private int impressionObjCount;
     @Getter

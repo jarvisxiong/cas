@@ -1,7 +1,7 @@
 package com.inmobi.adserve.contracts.ix.request;
 
 import com.google.gson.annotations.SerializedName;
-import com.inmobi.adserve.contracts.ix.request.nativead.Native;
+import com.inmobi.adserve.contracts.common.request.nativead.Native;
 
 import lombok.Data;
 import lombok.NonNull;

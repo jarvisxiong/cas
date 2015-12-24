@@ -55,8 +55,8 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
-import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
-import com.inmobi.adserve.contracts.ix.request.nativead.Native;
+import com.inmobi.adserve.contracts.common.request.nativead.Asset;
+import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.rtb.request.App;
 import com.inmobi.adserve.contracts.rtb.request.AppExt;
 import com.inmobi.adserve.contracts.rtb.request.AppStore;
@@ -171,7 +171,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isWapSiteUACEntity = false;
     private NativeAdTemplateEntity templateEntity;
-    private com.inmobi.adserve.contracts.ix.response.nativead.Native nativeObj;
+    private com.inmobi.adserve.contracts.common.response.nativead.Native nativeObj;
     private Map<Integer, Asset> mandatoryAssetMap;
     private Map<Integer, Asset> nonMandatoryAssetMap;
 

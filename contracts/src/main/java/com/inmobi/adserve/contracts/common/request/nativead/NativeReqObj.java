@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.inmobi.adserve.contracts.ix.request.nativead;
+package com.inmobi.adserve.contracts.common.request.nativead;
 
 import java.util.ArrayList;
 import java.util.List;

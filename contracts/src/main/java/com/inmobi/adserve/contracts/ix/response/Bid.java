@@ -3,7 +3,7 @@ package com.inmobi.adserve.contracts.ix.response;
 import java.util.List;
 
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
-import com.inmobi.adserve.contracts.ix.response.nativead.AdmObject;
+import com.inmobi.adserve.contracts.common.response.nativead.AdmObject;
 import com.inmobi.template.gson.GsonContract;
 import com.inmobi.template.gson.Required;
 

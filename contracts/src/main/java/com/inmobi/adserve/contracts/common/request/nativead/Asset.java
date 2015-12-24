@@ -1,4 +1,4 @@
-package com.inmobi.adserve.contracts.ix.request.nativead;
+package com.inmobi.adserve.contracts.common.request.nativead;
 
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.Video;
