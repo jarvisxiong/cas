@@ -149,7 +149,7 @@ public class NativeResponseMaker {
         context.put("OLD_LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("TRACKING_CODE", getTrackingCode(params, app));
         context.put("BEACON_URL", params.get("beaconUrl"));
-        context.put("CLICK_TRACKER", getClickUrl(params, app));
+        context.put("CLICK_TRACKER", getClickUrl(app));
         context.put(IMAI_BASE_URL, params.get(IMAI_BASE_URL));
         return context;
     }
