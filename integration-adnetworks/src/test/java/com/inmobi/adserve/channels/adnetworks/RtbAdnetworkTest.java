@@ -497,7 +497,7 @@ public class RtbAdnetworkTest {
         // Temporarily using ixResponseJSON instead of rtbdResponseJSON
         str.append(TestUtils.SampleStrings.ixResponseJson);
         final StringBuilder responseAdm = new StringBuilder();
-        responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
+        responseAdm.append("<html><head><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/></head><body style=\"margin:0;padding:0;\">");
         responseAdm
                 .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
         responseAdm.append("<img src=\'beaconUrl?b=${WIN_BID}\' height=1 width=1 border=0 />");
@@ -529,7 +529,7 @@ public class RtbAdnetworkTest {
         str.append(TestUtils.SampleStrings.ixResponseJson);
         final StringBuilder responseAdm = new StringBuilder();
         responseAdm
-                .append("<html><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beaconUrl?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
+                .append("<html><head><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/></head><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beaconUrl?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
         sas.setSdkVersion("a450");
         sas.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         final String externalSiteKey = "f6wqjq1r5v";
@@ -557,7 +557,7 @@ public class RtbAdnetworkTest {
         bidResponse.setCur("RMD");
         bidResponse.getSeatbid().get(0).getBid().get(0).setNurl("${AUCTION_PRICE}${AUCTION_CURRENCY}");
         final StringBuilder responseAdm = new StringBuilder();
-        responseAdm.append("<html><body style=\"margin:0;padding:0;\">");
+        responseAdm.append("<html><head><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/></head><body style=\"margin:0;padding:0;\">");
         responseAdm
                 .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
         responseAdm
