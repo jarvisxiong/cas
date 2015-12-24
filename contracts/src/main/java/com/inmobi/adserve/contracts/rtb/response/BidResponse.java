@@ -18,12 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @GsonContract
 public final class BidResponse {
-    @NonNull
-    @Required
-    private String id;
-    @NonNull
-    @Required
-    private List<SeatBid> seatbid;
+    @NonNull @Required private String id;
+    @NonNull @Required private List<SeatBid> seatbid;
     private String bidid;
     private String cur;
     private String customdata;

@@ -6,6 +6,6 @@ package com.inmobi.adserve.contracts.rtb.response;
 import lombok.Data;
 
 @Data
-public class BidExtensions {
+public final class BidExtensions {
     private BidExtVideo video;
 }

@@ -9,27 +9,18 @@ import com.inmobi.template.gson.Required;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Created by avinash.kumar on 12/14/15.
  */
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 @GsonContract
 public final class Bid {
-    @NonNull
-    @Required
-    private String id;
-    @NonNull
-    @Required
-    private String impid;
-    @NonNull
-    @Required
-    private Double price;
+    @NonNull @Required private String id;
+    @NonNull @Required private String impid;
+    @NonNull @Required private Double price;
     private String adid;
-        // Not in official spec - No Need for making this required, since we have AbstractAuctionFilter
     private String nurl;
     private String adm;
     private AdmObject admobject;

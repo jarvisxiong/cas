@@ -8,7 +8,7 @@ import lombok.Data;
  * Created by avinash.kumar on 12/14/15.
  */
 @Data
-public class BannerExtVideo {
+public final class BannerExtVideo {
     private final Integer linearity;
     private final Integer minduration;
     private final Integer maxduration;
