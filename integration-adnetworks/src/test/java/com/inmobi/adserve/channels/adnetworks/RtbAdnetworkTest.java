@@ -43,7 +43,7 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
-import com.inmobi.adserve.channels.api.natives.IxNativeBuilderImpl;
+import com.inmobi.adserve.channels.api.natives.CommonNativeBuilderImpl;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
@@ -994,7 +994,7 @@ public class RtbAdnetworkTest {
             .template("template")
             .nativeUILayout(layoutType)
             .build();
-        IxNativeBuilderImpl ixNativeBuilder = new IxNativeBuilderImpl(nativeAdTemplateEntity);
+        CommonNativeBuilderImpl ixNativeBuilder = new CommonNativeBuilderImpl(nativeAdTemplateEntity);
         Native natObj = ixNativeBuilder.buildNative();
 
         Integer imageType;
@@ -1079,7 +1079,7 @@ public class RtbAdnetworkTest {
             .template("template")
             .nativeUILayout(layoutType)
             .build();
-        IxNativeBuilderImpl ixNativeBuilder = new IxNativeBuilderImpl(nativeAdTemplateEntity);
+        CommonNativeBuilderImpl ixNativeBuilder = new CommonNativeBuilderImpl(nativeAdTemplateEntity);
         Native natObj = ixNativeBuilder.buildNative();
 
         assertEquals((Integer)Image.ImageAssetType.ICON.getId(), natObj.getRequestobj().getAssets().get(0).getImg().getType());

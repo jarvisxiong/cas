@@ -12,7 +12,6 @@ import com.google.inject.TypeLiteral;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.server.CasTimeoutHandler;
 import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
@@ -58,7 +57,6 @@ public class CasNettyModule extends AbstractModule {
 
         bind(CasNettyServer.class).asEagerSingleton();
         bind(AsyncHttpClientProvider.class).asEagerSingleton();
-        bind(NativeTemplateAttributeFinder.class).asEagerSingleton();
         bind(IPRepository.class).asEagerSingleton();
 
         // thread pool to be used in AsyncHttpClient

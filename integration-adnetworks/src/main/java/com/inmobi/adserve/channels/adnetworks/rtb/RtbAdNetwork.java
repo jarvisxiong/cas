@@ -4,7 +4,7 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -38,11 +38,10 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
+import com.inmobi.adserve.channels.api.natives.CommonNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
-import com.inmobi.adserve.channels.api.template.NativeTemplateAttributeFinder;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
@@ -70,6 +69,7 @@ import com.inmobi.adserve.contracts.rtb.request.Site;
 import com.inmobi.adserve.contracts.rtb.request.User;
 import com.inmobi.adserve.contracts.rtb.response.Bid;
 import com.inmobi.adserve.contracts.rtb.response.BidResponse;
+import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.types.DeviceType;
 import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
@@ -114,15 +114,16 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final String BLIND_STORE_URL_FORMAT = "http://www.ix.com/%s";
+    private static Gson gson;
 
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
 
     @Inject
-    private static NativeTemplateAttributeFinder nativeTemplateAttributeFinder;
+    protected static TemplateConfiguration templateConfiguration;
 
     @Inject
-    @IxNativeBuilderFactory
+    @CommonNativeBuilderFactory
     private static NativeBuilderFactory nativeBuilderfactory;
 
     @Inject
@@ -196,9 +197,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         this.advertiserName = advertiserName;
         templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
-        isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", true);
+        isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", false);
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
         bidderCurrency = config.getString(advertiserName + ".currency", USD);
+        gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
     @Override
@@ -322,7 +324,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private boolean serializeBidRequest() {
         try {
-            final Gson gson = new Gson();
             bidRequestJson = gson.toJson(bidRequest);
             LOG.info(traceMarker, "RTB request json is: {}", bidRequestJson);
             return true;
@@ -907,7 +908,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private boolean deserializeResponse(final String response) {
-        final Gson gson = new Gson();
         try {
             bidResponse = gson.fromJson(response, BidResponse.class);
             LOG.debug(traceMarker, "Done with parsing of bidresponse");

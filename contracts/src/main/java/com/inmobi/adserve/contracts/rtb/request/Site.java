@@ -14,8 +14,8 @@ public final class Site {
     private String name;
     private String domain;
     private List<String> cat;
-    private List<String> sectionCat;
-    private List<String> pageCat;
+    private List<String> sectioncat;
+    private List<String> pagecat;
     private String page;
     private Integer privacypolicy;
     private String ref;

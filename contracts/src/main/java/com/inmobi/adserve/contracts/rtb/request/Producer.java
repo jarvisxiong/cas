@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by avinash.kumar on 12/14/15.
  */
-public class Producer {
+public final class Producer {
     private String id;
     private String name;
     private List<String> cat;

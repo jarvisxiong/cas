@@ -21,7 +21,6 @@ public final class SeatBid {
     @NonNull
     @Required
     private List<Bid> bid;
-    // Trading Desk Ids
     private String seat;
     private Integer group;
 }

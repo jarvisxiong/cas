@@ -13,6 +13,7 @@ public final class Device {
     private String ua;
     private String ip;
     private Geo geo;
+    private String didraw;
     private String didsha1;
     private String didmd5;
     private String dpidsha1;

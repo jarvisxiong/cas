@@ -15,6 +15,6 @@ import com.google.inject.BindingAnnotation;
 @BindingAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target({FIELD, PARAMETER})
-public @interface IxNativeBuilderFactory {
+public @interface CommonNativeBuilderFactory {
 
 }

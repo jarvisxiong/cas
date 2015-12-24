@@ -22,7 +22,7 @@ import com.inmobi.adserve.contracts.misc.contentjson.TextAsset;
 /**
  * Created by ishanbhatnagar on 7/5/15.
  */
-public final class IxNativeBuilderImpl extends NativeBuilderImpl {
+public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
     private static final NativeLayoutId DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_ICON = NativeLayoutId.NEWS_FEED;
     private static final NativeLayoutId DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_FEED = NativeLayoutId.NEWS_FEED;
     private static final NativeLayoutId DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_STREAM = NativeLayoutId.CONTENT_STREAM;
@@ -35,7 +35,7 @@ public final class IxNativeBuilderImpl extends NativeBuilderImpl {
     private final NativeReqObj nativeReqObj;
 
     @Inject
-    public IxNativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
+    public CommonNativeBuilderImpl(@Assisted final NativeAdTemplateEntity templateEntity) {
         super(templateEntity);
         NativeLayoutId layoutId = NativeLayoutId.findByInmobiNativeUILayoutType(templateEntity.getNativeUILayout());
         if (null == layoutId) {

@@ -50,7 +50,7 @@ import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
+import com.inmobi.adserve.channels.api.natives.CommonNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -144,7 +144,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
     @Inject
-    @IxNativeBuilderFactory
+    @CommonNativeBuilderFactory
     private static NativeBuilderFactory nativeBuilderfactory;
     @Inject
     private static NativeResponseMaker nativeResponseMaker;

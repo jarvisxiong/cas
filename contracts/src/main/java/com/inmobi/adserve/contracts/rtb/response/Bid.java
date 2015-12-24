@@ -22,9 +22,14 @@ public final class Bid {
     @NonNull
     @Required
     private String id;
-    @NonNull @Required private String impid;
-    @NonNull @Required private Double price;
-    private String adid;    // Not in official spec - No Need for making this required, since we have AbstractAuctionFilter
+    @NonNull
+    @Required
+    private String impid;
+    @NonNull
+    @Required
+    private Double price;
+    private String adid;
+        // Not in official spec - No Need for making this required, since we have AbstractAuctionFilter
     private String nurl;
     private String adm;
     private AdmObject admobject;

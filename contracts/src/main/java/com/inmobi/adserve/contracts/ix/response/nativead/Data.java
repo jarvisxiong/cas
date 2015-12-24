@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @GsonContract
-public class Data {
+public final class Data {
     private String label;
     @Required private String value;
     private CommonExtension ext;
