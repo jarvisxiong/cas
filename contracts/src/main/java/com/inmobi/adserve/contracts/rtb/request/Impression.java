@@ -1,4 +1,4 @@
-package com.inmobi.adserve.contracts.ix.request;
+package com.inmobi.adserve.contracts.rtb.request;
 
 import com.google.gson.annotations.SerializedName;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 /**
- * Created by ishanbhatnagar on 22/1/15.
+ * Created by avinash.kumar on 12/14/15.
  */
 @Data
 public final class Impression {
@@ -17,13 +17,11 @@ public final class Impression {
     private Video video;
     @SerializedName("native")
     private Native nat;
-    private String tagid;
-    private Double bidfloor = 0.0;
-    private ProxyDemand proxydemand;
-    private Integer instl = 0;
-    private Integer secure = 0;
-    private ImpressionExtension ext;
-    // https://jira.corp.inmobi.com/browse/PROG-1052
     private String displaymanager;
     private String displaymanagerver;
+    private int instl = 0;
+    private String tagid;
+    private double bidfloor = 0.0;
+    private String bidfloorcur = "USD";
+    private int secure = 0;
 }
