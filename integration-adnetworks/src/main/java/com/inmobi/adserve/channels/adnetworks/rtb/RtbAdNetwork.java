@@ -201,52 +201,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         bidderCurrency = config.getString(advertiserName + ".currency", USD);
     }
 
-    private Impression createImpressionObject() {
-        Impression impression;
-        if (null != casInternalRequestParameters.getImpressionId()) {
-            impression = new Impression(casInternalRequestParameters.getImpressionId());
-        } else {
-            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
-            return null;
-        }
-
-        if (isNativeRequest) {
-            final Native nativeRtb = createNativeObject();
-            impression.setNat(nativeRtb);
-            if (nativeRtb != null) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
-                mandatoryAssetMap = new HashMap<>();
-                nonMandatoryAssetMap = new HashMap<>();
-                for (final Asset asset : nativeRtb.getRequestobj().getAssets()) {
-                    if (1 == asset.getRequired()) {
-                        mandatoryAssetMap.put(asset.getId(), asset);
-                    } else {
-                        nonMandatoryAssetMap.put(asset.getId(), asset);
-                    }
-                }
-            }
-        }
-        else {
-            impression.setBanner(createBannerObject());
-        }
-        impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
-        impression.setBidfloorcur(bidderCurrency);
-        // Set interstitial or not
-        impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
-        forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
-        forwardedBidGuidance = sasParams.getMarketRate();
-        impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
-        LOG.debug(traceMarker, "Bid floor is {} {}", impression.getBidfloor(), impression.getBidfloorcur());
-
-        if (null != sasParams.getSdkVersion()) {
-            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
-            impression.setDisplaymanagerver(sasParams.getSdkVersion());
-        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
-            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
-        }
-        return impression;
-    }
-
     @Override
     protected boolean configureParameters() {
         LOG.debug(traceMarker, "inside configureParameters of RTB");
@@ -378,6 +332,52 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 advertiserName, e);
             return false;
         }
+    }
+
+    private Impression createImpressionObject() {
+        Impression impression;
+        if (null != casInternalRequestParameters.getImpressionId()) {
+            impression = new Impression(casInternalRequestParameters.getImpressionId());
+        } else {
+            LOG.info(traceMarker, "Impression id can not be null in casInternal Request Params");
+            return null;
+        }
+
+        if (isNativeRequest) {
+            final Native nativeRtb = createNativeObject();
+            impression.setNat(nativeRtb);
+            if (nativeRtb != null) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
+                mandatoryAssetMap = new HashMap<>();
+                nonMandatoryAssetMap = new HashMap<>();
+                for (final Asset asset : nativeRtb.getRequestobj().getAssets()) {
+                    if (1 == asset.getRequired()) {
+                        mandatoryAssetMap.put(asset.getId(), asset);
+                    } else {
+                        nonMandatoryAssetMap.put(asset.getId(), asset);
+                    }
+                }
+            }
+        }
+        else {
+            impression.setBanner(createBannerObject());
+        }
+        impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
+        impression.setBidfloorcur(bidderCurrency);
+        // Set interstitial or not
+        impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
+        forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
+        forwardedBidGuidance = sasParams.getMarketRate();
+        impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
+        LOG.debug(traceMarker, "Bid floor is {} {}", impression.getBidfloor(), impression.getBidfloorcur());
+
+        if (null != sasParams.getSdkVersion()) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK);
+            impression.setDisplaymanagerver(sasParams.getSdkVersion());
+        } else if (null != sasParams.getAdcode() && "JS".equalsIgnoreCase(sasParams.getAdcode())) {
+            impression.setDisplaymanager(GlobalConstant.DISPLAY_MANAGER_INMOBI_JS);
+        }
+        return impression;
     }
 
     private Banner createBannerObject() {
