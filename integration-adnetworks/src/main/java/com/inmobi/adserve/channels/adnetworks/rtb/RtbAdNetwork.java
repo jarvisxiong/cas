@@ -92,10 +92,10 @@ import lombok.Setter;
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
     public static ImpressionCallbackHelper impressionCallbackHelper;
-    public static final List<String> CURRENCIES_SUPPORTED = new ArrayList<>(Arrays.asList(USD, "CNY", "JPY", "EUR",
-            "KRW", "RUB"));
-    private static final List<String> BLOCKED_ADVERTISER_LIST = new ArrayList<>(Arrays.asList("king.com",
-            "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
+    public static final List<String> CURRENCIES_SUPPORTED =
+            new ArrayList<>(Arrays.asList(USD, "CNY", "JPY", "EUR", "KRW", "RUB"));
+    private static final List<String> BLOCKED_ADVERTISER_LIST = new ArrayList<>(Arrays
+            .asList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com", "supercell.com"));
 
     private static final Logger LOG = LoggerFactory.getLogger(RtbAdNetwork.class);
     private static final int AUCTION_TYPE = 2;
@@ -104,8 +104,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private static final int DEVICE_TYPE_TABLET = 5;
     private static List<String> image_mimes = Arrays.asList("image/jpeg", "image/gif", "image/png");
     private static List<Integer> fsBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16);
-    private static List<Integer> performanceBlockedAttributes = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-            13, 14, 15, 16);
+    private static List<Integer> performanceBlockedAttributes =
+            Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
     private static final String FAMILY_SAFE_RATING = GlobalConstant.ONE;
     private static final String PERFORMANCE_RATING = GlobalConstant.ZERO;
@@ -180,9 +180,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return asyncHttpClientProvider.getRtbAsyncHttpClient();
     }
 
-    public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
-            final String advertiserName, final boolean templateWinNotification) {
+    public RtbAdNetwork(final Configuration config, final Bootstrap clientBootstrap, final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host, final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         urlArg = config.getString(advertiserName + ".urlArg");
@@ -207,8 +205,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     protected boolean configureParameters() {
         LOG.debug(traceMarker, "inside configureParameters of RTB");
         if (!checkIfBasicParamsAvailable()) {
-            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available",
-                    advertiserName);
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Basic Params Not Available", advertiserName);
             return false;
         }
 
@@ -240,8 +237,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final List<Impression> impresssionlist = new ArrayList<Impression>();
         final Impression impression = createImpressionObject();
         if (null == impression) {
-            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null",
-                    advertiserName);
+            LOG.info(traceMarker, "Configure parameters inside rtb returned false {}, Impression Obj is null", advertiserName);
             return false;
         }
         impresssionlist.add(impression);
@@ -264,9 +260,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
                 || StringUtils.isBlank(externalSiteId) || !isRequestFormatSupported()) {
-            LOG.debug(
-                    traceMarker,
-                    "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
+            LOG.debug(traceMarker, "mandate parameters missing or request format is not compatible to partner supported response for dummy so exiting adapter");
             return false;
         }
         return true;
@@ -276,8 +270,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         return isNativeRequest ? isNativeResponseSupported : isHTMLResponseSupported;
     }
 
-    private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app,
-            final User user, final Device device) {
+    private boolean createBidRequestObject(final List<Impression> impresssionlist, final Site site, final App app, final User user, final Device device) {
         bidRequest = new BidRequest(casInternalRequestParameters.getAuctionId(), impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
@@ -329,8 +322,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             return true;
         } catch (final Exception e) {
             LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
-            LOG.info(traceMarker, "Configure parameters inside RTB returned false advertiserName {} , exception thrown {}",
-                advertiserName, e);
+            LOG.info(traceMarker, "Configure parameters inside RTB returned false advertiserName {} , exception thrown {}", advertiserName, e);
             return false;
         }
     }
@@ -359,8 +351,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     }
                 }
             }
-        }
-        else {
+        } else {
             impression.setBanner(createBannerObject());
         }
         impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
@@ -505,7 +496,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     /**
      * Blind App - Send Category as App Name <br>
      * Transparent App - Set Proper App Name if available otherwise send Category.
-     * 
+     *
      * @return
      */
     private App createAppObject() {
@@ -521,7 +512,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
         String category = null;
 
-        if (StringUtils.isBlank(app.getName()) && isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType())) {
+        if (StringUtils.isBlank(app.getName()) && isWapSiteUACEntity && StringUtils
+                .isNotEmpty(wapSiteUACEntity.getAppType())) {
             app.setName(wapSiteUACEntity.getAppType());
         } else if (StringUtils.isBlank(app.getName()) && (category = getCategories(',', false)) != null) {
             app.setName(category);
@@ -663,7 +655,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 device.setDidmd5(DigestUtils.md5Hex(value));
                 device.setDpidsha1(null);
             }
-        } else if(StringUtils.isBlank(casInternalRequestParameters.getIem())) {
+        } else if (StringUtils.isBlank(casInternalRequestParameters.getIem())) {
             final String imei = getIMEI();
             if (imei != null) {
                 device.setDidmd5(imei);
@@ -672,7 +664,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 device.setDpidsha1(null);
             }
         }
-        
+
 
         final Map<String, String> deviceExtensions = getDeviceExt(device);
         final String ifa = getUidIFA(false);
@@ -724,13 +716,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         final byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
-        final Request ningRequest =
-                new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod(POST)
-                        .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
-                        .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
-                        .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
-                        .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).setBody(body).setBodyEncoding(UTF_8)
-                        .build();
+        final Request ningRequest = new RequestBuilder().setUrl(uriCallBack.toASCIIString()).setMethod(POST)
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
+                .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
+                .setHeader(HttpHeaders.Names.HOST, uriCallBack.getHost()).setBody(body).setBodyEncoding(UTF_8).build();
 
         final boolean callbackResult =
                 impressionCallbackHelper.writeResponse(uriCallBack, ningRequest, getAsyncHttpClient());
@@ -746,9 +736,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         final StringBuilder content = new StringBuilder();
         content.append("{\"bidid\"=").append(bidResponse.getBidid()).append(",\"seat\"=")
                 .append(bidResponse.getSeatbid().get(0).getSeat());
-        content.append(",\"bid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getId()).append(",\"price\"=")
-                .append(secondBidPriceInUsd).append(",\"adid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getAdid())
-                .append("}");
+        content.append(",\"bid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getId())
+                .append(",\"price\"=").append(secondBidPriceInUsd).append(",\"adid\"=")
+                .append(bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()).append("}");
     }
 
     public String replaceRTBMacros(String url) {
@@ -762,17 +752,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
-            url =
-                    url.replaceAll(RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
-                            .getBid().get(0).getAdid());
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE, bidResponse.getSeatbid().get(0).getBid()
+                    .get(0).getAdid());
         }
         if (null != bidResponse.getBidid()) {
             url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url =
-                    url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
-                            .getSeat());
+            url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0)
+                    .getSeat());
         }
         if (null == bidRequest) {
             LOG.info(traceMarker, "bidrequest is null");
@@ -877,8 +865,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
         } catch (final Exception e) {
             adStatus = NO_AD;
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}",
-                    advertiserName, e);
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner{} {}", advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.BANNER_PARSE_RESPONSE_EXCEPTION);
         }
 
@@ -987,7 +974,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
 
-            if(isNativeRequest && null != templateEntity) {
+            if (isNativeRequest && null != templateEntity) {
                 trackerBuilder.setNativeTemplateId(templateEntity.getId());
             }
         }
@@ -997,8 +984,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     public void setSecondBidPrice(final Double price) {
         secondBidPriceInUsd = price;
         secondBidPriceInLocal = calculatePriceInLocal(price);
-        LOG.debug("secondBidPriceInUsd {}, secondBidPriceInLocal {} {}", secondBidPriceInUsd, secondBidPriceInLocal,
-                bidderCurrency);
+        LOG.debug("secondBidPriceInUsd {}, secondBidPriceInLocal {} {}", secondBidPriceInUsd, secondBidPriceInLocal, bidderCurrency);
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
         responseContent = replaceRTBMacros(responseContent);
         final ThirdPartyAdResponse adResponse = getResponseAd();
@@ -1009,10 +995,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private Native createNativeObject() {
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
-            LOG.info(traceMarker,
-                "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
-                LOG.info(traceMarker,
-                "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
+            LOG.info(traceMarker, "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
+            LOG.info(traceMarker, "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
@@ -1024,9 +1008,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
             final App app = bidRequest.getApp();
-            final com.inmobi.template.context.App templateContext =
-                IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
-                    nonMandatoryAssetMap, impressionId);
+            final com.inmobi.template.context.App templateContext = IXAdNetworkHelper
+                    .validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap, nonMandatoryAssetMap, impressionId);
             if (null == templateContext) {
                 adStatus = TERM;
                 responseContent = DEFAULT_EMPTY_STRING;
@@ -1037,8 +1020,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
             final Map<String, String> params = new HashMap<>();
             params.put("beaconUrl", getBeaconUrl());
-            params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM
-                + RTBCallbackMacros.DEAL_GET_PARAM);
+            params.put("winUrl",
+                    getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM + RTBCallbackMacros.DEAL_GET_PARAM);
             params.put("appId", app.getId());
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
@@ -1046,8 +1029,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         } catch (final Exception e) {
             adStatus = TERM;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error(
-                "Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
+            LOG.error("Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
                     + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
