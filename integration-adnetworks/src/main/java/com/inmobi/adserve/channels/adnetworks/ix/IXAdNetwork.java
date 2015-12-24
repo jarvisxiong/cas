@@ -128,7 +128,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final int IX_MRAID1_VALUE = 1000;
 
     private static final List<Integer> MRAID_FRAMEWORK_VALUES = Lists.newArrayList(API_FRAMEWORKS.MRAID_2.getValue(),
-        API_FRAMEWORKS.MRAID_1.getValue(), IX_MRAID2_VALUE, IX_MRAID1_VALUE);
+            API_FRAMEWORKS.MRAID_1.getValue(), IX_MRAID2_VALUE, IX_MRAID1_VALUE);
     private static final String BLIND_BUNDLE_APP_FORMAT = "com.ix.%s";
     private static final String BLIND_DOMAIN_SITE_FORMAT = "http://www.ix.com/%s";
     private static final short AGE_LIMIT_FOR_COPPA = 8;
@@ -260,7 +260,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         globalBlindFromConfig = config.getList(advertiserName + ".globalBlind");
         bidFloorPercent = config.getInt(advertiserName + ".bidFloorPercent", 100);
         sproutUniqueIdentifierRegex =
-            config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
+                config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
     }
 
@@ -274,7 +274,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "inside configureParameters of IX");
         if (!checkIfBasicParamsAvailable()) {
             LOG.info(traceMarker, "Configure parameters inside IX returned false {}: BasicParams Not Available",
-                advertiserName);
+                    advertiserName);
             return false;
         }
 
@@ -297,7 +297,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Impression impression = createImpressionObject();
         if (null == impression) {
             LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Impression Obj is null",
-                advertiserName);
+                    advertiserName);
             return false;
         }
         impresssionlist.add(impression);
@@ -307,7 +307,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         bidRequest = createBidRequestObject(impresssionlist);
         if (null == bidRequest) {
             LOG.info(traceMarker, "Configure parameters inside IX returned false {}: Failed inside createBidRequest",
-                advertiserName);
+                    advertiserName);
             return false;
         }
         // Serializing the bidRequest Object
@@ -324,11 +324,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-            || StringUtils.isBlank(sasParams.getSiteId()) || StringUtils.isBlank(externalSiteId)
-            || !isRequestFormatSupported()) {
+                || StringUtils.isBlank(sasParams.getSiteId()) || StringUtils.isBlank(externalSiteId)
+                || !isRequestFormatSupported()) {
             LOG.debug(traceMarker,
-                "mandate parameters missing or request format is not compatible to partner supported response for "
-                    + "dummy so exiting adapter");
+                    "mandate parameters missing or request format is not compatible to partner supported response for "
+                            + "dummy so exiting adapter");
             return false;
         }
         return true;
@@ -376,7 +376,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } catch (final Exception e) {
             LOG.debug(traceMarker, "Could not create json from bidRequest for partner {}", advertiserName);
             LOG.info(traceMarker, "Configure parameters inside IX returned false {} , exception thrown {}",
-                advertiserName, e);
+                    advertiserName, e);
             return null;
         }
     }
@@ -384,8 +384,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Regulations createRegsObject() {
         final Regulations regs = new Regulations();
         isCoppaSet =
-            isWapSiteUACEntity && wapSiteUACEntity.isCoppaEnabled() || sasParams.getAge() != null
-                && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA;
+                isWapSiteUACEntity && wapSiteUACEntity.isCoppaEnabled() || sasParams.getAge() != null
+                        && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA;
         regs.setCoppa(isCoppaSet ? 1 : 0);
         return regs;
     }
@@ -413,9 +413,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             impression.setVideo(video);
             if (video != null) {
                 final String statName =
-                    isVideoRequest
-                        ? InspectorStrings.TOTAL_VAST_VIDEO_REQUESTS
-                        : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_REQUESTS;
+                        isVideoRequest
+                                ? InspectorStrings.TOTAL_VAST_VIDEO_REQUESTS
+                                : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_REQUESTS;
                 InspectorStats.incrementStatCount(getName(), statName);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
             }
@@ -485,11 +485,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity);
         final long endTime = System.currentTimeMillis();
         InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
-            InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
+                InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
 
         if (CollectionUtils.isNotEmpty(packageIds)) {
             final RPImpressionExtension rp =
-                impExt.getRp() == null ? new RPImpressionExtension(zoneId) : impExt.getRp();
+                    impExt.getRp() == null ? new RPImpressionExtension(zoneId) : impExt.getRp();
 
             final RPTargetingExtension target = new RPTargetingExtension();
             target.setPackages(Lists.transform(packageIds, Functions.toStringFunction()));
@@ -532,9 +532,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker,
-                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             LOG.info(traceMarker,
-                String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
+                    String.format("This placement id %d doesn't have native template: ", sasParams.getPlacementId()));
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
@@ -654,7 +654,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Geo geo = new Geo();
         // If Coppa is not set, only then send latLong
         if (!isCoppaSet && StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
-            && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
             final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             geo.setLat(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[0]))));
             geo.setLon(Double.parseDouble(String.format("%.4f", Double.parseDouble(latlong[1]))));
@@ -662,10 +662,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final LocationSource locSrc = sasParams.getLocationSource();
         if (LocationSource.LATLON == locSrc || LocationSource.BSSID_DERIVED == locSrc
-            || LocationSource.VISIBLE_BSSID == locSrc) {
+                || LocationSource.VISIBLE_BSSID == locSrc) {
             geo.setType(1);
         } else if (LocationSource.CCID == locSrc || LocationSource.WIFI == locSrc
-            || LocationSource.DERIVED_LAT_LON == locSrc || LocationSource.CELL_TOWER == locSrc) {
+                || LocationSource.DERIVED_LAT_LON == locSrc || LocationSource.CELL_TOWER == locSrc) {
             geo.setType(2);
         }
 
@@ -753,8 +753,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
         site.setId(sasParams.getSiteId());
         final String category =
-            isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
-                .getAppType() : getCategories(',', false);
+                isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
+                        .getAppType() : getCategories(',', false);
         site.setName(category);
 
         final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
@@ -894,8 +894,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private void setParamsForBlindApp(final App app, final CommonExtension ext) {
         app.setId(sasParams.getSiteId());
         final String category =
-            isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
-                .getAppType() : getCategories(',', false);
+                isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
+                        .getAppType() : getCategories(',', false);
         app.setName(category);
 
         final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
@@ -1005,11 +1005,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final String authEncoded = new String(Base64.encodeBase64(authStr.getBytes(CharsetUtil.UTF_8)));
         LOG.debug(traceMarker, "INSIDE GET NING REQUEST");
         return new RequestBuilder(httpRequestMethod).setUrl(uri.toString())
-            .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
-            .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
-            .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
-            .setHeader(HttpHeaders.Names.AUTHORIZATION, "Basic " + authEncoded)
-            .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).setBodyEncoding(UTF_8);
+                .setHeader(HttpHeaders.Names.CONTENT_TYPE, CONTENT_TYPE_VALUE)
+                .setHeader(HttpHeaders.Names.CONTENT_ENCODING, UTF_8)
+                .setHeader(HttpHeaders.Names.CONTENT_LENGTH, String.valueOf(body.length))
+                .setHeader(HttpHeaders.Names.AUTHORIZATION, "Basic " + authEncoded)
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost()).setBody(body).setBodyEncoding(UTF_8);
     }
 
     @Override
@@ -1086,8 +1086,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } catch (final Exception exp) {
             if (LOG.isInfoEnabled()) {
                 final String msg =
-                    String.format("Error in updateRPAccountInfo for rpAccIdStr %s, msg ->%s", rpAccIdStr,
-                        exp.getMessage());
+                        String.format("Error in updateRPAccountInfo for rpAccIdStr %s, msg ->%s", rpAccIdStr,
+                                exp.getMessage());
                 LOG.info(traceMarker, msg, exp);
             }
         }
@@ -1106,7 +1106,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null == adGroupMap || adGroupMap.isEmpty()) {
             // If collection is empty
             LOG.error("Channel Segment Entity collection for Rubicon DSP is empty: RP Acc id:{}, inmobi account id:{}",
-                rpAccIdStr, inmobiAccId);
+                    rpAccIdStr, inmobiAccId);
             return false;
         } else {
             // Else picking up the first channel segment entity and assuming that to be the correct entity
@@ -1122,7 +1122,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             // Generating new impression id
             LOG.debug(traceMarker, "Modifying existing impression id with new int key: incId {}", incId);
             final String newImpressionId =
-                ImpressionIdGenerator.getInstance().resetWilburyIntKey(oldImpressionId, incId);
+                    ImpressionIdGenerator.getInstance().resetWilburyIntKey(oldImpressionId, incId);
             if (StringUtils.isNotEmpty(newImpressionId)) {
                 impressionId = newImpressionId;
                 LOG.debug(traceMarker, "Replaced impression id to new value {}.", newImpressionId);
@@ -1205,8 +1205,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 LOG.debug(traceMarker, "Sprout Ad Received");
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VALID_SPROUT_RESPONSES);
                 admContent =
-                    IXAdNetworkHelper.replaceSproutMacros(admContent, casInternalRequestParameters, sasParams,
-                        isCoppaSet, getClickUrl(), beaconUrl);
+                        IXAdNetworkHelper.replaceSproutMacros(admContent, casInternalRequestParameters, sasParams,
+                                isCoppaSet, getClickUrl(), beaconUrl);
                 velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, admContent);
                 velocityContext.put(VelocityTemplateFieldConstants.SPROUT, true);
                 LOG.debug(traceMarker, "Replaced Sprout Macros");
@@ -1242,7 +1242,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner: {} {}",
-                advertiserName, e);
+                    advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.BANNER_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -1263,13 +1263,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         try {
             responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
-                repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
-                isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
+                    repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
+                    isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
             LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
-                advertiserName, e);
+                    advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.VIDEO_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -1283,13 +1283,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_CAU_RESPONSES);
         try {
             responseContent =
-                IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
-                    getAdMarkUp(), getWinUrl(), viewabilityTracker, hasViewabilityDeal);
+                    IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
+                            getAdMarkUp(), getWinUrl(), viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
             LOG.info(traceMarker, "Some exception is caught while filling the CAU template for partner:{} {}",
-                advertiserName, e);
+                    advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.CAU_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -1317,8 +1317,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             final App app = bidRequest.getApp();
             final com.inmobi.template.context.App templateContext =
-                IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
-                    nonMandatoryAssetMap, impressionId);
+                    IXAdNetworkHelper.validateAndBuildTemplateContext(nativeObj, mandatoryAssetMap,
+                            nonMandatoryAssetMap, impressionId);
             if (null == templateContext) {
                 adStatus = TERM;
                 responseContent = DEFAULT_EMPTY_STRING;
@@ -1330,7 +1330,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final Map<String, String> params = new HashMap<>();
             params.put("beaconUrl", getBeaconUrl());
             params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM
-                + RTBCallbackMacros.DEAL_GET_PARAM);
+                    + RTBCallbackMacros.DEAL_GET_PARAM);
             params.put("appId", app.getId());
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
@@ -1340,8 +1340,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             adStatus = TERM;
             responseContent = DEFAULT_EMPTY_STRING;
             LOG.error(
-                "Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
-                    + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
+                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}"
+                            + ", exception = {}", sasParams.getPlacementId(), advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
     }
@@ -1363,14 +1363,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
         } catch (final JsonParseException jpe) {
             LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
-                jpe.getMessage());
+                    jpe.getMessage());
             InspectorStats.incrementStatCount(getName(), InspectorStrings.JSON_PARSING_ERROR);
             // TODO: Figure out why adStatus is always reverted back to NO_AD
             adStatus = AdStatus.TERM.name();
             return false;
         } catch (final Exception e) {
             LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
-                e.toString());
+                    e.toString());
             adStatus = AdStatus.TERM.name();
             return false;
         }
@@ -1512,9 +1512,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (isVideoRequest || isRewardedVideoRequest) {
             if (IXAdNetworkHelper.isAdmValidXML(getAdMarkUp())) {
                 final String statName =
-                    isVideoRequest
-                        ? InspectorStrings.TOTAL_VAST_VIDEO_RESPONSES
-                        : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_RESPONSES;
+                        isVideoRequest
+                                ? InspectorStrings.TOTAL_VAST_VIDEO_RESPONSES
+                                : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_RESPONSES;
                 InspectorStats.incrementStatCount(getName(), statName);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_RESPONSES);
             } else {
@@ -1582,8 +1582,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
         // Setting deal floor
         dealFloor =
-            matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
-                indexOfDealId) : 0.0;
+                matchedPackageEntity.getDealFloors().size() > indexOfDealId ? matchedPackageEntity.getDealFloors().get(
+                        indexOfDealId) : 0.0;
 
         // Setting used csids and data vendor cost
         dataVendorCost = matchedPackageEntity.getDataVendorCost();
@@ -1602,8 +1602,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // TODO: Clean up trump logic in ResponseSender
         final String dealType =
-            matchedPackageEntity.getAccessTypes().size() > indexOfDealId ? matchedPackageEntity.getAccessTypes()
-                .get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
+                matchedPackageEntity.getAccessTypes().size() > indexOfDealId ? matchedPackageEntity.getAccessTypes()
+                        .get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
         if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
             isTrumpDeal = true;
         }
@@ -1622,20 +1622,20 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     LOG.debug("Viewability Trackers before substitution: {}", viewabilityTracker);
                 }
                 viewabilityTracker =
-                    IXAdNetworkHelper.replaceViewabilityTrackerMacros(viewabilityTracker,
-                        casInternalRequestParameters, sasParams);
+                        IXAdNetworkHelper.replaceViewabilityTrackerMacros(viewabilityTracker,
+                                casInternalRequestParameters, sasParams);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Viewability Trackers after substitution: {}", viewabilityTracker);
                 }
                 InspectorStats.incrementStatCount(getName(),
-                    InspectorStrings.TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS);
+                        InspectorStrings.TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS);
             }
         }
 
         // Applying if agency rebate is applicable
         agencyRebatePercentage =
-            matchedPackageEntity.getAgencyRebatePercentages().size() > indexOfDealId ? matchedPackageEntity
-                .getAgencyRebatePercentages().get(indexOfDealId) : null;
+                matchedPackageEntity.getAgencyRebatePercentages().size() > indexOfDealId ? matchedPackageEntity
+                        .getAgencyRebatePercentages().get(indexOfDealId) : null;
         if (null != agencyRebatePercentage) {
             if (agencyRebatePercentage <= 0 || agencyRebatePercentage > 100) {
                 agencyRebatePercentage = null;
@@ -1647,29 +1647,29 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (null != agencyRebatePercentage) {
             isAgencyRebateDeal = true;
             final String dealMetaDataSeatId =
-                matchedPackageEntity.getRpAgencyIds().size() > indexOfDealId
-                    && null != matchedPackageEntity.getRpAgencyIds().get(indexOfDealId) ? String
-                    .valueOf(matchedPackageEntity.getRpAgencyIds().get(indexOfDealId)) : null;
+                    matchedPackageEntity.getRpAgencyIds().size() > indexOfDealId
+                            && null != matchedPackageEntity.getRpAgencyIds().get(indexOfDealId) ? String
+                            .valueOf(matchedPackageEntity.getRpAgencyIds().get(indexOfDealId)) : null;
             if (StringUtils.isEmpty(seatId)) {
                 InspectorStats
-                    .incrementStatCount(getName(), InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
+                        .incrementStatCount(getName(), InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
                 seatId = dealMetaDataSeatId;
                 LOG.info(
-                    "Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}",
-                    dealId);
+                        "Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}",
+                        dealId);
                 if (StringUtils.isEmpty(seatId)) {
                     // This has been enforced in the UI and DB.
                     InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
+                            InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
                     LOG.error("Agency Id cannot be determined for Agency Rebate Deal.");
                     agencyRebatePercentage = null;
                     isAgencyRebateDeal = false;
                 }
             } else if (!seatId.equals(dealMetaDataSeatId)) {
                 InspectorStats.incrementStatCount(getName(),
-                    InspectorStrings.AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE);
+                        InspectorStrings.AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE);
                 LOG.error("Agency Id mismatch between response and deal metadata. DealId: {}, ReceivedSeatId: {}, "
-                    + "DealMetadataSeatId: {}", dealId, seatId, dealMetaDataSeatId);
+                        + "DealMetadataSeatId: {}", dealId, seatId, dealMetaDataSeatId);
                 agencyRebatePercentage = null;
                 isAgencyRebateDeal = false;
             }
@@ -1680,7 +1680,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - agencyRebatePercentage / 100.0);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AGENCY_REBATE_DEAL_RESPONSES);
             LOG.info(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
-                dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
+                    dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
         }
     }
 
