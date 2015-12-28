@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
-import com.inmobi.adserve.contracts.ix.request.nativead.Image.ImageAssetType;
+import com.inmobi.adserve.contracts.common.request.nativead.Image.ImageAssetType;
 import com.inmobi.casthrift.rtb.Image;
 
 /**
@@ -64,8 +64,8 @@ public class NativeConstraints {
     private static final Map<String, List<Mandatory>> DCP_MANDATORY = new HashMap<>();
     private static final Map<String, List<Mandatory>> IX_MANDATORY = new HashMap<>();
     private static final Map<String, Image> RTB_IMG = new HashMap<>();
-    private static final Map<String, com.inmobi.adserve.contracts.ix.request.nativead.Image> DCP_IMG = new HashMap<>();
-    private static final Map<String, com.inmobi.adserve.contracts.ix.request.nativead.Image> IX_IMG = new HashMap<>();
+    private static final Map<String, com.inmobi.adserve.contracts.common.request.nativead.Image> DCP_IMG = new HashMap<>();
+    private static final Map<String, com.inmobi.adserve.contracts.common.request.nativead.Image> IX_IMG = new HashMap<>();
 
     static {
         RTB_MANDATORY.put(LAYOUT_ICON, getIndexList(MAND_ICON));
@@ -132,9 +132,9 @@ public class NativeConstraints {
      * @return
      */
 
-    private static com.inmobi.adserve.contracts.ix.request.nativead.Image getDCPImage(final int wMin, final int hMin) {
-        final com.inmobi.adserve.contracts.ix.request.nativead.Image image = new com.inmobi.adserve.contracts.ix
-                .request.nativead.Image();
+    private static com.inmobi.adserve.contracts.common.request.nativead.Image getDCPImage(final int wMin, final int hMin) {
+        final com.inmobi.adserve.contracts.common.request.nativead.Image
+            image = new com.inmobi.adserve.contracts.common.request.nativead.Image();
         image.setType(ImageAssetType.MAIN);
         image.setWmin(wMin);
         image.setHmin(hMin);
@@ -147,9 +147,9 @@ public class NativeConstraints {
      * @param hMin
      * @return
      */
-    private static com.inmobi.adserve.contracts.ix.request.nativead.Image getIXImage(final int wMin, final int hMin) {
-        final com.inmobi.adserve.contracts.ix.request.nativead.Image image =
-                new com.inmobi.adserve.contracts.ix.request.nativead.Image();
+    private static com.inmobi.adserve.contracts.common.request.nativead.Image getIXImage(final int wMin, final int hMin) {
+        final com.inmobi.adserve.contracts.common.request.nativead.Image image =
+                new com.inmobi.adserve.contracts.common.request.nativead.Image();
         image.setType(ImageAssetType.MAIN);
         image.setWmin(wMin);
         image.setHmin(hMin);
@@ -181,10 +181,10 @@ public class NativeConstraints {
      * @param key
      * @return
      */
-    public static com.inmobi.adserve.contracts.ix.request.nativead.Image getIXImage(final String key) {
-        final com.inmobi.adserve.contracts.ix.request.nativead.Image img = IX_IMG.get(key);
+    public static com.inmobi.adserve.contracts.common.request.nativead.Image getIXImage(final String key) {
+        final com.inmobi.adserve.contracts.common.request.nativead.Image img = IX_IMG.get(key);
         if (img != null) {
-            return new com.inmobi.adserve.contracts.ix.request.nativead.Image(img);
+            return new com.inmobi.adserve.contracts.common.request.nativead.Image(img);
         }
         return img;
     }
@@ -194,10 +194,10 @@ public class NativeConstraints {
      * @param key
      * @return
      */
-    public static com.inmobi.adserve.contracts.ix.request.nativead.Image getDCPImage(final String key) {
-        final com.inmobi.adserve.contracts.ix.request.nativead.Image img = DCP_IMG.get(key);
+    public static com.inmobi.adserve.contracts.common.request.nativead.Image getDCPImage(final String key) {
+        final com.inmobi.adserve.contracts.common.request.nativead.Image img = DCP_IMG.get(key);
         if (img != null) {
-            return new com.inmobi.adserve.contracts.ix.request.nativead.Image(img);
+            return new com.inmobi.adserve.contracts.common.request.nativead.Image(img);
         }
         return img;
     }

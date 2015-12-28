@@ -50,7 +50,7 @@ import com.inmobi.adserve.channels.api.NativeResponseMaker;
 import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
-import com.inmobi.adserve.channels.api.natives.IxNativeBuilderFactory;
+import com.inmobi.adserve.channels.api.natives.CommonNativeBuilderFactory;
 import com.inmobi.adserve.channels.api.natives.NativeBuilder;
 import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -93,8 +93,8 @@ import com.inmobi.adserve.contracts.ix.request.Transparency;
 import com.inmobi.adserve.contracts.ix.request.User;
 import com.inmobi.adserve.contracts.ix.request.Video;
 import com.inmobi.adserve.contracts.ix.request.VideoExtension;
-import com.inmobi.adserve.contracts.ix.request.nativead.Asset;
-import com.inmobi.adserve.contracts.ix.request.nativead.Native;
+import com.inmobi.adserve.contracts.common.request.nativead.Asset;
+import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.ix.response.Bid;
 import com.inmobi.adserve.contracts.ix.response.BidResponse;
 import com.inmobi.adserve.contracts.ix.response.SeatBid;
@@ -144,7 +144,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Inject
     private static AsyncHttpClientProvider asyncHttpClientProvider;
     @Inject
-    @IxNativeBuilderFactory
+    @CommonNativeBuilderFactory
     private static NativeBuilderFactory nativeBuilderfactory;
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
@@ -208,7 +208,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> creativeAttributes;
     private boolean logCreative = false;
     private String adm;
-    private com.inmobi.adserve.contracts.ix.response.nativead.Native nativeObj;
+    private com.inmobi.adserve.contracts.common.response.nativead.Native nativeObj;
     @Getter
     private int impressionObjCount;
     @Getter
@@ -238,8 +238,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
-            final String advertiserName, final boolean templateWinNotification) {
+                       final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
+                       final String advertiserName, final boolean templateWinNotification) {
         super(baseRequestHandler, serverChannel);
         advertiserId = config.getString(advertiserName + ".advertiserId");
         unknownAdvertiserId = config.getString(advertiserName + ".unknownAdvId");
@@ -1263,8 +1263,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         try {
             responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
-                repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
-                isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
+                    repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
+                    isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
