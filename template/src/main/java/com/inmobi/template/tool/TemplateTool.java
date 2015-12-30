@@ -3,10 +3,13 @@
 package com.inmobi.template.tool;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -18,10 +21,10 @@ import org.apache.velocity.tools.generic.EscapeTool;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.template.gson.GsonManager;
-import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.Data;
@@ -41,7 +44,7 @@ public class TemplateTool extends EscapeTool {
     private final Gson gson;
 
     /**
-     * 
+     *
      * @param gsonManager
      */
     @Inject
@@ -50,7 +53,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param str
      * @return
      */
@@ -60,7 +63,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param str
      * @return
      */
@@ -69,7 +72,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param clickUrl
      * @param appendMacro
      * @return
@@ -86,7 +89,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param clickUrl
      * @param querySnippet
      * @return
@@ -100,7 +103,7 @@ public class TemplateTool extends EscapeTool {
 
 
     /**
-     * 
+     *
      * @param str
      * @return
      */
@@ -109,7 +112,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param str
      * @return
      */
@@ -118,7 +121,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param value
      * @return
      */
@@ -127,7 +130,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param ns
      * @param value
@@ -138,7 +141,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      * @return
@@ -148,7 +151,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      * @return
@@ -196,7 +199,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param urlString
      * @return
      */
@@ -205,7 +208,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param urlString
      * @return
      */
@@ -216,7 +219,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param urlString
      * @param scheme
      * @return
@@ -231,7 +234,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param urlString
      * @param authority
      * @return
@@ -247,7 +250,7 @@ public class TemplateTool extends EscapeTool {
 
 
     /**
-     * 
+     *
      * @param input
      * @return
      */
@@ -259,25 +262,31 @@ public class TemplateTool extends EscapeTool {
 
 
     /**
-     * 
+     *
      * @param jsonObject
      * @param jsonPathExpression
      * @return
      */
-    public Object evalJsonPath(final Object jsonObject, final String jsonPathExpression) {
-        if (jsonObject == null) {
+    public Object evalJsonPath(final String json, final String jsonPathExpression) {
+        if (StringUtils.isEmpty(json)) {
             return null;
         }
         final JsonPath jsonPath = JsonPath.compile(jsonPathExpression);
         try {
-            return jsonPath.read(jsonObject);
-        } catch (final InvalidPathException e) {
+            final Type mapType = new TypeToken<HashMap<String, Object>>() {}.getType();
+            final Map<String, Object> jsonMap = gson.fromJson(json, mapType);
+            return jsonPath.read(jsonMap);
+        } catch (final Exception exp) {
+            final String errorMsg =
+                    String.format("Error in evalJsonPath for json-> %s & jsonPathExpression -> %s", json,
+                            jsonPathExpression);
+            log.error(errorMsg, exp);
             return null;
         }
     }
 
     /**
-     * 
+     *
      * @param val
      * @return
      */
@@ -287,7 +296,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param json
      * @return
      */
@@ -296,7 +305,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param abTestingMode
      * @param list
      * @param value
@@ -311,7 +320,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param json
      * @return
      */
@@ -320,7 +329,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param countryCode
      * @return
      */
@@ -338,7 +347,7 @@ public class TemplateTool extends EscapeTool {
     }
 
     /**
-     * 
+     *
      * @param supplyWidth
      * @param supplyHeight
      * @param creativeWidth
