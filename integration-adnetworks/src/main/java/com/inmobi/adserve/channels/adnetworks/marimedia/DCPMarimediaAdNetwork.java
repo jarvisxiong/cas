@@ -4,11 +4,14 @@ package com.inmobi.adserve.channels.adnetworks.marimedia;
 
 import java.awt.Dimension;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -278,6 +281,14 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, impressionUrl);
                 }
 
+                List<String> partnerBeacons = new ArrayList<>();
+                if(ad.has("pixels")){
+                    JSONArray pixelArray = ad.getJSONArray("pixels");
+                    for(int i=0;i<pixelArray.length();i++){
+                        partnerBeacons.add(pixelArray.getString(i));
+                    }
+                    context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST, partnerBeacons);
+                }
                 context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
                 responseContent =
