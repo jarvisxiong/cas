@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
@@ -659,7 +660,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             final String imei = getIMEI();
             if (imei != null) {
                 device.setDidmd5(imei);
-                device.setDpidmd5(imei);
+                device.setDpidmd5(null);
                 device.setDidsha1(null);
                 device.setDpidsha1(null);
             }
@@ -927,7 +928,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
 
             return true;
-        } catch (final NullPointerException e) {
+        } catch (final JsonParseException e) {
+            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
+                    e.getMessage());
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.RESPONSE_CONTRACT_NOT_HONOURED);
+            return false;
+        } catch (final Exception e) {
             LOG.info(traceMarker, "Could not parse the rtb response from partner: {}, exception thrown {}", getName(), e);
             return false;
         }

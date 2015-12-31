@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.inmobi.adserve.contracts.common.request.nativead.Image.ImageAssetType;
-import com.inmobi.casthrift.rtb.Image;
+import com.inmobi.adserve.contracts.dcp.backward.Image;
 
 /**
  *

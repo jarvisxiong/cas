@@ -18,8 +18,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.repository.NativeConstraints;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.Image;
+import com.inmobi.adserve.contracts.dcp.backward.Image;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.exception.TemplateException;
@@ -43,26 +42,6 @@ public class NativeResponseMaker {
         gson = tc.getGsonManager().getGsonInstance();
         this.templateParser = templateParser;
         this.templateDecorator = templateDecorator;
-    }
-
-    private void checkPreconditions(final Map<String, String> params, final NativeAdTemplateEntity templateEntity) {
-        Preconditions.checkNotNull(params, ERROR_STR, "params");
-        Preconditions.checkNotNull(params.containsKey("placementId"), ERROR_STR, "placementId");
-        Preconditions.checkNotNull(templateEntity, ERROR_STR, "templateEntity");
-    }
-
-    public String makeResponse(final BidResponse response, final Map<String, String> params,
-            final NativeAdTemplateEntity templateEntity) throws Exception {
-        checkPreconditions(params, templateEntity);
-        Preconditions.checkNotNull(response, ERROR_STR, "BidResponse");
-
-        final String placementId = params.get("placementId");
-        final App app = createNativeAppObject(response.getSeatbid().get(0).getBid().get(0).getAdm(), params);
-        validateResponse(app, templateEntity);
-        final VelocityContext vc = getVelocityContext(app, params);
-        vc.put("NAMESPACE", Formatter.getRTBDNamespace());
-
-        return createNativeAd(vc, app, placementId);
     }
 
     public String makeDCPNativeResponse(final App app, final Map<String, String> params,
@@ -93,13 +72,6 @@ public class NativeResponseMaker {
         LOG.debug("contextCode : {}", contextCode);
         return makeNativeAd(pubContent, contextCode, namespace);
     }
-
-    private App createNativeAppObject(final String adm, final Map<String, String> params) throws Exception {
-        final App app = gson.fromJson(adm, App.class);
-        app.setAdImpressionId(params.get("impressionId"));
-        return app;
-    }
-
 
     private void validateResponse(final App app, final NativeAdTemplateEntity templateEntity) throws Exception {
         final String mandatoryKey = templateEntity.getMandatoryKey();

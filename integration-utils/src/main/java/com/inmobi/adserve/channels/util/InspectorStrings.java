@@ -35,6 +35,7 @@ public class InspectorStrings {
     public static final String THRIFT_PARSING_ERROR = "Terminated_ThriftError";
     public static final String THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST = "Terminated_ThriftError.EmptyAdPoolRequest";
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
+    public static final String RESPONSE_CONTRACT_NOT_HONOURED = "ResponseContractNotHonoured";
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
     public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
     public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";

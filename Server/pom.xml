@@ -176,6 +176,10 @@
             <groupId>com.inmobi.commons</groupId>
             <artifactId>security</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.inmobi.commons</groupId>
+            <artifactId>common-types</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
