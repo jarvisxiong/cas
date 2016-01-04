@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapRequestedAdTypeToAdFormat;
+import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapIntegrationDetailsToRequestSource;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,6 +55,7 @@ import com.inmobi.casthrift.IxAd;
 import com.inmobi.casthrift.PricingModel;
 import com.inmobi.casthrift.RTBDAuctionInfo;
 import com.inmobi.casthrift.Request;
+import com.inmobi.casthrift.RequestSource;
 import com.inmobi.casthrift.User;
 import com.inmobi.messaging.Message;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
@@ -426,7 +430,13 @@ public class Logging {
                             channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             final ContentRating contentRating = getContentRating(sasParams);
             final PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
+
             final AdMeta adMeta = new AdMeta(contentRating, pricingModel, BANNER);
+            final String adFormat = mapRequestedAdTypeToAdFormat(sasParams.getRequestedAdType());
+            if (null != adFormat) {
+                adMeta.setAd_format(adFormat);
+            }
+
             final Ad ad = new Ad(adChain, adMeta);
 
             // In case of Agency Rebates, this is the net bid. The gross bid is logged in channelsLog
@@ -472,6 +482,14 @@ public class Logging {
             }
             request.setRequestDst(DemandSourceType.findByValue(sasParams.getDst()));
 
+            if (null != sasParams.getPlacementId()) {
+                request.setPlacementId(sasParams.getPlacementId());
+            }
+
+            final RequestSource requestSource = mapIntegrationDetailsToRequestSource(sasParams.getIntegrationDetails());
+            if (null != requestSource) {
+                request.setRequest_source(requestSource);
+            }
         } else {
             request = new Request(adRequested, adsServed, null, null);
         }
@@ -529,6 +547,10 @@ public class Logging {
                 uidParam.remove(UidType.IEM.name());
             }
             user.setUids(uidParam);
+
+            if (StringUtils.isNotBlank(sasParams.getNormalizedUserId())) {
+                user.setNormalized_user_id(sasParams.getNormalizedUserId());
+            }
         }
         return user;
     }

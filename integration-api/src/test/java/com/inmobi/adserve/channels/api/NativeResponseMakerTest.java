@@ -19,9 +19,9 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.inmobi.casthrift.rtb.Bid;
-import com.inmobi.casthrift.rtb.BidResponse;
-import com.inmobi.casthrift.rtb.SeatBid;
+import com.inmobi.adserve.contracts.rtb.response.Bid;
+import com.inmobi.adserve.contracts.rtb.response.BidResponse;
+import com.inmobi.adserve.contracts.rtb.response.SeatBid;
 import com.inmobi.template.config.DefaultConfiguration;
 import com.inmobi.template.config.DefaultGsonDeserializerConfiguration;
 import com.inmobi.template.context.App;
@@ -32,7 +32,7 @@ import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.template.tool.ToolsImpl;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({App.class})
+@PrepareForTest({App.class, BidResponse.class, SeatBid.class, Bid.class})
 public class NativeResponseMakerTest {
     private static NativeResponseMaker nativeResponseMaker;
 
@@ -89,7 +89,7 @@ public class NativeResponseMakerTest {
 
     @Test
     public void testGetTrackingCodeExceptionThrown() {
-        BidResponse mockBidResponse = new BidResponse("id", null);
+        BidResponse mockBidResponse = new BidResponse("id", Arrays.asList(new SeatBid(Arrays.asList(new Bid()))));
         Map<String, String> params = new HashMap<>();
         App mockApp = createNiceMock(App.class);
 

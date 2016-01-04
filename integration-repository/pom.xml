@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.inmobi.channels</groupId>
         <artifactId>cas</artifactId>
-        <version>6.07-SNAPSHOT</version>
+        <version>6.09-SNAPSHOT</version>
     </parent>
 
     <artifactId>repository</artifactId>
@@ -62,6 +62,7 @@
         <dependency>
             <groupId>com.inmobi.commons</groupId>
             <artifactId>casthrift</artifactId>
+            <classifier>thrift-0.8</classifier>
         </dependency>
         <dependency>
             <groupId>com.inmobi.channels</groupId>

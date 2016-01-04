@@ -229,6 +229,10 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getSdkVersion()).andReturn("0").anyTimes();
         expect(mockSASRequestParameters.getSiteSegmentId()).andReturn(siteSegmentIds).anyTimes();
         expect(mockSASRequestParameters.getAppBundleId()).andReturn(appBundleId).anyTimes();
+        expect(mockSASRequestParameters.getPlacementId()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getRequestedAdType()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getIntegrationDetails()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getNormalizedUserId()).andReturn(null).anyTimes();
         expect(mockCasInternalRequestParameters.getDemandDensity()).andReturn(demandDensity).anyTimes();
         expect(mockCasInternalRequestParameters.getLongTermRevenue()).andReturn(longTermRevenue).anyTimes();
         expect(mockCasInternalRequestParameters.getPublisherYield()).andReturn(publisherYield).anyTimes();
@@ -877,6 +881,7 @@ public class LoggingTest {
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getSiteContentType()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getRequestedAdType()).andReturn(null).anyTimes();
         replayAll();
 
         Impression impression = Logging.getImpressionObject(mockChannelSegment, mockSASRequestParameters);
@@ -936,6 +941,7 @@ public class LoggingTest {
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn(externalSiteKey).anyTimes();
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(pricingModel).anyTimes();
         expect(mockSASRequestParameters.getSiteContentType()).andReturn(siteContentType).anyTimes();
+        expect(mockSASRequestParameters.getRequestedAdType()).andReturn(null).anyTimes();
         replayAll();
 
         Logging.getImpressionObject(mockChannelSegment, mockSASRequestParameters);
@@ -976,6 +982,7 @@ public class LoggingTest {
         Double auctionBidFloor = 455.98;
         Double marketRate = 567.98;
         final String appBundleId = "testAppBundleId";
+        final long placementId = 12l;
 
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         IXAdNetwork mockIXAdNetwork = createMock(IXAdNetwork.class);
@@ -1003,6 +1010,9 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getOsId()).andReturn(osId).anyTimes();
         expect(mockSASRequestParameters.getMarketRate()).andReturn(marketRate).anyTimes();
         expect(mockSASRequestParameters.getAppBundleId()).andReturn(appBundleId).anyTimes();
+        expect(mockSASRequestParameters.getPlacementId()).andReturn(placementId).anyTimes();
+        expect(mockSASRequestParameters.getIntegrationDetails()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getNormalizedUserId()).andReturn(null).anyTimes();
 
         replayAll();
         List<ChannelSegment> rankList = Arrays.asList(mockChannelSegment);
@@ -1016,7 +1026,7 @@ public class LoggingTest {
         assertThat(request.isSetSegmentId(), is(false));
         assertThat(request.isSetRequestDst(), is(false));
         assertThat(request.getAppBundleId(), is(equalTo(null)));
-
+        assertThat(request.isSetPlacementId(), is(equalTo(false)));
 
 
         // sasParams is present, slotServed and requestSlot are null, siteSegment  is null
@@ -1030,6 +1040,7 @@ public class LoggingTest {
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
         assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor)));
         assertThat(request.getBidGuidance(), is(equalTo(marketRate)));
+        assertThat(request.getPlacementId(), is(equalTo(placementId)));
 
         // everything is present
         request = Logging.getRequestObject(mockSASRequestParameters, adsServed, requestSlot, slotServed, rankList);
@@ -1042,6 +1053,7 @@ public class LoggingTest {
         assertThat(request.getRequestDst(), is(equalTo(DemandSourceType.findByValue(dst))));
         assertThat(request.getAuctionBidFloor(), is(equalTo(auctionBidFloor)));
         assertThat(request.getBidGuidance(), is(equalTo(marketRate)));
+        assertThat(request.getPlacementId(), is(equalTo(placementId)));
     }
 
     @Test
@@ -1103,20 +1115,24 @@ public class LoggingTest {
 
         Short age = 11;
         String gender = "m";
+        final String normaliseduserId = "n-uid";
 
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
         expect(mockSASRequestParameters.getAge()).andReturn(age).anyTimes();
         expect(mockSASRequestParameters.getGender()).andReturn(gender).anyTimes();
         expect(mockSASRequestParameters.getTUidParams()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getNormalizedUserId()).andReturn(normaliseduserId).anyTimes();
         replayAll();
 
         user = Logging.getUserObject(null);
         assertThat(user.isSetAge(), is(false));
         assertThat(user.isSetGender(), is(false));
+        assertThat(user.isSetNormalized_user_id(), is(false));
 
         user = Logging.getUserObject(mockSASRequestParameters);
         assertThat(user.getAge(), is(equalTo(age)));
         assertThat(user.getGender(), is(equalTo(Gender.MALE)));
+        assertThat(user.getNormalized_user_id(), is(equalTo(normaliseduserId)));
     }
 
     @Test

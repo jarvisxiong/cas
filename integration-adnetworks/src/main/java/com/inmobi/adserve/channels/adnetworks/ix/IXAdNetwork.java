@@ -1364,7 +1364,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } catch (final JsonParseException jpe) {
             LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
                     jpe.getMessage());
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.JSON_PARSING_ERROR);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.RESPONSE_CONTRACT_NOT_HONOURED);
             // TODO: Figure out why adStatus is always reverted back to NO_AD
             adStatus = AdStatus.TERM.name();
             return false;
