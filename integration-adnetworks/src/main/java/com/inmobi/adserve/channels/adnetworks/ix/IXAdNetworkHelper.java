@@ -140,9 +140,8 @@ public class IXAdNetworkHelper {
         final List<String> macros = new ArrayList<>();
         final List<String> substitutions = new ArrayList<>();
 
-        final String subsBeaconUrl = beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}";
         addSproutMacroToList(macros, substitutions, JS_ESC_BEACON_URL,
-                StringEscapeUtils.escapeJavaScript(subsBeaconUrl));
+                StringEscapeUtils.escapeJavaScript(beaconUrl));
         addSproutMacroToList(macros, substitutions, JS_ESC_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
 
         final String sdkVersion = sasParams.getSdkVersion();

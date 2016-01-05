@@ -1584,14 +1584,13 @@ public class IXTest {
     @Test(testName = "TEST_STUDIO_POSITIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_STUDIO_POSITIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        searchStringInLog = "Sprout Ad Received";
+        final String searchStringInLog = "Sprout Ad Received";
         final String searchStringInLog2 = "Replaced Sprout Macros";
-
         parserOutput = LogParserHelper.logParser(searchStringInLog, searchStringInLog2);
 
-        Reporter.log(parserOutput, true);
-
         Assert.assertTrue(parserOutput.equals("PASS"));
+        // Ensuring that beacons are properly replaced
+        Assert.assertTrue(!LogParserHelper.queryForLogs("loadBeacons : []").isNotEmpty());
     }
 
     @Test(testName = "TEST_STUDIO_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
