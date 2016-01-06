@@ -59,7 +59,7 @@ public class ServletLogParser implements Servlet {
             }
         }
         if (logFilePath == null) {
-            logFilePath = "/opt/mkhoj/logs/cas/debug/";
+            logFilePath = "/opt/inmobi/cas/logs/debug/";
         }
 
         final ProcessBuilder pb =

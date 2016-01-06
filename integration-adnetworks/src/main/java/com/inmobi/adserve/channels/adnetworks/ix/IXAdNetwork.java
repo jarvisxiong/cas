@@ -152,7 +152,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private final String userName;
     private final String password;
     private final Integer accountId;
-    private final boolean wnRequired;
     private final List<String> globalBlindFromConfig;
     @Getter
     private final int bidFloorPercent;
@@ -163,12 +162,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Setter
     private String urlArg;
     private final String ixMethod;
-    private final String callbackUrl;
     @Getter
     private double originalBidPriceInUsd;
     private double bidPriceInUsd;
     private double bidPriceInLocal;
-    private boolean templateWN = true;
     protected boolean isSproutSupported = false;
     private boolean altSizeIdsSet = false;
 
@@ -244,14 +241,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         advertiserId = config.getString(advertiserName + ".advertiserId");
         unknownAdvertiserId = config.getString(advertiserName + ".unknownAdvId");
         urlArg = config.getString(advertiserName + ".urlArg");
-        callbackUrl = config.getString(advertiserName + ".wnUrlback");
         ixMethod = config.getString(advertiserName + ".ixMethod");
-        wnRequired = config.getBoolean(advertiserName + ".isWnRequired");
         this.clientBootstrap = clientBootstrap;
         this.host = host;
         isIxPartner = true;
         this.advertiserName = advertiserName;
-        templateWN = templateWinNotification;
         isHTMLResponseSupported = config.getBoolean(advertiserName + ".htmlSupported", true);
         isNativeResponseSupported = config.getBoolean(advertiserName + ".nativeSupported", true);
         userName = config.getString(advertiserName + ".userName");
@@ -1181,11 +1175,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final VelocityContext velocityContext = new VelocityContext();
         final String beaconUrl = getBeaconUrl();
         String admContent = getAdMarkUp();
-        final int admSize = admContent.length();
-        if (!templateWN) {
-            final String winUrl = beaconUrl + RTBCallbackMacros.WIN_BID_GET_PARAM;
-            admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
-        }
+
         if (altSizeIdsSet) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_RESPONSES);
         }
@@ -1213,22 +1203,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             } else {
                 velocityContext.put(VelocityTemplateFieldConstants.PARTNER_HTML_CODE, MRAID + admContent);
             }
+
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }
         }
-        // Checking whether to send win notification
-        LOG.debug(traceMarker, "isWinRequired is {} and winfromconfig is {}", wnRequired, callbackUrl);
-        final String winUrl = getWinUrl();
-        if (StringUtils.isNotEmpty(winUrl)) {
-            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, winUrl);
+
+        final String partnerWinUrl = getWinUrl();
+        if (StringUtils.isNotEmpty(partnerWinUrl)) {
+            velocityContext.put(VelocityTemplateFieldConstants.PARTNER_BEACON_URL, partnerWinUrl);
         }
 
-        final int admAfterMacroSize = admContent.length();
-        if (templateWN || admAfterMacroSize == admSize) {
-            velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
-            velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
-        }
+        velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
+        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
         // Viewability Tracker
         if (StringUtils.isNotBlank(viewabilityTracker)) {
@@ -1296,17 +1283,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private String getWinUrl() {
         String winUrl = null;
-        if (wnRequired) {
-            // setCallbackContent();
-            // Win notification is required
-            LOG.debug(traceMarker, "nurl is {}", nurl);
-            if (StringUtils.isNotEmpty(callbackUrl)) {
-                LOG.debug(traceMarker, "inside wn from config");
-                winUrl = callbackUrl;
-            } else if (StringUtils.isNotEmpty(nurl)) {
-                LOG.debug(traceMarker, "inside wn from nurl");
-                winUrl = nurl;
-            }
+        LOG.debug(traceMarker, "nurl is {}", nurl);
+
+        if (StringUtils.isNotEmpty(nurl)) {
+            LOG.debug(traceMarker, "inside wn from nurl");
+            winUrl = nurl;
         }
         return winUrl;
     }
