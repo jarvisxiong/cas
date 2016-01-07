@@ -1,40 +1,18 @@
 <html>
     <head>
-        #if($IMAIBaseUrl)
-            <meta name="viewport" content="width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
-            <script src='$IMAIBaseUrl'></script>
-        #end
+        <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
         <style type="text/css" id="${first.ns}adStyles">
-            #${first.ns}adContainer{
-                display: table;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                overflow: hidden;
-            }
-            #${first.ns}ad{
-                vertical-align: middle;
-                text-align: center;
-                position: relative;
-                display: none;
-            }
             #${first.ns}frame{
                 position: absolute;
                 z-index: 5;
-                top: 0;
-                bottom: 0;
                 left: 0;
                 right: 0;
-                margin-top: auto;
-                margin-bottom: auto;
                 margin-left: auto;
                 margin-right: auto;
                 pointer-events: none;
             }
-            #${first.ns}thirdPartyAd{
-                display: inline-block;
-                position: relative;
-                vertical-align: middle;
+            #${first.ns}ad{
+                display: none;
             }
             #${first.ns}closeButton{
                 position: absolute;
@@ -44,26 +22,30 @@
             }
             .${first.ns}beacon{
                 display: none;
-                height: 1;
-                width: 1;
-                border: 0;
             }
             body {
                 margin:0;
                 padding:0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                overflow: hidden;
+            }
+            ## Overriding creative centring
+            P {
+                text-align: left!important;
             }
         </style>
     </head>
     <body>
-        <div id="${first.ns}adContainer">
-            <div id="${first.ns}ad" class="${first.ns}niuAnimate">
-                <img id="${first.ns}frame">
-                <img id="${first.ns}closeButton">
-                <div id="${first.ns}thirdPartyAd">
-                    $CAUContentJSEsc
-                </div>
+        <div id="${first.ns}ad" class="${first.ns}niuAnimate">
+            <img id="${first.ns}frame">
+            <img id="${first.ns}closeButton">
+            <div id="${first.ns}thirdPartyAd">
+                $CAUContentJSEsc
             </div>
         </div>
+        <script type="text/javascript" src="${IMAIBaseUrl}"></script>
         <script type="text/javascript">
             (function() {
                 var mraid = window.mraid,
@@ -79,7 +61,6 @@
                     adNamespace = '${first.ns}',
                     imgFrame = byId(adNamespace + "frame"),
                     imgCloseButton = byId(adNamespace + "closeButton"),
-                    adFrameCont = byId(adNamespace + "ad"),
                     thirdPartyAd = byId(adNamespace + "thirdPartyAd"),
 
                     events = {
@@ -165,8 +146,8 @@
                         }
                     };
 
-                var innerFrameDimensions = {
-                };
+                var innerFrameDimensions = {},
+                    outerFrameDimensions = {};
 
 
                 function setBodyDimension(w,h){
@@ -191,20 +172,34 @@
 
 
                 function toggleVisibleState(element, state) {
-                    element.style.display = state ? "table-cell" : "none";
+                    element.style.display = state ? "block" : "none";
                 }
 
 
                 function scaleAd() {
-                    var screenSize, availableWidth, availableHeight;
+                    var screenSize, availableWidth, availableHeight, temp;
 
                     if (!(isMraid && typeof mraid.getScreenSize == 'function' && mraid.getScreenSize() !== undefined)) {
                         availableWidth = document.body.clientWidth;
                         availableHeight = document.body.clientHeight;
                     } else {
-                        screenSize = mraid.getScreenSize();
+                        screenSize = mraid.getMaxSize();
                         availableWidth = screenSize.width;
                         availableHeight = screenSize.height;
+
+                        ## Falling back to mraid.getScreenSize
+                        if (0 === availableWidth || 0 === availableHeight) {
+                            screenSize = mraid.getScreenSize();
+                            availableWidth = screenSize.width;
+                            availableHeight = screenSize.height;
+                        }
+
+                        ## Portrait locking
+                        if (availableWidth > availableHeight) {
+                            temp = availableWidth;
+                            availableWidth = availableHeight;
+                            availableHeight = temp;
+                        }
                     }
 
                     var innerFrameWidth, innerFrameHeight,
@@ -213,10 +208,11 @@
 
                     var scaleFrameW, scaleFrameH, scaleFrame = 1;
                     var scaleAdW, scaleAdH, scaleAd = 1;
+                    var adOffsetX = 0, adOffsetY = 0;
 
                     if (isFrameAd) {
-                        outerFrameWidth = imgFrame.width;
-                        outerFrameHeight = imgFrame.height;
+                        outerFrameWidth = outerFrameDimensions.width;
+                        outerFrameHeight = outerFrameDimensions.height;
                     } else {
                         outerFrameWidth = availableWidth;
                         outerFrameHeight = availableHeight;
@@ -230,30 +226,61 @@
                     outerFrameHeight = outerFrameHeight * scaleFrame;
 
                     imgFrame.style.zoom = scaleFrame;
+                    imgFrame.style.webkitTransform = "translateY("+ (availableHeight-outerFrameHeight)/2 + "px)";
+                    imgFrame.style.transform =  "translateY("+ (availableHeight-outerFrameHeight)/2 + "px)";
+                    imgFrame.style.webkitTransformOrigin = "0 0";
+                    imgFrame.style.transformOrigin = "0 0";
 
                     adWidth = ${first.width};
                     adHeight = ${first.height};
 
+                    var frameAspectRatio = outerFrameWidth / outerFrameHeight;
+                    var adAspectRatio = adWidth / adHeight;
+
+                    ## Fix for https://jira.corp.inmobi.com/browse/IX-92
+                    if (Math.abs((adAspectRatio - frameAspectRatio)) > 0.05 * frameAspectRatio) {
+                        temp = adWidth;
+                        adWidth = adHeight;
+                        adHeight = temp;
+                    }
+
                     if (isFrameAd) {
-                        innerFrameWidth = (innerFrameDimensions.width - 2*innerFrameDimensions.leftOffset) * scaleFrame;
-                        innerFrameHeight = (innerFrameDimensions.height - 2*innerFrameDimensions.topOffset) * scaleFrame;
+                        innerFrameWidth = innerFrameDimensions.width*scaleFrame;
+                        innerFrameHeight = innerFrameDimensions.height*scaleFrame;
                     } else {
                         innerFrameWidth = outerFrameWidth;
                         innerFrameHeight = outerFrameHeight;
                     }
 
-                    scaleAdW = innerFrameWidth / adWidth;
-                    scaleAdH = innerFrameHeight / adHeight;
+                    scaledLeftOffset = innerFrameDimensions.leftOffset*scaleFrame;
+                    scaledTopOffset = innerFrameDimensions.topOffset*scaleFrame;
+                    scaleAdW = (innerFrameWidth-scaledLeftOffset) / adWidth;
+                    scaleAdH = (innerFrameHeight-scaledTopOffset) / adHeight;
                     scaleAd = Math.min(scaleAdW, scaleAdH, 1);
 
-                    thirdPartyAd.style.zoom = scaleAd;
+                    ## Centring within the frame
+                    if (scaleAdW != scaleAdH) {
+                        if (scaleAdH < scaleAdW) {
+                            adOffsetX = (scaleAdW-scaleAdH)*adWidth/2;
+                        } else {
+                            adOffsetY = (scaleAdH-scaleAdW)*adHeight/2;
+                        }
+                    }
+                    adOffsetX = adOffsetX + (availableWidth-innerFrameWidth)/2 + scaledLeftOffset;
+                    adOffsetY = adOffsetY + (availableHeight-innerFrameHeight)/2 + scaledTopOffset;
+
+                    ## Need to add webkit prefixed transforms for iOS
+                    thirdPartyAd.style.webkitTransform = "translate(" + adOffsetX + "px, "+ adOffsetY + "px) scale(" + scaleAd +")";
+                    thirdPartyAd.style.transform = "translate(" + adOffsetX + "px, "+ adOffsetY + "px) scale(" + scaleAd +")";
+                    thirdPartyAd.style.webkitTransformOrigin = "0 0";
+                    thirdPartyAd.style.transformOrigin = "0 0";
                 }
 
 
                 function onClose(event) {
                     event.stopPropagation();
                     if (!isMraid) {
-                        var adElem = byId(adNamespace + "adContainer");
+                        var adElem = byId(adNamespace + "ad");
                         adElem.innerHTML = "";
                         toggleVisibleState(adElem, false);
                     } else {
@@ -305,6 +332,8 @@
                                         var outerFrameWidth = frameJson.width,
                                             outerFrameHeight = frameJson.height,
                                             adAreaJson = frameJson.ad_area;
+                                            outerFrameDimensions.width = outerFrameWidth;
+                                            outerFrameDimensions.height = outerFrameHeight;
 
                                         if (null !== adAreaJson.percent_width) {
                                             innerFrameDimensions.width = outerFrameWidth * parseFloat(adAreaJson.percent_width);
