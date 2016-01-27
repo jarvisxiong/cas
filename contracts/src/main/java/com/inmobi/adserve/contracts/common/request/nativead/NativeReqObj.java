@@ -38,22 +38,24 @@ public class NativeReqObj {
      * @param asset
      */
     public void addAsset(final boolean required, final Object assetObj) {
-        if (assets == null) {
-            assets = new ArrayList<>();
+        if (null != assetObj) {
+            if (assets == null) {
+                assets = new ArrayList<>();
+            }
+            final Asset asset = new Asset(assets.size() + 1);
+            asset.setRequired(required ? 1 : 0);
+            if (assetObj instanceof Image) {
+                asset.setImg((Image) assetObj);
+            } else if (assetObj instanceof Title) {
+                asset.setTitle((Title) assetObj);
+            } else if (assetObj instanceof Video) {
+                asset.setVideo((Video) assetObj);
+            } else if (assetObj instanceof Data) {
+                asset.setData((Data) assetObj);
+            }
+            // TODO: No link object?
+            assets.add(asset);
         }
-        final Asset asset = new Asset(assets.size() + 1);
-        asset.setRequired(required ? 1 : 0);
-        if (assetObj instanceof Image) {
-            asset.setImg((Image) assetObj);
-        } else if (assetObj instanceof Title) {
-            asset.setTitle((Title) assetObj);
-        } else if (assetObj instanceof Video) {
-            asset.setVideo((Video) assetObj);
-        } else if (assetObj instanceof Data) {
-            asset.setData((Data) assetObj);
-        }
-        // TODO: No link object?
-        assets.add(asset);
     }
 
 
