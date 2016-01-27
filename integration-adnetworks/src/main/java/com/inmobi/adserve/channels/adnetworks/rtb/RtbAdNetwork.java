@@ -599,6 +599,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
     private Device createDeviceObject(final Geo geo) {
         final Device device = new Device();
+        final Map<String, String> deviceExtensions = getDeviceExt(device);
 
         if (DeviceType.TABLET == sasParams.getDeviceType()) {
             device.setDevicetype(DEVICE_TYPE_TABLET);
@@ -634,20 +635,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         device.setDnt(casInternalRequestParameters.isTrackingAllowed() ? 0 : 1);
 
         // Setting platform id sha1 hashed and md5 hashed
-        if (null != casInternalRequestParameters.getUidSO1()) {
-            device.setDidsha1(casInternalRequestParameters.getUidSO1());
+        if (null != casInternalRequestParameters.getUidSO1()) {              //SO1:40 OS:IOS hash:Sha1
             device.setDpidsha1(casInternalRequestParameters.getUidSO1());
-        } else if (null != casInternalRequestParameters.getUidO1()) {
-            device.setDidsha1(casInternalRequestParameters.getUidO1());
+        } else if (null != casInternalRequestParameters.getUidO1()) {        //O1:40 hash:Sha1, OS:Android
             device.setDpidsha1(casInternalRequestParameters.getUidO1());
-        } else if (null != casInternalRequestParameters.getUidMd5()) {
-            device.setDidsha1(casInternalRequestParameters.getUidMd5());
-            device.setDpidsha1(casInternalRequestParameters.getUidMd5());
-        } else if (null != casInternalRequestParameters.getUid()) {
-            device.setDidsha1(casInternalRequestParameters.getUid());
-            device.setDpidsha1(casInternalRequestParameters.getUid());
+        } else if (null != casInternalRequestParameters.getUidMd5()) {       //UM5:32 hash:MD5 OS:Android
+            device.setDpidmd5(casInternalRequestParameters.getUidMd5());
+        } else if (null != casInternalRequestParameters.getUid()) {          //Udid:32 hash:MD5 OS:Android
+            device.setDpidmd5(casInternalRequestParameters.getUid());
         }
-
 
         if (null != casInternalRequestParameters.getIem()) {
             final String value = casInternalRequestParameters.getIem();
@@ -655,19 +651,24 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 device.setDidsha1(DigestUtils.sha1Hex(value));
                 device.setDidmd5(DigestUtils.md5Hex(value));
                 device.setDpidsha1(null);
+                device.setDpidmd5(null);
             }
         } else if (StringUtils.isBlank(casInternalRequestParameters.getIem())) {
             final String imei = getIMEI();
             if (imei != null) {
-                device.setDidmd5(imei);
-                device.setDpidmd5(null);
                 device.setDidsha1(null);
+                device.setDidmd5(imei);
                 device.setDpidsha1(null);
+                device.setDpidmd5(null);
+            }
+        } else {
+            final String gpId = getGPID(false);
+            if (StringUtils.isNotEmpty(gpId)) {
+                deviceExtensions.put("gpid", gpId);
             }
         }
 
 
-        final Map<String, String> deviceExtensions = getDeviceExt(device);
         final String ifa = getUidIFA(false);
         // Setting Extension for idfa
         if (StringUtils.isNotEmpty(ifa)) {
@@ -676,10 +677,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             deviceExtensions.put("idfamd5", getHashedValue(ifa, MD5));
         }
 
-        final String gpId = getGPID(false);
-        if (StringUtils.isNotEmpty(gpId)) {
-            deviceExtensions.put("gpid", gpId);
-        }
         if (StringUtils.isNotBlank(sasParams.getLanguage())) {
             device.setLanguage(sasParams.getLanguage());
         }
