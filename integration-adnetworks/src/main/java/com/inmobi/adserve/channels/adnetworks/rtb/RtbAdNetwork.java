@@ -831,6 +831,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private void bannerAdBuilding() {
         final VelocityContext velocityContext = new VelocityContext();
         final String beaconUrl = getBeaconUrl();
+        final String clickUrl = getClickUrl();
         String admContent = getAdMarkUp();
 
         final int admSize = admContent.length();
@@ -858,6 +859,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (templateWN || admAfterMacroSize == admSize) {
             velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
         }
+
+        velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, clickUrl);
         try {
             responseContent =
                     Formatter.getResponseFromTemplate(TemplateType.RTB_HTML, velocityContext, sasParams, null);
@@ -999,7 +1002,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
         if (templateEntity == null) {
             LOG.info(traceMarker, "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
-            LOG.info(traceMarker, "This placement id {} doesn't have native template: ", sasParams.getPlacementId());
             return null;
         }
         final NativeBuilder nb = nativeBuilderfactory.create(templateEntity);
@@ -1023,11 +1025,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
             final Map<String, String> params = new HashMap<>();
             params.put("beaconUrl", getBeaconUrl());
+            params.put("clickUrl", getClickUrl());
             params.put("winUrl",
                     getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM + RTBCallbackMacros.DEAL_GET_PARAM);
             params.put("appId", app.getId());
             params.put("placementId", String.valueOf(sasParams.getPlacementId()));
             params.put("nUrl", nurl);
+            params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             responseContent = nativeResponseMaker.makeIXResponse(templateContext, params);
         } catch (final Exception e) {
             adStatus = TERM;

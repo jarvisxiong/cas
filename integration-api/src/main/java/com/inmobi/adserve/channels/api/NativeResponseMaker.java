@@ -121,7 +121,7 @@ public class NativeResponseMaker {
         context.put("OLD_LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("TRACKING_CODE", getTrackingCode(params, app));
         context.put("BEACON_URL", params.get("beaconUrl"));
-        context.put("CLICK_TRACKER", getClickUrl(app));
+        context.put("CLICK_TRACKER", getClickUrl(app, params.get("clickUrl")));
         context.put(IMAI_BASE_URL, params.get(IMAI_BASE_URL));
         return context;
     }
@@ -156,9 +156,12 @@ public class NativeResponseMaker {
         return bcu.toString();
     }
 
-    private String getClickUrl(final App app) {
+    private String getClickUrl(final App app, final String inmobiClickUrl) {
         final StringBuilder ct = new StringBuilder();
         final List<String> clickUrls = app.getClickUrls();
+        if (StringUtils.isNotBlank(inmobiClickUrl)) {
+            clickUrls.add(inmobiClickUrl);
+        }
         if (clickUrls != null) {
             int i = 0;
             for (; i < clickUrls.size() - 1; i++) {
