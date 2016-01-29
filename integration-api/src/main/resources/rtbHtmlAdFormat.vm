@@ -1,1 +1,58 @@
-<html><head><meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/></head><body style="margin:0;padding:0;">#if($IMAIBaseUrl)<script type="text/javascript" src="${IMAIBaseUrl}"></script>#end$PartnerHtmlCode#if($SDK450Onwards&&$isInterstitial)<script type="text/javascript">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script>#end#if($IMBeaconUrl)<img src='${IMBeaconUrl}?b=${WIN_BID}' height=1 width=1 border=0 />#end#if($PartnerBeaconUrl)<img src='$PartnerBeaconUrl' height=1 width=1 border=0 />#end</body></html>
+<html>
+    <head>
+        <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"/>
+        <style type="text/css">
+            html,body{
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+                height:100%;
+                position: relative;
+            }
+            .im_1011_beacon{
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        #if($IMAIBaseUrl)
+            <script type="text/javascript" src="${IMAIBaseUrl}"></script>
+        #end
+        $PartnerHtmlCode
+        #if($SDK450Onwards&&$isInterstitial)
+            <script type="text/javascript">
+                var readyHandler=function(){
+                    _im_imai.fireAdReady();
+                    _im_imai.removeEventListener('ready',readyHandler);
+                };
+                _im_imai.addEventListener('ready',readyHandler);
+            </script>
+        #end
+        <script type="text/javascript">
+            window['im_1011_fireBeacon'] = function(beaconUrl) {
+                if (undefined === beaconUrl) {
+                  return;
+                }
+                var x = document.createElement("img");
+                x.setAttribute("src", beaconUrl);
+                x.className = "im_1011_beacon";
+                document.body.appendChild(x);
+            };
+            (function() {
+                #if($IMClickUrl)
+                    var clickHandler = function() {
+                        document.removeEventListener('click', clickHandler);
+                        window['im_1011_fireBeacon']('${IMClickUrl}');
+                    };
+                    document.addEventListener('click', clickHandler);
+                #end
+            })();
+        </script>
+        #if($IMBeaconUrl)
+            <img src='${IMBeaconUrl}?b=${WIN_BID}' height=1 width=1 border=0 />
+        #end
+        #if($PartnerBeaconUrl)
+            <img src='$PartnerBeaconUrl' height=1 width=1 border=0 />
+        #end
+    </body>
+</html>

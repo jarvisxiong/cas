@@ -1310,6 +1310,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
             final Map<String, String> params = new HashMap<>();
             params.put("beaconUrl", getBeaconUrl());
+            params.put("clickUrl", getClickUrl());
             params.put("winUrl", getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM
                     + RTBCallbackMacros.DEAL_GET_PARAM);
             params.put("appId", app.getId());
