@@ -59,11 +59,13 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
             final String path = queryStringDecoder.path();
             Servlet servlet = pathToServletMap.get(path);
             if (servlet == null) {
-                log.debug(traceMarker, "Invalid Servlet Requested -> {}", httpRequest.getUri());
+                if (log.isDebugEnabled()) {
+                    log.debug(traceMarker, "Length of Request URI -> {}", httpRequest.getUri().length());
+                    log.debug(traceMarker, "Invalid Servlet Requested -> {}", httpRequest.getUri());
+                }
                 InspectorStats.incrementStatCount(INVALID_SERVLET_REQUEST, COUNT);
                 servlet = invalidServlet;
             }
-
             log.debug("Request servlet is {} for path {}", servlet, path);
             scope.seed(Servlet.class, servlet);
 
