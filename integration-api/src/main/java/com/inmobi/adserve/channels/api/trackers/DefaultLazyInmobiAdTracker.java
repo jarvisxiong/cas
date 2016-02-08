@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -179,26 +180,8 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
             adUrlSuffix.append(appendSeparator(DEFAULTIMSDK));
         }
 
-        // Creation of ImpressionInfo object (28th field)
-        final ImpressionInfo impInfo = new ImpressionInfo();
-
-        // 15th siteSegmentId/placementSegmentId
-        String segmentIdStr = Integer.toString(0);
-        if (null != placementId && null != placementSegmentId) {
-            segmentIdStr = getIdBase36(placementSegmentId);
-            // Setting placementId in the ImpressionInfo object
-            impInfo.setPlacementId(placementId);
-        } else if (null != siteSegmentId) {
-            segmentIdStr = getIdBase36(siteSegmentId);
-        }
-        adUrlSuffix.append(appendSeparator(segmentIdStr));
-
-        if (siteSegmentId != null) {
-            impInfo.setSiteSegmentId(siteSegmentId);
-        }
-        if (placementSegmentId != null) {
-            impInfo.setPlacementSegmentId(placementSegmentId);
-        }
+        // 15th siteSegmentId
+        adUrlSuffix.append(appendSeparator(getIdBase36((int)ObjectUtils.defaultIfNull(siteSegmentId, 0))));
 
         // 16the field for tier info
         adUrlSuffix.append(appendSeparator(tierInfo));
@@ -279,24 +262,39 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         adUrlSuffix.append(appendSeparator(finalBundleId));
         beaconUrlSuffix.append(appendSeparator(finalBundleId));
 
-        // 28th URL Component: encoded thrift serialized object with placementID, normalizedUserID and requestedAdType
-        // placementId is set alongside the 15th field
-        impInfo.setNormalizedUserId(normalizedUserId);
-        final IXSpecificInfo ixSpecificInfo = new IXSpecificInfo();
-        impInfo.setIxSpecificInfo(ixSpecificInfo);
+        // 28th URL Component: ImpressionInfo Thrift Object
+        final ImpressionInfo impInfo = new ImpressionInfo();
+
+        if (null != placementId) {
+            impInfo.setPlacementId(placementId);
+        }
+        if (null != siteSegmentId) {
+            impInfo.setSiteSegmentId(siteSegmentId);
+        }
+        if (null != placementSegmentId) {
+            impInfo.setPlacementSegmentId(placementSegmentId);
+        }
+        if (StringUtils.isNotBlank(normalizedUserId)) {
+            impInfo.setNormalizedUserId(normalizedUserId);
+        }
         if (null != requestedAdType) {
             impInfo.setRequestedAdType(requestedAdType.toString());
         }
         if (null != chargedBid) {
             impInfo.setChargedBid(chargedBid);
         }
-        if (null != agencyRebatePercentage) {
-            ixSpecificInfo.setAgencyRebatePercentage(agencyRebatePercentage);
-        }
         if (null != enrichmentCost && CollectionUtils.isNotEmpty(matchedCsids)) {
             impInfo.setEnrichment_cost(enrichmentCost);
             impInfo.setMatched_csids(matchedCsids);
         }
+
+        // IX Specific Info
+        final IXSpecificInfo ixSpecificInfo = new IXSpecificInfo();
+        impInfo.setIxSpecificInfo(ixSpecificInfo);
+        if (null != agencyRebatePercentage) {
+            ixSpecificInfo.setAgencyRebatePercentage(agencyRebatePercentage);
+        }
+
         // Native Strand Changes
         final RenderInfo renderInfo = new RenderInfo();
         final RenderUnitInfo renderUnitInfo = new RenderUnitInfo();
