@@ -39,7 +39,7 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
 
     @Inject
     public NettyRequestScopeSeedHandler(final NettyRequestScope scope, final Map<String, Servlet> pathToServletMap,
-            final ServletInvalid invalidServlet) {
+                                        final ServletInvalid invalidServlet) {
         this.scope = scope;
         this.pathToServletMap = pathToServletMap;
         this.invalidServlet = invalidServlet;

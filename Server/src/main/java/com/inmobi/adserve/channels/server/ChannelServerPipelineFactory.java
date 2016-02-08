@@ -19,11 +19,15 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
     private final ConnectionLimitHandler incomingConnectionLimitHandler;
     private final ServerConfig serverConfig;
     private final RequestParserHandler requestParserHandler;
+    private static final int MAX_REQUEST_LINE_LENGTH = 12228;
+    private static final int MAX_HEADER_SIZE = 8192;
+    private static final int MAX_CHUNK_SIZE = 8192;
 
     @Inject
     ChannelServerPipelineFactory(final ServerConfig serverConfig,
-            final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler,
-            final ConnectionLimitHandler incomingConnectionLimitHandler, final RequestParserHandler requestParserHandler) {
+                                 final NettyRequestScopeSeedHandler nettyRequestScopeSeedHandler,
+                                 final ConnectionLimitHandler incomingConnectionLimitHandler,
+                                 final RequestParserHandler requestParserHandler) {
         this.serverConfig = serverConfig;
         this.nettyRequestScopeSeedHandler = nettyRequestScopeSeedHandler;
         requestIdHandler = new RequestIdHandler();
@@ -37,7 +41,7 @@ public class ChannelServerPipelineFactory extends ChannelInitializer<SocketChann
         // enable logging handler only for dev purpose
         // pipeline.addLast("logging", loggingHandler);
         pipeline.addLast("incomingLimitHandler", incomingConnectionLimitHandler);
-        pipeline.addLast("decoderEncoder", new HttpServerCodec());
+        pipeline.addLast("decoderEncoder", new HttpServerCodec(MAX_REQUEST_LINE_LENGTH, MAX_HEADER_SIZE, MAX_CHUNK_SIZE));
         // 1 MB max request size
         pipeline.addLast("aggregator", new HttpObjectAggregator(1024 * 1024));
         pipeline.addLast("casTimeoutHandler", new CasTimeoutHandler(serverConfig));
