@@ -7,7 +7,7 @@ LoadPlugin write_graphite
     Port "2020"
     Protocol "tcp"
     LogSendErrors true
-    Prefix "{{graphite_prefix_base}}.{{IDP_CLUSTER}}.cas-1.sys.container-metrics."
+    Prefix "{{graphite_prefix_base}}.{{IDP_CLUSTER}}.cas-1.sys."
     StoreRates true
     AlwaysAppendDS false
     EscapeCharacter "_"
@@ -21,4 +21,42 @@ LoadPlugin write_graphite
     RemotePort "3000"
     RemotePort "12555"
 </Plugin>
+
+LoadPlugin disk
+LoadPlugin memory
+LoadPlugin swap
+
+LoadPlugin cpu
+LoadPlugin "aggregation"
+<Plugin "aggregation">
+<Aggregation>
+    Plugin "cpu"
+    Type "cpu"
+    SetPlugin "cpu"
+    SetPluginInstance "%{aggregation}"
+    GroupBy "Host"
+    GroupBy "TypeInstance"
+    CalculateMinimum true
+    CalculateMaximum true
+    CalculateAverage true
+</Aggregation>
+</Plugin>
+LoadPlugin "match_regex"
+PostCacheChain "Cpumetrics"
+<Chain "Cpumetrics">
+<Rule>
+    <Match "regex">
+    Plugin "^cpu$"
+    PluginInstance "^[0-9]+$"
+    </Match>
+    <Target write>
+        Plugin "aggregation"
+    </Target>
+    Target stop
+</Rule>
+Target "write"
+</Chain>
+
+
+
 

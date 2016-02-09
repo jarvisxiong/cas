@@ -13,7 +13,7 @@
 
     <groupId>com.inmobi.channels</groupId>
     <artifactId>cas</artifactId>
-    <version>6.17-SNAPSHOT</version>
+    <version>6.18-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.corp.inmobi.com/channel-adserve/cas</url>
 
