@@ -314,8 +314,9 @@ public class CasQueryConf {
                                         .getManufModelParamName() : "[]";
 
                 String language_targeting_list = "{}";
-                String placement_slot_ids = "{}";
-                String site_ids = "{}";
+                String placement_slot_ids = "{" + adGroup.get("placement_slot_ids") + "}";
+                String site_ids = "{" + adGroup.get("site_siteid")+ "}";
+
                 if ( Integer.parseInt(adGroup.get("package_id")) >= 10005) {
                     if (Integer.parseInt(adGroup.get("package_id")) == 10006) {
                         language_targeting_list = "{en,ar}";

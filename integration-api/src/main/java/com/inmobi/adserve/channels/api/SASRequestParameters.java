@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.EncryptionKeys;
@@ -108,6 +109,7 @@ public class SASRequestParameters {
     private String automationTestId;
     private Set<Long> cauMetadataSet;
     private Set<Long> customTemplateSet;
+    private ImmutableSet<Integer> vastProtocols;  // {2: VAST 2.0, 3: VAST 3.0, 5 : VAST 2.0 WRAPPER, 6 : VAST 3.0 WRAPPER}
 
     // requestGuid is a unique identifier used for tracking purposes between ump and the SDK. This value was
     // earlier being set by ump only in case of Native Ads so DCP flow was unaffected, but due to response format

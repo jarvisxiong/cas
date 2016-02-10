@@ -40,6 +40,7 @@ public class InspectorStrings {
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
     public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
     public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";
+    public static final String PURE_VAST_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(PureVast)";
     public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(CAU)";
     public static final String NATIVE_VM_TEMPLATE_ERROR = "NativeVMTemplateError";
     public static final String PROCESSING_ERROR = "Terminated_ServerError";
@@ -99,6 +100,9 @@ public class InspectorStrings {
     public static final String IMEI_BEING_SENT_FOR_RTBD = "ImeiBeingSentForRtbd";
     public static final String IMEI_BEING_SENT_FOR_DCP = "ImeiBeingSentForDCP";
 
+    public static final String UNEXPECTED_CONDITION = "UnexpectedCondition";
+    public static final String VAST_OUT_WITH_SDK = "VastOutWithSDK";
+
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
@@ -140,6 +144,12 @@ public class InspectorStrings {
     public static final String DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED = "DroppedAsSproutAdsAreNotSupportedOn";
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
     public static final String TOTAL_VAST_VIDEO_REQUESTS = "TotalVASTVideoRequests";
+    public static final String TOTAL_PURE_VAST_REQUESTS = "TotalPureVASTRequests";
+    public static final String TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API = "TotalPureVASTRequestsForOtherThanApi";
+    public static final String TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL = "TotalPureVASTRequestsForProtocol_";
+    public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
+    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING = "totalPureVastResponseInlineOrWrapperMissing";
+    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING = "totalPureVastResponseTrackingEventsMissing";
     public static final String TOTAL_REWARDED_VAST_VIDEO_REQUESTS = "TotalRewardedVASTVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
@@ -224,5 +234,4 @@ public class InspectorStrings {
     public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public static final String NULL_HOST_NAME = "NullHostName";
     public static final String NULL_IP_ADDRESS = "NullIPAddress";
-
 }

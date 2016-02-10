@@ -14,6 +14,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.ImmutableList;
+import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -37,18 +39,22 @@ public class CasUtilsTest {
         replayAll();
 
         final SasParamsTestData[] testData = {
-            new SasParamsTestData(GlobalConstant.APP, "a370", 3, "4.0", false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
-            new SasParamsTestData(GlobalConstant.APP, "a450", 3, "4.4", true, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
-            new SasParamsTestData(GlobalConstant.APP, "i370", 5, "6.0", false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", true, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", false, DemandSourceType.IX, RequestedAdType.NATIVE),
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", false, DemandSourceType.IX, RequestedAdType.BANNER),
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", false, DemandSourceType.IX, RequestedAdType.INLINE_BANNER),
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", false, DemandSourceType.RTBD, RequestedAdType.INTERSTITIAL), // Video not supported on RTBD
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", false, DemandSourceType.DCP, RequestedAdType.INTERSTITIAL), // Video not supported on DCP
-            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "5.0", false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL), // Unsupported iOS version
-            new SasParamsTestData(GlobalConstant.APP, "a450", 3, "3.0", false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL), // Unsupported Android version
-            new SasParamsTestData(GlobalConstant.WAP, "a450", 3, "4.0", false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),  // Unsupported Source
+            new SasParamsTestData(GlobalConstant.APP, "a370", 3, "4.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, "a450", 3, "4.4", IntegrationType.ANDROID_SDK, true, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, "i370", 5, "6.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", IntegrationType.ANDROID_SDK, true, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, null, 3, "4.4", IntegrationType.ANDROID_API, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, null, 5, "6.0", IntegrationType.ANDROID_API, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, null, 5, "6.0", IntegrationType.ANDROID_API, true, DemandSourceType.IX, RequestedAdType.VAST),
+            new SasParamsTestData(GlobalConstant.APP, null, 5, "6.0", IntegrationType.ANDROID_API, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.NATIVE),
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.BANNER),
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.INLINE_BANNER),
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.RTBD, RequestedAdType.INTERSTITIAL), // Video not supported on RTBD
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "6.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.DCP, RequestedAdType.INTERSTITIAL), // Video not supported on DCP
+            new SasParamsTestData(GlobalConstant.APP, "i450", 5, "5.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL), // Unsupported iOS version
+            new SasParamsTestData(GlobalConstant.APP, "a450", 3, "3.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL), // Unsupported Android version
+            new SasParamsTestData(GlobalConstant.WAP, "a450", 3, "4.0", IntegrationType.ANDROID_SDK, false, DemandSourceType.IX, RequestedAdType.INTERSTITIAL),  // Unsupported Source
         };
 
         int i = 1;
@@ -65,7 +71,9 @@ public class CasUtilsTest {
             sasParams.setPubControlSupportedAdTypes(ImmutableList.of(AdTypeEnum.VIDEO));
             sasParams.setDst(data.dst.getValue());
             sasParams.setRequestedAdType(data.requestedAdType);
-
+            IntegrationDetails integrationDetails = new IntegrationDetails();
+            integrationDetails.setIntegrationType(data.integrationType);
+            sasParams.setIntegrationDetails(integrationDetails);
             final boolean testResult = casUtils.isVideoSupported(sasParams);
             assertEquals(data.expectedResult, testResult);
         }
@@ -82,9 +90,10 @@ public class CasUtilsTest {
         final boolean expectedResult;
         final DemandSourceType dst;
         final RequestedAdType requestedAdType;
+        final IntegrationType integrationType;
 
-        SasParamsTestData(final String source, final String sdkVersion, final int osId, final String osVersion,
-            final boolean expectedResult, final DemandSourceType dst, final RequestedAdType requestedAdType) {
+        SasParamsTestData(final String source, final String sdkVersion, final int osId, final String osVersion, final
+                          IntegrationType integrationType, final boolean expectedResult, final DemandSourceType dst, final RequestedAdType requestedAdType) {
             this.source = source;
             this.sdkVersion = sdkVersion;
             this.osId = osId;
@@ -92,6 +101,7 @@ public class CasUtilsTest {
             this.expectedResult = expectedResult;
             this.dst = dst;
             this.requestedAdType = requestedAdType;
+            this.integrationType = integrationType;
         }
     }
 }

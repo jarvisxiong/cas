@@ -47,8 +47,10 @@ import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAsse
 import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAssetType.RATING;
 
 import java.awt.Dimension;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +59,11 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -65,6 +72,10 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -82,12 +93,14 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.GenericTemplateObject;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.response.nativead.Native;
+import com.inmobi.adserve.contracts.ix.request.Geo;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
@@ -123,6 +136,32 @@ public class IXAdNetworkHelper {
             IX_FS_INDUSTRY_BLOCKLIST_ID, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
     private static final ImmutableList<IXBlocklistType> supportedBlocklistTypes = ImmutableList.of(
             IXBlocklistType.ADVERTISERS, IXBlocklistType.INDUSTRY_IDS, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS);
+
+    private static final String IMPRESSION_TAG = "Impression";
+    private static final String ERROR_TAG = "Error";
+    private static final String TRACKING_TAG = "Tracking";
+    private static final String CLICK_TRACKING_TAG = "ClickTracking";
+    private static final String EVENT_ATTR = "event";
+    private static final String START = "start";
+    private static final String FIRST_QUARTILE = "firstQuartile";
+    private static final String MIDPOINT = "midpoint";
+    private static final String THIRD_QUARTILE = "thirdQuartile";
+    private static final String COMPLETE = "complete";
+    private static final String TRACKING_EVENTS_TAG = "TrackingEvents";
+    private static final String IN_LINE_TAG = "InLine";
+    private static final String WRAPPER_TAG = "Wrapper";
+    private static final String VIDEO_CLICKS_TAG = "VideoClicks";
+
+    private static Transformer transformer;
+
+    static {
+        try {
+            transformer = TransformerFactory.newInstance().newTransformer();
+        } catch (final Exception e) {
+            LOG.error("VAST PARSING EXCEPTION WHILE WRITING TO STRING BACK");
+        }
+    }
+
 
     /**
      *
@@ -692,5 +731,105 @@ public class IXAdNetworkHelper {
         velocityContext.put(FIRST_OBJECT_PREFIX, templateFirst);
 
         return Formatter.getResponseFromTemplate(TemplateType.CAU, velocityContext, sasParams, null);
+    }
+
+    public static String pureVastAdBuilding(String adMarkUp, final String beaconUrl, final String clickUrl) throws
+            ParserConfigurationException, IOException, SAXException, TransformerException {
+        final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+        domFactory.setIgnoringComments(true);
+        final DocumentBuilder builder = domFactory.newDocumentBuilder();
+        adMarkUp = adMarkUp.replaceFirst("^([\\W]+)<", "<");  //remove some special char in start to parse xml
+        final Document doc = builder.parse(new InputSource(new ByteArrayInputStream(adMarkUp.getBytes("utf-8"))));
+
+        final NodeList trackingEventsNode = doc.getElementsByTagName(TRACKING_EVENTS_TAG);
+        final NodeList inlineNode = doc.getElementsByTagName(IN_LINE_TAG);
+        final NodeList wrapperNode = doc.getElementsByTagName(WRAPPER_TAG);
+
+        final String impressionUriStr = beaconUrl + "?m=18";
+        final String errorUriStr = beaconUrl + "?m=99&action=vast-error&label=[ERRORCODE]";
+
+        if (0 != inlineNode.getLength()) {
+            addInXml(doc, inlineNode, IMPRESSION_TAG, null, null, impressionUriStr);
+            addInXml(doc, inlineNode, ERROR_TAG, null, null, errorUriStr);
+            addClickTracking(doc, inlineNode, clickUrl, beaconUrl);
+        } else if (0 != wrapperNode.getLength()) {
+            addInXml(doc, wrapperNode, IMPRESSION_TAG, null, null, impressionUriStr);
+            addInXml(doc, wrapperNode, ERROR_TAG, null, null, errorUriStr);
+            addClickTracking(doc, wrapperNode, clickUrl, beaconUrl);
+        } else {
+            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING);
+            throw new ParserConfigurationException();
+        }
+
+
+
+        if (0 != trackingEventsNode.getLength()) {
+            final String startUriStr = beaconUrl + "?m=10";
+            final String billingUriStr = beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}";
+            final String firstQuartileUriStr = beaconUrl + "?m=12&q=1&mid=video&__t=0";
+            final String midPointUriStr = beaconUrl + "?m=12&q=2&mid=video&__t=0";
+            final String thirdQuartileUriStr = beaconUrl + "?m=12&q=3&mid=video&__t=0";
+            final String completeUriStr = beaconUrl + "?m=13&mid=video&__t=0";
+
+            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, START, startUriStr);
+            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, START, billingUriStr);
+            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, FIRST_QUARTILE, firstQuartileUriStr);
+            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, MIDPOINT, midPointUriStr);
+            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, THIRD_QUARTILE, thirdQuartileUriStr);
+            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, COMPLETE, completeUriStr);
+        } else  {
+            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING);
+            throw new ParserConfigurationException();
+        }
+
+
+
+        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        final StreamResult result = new StreamResult(new StringWriter());
+        final DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+        return result.getWriter().toString();
+    }
+
+
+    private static void addClickTracking(final Document doc, final NodeList parentNodeList, final String clickUrl, final String beaconUrl) {
+        final NodeList videoClickNode = doc.getElementsByTagName(VIDEO_CLICKS_TAG);
+        final String beaconClickuUriStr = beaconUrl + "?m=8";
+        if (0 == videoClickNode.getLength()) {
+            final Element docElm = doc.createElement(VIDEO_CLICKS_TAG);
+            parentNodeList.item(0).appendChild(docElm);
+            addInXml(doc, docElm, CLICK_TRACKING_TAG, null, null, clickUrl);
+            addInXml(doc, docElm, CLICK_TRACKING_TAG, null, null, beaconClickuUriStr);
+        } else {
+            addInXml(doc, videoClickNode, CLICK_TRACKING_TAG, null, null, clickUrl);
+            addInXml(doc, videoClickNode, CLICK_TRACKING_TAG, null, null, beaconClickuUriStr);
+        }
+    }
+
+    // doc -> nodeList[0] -> EleementTag -> attributeKey, attributeValue -> data = uri
+    private static void addInXml(final Document doc, final NodeList nodeList, final String elmStr,
+                                 final String key, final String value, final String uri) {
+        nodeList.item(0).appendChild(getDocElm(doc, elmStr, key, value, uri));
+    }
+
+    private static void addInXml(final Document doc, final Element element, final String elmStr,
+                                 final String key, final String value, final String uri) {
+        element.appendChild(getDocElm(doc, elmStr, key, value, uri));
+    }
+
+    private static Element getDocElm(final Document doc, final String elmStr, final String key, final String value, final String uri) {
+        final CDATASection cdata = doc.createCDATASection(uri);
+        final Element docElm = doc.createElement(elmStr);
+        if (null != key && null != value) {
+            docElm.setAttribute(key, value);
+        }
+        docElm.appendChild(cdata);
+
+        if (null == key) {
+            LOG.debug("{} added in VAST xml", elmStr);
+        } else {
+            LOG.debug("{} added in VAST xml key is : {} and value is : {}", elmStr, key, value);
+        }
+        return docElm;
     }
 }

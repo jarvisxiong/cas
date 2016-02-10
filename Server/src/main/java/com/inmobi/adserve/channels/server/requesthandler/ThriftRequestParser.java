@@ -20,6 +20,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.AdPoolRequest;
 import com.inmobi.adserve.adpool.ConnectionType;
@@ -84,6 +85,9 @@ public class ThriftRequestParser {
         }
         if (tObject.isSetPlacementId()) {
             params.setPlacementId(tObject.placementId);
+        }
+        if (tObject.isSetVastProtocols()) {
+            params.setVastProtocols(ImmutableSet.copyOf(tObject.getVastProtocols()));
         }
         params.setRequestedAdType(tObject.getRequestedAdType());
         params.setRichMedia(tObject.isSetSupplyAllowedContents()

@@ -7,6 +7,7 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.TIME_OUT;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.PURE_VAST;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
 
 import java.io.UnsupportedEncodingException;
@@ -130,6 +131,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected boolean isNativeResponseSupported = false;
     @Getter
     protected boolean isVideoRequest = false;
+    protected boolean isPureVastRequest = false;
     protected boolean isRewardedVideoRequest = false;
     protected boolean isNativeRequest = false;
     protected boolean isRtbPartner = false;
@@ -564,11 +566,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // Checking the appropriate SecondaryAdFormatConstraints of an adgroup is a sufficient check for determining
         // vast video, rewarded video, etc support as the selected adgroup by this point, would have already had all
         // supply constraints checked in AdGroupAdTypeTargetingFilter
-        isVideoRequest = (VAST_VIDEO == entity.getSecondaryAdFormatConstraints());
+        isVideoRequest = VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
+        isPureVastRequest = PURE_VAST == entity.getSecondaryAdFormatConstraints();
         isRewardedVideoRequest = (REWARDED_VAST_VIDEO == entity.getSecondaryAdFormatConstraints());
 
         selectedSlotId = (short) slotId;
-        processedSlotId = (isVideoRequest || isRewardedVideoRequest)?
+        processedSlotId = (isVideoRequest || isRewardedVideoRequest || isPureVastRequest)?
             ObjectUtils.defaultIfNull(getOptimisedVideoSlot((short) slotId), (short) slotId) :
             (short) slotId;
 
@@ -859,7 +862,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public ADCreativeType getCreativeType() {
         if (isNativeRequest()) {
             return ADCreativeType.NATIVE;
-        } else if (isVideoRequest || isRewardedVideoRequest) {
+        } else if (isVideoRequest || isRewardedVideoRequest || isPureVastRequest) {
             return ADCreativeType.INTERSTITIAL_VIDEO;
         } else {
             return ADCreativeType.BANNER;

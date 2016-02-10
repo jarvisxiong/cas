@@ -1790,6 +1790,65 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
+    public void VastPassAssert() throws Exception {
+        final String impression = "Impression added in VAST xml";
+        final String error = "Error added in VAST xml";
+        final String clickTracking = "ClickTracking added in VAST xml";
+        final String start = "Tracking added in VAST xml key is : event and value is : start";
+        final String firstQuartile = "Tracking added in VAST xml key is : event and value is : firstQuartile";
+        final String midPoint = "Tracking added in VAST xml key is : event and value is : midpoint";
+        final String thirdQuartile = "Tracking added in VAST xml key is : event and value is : thirdQuartile";
+        final String complete = "Tracking added in VAST xml key is : event and value is : complete";
+
+        parserOutput =
+                LogParserHelper.logParser(impression, error, clickTracking, start , firstQuartile, midPoint,
+                        thirdQuartile, complete);
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_VAST_REQUEST_API_WAP_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_REQUEST_API_WAP_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        VastPassAssert();
+    }
+
+    @Test(testName = "TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        VastPassAssert();
+    }
+
+    @Test(testName = "TEST_VAST_REQUEST_API_APP_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_REQUEST_API_APP_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        VastPassAssert();
+    }
+
+    @Test(testName = "TEST_VAST_REQUEST_SDK_APP_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_REQUEST_SDK_APP_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        VastPassAssert();
+    }
+
+    @Test(testName = "TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        VastPassAssert();
+    }
+
+    @Test(testName = "TEST_VAST_AD_TYPE_TARGETING_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_AD_TYPE_TARGETING_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("Failed in filter AdGroupAdTypeTargetingFilter  , adgroup TEST_VAST_AD_TYPE_TARGETING_FAIL");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_VAST_VIDEO_SLOT_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_VIDEO_SLOT_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("Failed in filter AdGroupAdTypeTargetingFilter  , adgroup TEST_VAST_VIDEO_SLOT_FAIL");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)
     // public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder)

@@ -77,6 +77,7 @@ public class IXPackageMatcher {
         int droppedInPackageLanguageTargetingFilter = 0;
         int droppedInSdkVersionFilter = 0;
 
+
         // TODO: Refactor into proper filters
         for (final IXPackageEntity packageEntity : resultSet) {
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
@@ -198,6 +199,7 @@ public class IXPackageMatcher {
             .DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER, droppedInPackageLanguageTargetingFilter);
         InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
                 InspectorStrings.DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
+
         String matchedPackageIdStr = "";
         for (Integer i : matchedPackageIds){
             matchedPackageIdStr += " " + i;
@@ -211,7 +213,6 @@ public class IXPackageMatcher {
         return ((null == languageTargetingSet) ? true : (languageTargetingSet.isEmpty() ? true : languageTargetingSet
             .contains(reqLanguage)));
     }
-
 
     private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
         if (CollectionUtils.isEmpty(csiReqTags)) {
