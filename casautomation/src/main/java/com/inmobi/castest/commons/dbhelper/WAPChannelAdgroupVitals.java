@@ -40,7 +40,9 @@ public class WAPChannelAdgroupVitals {
         wapChannelAdGroup.put("automation_test_id", wapChannelAdGroup.get("fender_test_case_id"));
         wapChannelAdGroup.put("adgroup_id", wapChannelAdGroup.get("fender_test_case_id"));
         wapChannelAdGroup.put("status", "true");
-        wapChannelAdGroup.put("site_siteid", wapChannelAdGroup.get("fender_test_case_id"));
+        if (wapChannelAdGroup.get("site_siteid") == null ) {
+            wapChannelAdGroup.put("site_siteid", wapChannelAdGroup.get("fender_test_case_id"));
+        }
         return wapChannelAdGroup;
     }
 }

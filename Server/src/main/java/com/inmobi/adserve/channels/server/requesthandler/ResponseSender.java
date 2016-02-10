@@ -92,6 +92,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final String AD_IMAI_START_TAG = "<!DOCTYPE html>";
     private static final String NO_AD_IMAI = StringUtils.EMPTY;
     private static final String NO_AD_XHTML = "<AdResponse><Ads></Ads></AdResponse>";
+    private static final String NO_AD_VAST = "<AdResponse><Ads></Ads></AdResponse>";
     private static final String NO_AD_HTML = "<!-- mKhoj: No advt for this position -->";
     private static final String NO_AD_JS_ADCODE = "<html><head><title></title><style type=\"text/css\">"
             + " body {margin: 0; overflow: hidden; background-color: transparent}"
@@ -103,7 +104,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             "{\"requestId\":\"%s\",\"ads\":[{\"pubContent\":\"%s\"}]}";
     private static final String DCP_NATIVE_WRAPPING_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[%s]}";
     private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native",
-            "json");
+            "json", "vast");
 
     /**
      * At IX-Rubicon, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then the return
@@ -577,6 +578,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     httpResponseStatus = HttpResponseStatus.OK;
                     defaultContent = String.format(NO_AD_JS_ADCODE, sasParams.getRqIframe());
                     break;
+                case VAST:
+                    httpResponseStatus = HttpResponseStatus.OK;
+                    defaultContent = NO_AD_VAST;
+                    break;
             }
         }
         sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
@@ -844,7 +849,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public enum ResponseFormat {
-        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode"), JSON("json");
+        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode"), JSON("json"),
+        VAST("vast");
 
         private String[] formats;
 

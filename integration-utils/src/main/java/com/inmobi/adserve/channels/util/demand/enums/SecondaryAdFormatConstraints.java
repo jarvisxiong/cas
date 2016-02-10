@@ -15,6 +15,7 @@ public enum SecondaryAdFormatConstraints {
     STATIC(0),     // Banner, Interstitial and Native(non-video)
     VAST_VIDEO(1),
     REWARDED_VAST_VIDEO(2),
+    PURE_VAST(3),
     UNKNOWN(1000);
 
     @Getter
@@ -35,6 +36,9 @@ public enum SecondaryAdFormatConstraints {
                     break;
                 case 2:
                     returnValue = REWARDED_VAST_VIDEO;
+                    break;
+                case 3:
+                    returnValue = PURE_VAST;
                     break;
                 case -1:
                     returnValue = ALL;

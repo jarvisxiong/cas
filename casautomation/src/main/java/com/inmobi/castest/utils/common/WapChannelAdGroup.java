@@ -2,6 +2,7 @@ package com.inmobi.castest.utils.common;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class WapChannelAdGroup {
                 break;
         }
 
-        return wapGroup.get(0);
+        return wapGroup.size() != 0 ? wapGroup.get(0) : new HashMap<>();
     }
 
     public static Map<String, String> setWapChannelAdGroup(final Map<String, String> wapChannelAdGroup)

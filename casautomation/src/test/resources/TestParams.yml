@@ -1787,4 +1787,67 @@ TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL:
   adpool_placementId : '1431975537983742'
   source : 'APP'
 
+TEST_VAST_REQUEST_API_WAP_PASS:
+-  integration_type : 'ANDROID_API'
+   adpool_requestedadtype: 'VAST'
+   site_inventorytype : 'WAP' #forreq
+   adpool_responseformat : 'VAST'
+   adpool_selectedslots : '14'
+   geo_countryid : '125'
+   ad_type_targeting : '3'
 
+TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS:
+-  integration_type : 'ANDROID_API'
+   adpool_requestedadtype: 'VAST'
+   site_inventorytype : 'WAP' #forreq
+   adpool_responseformat : 'VAST'
+   adpool_selectedslots : '14'
+   geo_countryid : '125'
+   ad_type_targeting : '3'
+   integration_version: '500'
+
+TEST_VAST_REQUEST_API_APP_PASS:
+-  integration_type : 'ANDROID_API'
+   adpool_requestedadtype: 'VAST'
+   site_inventorytype : 'APP' #forreq
+   adpool_responseformat : 'VAST'
+   adpool_selectedslots : '14'
+   geo_countryid : '125'
+   ad_type_targeting : '3'
+
+TEST_VAST_REQUEST_SDK_APP_PASS:
+ -  integration_type: 'ANDROID_SDK'
+    adpool_requestedadtype: 'VAST'
+    site_inventorytype : 'APP' #forreq
+    adpool_responseformat : 'VAST'
+    adpool_selectedslots : '14'
+    geo_countryid : '125'
+    ad_type_targeting : '3'
+    integration_version: '500'
+
+TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS:
+ -  integration_type: 'ANDROID_SDK'
+    adpool_requestedadtype: 'VAST'
+    site_inventorytype : 'APP' #forreq
+    adpool_responseformat : 'VAST'
+    adpool_selectedslots : '14'
+    geo_countryid : '125'
+    ad_type_targeting : '3'
+
+TEST_VAST_AD_TYPE_TARGETING_FAIL:
+-  integration_type : 'ANDROID_API'
+   adpool_requestedadtype: 'VAST'
+   site_inventorytype : 'APP' #forreq
+   adpool_responseformat : 'VAST'
+   adpool_selectedslots : '14'
+   geo_countryid : '125'
+   ad_type_targeting : '2'
+
+TEST_VAST_VIDEO_SLOT_FAIL:
+-  integration_type : 'ANDROID_API'
+   adpool_requestedadtype: 'VAST'
+   site_inventorytype : 'APP' #forreq
+   adpool_responseformat : 'VAST'
+   adpool_selectedslots : '9'
+   geo_countryid : '125'
+   ad_type_targeting : '3'

@@ -513,6 +513,8 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getOsId()).andReturn(3).times(1).andReturn(5).times(1);
         expect(mockSasParam.getSource()).andReturn("WAP").times(1).andReturn(null).times(1).andReturn("WAP").times(2)
                 .andReturn("APP").times(2);
+        expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");

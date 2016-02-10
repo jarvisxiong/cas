@@ -863,6 +863,8 @@ public class AdserveBackfillRequest {
                 return RequestedAdType.NATIVE;
             } else if (requestadtype.toUpperCase().equals("BANNER")) {
                 return RequestedAdType.BANNER;
+            } else if (requestadtype.toUpperCase().equals("VAST")){
+                return RequestedAdType.VAST;
             }
 
         }
@@ -994,6 +996,8 @@ public class AdserveBackfillRequest {
                 return ResponseFormat.IMAI;
             } else if (responseformat.toUpperCase().equals("NATIVE")) {
                 return ResponseFormat.NATIVE;
+            } else if (responseformat.toUpperCase().equals("VAST")) {
+                return ResponseFormat.VAST;
             }
         }
 

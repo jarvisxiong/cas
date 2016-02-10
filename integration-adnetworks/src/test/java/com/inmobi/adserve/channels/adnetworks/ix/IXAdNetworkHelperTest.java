@@ -4,10 +4,12 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -47,6 +49,92 @@ public class IXAdNetworkHelperTest {
     private static IXBlocklistEntity emptySiteAdvertiserBlocklistEntity;
     private static IXBlocklistEntity emptySiteIndustryBlocklistEntity;
     private static IXBlocklistEntity emptySiteCreativeAttributesBlocklistEntity;
+
+    private static final String clickUrl = "http://some/click/url/";
+    private static final String beaconUrl = "http://some/beacon/url/";
+    private static final String adMarkUp_part1 = "\"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<VAST xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"vast.xsd\" version=\"2.0\">\n"
+            + " <Ad id=\"299060245\">\n";
+
+    private static final String inlineOpenTag =
+            "  <InLine>\n";
+    private static final String wrapperOpenTag =
+            "  <Wrapper>\n";
+    private static final String adMarkUp_part2 =
+            "   <AdSystem>DBM</AdSystem>\n"
+                    + "   <AdTitle>In-Stream Video</AdTitle>\n";
+    private static final String errorTag =
+            "   <Error><![CDATA[https://bid.g.doubleclick.net/xbbe/notify/rubicon?creative_id=16839126&usl_id=1181397&errorcode=[ERRORCODE]&d=APEucNVXoGKpR8JU4VGGuQsNBMSP2R4wXuhdPuHjl8BVEBavU7k0thNvWYak6z6aaaB4_d8AFgjUxXjDUhd5PBe7kz8_8U-Sron7C0xLvbMdKAsOEDImCcClCOySKsDHN0ea0xfTgQu2wOi90qG1_Nowx_ea7GZTDQ_LetU4omwWFMxZXymVHIYE6d8nqm35shZTPycvuimc8sUlP66oRhEb8ZauYrNhRvbDudUmreChBAnVgxOxDs9VPeQX6rFXqCs0rGvQlQFlBbj1MfKoeEThfQhTyPwz2bbhyRrt56j48z208Ru2PjI]]></Error>\n";
+    private static final String impressionTag =
+            "   <Impression><![CDATA[https://bid.g.doubleclick.net/xbbe/pixel?d=CJcBEP7pFBjW44MIIAE&v=APEucNX1ybOr1eT9xwNqEq-ieldOvmZR0E_cjceLanIbyjRc8eiAh86EWNcwiEhlK8VFHBpoyNuP]]></Impression>\n";
+    private static final String adMarkUp_part3 =
+            "   <Creatives>\n"
+                    + "    <Creative id=\"67382425\" sequence=\"1\">\n"
+                    + "     <Linear>\n"
+                    + "      <Duration>00:00:30</Duration>\n";
+    private static final String trackingEventsTag =
+            "      <TrackingEvents>\n"
+                    + "       <Tracking event=\"start\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=11;]]></Tracking>\n"
+                    + "       <Tracking event=\"firstQuartile\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=960584;]]></Tracking>\n"
+                    + "       <Tracking event=\"midpoint\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=18;]]></Tracking>\n"
+                    + "       <Tracking event=\"thirdQuartile\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=960585;]]></Tracking>\n"
+                    + "       <Tracking event=\"complete\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=13;]]></Tracking>\n"
+                    + "       <Tracking event=\"mute\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=16;]]></Tracking>\n"
+                    + "       <Tracking event=\"unmute\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=149645;]]></Tracking>\n"
+                    + "       <Tracking event=\"pause\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=15;]]></Tracking>\n"
+                    + "       <Tracking event=\"fullscreen\"><![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;met=1;ecn1=1;etm1=0;eid1=19;]]></Tracking>\n"
+                    + "      </TrackingEvents>\n";
+    private static final String adMarkUp_part4 =
+            "      <AdParameters><![CDATA[&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;VAST xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;vast.xsd&quot; version=&quot;2.0&quot;&gt;  &lt;Ad id=&quot;&quot;&gt;   &lt;Wrapper&gt;    &lt;AdSystem&gt;&lt;/AdSystem&gt;    &lt;VASTAdTagURI&gt;&lt;![CDATA[https://x4.vindicosuite.com/?lc=420877-883716&amp;t=x&amp;plid=v_PublisherInsertMacroOrValueHere_v&amp;ts=[timestamp]]]&gt;&lt;/VASTAdTagURI&gt;    &lt;Error&gt;&lt;![CDATA[]]&gt;&lt;/Error&gt;    &lt;Impression&gt;&lt;![CDATA[https://s0.2mdn.net/dot.gif]]&gt;&lt;/Impression&gt;    &lt;Creatives&gt;     &lt;Creative sequence=&quot;1&quot;&gt;      &lt;Linear&gt;       &lt;Duration&gt;00:00:30&lt;/Duration&gt;       &lt;TrackingEvents&gt;        &lt;Tracking event=&quot;start&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];dc_rfl=[URL_SIGNALS];ecn1=0;etm1=0;eid1=210001;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;firstQuartile&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210002;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;midpoint&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210003;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;thirdQuartile&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210004;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;complete&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210005;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;mute&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210006;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;unmute&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210007;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;pause&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210008;]]&gt;&lt;/Tracking&gt;        &lt;Tracking event=&quot;fullscreen&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=210009;]]&gt;&lt;/Tracking&gt;       &lt;/TrackingEvents&gt;       &lt;VideoClicks&gt;        &lt;ClickThrough&gt;&lt;![CDATA[https://adclick.g.doubleclick.net/pcs/click?xai=AKAOjsuJr8W9S-YevlPn3nxI6Tx0Ie5x6EwoCqOY8-ux1pwteLk3GECkeif8-F9Ymd6WNx_6FUgvJLCbLPfjh2w0ekPyL72N0yYpJwJsy_OwQQ&amp;sig=Cg0ArKJSzBLOeFgW0p5dEAE&amp;urlfix=1&amp;adurl=http://www.currys.co.uk]]&gt;&lt;/ClickThrough&gt;       &lt;/VideoClicks&gt;      &lt;/Linear&gt;     &lt;/Creative&gt;    &lt;/Creatives&gt;    &lt;Extensions&gt;     &lt;Extension type=&quot;dart&quot;&gt;&lt;AdServingData&gt;  &lt;DeliveryData&gt;   &lt;GeoData&gt;&lt;![CDATA[ct=IN&st=&city=7259&dma=0&zp=&bw=4]]&gt;&lt;/GeoData&gt;  &lt;/DeliveryData&gt; &lt;/AdServingData&gt; &lt;/Extension&gt;     &lt;Extension type=&quot;activeview&quot;&gt;&lt;CustomTracking&gt;  &lt;Tracking event=&quot;viewable_impression&quot;&gt;&lt;![CDATA[https://pagead2.googlesyndication.com/activeview?id=lidarv&amp;acvw=[VIEWABILITY]&amp;avi=BNLaiIbdqVqv4CsubvgSnrZrABgAAAAAQATgB4AQCiAXf7fgDoAY6]]&gt;&lt;/Tracking&gt;  &lt;Tracking event=&quot;measurable_impression&quot;&gt;&lt;![CDATA[https://pagead2.googlesyndication.com/activeview?id=lidarv&amp;acvw=[VIEWABILITY]&amp;avi=BNLaiIbdqVqv4CsubvgSnrZrABgAAAAAQATgB4AQCiAXf7fgDoAY6&amp;avm=1]]&gt;&lt;/Tracking&gt;  &lt;Tracking event=&quot;viewable_impression&quot;&gt;&lt;![CDATA[https://ad.doubleclick.net/ddm/activity/dc_oe=ChMI64zYxt3TyQIVy42PCh2nlgZoEAAYACCZ2ZAg;av=1;acvw=[VIEWABILITY];ecn1=0;etm1=0;eid1=200000;]]&gt;&lt;/Tracking&gt; &lt;/CustomTracking&gt; &lt;/Extension&gt;     &lt;Extension type=&quot;geo&quot;&gt;&lt;Country&gt;IN&lt;/Country&gt; &lt;Bandwidth&gt;4&lt;/Bandwidth&gt; &lt;BandwidthKbps&gt;16340&lt;/BandwidthKbps&gt; &lt;/Extension&gt;    &lt;/Extensions&gt;   &lt;/Wrapper&gt;  &lt;/Ad&gt; &lt;/VAST&gt; ]]>" + "</AdParameters>\n";
+    private static final String videoClicks =
+            "      <VideoClicks>\n" + "       <ClickThrough><![CDATA[http://www.currys.co.uk]]></ClickThrough>\n"
+                    + "       <ClickTracking><![CDATA[https://adclick.g.doubleclick.net/pcs/click?xai=AKAOjsuJr8W9S-YevlPn3nxI6Tx0Ie5x6EwoCqOY8-ux1pwteLk3GECkeif8-F9Ymd6WNx_6FUgvJLCbLPfjh2w0ekPyL72N0yYpJwJsy_OwQQ&sig=Cg0ArKJSzBLOeFgW0p5dEAE&urlfix=1&adurl=]]></ClickTracking>\n"
+                    + "      </VideoClicks>\n";
+    private static final String mediaFiles =
+            "      <MediaFiles>\n"
+                    + "       <MediaFile delivery=\"progressive\" width=\"640\" height=\"480\" type=\"application/x-shockwave-flash\" apiFramework=\"VPAID\"><![CDATA[https://imasdk.googleapis.com/flash/sdkloader/vpaid2video.swf?adTagUrl=embedded&embedAdsResponse=1]]></MediaFile>\n"
+                    + "      </MediaFiles>\n";
+    private static final String vastAdTagUrl =
+            "<VASTAdTagURL>\n"
+            + "<![CDATA[http://www.secondaryadserver.com/ad/tag/parameters?time=1234567]]>\n"
+            + "</VASTAdTagURL>\n";
+    private static final String adMarkUp_part5 =
+            "     </Linear>\n"
+                    + "    </Creative>\n"
+                    + "   </Creatives>\n"
+                    + "   <Extensions>\n"
+                    + "    <Extension type=\"dart\">"
+                    + "      <AdServingData>\n"
+                    + "       <DeliveryData>\n"
+                    + "         <GeoData><![CDATA[ct=IN&st=&city=7259&dma=0&zp=&bw=4]]></GeoData>\n"
+                    + "       </DeliveryData>\n"
+                    + "      </AdServingData>\n"
+                    + "    </Extension>\n"
+                    + "    <Extension type=\"geo\"><Country>IN</Country>\n"
+                    + "      <Bandwidth>4</Bandwidth>\n"
+                    + "      <BandwidthKbps>16340</BandwidthKbps>\n"
+                    + "    </Extension>\n"
+                    + "   </Extensions>\n";
+    private static final String inlineCloseTag =
+            "  </InLine>\n";
+    private static final String wrapperCloseTag =
+            "  </Wrapper>\n";
+    private static final String adMarkUp_part6 =
+            " </Ad>\n"
+                    + "</VAST>\n";
+
+    private static final String impression = "<Impression><![CDATA[http://some/beacon/url/?m=18]]></Impression>";
+    private static final String error = "<Error><![CDATA[http://some/beacon/url/?m=99&action=vast-error&label=[ERRORCODE]]]></Error>";
+    private static final String start = "<Tracking event=\"start\"><![CDATA[http://some/beacon/url/?m=10]]></Tracking>";
+    private static final String billing = "<Tracking event=\"start\"><![CDATA[http://some/beacon/url/?b=${WIN_BID}${DEAL_GET_PARAM}]]></Tracking>";
+    private static final String firstQuartile = "<Tracking event=\"firstQuartile\"><![CDATA[http://some/beacon/url/?m=12&q=1&mid=video&__t=0]]></Tracking>";
+    private static final String midPoint = "<Tracking event=\"midpoint\"><![CDATA[http://some/beacon/url/?m=12&q=2&mid=video&__t=0]]></Tracking>";
+    private static final String thirdQuartile = "<Tracking event=\"thirdQuartile\"><![CDATA[http://some/beacon/url/?m=12&q=3&mid=video&__t=0]]></Tracking>";
+    private static final String complete = "<Tracking event=\"complete\"><![CDATA[http://some/beacon/url/?m=13&mid=video&__t=0]]></Tracking>";
+    private static final String clickTracking = "<ClickTracking><![CDATA[http://some/click/url/]]></ClickTracking>";
+    private static final String beaconclickTracking = "<ClickTracking><![CDATA[http://some/beacon/url/?m=8]]></ClickTracking>";
+    private static final String videoClicksTag = "<VideoClicks>";
+    private static final String trackingEventsTagCheck = "<TrackingEvents>";
 
     @BeforeClass
     public static void setUp() {
@@ -154,6 +242,82 @@ public class IXAdNetworkHelperTest {
     public void testGetBlocklists(final String testCaseName, final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final List<String> expectedBlocklists) throws Exception {
         assertEquals(IXAdNetworkHelper.getBlocklists(sasParams, repositoryHelper, null), expectedBlocklists);
+    }
+
+    @DataProvider(name = "vastPositiveAdBuildingDataProvider")
+    public Object[][] vastPositiveAdBuildingDataProvider() {
+        return new Object[][] {
+                {"testInmobiAdTrackers_inline_withClickTrackingNode", clickUrl, beaconUrl, adMarkUp_part1+inlineOpenTag+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+trackingEventsTag+adMarkUp_part4+videoClicks+mediaFiles+
+                        adMarkUp_part5+inlineCloseTag+adMarkUp_part6, impression, error, start, billing, firstQuartile,
+                        midPoint, thirdQuartile, complete, clickTracking, beaconclickTracking, videoClicksTag, trackingEventsTagCheck},
+                {"testInmobiAdTrackers_inline_withoutClickTrackingNode", clickUrl, beaconUrl, adMarkUp_part1+inlineOpenTag+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+trackingEventsTag+adMarkUp_part4+mediaFiles+
+                        adMarkUp_part5+inlineCloseTag+adMarkUp_part6, impression, error, start, billing, firstQuartile,
+                        midPoint, thirdQuartile, complete, clickTracking, beaconclickTracking, videoClicksTag, trackingEventsTagCheck},
+                {"testInmobiAdTrackers_wrapper_withClickTrackingNode", clickUrl, beaconUrl, adMarkUp_part1+wrapperOpenTag+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+trackingEventsTag+adMarkUp_part4+videoClicks+vastAdTagUrl+
+                        adMarkUp_part5+wrapperCloseTag+adMarkUp_part6, impression, error, start, billing, firstQuartile,
+                        midPoint, thirdQuartile, complete, clickTracking, beaconclickTracking, videoClicksTag, trackingEventsTagCheck},
+                {"testInmobiAdTrackers_wrapper_withoutClickTrackingNode", clickUrl, beaconUrl, adMarkUp_part1+wrapperOpenTag+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+trackingEventsTag+adMarkUp_part4+vastAdTagUrl+
+                        adMarkUp_part5+wrapperCloseTag+adMarkUp_part6, impression, error, start, billing, firstQuartile,
+                        midPoint, thirdQuartile, complete, clickTracking, beaconclickTracking, videoClicksTag, trackingEventsTagCheck},
+        };
+    }
+
+    @Test(dataProvider = "vastPositiveAdBuildingDataProvider")
+    public void testVastPositiveAdBuilding(final String testName, final String clickUrl, final String beaconUrl, final String
+            adMarkup, final String impression,  final String error, final String start,final String billing, final String firstQuartile,
+                                   final String midPoint, final String thirdQuartile, final String complete, final
+                                   String clickTracking, final String beaconClickTracking, final String videoClicksTag, final String trackingEventsTagCheck )
+            throws Exception {
+
+        try {
+            String responseContent = IXAdNetworkHelper.pureVastAdBuilding(adMarkup, beaconUrl, clickUrl);
+            assertTrue(responseContent.contains(impression));
+            assertTrue(responseContent.contains(error));
+            assertTrue(responseContent.contains(start));
+            assertTrue(responseContent.contains(billing));
+            assertTrue(responseContent.contains(firstQuartile));
+            assertTrue(responseContent.contains(midPoint));
+            assertTrue(responseContent.contains(thirdQuartile));
+            assertTrue(responseContent.contains(complete));
+            assertTrue(responseContent.contains(clickTracking));
+            assertTrue(responseContent.contains(beaconClickTracking));
+            assertTrue(responseContent.contains(videoClicksTag));
+            assertTrue(responseContent.contains(trackingEventsTagCheck));
+
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
+    }
+
+    @DataProvider(name = "vastNegativeAdBuildingDataProvider")
+    public Object[][] vastNegativeAdBuildingDataProvider() {
+        return new Object[][] {
+                {"testInmobiAdTrackers_withoutInlineAndWrapper", clickUrl, beaconUrl, adMarkUp_part1+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+trackingEventsTag+adMarkUp_part4+videoClicks+mediaFiles+ adMarkUp_part5+adMarkUp_part6},
+                {"testInmobiAdTrackers_inline_withoutTrackingEvent", clickUrl, beaconUrl, adMarkUp_part1+inlineOpenTag+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+adMarkUp_part4+videoClicks+mediaFiles+adMarkUp_part5+inlineCloseTag+adMarkUp_part6},
+                {"testInmobiAdTrackers_wrapper_withoutTrackingEvent", clickUrl, beaconUrl, adMarkUp_part1+wrapperOpenTag+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+adMarkUp_part4+videoClicks+vastAdTagUrl+ adMarkUp_part5+wrapperCloseTag+adMarkUp_part6},
+                {"testInmobiAdTrackers_without_Inline_Wrapper_And_TrackingEvent", clickUrl, beaconUrl, adMarkUp_part1+adMarkUp_part2+errorTag+
+                        impressionTag+adMarkUp_part3+adMarkUp_part4+videoClicks+vastAdTagUrl+ adMarkUp_part5+adMarkUp_part6},
+        };
+    }
+
+    @Test(dataProvider = "vastNegativeAdBuildingDataProvider")
+    public void testVastNegativeAdBuilding(final String testName, final String clickUrl, final String beaconUrl,
+                                           final String adMarkup)
+            throws Exception {
+        try {
+            String responseContent = IXAdNetworkHelper.pureVastAdBuilding(adMarkup, beaconUrl, clickUrl);
+            Assert.assertTrue(false);
+        } catch (Exception e){
+            Assert.assertTrue(true);
+        }
+
     }
 
 }

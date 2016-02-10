@@ -64,6 +64,18 @@ public class ParameterizedAdGroupAdTypeTargetingFilterTest {
             {"Interstitial-Vast-RewardedNegative", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{40L}, true, true, true}, // Cannot show normal Vast on Rewarded
             {"Interstitial-Rewarded-Negative", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO, null, new Long[]{14L}, true, false, true},
             {"Interstitial-Rewarded-Positive", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO, null, new Long[]{14L}, true, true, false},
+            {"Vast-Out-Video-positive", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, false, false},
+            {"Vast-Out-Video-negative", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, false, false, true},
+            {"Vast-Out-Video-negative-isrewarded", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, true, true},
+            {"Vast-Out-Video-with-wrong-slot-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{9L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO, null, new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.STATIC, null, new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-requestedAdType-id", RequestedAdType.INTERSTITIAL, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-requestedAdType-id", RequestedAdType.INLINE_BANNER, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-requestedAdType-id", RequestedAdType.NATIVE, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, false, true},
+            {"Vast-Out-Video-with-mismatch-requestedAdType-id", RequestedAdType.BANNER, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, false, true},
         };
     }
 

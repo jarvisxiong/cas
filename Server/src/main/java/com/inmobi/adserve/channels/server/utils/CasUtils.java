@@ -62,7 +62,7 @@ public class CasUtils {
     }
 
     /**
-     * 
+     *
      * @param httpRequest
      * @return
      */
@@ -72,7 +72,7 @@ public class CasUtils {
     }
 
     /**
-     * 
+     *
      * @param sasParams
      * @return
      */
@@ -88,6 +88,10 @@ public class CasUtils {
         if (DemandSourceType.IX.getValue() != sasParams.getDst()) {
             LOG.debug("Not qualified for VAST video as DST was not IX");
             return false;
+        }
+
+        if (RequestedAdType.VAST == sasParams.getRequestedAdType()) {
+            return true;
         }
 
         if (RequestedAdType.INTERSTITIAL != sasParams.getRequestedAdType()) {
@@ -113,10 +117,10 @@ public class CasUtils {
 
         // Check for minimum sdk version
         final int minimumSdkVerForVAST = CasConfigUtil.getServerConfig()
-            .getInt("adtype.vast.minimumSupportedSdkVersion", 450);
+                .getInt("adtype.vast.minimumSupportedSdkVersion", 450);
         if (!Formatter.isRequestFromSdkVersionOnwards(sasParams, minimumSdkVerForVAST)) {
             LOG.debug("Not qualified for VAST video as request failed minimum SDK check. Minimum Supported SDK: {}",
-                minimumSdkVerForVAST);
+                    minimumSdkVerForVAST);
             return false;
         }
 
@@ -139,7 +143,7 @@ public class CasUtils {
                 isSupported = true;
             } else {
                 LOG.debug("Not qualified for VAST video as only requests from Android 4.0 or iOS 6.0 and higher are "
-                    + "supported");
+                        + "supported");
             }
         }
         return isSupported;

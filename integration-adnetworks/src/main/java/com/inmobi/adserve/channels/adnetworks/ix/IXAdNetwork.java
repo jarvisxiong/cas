@@ -39,6 +39,7 @@ import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
+import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
@@ -402,14 +403,25 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
         // Set Banner OR Video OR Native object.
-        if (isVideoRequest || isRewardedVideoRequest) {
+        if (isVideoRequest || isRewardedVideoRequest || isPureVastRequest) {
             final Video video = createVideoObject();
             impression.setVideo(video);
             if (video != null) {
-                final String statName =
-                        isVideoRequest
-                                ? InspectorStrings.TOTAL_VAST_VIDEO_REQUESTS
+                final String statName = isVideoRequest ?  InspectorStrings.TOTAL_VAST_VIDEO_REQUESTS :
+                        isPureVastRequest ? InspectorStrings.TOTAL_PURE_VAST_REQUESTS
                                 : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_REQUESTS;
+                if (isPureVastRequest) {
+                    if (null != sasParams.getIntegrationDetails() && IntegrationMethod.API !=
+                            sasParams.getIntegrationDetails().getIntegrationMethod()) {
+                        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API);
+                    }
+
+                    if (null != sasParams.getVastProtocols()) {
+                        sasParams.getVastProtocols().parallelStream().forEach(t -> InspectorStats.incrementStatCount(getName(),
+                                InspectorStrings.TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL + t));
+                    }
+
+                }
                 InspectorStats.incrementStatCount(getName(), statName);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
             }
@@ -441,7 +453,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         impression.setProxydemand(createProxyDemandObject());
         // Set interstitial or not, but for video int shoud be 1
         final boolean isInterstitial = RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType();
-        impression.setInstl(isInterstitial || isVideoRequest || isRewardedVideoRequest ? 1 : 0);
+        impression.setInstl(isInterstitial || isVideoRequest || isPureVastRequest || isRewardedVideoRequest ? 1 : 0);
         impression.setBidfloor(forwardedBidFloor);
         LOG.debug(traceMarker, "Bid floor is {}", impression.getBidfloor());
 
@@ -1042,7 +1054,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
             if (isNativeRequest()) {
                 nativeAdBuilding();
-            } else if (isVideoRequest || isRewardedVideoRequest) {
+            } else if (isPureVastRequest) {
+                pureVastAdBuilding();
+            } else if (isVideoRequest || isRewardedVideoRequest ) {
                 videoAdBuilding();
             } else if (isCAURequest()) {
                 cauAdBuilding();
@@ -1242,6 +1256,19 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return;
     }
 
+    private void pureVastAdBuilding() {
+        LOG.debug(traceMarker, "vastAdBuilding");
+        try {
+            responseContent = IXAdNetworkHelper.pureVastAdBuilding(getAdMarkUp(), getBeaconUrl(), getClickUrl());
+        } catch (final Exception e) {
+            adStatus = NO_AD;
+            responseContent = DEFAULT_EMPTY_STRING;
+            LOG.info(traceMarker, "Some exception is caught while adding Inmobi Ad Tracker to VAST XML:{} "
+                    + "{}", advertiserName, e);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.PURE_VAST_PARSE_RESPONSE_EXCEPTION);
+        }
+    }
+
     private void videoAdBuilding() {
         LOG.debug(traceMarker, "videoAdBuilding");
         if (isSproutAd()) {
@@ -1249,14 +1276,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         }
         try {
-            responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
-                    repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), getWinUrl(),
-                    isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
+            responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration
+                    .getTemplateTool(), sasParams, repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(),
+                    getAdMarkUp(), getWinUrl(), isRewardedVideoRequest, viewabilityTracker, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for partner:{} {}",
-                    advertiserName, e);
+            LOG.info(traceMarker, "Some exception is caught while filling the velocity template for "
+                    + "partner:{} {}", advertiserName, e);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.VIDEO_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -1491,12 +1518,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // For video requests, validate that a valid XML is received.
-        if (isVideoRequest || isRewardedVideoRequest) {
+        if (isVideoRequest || isRewardedVideoRequest || isPureVastRequest) {
             if (IXAdNetworkHelper.isAdmValidXML(getAdMarkUp())) {
                 final String statName =
-                        isVideoRequest
-                                ? InspectorStrings.TOTAL_VAST_VIDEO_RESPONSES
-                                : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_RESPONSES;
+                        isVideoRequest ? InspectorStrings.TOTAL_VAST_VIDEO_RESPONSES :
+                                isPureVastRequest ? InspectorStrings.TOTAL_PURE_VAST_RESPONSE :
+                                        InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_RESPONSES;
                 InspectorStats.incrementStatCount(getName(), statName);
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_RESPONSES);
             } else {
