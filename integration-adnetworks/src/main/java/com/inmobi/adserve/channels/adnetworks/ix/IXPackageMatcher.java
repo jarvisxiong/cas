@@ -169,8 +169,9 @@ public class IXPackageMatcher {
                         continue;
                     }
                 }
-
                 matchedPackageIds.add(packageEntity.getId());
+                InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_AND_DEAL_STATS,
+                        InspectorStrings.IX_PACKAGE_REQUEST_FOR_ID + packageEntity.getId());
                 // Break the loop if we reach the threshold.
                 if (++matchedPackagesCount == PACKAGE_MAX_LIMIT) {
                     InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
