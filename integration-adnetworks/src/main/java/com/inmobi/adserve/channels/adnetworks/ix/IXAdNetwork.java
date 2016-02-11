@@ -1494,6 +1494,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         if (dealId != null) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
+            InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_AND_DEAL_STATS,
+                    InspectorStrings.IX_DEAL_RESPONSES_FOR_ID + dealId);
             setDealRelatedMetadata();
         }
         nurl = bid.getNurl();

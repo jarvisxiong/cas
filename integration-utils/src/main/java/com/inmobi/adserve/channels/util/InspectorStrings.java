@@ -136,6 +136,7 @@ public class InspectorStrings {
     public static final String IX_DEAL_NON_EXISTING = "IxDealNonExisting";
     public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
     public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
+    public static final String IX_DEAL_RESPONSES_FOR_ID = "IXDealResponsesForId-";
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
     public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
     public static final String TOTAL_UMP_CAU_REQUESTS = "TotalUMPCAURequests";
@@ -197,8 +198,10 @@ public class InspectorStrings {
     public static final String TOTAL_SINGLE_FORMAT_REQUESTS = "IX-TotalSingleFormatRequests";
 
     // Package Filter Level Stats
+    public static final String PACKAGE_AND_DEAL_STATS = "PackageAndDealsStats";
     public static final String PACKAGE_FILTER_STATS = "PackageFilterStats";
     public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
+    public static final String IX_PACKAGE_REQUEST_FOR_ID = "IXPackageRequestForId-";
     public static final String DROPPED_IN_PACKAGE_DMP_FILTER = "DroppedInPackageDMPFilter";
     public static final String DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER = "DroppedInPackageAdTypeTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER = "DroppedInPackageManufModelTargetingFilter";
