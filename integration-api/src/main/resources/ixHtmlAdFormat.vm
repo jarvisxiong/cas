@@ -28,9 +28,9 @@
 
                 <script type='text/javascript'>
                     var events = {
-                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1' #end],
+                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1','${IMBeaconUrl}?m=99&action=load' #end],
                         renderBeacons : [
-                            #if($IMBeaconUrl) '${IMBeaconUrl}?m=18&b=${WIN_BID}${DEAL_GET_PARAM}' #end
+                            #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}','${IMBeaconUrl}?m=99&action=render' #end
                             #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
                         ],
                         clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end],
