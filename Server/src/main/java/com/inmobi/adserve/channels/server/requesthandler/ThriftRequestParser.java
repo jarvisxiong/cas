@@ -113,26 +113,17 @@ public class ThriftRequestParser {
         setCarrier(tObject, params);
         // Fill params from integration details object
         setIntegrationDetails(tObject, params);
+        // Set the iem field
+        if (tObject.isSetIem()) {
+            casInternal.setIem(tObject.getIem());
+            InspectorStats.incrementStatCount(InspectorStrings.IMEI, InspectorStrings.IMEI_BEING_SENT_FOR +
+                    DemandSourceType.findByValue(dst).toString());
+        }
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
             if (tObject.getUidParams().isSetRawUidValues()) {
                 params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
-                if (null != tObject.getUidParams().getRawUidValues().get(UidType.IEM)) {
-                    String parameterInspector;
-                    switch (dst) {
-                        case 6:
-                            parameterInspector = InspectorStrings.IMEI_BEING_SENT_FOR_RTBD;
-                            break;
-                        case 8:
-                            parameterInspector = InspectorStrings.IMEI_BEING_SENT_FOR_IX;
-                            break;
-                        default:
-                            parameterInspector = InspectorStrings.IMEI_BEING_SENT_FOR_DCP;
-                            break;
-                    }
-                    InspectorStats.incrementStatCount(InspectorStrings.IMEI, parameterInspector);
-                }
             }
         }
         if (tObject.isSetRqSslEnabled()) {
@@ -461,9 +452,6 @@ public class ThriftRequestParser {
                     break;
                 case GPID:
                     parameter.setGpid(uidValue);
-                    break;
-                case IEM:
-                    parameter.setIem(uidValue);
                     break;
                 default:
                     break;

@@ -1691,7 +1691,11 @@ TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
 - testName: 'ix-happy'
 
 TEST_IEM:
-- uidparams_rawuidvalues_iem: '123456789123456'
+- adpool_iem: '123456789123456'
+
+TEST_IEM_WITH_O1:
+- adpool_iem: '123456789123456'
+  uidparams_rawuidvalues_o1: '9e74e1b452e07afded40fd15b45aa9e6'
 
 TEST_DEVICE_LANGUAGE:
 - locale : 'en'
