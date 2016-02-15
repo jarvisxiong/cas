@@ -96,9 +96,7 @@ public class InspectorStrings {
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
 
     public static final String IMEI = "Imei";
-    public static final String IMEI_BEING_SENT_FOR_IX = "ImeiBeingSentForIx";
-    public static final String IMEI_BEING_SENT_FOR_RTBD = "ImeiBeingSentForRtbd";
-    public static final String IMEI_BEING_SENT_FOR_DCP = "ImeiBeingSentForDCP";
+    public static final String IMEI_BEING_SENT_FOR ="ImeiBeingSentFor";
 
     public static final String UNEXPECTED_CONDITION = "UnexpectedCondition";
     public static final String VAST_OUT_WITH_SDK = "VastOutWithSDK";

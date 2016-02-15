@@ -1,7 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapRequestedAdTypeToAdFormat;
 import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapIntegrationDetailsToRequestSource;
+import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapRequestedAdTypeToAdFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -543,9 +542,6 @@ public class Logging {
             }
 
             final Map<String, String> uidParam = sasParams.getTUidParams();
-            if (null != uidParam) {
-                uidParam.remove(UidType.IEM.name());
-            }
             user.setUids(uidParam);
 
             if (StringUtils.isNotBlank(sasParams.getNormalizedUserId())) {

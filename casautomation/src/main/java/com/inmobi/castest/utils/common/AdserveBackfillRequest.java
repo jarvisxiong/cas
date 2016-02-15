@@ -156,7 +156,7 @@ public class AdserveBackfillRequest {
         final String def_uidparams_rawuidvalues_iuds1 = null;
         final String def_uidparams_rawuidvalues_gid = null;
         final String def_uidparams_rawuidvalues_wc = null;
-        final String def_uidparams_rawuidvalues_iem = null;
+        final String def_adpool_iem = null;
 
         final String def_uidparams_udidfromrequest = null;
         final String def_uidparams_udidfromuidcookie = null;
@@ -450,9 +450,9 @@ public class AdserveBackfillRequest {
         final String adpool_uidparams_rawuidvalues_wc =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_wc"),
                         def_uidparams_rawuidvalues_wc);
-        final String adpool_uidparams_rawuidvalues_iem =
-            AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_rawuidvalues_iem"),
-                def_uidparams_rawuidvalues_iem);
+        final String adpool_iem =
+            AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_iem"),
+                def_adpool_iem);
 
         final String adpool_uidparams_udidfromrequest =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("uidparams_udidfromrequest"),
@@ -707,9 +707,6 @@ public class AdserveBackfillRequest {
         if (adpool_uidparams_rawuidvalues_wc != null) {
             rawUidValues.put(UidType.WC, adpool_uidparams_rawuidvalues_wc);
         }
-        if (adpool_uidparams_rawuidvalues_iem != null) {
-            rawUidValues.put(UidType.IEM, adpool_uidparams_rawuidvalues_iem);
-        }
 
         uidParams.setRawUidValues(rawUidValues);
         uidParams.setUdidFromRequest(adpool_uidparams_udidfromrequest);
@@ -723,6 +720,10 @@ public class AdserveBackfillRequest {
 
 
         adPoolRequest.setUidParams(uidParams);
+
+        if (null != adpool_iem) {
+            adPoolRequest.setIem(adpool_iem);
+        }
 
         final User user = new User();
         user.setDataVendorId(user_datavendorid);

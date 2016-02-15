@@ -1468,6 +1468,15 @@ public class RTBD_NewTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
+    @Test(testName = "TEST_IEM_WITH_O1", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IEM_WITH_O1(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("IEM=123456789123456", "O1=9e74e1b452e07afded40fd15b45aa9e6");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+
     @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
         final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":3,\"wmin\":480,\"hmin\":320}";

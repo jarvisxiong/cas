@@ -28,12 +28,13 @@
 
                 <script type='text/javascript'>
                     var events = {
-                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1','${IMBeaconUrl}?m=99&action=load' #end],
+                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1','${IMBeaconUrl}?m=99&action=load-test' #end],
                         renderBeacons : [
-                            #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}','${IMBeaconUrl}?m=99&action=render' #end
+                            #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}' #end
                             #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
                         ],
                         clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end],
+                        viewableChangeBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=vc-test' #end],
                         viewabilityBeacon1Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second' #end],
                         viewabilityBeacon2Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_two_second' #end],
                         viewabilityBeacon1SecSimple: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second_simple' #end],
@@ -63,6 +64,9 @@
                         },
                         fireLoadBeacons : function () {
                             this.fireBeacons(events.loadBeacons);
+                        },
+                        fireViewableChangeBeacons : function () {
+                            this.fireBeacons(events.viewableChangeBeacons);
                         },
                         fireRenderBeacons : function () {
                             var self = this;
@@ -143,6 +147,27 @@
                         }
                     }
 
+                    function checkForMraidTest() {
+                        count++;
+
+                        if (4 !== count) {
+                            if ("undefined" !== typeof mraid) {
+                                if (typeof mraid.isViewable === "function" && mraid.isViewable()) {
+                                    eventHandler.fireViewableChangeBeacons();
+                                } else {
+                                    mraid.addEventListener("viewableChange", function(viewable) {
+                                        if (viewable) {
+                                            mraid.removeEventListener("viewableChange", arguments.callee);
+                                            eventHandler.fireViewableChangeBeacons();
+                                        }
+                                    });
+                                }
+                            }
+                        } else {
+                            setTimeout(checkForMraid, 500);
+                        }
+                    }
+
 
                     function setupRender () {
                         #if($isInterstitial)
@@ -156,6 +181,13 @@
                         #end
                     }
 
+                    function setupViewableChangeTestBeacons () {
+                        #if($SDK)
+                            checkForMraidTest();
+                        #else
+                            eventHandler.fireViewableChangeBeacons();
+                        #end
+                    }
 
                     function setupClick() {
                         function clickHandler() {
@@ -171,6 +203,7 @@
                         fireAdReady();
                     #end
                     setupRender();
+                    setupViewableChangeTestBeacons();
                 </script>
                 ## ViewabilityTrackers have been added at the end to prevent the rest of the ad from failing for faulty viewability trackers
                 #if($Viewable && $ViewabilityTracker) $ViewabilityTracker #end

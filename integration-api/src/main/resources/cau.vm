@@ -64,9 +64,9 @@
                     thirdPartyAd = byId(adNamespace + "thirdPartyAd"),
 
                     events = {
-                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1','${IMBeaconUrl}?m=99&action=load' #end],
+                        loadBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=1','${IMBeaconUrl}?m=99&action=load-test' #end],
                         renderBeacons : [
-                            #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}','${IMBeaconUrl}?m=99&action=render' #end
+                            #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}','${IMBeaconUrl}?m=99&action=vc-test' #end
                             #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
                         ],
                         clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end],
