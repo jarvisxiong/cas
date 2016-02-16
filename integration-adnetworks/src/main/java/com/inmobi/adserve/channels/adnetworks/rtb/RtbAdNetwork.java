@@ -645,15 +645,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
-        if (null != casInternalRequestParameters.getIem()) {
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getIem())) {
             final String value = casInternalRequestParameters.getIem();
-            if (StringUtils.isNotBlank(value)) {
-                device.setDidsha1(DigestUtils.sha1Hex(value));
-                device.setDidmd5(DigestUtils.md5Hex(value));
-                device.setDpidsha1(null);
-                device.setDpidmd5(null);
-            }
-        } else if (StringUtils.isBlank(casInternalRequestParameters.getIem())) {
+            device.setDidsha1(DigestUtils.sha1Hex(value));
+            device.setDidmd5(DigestUtils.md5Hex(value));
+            device.setDpidsha1(null);
+            device.setDpidmd5(null);
+
+        } else {
             final String imei = getIMEI();
             if (imei != null) {
                 device.setDidsha1(null);
@@ -661,10 +660,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 device.setDpidsha1(null);
                 device.setDpidmd5(null);
             }
-        } else {
-            final String gpId = getGPID(false);
-            if (StringUtils.isNotEmpty(gpId)) {
-                deviceExtensions.put("gpid", gpId);
+            else {
+                final String gpId = getGPID(false);
+                if (StringUtils.isNotEmpty(gpId)) {
+                    deviceExtensions.put("gpid", gpId);
+                }
             }
         }
 
