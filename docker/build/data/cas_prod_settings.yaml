@@ -437,7 +437,7 @@ skyhook:
         cas:
             database:
                db_host: internal-skyhook-db.vip.uj1.inmobi.com
-               db_port: 6543
+               db_port: 5432
                database: wap_prod_adserve_cas
                cas_user: cas_read
                cas_pass: sa$c87Te@z
