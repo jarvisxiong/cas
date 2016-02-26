@@ -59,17 +59,8 @@ public class ServletIXFill extends BaseServlet {
     protected void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal) {
         LOG.debug("enrichDstSpecific IX");
-        // final SiteEcpmEntity nwSiteEcpmEntity = casUtils.getNetworkSiteEcpm(sasParams);
-        // nwSiteEcpmEntity = null that means no value for the given site, os, country combination exists
-
-        // final double bidFloor =
-        // nwSiteEcpmEntity == null ? sasParams.getSiteFloor() : Math.min(
-        // Math.max(GlobalConstant.MIN_BID_FLOOR, nwSiteEcpmEntity.getEcpm()), sasParams.getSiteFloor());
         casInternal.setAuctionBidFloor(sasParams.getSiteFloor());
         sasParams.setMarketRate(Math.max(sasParams.getMarketRate(), casInternal.getAuctionBidFloor()));
-        // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
-        // SasParams marketRate has tObject.guidanceBid * 1.0 / Math.pow(10, 6)
-
         LOG.debug("Final ixFloor is {}", casInternal.getAuctionBidFloor());
         LOG.debug("Final ixMarketRate is {}", sasParams.getMarketRate());
     }
