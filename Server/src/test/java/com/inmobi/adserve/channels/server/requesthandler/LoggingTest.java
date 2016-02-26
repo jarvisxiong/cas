@@ -180,6 +180,9 @@ public class LoggingTest {
         Double marketRate = 567.98;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
         final String appBundleId = "testAppBundleId";
+        final List<Short> slotList = new ArrayList<Short>();
+        slotList.add((short) 2);
+        slotList.add((short) 4);
 
         mockStaticNice(InspectorStats.class);
         mockStaticNice(InetAddress.class);
@@ -233,6 +236,7 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getRequestedAdType()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getIntegrationDetails()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getNormalizedUserId()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getRqMkSlot()).andReturn(slotList).anyTimes();
         expect(mockCasInternalRequestParameters.getDemandDensity()).andReturn(demandDensity).anyTimes();
         expect(mockCasInternalRequestParameters.getLongTermRevenue()).andReturn(longTermRevenue).anyTimes();
         expect(mockCasInternalRequestParameters.getPublisherYield()).andReturn(publisherYield).anyTimes();
@@ -1013,6 +1017,8 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getPlacementId()).andReturn(placementId).anyTimes();
         expect(mockSASRequestParameters.getIntegrationDetails()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getNormalizedUserId()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getRqMkSlot()).andReturn(null).anyTimes();
+
 
         replayAll();
         List<ChannelSegment> rankList = Arrays.asList(mockChannelSegment);
