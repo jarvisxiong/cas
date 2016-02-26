@@ -243,6 +243,12 @@ public class Logging {
                         || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
                     channel.setIxAds(Arrays.asList(createIxAd(ixAdNetwork)));
                 }
+
+                final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
+                if (null != channelSegmentEntity) {
+                    channel.setRpAdgroupIncId(channelSegmentEntity.getAdgroupIncId());
+                    LOG.debug("adding adgroupIncId in Channel object rpAdGroupIncId {}", channelSegmentEntity.getAdgroupIncId());
+                }
             }
             channels.add(channel);
 
@@ -503,6 +509,9 @@ public class Logging {
         }
         if (null != requestSlot) {
             request.setSlot_requested(requestSlot);
+        }
+        if (null != sasParams && CollectionUtils.isNotEmpty(sasParams.getRqMkSlot())) {
+            request.setSlot_requested_list(sasParams.getRqMkSlot());
         }
         return request;
     }
