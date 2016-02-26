@@ -180,7 +180,7 @@ public class InspectorStrings {
     // public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
-    public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloor";
+    public static final String BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR = "-BidGuidanceIsLessOrEqualToFloor";
     public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
     public static final String MULTI_FORMAT_AUCTIONS_TOTAL = "IX-MultiFormatAuctions.TotalAuctions";
     public static final String MULTI_FORMAT_AUCTIONS_NO_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithNoTrumpDeals";

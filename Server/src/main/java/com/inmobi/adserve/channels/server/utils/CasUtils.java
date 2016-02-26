@@ -18,10 +18,8 @@ import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -55,12 +53,6 @@ public class CasUtils {
         return null;
     }
 
-    // No longer being used
-    public Double getRtbFloor(final CasContext casContext) {
-        final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
-        return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
-    }
-
     /**
      *
      * @param httpRequest
@@ -69,16 +61,6 @@ public class CasUtils {
     public static String getHost(final HttpRequest httpRequest) {
         final HttpHeaders headers = httpRequest.headers();
         return headers.get("Host");
-    }
-
-    /**
-     *
-     * @param sasParams
-     * @return
-     */
-    public SiteEcpmEntity getNetworkSiteEcpm(final SASRequestParameters sasParams) {
-        return repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(), sasParams.getCountryId().intValue(),
-                sasParams.getOsId());
     }
 
     public boolean isVideoSupported(final SASRequestParameters sasParams) {

@@ -1,5 +1,14 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.ADPOOL_REQUEST_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
+import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI_BEING_SENT_FOR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
@@ -43,7 +52,6 @@ import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.types.AdAttributeType;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -59,8 +67,8 @@ public class ThriftRequestParser {
 
     private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
             "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
-    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES = Arrays.asList(AdTypeEnum.BANNER,
-            AdTypeEnum.VIDEO);
+    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES =
+            Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
             final CasInternalRequestParameters casInternal, final int dst) {
@@ -116,8 +124,7 @@ public class ThriftRequestParser {
         // Set the iem field
         if (tObject.isSetIem()) {
             casInternal.setIem(tObject.getIem());
-            InspectorStats.incrementStatCount(InspectorStrings.IMEI, InspectorStrings.IMEI_BEING_SENT_FOR +
-                    DemandSourceType.findByValue(dst).toString());
+            InspectorStats.incrementStatCount(IMEI, IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
         }
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
@@ -184,9 +191,8 @@ public class ThriftRequestParser {
         if (tObject.isSetGeo()) {
             // params.setLocSrc(tObject.geo.isSetLocationSource() ? tObject.geo.locationSource.name() :
             // GlobalConstant.LATLON);
-            params.setLocationSource(tObject.geo.isSetLocationSource()
-                    ? tObject.geo.getLocationSource()
-                    : LocationSource.LATLON);
+            params.setLocationSource(
+                    tObject.geo.isSetLocationSource() ? tObject.geo.getLocationSource() : LocationSource.LATLON);
             // TODO Change format in dcp
             String latLong = StringUtils.EMPTY;
             if (tObject.geo.latLong != null) {
@@ -197,13 +203,11 @@ public class ThriftRequestParser {
             params.setCountryId((long) tObject.geo.getCountryId()); // TODO: Evaluate if int->long casting is needed?
             final Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(
-                null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
-
+                    null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
             params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
             params.setState(
-                null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
-
+                    null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
             params.setGeoFenceIds(tObject.geo.getFenceIds());
         }
     }
@@ -289,28 +293,24 @@ public class ThriftRequestParser {
                 params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tSite.siteId,
                         tObject.geo.countryId, (int) tObject.device.osId));
             }
-            params.setSiteContentType(tSite.isSetSiteContentType()
-                    ? tSite.getSiteContentType()
-                    : ContentType.FAMILY_SAFE);
+            params.setSiteContentType(
+                    tSite.isSetSiteContentType() ? tSite.getSiteContentType() : ContentType.FAMILY_SAFE);
             params.setCategories(convertIntToLong(tSite.siteTaxonomies));
 
             final DemandSourceType dstEnum = DemandSourceType.findByValue(dst);
             double ecpmFloor = Math.max(tSite.ecpmFloor, tSite.cpmFloor);
             if (GlobalConstant.MIN_BID_FLOOR >= ecpmFloor) {
                 ecpmFloor = GlobalConstant.MIN_BID_FLOOR;
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
-                        + InspectorStrings.BID_FLOOR_TOO_LOW);
+                InspectorStats.incrementStatCount(AUCTION_STATS, dstEnum + BID_FLOOR_TOO_LOW);
             }
             params.setSiteFloor(ecpmFloor);
 
             final double marketRate = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
-            if (0.0 >= marketRate) {
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
-                        + InspectorStrings.BID_GUIDANCE_ABSENT);
+            if (marketRate <= 0.0) {
+                InspectorStats.incrementStatCount(AUCTION_STATS, dstEnum + BID_GUIDANCE_ABSENT);
             }
-            if (marketRate == ecpmFloor) {
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
-                        + InspectorStrings.BID_GUIDANCE_EQUAL_TO_UMP_FLOOR);
+            if (marketRate <= ecpmFloor) {
+                InspectorStats.incrementStatCount(AUCTION_STATS, dstEnum + BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR);
             }
             params.setMarketRate(marketRate);
 
@@ -335,9 +335,8 @@ public class ThriftRequestParser {
             }
 
             if (params.isRewardedVideo() && pubControlSupportedAdTypes.contains(AdTypeEnum.BANNER)) {
-                InspectorStats
-                    .incrementStatCount(InspectorStrings.ADPOOL_REQUEST_STATS,
-                        InspectorStrings.PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT);
+                InspectorStats.incrementStatCount(ADPOOL_REQUEST_STATS,
+                        PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT);
             }
 
             // Fill params for pub control - Media preferences json.
@@ -414,7 +413,8 @@ public class ThriftRequestParser {
     }
 
     private void setUserIdParams(final CasInternalRequestParameters parameter, final UidParams uidParams) {
-        final Map<UidType, String> uidMap = uidParams.isSetRawUidValues() ? uidParams.getRawUidValues() : new HashMap<>();
+        final Map<UidType, String> uidMap =
+                uidParams.isSetRawUidValues() ? uidParams.getRawUidValues() : new HashMap<>();
         if (uidParams.isSetLimitIOSAdTracking()) {
             parameter.setTrackingAllowed(!uidParams.isLimitIOSAdTracking());
         }
@@ -499,9 +499,9 @@ public class ThriftRequestParser {
         }
         final List<Short> validSlots = new ArrayList<>();
         for (final Short slotId : selectedSlots) {
-            final boolean toAdd =
-                    isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper
-                            .querySlotSizeMapRepository(slotId) != null;
+            final boolean toAdd = isIX
+                    ? SlotSizeMapping.isIXSupportedSlot(slotId)
+                    : CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(slotId) != null;
             if (toAdd) {
                 validSlots.add(slotId);
             }
