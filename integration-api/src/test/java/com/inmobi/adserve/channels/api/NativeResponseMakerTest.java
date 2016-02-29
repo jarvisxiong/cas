@@ -75,7 +75,7 @@ public class NativeResponseMakerTest {
 
     @Test
     public void testGetTrackingCodeNullCase() {
-        BidResponse mockBidResponse = getBidResponseMock("", null);
+        getBidResponseMock("", null);
         Map<String, String> params = new HashMap<>();
         App mockApp = createNiceMock(App.class);
 
@@ -89,7 +89,7 @@ public class NativeResponseMakerTest {
 
     @Test
     public void testGetTrackingCodeExceptionThrown() {
-        BidResponse mockBidResponse = new BidResponse("id", Arrays.asList(new SeatBid(Arrays.asList(new Bid()))));
+        new BidResponse("id", Arrays.asList(new SeatBid(Arrays.asList(new Bid()))));
         Map<String, String> params = new HashMap<>();
         App mockApp = createNiceMock(App.class);
 

@@ -561,6 +561,7 @@ public class BaseAdNetworkImplTest {
      */
     public class AsyncHttpClientForTest extends AsyncHttpClient {
 
+        @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
         public <T> ListenableFuture<T> executeRequest(final Request request, final AsyncHandler<T> handler)
                 throws IOException {
@@ -585,8 +586,10 @@ public class BaseAdNetworkImplTest {
 
         @Getter
         private final CountDownLatch signal = new CountDownLatch(1);
+        @SuppressWarnings("rawtypes")
         private final AsyncCompletionHandler reqHandlerFromBaseAdNetwork;
 
+        @SuppressWarnings("rawtypes")
         AsyncHandlerWithSignal(final AsyncHandler reqHandlerFromBaseAdNetwork) {
             this.reqHandlerFromBaseAdNetwork = (AsyncCompletionHandler) reqHandlerFromBaseAdNetwork;
         }
