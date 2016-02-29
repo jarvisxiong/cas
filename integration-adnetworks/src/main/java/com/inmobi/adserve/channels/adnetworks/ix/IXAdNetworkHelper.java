@@ -3,7 +3,7 @@
  */
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import static com.inmobi.adserve.channels.api.BaseAdNetworkImpl.getHashedValue;
+import static com.inmobi.adserve.channels.api.BaseAdNetworkHelper.getHashedValue;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.AD_OBJECT_PREFIX;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.CAU_CONTENT_JS_ESC;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.FIRST_OBJECT_PREFIX;
@@ -782,9 +782,6 @@ public class IXAdNetworkHelper {
             throw new ParserConfigurationException();
         }
 
-
-
-        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
         final StreamResult result = new StreamResult(new StringWriter());
         final DOMSource source = new DOMSource(doc);
         transformer.transform(source, result);

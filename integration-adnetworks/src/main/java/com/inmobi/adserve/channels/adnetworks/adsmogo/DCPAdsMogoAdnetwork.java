@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
+import com.inmobi.adserve.channels.api.BaseAdNetworkHelper;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -200,7 +201,7 @@ public class DCPAdsMogoAdnetwork extends AbstractDCPAdNetworkImpl {
         LOG.debug("AdsMogo url is {}", url);
         final URI requestUrl = new URI(url.toString());
         final StringBuilder query = new StringBuilder(URLDecoder.decode(requestUrl.getQuery())).append(authSecret);
-        authSignature = getHashedValue(query.toString(), GlobalConstant.MD5);
+        authSignature = BaseAdNetworkHelper.getHashedValue(query.toString(), GlobalConstant.MD5);
 
         return requestUrl;
 

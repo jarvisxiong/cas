@@ -32,6 +32,7 @@ import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper;
+import com.inmobi.adserve.channels.api.BaseAdNetworkHelper;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -486,7 +487,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             site.setName(category);
         }
 
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         site.setId(blindId);
 
         final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
@@ -559,7 +560,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void setParamsForBlindApp(final App app) {
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         app.setId(blindId);
 
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
@@ -673,8 +674,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Setting Extension for idfa
         if (StringUtils.isNotEmpty(ifa)) {
             deviceExtensions.put("idfa", ifa);
-            deviceExtensions.put("idfasha1", getHashedValue(ifa, SHA1));
-            deviceExtensions.put("idfamd5", getHashedValue(ifa, MD5));
+            deviceExtensions.put("idfasha1", BaseAdNetworkHelper.getHashedValue(ifa, SHA1));
+            deviceExtensions.put("idfamd5", BaseAdNetworkHelper.getHashedValue(ifa, MD5));
         }
 
         if (StringUtils.isNotBlank(sasParams.getLanguage())) {
