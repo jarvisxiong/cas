@@ -62,7 +62,7 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
     private String networkType;
 
     public DCPMarimediaAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
-                                 final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
     }
 
@@ -118,14 +118,15 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
             networkType = "carrier";
         }
 
-        if (sasParams.getOsId() == HandSetOS.Android.getValue() && StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
-            //version value can  be 3.2.4 or 3.2
+        if (sasParams.getOsId() == HandSetOS.Android.getValue()
+                && StringUtils.isNotBlank(sasParams.getOsMajorVersion())) {
+            // version value can be 3.2.4 or 3.2
             String version = sasParams.getOsMajorVersion();
             int index = version.indexOf(".");
-            String versionPart = version.substring(index+1);
+            String versionPart = version.substring(index + 1);
             versionPart = versionPart.replace(".", "");
 
-            if(Float.valueOf(version.substring(0,index+1)+ versionPart) < 2.1){
+            if (Float.valueOf(version.substring(0, index + 1) + versionPart) < 2.1) {
                 LOG.info("Blocking traffic for Android version less than 2.1");
                 return false;
             }
@@ -244,6 +245,20 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
     }
 
+    // Response is empty or null or status code other than 200.
+    public boolean isValidResponse(final String response, final HttpResponseStatus status) {
+        statusCode = status.code();
+        if (null == response || response.trim().isEmpty() || statusCode != 200) {
+            if (200 == statusCode) {
+                statusCode = 500;
+            }
+            responseContent = DEFAULT_EMPTY_STRING;
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("Marimedia response is {}", response);
@@ -282,18 +297,17 @@ public class DCPMarimediaAdNetwork extends AbstractDCPAdNetworkImpl {
                 }
 
                 List<String> partnerBeacons = new ArrayList<>();
-                if(ad.has("pixels")){
+                if (ad.has("pixels")) {
                     JSONArray pixelArray = ad.getJSONArray("pixels");
-                    for(int i=0;i<pixelArray.length();i++){
+                    for (int i = 0; i < pixelArray.length(); i++) {
                         partnerBeacons.add(pixelArray.getString(i));
                     }
                     context.put(VelocityTemplateFieldConstants.PARTNER_BEACON_LIST, partnerBeacons);
                 }
                 context.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
-                responseContent =
-                        Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams,
-                                getBeaconUrl());
+                responseContent = Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams,
+                        getBeaconUrl());
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;

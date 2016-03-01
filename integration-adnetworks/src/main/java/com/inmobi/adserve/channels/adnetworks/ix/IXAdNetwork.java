@@ -43,6 +43,7 @@ import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.adserve.channels.api.BaseAdNetworkHelper;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.Formatter.TemplateType;
@@ -746,7 +747,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             site.setName(wapSiteUACEntity.getSiteName());
         }
 
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         final String blindDomain = String.format(BLIND_DOMAIN_SITE_FORMAT, blindId);
 
         final Blind blindForSite = new Blind();
@@ -756,7 +757,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private void setParamsForBlindSite(final Site site, final CommonExtension ext) {
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         site.setId(sasParams.getSiteId());
         final String category =
                 isWapSiteUACEntity && StringUtils.isNotEmpty(wapSiteUACEntity.getAppType()) ? wapSiteUACEntity
@@ -890,7 +891,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             app.setName(wapSiteUACEntity.getSiteName());
         }
 
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         final Blind blindForApp = new Blind();
         blindForApp.setBundle(blindBundle);
@@ -904,7 +905,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                         .getAppType() : getCategories(',', false);
         app.setName(category);
 
-        final String blindId = getBlindedSiteId(sasParams.getSiteIncId());
+        final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         app.setBundle(blindBundle);
 

@@ -82,7 +82,6 @@ public class InmobiAdTrackerTest {
         DefaultLazyInmobiAdTrackerBuilder.init(mockConfiguration);
     }
 
-    @SuppressWarnings("unchecked")
     @Parameters
     public static Collection<Object> data() {
         return Arrays.asList(new Object[][] {

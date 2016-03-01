@@ -78,13 +78,6 @@ public class ParameterizedDefaultLazyInmobiAdTrackerTest {
         }
     }
 
-    private static final ImpressionInfo getImpressionInfoWithPlacementId(Long placementId) {
-        final ImpressionInfo impressionInfo = new ImpressionInfo();
-        if (null != placementId) {
-            impressionInfo.setPlacementId(placementId);
-        }
-        return impressionInfo;
-    }
 
     @DataProvider(name = "DataProviderForBeaconBillingRelatedPlacementContract")
     public Object[][] paramDataProviderForClearingPrice() {

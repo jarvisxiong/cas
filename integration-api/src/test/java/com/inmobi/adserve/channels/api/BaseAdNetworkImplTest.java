@@ -10,7 +10,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.createNiceMock;
@@ -64,7 +63,6 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Getter;
 
 @RunWith(PowerMockRunner.class)
@@ -336,13 +334,12 @@ public class BaseAdNetworkImplTest {
             @Override
             protected void configure() {
                 install(new FactoryModuleBuilder()
-                        .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
-                        .build(Key.get(InmobiAdTrackerBuilderFactory.class,
-                                DefaultLazyInmobiAdTrackerBuilderFactory.class)));
+                        .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class).build(Key.get(
+                                InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
             }
         });
-        MemberModifier.field(BaseAdNetworkImpl.class, "inmobiAdTrackerBuilderFactory")
-                .set(baseAdNetwork, injector.getInstance(
+        MemberModifier.field(BaseAdNetworkImpl.class, "inmobiAdTrackerBuilderFactory").set(baseAdNetwork,
+                injector.getInstance(
                         Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
         baseAdNetwork.setHost(host);
         baseAdNetwork.configureParameters(mockSasParam, mockCasInternal, mockEntity, 14L, null);
@@ -417,83 +414,6 @@ public class BaseAdNetworkImplTest {
         verifyAll();
     }
 
-    @Test
-    public void testIsValidResponse() {
-        final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
-            @Override
-            public String getId() {
-                return null;
-            }
-
-            @Override
-            public URI getRequestUri() throws Exception {
-                return null;
-            }
-        };
-
-        // Valid Response
-        boolean response = baseAdNetwork.isValidResponse("Valid Response", HttpResponseStatus.OK);
-        assertTrue(response);
-
-        // Empty Response
-        response = baseAdNetwork.isValidResponse("", HttpResponseStatus.OK);
-        assertEquals(baseAdNetwork.statusCode, 500);
-        assertFalse(response);
-
-        // Invalid Response
-        response = baseAdNetwork.isValidResponse("ERROR: Bad Request", HttpResponseStatus.BAD_REQUEST);
-        assertFalse(response);
-    }
-
-    @Test
-    public void testIsInterstitial() throws Exception {
-        final ChannelSegmentEntity mockEntity = createMock(ChannelSegmentEntity.class);
-        final SASRequestParameters mockSasParam = createMock(SASRequestParameters.class);
-
-        expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key").times(2);
-        expect(mockEntity.getAdgroupIncId()).andReturn(5L).times(2);
-        expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockSasParam.getSiteIncId()).andReturn(10L).times(2);
-        expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC").times(2);
-        expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
-        expect(mockSasParam.getDst()).andReturn(2).anyTimes();
-        expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
-
-        replayAll();
-
-        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
-        ipRepositoryField.setAccessible(true);
-        final IPRepository ipRepository = new IPRepository();
-        ipRepository.getUpdateTimer().cancel();
-        ipRepositoryField.set(null, ipRepository);
-
-        final BaseAdNetworkImpl baseAdNetwork = new BaseAdNetworkImpl(null, null) {
-            @Override
-            public String getId() {
-                return null;
-            }
-
-            @Override
-            public URI getRequestUri() throws Exception {
-                return null;
-            }
-        };
-        final String host = serverUrl + "/get";
-        baseAdNetwork.setHost(host);
-
-        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 14L, null);
-        boolean result = baseAdNetwork.isInterstitial();
-        assertTrue(result);
-
-        baseAdNetwork.configureParameters(mockSasParam, null, mockEntity, 13L, null);
-        result = baseAdNetwork.isInterstitial();
-        assertFalse(result);
-
-        verifyAll();
-    }
-
     /**
      * This method tests various small methods of BaseAdNetworkImpl.
      */
@@ -511,8 +431,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getAge()).andReturn((short) 11).times(3);
         expect(mockSasParam.getDst()).andReturn(2).times(1).andReturn(6).times(1).andReturn(8).times(1);
         expect(mockSasParam.getOsId()).andReturn(3).times(1).andReturn(5).times(1);
-        expect(mockSasParam.getSource()).andReturn("WAP").times(1).andReturn(null).times(1).andReturn("WAP").times(2)
-                .andReturn("APP").times(2);
+        expect(mockSasParam.getSource()).andReturn("WAP").times(1);
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
 
         replayAll();
@@ -541,22 +460,15 @@ public class BaseAdNetworkImplTest {
         assertEquals(baseAdNetwork.getCreativeType(), ADCreativeType.INTERSTITIAL_VIDEO);
 
         // Test getHashedValue()
-        String res = baseAdNetwork.getHashedValue("TEST STRING", "MD5");
+        String res = BaseAdNetworkHelper.getHashedValue("TEST STRING", "MD5");
         assertEquals(res, "2d7d687432758a8eeeca7b7e5d518e7f");
-        res = baseAdNetwork.getHashedValue("TEST STRING", "SHA-1");
+        res = BaseAdNetworkHelper.getHashedValue("TEST STRING", "SHA-1");
         assertEquals(res, "d39d009c05797a93a79720952e99c7054a24e7c4");
 
         // Test cleanup()
         baseAdNetwork.cleanUp();
         assertEquals(baseAdNetwork.adStatus, "TERM");
         assertEquals(baseAdNetwork.getResponseStruct().getAdStatus(), "TERM");
-
-        // Test getURLEncode()
-        res = baseAdNetwork.getURLEncode("this is a sample sentence.", "UTF-8");
-        assertEquals(res, "this+is+a+sample+sentence.");
-        // Test getURLEncode()
-        res = baseAdNetwork.getURLEncode("special chars: ? # @.", "UTF-8");
-        assertEquals(res, "special+chars%3A+%3F+%23+%40.");
 
         // Test getYearofBirth()
         final int yearOfBirth = baseAdNetwork.getYearofBirth();
@@ -573,12 +485,6 @@ public class BaseAdNetworkImplTest {
         // Test isAndroid() and isIOS()
         assertEquals(baseAdNetwork.isAndroid(), true);
         assertEquals(baseAdNetwork.isIOS(), true);
-
-        // Test isApp()
-        assertEquals(baseAdNetwork.isApp(), false);
-        assertEquals(baseAdNetwork.isApp(), false);
-        assertEquals(baseAdNetwork.isApp(), true);
-
 
         verifyAll();
     }
@@ -637,8 +543,7 @@ public class BaseAdNetworkImplTest {
         };
         final String host = serverUrl + "/get";
         baseAdNetwork.setHost(host);
-        baseAdNetwork
-                .configureParameters(mockSasParam, mockCasInternalRequestParameters, mockEntity, 14L, null);
+        baseAdNetwork.configureParameters(mockSasParam, mockCasInternalRequestParameters, mockEntity, 14L, null);
 
         assertEquals("UID00000000000000000000000000000", baseAdNetwork.getUid(true));
         assertEquals("IDUS1000000000000000000000000000", baseAdNetwork.getUid(true));
@@ -656,6 +561,7 @@ public class BaseAdNetworkImplTest {
      */
     public class AsyncHttpClientForTest extends AsyncHttpClient {
 
+        @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
         public <T> ListenableFuture<T> executeRequest(final Request request, final AsyncHandler<T> handler)
                 throws IOException {
@@ -680,8 +586,10 @@ public class BaseAdNetworkImplTest {
 
         @Getter
         private final CountDownLatch signal = new CountDownLatch(1);
+        @SuppressWarnings("rawtypes")
         private final AsyncCompletionHandler reqHandlerFromBaseAdNetwork;
 
+        @SuppressWarnings("rawtypes")
         AsyncHandlerWithSignal(final AsyncHandler reqHandlerFromBaseAdNetwork) {
             this.reqHandlerFromBaseAdNetwork = (AsyncCompletionHandler) reqHandlerFromBaseAdNetwork;
         }
