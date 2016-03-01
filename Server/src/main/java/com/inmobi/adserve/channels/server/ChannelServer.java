@@ -291,6 +291,7 @@ public class ChannelServer {
 
                 @Override
                 public void run() {
+                    ixPackageRepository.stop();
                     manager.close();
                 }
             });
