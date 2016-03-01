@@ -72,8 +72,8 @@ server.tickDuration=100
 server.enableDatabusLogging=true
 server.enableFileLogging=true
 
-server.circuitbreaker.disable=true
-server.circuitbreaker.failureThreshold=0.5
+server.circuitbreaker.disable={{circuit_breaker_disabled}}
+server.circuitbreaker.failureThreshold=0.995
 server.circuitbreaker.lengthOfMovingWindowCounterInSeconds=300
 server.circuitbreaker.minimumNumberOfRequests=100
 server.circuitbreaker.numberOfSecondsUnderObservation=10
@@ -321,7 +321,7 @@ adapter.adbaydcp.host.uh1=NA
 adapter.adbaydcp.host.lhr1=NA
 adapter.adbaydcp.class=com.inmobi.adserve.channels.adnetworks.adbay.DCPAdbayAdnetwork
 
-adapter.ironsource.status=on
+adapter.ironsource.status=off
 adapter.ironsource.host=http://dynamic.mobilecore.com/api/v1
 adapter.ironsource.advertiserId=04095b9425f6438095a78a80d21e6589
 adapter.ironsource.tokenid=w9pR1SCLuM54sziOtvJw
@@ -330,7 +330,7 @@ adapter.ironsource.host.hkg1=NA
 adapter.ironsource.class=com.inmobi.adserve.channels.adnetworks.ironsource.DCPIronSourceAdnetwork
 
 adapter.amoad.advertiserId=0d7eab3ab68c4afab94ad897ec080ef6
-adapter.amoad.status=on
+adapter.amoad.status=off
 adapter.amoad.host=http://www.amoad.com
 adapter.amoad.host.uj1=NA
 adapter.amoad.class=com.inmobi.adserve.channels.adnetworks.amoad.DCPAmoAdAdNetwork
@@ -345,7 +345,7 @@ adapter.openx.class=com.inmobi.adserve.channels.adnetworks.openx.OpenxAdNetwork
 adapter.tapit.host=http://r.tapit.com/adrequest.php
 adapter.tapit.host.hkg1=NA
 adapter.tapit.host.uj1=NA
-adapter.tapit.status=on
+adapter.tapit.status=off
 adapter.tapit.responseFormat=json
 adapter.tapit.test=0
 adapter.tapit.advertiserId=4028cb1e38411ed20138515af2b6025a
@@ -355,14 +355,14 @@ adapter.tapit.class=com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwo
 adapter.huntmads.host=http://ads.huntmad.com/ad
 adapter.huntmads.host.hkg1=NA
 adapter.huntmads.host.uj1=http://ads.huntmad.com/ad
-adapter.huntmads.status=on
+adapter.huntmads.status=off
 adapter.huntmads.test=0
 adapter.huntmads.advertiserId=62bdf93ca0684da7854614b48665b641
 adapter.huntmads.partnerSegmentNo=1
 adapter.huntmads.class=com.inmobi.adserve.channels.adnetworks.mocean.DCPMoceanAdNetwork
 
 adapter.httpool.host=http://a.mobile.toboads.com/get?ormma=0&fh=0&sdkid=api&sdkver=100&
-adapter.httpool.status=on
+adapter.httpool.status=off
 adapter.httpool.test=0
 adapter.httpool.advertiserId=015ae09e322940d3a5e1b2ef4a19f07d
 adapter.httpool.partnerSegmentNo=1
@@ -475,7 +475,7 @@ adapter.placeiq.responseFormat=html
 adapter.placeiq.partnerSegmentNo=2
 adapter.placeiq.class=com.inmobi.adserve.channels.adnetworks.placeiq.DCPPlaceIQAdnetwork
 
-adapter.wapstart.status=on
+adapter.wapstart.status=off
 adapter.wapstart.advertiserId=59039ca912c44e4c8a0f3e2097e2a5e4
 adapter.wapstart.host=http://api.plus1.wapstart.ru/v1/ads/%s.json
 adapter.wapstart.host.hkg1=NA
@@ -546,7 +546,7 @@ adapter.adsmogo.authsecret=eb2hedsdhn7oe2cj6393rhoz74en72ac
 adapter.adsmogo.partnerSegmentNo=1
 adapter.adsmogo.class=com.inmobi.adserve.channels.adnetworks.adsmogo.DCPAdsMogoAdnetwork
 
-adapter.startmeappdcp.status=on
+adapter.startmeappdcp.status=off
 adapter.startmeappdcp.pubid=11629
 adapter.startmeappdcp.advertiserId=a63e53ae51234e72a0dc89642b7a82e0
 adapter.startmeappdcp.host=http://inmobi.api.ssp.startmeapp.net/request
@@ -635,7 +635,7 @@ adapter.dmg.class=com.inmobi.adserve.channels.adnetworks.amobeeplatform.DCPAmobe
 
 adapter.webmoblink.host=http://webmoblink-traffic.us/inmobi/MobileAPI2014.aspx
 adapter.webmoblink.host.uj1=NA
-adapter.webmoblink.status=on
+adapter.webmoblink.status=off
 adapter.webmoblink.accountId=15321
 adapter.webmoblink.mode=LIVE
 adapter.webmoblink.adformat=ANY
@@ -645,7 +645,7 @@ adapter.webmoblink.partnerSegmentNo=1
 adapter.webmoblink.class=com.inmobi.adserve.channels.adnetworks.webmoblink.DCPWebmoblinkAdNetwork
 
 adapter.collectcents.advertiserId=63e2fe7d1cd14c9dbd22788a014c9174
-adapter.collectcents.status=on
+adapter.collectcents.status=off
 adapter.collectcents.host=http://adserver.api.collectcent.com:80/
 adapter.collectcents.pubid=inmobi
 adapter.collectcents.partnerSegmentNo=1
@@ -653,7 +653,7 @@ adapter.collectcents.class=com.inmobi.adserve.channels.adnetworks.collectcents.D
 
 adapter.local.host=http://ads.moceanads.com/ad
 adapter.local.host.uj1=NA
-adapter.local.status=on
+adapter.local.status=off
 adapter.local.test=0
 adapter.local.advertiserId=5cc86c3a19fc46028b4bb7265fc9c308
 adapter.local.partnerSegmentNo=1

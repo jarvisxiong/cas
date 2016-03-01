@@ -21,13 +21,13 @@ public interface CircuitBreakerInterface {
      * 
      * @param startTime: It it the time at which the request was received to us by the UMP
      */
-    void increamentFailureCounter(final long startTime);
+    void incrementFailureCounter(final long startTime);
 
     /**
      * For every advertiser, request counter is increased on every request sent to the advertiser
      * 
      * @param startTime: It it the time at which the request was received to us by the UMP
      */
-    void increamentRequestCounter(final long startTime);
+    void incrementTotalCounter(final long startTime);
 
 }

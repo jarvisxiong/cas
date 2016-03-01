@@ -154,16 +154,16 @@ public class CircuitBreakerImpl implements CircuitBreakerInterface {
      * For every advertiser, failure counter is increased on every failure. Here failure means timeouts + terminates
      */
     @Override
-    public void increamentFailureCounter(final long startTime) {
+    public void incrementFailureCounter(final long startTime) {
         failureMovingWindowCounter.incrementRequest(startTime);
     }
 
 
     /**
-     * For every advertiser, request counter is increased on every request sent to the advertiser
+     * For every advertiser, counter is increased on every request sent to the advertiser
      */
     @Override
-    public void increamentRequestCounter(final long startTime) {
+    public void incrementTotalCounter(final long startTime) {
         requestMovingWindowCounter.incrementRequest(startTime);
     }
 

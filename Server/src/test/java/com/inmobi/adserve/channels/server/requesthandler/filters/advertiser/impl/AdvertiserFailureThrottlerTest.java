@@ -145,7 +145,7 @@ public class AdvertiserFailureThrottlerTest extends TestCase {
         advertiserIdConfigMap.put(advertiserId, adapterConfig);
 
         AdvertiserFailureThrottler filter = new AdvertiserFailureThrottler(null, advertiserIdConfigMap);
-        AdvertiserFailureThrottler.increamentRequestsCounter(advertiserId, System.currentTimeMillis());
+        AdvertiserFailureThrottler.incrementTotalCounter(advertiserId, System.currentTimeMillis());
         assertThat(filter.failedInFilter(mockChannelSegment, null), is(equalTo(false)));
     }
 
@@ -173,7 +173,7 @@ public class AdvertiserFailureThrottlerTest extends TestCase {
         advertiserIdConfigMap.put(advertiserId, adapterConfig);
 
         AdvertiserFailureThrottler filter = new AdvertiserFailureThrottler(null, advertiserIdConfigMap);
-        AdvertiserFailureThrottler.increamentRequestsCounter(advertiserId, System.currentTimeMillis());
+        AdvertiserFailureThrottler.incrementTotalCounter(advertiserId, System.currentTimeMillis());
         assertThat(filter.failedInFilter(mockChannelSegment, null), is(equalTo(false)));
     }
     

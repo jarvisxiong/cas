@@ -30,6 +30,7 @@ prod:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'tzns4003.grid.uj1.inmobi.com'
@@ -73,6 +74,7 @@ prod:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'krvm4102.grid.uh1.inmobi.com'
@@ -116,6 +118,7 @@ prod:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'erns4003.grid.lhr1.inmobi.com'
@@ -159,6 +162,7 @@ prod:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'opns4006.grid.hkg1.inmobi.com'
@@ -203,6 +207,7 @@ pilot:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'tzns4003.grid.uj1.inmobi.com'
@@ -246,6 +251,7 @@ pilot:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'krvm4102.grid.uh1.inmobi.com'
@@ -289,6 +295,7 @@ pilot:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'erns4003.grid.lhr1.inmobi.com'
@@ -332,6 +339,7 @@ pilot:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'opns4006.grid.hkg1.inmobi.com'
@@ -376,6 +384,7 @@ non_prod:
                 ix_default_url: 'http://10.14.118.66:8889/getIXBid'
             t_segmentno: '-1'
             automation_tests_enabled: 'true'
+            circuit_breaker_disabled: 'true'
 
         scribe:
             mondemand_address: 'localhost'
@@ -419,6 +428,7 @@ non_prod:
                 ix_default_url: 'http://10.14.118.66:8889/getIXBid'
             t_segmentno: '-1'
             automation_tests_enabled: 'true'
+            circuit_breaker_disabled: 'true'
 
         scribe:
             mondemand_address: 'localhost'
@@ -463,6 +473,7 @@ skyhook:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'tzns4003.grid.uj1.inmobi.com'
@@ -475,6 +486,7 @@ skyhook:
             flush_debug_log: 'false'
 
         graphite_prefix_base: 'prod'
+
     hkg1:
         cas:
             database:
@@ -505,6 +517,7 @@ skyhook:
                 ix_default_url: 'NA'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
+            circuit_breaker_disabled: 'false'
 
         scribe:
             mondemand_address: 'opns4006.grid.hkg1.inmobi.com'

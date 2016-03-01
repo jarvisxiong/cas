@@ -263,18 +263,17 @@ public class Logging {
                     break;
                 case GlobalConstant.NO_AD:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
+                    AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 case GlobalConstant.TIME_OUT:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
-                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(),
-                            adResponse.getStartTime());
+                    AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 default:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
                     InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
-                    AdvertiserFailureThrottler.increamentRequestsThrottlerCounter(adNetwork.getId(),
-                            adResponse.getStartTime());
+                    AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
             }
         }
