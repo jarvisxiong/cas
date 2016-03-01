@@ -217,9 +217,6 @@ public abstract class BaseServlet implements Servlet {
                 return false;
             }
             imaiBaseUrl = sdkMraidMapEntity.getMraidPath();
-            if (sasParams.isSecureRequest()) {
-                imaiBaseUrl = imaiBaseUrl.replace("http:", "https:");
-            }
         }
         sasParams.setImaiBaseUrl(imaiBaseUrl);
         LOG.debug("imai base url is {}", imaiBaseUrl);

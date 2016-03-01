@@ -192,6 +192,7 @@ public class IXPackageRepository {
         packageIndex.addIndex(HashIndex.onAttribute(DEAL_IDS));
 
         metricsRegistry.register(MetricRegistry.name(this.getClass(), "size"), (Gauge<Integer>) () -> packageSet.size());
+
         start();
     }
 
@@ -531,8 +532,11 @@ public class IXPackageRepository {
     }
 
     private void start() {
-        logger.info("Start IXPackageRepository updates.");
+        logger.info("Starting asynchronous IXPackageRepository updates.");
         reader.startAsync();
+        logger.info("Waiting for initial IXPackageRepository load");
+        reader.awaitRunning();
+        logger.info("Initial IXPackageRepository load complete");
     }
 
     public void stop() {
