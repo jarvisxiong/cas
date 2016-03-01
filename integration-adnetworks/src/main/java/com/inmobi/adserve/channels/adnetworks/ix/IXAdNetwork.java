@@ -141,7 +141,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final Integer VIDEO_MAX_DURATION = 30;
     private static final Integer VIDEO_MAX_BITRATE = 2000;
     private static final List<Integer> VIDEO_PROTOCOLS = Lists.newArrayList(VideoProtocols.VAST_2_0_WRAPPER.getValue());
-    private static final List<String> VIDEO_MIMES = Lists.newArrayList(("video/mp4")); // Supported video mimes
+    private static final List<String> VIDEO_MIMES = Lists.newArrayList("video/mp4"); // Supported video mimes
     private static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
     @Inject
     protected static TemplateConfiguration templateConfiguration;
