@@ -445,7 +445,7 @@ public class LoggingTest {
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
 
         mockStaticNice(InspectorStats.class);
-        PowerMock.suppress(AdvertiserFailureThrottler.class.getDeclaredMethod("increamentRequestsThrottlerCounter", String.class, long.class));
+        PowerMock.suppress(AdvertiserFailureThrottler.class.getDeclaredMethod("incrementFailureCounter", String.class, long.class));
 
         AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);

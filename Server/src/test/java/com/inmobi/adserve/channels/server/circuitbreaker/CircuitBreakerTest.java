@@ -52,7 +52,7 @@ public class CircuitBreakerTest extends TestCase {
         replayAll();
 
         CircuitBreakerImpl circuitBreaker = new CircuitBreakerImpl(advertiserName);
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
 
         long currentTimeAddedWithSixMinutes = System.currentTimeMillis() +11 * 60 * 1000; 
         mockStatic(System.class);
@@ -67,7 +67,7 @@ public class CircuitBreakerTest extends TestCase {
     public void testCircuitBreakerAfterOneRequestForwarding() throws Exception {
         replayAll();
         CircuitBreakerImpl circuitBreaker = new CircuitBreakerImpl(advertiserName);
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
         assertThat(circuitBreaker.canForwardTheRequest(), is(equalTo(true)));
     }
     
@@ -76,8 +76,8 @@ public class CircuitBreakerTest extends TestCase {
     public void testMovingToCircuitOpenState() throws Exception {
         replayAll();
         CircuitBreakerImpl circuitBreaker = new CircuitBreakerImpl(advertiserName);
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
-        circuitBreaker.increamentFailureCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
+        circuitBreaker.incrementFailureCounter(System.currentTimeMillis());
         PowerMock.stub(CircuitBreakerImpl.class.getDeclaredMethod("isTenSecondsOver")).andReturn(true);
         assertThat(circuitBreaker.canForwardTheRequest(), is(equalTo(false)));
         PowerMock.reset(CircuitBreakerImpl.class);
@@ -88,15 +88,15 @@ public class CircuitBreakerTest extends TestCase {
     public void testMovingToCircuitObservationState() throws Exception {
         replayAll();
         CircuitBreakerImpl circuitBreaker = new CircuitBreakerImpl(advertiserName);
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
-        circuitBreaker.increamentFailureCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
+        circuitBreaker.incrementFailureCounter(System.currentTimeMillis());
         
         PowerMock.stub(CircuitBreakerImpl.class.getDeclaredMethod("isTenSecondsOver")).andReturn(true);
         //circuitBreaker has moved to open state
         assertThat(circuitBreaker.canForwardTheRequest(), is(equalTo(false)));
         
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
-        circuitBreaker.increamentFailureCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
+        circuitBreaker.incrementFailureCounter(System.currentTimeMillis());
         
         long currentTimeAddedWithSixMinutes = System.currentTimeMillis() + 6 * 60 * 1000; 
         mockStatic(System.class);
@@ -113,10 +113,10 @@ public class CircuitBreakerTest extends TestCase {
         replayAll();
         CircuitBreakerImpl circuitBreaker = new CircuitBreakerImpl(advertiserName);
         circuitBreaker.setCurrentState(CircuitBreakerImpl.State.UNDER_OBSERVATION);
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
-        circuitBreaker.increamentFailureCounter(System.currentTimeMillis());
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
-        circuitBreaker.increamentFailureCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
+        circuitBreaker.incrementFailureCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
+        circuitBreaker.incrementFailureCounter(System.currentTimeMillis());
         
         long currentTimeAddedWithSixMinutes = System.currentTimeMillis() + 6 * 60 * 1000; 
         mockStatic(System.class);
@@ -132,7 +132,7 @@ public class CircuitBreakerTest extends TestCase {
         replayAll();
         CircuitBreakerImpl circuitBreaker = new CircuitBreakerImpl(advertiserName);
         circuitBreaker.setCurrentState(CircuitBreakerImpl.State.UNDER_OBSERVATION);
-        circuitBreaker.increamentRequestCounter(System.currentTimeMillis());
+        circuitBreaker.incrementTotalCounter(System.currentTimeMillis());
         
         long currentTimeAddedWithSixMinutes = System.currentTimeMillis() + 6 * 60 * 1000; 
         mockStatic(System.class);

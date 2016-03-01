@@ -72,8 +72,8 @@ server.tickDuration=100
 server.enableDatabusLogging=true
 server.enableFileLogging=true
 
-server.circuitbreaker.disable=true
-server.circuitbreaker.failureThreshold=0.5
+server.circuitbreaker.disable={{circuit_breaker_disabled}}
+server.circuitbreaker.failureThreshold=0.995
 server.circuitbreaker.lengthOfMovingWindowCounterInSeconds=300
 server.circuitbreaker.minimumNumberOfRequests=100
 server.circuitbreaker.numberOfSecondsUnderObservation=10

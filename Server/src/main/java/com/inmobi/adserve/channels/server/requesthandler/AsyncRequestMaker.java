@@ -196,7 +196,7 @@ public class AsyncRequestMaker {
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
                         .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
-                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
+                AdvertiserFailureThrottler.incrementTotalCounter(channelSegment.getAdNetworkInterface().getId(),
                         System.currentTimeMillis());
             } else {
                 itr.remove();
@@ -211,7 +211,7 @@ public class AsyncRequestMaker {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
                         channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
                                 .getChannelId());
-                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
+                AdvertiserFailureThrottler.incrementTotalCounter(channelSegment.getAdNetworkInterface().getId(),
                         System.currentTimeMillis());
             } else {
                 rtbItr.remove();
