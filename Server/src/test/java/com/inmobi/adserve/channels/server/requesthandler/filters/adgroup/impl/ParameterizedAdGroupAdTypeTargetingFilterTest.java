@@ -67,7 +67,7 @@ public class ParameterizedAdGroupAdTypeTargetingFilterTest {
             {"Vast-Out-Video-positive", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, false, false},
             {"Vast-Out-Video-negative", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, false, false, true},
             {"Vast-Out-Video-negative-isrewarded", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{14L}, true, true, true},
-            {"Vast-Out-Video-with-wrong-slot-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{9L}, true, false, true},
+            {"Vast-Out-Video-with-any-slot-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.PURE_VAST, null, new Long[]{9L}, true, false, false},
             {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.VAST_VIDEO, null, new Long[]{14L}, true, false, true},
             {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO, null, new Long[]{14L}, true, false, true},
             {"Vast-Out-Video-with-mismatch-secondaryAdFormatConstraint-id", RequestedAdType.VAST, SecondaryAdFormatConstraints.STATIC, Arrays.asList(AdTypeEnum.BANNER), new Long[]{14L}, true, false, true},

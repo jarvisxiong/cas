@@ -41,29 +41,26 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
     @Override
     protected boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams,
         final CasContext casContext) {
-
         final boolean returnValue;
         final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
+        final boolean isRequestAdTypeVast = RequestedAdType.VAST == sasParams.getRequestedAdType();
         switch (channelSegmentEntity.getSecondaryAdFormatConstraints()) {
             case VAST_VIDEO:
-                returnValue =
-                    sasParams.isRewardedVideo() || RequestedAdType.VAST == sasParams.getRequestedAdType() ||
-                            !checkVideoEligibility(channelSegment.getChannelSegmentEntity().getSlotIds(), sasParams);
-                break;
-            case PURE_VAST:
-                returnValue = sasParams.isRewardedVideo() || RequestedAdType.VAST != sasParams.getRequestedAdType()
+                returnValue = sasParams.isRewardedVideo() || isRequestAdTypeVast
                         || !checkVideoEligibility(channelSegment.getChannelSegmentEntity().getSlotIds(), sasParams);
                 break;
+            case PURE_VAST:
+                returnValue = sasParams.isRewardedVideo() || !isRequestAdTypeVast || !sasParams.isVideoSupported();
+                break;
             case REWARDED_VAST_VIDEO:
-                returnValue =
-                    !(sasParams.isRewardedVideo() && RequestedAdType.VAST != sasParams.getRequestedAdType() &&
-                            checkVideoEligibility(channelSegment.getChannelSegmentEntity().getSlotIds(), sasParams));
+                returnValue = !sasParams.isRewardedVideo() || isRequestAdTypeVast
+                        || !checkVideoEligibility(channelSegment.getChannelSegmentEntity().getSlotIds(), sasParams);
                 break;
             case STATIC:
                 // Not enforcing interstitial slots. Assuming that this is correctly handled in UMP.
                 final List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
                 returnValue =
-                    CollectionUtils.isEmpty(supportedAdTypes) || RequestedAdType.VAST == sasParams.getRequestedAdType()
+                    CollectionUtils.isEmpty(supportedAdTypes) || isRequestAdTypeVast
                             || !supportedAdTypes.contains(AdTypeEnum.BANNER) || sasParams.isRewardedVideo();
                 break;
             default:
