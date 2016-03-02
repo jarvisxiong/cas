@@ -55,7 +55,7 @@ CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 #note: IDP_NODE is equivalent to the CONTAINER_NAME
 
 # Useful Docker run Commands:
-# 1) Build: docker built -t cas_image .
+# 1) Build: docker build -t cas_image .
 # 2) Run: docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e HOST_NAME=localhost -e IDP_NODE=cas1234 --name=cas_container cas_image
 # 3) All in one: docker build -t cas_image .; docker rm cas_container; docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=cas1234 --name=cas_container cas_image
 # 4) ssh into running container: docker exec -it cas_container /bin/bash
