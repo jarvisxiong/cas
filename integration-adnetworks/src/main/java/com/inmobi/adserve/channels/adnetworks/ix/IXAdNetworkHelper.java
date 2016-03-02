@@ -152,6 +152,17 @@ public class IXAdNetworkHelper {
     private static final String WRAPPER_TAG = "Wrapper";
     private static final String VIDEO_CLICKS_TAG = "VideoClicks";
 
+    // below are the suffix to base beacon URL for generating various beacon events.
+    private static final String RENDER_BEACON_SUFFIX = "?m=18";
+    private static final String CLICK_BEACON_SUFFIX = "?m=8";
+    private static final String ERROR_BEACON_SUFFIX = "?m=99&action=vast-error&label=[ERRORCODE]";
+    private static final String BILLING_BEACON_SUFFIX = "?b=${WIN_BID}${DEAL_GET_PARAM}";
+    private static final String MEDIA_START_BEACON_SUFFIX = "?m=10";
+    private static final String Q1_BEACON_SUFFIX = "?m=12&q=1&mid=video&__t=0";
+    private static final String Q2_BEACON_SUFFIX = "?m=12&q=2&mid=video&__t=0";
+    private static final String Q3_BEACON_SUFFIX = "?m=12&q=3&mid=video&__t=0";
+    private static final String Q4_BEACON_SUFFIX = "?m=13&mid=video&__t=0";
+
     private static Transformer transformer;
 
     static {
@@ -640,6 +651,7 @@ public class IXAdNetworkHelper {
         final GenericTemplateObject vastTemplFirst = new GenericTemplateObject();
         // JS escaped IM beacon and click URLs.
         vastTemplFirst.setBeaconUrl(StringEscapeUtils.escapeJavaScript(beaconUrl));
+        vastTemplFirst.setBillingUrl(StringEscapeUtils.escapeJavaScript(beaconUrl + BILLING_BEACON_SUFFIX));
         vastTemplFirst.setClickServerUrl(StringEscapeUtils.escapeJavaScript(clickUrl));
         // Namespace
         vastTemplFirst.setNs(Formatter.getIXNamespace());
@@ -745,8 +757,8 @@ public class IXAdNetworkHelper {
         final NodeList inlineNode = doc.getElementsByTagName(IN_LINE_TAG);
         final NodeList wrapperNode = doc.getElementsByTagName(WRAPPER_TAG);
 
-        final String impressionUriStr = beaconUrl + "?m=18";
-        final String errorUriStr = beaconUrl + "?m=99&action=vast-error&label=[ERRORCODE]";
+        final String impressionUriStr = beaconUrl + RENDER_BEACON_SUFFIX;
+        final String errorUriStr = beaconUrl + ERROR_BEACON_SUFFIX;
 
         if (0 != inlineNode.getLength()) {
             addInXml(doc, inlineNode, IMPRESSION_TAG, null, null, impressionUriStr);
@@ -764,12 +776,12 @@ public class IXAdNetworkHelper {
 
 
         if (0 != trackingEventsNode.getLength()) {
-            final String startUriStr = beaconUrl + "?m=10";
-            final String billingUriStr = beaconUrl + "?b=${WIN_BID}${DEAL_GET_PARAM}";
-            final String firstQuartileUriStr = beaconUrl + "?m=12&q=1&mid=video&__t=0";
-            final String midPointUriStr = beaconUrl + "?m=12&q=2&mid=video&__t=0";
-            final String thirdQuartileUriStr = beaconUrl + "?m=12&q=3&mid=video&__t=0";
-            final String completeUriStr = beaconUrl + "?m=13&mid=video&__t=0";
+            final String startUriStr = beaconUrl + MEDIA_START_BEACON_SUFFIX;
+            final String billingUriStr = beaconUrl + BILLING_BEACON_SUFFIX;
+            final String firstQuartileUriStr = beaconUrl + Q1_BEACON_SUFFIX;
+            final String midPointUriStr = beaconUrl + Q2_BEACON_SUFFIX;
+            final String thirdQuartileUriStr = beaconUrl + Q3_BEACON_SUFFIX;
+            final String completeUriStr = beaconUrl + Q4_BEACON_SUFFIX;
 
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, START, startUriStr);
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, START, billingUriStr);
@@ -791,7 +803,7 @@ public class IXAdNetworkHelper {
 
     private static void addClickTracking(final Document doc, final NodeList parentNodeList, final String clickUrl, final String beaconUrl) {
         final NodeList videoClickNode = doc.getElementsByTagName(VIDEO_CLICKS_TAG);
-        final String beaconClickuUriStr = beaconUrl + "?m=8";
+        final String beaconClickuUriStr = beaconUrl + CLICK_BEACON_SUFFIX;
         if (0 == videoClickNode.getLength()) {
             final Element docElm = doc.createElement(VIDEO_CLICKS_TAG);
             parentNodeList.item(0).appendChild(docElm);

@@ -13,6 +13,7 @@ public class GenericTemplateObject {
 
     private String beaconUrl;
     private String clickServerUrl;
+    private String billingUrl;
     private String ns;
 
     private int supplyWidth;
