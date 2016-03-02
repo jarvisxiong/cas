@@ -1847,7 +1847,7 @@ TEST_VAST_AD_TYPE_TARGETING_FAIL:
    geo_countryid : '125'
    ad_type_targeting : '2'
 
-TEST_VAST_VIDEO_SLOT_FAIL:
+TEST_VAST_VIDEO_SLOT_PASS:
 -  integration_type : 'ANDROID_API'
    adpool_requestedadtype: 'VAST'
    site_inventorytype : 'APP' #forreq

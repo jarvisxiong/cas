@@ -68,8 +68,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.iab.ApiFrameworks;
@@ -419,7 +419,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                                 : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_REQUESTS;
                 if (isPureVastRequest) {
                     if (null != sasParams.getIntegrationDetails()
-                            && IntegrationMethod.API != sasParams.getIntegrationDetails().getIntegrationMethod()) {
+                            && (IntegrationMethod.API != sasParams.getIntegrationDetails().getIntegrationMethod()
+                            && IntegrationMethod.API_VAST != sasParams.getIntegrationDetails().getIntegrationMethod())) {
                         InspectorStats.incrementStatCount(getName(),
                                 InspectorStrings.TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API);
                     }

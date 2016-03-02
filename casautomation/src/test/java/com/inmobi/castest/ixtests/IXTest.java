@@ -1840,12 +1840,9 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST_VAST_VIDEO_SLOT_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_VIDEO_SLOT_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("Failed in filter AdGroupAdTypeTargetingFilter  , adgroup TEST_VAST_VIDEO_SLOT_FAIL");
-        Reporter.log(parserOutput, true);
-        Assert.assertTrue(parserOutput.equals("PASS"));
+    @Test(testName = "TEST_VAST_VIDEO_SLOT_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_VAST_VIDEO_SLOT_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        VastPassAssert();
     }
 
 
