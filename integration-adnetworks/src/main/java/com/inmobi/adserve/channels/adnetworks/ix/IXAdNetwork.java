@@ -73,6 +73,7 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.iab.ApiFrameworks;
+import com.inmobi.adserve.contracts.iab.VastCompanionTypes;
 import com.inmobi.adserve.contracts.iab.VideoProtocols;
 import com.inmobi.adserve.contracts.ix.common.CommonExtension;
 import com.inmobi.adserve.contracts.ix.request.AdQuality;
@@ -140,6 +141,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final Integer VIDEO_MIN_DURATION = 0;
     private static final Integer VIDEO_MAX_DURATION = 30;
     private static final Integer VIDEO_MAX_BITRATE = 2000;
+    private static final List<Integer> VAST_COMPANION_TYPES =
+            Lists.newArrayList(VastCompanionTypes.STATIC_RESOURCE.getValue());
     private static final List<Integer> VIDEO_PROTOCOLS = Lists.newArrayList(VideoProtocols.VAST_2_0_WRAPPER.getValue());
     private static final List<String> VIDEO_MIMES = Lists.newArrayList("video/mp4"); // Supported video mimes
     private static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
@@ -658,7 +661,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             banner.setH((int) dim.getHeight());
         }
         video.setCompanionad(Lists.newArrayList(banner));
-
+        video.setCompaniontype(VAST_COMPANION_TYPES);
 
         final VideoExtension ext = new VideoExtension();
         ext.setSkip(isSkippable ? 1 : 0);
