@@ -246,8 +246,11 @@ public class Logging {
 
                 final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
                 if (null != channelSegmentEntity) {
-                    channel.setRpAdgroupIncId(channelSegmentEntity.getAdgroupIncId());
-                    LOG.debug("adding adgroupIncId in Channel object rpAdGroupIncId {}", channelSegmentEntity.getAdgroupIncId());
+                    final long rpAdGroupIncId = channelSegmentEntity.getAdgroupIncId();
+                    final long rpAdIncId = channelSegmentEntity.getIncId(ixAdNetwork.getCreativeType());
+                    channel.setRpAdgroupIncId(rpAdGroupIncId);
+                    channel.setRpAdIncId(rpAdIncId);
+                    LOG.debug("adding in Channel object rpAdGroupIncId : {}, rpAdIncId : {}", rpAdGroupIncId, rpAdIncId);
                 }
             }
             channels.add(channel);

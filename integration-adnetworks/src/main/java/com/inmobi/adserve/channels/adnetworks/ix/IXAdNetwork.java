@@ -412,8 +412,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                         isPureVastRequest ? InspectorStrings.TOTAL_PURE_VAST_REQUESTS
                                 : InspectorStrings.TOTAL_REWARDED_VAST_VIDEO_REQUESTS;
                 if (isPureVastRequest) {
-                    if (null != sasParams.getIntegrationDetails() && IntegrationMethod.API !=
-                            sasParams.getIntegrationDetails().getIntegrationMethod()) {
+                    if (null != sasParams.getIntegrationDetails() && (IntegrationMethod.API !=
+                            sasParams.getIntegrationDetails().getIntegrationMethod() && IntegrationMethod.API_VAST !=
+                            sasParams.getIntegrationDetails().getIntegrationMethod())) {
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API);
                     }
 

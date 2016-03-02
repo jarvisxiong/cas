@@ -494,7 +494,7 @@
                 <groupId>com.inmobi.commons</groupId>
                 <artifactId>casthrift</artifactId>
                 <classifier>thrift-0.8</classifier>
-                <version>2.26</version>
+                <version>2.27</version>
             </dependency>
             <dependency>
                 <groupId>com.inmobi.commons</groupId>
