@@ -57,11 +57,11 @@ server.enableAutomationTests={{automation_tests_enabled}}
 server.adtype.vast.minimumSupportedSdkVersion=450
 
 server.clickmaker.ipFileVersion = 1
-server.clickmaker.clickURLPrefix = http://c2.w.inmobi.com/c.asm
-server.clickmaker.clickSecureURLPrefix=https://c2.w.inmobi.com/c.asm
+server.clickmaker.clickURLPrefix = http://{{{click_url_prefix}}}
+server.clickmaker.clickSecureURLPrefix=https:{{{click_url_prefix}}}
 server.clickmaker.clickURLHashingSecretKeyVersion = 1
-server.clickmaker.beaconURLPrefix=http://et2.w.inmobi.com/c.asm
-server.clickmaker.beaconSecureURLPrefix=https://et2.w.inmobi.com/c.asm
+server.clickmaker.beaconURLPrefix=http://{{{beacon_url_prefix}}}
+server.clickmaker.beaconSecureURLPrefix=https://{{{beacon_url_prefix}}}
 server.clickmaker.unhashable=UM5,IUDS1,IDA,GID
 server.clickmaker.key = 1
 server.clickmaker.key.1.type=HmacSha1Crc

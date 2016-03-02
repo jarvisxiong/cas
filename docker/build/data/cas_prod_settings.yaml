@@ -28,6 +28,9 @@ prod:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            # Beacon and click urls must work for both http and https
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -72,6 +75,8 @@ prod:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -116,6 +121,8 @@ prod:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -160,6 +167,8 @@ prod:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -205,6 +214,8 @@ pilot:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -249,6 +260,8 @@ pilot:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -293,6 +306,8 @@ pilot:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -337,6 +352,8 @@ pilot:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -382,6 +399,8 @@ non_prod:
             ix:
                 ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
                 ix_default_url: 'http://10.14.118.66:8889/getIXBid'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'true'
             circuit_breaker_disabled: 'true'
@@ -426,6 +445,8 @@ non_prod:
             ix:
                 ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
                 ix_default_url: 'http://10.14.118.66:8889/getIXBid'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'true'
             circuit_breaker_disabled: 'true'
@@ -471,6 +492,8 @@ skyhook:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -515,6 +538,8 @@ skyhook:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
+            beacon_url_prefix: 'et2-cn.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2-cn.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
