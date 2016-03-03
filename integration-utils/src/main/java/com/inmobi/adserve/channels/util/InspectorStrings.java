@@ -208,7 +208,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
     public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
 
-
+    public static final String DROPPED_IN_CHINA_MOBILE_TARGETING_FILTER = "DroppedInChinaMobileTargetingFilter";
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)
@@ -235,4 +235,5 @@ public class InspectorStrings {
     public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public static final String NULL_HOST_NAME = "NullHostName";
     public static final String NULL_IP_ADDRESS = "NullIPAddress";
+
 }

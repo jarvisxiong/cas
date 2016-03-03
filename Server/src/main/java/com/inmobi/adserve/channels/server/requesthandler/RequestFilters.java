@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static com.inmobi.adserve.channels.util.InspectorStrings.COUNT;
 // import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_BANNER_NOT_ALLOWED_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_CHINA_MOBILE_TARGETING_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_INVALID_SLOT_REQUEST_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.JSON_PARSING_ERROR;
@@ -28,6 +29,8 @@ import com.inmobi.casthrift.DemandSourceType;
 
 public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
+    private static final int CHINA = 164;
+    private static final int CHINA_MOBILE = 594;
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
         if (null != hrh.getTerminationReason()) {
@@ -68,15 +71,6 @@ public class RequestFilters {
             InspectorStats.incrementStatCount(DROPPED_IN_BANNER_NOT_ALLOWED_FILTER, COUNT);
             return true;
         }
-        /* Commented as UMP is blocking CT with Default_fallback=false & sending CT where Default_fallback=true */
-        // CT Present and CAU not present, means it is CT request to drop it (For native CT has Native Template
-        // final boolean isNativeReq = SASParamsUtils.isNativeRequest(sasParams);
-        // if (!isNativeReq && CollectionUtils.isEmpty(sasParams.getCauMetadataSet())
-        // && CollectionUtils.isNotEmpty(sasParams.getCustomTemplateSet())) {
-        // LOG.info("Request not being served because Custom Template is not supported");
-        // InspectorStats.incrementStatCount(DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER, COUNT);
-        // return true;
-        // }
 
         if (sasParams.getSiteContentType() != null
                 && !CasConfigUtil.allowedSiteTypes.contains(sasParams.getSiteContentType().name())) {
@@ -110,6 +104,15 @@ public class RequestFilters {
             LOG.info("Request dropped since no slot in the list RqMkSlot has a mapping to InMobi slots/IX supported slots");
             return true;
         }
+
+        final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
+        //allow only ChinaMobile traffic for China(Immediate solution, Need to enable the targeting at segment level)
+        if(DemandSourceType.IX == dst && sasParams.getCountryId() == CHINA && sasParams.getCarrierId() != CHINA_MOBILE){
+            LOG.info("Request dropped since the China request is not from China Mobile");
+            InspectorStats.incrementStatCount(DROPPED_IN_CHINA_MOBILE_TARGETING_FILTER, COUNT);
+            return true;
+        }
+
         return false;
     }
 
