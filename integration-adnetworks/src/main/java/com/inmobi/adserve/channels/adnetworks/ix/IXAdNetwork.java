@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZE_ID_NOT_SET_IN_ALT_SIZE_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZE_ID_NOT_SET_IN_NON_ALT_SIZE_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZE_ID_SET_IN_ALT_SIZE_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZE_ID_SET_IN_NON_ALT_SIZE_RESPONSE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_JS;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
@@ -175,6 +179,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInLocal;
     protected boolean isSproutSupported = false;
     private boolean altSizeIdsSet = false;
+    private Integer responseSizeId;
 
     private final String unknownAdvertiserId;
     private final String advertiserId;
@@ -615,7 +620,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             rp.setUsenurl(true);
 
             if (rpSlots.size() > 0) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_REQUESTS);
+                InspectorStats.incrementStatCount(getName(),
+                        InspectorStrings.TOTAL_ALT_SLOT_SIZE_REQUESTS + ".rpSlot" + rpSlot);
                 altSizeIdsSet = true;
                 rp.setAlt_size_ids(rpSlots);
             }
@@ -1527,7 +1533,23 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Fetch bid.ext.rp.advid.
         if (null != bid.getExt() && null != bid.getExt().getRp()) {
-            advId = bid.getExt().getRp().getAdvid();
+            final RubiconExtension rp = bid.getExt().getRp();
+            advId = rp.getAdvid();
+
+            if (null != rp.getSize_id()) {
+                responseSizeId = rp.getSize_id();
+                if (altSizeIdsSet) {
+                    InspectorStats.incrementStatCount(getName(), RP_SIZE_ID_SET_IN_ALT_SIZE_RESPONSE);
+                } else {
+                    InspectorStats.incrementStatCount(getName(), RP_SIZE_ID_SET_IN_NON_ALT_SIZE_RESPONSE);
+                }
+            } else {
+                if (altSizeIdsSet) {
+                    InspectorStats.incrementStatCount(getName(), RP_SIZE_ID_NOT_SET_IN_ALT_SIZE_RESPONSE);
+                } else {
+                    InspectorStats.incrementStatCount(getName(), RP_SIZE_ID_NOT_SET_IN_NON_ALT_SIZE_RESPONSE);
+                }
+            }
         }
 
         // For video requests, validate that a valid XML is received.

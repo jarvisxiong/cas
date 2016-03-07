@@ -169,6 +169,11 @@ public class InspectorStrings {
             "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
+    // Temporary
+    public static final String RP_SIZE_ID_SET_IN_NON_ALT_SIZE_RESPONSE = "RPSizeIdSetInResponse.NonAltSize";
+    public static final String RP_SIZE_ID_SET_IN_ALT_SIZE_RESPONSE = "RPSizeIdSetInResponse.AltSize";
+    public static final String RP_SIZE_ID_NOT_SET_IN_NON_ALT_SIZE_RESPONSE = "RPSizeIdNotSetInResponse.NonAltSize";
+    public static final String RP_SIZE_ID_NOT_SET_IN_ALT_SIZE_RESPONSE = "RPSizeIdNotSetInResponse.AltSize";
 
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
