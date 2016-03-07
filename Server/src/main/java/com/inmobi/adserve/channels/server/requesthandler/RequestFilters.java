@@ -30,7 +30,7 @@ import com.inmobi.casthrift.DemandSourceType;
 public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
     private static final int CHINA = 164;
-    private static final int CHINA_MOBILE = 594;
+    private static final int CHINA_MOBILE = 787;
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
         if (null != hrh.getTerminationReason()) {
