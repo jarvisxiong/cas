@@ -155,8 +155,8 @@ public class Logging {
             final AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
 
             // Log every new RTB or IX video ad creative.
-            if ((adNetworkInterface.isRtbPartner() || adNetworkInterface.isIxPartner())
-                    && adNetworkInterface.isLogCreative()) {
+            if ((adNetworkInterface.isRtbPartner() || adNetworkInterface.isIxPartner()) && adNetworkInterface
+                    .isLogCreative()) {
                 String response = adNetworkInterface.getHttpResponseContent();
                 if (adNetworkInterface.getCreativeType() == ADCreativeType.NATIVE) {
                     // adm is not populated for Native on IX. Use admobject instead
@@ -171,8 +171,7 @@ public class Logging {
                 final String adStatus = adResponse.getAdStatus();
 
                 final CasAdvertisementLog creativeLog =
-                        new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey,
-                                advertiserId);
+                        new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
 
                 creativeLog.setCountryId(sasRequestParameters.getCountryId().intValue());
                 creativeLog.setImageUrl(adNetworkInterface.getIUrl());
@@ -206,11 +205,11 @@ public class Logging {
 
         if (CollectionUtils.isNotEmpty(rankList) && rankList.get(0).getAdNetworkInterface() instanceof IXAdNetwork) {
             if (rankList.size() > 1) {
-                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface().getName(),
-                        InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS);
+                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface()
+                        .getName(), InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS);
             } else {
-                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface().getName(),
-                        InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS);
+                InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface()
+                        .getName(), InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS);
             }
         }
 
@@ -239,8 +238,8 @@ public class Logging {
                     channel.setBid(originalBid);
                 }
 
-                if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
-                        || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
+                if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus()) || CollectionUtils
+                        .isNotEmpty(ixAdNetwork.getPackageIds())) {
                     channel.setIxAds(Arrays.asList(createIxAd(ixAdNetwork)));
                 }
 
@@ -258,8 +257,8 @@ public class Logging {
             // Incrementing inspectors
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.getLatency());
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
-                    adNetwork.getConnectionLatency());
+            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY, adNetwork
+                    .getConnectionLatency());
             switch (adResponse.getAdStatus()) {
                 case GlobalConstant.AD_STRING:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
@@ -385,7 +384,8 @@ public class Logging {
         }
 
         final String timestamp = new Date().toString();
-        final Request request = getRequestObject(sasParams, adsServed, requestSlot, slotServed, rankList);
+        final Request request =
+                getRequestObject(sasParams, casInternalRequestParameters, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
         // Container name must equal the hostname for now.
@@ -404,9 +404,9 @@ public class Logging {
             final double bidGuidance = sasParams.getMarketRate();
 
             if (0 != bidGuidance) {
-                final RTBDAuctionInfo rtbdAuctionInfo =
-                        new RTBDAuctionInfo(casParams.getDemandDensity() / bidGuidance, casParams.getLongTermRevenue()
-                                / bidGuidance, casParams.getPublisherYield());
+                final RTBDAuctionInfo rtbdAuctionInfo = new RTBDAuctionInfo(
+                        casParams.getDemandDensity() / bidGuidance,
+                        casParams.getLongTermRevenue() / bidGuidance, casParams.getPublisherYield());
                 auctionInfo = new AuctionInfo();
                 auctionInfo.setRtbd_auction_info(rtbdAuctionInfo);
             }
@@ -431,10 +431,10 @@ public class Logging {
             }
 
             InspectorStats.incrementStatCount(adNetworkInterface.getName(), InspectorStrings.SERVER_IMPRESSION);
-            final AdIdChain adChain =
-                    new AdIdChain(channelSegmentEntity.getAdId(adNetworkInterface.getCreativeType()),
-                            channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
-                            channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
+            final AdIdChain adChain = new AdIdChain(channelSegmentEntity
+                    .getAdId(adNetworkInterface.getCreativeType()), channelSegmentEntity
+                    .getAdgroupId(), channelSegmentEntity.getCampaignId(), channelSegmentEntity
+                    .getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());
             final ContentRating contentRating = getContentRating(sasParams);
             final PricingModel pricingModel = getPricingModel(channelSegmentEntity.getPricingModel());
 
@@ -456,7 +456,8 @@ public class Logging {
         return impression;
     }
 
-    protected static Request getRequestObject(final SASRequestParameters sasParams, final short adsServed,
+    protected static Request getRequestObject(final SASRequestParameters sasParams,
+            final CasInternalRequestParameters casInternalRequestParameters, final short adsServed,
             final Short requestSlot, final Short slotServed, final List<ChannelSegment> rankList) {
         final short adRequested = 1;
         Request request;
@@ -515,6 +516,13 @@ public class Logging {
         if (null != sasParams && CollectionUtils.isNotEmpty(sasParams.getRqMkSlot())) {
             request.setSlot_requested_list(sasParams.getRqMkSlot());
         }
+
+        if (null != casInternalRequestParameters) {
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getIem())) {
+                request.setImeiPresent(true);
+            }
+        }
+
         return request;
     }
 
@@ -669,8 +677,7 @@ public class Logging {
             if (enableDatabusLogging && decideToLog(partnerName, externalSiteKey)) {
                 // Actual Logging to stream
                 final CasAdvertisementLog casAdvertisementLog =
-                        new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey,
-                                advertiserId);
+                        new CasAdvertisementLog(partnerName, requestUrl, response, adStatus, externalSiteKey, advertiserId);
                 casAdvertisementLog.setCreativeType(adNetworkInterface.getCreativeType());
                 sendToDatabus(casAdvertisementLog, sampledAdvertisementLogKey);
             }
@@ -764,8 +771,8 @@ public class Logging {
     }
 
     public static InventoryType getInventoryType(final SASRequestParameters sasParams) {
-        if (null != sasParams && sasParams.getSdkVersion() != null
-                && GlobalConstant.ZERO.equalsIgnoreCase(sasParams.getSdkVersion())) {
+        if (null != sasParams && sasParams.getSdkVersion() != null && GlobalConstant.ZERO
+                .equalsIgnoreCase(sasParams.getSdkVersion())) {
             return InventoryType.BROWSER;
         }
         return InventoryType.APP;
