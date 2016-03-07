@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.AEROSPIKE_FEEDBACK;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_FEEDBACK_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_REPOSITORY;
@@ -8,8 +9,8 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHA
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IMEI_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.ws.rs.Path;
 
 import org.json.JSONArray;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.inject.Singleton;
 import com.googlecode.cqengine.resultset.ResultSet;
+import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -58,6 +61,8 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 @Path("/getsegments")
 public class ServletGetSegment implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletGetSegment.class);
+    @Inject
+    private IPRepository ipRepository;
 
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
@@ -107,35 +112,30 @@ public class ServletGetSegment implements Servlet {
                 } else if (repoName.equalsIgnoreCase(SITE_TAXONOMY_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySiteTaxonomyRepository(id);
                 } else if (repoName.equalsIgnoreCase(PRICING_ENGINE_REPOSITORY)) {
-                    entity =
-                            CasConfigUtil.repositoryHelper.queryPricingEngineRepository(
-                                    Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
+                    entity = CasConfigUtil.repositoryHelper.queryPricingEngineRepository(
+                            Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(SITE_FILTER_REPOSITORY)) {
-                    entity =
-                            CasConfigUtil.repositoryHelper.querySiteFilterRepository(id.split("_")[0],
-                                    Integer.parseInt(id.split("_")[1]));
+                    entity = CasConfigUtil.repositoryHelper.querySiteFilterRepository(id.split("_")[0],
+                            Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(AEROSPIKE_FEEDBACK)) {
                     if (id.split("_").length > 1) {
-                        entity =
-                                CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id.split("_")[0],
-                                        Integer.parseInt(id.split("_")[1]));
+                        entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id.split("_")[0],
+                                Integer.parseInt(id.split("_")[1]));
                     } else {
                         entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id);
                     }
                 } else if (repoName.equalsIgnoreCase(IMEI_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(id);
                 } else if (repoName.equalsIgnoreCase(SITE_ECPM_REPOSITORY)) {
-                    entity =
-                            CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
-                                    Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
+                    entity = CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
+                            Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
                 } else if (repoName.equalsIgnoreCase(CURRENCY_CONVERSION_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id);
                 } else if (repoName.equalsIgnoreCase(WAP_SITE_UAC_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository((id.split("_")[0]));
+                    entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
                 } else if (repoName.equalsIgnoreCase(IX_ACCOUNT_MAP_REPOSITORY)) {
-                    entity =
-                            CasConfigUtil.repositoryHelper
-                                    .queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
+                    entity = CasConfigUtil.repositoryHelper
+                            .queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
                 } else if (repoName.equalsIgnoreCase(CREATIVE_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 } else if (repoName.equalsIgnoreCase(NATIVE_AD_TEMPLATE_REPOSITORY)) {
@@ -146,11 +146,12 @@ public class ServletGetSegment implements Servlet {
                     entity = CasConfigUtil.repositoryHelper.queryCauMetaDataRepository(Long.parseLong(id));
                 } else if (repoName.equalsIgnoreCase(SLOT_SIZE_MAP_REPOSITORY)) {
                     entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
+                } else if (repoName.equalsIgnoreCase(IP_REPOSITORY)) {
+                    entity = ipRepository.getIPAddress(id);
                 } else if (repoName.equalsIgnoreCase(IX_PACKAGE_REPOSITORY)) {
-                    final ResultSet<IXPackageEntity> resultSet =
-                            CasConfigUtil.repositoryHelper.queryIXPackageRepository(Integer.parseInt(id.split("_")[0]),
-                                    id.split("_")[1], Integer.parseInt(id.split("_")[2]),
-                                    Integer.parseInt(id.split("_")[3]));
+                    final ResultSet<IXPackageEntity> resultSet = CasConfigUtil.repositoryHelper
+                            .queryIXPackageRepository(Integer.parseInt(id.split("_")[0]), id.split("_")[1],
+                                    Integer.parseInt(id.split("_")[2]), Integer.parseInt(id.split("_")[3]));
                     final List<Integer> result = new ArrayList<>();
                     for (final IXPackageEntity packageEntity : resultSet) {
                         result.add(packageEntity.getId());

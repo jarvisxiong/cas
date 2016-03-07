@@ -236,9 +236,6 @@ public class InspectorStrings {
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
 
     // IP repository Strings
-    public static final String URI_SYNTAX_EXCEPTION = "URISyntaxException";
-    public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public static final String NULL_HOST_NAME = "NullHostName";
-    public static final String NULL_IP_ADDRESS = "NullIPAddress";
-
+    
 }

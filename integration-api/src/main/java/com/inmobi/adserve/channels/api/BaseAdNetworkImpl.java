@@ -623,8 +623,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getCategories(final char seperator, final boolean isAllRequired) {
         return BaseAdNetworkHelper.getCategories(seperator, isAllRequired, false, sasParams, entity);
     }
-    
-    protected  String getCategories(final char seperator, final boolean isAllRequired, final boolean isIABCategory) {
+
+    protected String getCategories(final char seperator, final boolean isAllRequired, final boolean isIABCategory) {
         return BaseAdNetworkHelper.getCategories(seperator, isAllRequired, isIABCategory, sasParams, entity);
     }
 
@@ -867,7 +867,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
             }
         }
-        host = ipRepository.getIPAddress(getName(), host, traceMarker);
+        host = ipRepository.getIPAddress(getName(), host);
     }
 
     private void setVirtualHost(final RequestBuilder ningRequestBuilder) {

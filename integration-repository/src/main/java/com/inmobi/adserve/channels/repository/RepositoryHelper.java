@@ -411,7 +411,6 @@ public class RepositoryHelper {
                         in(IXPackageRepository.SITE_ID, siteId, IXPackageRepository.ALL_SITE_ID),
                         in(IXPackageRepository.COUNTRY_ID, countryId, IXPackageRepository.ALL_COUNTRY_ID),
                         in(IXPackageRepository.SLOT_ID, slotId, IXPackageRepository.ALL_SLOT_ID));
-
         return ixPackageRepository.getPackageIndex().retrieve(query);
     }
 

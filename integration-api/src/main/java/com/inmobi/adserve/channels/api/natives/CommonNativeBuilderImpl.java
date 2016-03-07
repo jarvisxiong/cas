@@ -6,12 +6,12 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.repository.NativeConstraints;
-import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.common.request.nativead.Data;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.common.request.nativead.NativeReqObj;
 import com.inmobi.adserve.contracts.common.request.nativead.Title;
+import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -49,7 +49,7 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
                 case NativeConstraints.LAYOUT_STREAM:
                     layoutId = DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_STREAM;
                     break;
-            // default is already taken care of in the repository.
+                // default is already taken care of in the repository.
             }
         }
         nativeReqObj = new NativeReqObj(layoutId);
@@ -76,15 +76,12 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
 
     private void buildImageAssets() {
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-
         for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
-            final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
             final Dimension dimensions = imageAsset.getDimension();
-
             final Image image = new Image();
             image.setHmin(dimensions.getHeight());
             image.setWmin(dimensions.getWidth());
-
+            final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
             switch (attributes.getAdContentAsset()) {
                 case SCREENSHOT:
                     image.setType(Image.ImageAssetType.MAIN);
@@ -102,27 +99,17 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
 
     private void buildTextAssets() {
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-
         for (final TextAsset textAsset : nativeContentObject.getTextAssets()) {
             final CommonAssetAttributes attributes = textAsset.getCommonAttributes();
             int maxChars = textAsset.getMaxChars();
-
             switch (attributes.getAdContentAsset()) {
                 case TITLE:
-                    if (0 == maxChars) {
-                        maxChars = DEFAULT_TITLE_LENGTH;
-                    }
-
+                    maxChars = 0 == maxChars ? DEFAULT_TITLE_LENGTH : maxChars;
                     nativeReqObj.addAsset(!attributes.isOptional(), new Title(maxChars));
                     break;
                 case DESCRIPTION:
-                    if (0 == maxChars) {
-                        maxChars = DEFAULT_DESC_LENGTH;
-                    }
-
                     final Data description = new Data(Data.DataAssetType.DESC);
-                    description.setLen(maxChars);
-
+                    description.setLen(0 == maxChars ? DEFAULT_DESC_LENGTH : maxChars);
                     nativeReqObj.addAsset(!attributes.isOptional(), description);
                     break;
                 default:
@@ -134,10 +121,8 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
 
     private void buildOtherAssets() {
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-
         for (final OtherAsset otherAsset : nativeContentObject.getOtherAssets()) {
             final CommonAssetAttributes attributes = otherAsset.getCommonAttributes();
-
             Data data;
             switch (attributes.getAdContentAsset()) {
                 case CTA:

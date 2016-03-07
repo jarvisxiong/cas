@@ -18,7 +18,6 @@ public class IPRepositoryTest extends TestCase {
     private String advertiserName = "advertiserName";
 
     public void setUp() {
-
         ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
     }
@@ -27,7 +26,7 @@ public class IPRepositoryTest extends TestCase {
     public void testGetter() {
         mockStaticNice(InspectorStats.class);
         replayAll();
-        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localhost:8080/getBid", null);
+        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localhost:8080/getBid");
         String expectedUrlAddr = "http://127.0.0.1:8080/getBid";
         assertEquals(expectedUrlAddr, actualUrlAddr);
     }
@@ -36,7 +35,7 @@ public class IPRepositoryTest extends TestCase {
     public void testGetterWithSpecialCharacterInUrl() {
         mockStaticNice(InspectorStats.class);
         replayAll();
-        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localhost:8080/%s/getBid", null);
+        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localhost:8080/%s/getBid");
         String expectedUrlAddr = actualUrlAddr;
         assertEquals(expectedUrlAddr, actualUrlAddr);
     }
@@ -45,7 +44,7 @@ public class IPRepositoryTest extends TestCase {
     public void testGetterWithInvalidHost() {
         mockStaticNice(InspectorStats.class);
         replayAll();
-        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localho:8080/getBid", null);
+        String actualUrlAddr = ipRepository.getIPAddress(advertiserName, "http://localho:8080/getBid");
         String expectedUrlAddr = "http://localho:8080/getBid";;
         assertEquals(expectedUrlAddr, actualUrlAddr);
     }
