@@ -122,7 +122,7 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
                     context.put(VelocityTemplateFieldConstants.PARTNER_CLICK_BEACON, tencentResponse.getCv_url());
                     responseContent =
                             Formatter.getResponseFromTemplate(Formatter.TemplateType.IMAGE, context, sasParams, getBeaconUrl());
-
+                    adStatus = AD_STRING;
                 } catch (Exception exception) {
                     adStatus = NO_AD;
                     LOG.info("Error parsing response {} from Tenent: {}", response, exception);
@@ -140,7 +140,7 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return advertiserName;
+        return advertiserName+DCP_KEY;
     }
 
 }
