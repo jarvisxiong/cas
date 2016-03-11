@@ -45,8 +45,6 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -76,7 +74,6 @@ public class ServletGetSegment implements Servlet {
             LOG.debug("Encountered Json Error while creating json object inside servlet, exception raised {}",
                     exception);
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
-            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }

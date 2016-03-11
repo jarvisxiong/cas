@@ -20,6 +20,10 @@ public class CasConfigUtil {
     public static final String INCOMPATIBLE_SITE_TYPE = "ESITE";
     public static final String LOW_SDK_VERSION = "LSDK";
     public static final String MISSING_CATEGORY = "MISSINGCATEGORY";
+    public static final String BANNER_NOT_ALLOWED = "BANNERNOTALLOWED";
+    public static final String CHINA_MOBILE_TARGETING = "NONCHINAMOBILE";
+    public static final String NO_SUPPORTED_SLOTS = "NOSUPPORTEDSLOTS";
+    public static final String NO_SAS_PARAMS = "NOSASPARAMS";
     public static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
     public static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
     public static final Random RANDOM = new Random();

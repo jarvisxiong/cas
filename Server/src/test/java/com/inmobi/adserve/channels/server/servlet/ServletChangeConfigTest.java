@@ -46,8 +46,6 @@ public class ServletChangeConfigTest {
         expect(CasUtils.extractParams(null, "update")).andThrow(new JSONException("Json Exception"));
         mockHttpRequestHandler.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
         expectLastCall().times(1);
-        InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
-        expectLastCall().times(1);
         mockResponseSender.sendResponse("Incorrect Json", null);
         expectLastCall().times(1);
 

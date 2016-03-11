@@ -1,7 +1,7 @@
 package com.inmobi.adserve.channels.server.handler;
 
-import static com.inmobi.adserve.channels.util.InspectorStrings.COUNT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_SERVLET_REQUEST;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TERMINATED_REQUESTS;
 
 import java.util.Map;
 
@@ -38,7 +38,7 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
 
     @Inject
     public NettyRequestScopeSeedHandler(final NettyRequestScope scope, final Map<String, Servlet> pathToServletMap,
-                                        final ServletInvalid invalidServlet) {
+            final ServletInvalid invalidServlet) {
         this.scope = scope;
         this.pathToServletMap = pathToServletMap;
         this.invalidServlet = invalidServlet;
@@ -62,7 +62,7 @@ public class NettyRequestScopeSeedHandler extends ChannelInboundHandlerAdapter {
                     log.debug(traceMarker, "Length of Request URI -> {}", httpRequest.getUri().length());
                     log.debug(traceMarker, "Invalid Servlet Requested -> {}", httpRequest.getUri());
                 }
-                InspectorStats.incrementStatCount(INVALID_SERVLET_REQUEST, COUNT);
+                InspectorStats.incrementStatCount(TERMINATED_REQUESTS, INVALID_SERVLET_REQUEST);
                 servlet = invalidServlet;
             }
             log.debug("Request servlet is {} for path {}", servlet, path);

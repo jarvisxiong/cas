@@ -31,10 +31,24 @@ public class InspectorStrings {
     public static final String CONNECTION_TIMEOUT = "ConnectionTimeout";
     public static final String TOTAL_TERMINATE = "TotalTerminate";
     public static final String SUCCESSFUL_REQUESTS = "success";
-    public static final String INVALID_SERVLET_REQUEST = "InvalidServletRequest";
+    
+    // Request filters
+    public static final String TERMINATED_REQUESTS = "TerminateRequests";
     public static final String JSON_PARSING_ERROR = "Terminated_JsonError";
     public static final String THRIFT_PARSING_ERROR = "Terminated_ThriftError";
     public static final String THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST = "Terminated_ThriftError.EmptyAdPoolRequest";
+    public static final String PROCESSING_ERROR = "Terminated_ServerError";
+    public static final String MISSING_SITE_ID = "Terminated_NoSiteId";
+    public static final String INCOMPATIBLE_SITE_TYPE = "Terminated_IncompatibleSite";
+    public static final String BANNER_NOT_ALLOWED = "Terminated_BannerNotAllowedFilter";
+    public static final String INVALID_SLOT_REQUEST = "Terminated_InInvalidSlotRequest";
+    public static final String CHINA_MOBILE_TARGETING = "Terminated_ChinaMobileTargeting";
+    public static final String NO_SUPPORTED_SLOTS = "Terminated_NoSupportedSlots";
+    public static final String MISSING_CATEGORY = "Terminated_MissingCategory";
+    public static final String LOW_SDK_VERSION = "Terminated_LowSdkVersion";
+    public static final String NO_SAS_PARAMS = "Terminated_NoSASParams";
+    public static final String INVALID_SERVLET_REQUEST = "Terminated_InvalidServletRequest";
+    
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
     public static final String RESPONSE_CONTRACT_NOT_HONOURED = "ResponseContractNotHonoured";
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
@@ -43,14 +57,11 @@ public class InspectorStrings {
     public static final String PURE_VAST_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(PureVast)";
     public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(CAU)";
     public static final String NATIVE_VM_TEMPLATE_ERROR = "NativeVMTemplateError";
-    public static final String PROCESSING_ERROR = "Terminated_ServerError";
-    public static final String MISSING_SITE_ID = "Terminated_NoSite";
     public static final String CLIENT_TIMER_LATENCY = "ClientTimerLatency";
     public static final String CAS_TIMEOUT_HANDLER_LATENCY = "CasTimeoutHandlerLatency";
     public static final String TIMER_LATENCY = "timerLatency";
     public static final String TIMEOUT_EXCEPTION = "TimeoutException";
     public static final String IO_EXCEPTION = "IOException";
-    public static final String INCOMPATIBLE_SITE_TYPE = "Terminated_IncompatibleSite";
     public static final String PERCENT_ROLL_OUT = "PercentRollout";
     public static final String NO_MATCH_SEGMENT_LATENCY = "NoMatchSegmentLatency";
     public static final String NO_MATCH_SEGMENT_COUNT = "NoMatchSegmentCount";
@@ -63,7 +74,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_SEGMENT_PER_REQUEST_FILTER = "DroppedInSegmentPerRequestFilter";
     public static final String TOTAL_MATCHED_SEGMENTS = "TotalMatchedSegments";
     public static final String TOTAL_SELECTED_SEGMENTS = "TotalSelectedSegments";
-    public static final String LOW_SDK_VERSION = "LowSdkVersion";
     public static final String SERVER_IMPRESSION = "Impression";
     public static final String CHANNEL_EXCEPTION = "ChannelException";
     public static final String DROPPED_IN_UDID_FILTER = "DroppedInUdidFilter";
@@ -86,7 +96,7 @@ public class InspectorStrings {
     public static final String SITE_FEEDBACK_LATENCY = "SiteFeedbackLatency";
     public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
     public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
-    public static final String MISSING_CATEGORY = "MissingCategory";
+    
 
     public static final String IMEI_CACHE_MISS = "IMEICacheMiss";
     public static final String IMEI_CACHE_HIT = "IMEICacheHit";
@@ -118,11 +128,8 @@ public class InspectorStrings {
             "DroppedInSupplyDemandClassificationFilter";
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
-    public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
-    // public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
-    public static final String DROPPED_IN_INVALID_SLOT_REQUEST_FILTER = "DroppedInInvalidSlotRequestFilter";
     public static final String IX_SENT_AS_TRANSPARENT = "IXSentAsTransparent";
     public static final String IX_SENT_AS_BLIND = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
@@ -170,10 +177,10 @@ public class InspectorStrings {
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
     // Temporary
-    public static final String RP_SIZE_ID_SET_IN_NON_ALT_SIZE_RESPONSE = "RPSizeIdSetInResponse.NonAltSize";
-    public static final String RP_SIZE_ID_SET_IN_ALT_SIZE_RESPONSE = "RPSizeIdSetInResponse.AltSize";
-    public static final String RP_SIZE_ID_NOT_SET_IN_NON_ALT_SIZE_RESPONSE = "RPSizeIdNotSetInResponse.NonAltSize";
-    public static final String RP_SIZE_ID_NOT_SET_IN_ALT_SIZE_RESPONSE = "RPSizeIdNotSetInResponse.AltSize";
+    public static final String RP_SIZEID_SET_IN_NON_ALT_SIZE_RESP = "RPSizeIdSetInResponse.NonAltSize";
+    public static final String RP_SIZEID_SET_IN_ALT_SIZE_RESP = "RPSizeIdSetInResponse.AltSize";
+    public static final String RP_SIZEID_NOT_SET_IN_NON_ALT_SIZE_RESP = "RPSizeIdNotSetInResponse.NonAltSize";
+    public static final String RP_SIZEID_NOT_SET_IN_ALT_SIZE_RESP = "RPSizeIdNotSetInResponse.AltSize";
 
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
@@ -212,8 +219,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
     public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
-
-    public static final String DROPPED_IN_CHINA_MOBILE_TARGETING_FILTER = "DroppedInChinaMobileTargetingFilter";
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)

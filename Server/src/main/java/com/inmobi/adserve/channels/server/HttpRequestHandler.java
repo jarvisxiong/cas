@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.COUNT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PROCESSING_ERROR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TERMINATED_REQUESTS;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -11,7 +15,6 @@ import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -57,11 +60,10 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             servlet.handleRequest(this, new QueryStringDecoder(httpRequest.getUri()), ctx.channel());
         } catch (final Exception exception) {
             responseSender.setTerminationReason(CasConfigUtil.PROCESSING_ERROR);
-            InspectorStats.incrementStatCount(InspectorStrings.PROCESSING_ERROR, InspectorStrings.COUNT);
+            InspectorStats.incrementStatCount(TERMINATED_REQUESTS, PROCESSING_ERROR);
             responseSender.sendNoAdResponse(ctx.channel());
             final String exceptionClass = exception.getClass().getSimpleName();
-            InspectorStats.incrementStatCount(exceptionClass, InspectorStrings.COUNT);
-
+            InspectorStats.incrementStatCount(exceptionClass, COUNT);
             if (LOG.isDebugEnabled(traceMarker)) {
                 LOG.debug(traceMarker, "Error caught", exception);
                 final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(exception);
