@@ -31,6 +31,7 @@ public class InspectorStrings {
     public static final String CONNECTION_TIMEOUT = "ConnectionTimeout";
     public static final String TOTAL_TERMINATE = "TotalTerminate";
     public static final String SUCCESSFUL_REQUESTS = "success";
+    public static final String MISSING_ADDITIONAL_PARAMS = "MissingAdditionalParam";
     
     // Request filters
     public static final String TERMINATED_REQUESTS = "TerminateRequests";
@@ -48,7 +49,7 @@ public class InspectorStrings {
     public static final String LOW_SDK_VERSION = "Terminated_LowSdkVersion";
     public static final String NO_SAS_PARAMS = "Terminated_NoSASParams";
     public static final String INVALID_SERVLET_REQUEST = "Terminated_InvalidServletRequest";
-    
+
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
     public static final String RESPONSE_CONTRACT_NOT_HONOURED = "ResponseContractNotHonoured";
     public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
