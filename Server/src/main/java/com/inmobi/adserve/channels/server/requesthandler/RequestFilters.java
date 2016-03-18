@@ -20,6 +20,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -31,6 +32,10 @@ public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
     private static final int CHINA = 164;
     private static final int CHINA_MOBILE = 787;
+    private static final int CHINA_WIFI_CARRIER_ID = 789;
+    private static final short INMOBI_SLOT_FOR_300x250 = 10;
+    private static final List<Short> chinaWifiAllowedSlotList = ImmutableList.of(INMOBI_SLOT_FOR_300x250);
+
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
         final String termReason = hrh.getTerminationReason();
@@ -101,7 +106,26 @@ public class RequestFilters {
             }
         }
 
-        if (sasParams.getProcessedMkSlot().isEmpty()) {
+        // China Mobile hack. TODO: Need to enable targeting at segment level
+        if (DemandSourceType.IX == dst && CHINA == sasParams.getCountryId()) {
+            if (CHINA_MOBILE == sasParams.getCarrierId()) {
+                // Removing slot for 300x250
+                sasParams.getProcessedMkSlot().remove(INMOBI_SLOT_FOR_300x250);
+            } else if (CHINA_WIFI_CARRIER_ID == sasParams.getCarrierId()) {
+                // Only trying to include slot 300x250
+                sasParams.setProcessedMkSlot(sasParams.getProcessedMkSlot().contains(INMOBI_SLOT_FOR_300x250) ?
+                        chinaWifiAllowedSlotList :
+                        null);
+            } else {
+                // Drop Request
+                LOG.info("Request dropped since the China request is not from China Mobile or WIFI");
+                hrh.setTerminationReason(CasConfigUtil.CHINA_MOBILE_TARGETING);
+                InspectorStats.incrementStatCount(TERMINATED_REQUESTS, CHINA_MOBILE_TARGETING + dstName);
+                return true;
+            }
+        }
+
+        if (CollectionUtils.isEmpty(sasParams.getProcessedMkSlot())) {
             /* Commenting to reduce stats, un-comment on need basis */
             // incrementStats(sasParams);
             LOG.info(
@@ -111,14 +135,6 @@ public class RequestFilters {
             return true;
         }
 
-        // allow only ChinaMobile traffic for China(Immediate solution, Need to enable the targeting at segment level)
-        if (DemandSourceType.IX == dst && sasParams.getCountryId() == CHINA
-                && sasParams.getCarrierId() != CHINA_MOBILE) {
-            LOG.info("Request dropped since the China request is not from China Mobile");
-            hrh.setTerminationReason(CasConfigUtil.CHINA_MOBILE_TARGETING);
-            InspectorStats.incrementStatCount(TERMINATED_REQUESTS, CHINA_MOBILE_TARGETING + dstName);
-            return true;
-        }
         return false;
     }
 

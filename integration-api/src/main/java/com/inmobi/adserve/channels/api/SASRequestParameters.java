@@ -70,6 +70,7 @@ public class SASRequestParameters {
     private String deviceMake;
     private String deviceModel;
     private int osId;
+    private String osMajorVersion;
     private Short rqMkAdcount;
     private String tid;
     private long handsetInternalId;
@@ -90,7 +91,6 @@ public class SASRequestParameters {
     private Set<Integer> accountSegment;
     private int sst; // 0 for Network
     private String pubId;
-    private String osMajorVersion;
     private ConnectionType connectionType;
     private double marketRate;
     private IntegrationDetails integrationDetails;
