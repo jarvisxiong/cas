@@ -4,6 +4,14 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
 import static com.inmobi.adserve.channels.api.BaseAdNetworkHelper.getHashedValue;
+import static com.inmobi.adserve.channels.api.Formatter.TemplateType.CAU;
+import static com.inmobi.adserve.channels.api.Formatter.TemplateType.INTERSTITIAL_REWARDED_VAST_VIDEO;
+import static com.inmobi.adserve.channels.api.Formatter.TemplateType.INTERSTITIAL_VAST_VIDEO;
+import static com.inmobi.adserve.channels.types.IXBlocklistKeyType.COUNTRY;
+import static com.inmobi.adserve.channels.types.IXBlocklistKeyType.SITE;
+import static com.inmobi.adserve.channels.types.IXBlocklistType.ADVERTISERS;
+import static com.inmobi.adserve.channels.types.IXBlocklistType.CREATIVE_ATTRIBUTE_IDS;
+import static com.inmobi.adserve.channels.types.IXBlocklistType.INDUSTRY_IDS;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.AD_OBJECT_PREFIX;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.CAU_CONTENT_JS_ESC;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.FIRST_OBJECT_PREFIX;
@@ -90,7 +98,6 @@ import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.GenericTemplateObject;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -116,26 +123,27 @@ import lombok.NoArgsConstructor;
 public class IXAdNetworkHelper {
     private static final Logger LOG = LoggerFactory.getLogger(IXAdNetworkHelper.class);
     private static final String PUBLISHER_BLOCKLIST_FORMAT = "blk%s";
+    private static final String DEFAULT_CTA = "Know More";
 
     private static final String IX_PERF_ADVERTISER_BLOCKLIST_ID = "InMobiPERFAdv";
     private static final String IX_PERF_INDUSTRY_BLOCKLIST_ID = "InMobiPERFInd";
     private static final String IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID = "InMobiPERFCre";
-
     private static final String IX_FS_ADVERTISER_BLOCKLIST_ID = "InMobiFSAdv";
     private static final String IX_FS_INDUSTRY_BLOCKLIST_ID = "InMobiFSInd";
     private static final String IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID = "InMobiFSCre";
 
     private static final long RANDOM_SALT = 41768l;
 
-    private static final ImmutableMap<IXBlocklistType, String> inmobiPerfBlocklistMap = ImmutableMap.of(
-            IXBlocklistType.ADVERTISERS, IX_PERF_ADVERTISER_BLOCKLIST_ID, IXBlocklistType.INDUSTRY_IDS,
-            IX_PERF_INDUSTRY_BLOCKLIST_ID, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS,
-            IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
-    private static final ImmutableMap<IXBlocklistType, String> inmobiFsBlocklistMap = ImmutableMap.of(
-            IXBlocklistType.ADVERTISERS, IX_FS_ADVERTISER_BLOCKLIST_ID, IXBlocklistType.INDUSTRY_IDS,
-            IX_FS_INDUSTRY_BLOCKLIST_ID, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS, IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
-    private static final ImmutableList<IXBlocklistType> supportedBlocklistTypes = ImmutableList.of(
-            IXBlocklistType.ADVERTISERS, IXBlocklistType.INDUSTRY_IDS, IXBlocklistType.CREATIVE_ATTRIBUTE_IDS);
+    private static final ImmutableMap<IXBlocklistType, String> inmobiPerfBlocklistMap =
+            ImmutableMap.of(ADVERTISERS, IX_PERF_ADVERTISER_BLOCKLIST_ID, INDUSTRY_IDS, IX_PERF_INDUSTRY_BLOCKLIST_ID,
+                    CREATIVE_ATTRIBUTE_IDS, IX_PERF_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
+
+    private static final ImmutableMap<IXBlocklistType, String> inmobiFsBlocklistMap =
+            ImmutableMap.of(ADVERTISERS, IX_FS_ADVERTISER_BLOCKLIST_ID, INDUSTRY_IDS, IX_FS_INDUSTRY_BLOCKLIST_ID,
+                    CREATIVE_ATTRIBUTE_IDS, IX_FS_CREATIVE_ATTRIBUTE_BLOCKLIST_ID);
+
+    private static final ImmutableList<IXBlocklistType> supportedBlocklistTypes =
+            ImmutableList.of(ADVERTISERS, INDUSTRY_IDS, CREATIVE_ATTRIBUTE_IDS);
 
     private static final String IMPRESSION_TAG = "Impression";
     private static final String ERROR_TAG = "Error";
@@ -190,12 +198,12 @@ public class IXAdNetworkHelper {
         final List<String> macros = new ArrayList<>();
         final List<String> substitutions = new ArrayList<>();
 
-        addSproutMacroToList(macros, substitutions, JS_ESC_BEACON_URL,
-                StringEscapeUtils.escapeJavaScript(beaconUrl));
+        addSproutMacroToList(macros, substitutions, JS_ESC_BEACON_URL, StringEscapeUtils.escapeJavaScript(beaconUrl));
         addSproutMacroToList(macros, substitutions, JS_ESC_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
 
         final String sdkVersion = sasParams.getSdkVersion();
-        addSproutMacroToList(macros, substitutions, SDK_VERSION_ID, null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
+        addSproutMacroToList(macros, substitutions, SDK_VERSION_ID,
+                null != sdkVersion ? sdkVersion : StringUtils.EMPTY);
 
         // default value for replacement of macros is an empty string
         final Geo geo = createSproutGeoObject(casInternal, sasParams, isCoppaSet);
@@ -217,16 +225,15 @@ public class IXAdNetworkHelper {
         // No function is being provided
         addSproutMacroToList(macros, substitutions, OPEN_LP_FUN, StringUtils.EMPTY);
 
-        final String sitePreferences =
-                null != sasParams.getPubControlPreferencesJson()
-                        ? sasParams.getPubControlPreferencesJson()
-                        : StringUtils.EMPTY;
+        final String sitePreferences = null != sasParams.getPubControlPreferencesJson()
+                ? sasParams.getPubControlPreferencesJson()
+                : StringUtils.EMPTY;
         addSproutMacroToList(macros, substitutions, SITE_PREFERENCES_JSON, sitePreferences);
         addSproutMacroToList(macros, substitutions, JS_ESC_SITE_PREFERENCES_JSON, javascriptEscape(sitePreferences));
 
-        final String userId =
-                StringUtils.isNotEmpty(casInternal.getUidIFA()) ? casInternal.getUidIFA() : StringUtils
-                        .isNotEmpty(casInternal.getGpid()) ? casInternal.getGpid() : null;
+        final String userId = StringUtils.isNotEmpty(casInternal.getUidIFA())
+                ? casInternal.getUidIFA()
+                : StringUtils.isNotEmpty(casInternal.getGpid()) ? casInternal.getGpid() : null;
 
         // Non Sprout Macros
         addSproutMacroToList(macros, substitutions, IMP_CB, casInternal.getAuctionId());
@@ -255,8 +262,8 @@ public class IXAdNetworkHelper {
         addSproutMacroToList(macros, substitutions, IMP_CB, casInternal.getAuctionId());
         addSproutMacroToList(macros, substitutions, HANDSET_NAME,
                 ObjectUtils.defaultIfNull(sasParams.getHandsetName(), StringUtils.EMPTY));
-        addSproutMacroToList(macros, substitutions, HANDSET_TYPE, ObjectUtils.defaultIfNull(
-                getHandSetTypeNameFromId(sasParams.getDeviceType().getValue()), StringUtils.EMPTY));
+        addSproutMacroToList(macros, substitutions, HANDSET_TYPE, ObjectUtils
+                .defaultIfNull(getHandSetTypeNameFromId(sasParams.getDeviceType().getValue()), StringUtils.EMPTY));
         addSproutMacroToList(macros, substitutions, SI_BLIND, String.valueOf(sasParams.getSiteIncId() + RANDOM_SALT));
 
         final String[] macroArray = macros.toArray(new String[macros.size()]);
@@ -335,7 +342,8 @@ public class IXAdNetworkHelper {
 
     /**
      * Verifies that <br>
-     * 1) we receive a corresponding Asset object for every requested required Asset object with the same id and type<br>
+     * 1) we receive a corresponding Asset object for every requested required Asset object with the same id and type
+     * <br>
      * 2) Response Asset object doesn't contain more than one of title, img, video or data objects <br>
      * 3) Height and width are present for IMAGE MAIN objects <br>
      * 4) Minimum width and height image constraints are met for IMAGE MAIN objects<br>
@@ -429,17 +437,19 @@ public class IXAdNetworkHelper {
                 LOG.debug("Video objects are currently not supported for native");
                 break;
             case DATA:
-                if (DESC.getId() == requestAsset.getData().getType()) {
-                    contextBuilder.setDesc(responseAsset.getData().getValue());
-                } else if (CTA_TEXT.getId() == requestAsset.getData().getType()) {
-                    contextBuilder.setActionText(responseAsset.getData().getValue());
-                } else if (DOWNLOADS.getId() == requestAsset.getData().getType()) {
-                    contextBuilder.setDownloads(Integer.valueOf(responseAsset.getData().getValue()));
-                } else if (RATING.getId() == requestAsset.getData().getType()) {
-                    contextBuilder.setRating(responseAsset.getData().getValue());
+                final Integer type = requestAsset.getData().getType();
+                final String value = responseAsset.getData().getValue();
+                if (DESC.getId() == type) {
+                    contextBuilder.setDesc(value);
+                } else if (CTA_TEXT.getId() == type) {
+                    final boolean ctaNotPresent = StringUtils.isEmpty(value);
+                    contextBuilder.setActionText(ctaNotPresent ? DEFAULT_CTA : value);
+                } else if (DOWNLOADS.getId() == type) {
+                    contextBuilder.setDownloads(Integer.valueOf(value));
+                } else if (RATING.getId() == type) {
+                    contextBuilder.setRating(value);
                 }
         }
-
         return true;
     }
 
@@ -563,7 +573,7 @@ public class IXAdNetworkHelper {
         for (final IXBlocklistType blocklistType : supportedBlocklistTypes) {
             blocklistName = null;
             final IXBlocklistEntity siteBlocklistEntity =
-                    repositoryHelper.queryIXBlocklistRepository(siteId, IXBlocklistKeyType.SITE, blocklistType);
+                    repositoryHelper.queryIXBlocklistRepository(siteId, SITE, blocklistType);
 
             if (null != siteBlocklistEntity) {
                 if (0 != siteBlocklistEntity.getBlocklistSize()) {
@@ -575,13 +585,12 @@ public class IXAdNetworkHelper {
                 }
             } else {
                 final IXBlocklistEntity countryBlocklistEntity =
-                        repositoryHelper.queryIXBlocklistRepository(String.valueOf(countryId),
-                                IXBlocklistKeyType.COUNTRY, blocklistType);
+                        repositoryHelper.queryIXBlocklistRepository(String.valueOf(countryId), COUNTRY, blocklistType);
                 if (null != countryBlocklistEntity) {
                     if (0 != countryBlocklistEntity.getBlocklistSize()) {
                         blocklistName = countryBlocklistEntity.getBlocklistName();
-                        LOG.debug(traceMarker, "Setting strategic {} blocklist at the country level, {}",
-                                blocklistType, blocklistName);
+                        LOG.debug(traceMarker, "Setting strategic {} blocklist at the country level, {}", blocklistType,
+                                blocklistName);
                     } else {
                         LOG.debug(traceMarker, "No strategic {} blocklists", blocklistType);
                     }
@@ -685,10 +694,7 @@ public class IXAdNetworkHelper {
         velocityContext.put(TOOL_OBJECT, tool);
 
         final TemplateType templateType =
-                isRewardedVideoRequest
-                        ? TemplateType.INTERSTITIAL_REWARDED_VAST_VIDEO
-                        : TemplateType.INTERSTITIAL_VAST_VIDEO;
-
+                isRewardedVideoRequest ? INTERSTITIAL_REWARDED_VAST_VIDEO : INTERSTITIAL_VAST_VIDEO;
         return Formatter.getResponseFromTemplate(templateType, velocityContext, sasParams, null);
     }
 
@@ -742,15 +748,15 @@ public class IXAdNetworkHelper {
         // Add object to velocityContext
         velocityContext.put(FIRST_OBJECT_PREFIX, templateFirst);
 
-        return Formatter.getResponseFromTemplate(TemplateType.CAU, velocityContext, sasParams, null);
+        return Formatter.getResponseFromTemplate(CAU, velocityContext, sasParams, null);
     }
 
-    public static String pureVastAdBuilding(String adMarkUp, final String beaconUrl, final String clickUrl) throws
-            ParserConfigurationException, IOException, SAXException, TransformerException {
+    public static String pureVastAdBuilding(String adMarkUp, final String beaconUrl, final String clickUrl)
+            throws ParserConfigurationException, IOException, SAXException, TransformerException {
         final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setIgnoringComments(true);
         final DocumentBuilder builder = domFactory.newDocumentBuilder();
-        adMarkUp = adMarkUp.replaceFirst("^([\\W]+)<", "<");  //remove some special char in start to parse xml
+        adMarkUp = adMarkUp.replaceFirst("^([\\W]+)<", "<"); // remove some special char in start to parse xml
         final Document doc = builder.parse(new InputSource(new ByteArrayInputStream(adMarkUp.getBytes("utf-8"))));
 
         final NodeList trackingEventsNode = doc.getElementsByTagName(TRACKING_EVENTS_TAG);
@@ -773,8 +779,6 @@ public class IXAdNetworkHelper {
             throw new ParserConfigurationException();
         }
 
-
-
         if (0 != trackingEventsNode.getLength()) {
             final String startUriStr = beaconUrl + MEDIA_START_BEACON_SUFFIX;
             final String billingUriStr = beaconUrl + BILLING_BEACON_SUFFIX;
@@ -789,7 +793,7 @@ public class IXAdNetworkHelper {
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, MIDPOINT, midPointUriStr);
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, THIRD_QUARTILE, thirdQuartileUriStr);
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, COMPLETE, completeUriStr);
-        } else  {
+        } else {
             InspectorStats.incrementStatCount(InspectorStrings.TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING);
             throw new ParserConfigurationException();
         }
@@ -801,7 +805,8 @@ public class IXAdNetworkHelper {
     }
 
 
-    private static void addClickTracking(final Document doc, final NodeList parentNodeList, final String clickUrl, final String beaconUrl) {
+    private static void addClickTracking(final Document doc, final NodeList parentNodeList, final String clickUrl,
+            final String beaconUrl) {
         final NodeList videoClickNode = doc.getElementsByTagName(VIDEO_CLICKS_TAG);
         final String beaconClickuUriStr = beaconUrl + CLICK_BEACON_SUFFIX;
         if (0 == videoClickNode.getLength()) {
@@ -816,17 +821,18 @@ public class IXAdNetworkHelper {
     }
 
     // doc -> nodeList[0] -> EleementTag -> attributeKey, attributeValue -> data = uri
-    private static void addInXml(final Document doc, final NodeList nodeList, final String elmStr,
-                                 final String key, final String value, final String uri) {
+    private static void addInXml(final Document doc, final NodeList nodeList, final String elmStr, final String key,
+            final String value, final String uri) {
         nodeList.item(0).appendChild(getDocElm(doc, elmStr, key, value, uri));
     }
 
-    private static void addInXml(final Document doc, final Element element, final String elmStr,
-                                 final String key, final String value, final String uri) {
+    private static void addInXml(final Document doc, final Element element, final String elmStr, final String key,
+            final String value, final String uri) {
         element.appendChild(getDocElm(doc, elmStr, key, value, uri));
     }
 
-    private static Element getDocElm(final Document doc, final String elmStr, final String key, final String value, final String uri) {
+    private static Element getDocElm(final Document doc, final String elmStr, final String key, final String value,
+            final String uri) {
         final CDATASection cdata = doc.createCDATASection(uri);
         final Element docElm = doc.createElement(elmStr);
         if (null != key && null != value) {

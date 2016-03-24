@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ImageAsset {
     private CommonAssetAttributes commonAttributes;
-    private Dimension             dimension;
+    private Dimension dimension;
 }

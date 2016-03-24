@@ -1,11 +1,16 @@
 package com.inmobi.adserve.channels.api.natives;
 
+import static com.inmobi.adserve.channels.repository.NativeConstraints.LAYOUT_FEED;
+import static com.inmobi.adserve.channels.repository.NativeConstraints.LAYOUT_ICON;
+import static com.inmobi.adserve.channels.repository.NativeConstraints.LAYOUT_STREAM;
+
 import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.repository.NativeConstraints;
+import com.inmobi.adserve.channels.repository.NativeConstraints.Mandatory;
 import com.inmobi.adserve.contracts.common.request.nativead.Data;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
@@ -40,13 +45,13 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
         NativeLayoutId layoutId = NativeLayoutId.findByInmobiNativeUILayoutType(templateEntity.getNativeUILayout());
         if (null == layoutId) {
             switch (templateEntity.getMandatoryKey()) {
-                case NativeConstraints.LAYOUT_ICON:
+                case LAYOUT_ICON:
                     layoutId = DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_ICON;
                     break;
-                case NativeConstraints.LAYOUT_FEED:
+                case LAYOUT_FEED:
                     layoutId = DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_FEED;
                     break;
-                case NativeConstraints.LAYOUT_STREAM:
+                case LAYOUT_STREAM:
                     layoutId = DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_STREAM;
                     break;
                 // default is already taken care of in the repository.
@@ -135,14 +140,15 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
                     // Stray objects are ignored
                     continue;
             }
-            nativeReqObj.addAsset(!attributes.isOptional(), data);
+            // Making CTA, STAR_RATING as optional fields
+            // nativeReqObj.addAsset(!attributes.isOptional(), data);
+            nativeReqObj.addAsset(false, data);
         }
     }
 
     private void buildMandatory() {
-        final List<NativeConstraints.Mandatory> mandatoryKeys =
-                NativeConstraints.getIXMandatoryList(templateEntity.getMandatoryKey());
-        for (final NativeConstraints.Mandatory mandatory : mandatoryKeys) {
+        final List<Mandatory> mandatoryKeys = NativeConstraints.getMandatoryList(templateEntity.getMandatoryKey());
+        for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case TITLE:
                     nativeReqObj.addAsset(true, new Title(100));
@@ -158,7 +164,7 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
                     nativeReqObj.addAsset(true, new Data(Data.DataAssetType.DESC));
                     break;
                 case SCREEN_SHOT:
-                    final Image screen = NativeConstraints.getIXImage(templateEntity.getImageKey());
+                    final Image screen = NativeConstraints.getImage(templateEntity.getImageKey());
                     nativeReqObj.addAsset(true, screen);
                     break;
             }

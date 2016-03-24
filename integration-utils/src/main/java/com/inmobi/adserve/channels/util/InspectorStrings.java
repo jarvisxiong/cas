@@ -32,7 +32,7 @@ public class InspectorStrings {
     public static final String TOTAL_TERMINATE = "TotalTerminate";
     public static final String SUCCESSFUL_REQUESTS = "success";
     public static final String MISSING_ADDITIONAL_PARAMS = "MissingAdditionalParam";
-    
+
     // Request filters
     public static final String TERMINATED_REQUESTS = "TerminateRequests";
     public static final String JSON_PARSING_ERROR = "Terminated_JsonError";
@@ -52,11 +52,11 @@ public class InspectorStrings {
 
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
     public static final String RESPONSE_CONTRACT_NOT_HONOURED = "ResponseContractNotHonoured";
-    public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
-    public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
-    public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";
-    public static final String PURE_VAST_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(PureVast)";
-    public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(CAU)";
+    public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-Banner";
+    public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-Native";
+    public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-Video";
+    public static final String PURE_VAST_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-PureVast";
+    public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-CAU";
     public static final String NATIVE_VM_TEMPLATE_ERROR = "NativeVMTemplateError";
     public static final String CLIENT_TIMER_LATENCY = "ClientTimerLatency";
     public static final String CAS_TIMEOUT_HANDLER_LATENCY = "CasTimeoutHandlerLatency";
@@ -97,7 +97,7 @@ public class InspectorStrings {
     public static final String SITE_FEEDBACK_LATENCY = "SiteFeedbackLatency";
     public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
     public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
-    
+
 
     public static final String IMEI_CACHE_MISS = "IMEICacheMiss";
     public static final String IMEI_CACHE_HIT = "IMEICacheHit";
@@ -107,7 +107,7 @@ public class InspectorStrings {
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
 
     public static final String IMEI = "Imei";
-    public static final String IMEI_BEING_SENT_FOR ="ImeiBeingSentFor";
+    public static final String IMEI_BEING_SENT_FOR = "ImeiBeingSentFor";
 
     public static final String UNEXPECTED_CONDITION = "UnexpectedCondition";
     public static final String VAST_OUT_WITH_SDK = "VastOutWithSDK";
@@ -155,8 +155,10 @@ public class InspectorStrings {
     public static final String TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API = "TotalPureVASTRequestsForOtherThanApi";
     public static final String TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL = "TotalPureVASTRequestsForProtocol_";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
-    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING = "totalPureVastResponseInlineOrWrapperMissing";
-    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING = "totalPureVastResponseTrackingEventsMissing";
+    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
+            "totalPureVastResponseInlineOrWrapperMissing";
+    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING =
+            "totalPureVastResponseTrackingEventsMissing";
     public static final String TOTAL_REWARDED_VAST_VIDEO_REQUESTS = "TotalRewardedVASTVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
@@ -186,7 +188,7 @@ public class InspectorStrings {
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
     public static final String PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT =
-            "PubControlsAlsoContainsBannerForRewardedPlacement(Approx)";
+            "PubControlsAlsoContainsBannerForRewardedPlacement";
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
@@ -204,7 +206,7 @@ public class InspectorStrings {
     public static final String MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS = "IX-MultiFormatAuctions.TotalVastVideoWins";
     public static final String MULTI_FORMAT_AUCTIONS_STATIC_WINS = "IX-MultiFormatAuctions.TotalStaticWins";
 
-    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout (=2)
+    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout
     public static final String TOTAL_MULTI_FORMAT_REQUESTS = "IX-TotalMultiFormatRequests";
     public static final String TOTAL_SINGLE_FORMAT_REQUESTS = "IX-TotalSingleFormatRequests";
 
@@ -243,5 +245,5 @@ public class InspectorStrings {
 
     // IP repository Strings
     public static final String NULL_HOST_NAME = "NullHostName";
-    
+
 }

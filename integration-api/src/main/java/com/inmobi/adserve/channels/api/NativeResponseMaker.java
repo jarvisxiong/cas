@@ -17,10 +17,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
-import com.inmobi.adserve.channels.repository.NativeConstraints;
-import com.inmobi.adserve.contracts.dcp.backward.Image;
 import com.inmobi.template.context.App;
-import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
@@ -46,7 +43,6 @@ public class NativeResponseMaker {
 
     public String makeDCPNativeResponse(final App app, final Map<String, String> params,
             final NativeAdTemplateEntity templateEntity) throws Exception {
-        validateResponse(app, templateEntity);
         final VelocityContext vc = getVelocityContext(app, params);
         vc.put("NAMESPACE", Formatter.getDCPNamespace());
 
@@ -72,48 +68,6 @@ public class NativeResponseMaker {
         LOG.debug("contextCode : {}", contextCode);
         return makeNativeAd(pubContent, contextCode, namespace);
     }
-
-    private void validateResponse(final App app, final NativeAdTemplateEntity templateEntity) throws Exception {
-        final String mandatoryKey = templateEntity.getMandatoryKey();
-        final List<Integer> mandatoryList = NativeConstraints.getRTBDMandatoryList(mandatoryKey);
-        for (final Integer integer : mandatoryList) {
-            switch (integer) {
-                case NativeConstraints.ICON_INDEX:
-                    if (app.getIcons() == null || app.getIcons().isEmpty()
-                            || StringUtils.isEmpty(app.getIcons().get(0).getUrl())) {
-                        throw new Exception(String.format(ERROR_STR, "Icon"));
-                    }
-                    break;
-                case NativeConstraints.SCREEN_SHOT_INDEX:
-                    if (app.getScreenshots() == null || app.getScreenshots().isEmpty()) {
-                        throw new Exception(String.format(ERROR_STR, "Image"));
-                    }
-                    break;
-                case NativeConstraints.TITLE_INDEX:
-                    if (StringUtils.isEmpty(app.getTitle())) {
-                        throw new Exception(String.format(ERROR_STR, "Title"));
-                    }
-                    break;
-                case NativeConstraints.DESCRIPTION_INDEX:
-                    if (StringUtils.isEmpty(app.getDesc())) {
-                        throw new Exception(String.format(ERROR_STR, "Description"));
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        final Image image = NativeConstraints.getRTBImage(templateEntity.getImageKey());
-        if (image != null) {
-            final Screenshot screenShot = app.getScreenshots().get(0);
-            if (!(screenShot.getW() >= image.getMinwidth() && screenShot.getW() <= image.getMaxwidth())) {
-                throw new Exception(String.format("Expected image constraints are %s. But got image attributes : %s ",
-                        image, screenShot));
-            }
-        }
-    }
-
 
     private VelocityContext getVelocityContext(final App app, final Map<String, String> params) {
         final VelocityContext context = new VelocityContext();

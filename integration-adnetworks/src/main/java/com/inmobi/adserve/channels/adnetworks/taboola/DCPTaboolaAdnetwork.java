@@ -22,10 +22,11 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.NativeConstraints;
+import com.inmobi.adserve.channels.repository.NativeConstraints.Mandatory;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -95,7 +96,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         iconUrl = config.getString("taboola.icon");
         notificationUrl = config.getString("taboola.notification");
 
-        if (sasParams.getWapSiteUACEntity() != null && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
+        if (sasParams.getWapSiteUACEntity() != null
+                && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
         } else {
             LOG.info("Uac is not initialized for site {} in Taboola", sasParams.getSiteId());
@@ -183,7 +185,6 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 final List<Icon> icons = new ArrayList<>();
 
                 final List<Screenshot> screenshotList = new ArrayList<>();
-
                 if (isScreenshotResponse) {
                     setStaticIconForScreenshotResponse(icons);
                     updateScreenshotList(taboolaNative, screenshotList);
@@ -201,9 +202,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 pixelUrls.add(beacon);
                 appBuilder.setPixelUrls(pixelUrls);
                 final App app = (App) appBuilder.build();
-                responseContent =
-                        nativeResponseMaker.makeDCPNativeResponse(app, params,
-                                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params,
+                        repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 
@@ -211,12 +211,12 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = NO_AD;
                 responseContent = DEFAULT_EMPTY_STRING;
             }
-        } catch (final Exception e) {
+        } catch (final Exception exp) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error(
-                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
-                            + "exception = {}", sasParams.getPlacementId(), getName(), e);
+            final String msg = String.format("Exception with native template for placementId = %s , advertiser = %s",
+                    sasParams.getPlacementId(), getName());
+            LOG.error(msg, exp);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
         }
     }
@@ -285,15 +285,15 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
         if (nativeContentObject == null) {
-            setDimentionForHandwritenTemplate();
+            setDimensionForCustomTemplates();
         } else {
             for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
                 final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
+                final NativeAdContentAsset adContentAsset = attributes.getAdContentAsset();
                 final Dimension dimensions = imageAsset.getDimension();
                 thumbnailHeight = dimensions.getHeight();
                 thumbnailWidth = dimensions.getWidth();
-
-                if (attributes.getAdContentAsset() == NativeAdContentAsset.SCREENSHOT) {
+                if (adContentAsset == NativeAdContentAsset.SCREENSHOT) {
                     isScreenshotResponse = true;
                     break;
                 }
@@ -302,27 +302,22 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    private void setDimentionForHandwritenTemplate() {
-        final List<NativeConstraints.Mandatory> mandatoryKeys =
-                NativeConstraints.getDCPMandatoryList(templateEntity.getMandatoryKey());
-
-        for (final NativeConstraints.Mandatory mandatory : mandatoryKeys) {
+    private void setDimensionForCustomTemplates() {
+        final List<Mandatory> mandatoryKeys = NativeConstraints.getMandatoryList(templateEntity.getMandatoryKey());
+        for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case ICON:
                     thumbnailHeight = defaultIconWidthAndHeight;
                     thumbnailWidth = defaultIconWidthAndHeight;
                     break;
                 case SCREEN_SHOT:
-                    final Image screen = NativeConstraints.getDCPImage(templateEntity.getImageKey());
+                    final Image screen = NativeConstraints.getImage(templateEntity.getImageKey());
                     thumbnailHeight = screen.getHmin();
                     thumbnailWidth = screen.getWmin();
+                    isScreenshotResponse = true;
                     break;
                 default:
                     break;
-            }
-            if (mandatory == NativeConstraints.Mandatory.SCREEN_SHOT) {
-                isScreenshotResponse = true;
-                break;
             }
         }
     }
