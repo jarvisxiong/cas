@@ -32,9 +32,9 @@ public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
     private static final int CHINA = 164;
     private static final int CHINA_MOBILE = 787;
-    private static final int CHINA_WIFI_CARRIER_ID = 789;
+    private static final int CHINA_TELECOM_CARRIER_ID = 786;
     private static final short INMOBI_SLOT_FOR_300x250 = 10;
-    private static final List<Short> chinaWifiAllowedSlotList = ImmutableList.of(INMOBI_SLOT_FOR_300x250);
+    private static final List<Short> chinaTestingAllowedSlotList = ImmutableList.of(INMOBI_SLOT_FOR_300x250);
 
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
@@ -111,14 +111,14 @@ public class RequestFilters {
             if (CHINA_MOBILE == sasParams.getCarrierId()) {
                 // Removing slot for 300x250
                 sasParams.getProcessedMkSlot().remove(INMOBI_SLOT_FOR_300x250);
-            } else if (CHINA_WIFI_CARRIER_ID == sasParams.getCarrierId()) {
+            } else if (CHINA_TELECOM_CARRIER_ID == sasParams.getCarrierId()) {
                 // Only trying to include slot 300x250
                 sasParams.setProcessedMkSlot(sasParams.getProcessedMkSlot().contains(INMOBI_SLOT_FOR_300x250) ?
-                        chinaWifiAllowedSlotList :
+                        chinaTestingAllowedSlotList :
                         null);
             } else {
                 // Drop Request
-                LOG.info("Request dropped since the China request is not from China Mobile or WIFI");
+                LOG.info("Request dropped since the China request is not from China Mobile or Test Carrier");
                 hrh.setTerminationReason(CasConfigUtil.CHINA_MOBILE_TARGETING);
                 InspectorStats.incrementStatCount(TERMINATED_REQUESTS, CHINA_MOBILE_TARGETING + dstName);
                 return true;

@@ -81,13 +81,8 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
         final StringBuilder requestBuilder = new StringBuilder(host);
         appendQueryParam(requestBuilder, CHANNEL, externalSiteId, true);
         appendQueryParam(requestBuilder, LOC_ID, slotId, false);
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getIem())) {
-            appendQueryParam(requestBuilder, IMEI, casInternalRequestParameters.getIem(), false);
-        } else {
-            final String imei = getIMEI();
-            if (StringUtils.isNotBlank(imei)) {
-                appendQueryParam(requestBuilder, IMEI, imei, false);
-            }
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiMD5())) {
+            appendQueryParam(requestBuilder, IMEI, casInternalRequestParameters.getImeiMD5(), false);
         }
         final String idfa = getUidIFA(true);
         if (null != idfa) {

@@ -518,7 +518,8 @@ public class Logging {
         }
 
         if (null != casInternalRequestParameters) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getIem())) {
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiMD5()) ||
+                    StringUtils.isNotBlank(casInternalRequestParameters.getImeiSHA1())) {
                 request.setImeiPresent(true);
             }
         }

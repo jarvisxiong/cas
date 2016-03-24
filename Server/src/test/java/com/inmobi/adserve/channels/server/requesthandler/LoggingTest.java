@@ -241,7 +241,8 @@ public class LoggingTest {
         expect(mockCasInternalRequestParameters.getDemandDensity()).andReturn(demandDensity).anyTimes();
         expect(mockCasInternalRequestParameters.getLongTermRevenue()).andReturn(longTermRevenue).anyTimes();
         expect(mockCasInternalRequestParameters.getPublisherYield()).andReturn(publisherYield).anyTimes();
-        expect(mockCasInternalRequestParameters.getIem()).andReturn("dummy").anyTimes();
+        expect(mockCasInternalRequestParameters.getImeiMD5()).andReturn("dummy").anyTimes();
+        expect(mockCasInternalRequestParameters.getImeiSHA1()).andReturn("dummy").anyTimes();
         replayAll();
 
         AdRR adRR = Logging.getAdRR(mockChannelSegment, null, mockSASRequestParameters,
@@ -1022,8 +1023,8 @@ public class LoggingTest {
         expect(mockSASRequestParameters.getIntegrationDetails()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getNormalizedUserId()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getRqMkSlot()).andReturn(null).anyTimes();
-
-        expect(mockCasInternalRequestParameters.getIem()).andReturn(iem).anyTimes();
+        expect(mockCasInternalRequestParameters.getImeiMD5()).andReturn(iem).anyTimes();
+        expect(mockCasInternalRequestParameters.getImeiSHA1()).andReturn(iem).anyTimes();
 
 
         replayAll();

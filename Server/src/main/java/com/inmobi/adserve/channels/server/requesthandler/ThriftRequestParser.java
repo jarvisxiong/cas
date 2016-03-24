@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
 import static com.inmobi.adserve.channels.util.InspectorStrings.ADPOOL_REQUEST_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -49,9 +51,11 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.types.AdAttributeType;
 import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -121,16 +125,29 @@ public class ThriftRequestParser {
         setCarrier(tObject, params);
         // Fill params from integration details object
         setIntegrationDetails(tObject, params);
-        // Set the iem field
-        if (tObject.isSetIem()) {
-            casInternal.setIem(tObject.getIem());
-            InspectorStats.incrementStatCount(IMEI, IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
-        }
+
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
             if (tObject.getUidParams().isSetRawUidValues()) {
                 params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+            }
+        }
+
+        // Set imei related fields
+        if (Android.getValue() == params.getOsId() && GlobalConstant.CHINA_COUNTRY_CODE.equals(params.getCountryCode())) {
+            if (tObject.isSetIem()) {
+                InspectorStats.incrementStatCount(IMEI, IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
+                casInternal.setImeiMD5(DigestUtils.md5Hex(tObject.getIem()));
+                casInternal.setImeiSHA1(DigestUtils.sha1Hex(tObject.getIem()));
+            } else {
+                if (StringUtils.isNotBlank(casInternal.getUidO1())) {
+                    final IMEIEntity entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(casInternal.getUidO1());
+                    if (entity != null) {
+                        InspectorStats.incrementStatCount(InspectorStrings.IMEI_MATCH);
+                        casInternal.setImeiMD5(entity.getImei());
+                    }
+                }
             }
         }
         if (tObject.isSetRqSslEnabled()) {

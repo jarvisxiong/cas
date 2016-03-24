@@ -137,7 +137,8 @@ public class DCPTencentAdnetworkTest {
         sasParams
                 .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
-        casInternalRequestParameters.setIem("xxxx");
+        casInternalRequestParameters.setImeiMD5("xxxx");
+        casInternalRequestParameters.setImeiSHA1("xxxx");
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         final java.util.List<Long> cat = new ArrayList<Long>();
         cat.add(13l);

@@ -1,10 +1,11 @@
-# Base Image
 FROM dockerhub.corp.inmobi.com/idp/docker-jvm-8
 MAINTAINER dcp-engg@inmobi.com
 
+# Creating useful aliases
+COPY docker/bash/bash_aliases /root/.bash_aliases
+
 # Using a newer version of supervisor for environment variable substitution support in configs
 RUN pip install supervisor==3.1.3
-# Use "supervisorctl -c /etc/supervisor/supervisord.conf" inside the container to access the supervisord cli
 
 # Change /opt/inmobi/cas to /opt/mkhoj/cas in the below segment for backward compatibility
 ENV CAS_BASE_DIRECTORY /opt/inmobi/cas

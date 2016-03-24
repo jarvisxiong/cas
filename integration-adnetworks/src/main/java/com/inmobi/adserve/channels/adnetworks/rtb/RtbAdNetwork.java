@@ -646,29 +646,24 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setDpidmd5(casInternalRequestParameters.getUid());
         }
 
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getIem())) {
-            final String value = casInternalRequestParameters.getIem();
-            device.setDidsha1(DigestUtils.sha1Hex(value));
-            device.setDidmd5(DigestUtils.md5Hex(value));
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiMD5()) ||
+                StringUtils.isNotBlank(casInternalRequestParameters.getImeiSHA1())) {
+            // Cleaning up other device data signals
             device.setDpidsha1(null);
             device.setDpidmd5(null);
 
-        } else {
-            final String imei = getIMEI();
-            if (imei != null) {
-                device.setDidsha1(null);
-                device.setDidmd5(imei);
-                device.setDpidsha1(null);
-                device.setDpidmd5(null);
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiSHA1())) {
+                device.setDidsha1(casInternalRequestParameters.getImeiSHA1());
             }
-            else {
-                final String gpId = getGPID(false);
-                if (StringUtils.isNotEmpty(gpId)) {
-                    deviceExtensions.put("gpid", gpId);
-                }
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiMD5())) {
+                device.setDidmd5(casInternalRequestParameters.getImeiMD5());
+            }
+        } else {
+            final String gpId = getGPID(false);
+            if (StringUtils.isNotEmpty(gpId)) {
+                deviceExtensions.put("gpid", gpId);
             }
         }
-
 
         final String ifa = getUidIFA(false);
         // Setting Extension for idfa
