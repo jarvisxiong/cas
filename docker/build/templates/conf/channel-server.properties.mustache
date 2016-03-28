@@ -252,13 +252,6 @@ Cache.IXPackageRepository.initialDelay = 0
 Cache.IXPackageRepository.refreshTime = 1867
 Cache.IXPackageRepository.dataSourceName = jdbc
 
-Cache.Name = SdkViewabilityEligibilityRepository
-Cache.SdkViewabilityEligibilityRepository.Manager = com.inmobi.adserve.channels.repository.SdkViewabilityEligibilityRepository
-Cache.SdkViewabilityEligibilityRepository.query = select * from sdk_viewability_eligibility where modified_on >=('${last_update}')
-Cache.SdkViewabilityEligibilityRepository.initialDelay = 300
-Cache.SdkViewabilityEligibilityRepository.refreshTime = 2131
-Cache.SdkViewabilityEligibilityRepository.dataSourceName = jdbc
-
 Cache.Name = SiteEcpmRepository
 Cache.SiteEcpmRepository.Manager = com.inmobi.adserve.channels.repository.SiteEcpmRepository
 Cache.SiteEcpmRepository.query = select * from site_ecpm_fun('${last_update}')

@@ -1,6 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import static com.inmobi.adserve.channels.util.config.GlobalConstant.ALL;
+import static com.inmobi.adserve.adpool.RequestedAdType.BANNER;
+import static com.inmobi.adserve.adpool.RequestedAdType.INTERSTITIAL;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_DMP_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_GEO_REGION_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_OS_VERSION_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_SDK_VERSION_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IX_PACKAGE_REQUEST_FOR_ID;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PACKAGE_AND_DEAL_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PACKAGE_FILTER_STATS;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.STATIC;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,23 +26,22 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Range;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.entity.SdkViewabilityEligibilityEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
-import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
@@ -48,6 +63,13 @@ import com.inmobi.segment.impl.ZipCodePresent;
 public class IXPackageMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(IXPackageMatcher.class);
     public static final int PACKAGE_MAX_LIMIT = 35;
+
+    private static final Set<Integer> bannerAllowedSdksForViewability = ImmutableSortedSet.of(
+            300,364,365,370,371,381,400,402,403,404,410,411,430,440,441,442,443,451,452,453,454,455);
+    private static final Set<Integer> interstitialAllowedSdksForViewability = ImmutableSortedSet.of(
+            442,443,452,454,456);
+    private static final Set<Integer> vastAllowedSdksForViewability = ImmutableSortedSet.of(
+            402,403,404,410,411,430,440,441,442,443,450,451,453,456);
 
     public static List<Integer> findMatchingPackageIds(final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short selectedSlotId,
@@ -123,29 +145,21 @@ public class IXPackageMatcher {
                     continue;
                 }
 
-                // SDK Version Targeting
-                final String adType =
-                    SecondaryAdFormatConstraints.STATIC != adGroupEntity.getSecondaryAdFormatConstraints() ?
-                        SecondaryAdFormatConstraints.VAST_VIDEO.name().toUpperCase() :
-                        (null == sasParams.getRequestedAdType() ?
-                            GlobalConstant.BANNER :
-                            sasParams.getRequestedAdType().name().toUpperCase());
-
-                SdkViewabilityEligibilityEntity sdkViewabilityEligibilityEntity =
-                        repositoryHelper.querySDKViewabilityEligibilityRepository(sasParams.getCountryId().intValue(),
-                                adType, DemandSourceType.IX.getValue());
-
-                if (null == sdkViewabilityEligibilityEntity) {
-                    sdkViewabilityEligibilityEntity =
-                            repositoryHelper.querySDKViewabilityEligibilityRepository(sasParams.getCountryId()
-                                    .intValue(), adType, ALL);
+                Set<Integer> viewabilityInclusionList = null;
+                final SecondaryAdFormatConstraints adgroupSecondaryAdFormat = adGroupEntity.getSecondaryAdFormatConstraints();
+                if (STATIC == adgroupSecondaryAdFormat) {
+                    if (BANNER == sasParams.getRequestedAdType()) {
+                        viewabilityInclusionList = bannerAllowedSdksForViewability;
+                    } else if (INTERSTITIAL == sasParams.getRequestedAdType()) {
+                        viewabilityInclusionList = interstitialAllowedSdksForViewability;
+                    }
+                } else if (VAST_VIDEO == adgroupSecondaryAdFormat || REWARDED_VAST_VIDEO == adgroupSecondaryAdFormat) {
+                    viewabilityInclusionList = vastAllowedSdksForViewability;
                 }
 
-                final Pair<Boolean, Set<Integer>> sdkViewabilityEligibility =
-                        null == sdkViewabilityEligibilityEntity ? null : sdkViewabilityEligibilityEntity
-                                .getSdkViewabilityInclusionExclusion();
-                if (!checkForSDKVersionTargeting(sasParams.getSdkVersion(), packageEntity.getSdkVersionTargeting(),
-                        packageEntity.isViewable(), sdkViewabilityEligibility)) {
+                if (!checkForSDKVersionTargeting(sasParams.getSdkVersion(),
+                        packageEntity.getSdkVersionTargeting(), packageEntity.isViewable(),
+                        new ImmutablePair<>(false, viewabilityInclusionList))) {
                     LOG.debug("Package {} dropped in SDK Version Filter", packageEntity.getId());
                     droppedInSdkVersionFilter += 1;
                     continue;
@@ -170,12 +184,11 @@ public class IXPackageMatcher {
                     }
                 }
                 matchedPackageIds.add(packageEntity.getId());
-                InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_AND_DEAL_STATS,
-                        InspectorStrings.IX_PACKAGE_REQUEST_FOR_ID + packageEntity.getId());
+                InspectorStats.incrementStatCount(PACKAGE_AND_DEAL_STATS,
+                        IX_PACKAGE_REQUEST_FOR_ID + packageEntity.getId());
                 // Break the loop if we reach the threshold.
                 if (++matchedPackagesCount == PACKAGE_MAX_LIMIT) {
-                    InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                            InspectorStrings.IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT);
+                    InspectorStats.incrementStatCount(PACKAGE_FILTER_STATS, IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT);
                     break;
                 }
             } else {
@@ -184,22 +197,15 @@ public class IXPackageMatcher {
             }
         }
 
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER, droppedInPackageAdTypeTargetingFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_DMP_FILTER, droppedInPackageDMPFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER, droppedInPackageManufModelFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_OS_VERSION_FILTER, droppedInPackageOsVersionFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_GEO_REGION_FILTER, droppedInPackageGeoRegionFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER, droppedInPackageSegmentSubsetFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS, InspectorStrings
-            .DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER, droppedInPackageLanguageTargetingFilter);
-        InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_FILTER_STATS,
-                InspectorStrings.DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER, droppedInPackageAdTypeTargetingFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_DMP_FILTER, droppedInPackageDMPFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER, droppedInPackageManufModelFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_OS_VERSION_FILTER, droppedInPackageOsVersionFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_GEO_REGION_FILTER, droppedInPackageGeoRegionFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER, droppedInPackageSegmentSubsetFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER,
+                droppedInPackageLanguageTargetingFilter);
+        incrementPackageFilterStat(DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
 
         String matchedPackageIdStr = "";
         for (Integer i : matchedPackageIds){
@@ -207,6 +213,10 @@ public class IXPackageMatcher {
         }
         LOG.debug("Packages selected: {}", matchedPackageIdStr);
         return matchedPackageIds;
+    }
+
+    private static void incrementPackageFilterStat(final String dropInFilterStat, final int increment) {
+        InspectorStats.incrementStatCount(PACKAGE_FILTER_STATS, dropInFilterStat, increment);
     }
 
     private static boolean checkForLanguageTargeting(final String reqLanguage , final IXPackageEntity packageEntity) {
