@@ -64,12 +64,12 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
 
     @Override
     public Native buildNative() {
-        if (null != templateEntity.getContentJson()) {
-            buildUsingContentJson();
-        } else {
-            buildMandatory();
-            buildNonMandatory();
-        }
+        // if (null != templateEntity.getContentJson()) {
+        // buildUsingContentJson();
+        // } else {
+        buildMandatory();
+        buildNonMandatory();
+        // }
         return new Native(nativeReqObj);
     }
 
@@ -84,8 +84,10 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
         for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
             final Dimension dimensions = imageAsset.getDimension();
             final Image image = new Image();
-            image.setHmin(dimensions.getHeight());
-            image.setWmin(dimensions.getWidth());
+            // image.setHmin(dimensions.getHeight());
+            // image.setWmin(dimensions.getWidth());
+            image.setH(dimensions.getHeight());
+            image.setW(dimensions.getWidth());
             final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
             switch (attributes.getAdContentAsset()) {
                 case SCREENSHOT:
