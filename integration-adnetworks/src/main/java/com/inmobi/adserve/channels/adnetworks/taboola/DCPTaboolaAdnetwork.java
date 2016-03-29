@@ -58,7 +58,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
     private static final String READ_MORE = "Read More";
-    private static final int defaultIconWidthAndHeight = 150;
+    private static final int ICON_DEFAULT_DIMENSION = 150;
 
     @Inject
     protected static TemplateConfiguration templateConfiguration;
@@ -217,7 +217,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             final String msg = String.format("Exception with native template for placementId = %s , advertiser = %s",
                     sasParams.getPlacementId(), getName());
             LOG.error(msg, exp);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
     }
 
@@ -307,8 +307,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case ICON:
-                    thumbnailHeight = defaultIconWidthAndHeight;
-                    thumbnailWidth = defaultIconWidthAndHeight;
+                    thumbnailHeight = ICON_DEFAULT_DIMENSION;
+                    thumbnailWidth = ICON_DEFAULT_DIMENSION;
                     break;
                 case SCREEN_SHOT:
                     final Image screen = NativeConstraints.getImage(templateEntity.getImageKey());

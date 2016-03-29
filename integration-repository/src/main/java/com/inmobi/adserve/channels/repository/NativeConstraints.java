@@ -76,10 +76,8 @@ public class NativeConstraints {
     private static Image getNativeImage(final int wMin, final int hMin) {
         final Image image = new Image();
         image.setType(ImageAssetType.MAIN);
-        // image.setWmin(wMin);
-        image.setW(wMin);
-        // image.setHmin(hMin);
-        image.setH(hMin);
+        image.setWmin(wMin);
+        image.setHmin(hMin);
         return image;
     }
 

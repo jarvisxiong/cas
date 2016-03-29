@@ -17,12 +17,12 @@ import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.common.request.nativead.NativeReqObj;
 import com.inmobi.adserve.contracts.common.request.nativead.Title;
 import com.inmobi.adserve.contracts.iab.NativeLayoutId;
-import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
-import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
-import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
-import com.inmobi.adserve.contracts.misc.contentjson.OtherAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.TextAsset;
+// import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
+// import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
+// import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
+// import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
+// import com.inmobi.adserve.contracts.misc.contentjson.OtherAsset;
+// import com.inmobi.adserve.contracts.misc.contentjson.TextAsset;
 
 /**
  * Created by ishanbhatnagar on 7/5/15.
@@ -32,9 +32,9 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
     private static final NativeLayoutId DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_FEED = NativeLayoutId.NEWS_FEED;
     private static final NativeLayoutId DEFAULT_NATIVE_LAYOUT_ID_FOR_LAYOUT_STREAM = NativeLayoutId.CONTENT_STREAM;
 
-    private static final int DEFAULT_TITLE_LENGTH = 100;
-    private static final int DEFAULT_DESC_LENGTH = 100;
-    private static final int ICON_DEFAULT_DIMENSION = 300;
+    private static final int DEFAULT_MAX_TITLE_LENGTH = 100;
+    private static final int DEFAULT_MAX_DESC_LENGTH = 100;
+    private static final int ICON_DEFAULT_DIMENSION = 37;
     private static final int DEFAULT_AD_UNIT_ID = 500;
 
     private final NativeReqObj nativeReqObj;
@@ -73,21 +73,19 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
         return new Native(nativeReqObj);
     }
 
-    private void buildUsingContentJson() {
+ /* private void buildUsingContentJson() {
         buildImageAssets();
         buildTextAssets();
         buildOtherAssets();
     }
-
+    
     private void buildImageAssets() {
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
         for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
             final Dimension dimensions = imageAsset.getDimension();
             final Image image = new Image();
-            // image.setHmin(dimensions.getHeight());
-            // image.setWmin(dimensions.getWidth());
-            image.setH(dimensions.getHeight());
-            image.setW(dimensions.getWidth());
+            image.setHmin(dimensions.getHeight());
+            image.setWmin(dimensions.getWidth());
             final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
             switch (attributes.getAdContentAsset()) {
                 case SCREENSHOT:
@@ -103,7 +101,7 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
             nativeReqObj.addAsset(!attributes.isOptional(), image);
         }
     }
-
+    
     private void buildTextAssets() {
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
         for (final TextAsset textAsset : nativeContentObject.getTextAssets()) {
@@ -116,7 +114,7 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
                     break;
                 case DESCRIPTION:
                     final Data description = new Data(Data.DataAssetType.DESC);
-                    description.setLen(0 == maxChars ? DEFAULT_DESC_LENGTH : maxChars);
+                    description.setLen(0 == maxChars ? DEFAULT_MAX_DESC_LENGTH : maxChars);
                     nativeReqObj.addAsset(!attributes.isOptional(), description);
                     break;
                 default:
@@ -125,7 +123,7 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
             }
         }
     }
-
+    
     private void buildOtherAssets() {
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
         for (final OtherAsset otherAsset : nativeContentObject.getOtherAssets()) {
@@ -146,14 +144,14 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
             // nativeReqObj.addAsset(!attributes.isOptional(), data);
             nativeReqObj.addAsset(false, data);
         }
-    }
+    }*/
 
     private void buildMandatory() {
         final List<Mandatory> mandatoryKeys = NativeConstraints.getMandatoryList(templateEntity.getMandatoryKey());
         for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case TITLE:
-                    nativeReqObj.addAsset(true, new Title(100));
+                    nativeReqObj.addAsset(true, new Title(DEFAULT_MAX_TITLE_LENGTH));
                     break;
                 case ICON:
                     final Image icon = new Image();
@@ -163,7 +161,9 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
                     nativeReqObj.addAsset(true, icon);
                     break;
                 case DESCRIPTION:
-                    nativeReqObj.addAsset(true, new Data(Data.DataAssetType.DESC));
+                    final Data desc = new Data(Data.DataAssetType.DESC);
+                    desc.setLen(DEFAULT_MAX_DESC_LENGTH);
+                    nativeReqObj.addAsset(true, desc);
                     break;
                 case SCREEN_SHOT:
                     final Image screen = NativeConstraints.getImage(templateEntity.getImageKey());

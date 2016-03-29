@@ -18,6 +18,14 @@ import static com.inmobi.adserve.channels.util.GenericTemplateObject.FIRST_OBJEC
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.PARTNER_BEACON_URL;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.TOOL_OBJECT;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.VAST_CONTENT_JS_ESC;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_AR_DIFF_LESS_10_PERCENT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_AR_DIFF_LESS_20_PERCENT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_AR_DIFF_MORE_20_PERCENT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_AR_SAME;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_WIDTH_OR_HEIGHT_NULL;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_WIDTH_OR_HEIGHT_SMALL;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LAT;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_LNG;
@@ -101,7 +109,6 @@ import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.GenericTemplateObject;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
@@ -412,24 +419,43 @@ public class IXAdNetworkHelper {
                 contextBuilder.setTitle(responseAsset.getTitle().getText());
                 break;
             case IMAGE:
-                final com.inmobi.adserve.contracts.common.response.nativead.Image img = responseAsset.getImg();
-                final Integer width = img.getW() == null ? requestAsset.getImg().getWmin() : img.getW();
-                final Integer height = img.getH() == null ? requestAsset.getImg().getHmin() : img.getH();
-                if (Image.ImageAssetType.ICON.getId() == requestAsset.getImg().getType()) {
+                final com.inmobi.adserve.contracts.common.response.nativead.Image respImg = responseAsset.getImg();
+                final Image reqImg = requestAsset.getImg();
+                final Integer respWidth = respImg.getW() == null ? reqImg.getWmin() : respImg.getW();
+                final Integer respHeight = respImg.getH() == null ? reqImg.getHmin() : respImg.getH();
+
+                if (respImg.getW() == null || respImg.getH() == null) {
+                    InspectorStats.incrementStatCount(IMAGE_WIDTH_OR_HEIGHT_NULL + reqImg.getType());
+                }
+                if (respWidth < reqImg.getWmin() || respHeight < reqImg.getHmin()) {
+                    InspectorStats.incrementStatCount(IMAGE_WIDTH_OR_HEIGHT_SMALL + reqImg.getType());
+                    return false;
+                }
+
+                final double requestedAr = (double) reqImg.getWmin() / (double) reqImg.getHmin();
+                final double responseAr = (double) respWidth / (double) respHeight;
+                final double deltaInArPercentage = Math.abs(requestedAr - responseAr) * 100 / requestedAr;
+                if (deltaInArPercentage == 0d) {
+                    InspectorStats.incrementStatCount(IMAGE_AR_SAME + reqImg.getType());
+                } else if (deltaInArPercentage > 0 && deltaInArPercentage <= 10) {
+                    InspectorStats.incrementStatCount(IMAGE_AR_DIFF_LESS_10_PERCENT + reqImg.getType());
+                } else if (deltaInArPercentage > 10 && deltaInArPercentage <= 20) {
+                    InspectorStats.incrementStatCount(IMAGE_AR_DIFF_LESS_20_PERCENT + reqImg.getType());
+                } else {
+                    InspectorStats.incrementStatCount(IMAGE_AR_DIFF_MORE_20_PERCENT + reqImg.getType());
+                }
+
+                if (Image.ImageAssetType.ICON.getId() == reqImg.getType()) {
                     final Icon.Builder iconbuilder = Icon.newBuilder();
-                    iconbuilder.setUrl(img.getUrl());
-                    iconbuilder.setW(width);
-                    iconbuilder.setH(height);
+                    iconbuilder.setUrl(respImg.getUrl());
+                    iconbuilder.setW(respWidth);
+                    iconbuilder.setH(respHeight);
                     contextBuilder.setIcons(Collections.singletonList((Icon) iconbuilder.build()));
-                } else if (Image.ImageAssetType.MAIN.getId() == requestAsset.getImg().getType()) {
+                } else if (Image.ImageAssetType.MAIN.getId() == reqImg.getType()) {
                     final Screenshot.Builder screenshotBuilder = Screenshot.newBuilder();
-                    screenshotBuilder.setUrl(img.getUrl());
-                    if (width < requestAsset.getImg().getWmin() || height < requestAsset.getImg().getHmin()) {
-                        LOG.debug("Image Constraints not met.");
-                        return false;
-                    }
-                    screenshotBuilder.setW(width);
-                    screenshotBuilder.setH(height);
+                    screenshotBuilder.setUrl(respImg.getUrl());
+                    screenshotBuilder.setW(respWidth);
+                    screenshotBuilder.setH(respHeight);
                     contextBuilder.setScreenshots(Collections.singletonList((Screenshot) screenshotBuilder.build()));
                 }
                 break;
@@ -775,7 +801,7 @@ public class IXAdNetworkHelper {
             addInXml(doc, wrapperNode, ERROR_TAG, null, null, errorUriStr);
             addClickTracking(doc, wrapperNode, clickUrl, beaconUrl);
         } else {
-            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING);
+            InspectorStats.incrementStatCount(TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING);
             throw new ParserConfigurationException();
         }
 
@@ -794,7 +820,7 @@ public class IXAdNetworkHelper {
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, THIRD_QUARTILE, thirdQuartileUriStr);
             addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, COMPLETE, completeUriStr);
         } else {
-            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING);
+            InspectorStats.incrementStatCount(TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING);
             throw new ParserConfigurationException();
         }
 

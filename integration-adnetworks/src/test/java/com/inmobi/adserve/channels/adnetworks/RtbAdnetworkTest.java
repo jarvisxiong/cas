@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,10 +51,10 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.common.request.nativead.Data;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
+import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -573,7 +571,6 @@ public class RtbAdnetworkTest {
         AdapterTestHelper.setBeaconAndClickStubs();
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
-        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         final Gson gson = new Gson();
         rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());

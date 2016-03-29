@@ -245,5 +245,12 @@ public class InspectorStrings {
 
     // IP repository Strings
     public static final String NULL_HOST_NAME = "NullHostName";
-
+    
+    // Stats related to Native Image Analysis
+    public static final String IMAGE_WIDTH_OR_HEIGHT_NULL = "ImageWidthOrHeightNull-";
+    public static final String IMAGE_WIDTH_OR_HEIGHT_SMALL = "ImageWidthOrHeightSmall-";
+    public static final String IMAGE_AR_SAME = "ImageArSame-";
+    public static final String IMAGE_AR_DIFF_LESS_10_PERCENT = "ImageArDiffLessThan10Percent-";
+    public static final String IMAGE_AR_DIFF_LESS_20_PERCENT = "ImageArDiffLessThan20Percent-";
+    public static final String IMAGE_AR_DIFF_MORE_20_PERCENT = "ImageArDiffMoreThan20Percent-";
 }

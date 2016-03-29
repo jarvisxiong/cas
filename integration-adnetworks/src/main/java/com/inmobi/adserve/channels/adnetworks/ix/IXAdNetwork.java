@@ -37,7 +37,6 @@ import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 import com.inmobi.adserve.adpool.ConnectionType;
@@ -72,8 +71,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.iab.ApiFrameworks;
@@ -1386,16 +1385,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 LOG.debug("Returning from conformsToContract as response was null/empty");
                 return false;
             }
-        } catch (final JsonParseException jpe) {
+        } catch (final Exception jpe) {
             LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
                     jpe.getMessage());
             InspectorStats.incrementStatCount(getName(), InspectorStrings.RESPONSE_CONTRACT_NOT_HONOURED);
             // TODO: Figure out why adStatus is always reverted back to NO_AD
-            adStatus = AdStatus.TERM.name();
-            return false;
-        } catch (final Exception e) {
-            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
-                    e.toString());
             adStatus = AdStatus.TERM.name();
             return false;
         }
