@@ -465,6 +465,10 @@ public class IXAdNetworkHelper {
             case DATA:
                 final Integer type = requestAsset.getData().getType();
                 final String value = responseAsset.getData().getValue();
+                if (StringUtils.isBlank(value)) {
+                    LOG.debug("Data object value is blank/missing");
+                    return false;
+                }
                 if (DESC.getId() == type) {
                     contextBuilder.setDesc(value);
                 } else if (CTA_TEXT.getId() == type) {
