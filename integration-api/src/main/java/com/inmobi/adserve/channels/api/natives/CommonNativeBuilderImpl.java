@@ -175,7 +175,6 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
 
     private void buildNonMandatory() {
         nativeReqObj.addAsset(false, new Data(Data.DataAssetType.CTA_TEXT));
-        nativeReqObj.addAsset(false, new Data(Data.DataAssetType.DOWNLOADS));
         nativeReqObj.addAsset(false, new Data(Data.DataAssetType.RATING));
     }
 }

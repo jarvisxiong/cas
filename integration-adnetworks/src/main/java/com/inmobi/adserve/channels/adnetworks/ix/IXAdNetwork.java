@@ -1,9 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZEID_NOT_SET_IN_ALT_SIZE_RESP;
-import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZEID_NOT_SET_IN_NON_ALT_SIZE_RESP;
-import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZEID_SET_IN_ALT_SIZE_RESP;
-import static com.inmobi.adserve.channels.util.InspectorStrings.RP_SIZEID_SET_IN_NON_ALT_SIZE_RESP;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_JS;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
@@ -1523,16 +1519,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             // Done to maintain consistency in logging (See sampleAdvertiserLogging)
             adm = nativeObj.toString();
         }
-
+        
         // Fetch bid.ext.rp.advid.
         if (null != bid.getExt() && null != bid.getExt().getRp()) {
             final RubiconExtension rp = bid.getExt().getRp();
             advId = rp.getAdvid();
-
-            final String statName = null != rp.getSize_id()
-                    ? altSizeIdsSet ? RP_SIZEID_SET_IN_ALT_SIZE_RESP : RP_SIZEID_SET_IN_NON_ALT_SIZE_RESP
-                    : altSizeIdsSet ? RP_SIZEID_NOT_SET_IN_ALT_SIZE_RESP : RP_SIZEID_NOT_SET_IN_NON_ALT_SIZE_RESP;
-            InspectorStats.incrementStatCount(getName(), statName);
         }
 
         // For video requests, validate that a valid XML is received.
@@ -1550,11 +1541,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 adStatus = TERM;
                 return false;
             }
-        }
-
-        // Going forward, we will be using Advertiser Id, so an prelim check to see how many of it is null
-        if (StringUtils.isEmpty(advId)) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.INVALID_ADV_ID);
         }
 
         if (updateRPAccountInfo(dspId)) {

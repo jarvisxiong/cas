@@ -135,7 +135,6 @@ public class InspectorStrings {
     public static final String IX_SENT_AS_BLIND = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
-    public static final String INVALID_ADV_ID = "NoAdvertiserId";
     public static final String UNKNOWN_ADV_ID = "ADFromUnknownAdvId";
     public static final String DROPPED_INVALID_DSP_ID = "DroppedDueToInvalidDspId";
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
@@ -179,11 +178,6 @@ public class InspectorStrings {
             "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
-    // Temporary
-    public static final String RP_SIZEID_SET_IN_NON_ALT_SIZE_RESP = "RPSizeIdSetInResponse.NonAltSize";
-    public static final String RP_SIZEID_SET_IN_ALT_SIZE_RESP = "RPSizeIdSetInResponse.AltSize";
-    public static final String RP_SIZEID_NOT_SET_IN_NON_ALT_SIZE_RESP = "RPSizeIdNotSetInResponse.NonAltSize";
-    public static final String RP_SIZEID_NOT_SET_IN_ALT_SIZE_RESP = "RPSizeIdNotSetInResponse.AltSize";
 
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
@@ -247,10 +241,7 @@ public class InspectorStrings {
     public static final String NULL_HOST_NAME = "NullHostName";
     
     // Stats related to Native Image Analysis
-    public static final String IMAGE_WIDTH_OR_HEIGHT_NULL = "ImageWidthOrHeightNull-";
     public static final String IMAGE_WIDTH_OR_HEIGHT_SMALL = "ImageWidthOrHeightSmall-";
-    public static final String IMAGE_AR_SAME = "ImageArSame-";
-    public static final String IMAGE_AR_DIFF_LESS_10_PERCENT = "ImageArDiffLessThan10Percent-";
-    public static final String IMAGE_AR_DIFF_LESS_20_PERCENT = "ImageArDiffLessThan20Percent-";
-    public static final String IMAGE_AR_DIFF_MORE_20_PERCENT = "ImageArDiffMoreThan20Percent-";
+    public static final String IMAGE_AR_DIFF_MORE_10_PERCENT = "ImageArDiffMoreThan10Percent-";
+    public static final String IMAGE_WIDTH_MODIFIED = "ImageWidthModified-";
 }
