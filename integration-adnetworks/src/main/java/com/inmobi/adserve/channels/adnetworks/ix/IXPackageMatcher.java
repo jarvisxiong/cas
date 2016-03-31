@@ -361,12 +361,17 @@ public class IXPackageMatcher {
             if (checkForViewability) {
                 if (null != sdkViewabilityEligibility) {
                     final Set<Integer> sdkViewabilityVersionSet = sdkViewabilityEligibility.getRight();
-                    if (sdkViewabilityEligibility.getLeft()) {
-                        // If exclusion sdk version list
-                        returnValue = returnValue && !sdkViewabilityVersionSet.contains(sdkVersion);
+                    if (null != sdkViewabilityVersionSet) {
+                        if (sdkViewabilityEligibility.getLeft()) {
+                            // If exclusion sdk version list
+                            returnValue = returnValue && !sdkViewabilityVersionSet.contains(sdkVersion);
+                        } else {
+                            // If inclusion sdk version list
+                            returnValue = returnValue && sdkViewabilityVersionSet.contains(sdkVersion);
+                        }
                     } else {
-                        // If inclusion sdk version list
-                        returnValue = returnValue && sdkViewabilityVersionSet.contains(sdkVersion);
+                        LOG.debug("Unsupported ad type for viewability");
+                        returnValue = false;
                     }
                 } else {
                     returnValue = false;
