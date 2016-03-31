@@ -1845,6 +1845,22 @@ public class IXTest {
         VastPassAssert();
     }
 
+    @Test(testName = "TEST_SECURE_SEGMENT_FLAG", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_SECURE_SEGMENT_FLAG(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_SECURE_SEGMENT_FLAG_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_SECURE_SEGMENT_FLAG_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG_NEGATIVE");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("FAIL"));
+    }
+
 
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)

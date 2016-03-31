@@ -189,7 +189,9 @@ public class AdserveBackfillRequest {
         final String def_adpool_requestGuid = WilburyUUID.getUUID(System.nanoTime()).toString();
         final String def_adpool_placementId = "1234";
 
-
+        final String def_rqSslEnabled = "false";
+        final boolean rqSslEnabled = Boolean.parseBoolean(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_rqSslEnabled"),
+                                                                                                      def_rqSslEnabled));
         final Long adpool_placementId =
                 Long.parseLong(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_placementId"),
                     def_adpool_placementId));
@@ -566,7 +568,7 @@ public class AdserveBackfillRequest {
         integrationDetails.setIntegrationType(adpool_integration_integrationtype);
         integrationDetails.setIntegrationVersion(adpool_integration_integrationversion);
         final String app_bundle_id = requestObject.get("app_bundle_id");
-        // adPoolRequest.setRqSslEnabled(true);
+        adPoolRequest.setRqSslEnabled(rqSslEnabled);
         adPoolRequest.setTaskId(adpool_taskid);
         adPoolRequest.setRemoteHostIp(adpool_remotehostip);
         adPoolRequest.setGuidanceBid(adpool_guidanceBid);

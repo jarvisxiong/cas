@@ -57,6 +57,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     private final boolean stripUdId;
     private final boolean stripZipCode;
     private final boolean stripLatlong;
+    private final boolean secure;
     private final JSONObject additionalParams;
     private final Long[] categoryTaxonomy;
     private final Set<String> sitesIE;
@@ -110,6 +111,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         stripUdId = builder.stripUdId;
         stripZipCode = builder.stripZipCode;
         stripLatlong = builder.stripLatlong;
+        secure = builder.secure;
         additionalParams = builder.additionalParams;
         categoryTaxonomy = builder.categoryTaxonomy;
         sitesIE = builder.sitesIE;
@@ -162,6 +164,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
         private boolean stripUdId;
         private boolean stripZipCode;
         private boolean stripLatlong;
+        private boolean secure;
         private JSONObject additionalParams;
         private Long[] categoryTaxonomy;
         private Set<String> sitesIE;

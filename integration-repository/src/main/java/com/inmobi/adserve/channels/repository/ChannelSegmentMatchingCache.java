@@ -25,8 +25,8 @@ public class ChannelSegmentMatchingCache {
 
     public static Collection<ChannelSegmentEntity> getEntities(final long slotId, final long category,
             final long country, final Integer targetingPlatform, final Integer siteRating, final Integer osId,
-            final Integer dst) {
-        final String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId, dst);
+            final boolean secure, final Integer dst) {
+        final String key = getKey(slotId, category, country, targetingPlatform, siteRating, osId, secure, dst);
         final Map<String, ChannelSegmentEntity> entities = entityHashMap.get(key);
         if (null == entities) {
             logger.debug("Lookup in repository for key: " + key + "returned empty array");
@@ -79,6 +79,7 @@ public class ChannelSegmentMatchingCache {
                 entity.getOsIds() == null || entity.getOsIds().isEmpty() ? new ArrayList<Integer>(
                         Arrays.asList(new Integer[] {-1})) : entity.getOsIds();
 
+        final boolean secure = entity.isSecure();
         final Integer dst = entity.getDst();
 
         final List<String> matchingKeys = new ArrayList<String>();
@@ -89,7 +90,7 @@ public class ChannelSegmentMatchingCache {
                         for (final Integer siteRating : allowedSiteRatings) {
                             for (final Integer osId : allowedOsIds) {
                                 final String key =
-                                        getKey(slot, category, country, targetingPlatform, siteRating, osId, dst);
+                                        getKey(slot, category, country, targetingPlatform, siteRating, osId, secure, dst);
                                 matchingKeys.add(key);
                             }
                         }
@@ -101,9 +102,9 @@ public class ChannelSegmentMatchingCache {
     }
 
     private static String getKey(final long slotId, final long category, final long country,
-            final Integer targetingPlatform, final Integer siteRating, final Integer osId, final Integer dst) {
-        return slotId + "_" + category + "_" + country + "_" + targetingPlatform + "_" + siteRating + "_" + osId + "_"
-                + dst;
+            final Integer targetingPlatform, final Integer siteRating, final Integer osId, final boolean secure, final Integer dst) {
+        return slotId + "_" + category + "_" + country + "_" + targetingPlatform + "_" + siteRating + "_" + osId + "_" +
+        secure + "_" + dst;
     }
 
 }

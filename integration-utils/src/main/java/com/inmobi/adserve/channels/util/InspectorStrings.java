@@ -244,4 +244,7 @@ public class InspectorStrings {
     public static final String IMAGE_WIDTH_OR_HEIGHT_SMALL = "ImageWidthOrHeightSmall-";
     public static final String IMAGE_AR_DIFF_MORE_10_PERCENT = "ImageArDiffMoreThan10Percent-";
     public static final String IMAGE_WIDTH_MODIFIED = "ImageWidthModified-";
+
+    public static final String TOTAL_SECURE_REQUEST = "TotalSecureRequest";
+    public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 }

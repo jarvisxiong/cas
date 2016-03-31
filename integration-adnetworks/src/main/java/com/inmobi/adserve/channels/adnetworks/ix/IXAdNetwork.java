@@ -405,7 +405,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.info(traceMarker, "Impression id can not be null in Cas Internal Request Params");
             return null;
         }
-        impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
+        if (sasParams.isSecureRequest()) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_SECURE_REQUEST);
+            impression.setSecure(1);
+        } else {
+            impression.setSecure(0);
+        }
         // Set Banner OR Video OR Native object.
         if (isVideoRequest || isRewardedVideoRequest || isPureVastRequest) {
             final Video video = createVideoObject();
@@ -1067,7 +1072,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             buildInmobiAdTracker();
             responseContent = DEFAULT_EMPTY_STRING;
             adStatus = AdStatus.AD.name();
-
+            if (sasParams.isSecureRequest()) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_SECURE_RESPONSE);
+            }
             if (isNativeRequest()) {
                 nativeAdBuilding();
             } else if (isPureVastRequest) {
