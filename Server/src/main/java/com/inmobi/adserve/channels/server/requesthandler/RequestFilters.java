@@ -20,7 +20,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -30,11 +29,10 @@ import com.inmobi.casthrift.DemandSourceType;
 
 public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
-    private static final int CHINA = 164;
-    private static final int CHINA_MOBILE = 787;
-    private static final int CHINA_TELECOM_CARRIER_ID = 786;
-    private static final short INMOBI_SLOT_FOR_300x250 = 10;
-    private static final List<Short> chinaTestingAllowedSlotList = ImmutableList.of(INMOBI_SLOT_FOR_300x250);
+    protected static final Long CHINA = 164l;
+    protected static final Integer CHINA_MOBILE = 787;
+    protected static final Integer TEST_CHINA_CARRIER_ID = 788; // China Unicom
+    protected static final Short INMOBI_SLOT_FOR_300x250 = 10;
 
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
@@ -57,7 +55,7 @@ public class RequestFilters {
         }
 
         final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-        final String dstName = dst != null ? "-" + dst.name() : "-UNKOWN_DST";
+        final String dstName = dst != null ? "-" + dst.name() : "-UNKNOWN_DST";
 
         if (CollectionUtils.isEmpty(sasParams.getCategories())) {
             LOG.info("Category field is not present in the request so sending noad");
@@ -106,23 +104,14 @@ public class RequestFilters {
             }
         }
 
-        // China Mobile hack. TODO: Need to enable targeting at segment level
-        if (DemandSourceType.IX == dst && CHINA == sasParams.getCountryId()) {
-            if (CHINA_MOBILE == sasParams.getCarrierId()) {
-                // Removing slot for 300x250
-                sasParams.getProcessedMkSlot().remove(INMOBI_SLOT_FOR_300x250);
-            } else if (CHINA_TELECOM_CARRIER_ID == sasParams.getCarrierId()) {
-                // Only trying to include slot 300x250
-                sasParams.setProcessedMkSlot(sasParams.getProcessedMkSlot().contains(INMOBI_SLOT_FOR_300x250) ?
-                        chinaTestingAllowedSlotList :
-                        null);
-            } else {
-                // Drop Request
-                LOG.info("Request dropped since the China request is not from China Mobile or Test Carrier");
-                hrh.setTerminationReason(CasConfigUtil.CHINA_MOBILE_TARGETING);
-                InspectorStats.incrementStatCount(TERMINATED_REQUESTS, CHINA_MOBILE_TARGETING + dstName);
-                return true;
-            }
+        if (DemandSourceType.IX == dst &&
+                dropInChinaMobileTargetingFilter(sasParams.getProcessedMkSlot(), sasParams.getCountryId(),
+                        sasParams.getCarrierId())) {
+            // Drop Request
+            LOG.info("Request dropped since the China request is not from China Mobile or Test Carrier");
+            hrh.setTerminationReason(CasConfigUtil.CHINA_MOBILE_TARGETING);
+            InspectorStats.incrementStatCount(TERMINATED_REQUESTS, CHINA_MOBILE_TARGETING);
+            return true;
         }
 
         if (CollectionUtils.isEmpty(sasParams.getProcessedMkSlot())) {
@@ -136,6 +125,30 @@ public class RequestFilters {
         }
 
         return false;
+    }
+
+
+    protected static boolean dropInChinaMobileTargetingFilter(final List<Short> processedMkSlot, final Long countryId,
+            final Integer carrierId) {
+        boolean dropInFilter = false;
+        // China Mobile hack. TODO: Need to enable targeting at segment level
+        if (CHINA == countryId && CollectionUtils.isNotEmpty(processedMkSlot)) {
+            if (CHINA_MOBILE == carrierId) {
+                // Removing slot for 300x250
+                processedMkSlot.remove(INMOBI_SLOT_FOR_300x250);
+            } else if (TEST_CHINA_CARRIER_ID == carrierId) {
+                // Only trying to include slot 300x250
+                if (processedMkSlot.contains(INMOBI_SLOT_FOR_300x250)) {
+                    processedMkSlot.clear();
+                    processedMkSlot.add(INMOBI_SLOT_FOR_300x250);
+                } else {
+                    processedMkSlot.clear();
+                }
+            } else {
+                dropInFilter = true;
+            }
+        }
+        return dropInFilter;
     }
 
     /**
