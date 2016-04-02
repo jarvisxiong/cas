@@ -241,9 +241,10 @@ public class InspectorStrings {
     public static final String NULL_HOST_NAME = "NullHostName";
     
     // Stats related to Native Image Analysis
-    public static final String IMAGE_WIDTH_OR_HEIGHT_SMALL = "ImageWidthOrHeightSmall-";
-    public static final String IMAGE_AR_DIFF_MORE_10_PERCENT = "ImageArDiffMoreThan10Percent-";
-    public static final String IMAGE_WIDTH_MODIFIED = "ImageWidthModified-";
+    public static final String NATIVE_IMAGE_NOT_PROPER = "NativeImageWidthOrHeightSmall-";
+    public static final String NATIVE_IMAGE_AR_DIFF_MORE_10_PERCENT = "NativeImageArDiffMoreThan10Percent-";
+    public static final String NATIVE_IMAGE_WIDTH_MODIFIED = "NativeImageWidthModified-";
+    public static final String ALL_NATIVE_ASSETS_DEFAULT= "AllNativeAssetsDefault";
 
     public static final String TOTAL_SECURE_REQUEST = "TotalSecureRequest";
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";

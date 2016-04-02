@@ -236,8 +236,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         final Icon.Builder iconBuilder = Icon.newBuilder();
         // static icon url is 300x300 size
         iconBuilder.setUrl(iconUrl);
-        iconBuilder.setW(300);
-        iconBuilder.setH(300);
+        iconBuilder.setW(180);
+        iconBuilder.setH(180);
         icons.add((Icon) iconBuilder.build());
     }
 

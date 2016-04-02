@@ -67,13 +67,12 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
         // if (null != templateEntity.getContentJson()) {
         // buildUsingContentJson();
         // } else {
-        buildMandatory();
-        buildNonMandatory();
+        buildUsingNativeConstraints();
         // }
         return new Native(nativeReqObj);
     }
 
- /* private void buildUsingContentJson() {
+    /* private void buildUsingContentJson() {
         buildImageAssets();
         buildTextAssets();
         buildOtherAssets();
@@ -146,24 +145,29 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
         }
     }*/
 
-    private void buildMandatory() {
+    private void buildUsingNativeConstraints() {
         final List<Mandatory> mandatoryKeys = NativeConstraints.getMandatoryList(templateEntity.getMandatoryKey());
+        nativeReqObj.addAsset(false, new Data(Data.DataAssetType.CTA_TEXT));
+        nativeReqObj.addAsset(false, new Data(Data.DataAssetType.RATING));
+        // Add mandatory assets
+        // https://jira.corp.inmobi.com/browse/IX-265
+        // Making title, icon, description as optional since we have a default of it
         for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case TITLE:
-                    nativeReqObj.addAsset(true, new Title(DEFAULT_MAX_TITLE_LENGTH));
+                    nativeReqObj.addAsset(false, new Title(DEFAULT_MAX_TITLE_LENGTH));
                     break;
                 case ICON:
                     final Image icon = new Image();
                     icon.setType(Image.ImageAssetType.ICON);
                     icon.setWmin(ICON_DEFAULT_DIMENSION);
                     icon.setHmin(ICON_DEFAULT_DIMENSION);
-                    nativeReqObj.addAsset(true, icon);
+                    nativeReqObj.addAsset(false, icon);
                     break;
                 case DESCRIPTION:
                     final Data desc = new Data(Data.DataAssetType.DESC);
                     desc.setLen(DEFAULT_MAX_DESC_LENGTH);
-                    nativeReqObj.addAsset(true, desc);
+                    nativeReqObj.addAsset(false, desc);
                     break;
                 case SCREEN_SHOT:
                     final Image screen = NativeConstraints.getImage(templateEntity.getImageKey());
@@ -173,8 +177,4 @@ public final class CommonNativeBuilderImpl extends NativeBuilderImpl {
         }
     }
 
-    private void buildNonMandatory() {
-        nativeReqObj.addAsset(false, new Data(Data.DataAssetType.CTA_TEXT));
-        nativeReqObj.addAsset(false, new Data(Data.DataAssetType.RATING));
-    }
 }

@@ -18,9 +18,10 @@ import static com.inmobi.adserve.channels.util.GenericTemplateObject.FIRST_OBJEC
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.PARTNER_BEACON_URL;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.TOOL_OBJECT;
 import static com.inmobi.adserve.channels.util.GenericTemplateObject.VAST_CONTENT_JS_ESC;
-import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_AR_DIFF_MORE_10_PERCENT;
-import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_WIDTH_MODIFIED;
-import static com.inmobi.adserve.channels.util.InspectorStrings.IMAGE_WIDTH_OR_HEIGHT_SMALL;
+import static com.inmobi.adserve.channels.util.InspectorStrings.ALL_NATIVE_ASSETS_DEFAULT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_IMAGE_AR_DIFF_MORE_10_PERCENT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_IMAGE_NOT_PROPER;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_IMAGE_WIDTH_MODIFIED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.GEO_CC;
@@ -61,6 +62,7 @@ import static com.inmobi.adserve.contracts.common.request.nativead.Data.DataAsse
 import static com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses.DEFAULT_CTA;
 import static com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses.DEFAULT_DESC;
 import static com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses.DEFAULT_DOWNLOAD;
+import static com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses.DEFAULT_ICON;
 import static com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses.DEFAULT_RATING;
 import static com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses.DEFAULT_TITLE;
 
@@ -114,6 +116,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.SproutTemplateConstants;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
+import com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.response.nativead.Native;
 import com.inmobi.adserve.contracts.ix.request.Geo;
@@ -359,11 +362,111 @@ public class IXAdNetworkHelper {
      * @param responseAsset
      * @param contextBuilder
      * @param defaultRequired
+     * @param isAnyAssetNonDefault
      * @return
      */
     public static boolean areRequestResponseAssetsValid(final Asset requestAsset,
             final com.inmobi.adserve.contracts.common.response.nativead.Asset responseAsset,
-            final com.inmobi.template.context.App.Builder contextBuilder, final boolean defaultRequired) {
+            final com.inmobi.template.context.App.Builder contextBuilder, final boolean defaultRequired,
+            Boolean isAnyAssetNonDefault) {
+        final AssetType requestObject = verifyAsset(requestAsset, responseAsset);
+        if (requestObject == null) {
+            return false;
+        }
+        // note: Current implementation doesn't support multiple assets of the same type
+        switch (requestObject) {
+            case IMAGE:
+                final Image reqImg = requestAsset.getImg();
+                com.inmobi.adserve.contracts.common.response.nativead.Image respImg = responseAsset.getImg();
+
+                // Set default Icon if not present
+                final boolean isIcon = Image.ImageAssetType.ICON.getId() == reqImg.getType();
+                final boolean imageUrlBlank = StringUtils.isBlank(respImg.getUrl());
+                respImg = isIcon && imageUrlBlank ? DEFAULT_ICON : respImg;
+
+                Integer respWidth = respImg.getW() != null ? respImg.getW() : reqImg.getWmin();
+                final Integer respHeight = respImg.getH() != null ? respImg.getH() : reqImg.getHmin();
+                if (imageUrlBlank || respWidth < reqImg.getWmin() || respHeight < reqImg.getHmin()) {
+                    LOG.error("Image Width/Height/URL not proper {}", reqImg.getType());
+                    InspectorStats.incrementStatCount(NATIVE_IMAGE_NOT_PROPER + reqImg.getType());
+                    return false;
+                }
+
+                final double requestedAr = (double) reqImg.getWmin() / (double) reqImg.getHmin();
+                final double responseAr = (double) respWidth / (double) respHeight;
+                final double deltaInArPercentage = Math.abs(requestedAr - responseAr) * 100 / requestedAr;
+                if (deltaInArPercentage > 0 && deltaInArPercentage <= 10) {
+                    InspectorStats.incrementStatCount(NATIVE_IMAGE_WIDTH_MODIFIED + reqImg.getType());
+                    respWidth = (int) (requestedAr * respHeight);
+                } else {
+                    InspectorStats.incrementStatCount(NATIVE_IMAGE_AR_DIFF_MORE_10_PERCENT + reqImg.getType());
+                }
+
+                if (!imageUrlBlank) {
+                    isAnyAssetNonDefault = true;
+                    LOG.debug("Found Non Default IMAGE of type {}", reqImg.getType());
+                }
+                if (isIcon) {
+                    final Icon.Builder iconbuilder = Icon.newBuilder();
+                    iconbuilder.setUrl(respImg.getUrl());
+                    iconbuilder.setW(respWidth);
+                    iconbuilder.setH(respHeight);
+                    contextBuilder.setIcons(Collections.singletonList((Icon) iconbuilder.build()));
+                } else if (Image.ImageAssetType.MAIN.getId() == reqImg.getType()) {
+                    final Screenshot.Builder screenshotBuilder = Screenshot.newBuilder();
+                    screenshotBuilder.setUrl(respImg.getUrl());
+                    screenshotBuilder.setW(respWidth);
+                    screenshotBuilder.setH(respHeight);
+                    contextBuilder.setScreenshots(Collections.singletonList((Screenshot) screenshotBuilder.build()));
+                }
+                break;
+            case VIDEO:
+                LOG.debug("Video objects are currently not supported for native");
+                break;
+            case TITLE:
+                final String title = responseAsset.getTitle().getText();
+                final boolean isTitleBlank = StringUtils.isBlank(title);
+                if (!isTitleBlank) {
+                    isAnyAssetNonDefault = true;
+                    LOG.debug("Found Non Default Title -> {}", title);
+                }
+                contextBuilder.setTitle(isTitleBlank ? DEFAULT_TITLE : title);
+                break;
+            case DATA:
+                final Integer type = requestAsset.getData().getType();
+                final String value = responseAsset.getData().getValue();
+                final boolean isValBlank = StringUtils.isBlank(value);
+                if (!isValBlank) {
+                    isAnyAssetNonDefault = true;
+                    LOG.debug("Found Non Default DATA of type {}", type);
+                }
+                if (defaultRequired || !isValBlank) {
+                    if (DESC.getId() == type) {
+                        contextBuilder.setDesc(isValBlank ? DEFAULT_DESC : value);
+                    } else if (CTA_TEXT.getId() == type) {
+                        contextBuilder.setActionText(isValBlank ? DEFAULT_CTA : value);
+                    } else if (DOWNLOADS.getId() == type) {
+                        contextBuilder.setDownloads(isValBlank ? DEFAULT_DOWNLOAD : Integer.valueOf(value));
+                    } else if (RATING.getId() == type) {
+                        contextBuilder.setRating(isValBlank ? DEFAULT_RATING : value);
+                    }
+                }
+        }
+        return true;
+    }
+
+    /**
+     * Verifies that <br>
+     * 1) we receive a corresponding Asset object for every requested required Asset object with the same id and type
+     * <br>
+     * 2) Response Asset object doesn't contain more than one of title, img, video or data objects <br>
+     *
+     * @param requestAsset
+     * @param responseAsset
+     * @return
+     */
+    private static AssetType verifyAsset(final Asset requestAsset,
+            final com.inmobi.adserve.contracts.common.response.nativead.Asset responseAsset) {
         int requestAssetCount = 0;
         int responseAssetCount = 0;
         Asset.AssetType requestObject = null;
@@ -406,78 +509,14 @@ public class IXAdNetworkHelper {
         if (1 != requestAssetCount || 1 != responseAssetCount) {
             LOG.error("Aborting as more than one or none of title, img, video or data were present in the "
                     + "same Asset object");
-            return false;
+            return null;
         }
         if (requestObject != responseObject) {
             LOG.error("Aborting as type mismatch between Asset objects with id: {}. Received {} instead " + "of {}",
                     responseAsset.getId(), responseObject.name(), requestObject.name());
-            return false;
+            return null;
         }
-
-        // note: Current implementation doesn't support multiple assets of the same type
-        switch (requestObject) {
-            case IMAGE:
-                final com.inmobi.adserve.contracts.common.response.nativead.Image respImg = responseAsset.getImg();
-                final Image reqImg = requestAsset.getImg();
-                Integer respWidth = respImg.getW() == null ? reqImg.getWmin() : respImg.getW();
-                final Integer respHeight = respImg.getH() == null ? reqImg.getHmin() : respImg.getH();
-
-                if (respWidth < reqImg.getWmin() || respHeight < reqImg.getHmin()) {
-                    LOG.error("Image Width or Height lower for type {}", reqImg.getType());
-                    InspectorStats.incrementStatCount(IMAGE_WIDTH_OR_HEIGHT_SMALL + reqImg.getType());
-                    return false;
-                }
-
-                final double requestedAr = (double) reqImg.getWmin() / (double) reqImg.getHmin();
-                final double responseAr = (double) respWidth / (double) respHeight;
-                final double deltaInArPercentage = Math.abs(requestedAr - responseAr) * 100 / requestedAr;
-
-                if (deltaInArPercentage > 0 && deltaInArPercentage <= 10) {
-                    InspectorStats.incrementStatCount(IMAGE_WIDTH_MODIFIED + reqImg.getType());
-                    respWidth = (int) (requestedAr * respHeight);
-                } else {
-                    InspectorStats.incrementStatCount(IMAGE_AR_DIFF_MORE_10_PERCENT + reqImg.getType());
-                }
-
-                if (Image.ImageAssetType.ICON.getId() == reqImg.getType()) {
-                    final Icon.Builder iconbuilder = Icon.newBuilder();
-                    iconbuilder.setUrl(respImg.getUrl());
-                    iconbuilder.setW(respWidth);
-                    iconbuilder.setH(respHeight);
-                    contextBuilder.setIcons(Collections.singletonList((Icon) iconbuilder.build()));
-                } else if (Image.ImageAssetType.MAIN.getId() == reqImg.getType()) {
-                    final Screenshot.Builder screenshotBuilder = Screenshot.newBuilder();
-                    screenshotBuilder.setUrl(respImg.getUrl());
-                    screenshotBuilder.setW(respWidth);
-                    screenshotBuilder.setH(respHeight);
-                    contextBuilder.setScreenshots(Collections.singletonList((Screenshot) screenshotBuilder.build()));
-                }
-                break;
-            case VIDEO:
-                LOG.debug("Video objects are currently not supported for native");
-                break;
-            case TITLE:
-                final String title = responseAsset.getTitle().getText();
-                final boolean isTitleBlank = StringUtils.isBlank(title);
-                contextBuilder.setTitle(isTitleBlank ? DEFAULT_TITLE : title);
-                break;
-            case DATA:
-                final Integer type = requestAsset.getData().getType();
-                final String value = responseAsset.getData().getValue();
-                final boolean isValBlank = StringUtils.isBlank(value);
-                if (defaultRequired || !isValBlank) {
-                    if (DESC.getId() == type) {
-                        contextBuilder.setDesc(isValBlank ? DEFAULT_DESC : value);
-                    } else if (CTA_TEXT.getId() == type) {
-                        contextBuilder.setActionText(isValBlank ? DEFAULT_CTA : value);
-                    } else if (DOWNLOADS.getId() == type) {
-                        contextBuilder.setDownloads(isValBlank ? DEFAULT_DOWNLOAD : Integer.valueOf(value));
-                    } else if (RATING.getId() == type) {
-                        contextBuilder.setRating(isValBlank ? DEFAULT_RATING : value);
-                    }
-                }
-        }
-        return true;
+        return requestObject;
     }
 
     /**
@@ -498,20 +537,19 @@ public class IXAdNetworkHelper {
 
         LOG.debug("Starting building NativeResponseMaker interfacing object from response native object");
         final com.inmobi.template.context.App.Builder contextBuilder = com.inmobi.template.context.App.newBuilder();
-
         try {
             contextBuilder.setOpeningLandingUrl(nativeObj.getLink().getUrl());
             contextBuilder.setClickUrls(nativeObj.getLink().getClicktrackers());
             contextBuilder.setPixelUrls(nativeObj.getImptrackers());
             contextBuilder.setAdImpressionId(impressionId);
 
-            final List<com.inmobi.adserve.contracts.common.response.nativead.Asset> assetList = nativeObj.getAssets();
-            for (final com.inmobi.adserve.contracts.common.response.nativead.Asset asset : assetList) {
+            final Boolean isAnyAssetNonDefault = false;
+            for (final com.inmobi.adserve.contracts.common.response.nativead.Asset asset : nativeObj.getAssets()) {
                 final int assetId = asset.getId();
                 // We need all of mandatory fields. And Requested type should be same as response
                 if (mandatoryAssetMap.containsKey(assetId)) {
-                    final boolean isReqValid =
-                            areRequestResponseAssetsValid(mandatoryAssetMap.get(assetId), asset, contextBuilder, true);
+                    final boolean isReqValid = areRequestResponseAssetsValid(mandatoryAssetMap.get(assetId), asset,
+                            contextBuilder, true, isAnyAssetNonDefault);
                     if (isReqValid) {
                         mandatoryAssetMap.remove(assetId);
                         continue;
@@ -521,10 +559,13 @@ public class IXAdNetworkHelper {
                 }
                 // We do not need all of mandatory fields. But Requested type should be same as response
                 if (nonMandatoryAssetMap.containsKey(assetId)) {
-                    areRequestResponseAssetsValid(nonMandatoryAssetMap.get(assetId), asset, contextBuilder, false);
+                    areRequestResponseAssetsValid(nonMandatoryAssetMap.get(assetId), asset, contextBuilder, false,
+                            isAnyAssetNonDefault);
                 }
             }
-
+            if (!isAnyAssetNonDefault) {
+                InspectorStats.incrementStatCount(ALL_NATIVE_ASSETS_DEFAULT);
+            }
             if (mandatoryAssetMap.isEmpty()) {
                 LOG.debug("NativeResponseMaker interfacing object built successfully");
                 return (App) contextBuilder.build();
