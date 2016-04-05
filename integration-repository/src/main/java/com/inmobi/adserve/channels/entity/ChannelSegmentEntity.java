@@ -6,12 +6,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.inmobi.adtemplate.platform.CreativeType;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.channels.types.AdFormatType;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
@@ -204,10 +204,10 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
             return notFound;
         }
 
-        final int requestedAdFormatId = getAdFormatId(creativeType);
+        final List<Integer> requestedAdFormatIdList = getAdFormatIdList(creativeType);
         try {
             for (int i = 0; i < getAdFormatIds().length; i++) {
-                if (getAdFormatIds()[i] == requestedAdFormatId) {
+                if (requestedAdFormatIdList.contains(getAdFormatIds()[i])) {
                     return getIncIds()[i];
                 }
             }
@@ -229,10 +229,10 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
             return notFound;
         }
 
-        final int requestedAdFormatId = getAdFormatId(creativeType);
+        final List<Integer> requestedAdFormatIdList = getAdFormatIdList(creativeType);
         try {
             for (int i = 0; i < getAdFormatIds().length; i++) {
-                if (getAdFormatIds()[i] == requestedAdFormatId) {
+                if (requestedAdFormatIdList.contains(getAdFormatIds()[i])) {
                     return getAdIds()[i];
                 }
             }
@@ -245,17 +245,30 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
     }
 
     /**
-     * Get Ad format id corresponding to a creative type in the ad group.
+     * Get Ad format ids corresponding to a creative type in the ad group.
      */
-    private int getAdFormatId(final ADCreativeType creativeType) {
-        if (creativeType == ADCreativeType.NATIVE) {
-            return AdFormatType.META_JSON.getValue(); // NATIVE
-        } else if (creativeType == ADCreativeType.INTERSTITIAL_VIDEO) {
-            return AdFormatType.VIDEO.getValue(); // VIDEO
-        } else if (creativeType == ADCreativeType.BANNER) {
-            return AdFormatType.TEXT.getValue(); // BANNER
-        } else {
-            return -1; // not found
+    private List<Integer> getAdFormatIdList(final ADCreativeType creativeType) {
+        List<Integer> adFormatIdList = new ArrayList<>(2);
+        if (null == creativeType) {
+            adFormatIdList.add(-1);
+            return adFormatIdList;
         }
+
+        switch (creativeType) {
+            case NATIVE:
+                adFormatIdList.add(CreativeType.META.getValue()); // NATIVE META_JSON
+                break;
+            case INTERSTITIAL_VIDEO:
+                adFormatIdList.add(CreativeType.VIDEO.getValue()); // VIDEO
+                adFormatIdList.add(CreativeType.VIDEO_VAST_URL.getValue()); // VAST
+                break;
+            case BANNER:
+                adFormatIdList.add(CreativeType.TEXT.getValue()); //BANNER
+                break;
+            default:
+                adFormatIdList.add(-1);
+
+        }
+        return adFormatIdList;
     }
 }
