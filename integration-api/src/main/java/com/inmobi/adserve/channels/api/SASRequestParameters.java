@@ -80,6 +80,7 @@ public class SASRequestParameters {
     private Integer state;
     private List<Short> rqMkSlot;
     private List<Short> processedMkSlot;
+    private Double derivedDeviceDensity;
     private Integer ipFileVersion;
     private boolean isRichMedia;
     private boolean isRewardedVideo;

@@ -25,6 +25,7 @@ public final class Device {
     private String model;
     private String os;
     private String osv;
+    private Double pxratio;
     private Integer js;
     private Integer connectiontype;
     private Integer devicetype;

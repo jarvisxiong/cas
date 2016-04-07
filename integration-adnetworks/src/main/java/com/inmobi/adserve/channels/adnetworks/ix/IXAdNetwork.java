@@ -985,6 +985,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final RubiconExtension rpForDevice = new RubiconExtension();
         rpForDevice.setXff(sasParams.getRemoteHostIp());
+        if (null != sasParams.getDerivedDeviceDensity()) {
+            rpForDevice.setPixelratio(sasParams.getDerivedDeviceDensity());
+        }
+
         final CommonExtension ext = new CommonExtension();
         ext.setRp(rpForDevice);
         device.setExt(ext);

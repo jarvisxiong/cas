@@ -257,6 +257,9 @@ public class ThriftRequestParser {
             if (tDevice.isSetDisplayName()) {
                 params.setHandsetName(tDevice.getDisplayName());
             }
+            if (tDevice.isSetDerivedDensity()) {
+                params.setDerivedDeviceDensity(tDevice.getDerivedDensity());
+            }
         }
     }
 

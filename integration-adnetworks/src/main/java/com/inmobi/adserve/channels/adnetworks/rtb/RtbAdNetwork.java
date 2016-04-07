@@ -631,6 +631,10 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             device.setConnectiontype(0);
         }
 
+        if (null != sasParams.getDerivedDeviceDensity()) {
+            device.setPxratio(sasParams.getDerivedDeviceDensity());
+        }
+
         // Spec says - If “0”, then do not track Is set to false, if “1”, then do no track is set to true in browser.
         device.setDnt(casInternalRequestParameters.isTrackingAllowed() ? 0 : 1);
 
