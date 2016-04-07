@@ -63,6 +63,7 @@ public class AeroSpikeDataIngestion {
         aerospikeClient = new AerospikeClient(clientPolicy, host, port);
 
         writePolicy = new WritePolicy();
+        writePolicy.sendKey = true;
         writePolicy.expiration = -1;
 
         readPolicy = new Policy();
