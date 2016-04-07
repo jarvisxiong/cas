@@ -119,7 +119,7 @@ public class SlotSizeMapping {
         return IX_SLOT_ID_MAP.get(inmobiSlot);
     }
 
-    public static Short getOptimisedVideoSlot(final int videoSlotId) {
+    public static Short getOptimisedVideoSlot(final short videoSlotId) {
         return OPTIMISED_VAST_SLOT_ID_MAP.get(videoSlotId);
     }
 }
