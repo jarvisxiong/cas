@@ -24,7 +24,7 @@ prod:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -71,7 +71,7 @@ prod:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -117,7 +117,7 @@ prod:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -163,7 +163,7 @@ prod:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -210,7 +210,7 @@ pilot:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -256,7 +256,7 @@ pilot:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -302,7 +302,7 @@ pilot:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -348,7 +348,7 @@ pilot:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -488,7 +488,7 @@ skyhook:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -534,7 +534,7 @@ skyhook:
                 rtbd_publisher_yield: '12'
                 rtb2_status: 'off'
             dcp:
-                taboola_default_url: 'https://api.taboola.com/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
+                taboola_default_url: 'https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
