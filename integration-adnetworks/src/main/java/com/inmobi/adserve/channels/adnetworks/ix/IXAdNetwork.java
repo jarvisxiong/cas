@@ -4,6 +4,7 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MAN
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 import java.awt.Dimension;
 import java.net.URI;
@@ -879,9 +880,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     public String getAppBundleId() {
         if (null != wapSiteUACEntity) {
             if (wapSiteUACEntity.isIOS()) {
-                return StringUtils.defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
+                return defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
             } else {
-                return StringUtils.defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
+                return defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
             }
         } else {
             return sasParams.getAppBundleId();
@@ -896,9 +897,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         final String marketId;
         if (wapSiteUACEntity.isIOS()) {
-            marketId = StringUtils.defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
+            marketId = defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
         } else {
-            marketId = StringUtils.defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
+            marketId = wapSiteUACEntity.isOverrideMarketId() ?
+                    wapSiteUACEntity.getMarketId() :
+                    defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
         }
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);

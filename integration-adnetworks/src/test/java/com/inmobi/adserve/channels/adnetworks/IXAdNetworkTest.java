@@ -308,10 +308,9 @@ public class IXAdNetworkTest {
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
-            sas
-                    .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+            sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
             adapterCreated =
                     ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
@@ -347,7 +346,7 @@ public class IXAdNetworkTest {
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -386,11 +385,11 @@ public class IXAdNetworkTest {
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-            builder.setTransparencyEnabled(false);
-            builder.setBundleId("com.play.google.testApp.bundleId");
-            builder.setMarketId("com.play.google.testApp.marketId");
-            builder.setSiteUrl("http://www.testSite.com");
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            builder.isTransparencyEnabled(false);
+            builder.bundleId("com.play.google.testApp.bundleId");
+            builder.marketId("com.play.google.testApp.marketId");
+            builder.siteUrl("http://www.testSite.com");
+            sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -419,8 +418,8 @@ public class IXAdNetworkTest {
 
             // Test case when site_blind_list and pub_blind_list are null, should take global blind list, set above.
             sas.setSource("wap");
-            builder.setTransparencyEnabled(true);
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            builder.isTransparencyEnabled(true);
+            sas.setWapSiteUACEntity(builder.build());
 
             adapterCreated =
                     ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
@@ -446,10 +445,10 @@ public class IXAdNetworkTest {
 
             // Test case when site_blind_list or pub_blind_list is present
             sas.setSource("wap");
-            builder.setTransparencyEnabled(true);
+            builder.isTransparencyEnabled(true);
             blindList = new ArrayList<Integer>(Arrays.asList(8, 2, 3));
-            builder.setBlindList(blindList);
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            builder.blindList(blindList);
+            sas.setWapSiteUACEntity(builder.build());
 
             adapterCreated =
                     ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
@@ -495,7 +494,7 @@ public class IXAdNetworkTest {
             sas.setSiteId(SITE_ID);
 
             final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -563,11 +562,11 @@ public class IXAdNetworkTest {
             sas.setSiteContentType(ContentType.PERFORMANCE);
             sas.setSiteIncId(423);
             builder = WapSiteUACEntity.newBuilder();
-            builder.setAppType("Games");
-            builder.setSiteName("TESTSITE");
-            builder.setSiteUrl("www.testSite.com");
-            builder.setTransparencyEnabled(true);
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            builder.appType("Games");
+            builder.siteName("TESTSITE");
+            builder.siteUrl("www.testSite.com");
+            builder.isTransparencyEnabled(true);
+            sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
             sas
                     .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
@@ -591,12 +590,12 @@ public class IXAdNetworkTest {
             sas.setSiteContentType(ContentType.FAMILY_SAFE);
             sas.setSiteIncId(423);
             builder = WapSiteUACEntity.newBuilder();
-            builder.setAppType("Games");
-            builder.setSiteName("TESTSITE");
-            builder.setSiteUrl("www.testSite.com");
-            builder.setTransparencyEnabled(false);
+            builder.appType("Games");
+            builder.siteName("TESTSITE");
+            builder.siteUrl("www.testSite.com");
+            builder.isTransparencyEnabled(false);
 
-            sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+            sas.setWapSiteUACEntity(builder.build());
 
             adapterCreated =
                     ixAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);

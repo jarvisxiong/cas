@@ -264,6 +264,9 @@ public class ChannelServer {
 
             final RepositoryHelper repositoryHelper = repoHelperBuilder.build();
 
+            wapSiteUACRepository.initOverrides(
+                    configurationLoader.getCacheConfiguration().subset(WAP_SITE_UAC_REPOSITORY), Logger.getLogger("repository"));
+
             instantiateRepository(Logger.getLogger("repository"), configurationLoader, dataCentreName);
             CasConfigUtil.init(configurationLoader, repositoryHelper);
 

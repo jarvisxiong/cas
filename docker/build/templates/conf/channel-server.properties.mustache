@@ -196,6 +196,22 @@ Cache.WapSiteUACRepository.refreshTime = 1423
 Cache.WapSiteUACRepository.isUpdatable = true
 Cache.WapSiteUACRepository.dataSourceName = jdbc
 
+{{! Site Overrides. Last defined value takes precedence in case of collisions. For list of possible overrides see WapSiteUACRepository}}
+Cache.WapSiteUACRepository.override.site.3e29652ee5a34fc9960191de50a75ebf.marketId=com.coremobility.app.vnotes
+Cache.WapSiteUACRepository.override.site.78177b201da54aab9ce6ef53db6a42b8.marketId=com.coremobility.app.vnotes
+Cache.WapSiteUACRepository.override.site.b3201f86aaad40b4bf2cd9b1cb997b41.marketId=com.coremobility.app.vnotes
+Cache.WapSiteUACRepository.override.site.e4bd17df91e641b1afe1b8a46101d852.marketId=com.coremobility.app.vnotes
+
+Cache.WapSiteUACRepository.override.site.3e29652ee5a34fc9960191de50a75ebf.bundleId=com.coremobility.app.vnotes
+Cache.WapSiteUACRepository.override.site.78177b201da54aab9ce6ef53db6a42b8.bundleId=com.coremobility.app.vnotes
+Cache.WapSiteUACRepository.override.site.b3201f86aaad40b4bf2cd9b1cb997b41.bundleId=com.coremobility.app.vnotes
+Cache.WapSiteUACRepository.override.site.e4bd17df91e641b1afe1b8a46101d852.bundleId=com.coremobility.app.vnotes
+
+Cache.WapSiteUACRepository.override.site.3e29652ee5a34fc9960191de50a75ebf.siteUrl=
+Cache.WapSiteUACRepository.override.site.78177b201da54aab9ce6ef53db6a42b8.siteUrl=
+Cache.WapSiteUACRepository.override.site.b3201f86aaad40b4bf2cd9b1cb997b41.siteUrl=
+Cache.WapSiteUACRepository.override.site.e4bd17df91e641b1afe1b8a46101d852.siteUrl=
+
 Cache.Name = ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.Manager = com.inmobi.adserve.channels.repository.ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_28082015('${last_update}')

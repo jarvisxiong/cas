@@ -3,15 +3,18 @@ package com.inmobi.adserve.channels.entity;
 import java.sql.Timestamp;
 import java.util.List;
 
-import lombok.Data;
-import lombok.Setter;
-
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author ritwik.kumar
  */
 @Data
+@RequiredArgsConstructor
+@Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
     private static final long IOS_SITE_TYPE = 21;
@@ -20,6 +23,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final String id;
     // Type of site (Android, IOS etc.)
     private final String marketId;
+    private final boolean overrideMarketId;
     // long id ios=21, android=22 etc
     private final long siteTypeId;
     // Content Rating of the App
@@ -45,56 +49,12 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     // last modified time of this table
     private final Timestamp modifiedOn;
 
-
-    public WapSiteUACEntity(final Builder builder) {
-        id = builder.id;
-        marketId = builder.marketId;
-        siteTypeId = builder.siteTypeId;
-        contentRating = builder.contentRating;
-        appType = builder.appType;
-        categories = builder.categories;
-        isCoppaEnabled = builder.isCoppaEnabled;
-        isTransparencyEnabled = builder.isTransparencyEnabled;
-        blindList = builder.blindList;
-        siteUrl = builder.siteUrl;
-        siteName = builder.siteName;
-        appTitle = builder.appTitle;
-        bundleId = builder.bundleId;
-        modifiedOn = builder.modifiedOn;
-    }
-
     public boolean isAndroid() {
         return ANDROID_SITE_TYPE == siteTypeId;
     }
 
     public boolean isIOS() {
         return IOS_SITE_TYPE == siteTypeId;
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    @Setter
-    public static class Builder {
-        private String id;
-        private String marketId;
-        private long siteTypeId;
-        private String contentRating;
-        private String appType;
-        private List<String> categories;
-        private boolean isCoppaEnabled;
-        private boolean isTransparencyEnabled;
-        private List<Integer> blindList;
-        private String siteUrl;
-        private String siteName;
-        private String appTitle;
-        private String bundleId;
-        private Timestamp modifiedOn;
-
-        public WapSiteUACEntity build() {
-            return new WapSiteUACEntity(this);
-        }
     }
 
     @Override

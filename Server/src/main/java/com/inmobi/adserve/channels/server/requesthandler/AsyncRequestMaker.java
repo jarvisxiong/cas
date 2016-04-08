@@ -52,7 +52,7 @@ public class AsyncRequestMaker {
             final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalGlobal,
             final List<ChannelSegment> rtbSegments) throws Exception {
 
-        final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
+        final List<ChannelSegment> segments = new ArrayList<>();
         LOG.debug("Total channels available for sending requests {}", rows.size());
 
         /*

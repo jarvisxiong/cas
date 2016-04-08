@@ -414,8 +414,8 @@ public class NewIXAdNetworkTest {
                 new IXAdNetwork(mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "",
                         advertiserName, true);
 
-        final WapSiteUACEntity.Builder wapBuild = new WapSiteUACEntity.Builder();
-        wapBuild.setTransparencyEnabled(true);
+        final WapSiteUACEntity.Builder wapBuild = WapSiteUACEntity.newBuilder();
+        wapBuild.isTransparencyEnabled(true);
 
         final SASRequestParameters sas = new SASRequestParameters();
         sas.setRemoteHostIp("10.14.112.15");

@@ -120,6 +120,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getSiteName(), format), false);
         }
+
+        // TODO: IX/RTBD pass the market id in the bundle id field, investigate why
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getBundleId())) {
             appendQueryParam(requestBuilder, SOURCE_ID, wapSiteUACEntity.getBundleId(), false);
         }

@@ -552,6 +552,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
         String marketId = isWapSiteUACEntity ? wapSiteUACEntity.getMarketId() : null;
+        // TODO: This should use the same logic as IX
         marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);

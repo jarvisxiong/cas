@@ -305,8 +305,8 @@ public class RtbAdnetworkTest {
 
         sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        sas.setWapSiteUACEntity(builder.build());
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
 
@@ -323,8 +323,8 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is not null, then it should set primary category name from uac.
         sas.setSource("app");
         builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Social");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Social");
+        sas.setWapSiteUACEntity(builder.build());
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
         // Setting primary category name from uac.
@@ -599,10 +599,10 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        builder.setTransparencyEnabled(true);
-        builder.setSiteUrl("www.inmobi.com");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        builder.isTransparencyEnabled(true);
+        builder.siteUrl("www.inmobi.com");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -633,8 +633,8 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -694,12 +694,12 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        builder.setTransparencyEnabled(true);
-        builder.setSiteUrl("www.inmobi.com");
-        builder.setBundleId("com.android.app.bundleId");
-        builder.setMarketId("com.android.app.marketId");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        builder.isTransparencyEnabled(true);
+        builder.siteUrl("www.inmobi.com");
+        builder.bundleId("com.android.app.bundleId");
+        builder.marketId("com.android.app.marketId");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -730,8 +730,8 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
