@@ -66,7 +66,8 @@ public abstract class BaseServlet implements Servlet {
     protected BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
             final ChannelSegmentFilterApplier channelSegmentFilterApplier, final CasUtils casUtils,
             final RequestFilters requestFilters, final AsyncRequestMaker asyncRequestMaker,
-            final List<AdvertiserLevelFilter> advertiserLevelFilters, final List<AdGroupLevelFilter> adGroupLevelFilters) {
+            final List<AdvertiserLevelFilter> advertiserLevelFilters,
+            final List<AdGroupLevelFilter> adGroupLevelFilters) {
         this.matchSegments = matchSegments;
         this.traceMarkerProvider = traceMarkerProvider;
         this.channelSegmentFilterApplier = channelSegmentFilterApplier;
@@ -111,7 +112,7 @@ public abstract class BaseServlet implements Servlet {
             return;
         }
 
-        final boolean isVideoSupported = casUtils.isVideoSupported(sasParams);
+        final boolean isVideoSupported = casUtils.isVideoSupportedSite(sasParams);
         sasParams.setVideoSupported(isVideoSupported);
         LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
 
@@ -124,9 +125,8 @@ public abstract class BaseServlet implements Servlet {
         }
 
         // applying all the filters
-        final List<ChannelSegment> filteredSegments =
-                channelSegmentFilterApplier.getChannelSegments(matchedSegmentDetails, sasParams, casContext,
-                        advertiserLevelFilters, adGroupLevelFilters);
+        final List<ChannelSegment> filteredSegments = channelSegmentFilterApplier.getChannelSegments(
+                matchedSegmentDetails, sasParams, casContext, advertiserLevelFilters, adGroupLevelFilters);
 
         if (filteredSegments == null || filteredSegments.isEmpty()) {
             LOG.debug(traceMarker, "All segments dropped in filters");
@@ -147,13 +147,10 @@ public abstract class BaseServlet implements Servlet {
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());
         final List<ChannelSegment> rtbSegments = new ArrayList<>();
-        List<ChannelSegment> dcpSegments;
-
-        dcpSegments =
-                asyncRequestMaker.prepareForAsyncRequest(filteredSegments, CasConfigUtil.getServerConfig(),
-                        CasConfigUtil.getRtbConfig(), CasConfigUtil.getAdapterConfig(), hrh.responseSender,
-                        sasParams.getUAdapters(), serverChannel, CasConfigUtil.repositoryHelper, sasParams,
-                        casInternal, rtbSegments);
+        final List<ChannelSegment> dcpSegments = asyncRequestMaker.prepareForAsyncRequest(filteredSegments,
+                CasConfigUtil.getServerConfig(), CasConfigUtil.getRtbConfig(), CasConfigUtil.getAdapterConfig(),
+                hrh.responseSender, sasParams.getUAdapters(), serverChannel, CasConfigUtil.repositoryHelper, sasParams,
+                casInternal, rtbSegments);
 
         LOG.debug("rtb rankList size is {}", rtbSegments.size());
         if (CollectionUtils.isEmpty(dcpSegments) && CollectionUtils.isEmpty(rtbSegments)) {
@@ -167,10 +164,10 @@ public abstract class BaseServlet implements Servlet {
 
         hrh.responseSender.setRankList(tempRankList);
         auctionEngine.setUnfilteredChannelSegmentList(rtbSegments);
-        LOG.debug(traceMarker, "Number of tpans whose request was successfully completed {}", hrh.responseSender
-                .getRankList().size());
-        LOG.debug(traceMarker, "Number of rtb tpans whose request was successfully completed {}", hrh.responseSender
-                .getAuctionEngine().getUnfilteredChannelSegmentList().size());
+        LOG.debug(traceMarker, "Number of tpans whose request was successfully completed {}",
+                hrh.responseSender.getRankList().size());
+        LOG.debug(traceMarker, "Number of rtb tpans whose request was successfully completed {}",
+                hrh.responseSender.getAuctionEngine().getUnfilteredChannelSegmentList().size());
         // if none of the async request succeed, we return NO_AD
         if (hrh.responseSender.getRankList().isEmpty() && auctionEngine.getUnfilteredChannelSegmentList().isEmpty()) {
             LOG.debug(traceMarker, "No calls");
@@ -188,8 +185,8 @@ public abstract class BaseServlet implements Servlet {
             }
             // Resetting the rankIndexToProcess for already completed adapters.
             hrh.responseSender.processDcpList(serverChannel);
-            LOG.debug(traceMarker, "returned from send Response, ranklist size is {}", hrh.responseSender.getRankList()
-                    .size());
+            LOG.debug(traceMarker, "returned from send Response, ranklist size is {}",
+                    hrh.responseSender.getRankList().size());
         }
     }
 

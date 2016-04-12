@@ -1,14 +1,12 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
-import static com.inmobi.adserve.channels.util.InspectorStrings.ADPOOL_REQUEST_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI_BEING_SENT_FOR;
-import static com.inmobi.adserve.channels.util.InspectorStrings.PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -337,10 +335,10 @@ public class ThriftRequestParser {
             // Fill params for Pub Control - Supported Ad Types.
             List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
             if (tSite.isSetEnrichedSiteAllowedMediaAttributes()) {
-                for (final int i : tSite.getEnrichedSiteAllowedMediaAttributes()) {
-                    if (i == AdAttributeType.VIDEO.getValue()) {
+                for (final int adAttribVal : tSite.getEnrichedSiteAllowedMediaAttributes()) {
+                    if (adAttribVal == AdAttributeType.VIDEO.getValue()) {
                         pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
-                    } else if (i == AdAttributeType.DEFAULT.getValue()) {
+                    } else if (adAttribVal == AdAttributeType.DEFAULT.getValue()) {
                         pubControlSupportedAdTypes.add(AdTypeEnum.BANNER);
                     } // Ignore other fields which are not relevant to us.
                 }
@@ -352,11 +350,6 @@ public class ThriftRequestParser {
             params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
             if (tSite.isSetRewarded()) {
                 params.setRewardedVideo(tSite.isRewarded());
-            }
-
-            if (params.isRewardedVideo() && pubControlSupportedAdTypes.contains(AdTypeEnum.BANNER)) {
-                InspectorStats.incrementStatCount(ADPOOL_REQUEST_STATS,
-                        PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT);
             }
 
             // Fill params for pub control - Media preferences json.

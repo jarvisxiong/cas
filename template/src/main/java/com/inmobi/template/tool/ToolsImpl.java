@@ -2,6 +2,7 @@ package com.inmobi.template.tool;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.inmobi.template.context.KeyConstants;
 import com.inmobi.template.gson.GsonManager;
 import com.inmobi.template.interfaces.Context;
 import com.inmobi.template.interfaces.Tools;
@@ -35,8 +36,13 @@ public class ToolsImpl extends Tools {
     }
 
     @Override
-    public String nativeAd(final Context creativeContext, final String pubContent) {
+    public String nativeAd(final Context context, final String pubContent) {
         return pubContent;
+    }
+
+    @Override
+    public String getVastXMl(final Context context) {
+        return jpathStr(context, KeyConstants.AD_VASTCONTENT);
     }
 
 }

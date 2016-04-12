@@ -47,13 +47,6 @@ public class AdapterConfig implements CasConfig {
     }
 
     /**
-     * @return true for explicit wn, false otherwise
-     */
-    public boolean templateWinNotification() {
-        return adapterConfig.getBoolean("templateWinNotification", true);
-    }
-
-    /**
      * @return the adapterName
      */
     public String getAdapterName() {

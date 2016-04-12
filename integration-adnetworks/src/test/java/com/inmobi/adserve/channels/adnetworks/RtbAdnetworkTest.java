@@ -170,7 +170,7 @@ public class RtbAdnetworkTest {
                 .anyTimes();
         replay(repositoryHelper);
 
-        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", true);
+        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb");
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
@@ -982,7 +982,7 @@ public class RtbAdnetworkTest {
         nativeContentJsonObject.setOtherAssets(Arrays.asList(otherAsset));
 
         final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
-            .nativeTemplateId(4408950071453012585l)
+            .templateId(4408950071453012585l)
             .contentJson(nativeContentJsonObject)
             .imageKey("imageKey")
             .mandatoryKey("mandatoryKey")
@@ -1067,7 +1067,7 @@ public class RtbAdnetworkTest {
     public void verifyNativeOnRtbWhenEntityNull(final NativeAdContentUILayoutType layoutType, final String mandatoryKey,
                                                 final String imageKey) throws Exception {
         final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
-            .nativeTemplateId(4408950071453012585l)
+            .templateId(4408950071453012585l)
             .contentJson(null)
             .imageKey(imageKey)
             .mandatoryKey(mandatoryKey)

@@ -165,7 +165,7 @@ public class AuctionEngineIXTest extends PowerMockTestCase {
         expect(((IXAdNetwork) mockAdnetworkInterface).getOriginalBidPriceInUsd()).andReturn(bidValue).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getImpressionObjCount()).andReturn(1).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).isTrumpDeal()).andReturn(isTrumpDeal).anyTimes();
-        expect(((IXAdNetwork) mockAdnetworkInterface).isVideoRequest()).andReturn(true).anyTimes();
+        expect(((IXAdNetwork) mockAdnetworkInterface).isSegmentVideoSupported()).andReturn(true).anyTimes();
         expect(((IXAdNetwork) mockAdnetworkInterface).getDealId()).andReturn("dealId").anyTimes();
         expect(mockAdnetworkInterface.getCreativeType()).andReturn(adCreativeType).anyTimes();
         // responseBidObjCount

@@ -456,7 +456,7 @@ public class BaseAdNetworkImplTest {
         // Test getCreativeType().
         assertEquals(baseAdNetwork.getCreativeType(), ADCreativeType.NATIVE);
         assertEquals(baseAdNetwork.getCreativeType(), ADCreativeType.BANNER);
-        baseAdNetwork.isVideoRequest = true;
+        baseAdNetwork.isSegmentVideoSupported = true;
         assertEquals(baseAdNetwork.getCreativeType(), ADCreativeType.INTERSTITIAL_VIDEO);
 
         // Test getHashedValue()

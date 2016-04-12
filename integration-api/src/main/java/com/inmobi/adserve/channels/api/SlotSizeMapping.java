@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 
  * @author ritwik.kumar<br>
- * <br>
+ *         <br>
  *         Rubicon Supported Size Ids <br>
  *         Size ID 44: Mobile banner 2 (300x50)<br>
  *         Size ID 43: Mobile Banner 1 (320x50)<br>
@@ -27,7 +27,7 @@ import java.util.Map;
  *         Size ID 53: Tablet Full Page (1024x768)<br>
  *         Size ID 51: Tablet Portrait Banner (768x900)<br>
  *         Size ID 61: Full page (1000x1000)<br>
- * <br>
+ *         <br>
  *         InMobi supported slots<br>
  *         wap_prod_adserve=> select id, width, height, ad_type from serving_unit;<br>
  */
@@ -99,6 +99,9 @@ public class SlotSizeMapping {
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 17, (short) 33);
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 33, (short) 33);
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 34, (short) 33);
+
+        // Mapped to 320x480 (width*height)
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 0, (short) 32);
     }
 
     /**

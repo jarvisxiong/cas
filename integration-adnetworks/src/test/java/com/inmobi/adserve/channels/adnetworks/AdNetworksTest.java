@@ -34,6 +34,7 @@ import com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -169,6 +170,7 @@ public class AdNetworksTest {
         builder.setTod(tod);
         builder.setAdgroupIncId(adGroupIncId);
         builder.setAdFormatIds(AdFormatIds);
+        builder.setSecondaryAdFormatConstraints(SecondaryAdFormatConstraints.STATIC);
         return builder;
     }
 

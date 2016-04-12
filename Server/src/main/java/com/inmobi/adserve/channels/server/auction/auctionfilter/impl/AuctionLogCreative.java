@@ -34,17 +34,15 @@ public class AuctionLogCreative extends AbstractAuctionFilter {
 
     @Override
     protected boolean failedInFilter(final ChannelSegment rtbSegment,
-                                     final CasInternalRequestParameters casInternalRequestParameters) {
-
-        String creativeId = rtbSegment.getAdNetworkInterface().getCreativeId();
+            final CasInternalRequestParameters casInternalRequestParameters) {
+        final String creativeId = rtbSegment.getAdNetworkInterface().getCreativeId();
         String advertiserAccountId = rtbSegment.getChannelEntity().getAccountId();
 
-        /**
-         * In case of IX, we are only interested in logging VIDEO creative.
-         * This logging is required since video creative is not yet supported in the RP creative audit API.
-         */
-        if (rtbSegment.getAdNetworkInterface().getDst() == DemandSourceType.IX ) {
-            if (rtbSegment.getAdNetworkInterface().getCreativeType() != ADCreativeType.INTERSTITIAL_VIDEO){
+        // In case of IX, we are only interested in logging VIDEO creative. This logging is required since video
+        // creative is not yet supported in the RP creative audit API.
+
+        if (rtbSegment.getAdNetworkInterface().getDst() == DemandSourceType.IX) {
+            if (rtbSegment.getAdNetworkInterface().getCreativeType() != ADCreativeType.INTERSTITIAL_VIDEO) {
                 return false;
             }
             // Replace the RP account Id with the DSP account Id.
@@ -64,6 +62,7 @@ public class AuctionLogCreative extends AbstractAuctionFilter {
             rtbSegment.getAdNetworkInterface().setLogCreative(true);
             creativeCache.addToCache(advertiserAccountId, creativeId);
         } else if (null != creativeEntity && presentInCache) {
+            // Remove from local cache since we have this in DB already
             creativeCache.removeFromCache(advertiserAccountId, creativeId);
         }
         return false;

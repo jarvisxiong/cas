@@ -2,12 +2,22 @@ package com.inmobi.adserve.channels.api;
 
 
 import static com.inmobi.adserve.channels.api.SlotSizeMapping.getOptimisedVideoSlot;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseFormat.HTML;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseFormat.JSON;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.SUCCESS;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CHINA_COUNTRY_CODE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.TIME_OUT;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.PURE_VAST;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.STATIC;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
+import static com.inmobi.casthrift.ADCreativeType.BANNER;
+import static com.inmobi.casthrift.ADCreativeType.INTERSTITIAL_VIDEO;
+import static com.inmobi.casthrift.ADCreativeType.NATIVE;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,7 +73,7 @@ import lombok.Setter;
 
 /**
  * This abstract class have base functionality of TPAN adapters
- * 
+ *
  * @author ritwik.kumar
  *
  */
@@ -120,14 +130,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String responseContent = DEFAULT_EMPTY_STRING;
     @Getter
     protected String adStatus = NO_AD;
-    protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
-    protected boolean isHTMLResponseSupported = true;
-    protected boolean isNativeResponseSupported = false;
+    protected ThirdPartyAdResponse.ResponseStatus errorStatus = SUCCESS;
+
     @Getter
-    protected boolean isVideoRequest = false;
-    protected boolean isPureVastRequest = false;
-    protected boolean isRewardedVideoRequest = false;
-    protected boolean isNativeRequest = false;
+    private boolean isNativeRequest = false;
+    @Getter
+    protected boolean isSegmentVideoSupported = false;
+    @Getter
+    protected boolean isSegmentPureVastSupported = false;
+    protected boolean isSegmentRewardedVideoSupported = false;
+    protected boolean isSegmentStaticSupported = false;
+
     protected boolean isRtbPartner = false;
     protected boolean isIxPartner = false;
     protected SASRequestParameters sasParams;
@@ -320,6 +333,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             startTime = System.currentTimeMillis();
             final boolean isTraceEnabled = casInternalRequestParameters.isTraceEnabled();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
+                /*
+                 * (non-Javadoc)
+                 * @see com.ning.http.client.AsyncCompletionHandler#onCompleted(com.ning.http.client.Response)
+                 */
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     latency = System.currentTimeMillis() - startTime;
@@ -352,6 +369,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     return response;
                 }
 
+                /*
+                 * (non-Javadoc)
+                 * @see com.ning.http.client.AsyncCompletionHandler#onThrowable(java.lang.Throwable)
+                 */
                 @Override
                 public void onThrowable(final Throwable t) {
                     latency = System.currentTimeMillis() - startTime;
@@ -493,25 +514,23 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.setResponseFormat(isNativeRequest()
-                ? ThirdPartyAdResponse.ResponseFormat.JSON
-                : ThirdPartyAdResponse.ResponseFormat.HTML);
+        responseStruct.setResponseFormat(isNativeRequest() ? JSON : HTML);
         responseStruct.setResponse(getHttpResponseContent());
         responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
-            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR);
+            responseStruct.setResponseStatus(FAILURE_NETWORK_ERROR);
         } else if (statusCode >= 300) {
-            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR);
+            responseStruct.setResponseStatus(FAILURE_REQUEST_ERROR);
         } else if (statusCode == 200) {
             if (StringUtils.isBlank(responseContent) || !AD_STRING.equalsIgnoreCase(adStatus)) {
                 adStatus = NO_AD;
-                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
+                responseStruct.setResponseStatus(FAILURE_NO_AD);
             } else {
-                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.SUCCESS);
+                responseStruct.setResponseStatus(SUCCESS);
                 adStatus = AD_STRING;
             }
         } else if (statusCode >= 204) {
-            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
+            responseStruct.setResponseStatus(FAILURE_NO_AD);
         }
         responseStruct.setLatency(latency);
         responseStruct.setStartTime(startTime);
@@ -542,20 +561,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
         blindedSiteId = BaseAdNetworkHelper.getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        // TODO: Move all supported ad type checks to ThriftRequestParser or AdGroupAdTypeTargetingFilter.
         isNativeRequest = SASParamsUtils.isNativeRequest(sasParams);
 
         // Checking the appropriate SecondaryAdFormatConstraints of an adgroup is a sufficient check for determining
         // vast video, rewarded video, etc support as the selected adgroup by this point, would have already had all
         // supply constraints checked in AdGroupAdTypeTargetingFilter
-        isVideoRequest = VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
-        isPureVastRequest = PURE_VAST == entity.getSecondaryAdFormatConstraints();
-        isRewardedVideoRequest = (REWARDED_VAST_VIDEO == entity.getSecondaryAdFormatConstraints());
+        isSegmentVideoSupported = VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
+        isSegmentPureVastSupported = PURE_VAST == entity.getSecondaryAdFormatConstraints();
+        isSegmentRewardedVideoSupported = REWARDED_VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
+        isSegmentStaticSupported = STATIC == entity.getSecondaryAdFormatConstraints();
 
         selectedSlotId = (short) slotId;
-        processedSlotId = (isVideoRequest || isRewardedVideoRequest || isPureVastRequest)
-                ? ObjectUtils.defaultIfNull(getOptimisedVideoSlot((short) slotId), (short) slotId)
-                : (short) slotId;
+        processedSlotId = isSegmentVideoSupported || isSegmentRewardedVideoSupported || isSegmentPureVastSupported
+                ? ObjectUtils.defaultIfNull(getOptimisedVideoSlot(selectedSlotId), selectedSlotId)
+                : selectedSlotId;
 
         isCpc = BaseAdNetworkHelper.getPricingModel(entity);
         final boolean isConfigured = configureParameters();
@@ -707,22 +726,18 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     }
 
-    public boolean isNativeRequest() {
-        return isNativeRequest;
-    }
-
     public boolean isCAURequest() {
         return CollectionUtils.isNotEmpty(sasParams.getCauMetadataSet());
     }
 
     @Override
     public ADCreativeType getCreativeType() {
-        if (isNativeRequest()) {
-            return ADCreativeType.NATIVE;
-        } else if (isVideoRequest || isRewardedVideoRequest || isPureVastRequest) {
-            return ADCreativeType.INTERSTITIAL_VIDEO;
+        if (isNativeRequest() && isSegmentStaticSupported) {
+            return NATIVE;
+        } else if (isSegmentVideoSupported || isSegmentRewardedVideoSupported || isSegmentPureVastSupported) {
+            return INTERSTITIAL_VIDEO;
         } else {
-            return ADCreativeType.BANNER;
+            return BANNER;
         }
     }
 

@@ -41,26 +41,45 @@ public class ImpressionIdGenerator {
         }
     }
 
+    /**
+     *
+     * @param adId
+     * @return
+     */
     public String getImpressionId(final long adId) {
         final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId).toString();
         final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, containerIdCode).toString();
-        final String uuidWithCyclicCounter =
-                WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128))
-                        .toString();
+        final String uuidWithCyclicCounter = WilburyUUID
+                .setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128)).toString();
         return WilburyUUID.setDataCenterId(uuidWithCyclicCounter, dataCenterIdCode).toString();
     }
 
+    /**
+     *
+     * @param adId
+     * @return
+     */
     public long getUniqueId(final long adId) {
         final String uuidIntKey = WilburyUUID.setIntKey(WilburyUUID.getUUID().toString(), (int) adId).toString();
         final String uuidMachineKey = WilburyUUID.setMachineId(uuidIntKey, containerIdCode).toString();
-        final String uuidWithCyclicCounter =
-                WilburyUUID.setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128))
-                        .toString();
+        final String uuidWithCyclicCounter = WilburyUUID
+                .setCyclicCounter(uuidMachineKey, (byte) Math.abs(COUNTER.getAndIncrement() % 128)).toString();
         return WilburyUUID.setDataCenterId(uuidWithCyclicCounter, dataCenterIdCode).getLeastSignificantBits();
     }
 
     /**
+     *
+     * @param bid
+     * @return
+     */
+    public String getEncryptedBid(final Double bid) {
+        final long winBid = (long) (bid * Math.pow(10, 6));
+        return getImpressionId(winBid);
+    }
+
+    /**
      * Takes a existing WilburyUUID String (oldImpressionId) and changes the int key to adId.
+     * 
      * @param oldImpressionId
      * @param adId
      * @return New ImpressionId which differs from the oldImpressionId only in the int key.
@@ -70,30 +89,35 @@ public class ImpressionIdGenerator {
     }
 
     /**
-     * Checks whether two WilburyUUID strings are similar.
-     * Two WilburyUUID strings are said to be similar if all their sub components (except their int key) match and
-     * their int keys differ by no more than the SIMILARITY_LIMIT.
+     * Checks whether two WilburyUUID strings are similar. Two WilburyUUID strings are said to be similar if all their
+     * sub components (except their int key) match and their int keys differ by no more than the SIMILARITY_LIMIT.
+     * 
      * @param impressionId1
      * @param impressionId2
      * @return
      */
     public boolean areImpressionIdsSimilar(final String impressionId1, final String impressionId2) {
         return WilburyUUID.setIntKey(impressionId1, 0).toString()
-            .equals(WilburyUUID.setIntKey(impressionId2, 0).toString())
-            && Math.abs(WilburyUUID.getIntKey(impressionId1) - WilburyUUID.getIntKey(impressionId2))
-            <= SIMILARITY_LIMIT;
+                .equals(WilburyUUID.setIntKey(impressionId2, 0).toString())
+                && Math.abs(WilburyUUID.getIntKey(impressionId1)
+                        - WilburyUUID.getIntKey(impressionId2)) <= SIMILARITY_LIMIT;
     }
 
-    private static Date extractDateFromImpId(String uuid) {
-        UUID u = UUID.fromString(uuid);
+    /**
+     *
+     * @param uuid
+     * @return
+     */
+    private static Date extractDateFromImpId(final String uuid) {
+        final UUID u = UUID.fromString(uuid);
         long lsig = u.getLeastSignificantBits();
-        long msig = u.getMostSignificantBits();
+        final long msig = u.getMostSignificantBits();
         lsig &= 0xff00ffff000000ffL;
         return new Date(new UUID(msig, lsig).timestamp());
     }
 
-    public static void main(String[] args) {
-        String impressionId = "d688ba4f-014f-1000-d715-3e90392b0064";
+    public static void main(final String[] args) {
+        final String impressionId = "d688ba4f-014f-1000-d715-3e90392b0064";
 
         System.out.println("UUID = " + WilburyUUID.extractUUID(impressionId));
         System.out.println("Impression Time = " + extractDateFromImpId(impressionId));

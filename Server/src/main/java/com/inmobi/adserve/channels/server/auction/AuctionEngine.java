@@ -90,8 +90,8 @@ public class AuctionEngine implements AuctionEngineInterface {
                 SecondBidPrice is set to the second highest distinct bid (defaulting to the auctionBidFloor if all the
                 bids are the same.
              */
-            double secondHighestDistinctBid = casInternalRequestParameters.getAuctionBidFloor(); // Acts as the default
-                                                                                                 // secondBidPrice
+            // Acts as the default secondBidPrice
+            double secondHighestDistinctBid = casInternalRequestParameters.getAuctionBidFloor();
 
             for (int index = 1; index < filteredChannelSegmentList.size(); ++index) {
                 final AdNetworkInterface adNetworkInterface =
@@ -183,7 +183,7 @@ public class AuctionEngine implements AuctionEngineInterface {
                 LOG.debug("IX multi-format auction run. ({} Trump Deals)", ixMultiFormatAuctionTrumpDealsCount);
                 final IXAdNetwork winningIXAdNetwork =
                         (IXAdNetwork) filteredChannelSegmentList.get(winnerIndex).getAdNetworkInterface();
-                if (winningIXAdNetwork.isVideoRequest()) {
+                if (winningIXAdNetwork.isSegmentVideoSupported()) {
                     LOG.debug("Winning ad type is VAST_VIDEO");
                     InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS,
                             InspectorStrings.MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS);
@@ -204,22 +204,16 @@ public class AuctionEngine implements AuctionEngineInterface {
             LOG.debug("Returning from auction engine, as unhandled DST was encountered. No winner.");
             return null;
         }
-
         auctionResponse = filteredChannelSegmentList.get(winnerIndex);
         final AdNetworkInterface winningAdNetwork = filteredChannelSegmentList.get(winnerIndex).getAdNetworkInterface();
-
         if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
-            winningAdNetwork
-                    .setEncryptedBid(getEncryptedBid(((IXAdNetwork) winningAdNetwork).getOriginalBidPriceInUsd()));
-
             // For all ads that pass auction filters, we update their channel segments with DSP specific info. The rest
             // are left with RP parent specific info.
             unfilteredChannelSegmentList =
                     mapRPChannelSegmentsToDSPChannelSegments(unfilteredChannelSegmentList, filteredChannelSegmentList);
             auctionResponse = updateChannelSegmentWithDSPFields(auctionResponse);
-
         } else {
-            winningAdNetwork.setEncryptedBid(getEncryptedBid(secondBidPrice));
+            winningAdNetwork.setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(secondBidPrice));
         }
         winningAdNetwork.setSecondBidPrice(secondBidPrice);
 
@@ -269,11 +263,6 @@ public class AuctionEngine implements AuctionEngineInterface {
 
     public void setUnfilteredChannelSegmentList(final List<ChannelSegment> unfilteredChannelSegmentList) {
         this.unfilteredChannelSegmentList = unfilteredChannelSegmentList;
-    }
-
-    public String getEncryptedBid(final Double bid) {
-        final long winBid = (long) (bid * Math.pow(10, 6));
-        return ImpressionIdGenerator.getInstance().getImpressionId(winBid);
     }
 
     /**

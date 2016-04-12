@@ -158,7 +158,7 @@ public class ChannelServer {
             // Initialising all loggers
             configureApplicationLoggers(configurationLoader.getLoggerConfiguration());
             LOG = LoggerFactory.getLogger(ChannelServer.class);
-
+            
             Formatter.init();
 
             final ChannelServerHelper channelServerHelper = new ChannelServerHelper();
@@ -369,6 +369,7 @@ public class ChannelServer {
             }
             logger.error(String.format("*************** Starting repo loading with retry count as %s",
                     repoLoadRetryCount));
+            loadRepos(nativeAdTemplateRepository, NATIVE_AD_TEMPLATE_REPOSITORY, config, logger);
             loadRepos(creativeRepository, CREATIVE_REPOSITORY, config, logger);
             loadRepos(currencyConversionRepository, CURRENCY_CONVERSION_REPOSITORY, config, logger);
             loadRepos(wapSiteUACRepository, WAP_SITE_UAC_REPOSITORY, config, logger);
@@ -382,7 +383,6 @@ public class ChannelServer {
             loadRepos(pricingEngineRepository, PRICING_ENGINE_REPOSITORY, config, logger);
             loadRepos(siteFilterRepository, SITE_FILTER_REPOSITORY, config, logger);
             loadRepos(siteEcpmRepository, SITE_ECPM_REPOSITORY, config, logger);
-            loadRepos(nativeAdTemplateRepository, NATIVE_AD_TEMPLATE_REPOSITORY, config, logger);
             loadRepos(geoZipRepository, GEO_ZIP_REPOSITORY, config, logger);
             loadRepos(slotSizeMapRepository, SLOT_SIZE_MAP_REPOSITORY, config, logger);
             loadRepos(sdkMraidMapRepository, SDK_MRAID_MAP_REPOSITORY, config, logger);

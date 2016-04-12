@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
+import static com.inmobi.adserve.channels.server.CasConfigUtil.JSON_PARSING_ERROR;
+import static com.inmobi.adserve.channels.server.CasConfigUtil.repositoryHelper;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.AEROSPIKE_FEEDBACK;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CAU_METADATA_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_ADGROUP_REPOSITORY;
@@ -41,7 +45,6 @@ import com.google.inject.Singleton;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
-import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
@@ -73,13 +76,13 @@ public class ServletGetSegment implements Servlet {
         } catch (final JSONException exception) {
             LOG.debug("Encountered Json Error while creating json object inside servlet, exception raised {}",
                     exception);
-            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
+            hrh.setTerminationReason(JSON_PARSING_ERROR);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
 
         if (null == jObject) {
-            hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
+            hrh.setTerminationReason(JSON_PARSING_ERROR);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }
@@ -97,58 +100,59 @@ public class ServletGetSegment implements Servlet {
 
             if (repoName != null) {
                 if (repoName.equalsIgnoreCase(CHANNEL_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryChannelRepository(id);
+                    entity = repositoryHelper.queryChannelRepository(id);
                 } else if (repoName.equalsIgnoreCase(CHANNEL_ADGROUP_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryChannelAdGroupRepository(id);
+                    entity = repositoryHelper.queryChannelAdGroupRepository(id);
                 } else if (repoName.equalsIgnoreCase(CHANNEL_FEEDBACK_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryChannelFeedbackRepository(id);
+                    entity = repositoryHelper.queryChannelFeedbackRepository(id);
                 } else if (repoName.equalsIgnoreCase(CHANNEL_SEGMENT_FEEDBACK_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryChannelSegmentFeedbackRepository(id);
+                    entity = repositoryHelper.queryChannelSegmentFeedbackRepository(id);
                 } else if (repoName.equalsIgnoreCase(SITE_METADATA_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.querySiteMetaDetaRepository(id);
+                    entity = repositoryHelper.querySiteMetaDetaRepository(id);
                 } else if (repoName.equalsIgnoreCase(SITE_TAXONOMY_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.querySiteTaxonomyRepository(id);
+                    entity = repositoryHelper.querySiteTaxonomyRepository(id);
                 } else if (repoName.equalsIgnoreCase(PRICING_ENGINE_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryPricingEngineRepository(
-                            Integer.parseInt(id.split("_")[0]), Integer.parseInt(id.split("_")[1]));
+                    entity = repositoryHelper.queryPricingEngineRepository(Integer.parseInt(id.split("_")[0]),
+                            Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(SITE_FILTER_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.querySiteFilterRepository(id.split("_")[0],
+                    entity = repositoryHelper.querySiteFilterRepository(id.split("_")[0],
                             Integer.parseInt(id.split("_")[1]));
                 } else if (repoName.equalsIgnoreCase(AEROSPIKE_FEEDBACK)) {
                     if (id.split("_").length > 1) {
-                        entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id.split("_")[0],
+                        entity = repositoryHelper.querySiteAerospikeFeedbackRepository(id.split("_")[0],
                                 Integer.parseInt(id.split("_")[1]));
                     } else {
-                        entity = CasConfigUtil.repositoryHelper.querySiteAerospikeFeedbackRepository(id);
+                        entity = repositoryHelper.querySiteAerospikeFeedbackRepository(id);
                     }
                 } else if (repoName.equalsIgnoreCase(IMEI_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(id);
+                    entity = repositoryHelper.queryIMEIRepository(id);
                 } else if (repoName.equalsIgnoreCase(SITE_ECPM_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
+                    entity = repositoryHelper.querySiteEcpmRepository(id.split("_")[0],
                             Integer.parseInt(id.split("_")[1]), Integer.parseInt(id.split("_")[2]));
                 } else if (repoName.equalsIgnoreCase(CURRENCY_CONVERSION_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryCurrencyConversionRepository(id);
+                    entity = repositoryHelper.queryCurrencyConversionRepository(id);
                 } else if (repoName.equalsIgnoreCase(WAP_SITE_UAC_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
+                    entity = repositoryHelper.queryWapSiteUACRepository(id.split("_")[0]);
                 } else if (repoName.equalsIgnoreCase(IX_ACCOUNT_MAP_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper
-                            .queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
+                    entity = repositoryHelper.queryIXAccountMapRepository(Long.parseLong(id.split("_")[0]));
                 } else if (repoName.equalsIgnoreCase(CREATIVE_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
+                    entity = repositoryHelper.queryCreativeRepository(id.split("_")[0], id.split("_")[1]);
                 } else if (repoName.equalsIgnoreCase(NATIVE_AD_TEMPLATE_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryNativeAdTemplateRepository(Long.parseLong(id));
+                    final long placementId = Long.parseLong(id);
+                    segmentInfo.put("VAST", repositoryHelper.queryNativeAdTemplateRepository(placementId, VAST));
+                    segmentInfo.put("STATIC", repositoryHelper.queryNativeAdTemplateRepository(placementId, STATIC));
                 } else if (repoName.equalsIgnoreCase(GEO_ZIP_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
+                    entity = repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(CAU_METADATA_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.queryCauMetaDataRepository(Long.parseLong(id));
+                    entity = repositoryHelper.queryCauMetaDataRepository(Long.parseLong(id));
                 } else if (repoName.equalsIgnoreCase(SLOT_SIZE_MAP_REPOSITORY)) {
-                    entity = CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
+                    entity = repositoryHelper.querySlotSizeMapRepository(Short.parseShort(id));
                 } else if (repoName.equalsIgnoreCase(IP_REPOSITORY)) {
-                    entity = ipRepository.getIPAddress(id);
+                    entity = ipRepository.replaceHostWitIp(id);
                 } else if (repoName.equalsIgnoreCase(IX_PACKAGE_REPOSITORY)) {
-                    final ResultSet<IXPackageEntity> resultSet = CasConfigUtil.repositoryHelper
-                            .queryIXPackageRepository(Integer.parseInt(id.split("_")[0]), id.split("_")[1],
-                                    Integer.parseInt(id.split("_")[2]), Integer.parseInt(id.split("_")[3]));
+                    final ResultSet<IXPackageEntity> resultSet = repositoryHelper.queryIXPackageRepository(
+                            Integer.parseInt(id.split("_")[0]), id.split("_")[1], Integer.parseInt(id.split("_")[2]),
+                            Integer.parseInt(id.split("_")[3]));
                     final List<Integer> result = new ArrayList<>();
                     for (final IXPackageEntity packageEntity : resultSet) {
                         result.add(packageEntity.getId());

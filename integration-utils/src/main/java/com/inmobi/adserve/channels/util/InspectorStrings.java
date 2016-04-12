@@ -16,6 +16,7 @@ public class InspectorStrings {
     public static final String IX_REQUESTS = "IXRequests";
     public static final String TOTAL_NATIVE_REQUESTS = "TotalNativeRequests";
     public static final String TOTAL_NATIVE_RESPONSES = "TotalNativeResponses";
+    public static final String TOTAL_NATIVE_VIDEO_RESPONSES = "TotalNativeVideoResponses";
     public static final String NON_AD_REQUESTS = "NonAdRequests";
     public static final String TOTAL_INVOCATIONS = "TotalInvocations";
     public static final String SUCCESSFUL_CONFIGURE = "SuccessfulConfigure";
@@ -151,7 +152,7 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
     public static final String TOTAL_VAST_VIDEO_REQUESTS = "TotalVASTVideoRequests";
     public static final String TOTAL_PURE_VAST_REQUESTS = "TotalPureVASTRequests";
-    public static final String TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API = "TotalPureVASTRequestsForOtherThanApi";
+    public static final String TOTAL_NATIVE_VAST_REQUESTS = "TotalNativeVASTRequests";
     public static final String TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL = "TotalPureVASTRequestsForProtocol_";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
     public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
@@ -238,6 +239,7 @@ public class InspectorStrings {
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
 
     // IP repository Strings
+    public static final String NULL_URI = "NullURI";
     public static final String NULL_HOST_NAME = "NullHostName";
     
     // Stats related to Native Image Analysis

@@ -29,47 +29,56 @@ public class SegmentFactory {
         this.advertiserIdConfigMap = advertiserIdConfigMap;
     }
 
+    /**
+     * Call the Specific Adapter of the Ad Networks
+     * 
+     * @param advertiserId
+     * @param config
+     * @param dcpClientBootstrap
+     * @param rtbClientBootstrap
+     * @param base
+     * @param channel
+     * @param advertiserSet
+     * @return
+     */
     public AdNetworkInterface getChannel(final String advertiserId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
             final Channel channel, final Set<String> advertiserSet) {
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
-        if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterConfig.getAdapterName()))) {
+        final String adapterName = adapterConfig.getAdapterName();
+        final String adapterHost = adapterConfig.getAdapterHost();
+        if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterName))) {
             return null;
         }
-
         final Class<AdNetworkInterface> adNetworkInterfaceClass = adapterConfig.getAdNetworkInterfaceClass();
         if (adapterConfig.isRtb() || adapterConfig.isIx()) {
-            LOG.debug("urlBase is {}", adapterConfig.getAdapterHost());
+            LOG.debug("urlBase is {}", adapterHost);
             try {
-                LOG.debug("adapterConfig.templateWinNotification() {}", adapterConfig.templateWinNotification());
-                final AdNetworkInterface rtbAdNetwork =
-                        adNetworkInterfaceClass.getConstructor(
-                                new Class[] {Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
-                                        Channel.class, String.class, String.class, boolean.class})
-                                .newInstance(config, rtbClientBootstrap, base, channel, adapterConfig.getAdapterHost(),
-                                        adapterConfig.getAdapterName(), adapterConfig.templateWinNotification());
-                rtbAdNetwork.setName(adapterConfig.getAdapterName());
+                final AdNetworkInterface rtbAdNetwork = adNetworkInterfaceClass
+                        .getConstructor(new Class[] {Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
+                                Channel.class, String.class, String.class})
+                        .newInstance(config, rtbClientBootstrap, base, channel, adapterHost, adapterName);
+                rtbAdNetwork.setName(adapterName);
                 LOG.debug("Created RTB adapter instance for advertiser id : {}", advertiserId);
                 return rtbAdNetwork;
             } catch (final Exception e) {
                 LOG.error("Error instantiating adapter");
                 throw new RuntimeException(e);
             }
-
         } else {
             try {
                 final AdNetworkInterface adNetworkInterface =
-                        adNetworkInterfaceClass.getConstructor(
-                                new Class[] {Configuration.class, Bootstrap.class, HttpRequestHandlerBase.class,
-                                        Channel.class}).newInstance(config, dcpClientBootstrap, base, channel);
-                adNetworkInterface.setName(adapterConfig.getAdapterName());
+                        adNetworkInterfaceClass
+                                .getConstructor(new Class[] {Configuration.class, Bootstrap.class,
+                                        HttpRequestHandlerBase.class, Channel.class})
+                                .newInstance(config, dcpClientBootstrap, base, channel);
+                adNetworkInterface.setName(adapterName);
                 return adNetworkInterface;
             } catch (final Exception e) {
                 LOG.error("Error instantiating adapter");
                 throw new RuntimeException(e);
             }
         }
-
     }
 
 }

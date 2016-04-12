@@ -76,7 +76,7 @@ public class CasUtilsTest {
             IntegrationDetails integrationDetails = new IntegrationDetails();
             integrationDetails.setIntegrationType(data.integrationType);
             sasParams.setIntegrationDetails(integrationDetails);
-            final boolean testResult = casUtils.isVideoSupported(sasParams);
+            final boolean testResult = casUtils.isVideoSupportedSite(sasParams);
             assertEquals(data.expectedResult, testResult);
         }
     }

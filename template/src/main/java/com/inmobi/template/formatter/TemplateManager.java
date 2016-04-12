@@ -14,8 +14,8 @@ public class TemplateManager {
     private static final Logger LOG = Logger.getLogger("repository");
     private static final String STRING_REPO_NAME = "rtb-service-template-test-internal-repo";
     private static final String ERROR_STR = "%s can't be null.";
-    private static final  TemplateManager SINGLETON = new TemplateManager();
-    
+    private static final TemplateManager SINGLETON = new TemplateManager();
+
     private final StringResourceRepository stringResourceRepository = new StringResourceRepositoryImpl();
     private final VelocityEngine velocityEngine = new VelocityEngine();
 
@@ -44,33 +44,42 @@ public class TemplateManager {
 
     /**
      * 
-     * @param placementId
+     * @param templateId
      * @param templateContent
      */
-    public void addToTemplateCache(final String placementId, final String templateContent) {
-        Preconditions.checkNotNull(placementId, ERROR_STR, placementId);
+    public void addToTemplateCache(final String templateId, final String templateContent) {
+        Preconditions.checkNotNull(templateId, ERROR_STR, templateId);
         Preconditions.checkNotNull(templateContent, ERROR_STR, templateContent);
-        LOG.debug(String.format("Adding to template cache for placement id %s ", placementId));
-        stringResourceRepository.putStringResource(placementId, templateContent);
+        LOG.debug(String.format("Adding to template cache for templateId id %s ", templateId));
+        stringResourceRepository.putStringResource(templateId, templateContent);
     }
 
     /**
      * 
-     * @param placementId
-     * @return
+     * @param templateId
+     * @param templateContent
      */
-    public Template getTemplate(final String placementId) {
-        LOG.debug("GET Template for placementId: " + placementId);
-        return velocityEngine.getTemplate(placementId);
+    public void addToTemplateCache(final long templateId, final String templateContent) {
+        addToTemplateCache(String.valueOf(templateId), templateContent);
     }
 
     /**
      * 
-     * @param placementId
+     * @param templateId
      * @return
      */
-    public String getTemplateContent(final String placementId) {
-        LOG.debug(String.format("Get templateContent for placement: %d", placementId));
-        return velocityEngine.getTemplate(placementId).getData().toString();
+    public Template getTemplate(final String templateId) {
+        LOG.debug("GET Template for templateId: " + templateId);
+        return velocityEngine.getTemplate(templateId);
     }
+
+    /**
+     * 
+     * @param templateId
+     * @return
+     */
+    public Template getTemplate(final long templateId) {
+        return getTemplate(String.valueOf(templateId));
+    }
+
 }

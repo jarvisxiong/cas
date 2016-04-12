@@ -19,7 +19,7 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.support.membermodification.MemberModifier;
+import org.powermock.api.support.membermodification.MemberMatcher;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -32,6 +32,7 @@ import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
@@ -40,25 +41,27 @@ import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
 import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
 import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.template.config.DefaultConfiguration;
-import com.inmobi.template.config.DefaultGsonDeserializerConfiguration;
 import com.inmobi.template.gson.GsonManager;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+
 /**
  * Created by thushara.v on 19/06/15.
  */
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({BaseAdNetworkImpl.class,NativeAdTemplateEntity.class})
+@PrepareForTest({BaseAdNetworkImpl.class, NativeAdTemplateEntity.class})
 public class DCPTaboolaAdnetworkTest {
     private static final String debug = "debug";
     private static final String loggerConf = "/tmp/channel-server.properties";
     private static final Bootstrap clientBootstrap = null;
-    private static final String taboolaHost = "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init";
-    private static final String taboolaNotification = "http://api.taboola.com//json/inmobi/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s";
+    private static final String taboolaHost =
+            "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init";
+    private static final String taboolaNotification =
+            "http://api.taboola.com//json/inmobi/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s";
     private static final String taboolaIcon = "http://api2.taboola.com/taboola";
     private static final String taboolaStatus = "on";
     private static final String taboolaAdvId = "taboolaadv1";
@@ -85,9 +88,10 @@ public class DCPTaboolaAdnetworkTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
-        defaultConfiguration.setGsonManager(new GsonManager(new DefaultGsonDeserializerConfiguration()));
-        MemberModifier.field(DCPTaboolaAdnetwork.class, "templateConfiguration").set(DCPTaboolaAdnetwork.class, defaultConfiguration);
+        final DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+        defaultConfiguration.setGsonManager(new GsonManager());
+        MemberMatcher.field(DCPTaboolaAdnetwork.class, "templateConfiguration").set(DCPTaboolaAdnetwork.class,
+                defaultConfiguration);
         File f;
         f = new File(loggerConf);
         if (!f.exists()) {
@@ -119,31 +123,26 @@ public class DCPTaboolaAdnetworkTest {
         replay(slotSizeMapEntityFor15);
 
         repositoryHelper = createMock(RepositoryHelper.class);
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 0))
-                .andReturn(slotSizeMapEntityFor0).anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 4))
-                .andReturn(slotSizeMapEntityFor4).anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 9))
-                .andReturn(slotSizeMapEntityFor9).anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 11))
-                .andReturn(slotSizeMapEntityFor11).anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 14))
-                .andReturn(slotSizeMapEntityFor14).anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
-                .andReturn(slotSizeMapEntityFor15).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 0)).andReturn(slotSizeMapEntityFor0).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15).anyTimes();
 
         commonAssetAttributes = createMock(CommonAssetAttributes.class);
         expect(commonAssetAttributes.getAdContentAsset()).andReturn(NativeAdContentAsset.SCREENSHOT);
         replay(commonAssetAttributes);
         imageAsset = createMock(ImageAsset.class);
-        com.inmobi.adserve.contracts.misc.contentjson.Dimension dimension = new com.inmobi.adserve.contracts.misc.contentjson.Dimension();
+        final com.inmobi.adserve.contracts.misc.contentjson.Dimension dimension =
+                new com.inmobi.adserve.contracts.misc.contentjson.Dimension();
         dimension.setHeight(200);
         dimension.setWidth(200);
         expect(imageAsset.getDimension()).andReturn(dimension);
 
         expect(imageAsset.getCommonAttributes()).andReturn(commonAssetAttributes);
         replay(imageAsset);
-        List<ImageAsset> assets = new ArrayList<>();
+        final List<ImageAsset> assets = new ArrayList<>();
         assets.add(imageAsset);
         wapSiteUACEntity = createMock(WapSiteUACEntity.class);
         expect(wapSiteUACEntity.isTransparencyEnabled()).andReturn(true).anyTimes();
@@ -152,12 +151,13 @@ public class DCPTaboolaAdnetworkTest {
         expect(wapSiteUACEntity.getSiteUrl()).andReturn("http://abc.com").anyTimes();
         expect(wapSiteUACEntity.getBundleId()).andReturn("a.b.c").anyTimes();
         replay(wapSiteUACEntity);
-        NativeContentJsonObject json = createMock(NativeContentJsonObject.class);
+        final NativeContentJsonObject json = createMock(NativeContentJsonObject.class);
         templateEntity = createMock(NativeAdTemplateEntity.class);
         expect(templateEntity.getContentJson()).andReturn(json);
         expect(json.getImageAssets()).andReturn(assets);
         replay(templateEntity);
-        expect(repositoryHelper.queryNativeAdTemplateRepository(1l)).andReturn(templateEntity).anyTimes();
+        expect(repositoryHelper.queryNativeAdTemplateRepository(1l, TemplateClass.STATIC)).andReturn(templateEntity)
+                .anyTimes();
         replay(repositoryHelper);
         replay(json);
 
@@ -165,7 +165,7 @@ public class DCPTaboolaAdnetworkTest {
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
-        IPRepository ipRepository = new IPRepository();
+        final IPRepository ipRepository = new IPRepository();
         ipRepository.getUpdateTimer().cancel();
         ipRepositoryField.set(null, ipRepository);
     }
@@ -176,8 +176,8 @@ public class DCPTaboolaAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setOsId(SASRequestParameters.HandSetOS.Android.getValue());
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sasParams.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("23e2ewq445545");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -187,11 +187,11 @@ public class DCPTaboolaAdnetworkTest {
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(taboolaAdvId, null, null, null,
-                        0, null, null, true, true, externalKey, null, null, new Long[] {0L}, new Long[] {0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, null,
+                        0, null, null, true, true, externalKey, null, null, new Long[] {0L}, new Long[] {0L}, true,
+                        null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(true,
-                dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 0, repositoryHelper));
+        assertEquals(true, dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 0, repositoryHelper));
     }
 
 
@@ -201,19 +201,19 @@ public class DCPTaboolaAdnetworkTest {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sasParams.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         sasParams.setSiteId("abcd");
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(taboolaAdvId, null, null, null,
-                        0, null, null, true, true, externalKey, null, null, new Long[] {0L}, new Long[] {0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, null,
+                        0, null, null, true, true, externalKey, null, null, new Long[] {0L}, new Long[] {0L}, true,
+                        null, null, 0, null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(false,
-                dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 0, repositoryHelper));
+        assertEquals(false, dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                (short) 0, repositoryHelper));
     }
 
 
@@ -221,12 +221,11 @@ public class DCPTaboolaAdnetworkTest {
     public void testDCPtaboolaRequestUri() throws Exception {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
-        casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[]{"IAB10", "IAB21", "IAB12"}));
+        casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[] {"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams
-                .setUserAgent(URLEncoder
-                        .encode("Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601",
-                                "UTF-8"));
+        sasParams.setUserAgent(URLEncoder.encode(
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_5 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B601",
+                "UTF-8"));
         sasParams.setSource("APP");
         sasParams.setPlacementId(1l);
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
@@ -245,7 +244,8 @@ public class DCPTaboolaAdnetworkTest {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
 
-        dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 0, repositoryHelper);
+        dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 0,
+                repositoryHelper);
         final String actualUrl = dcptaboolaAdNetwork.getRequestUri().toString();
         final String expectedUrl =
                 "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init&app.name=Taboola&source.id=a.b.c&source.placement=00000000-0000-0000-0000-0000006456fc&source.url=http://abc.com&user.realip=206.29.182.240&user.agent=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&rec.thumbnail.height=200&rec.thumbnail.width=200&user.id=202cb962ac59075b964b07152d234b70";
@@ -272,18 +272,19 @@ public class DCPTaboolaAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setSiteId("abcd");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sasParams.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(taboolaAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 0, repositoryHelper);
+                        null, false, false, false, false, false, false, false, false, false, false,
+                        new JSONObject("{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"), new ArrayList<>(),
+                        0.0d, null, null, 32, new Integer[] {0}));
+        dcptaboolaAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 0,
+                repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcptaboolaAdNetwork.getImpressionId());
     }
 

@@ -15,6 +15,7 @@ import lombok.ToString;
 public final class App extends AbstractContext {
     private final String title;
     private final String desc;
+    private final String vastContent;
     private final List<Icon> icons;
     private final List<Screenshot> screenshots;
     private final String id;
@@ -32,6 +33,7 @@ public final class App extends AbstractContext {
     private App(final Builder builder) {
         title = builder.title;
         desc = builder.desc;
+        vastContent = builder.vastContent;
         icons = builder.icons;
         screenshots = builder.screenshots;
         id = builder.id;
@@ -59,23 +61,29 @@ public final class App extends AbstractContext {
         params.put(KeyConstants.APP_RATING_COUNT, rating_count);
         params.put(KeyConstants.APP_DOWNLOADS, downloads);
 
-        params.put(KeyConstants.APP_CREATIVE, this);
+        params.put(KeyConstants.AD_ICON, icons);
+        params.put(KeyConstants.AD_TITLE, title);
+        params.put(KeyConstants.AD_VASTCONTENT, vastContent);
 
         params.put(KeyConstants.ICON, icons);
-        params.put(KeyConstants.APP_CREATIVE_ICONS, icons);
-        params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE, new CreativeBean("text", title));
-        params.put(KeyConstants.IMNATIVE_CREATIVE_DESC, new CreativeBean("text", desc));
+        params.put(KeyConstants.IMAGE, screenshots);
+
+        params.put(KeyConstants.IMNATIVE_APP_CREATIVE, this);
+        params.put(KeyConstants.IMNATIVE_CREATIVE_ICON, icons);
+        params.put(KeyConstants.IMNATIVE_IMAGE, screenshots);
+
+        params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE_BEAN, new CreativeBean("text", title));
         params.put(KeyConstants.IMNATIVE_CREATIVE_HEADLINE_TEXT, title);
+
+        params.put(KeyConstants.IMNATIVE_CREATIVE_DESC_BEAN, new CreativeBean("text", desc));
         params.put(KeyConstants.IMNATIVE_CREATIVE_DESC_TEXT, desc);
 
-        params.put(KeyConstants.IMAGE, screenshots);
-        params.put(KeyConstants.IMNATIVE_IMAGE, screenshots);
-        params.put(KeyConstants.IMNATIVE_ACTION, new CreativeBean("text", actionText));
-        params.put(KeyConstants.IMNATIVE_ACTION_TEXT, new CreativeBean("text", actionText));
-        params.put(KeyConstants.APP_CREATIVE_RATING, rating);
-        params.put(KeyConstants.APP_CREATIVE_RATING_BEAN, new CreativeBean("rating", rating));
-    }
+        params.put(KeyConstants.IMNATIVE_ACTION_BEAN, new CreativeBean("text", actionText));
+        params.put(KeyConstants.IMNATIVE_ACTION_TEXT, actionText);
 
+        params.put(KeyConstants.IMNATIVE_CREATIVE_SOCIAL_RATING_BEAN, new CreativeBean("rating", rating));
+        params.put(KeyConstants.IMNATIVE_CREATIVE_SOCIAL_RATING, rating);
+    }
 
 
     public static Builder newBuilder() {
@@ -88,6 +96,8 @@ public final class App extends AbstractContext {
         private String title;
         @Setter
         private String desc;
+        @Setter
+        private String vastContent;
         @Setter
         private List<Icon> icons;
         @Setter

@@ -24,6 +24,7 @@ import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
@@ -33,6 +34,7 @@ import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.entity.SiteTaxonomyEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
+import com.inmobi.adserve.channels.query.NativeAdTemplateQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
@@ -86,6 +88,7 @@ public class RepositoryHelperTest {
     public static CreativeQuery mockCreativeQuery = createMock(CreativeQuery.class);
     public static SiteFilterQuery mockSiteFilterQuery = createMock(SiteFilterQuery.class);
     public static SiteEcpmQuery mockSiteEcpmQuery = createMock(SiteEcpmQuery.class);
+    public static NativeAdTemplateQuery mockNativeAdTemplateQuery = createMock(NativeAdTemplateQuery.class);
 
     public static RepositoryHelper tested;
     public static String query1 = "query1";
@@ -120,9 +123,8 @@ public class RepositoryHelperTest {
         expect(mockSiteEcpmRepository.query(mockSiteEcpmQuery))
                 .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockSiteEcpmEntity)
                 .times(1);
-        expect(mockCurrencyConversionRepository.query(query1))
-                .andThrow(new RepositoryException("Repository Exception")).times(1)
-                .andReturn(mockCurrencyConversionEntity).times(1);
+        expect(mockCurrencyConversionRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
+                .times(1).andReturn(mockCurrencyConversionEntity).times(1);
         expect(mockWapSiteUACRepository.query(query1)).andThrow(new RepositoryException("Repository Exception"))
                 .times(1).andReturn(mockWapSiteUACEntity).times(1);
         expect(mockCauMetaDataRepository.query(query4)).andThrow(new RepositoryException("Repository Exception"))
@@ -132,19 +134,21 @@ public class RepositoryHelperTest {
         expect(mockCreativeRepository.query(mockCreativeQuery))
                 .andThrow(new RepositoryException("Repository Exception")).times(1).andReturn(mockCreativeEntity)
                 .times(1);
-        expect(mockNativeAdTemplateRepository.query(query4)).andThrow(new RepositoryException("Repository Exception"))
-                .times(1).andReturn(mockNativeAdTemplateEntity).times(1);
+        expect(mockNativeAdTemplateRepository.query(mockNativeAdTemplateQuery))
+                .andThrow(new RepositoryException("Repository Exception")).times(1)
+                .andReturn(mockNativeAdTemplateEntity).times(1);
         replayAll();
 
-        expectNew(PricingEngineQuery.class, new Class[] {Integer.class, Integer.class}, query3, query3).andReturn(
-                mockPricingEngineQuery).times(2);
-        expectNew(CreativeQuery.class, new Class[] {String.class, String.class}, query1, query2).andReturn(
-                mockCreativeQuery).times(2);
-        expectNew(SiteFilterQuery.class, new Class[] {String.class, Integer.class}, query1, query3).andReturn(
-                mockSiteFilterQuery).times(2);
+        expectNew(PricingEngineQuery.class, new Class[] {Integer.class, Integer.class}, query3, query3)
+                .andReturn(mockPricingEngineQuery).times(2);
+        expectNew(CreativeQuery.class, new Class[] {String.class, String.class}, query1, query2)
+                .andReturn(mockCreativeQuery).times(2);
+        expectNew(SiteFilterQuery.class, new Class[] {String.class, Integer.class}, query1, query3)
+                .andReturn(mockSiteFilterQuery).times(2);
         expectNew(SiteEcpmQuery.class, new Class[] {String.class, Integer.class, Integer.class}, query1, query3, query3)
                 .andReturn(mockSiteEcpmQuery).times(2);
-
+        expectNew(NativeAdTemplateQuery.class, new Class[] {Long.class, TemplateClass.class}, query4, TemplateClass.STATIC)
+                .andReturn(mockNativeAdTemplateQuery).times(2);
         replayAll();
 
         final RepositoryHelper.Builder builder = RepositoryHelper.newBuilder();
@@ -288,7 +292,7 @@ public class RepositoryHelperTest {
 
     @Test
     public void testQueryNativeAdTemplateRepository() throws Exception {
-        assertThat(tested.queryNativeAdTemplateRepository(query4), is(equalTo(null)));
-        assertThat(tested.queryNativeAdTemplateRepository(query4), is(equalTo(mockNativeAdTemplateEntity)));
+        assertThat(tested.queryNativeAdTemplateRepository(query4, TemplateClass.STATIC), is(equalTo(null)));
+        assertThat(tested.queryNativeAdTemplateRepository(query4, TemplateClass.STATIC), is(equalTo(mockNativeAdTemplateEntity)));
     }
 }

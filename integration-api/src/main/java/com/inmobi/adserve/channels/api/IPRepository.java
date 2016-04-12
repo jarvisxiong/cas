@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
 import static com.inmobi.adserve.channels.util.InspectorStrings.NULL_HOST_NAME;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NULL_URI;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -16,6 +17,13 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.util.InspectorStats;
 
+/**
+ * Local cache of Host to IP resolutions which get refreshed automatically. This cache is required to reduce load to DNS
+ * server and remove the bottle neck of DNS lookup
+ *
+ * @author ritwik.kumar
+ *
+ */
 @Singleton
 public class IPRepository {
     private static final Logger LOG = LoggerFactory.getLogger(IPRepository.class);
@@ -35,17 +43,22 @@ public class IPRepository {
         updateTimer.schedule(ipRepositoryTimerTask, REFRESH_TIME, REFRESH_TIME);
     }
 
+    /**
+     * 
+     * @return
+     */
     public Timer getUpdateTimer() {
         return updateTimer;
     }
 
     /**
      *
-     * @param host
-     * @return
+     * @param uri
+     * @return - An URL where Host is replaced with an IP, If there is an issue in resolution URI as it was passed is
+     *         returned
      */
-    public String getIPAddress(final String host) {
-        return getIPAddress(DEFAULT_ADAPTER, host);
+    public String replaceHostWitIp(final String uri) {
+        return getIPAddress(DEFAULT_ADAPTER, uri);
     }
 
     /**
@@ -53,37 +66,38 @@ public class IPRepository {
      * {@link InetAddress#getByName(String)}
      *
      * @param adapterName - Used only for pushing stats
-     * @param host
-     * @return IP address
+     * @param uri
+     * @return An URL where Host is replaced with an IP, If there is an issue in resolution URI as it was passed is
+     *         returned
      */
-    public String getIPAddress(final String adapterName, String host) {
-        if (host == null) {
-            InspectorStats.incrementStatCount(CLASS_NAME, adapterName + "-" + NULL_HOST_NAME);
+    public String getIPAddress(final String adapterName, String uri) {
+        if (uri == null) {
+            InspectorStats.incrementStatCount(CLASS_NAME, adapterName + "-" + NULL_URI);
             return null;
         }
-        LOG.debug("Doing lookup for {}", host);
+        LOG.debug("Doing lookup for {}", uri);
 
-        URI uri = null;
+        URI uriObj = null;
         try {
-            uri = new URI(host);
+            uriObj = new URI(uri);
         } catch (final Exception ex) {
             InspectorStats.incrementStatCount(CLASS_NAME, adapterName + "-" + ex.getClass().getSimpleName());
-            LOG.error("Error getting URI Object for host ->" + host, ex);
-            return host;
+            LOG.error("Error getting URI Object for ->" + uri, ex);
+            return uri;
         }
 
-        final String hostname = uri.getHost();
+        final String hostname = uriObj.getHost();
         if (!ipRepoMap.containsKey(hostname)) {
             setIPAddr(hostname);
         }
         final String ip = ipRepoMap.get(hostname);
-        host = host.replaceFirst(hostname, ip);
-        LOG.debug("Done lookup and the resolution is {}", host);
-        return host;
+        uri = uri.replaceFirst(hostname, ip);
+        LOG.debug("Done lookup and the resolution is {}", uri);
+        return uri;
     }
 
     /**
-     * 
+     *
      * @param key
      */
     private void setIPAddr(final String hostname) {

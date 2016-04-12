@@ -176,7 +176,6 @@ public class AeroSpikeDataIngestion {
     }
 
     private void getFromAerospike(final List<String> keys, final String binName) {
-        final Key key;
         try {
             for (final String _key : keys) {
                 final Record record = aerospikeClient.get(readPolicy, new Key(NAMESPACE, SET, _key), binName);

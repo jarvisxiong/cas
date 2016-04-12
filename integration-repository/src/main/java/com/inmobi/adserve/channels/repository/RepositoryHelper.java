@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.entity.IXBlocklistEntity;
 import com.inmobi.adserve.channels.entity.IXBlocklistRepository;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SegmentAdGroupFeedbackEntity;
@@ -37,6 +38,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.query.IXBlocklistsQuery;
+import com.inmobi.adserve.channels.query.NativeAdTemplateQuery;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
@@ -344,9 +346,9 @@ public class RepositoryHelper {
         return null;
     }
 
-    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final Long placementId) {
+    public NativeAdTemplateEntity queryNativeAdTemplateRepository(final Long placementId, final TemplateClass templateClass) {
         try {
-            return nativeAdTemplateRepository.query(placementId);
+            return nativeAdTemplateRepository.query(new NativeAdTemplateQuery(placementId, templateClass));
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying NativeAdTemplate Repository, {}", ignored);
         }

@@ -43,6 +43,9 @@ public class IXSlotMatcher {
 
     /**
      *
+     * Get the first matching Rubicon size for the given sets of Custom Ad Units. Take size and tolerance into
+     * consideration.
+     *
      * @param cauSet
      * @return
      */

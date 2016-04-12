@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +48,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
  */
 public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPTaboolaAdnetwork.class);
-
     private static final String APP_NAME = "app.name";
     private static final String THUMBNAIL_WIDTH = "rec.thumbnail.width";
     private static final String THUMBNAIL_HEIGHT = "rec.thumbnail.height";
@@ -60,19 +61,16 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String READ_MORE = "Read More";
     private static final int ICON_DEFAULT_DIMENSION = 150;
 
-    @Inject
-    protected static TemplateConfiguration templateConfiguration;
-
     private String iconUrl;
     private String notificationUrl;
     private int thumbnailWidth = 0;
     private int thumbnailHeight = 0;
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isScreenshotResponse = false;
-
     private NativeAdTemplateEntity templateEntity;
     protected final Gson gson;
-
+    @Inject
+    protected static TemplateConfiguration templateConfiguration;
 
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
@@ -103,7 +101,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Uac is not initialized for site {} in Taboola", sasParams.getSiteId());
             return false;
         }
-        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), STATIC);
         if (templateEntity == null) {
             LOG.error("No template is available for PlacementId {}", sasParams.getPlacementId());
             return false;
@@ -204,8 +202,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 pixelUrls.add(beacon);
                 appBuilder.setPixelUrls(pixelUrls);
                 final App app = (App) appBuilder.build();
-                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params,
-                        repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params);
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 
@@ -227,9 +224,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
-
-            if (isNativeRequest && null != templateEntity) {
-                trackerBuilder.setNativeTemplateId(templateEntity.getId());
+            if (isNativeRequest() && null != templateEntity) {
+                trackerBuilder.setNativeTemplateId(templateEntity.getTemplateId());
             }
         }
     }
@@ -264,10 +260,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void updateNativeParams(final Map<String, String> params, final String nurl, final String beacon) {
-        params.put("beaconUrl", beacon);
-        params.put("impressionId", impressionId);
-        params.put("placementId", String.valueOf(sasParams.getPlacementId()));
-        params.put("nUrl", nurl);
+        params.put(NativeResponseMaker.BEACON_URL_PARAM, beacon);
+        params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
+        params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
         params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
     }
 

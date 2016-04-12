@@ -50,6 +50,7 @@ import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.VI
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.WIFI;
 import static com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType.DATA;
 import static com.inmobi.adserve.contracts.common.request.nativead.Asset.AssetType.IMAGE;
@@ -817,10 +818,10 @@ public class IXAdNetworkHelper {
             throws ParserConfigurationException, IOException, SAXException, TransformerException {
         final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setIgnoringComments(true);
+        adMarkUp = adMarkUp.replaceFirst("^([\\W]+)<", "<");  //remove some special char in start to parse xml
+        
         final DocumentBuilder builder = domFactory.newDocumentBuilder();
-        adMarkUp = adMarkUp.replaceFirst("^([\\W]+)<", "<"); // remove some special char in start to parse xml
-        final Document doc = builder.parse(new InputSource(new ByteArrayInputStream(adMarkUp.getBytes("utf-8"))));
-
+        final Document doc = builder.parse(new InputSource(new ByteArrayInputStream(adMarkUp.getBytes(UTF_8))));
         final NodeList trackingEventsNode = doc.getElementsByTagName(TRACKING_EVENTS_TAG);
         final NodeList inlineNode = doc.getElementsByTagName(IN_LINE_TAG);
         final NodeList wrapperNode = doc.getElementsByTagName(WRAPPER_TAG);

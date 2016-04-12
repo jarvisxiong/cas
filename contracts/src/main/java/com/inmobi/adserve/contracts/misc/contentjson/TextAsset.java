@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class TextAsset {
     private CommonAssetAttributes commonAttributes;
-    private int                   maxChars;
+    private int maxChars;
 }

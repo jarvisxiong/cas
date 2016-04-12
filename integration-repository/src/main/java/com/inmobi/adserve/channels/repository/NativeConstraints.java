@@ -83,20 +83,29 @@ public class NativeConstraints {
 
     /**
      * 
-     * @param key
+     * @param mandatoryKey - Mandatory Key
      * @return
      */
-    public static boolean isMandatoryKey(final String key) {
-        return MANDATORY_MAP.containsKey(key);
+    public static boolean isImageRequired(final String mandatoryKey) {
+        return LAYOUT_STREAM.equals(mandatoryKey);
     }
 
     /**
      * 
-     * @param key
+     * @param mandatoryKey - Mandatory Key
      * @return
      */
-    public static boolean isImageKey(final String key) {
-        return IMG_MAP.containsKey(key);
+    public static boolean isMandatoryKey(final String mandatoryKey) {
+        return MANDATORY_MAP.containsKey(mandatoryKey);
+    }
+
+    /**
+     * 
+     * @param imageKey - Image Key
+     * @return
+     */
+    public static boolean isImageKey(final String imageKey) {
+        return IMG_MAP.containsKey(imageKey);
     }
 
     /**

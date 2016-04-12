@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.template.context.App;
 import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
@@ -28,7 +27,12 @@ import lombok.Data;
 public class NativeResponseMaker {
     private static final Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
     private static final String ERROR_STR = "%s can't be null.";
-
+    public static final String NAMESPACE_PARAM = "NAMESPACE";
+    public static final String TEMPLATE_ID_PARAM = "templateId";
+    public static final String BEACON_URL_PARAM = "beaconUrl";
+    public static final String CLICK_URL_PARAM = "clickUrl";
+    public static final String WIN_URL_PARAM = "winUrl";
+    public static final String NURL_URL_PARAM = "nUrl";
     private final TemplateParser templateParser;
     private final TemplateDecorator templateDecorator;
     private final Gson gson;
@@ -41,41 +45,45 @@ public class NativeResponseMaker {
         this.templateDecorator = templateDecorator;
     }
 
-    public String makeDCPNativeResponse(final App app, final Map<String, String> params,
-            final NativeAdTemplateEntity templateEntity) throws Exception {
-        final VelocityContext vc = getVelocityContext(app, params);
-        vc.put("NAMESPACE", Formatter.getDCPNamespace());
+    public String makeDCPNativeResponse(final App app, final Map<String, String> params) throws Exception {
+        final VelocityContext vcContextCode = getVCForContextCode(app, params);
+        vcContextCode.put(NAMESPACE_PARAM, Formatter.getDCPNamespace());
+        return createNativeAd(vcContextCode, app, params.get(TEMPLATE_ID_PARAM));
+    }
 
-        return createNativeAd(vc, app, params.get("placementId"));
+    public String makeRTBDResponse(final App app, final Map<String, String> params) throws Exception {
+        final VelocityContext vcContextCode = getVCForContextCode(app, params);
+        vcContextCode.put(NAMESPACE_PARAM, Formatter.getRTBDNamespace());
+        return createNativeAd(vcContextCode, app, params.get(TEMPLATE_ID_PARAM));
     }
 
     public String makeIXResponse(final App app, final Map<String, String> params) throws Exception {
-        Preconditions.checkNotNull(params, ERROR_STR, "params");
-        Preconditions.checkNotNull(params.containsKey("placementId"), ERROR_STR, "placementId");
-        final VelocityContext vc = getVelocityContext(app, params);
-        vc.put("NAMESPACE", Formatter.getIXNamespace());
-
-        return createNativeAd(vc, app, params.get("placementId"));
+        final VelocityContext vcContextCode = getVCForContextCode(app, params);
+        vcContextCode.put(NAMESPACE_PARAM, Formatter.getIXNamespace());
+        return createNativeAd(vcContextCode, app, params.get(TEMPLATE_ID_PARAM));
     }
 
-    private String createNativeAd(final VelocityContext vc, final App app, final String placementId) throws Exception {
-        final String namespace = (String) vc.get("NAMESPACE");
-        final String pubContent = templateParser.format(app, placementId);
+    private String createNativeAd(final VelocityContext vc, final App app, final String templateId) throws Exception {
+        final String namespace = (String) vc.get(NAMESPACE_PARAM);
+        final String pubContent = templateParser.format(app, templateId);
         final String contextCode = templateDecorator.getContextCode(vc);
-        LOG.debug("Making response for placementId : {} ", placementId);
+        LOG.debug("Making response for templateId : {} ", templateId);
         LOG.debug("namespace : {}", namespace);
         LOG.debug("pubContent : {}", pubContent);
         LOG.debug("contextCode : {}", contextCode);
         return makeNativeAd(pubContent, contextCode, namespace);
     }
 
-    private VelocityContext getVelocityContext(final App app, final Map<String, String> params) {
+    private VelocityContext getVCForContextCode(final App app, final Map<String, String> params) {
+        Preconditions.checkNotNull(params, ERROR_STR, "params");
+        Preconditions.checkNotNull(params.containsKey(TEMPLATE_ID_PARAM), ERROR_STR, TEMPLATE_ID_PARAM);
+
         final VelocityContext context = new VelocityContext();
         context.put("LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("OLD_LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("TRACKING_CODE", getTrackingCode(params, app));
-        context.put("BEACON_URL", params.get("beaconUrl"));
-        context.put("CLICK_TRACKER", getClickUrl(app, params.get("clickUrl")));
+        context.put("BEACON_URL", params.get(BEACON_URL_PARAM));
+        context.put("CLICK_TRACKER", getClickUrl(app, params.get(CLICK_URL_PARAM)));
         context.put(IMAI_BASE_URL, params.get(IMAI_BASE_URL));
         return context;
     }
@@ -87,7 +95,7 @@ public class NativeResponseMaker {
     protected String getTrackingCode(final Map<String, String> params, final App app) {
         final StringBuilder bcu = new StringBuilder();
         try {
-            final String nUrl = params.get("nUrl");
+            final String nUrl = params.get(NURL_URL_PARAM);
             if (nUrl != null) {
                 bcu.append(constructBeaconUrl(nUrl));
             }
@@ -96,7 +104,7 @@ public class NativeResponseMaker {
             LOG.debug("Exception while parsing response {}", e);
         }
 
-        final String winUrl = params.get("winUrl");
+        final String winUrl = params.get(WIN_URL_PARAM);
         if (!StringUtils.isEmpty(winUrl)) {
             bcu.append(constructBeaconUrl(winUrl));
         }
