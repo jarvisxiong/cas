@@ -149,7 +149,7 @@ public class DCPTencentAdnetworkTest {
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(tencentAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false,
-                        new JSONObject("{\"slot\":\"6964_e2ab6d06fe5317dbb47628dbd5f83f40\"}"), new ArrayList<>(), 0.0d,
+                        new JSONObject("{\"320X48\":\"6964_e2ab6d06fe5317dbb47628dbd5f83f40\"}"), new ArrayList<>(), 0.0d,
                         null, null, 32, new Integer[] {0}));
         assertTrue(tencentAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9,
                 repositoryHelper));

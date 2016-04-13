@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.awt.Dimension;
 import java.net.URI;
 
 /**
@@ -30,7 +32,7 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String IFA = "ifa";
     private static final String IMEI = "imei";
     private static final String HASHED_SITE_ID = "inmobi_site_id";
-    private static final String SLOT = "slot";
+    private static final String SLOT_FORMAT = "%dX%d";
 
     @Inject
     protected static TemplateConfiguration templateConfiguration;
@@ -59,9 +61,11 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
         try {
+            final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(processedSlotId);
+            final Dimension dim = slotSizeMapEntity.getDimension();
             final JSONObject additionalParams = entity.getAdditionalParams();
             if (null != additionalParams) {
-                slotId = additionalParams.getString(SLOT);
+                slotId = additionalParams.getString(String.format(SLOT_FORMAT,(int)dim.getWidth(),(int)dim.getHeight()));
             }
         } catch (Exception exception) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.MISSING_ADDITIONAL_PARAMS);
