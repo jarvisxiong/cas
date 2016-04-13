@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.entity;
 
 import java.sql.Timestamp;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 import lombok.Getter;
@@ -13,6 +14,7 @@ import lombok.Setter;
 @Getter
 public class SdkMraidMapEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String sdkName;
     private final String mraidPath;
     private final Timestamp modifiedOn;
@@ -45,7 +47,6 @@ public class SdkMraidMapEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return String.format("{\"sdkName\":\"%s\",\"mraidPath\":%s,\"modifiedOn\":\"%s\"}", sdkName, mraidPath,
-                modifiedOn);
+        return GSON.toJson(this);
     }
 }

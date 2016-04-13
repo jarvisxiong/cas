@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import lombok.Data;
 import lombok.ToString;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.query.SiteFilterQuery;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
@@ -12,9 +13,8 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Data
 @ToString
 public class SiteFilterEntity implements IdentifiableEntity<SiteFilterQuery> {
-
     private static final long serialVersionUID = -3778683319364509021L;
-
+    private final static Gson GSON = new Gson();
     private String siteId;
     private String pubId;
     private String[] blockedIabCategories;
@@ -25,7 +25,7 @@ public class SiteFilterEntity implements IdentifiableEntity<SiteFilterQuery> {
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
     @Override

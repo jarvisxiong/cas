@@ -161,7 +161,6 @@ public class ChannelSegmentEntityTest {
         assertThat(tested.getAdFormatIds(), is(equalTo(adFormatIds)));
 
         assertThat(tested.getId(), is(equalTo(adgroupId)));
-        assertThat(tested.getJSON(), is(equalTo(null)));
         assertThat(tested.getIncId(ADCreativeType.NATIVE), is(equalTo(incIds[0])));
         assertThat(tested.getIncId(ADCreativeType.INTERSTITIAL_VIDEO), is(equalTo(incIds[1])));
         assertThat(tested.getIncId(ADCreativeType.BANNER), is(equalTo(incIds[2])));

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
@@ -22,10 +23,9 @@ import lombok.Setter;
 
 @Getter
 public class ChannelSegmentEntity implements IdentifiableEntity<String> {
-
-    private static final long serialVersionUID = 1L;
     private final static Logger LOG = LoggerFactory.getLogger(ChannelSegmentEntity.class);
-
+    private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String advertiserId;
     private final String adgroupId;
     private final String[] adIds;
@@ -191,7 +191,7 @@ public class ChannelSegmentEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return null; // To change body of implemented methods use File | Settings | File Templates.
+        return GSON.toJson(this);
     }
 
     /**

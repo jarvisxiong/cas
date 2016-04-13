@@ -16,6 +16,7 @@ import lombok.Getter;
 public final class NativeAdTemplateEntity implements IdentifiableEntity<NativeAdTemplateQuery> {
     public static final String VAST_KEY = "ad.videos";
     private static final long serialVersionUID = -648051414378424341L;
+    private final static Gson GSON = new Gson();
     private final long placementId;
     private final TemplateClass templateClass;
     private final Long templateId;
@@ -28,8 +29,7 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<NativeAd
 
     @Override
     public String getJSON() {
-        final Gson gson = new Gson();
-        return gson.toJson(this);
+        return GSON.toJson(this);
     }
 
     @Override

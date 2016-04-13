@@ -187,8 +187,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private double bidPriceInUsd;
     private double bidPriceInLocal;
     protected boolean isSproutSupported = false;
-    private boolean altSizeIdsSet = false;
-
     private final String unknownAdvertiserId;
     private final String advertiserId;
     private final String advertiserName;
@@ -596,11 +594,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             rp.setMime(MIME_HTML);
             rp.setSize_id(rpSlot);
             rp.setUsenurl(true);
-
             if (rpSlots.size() > 0) {
-                InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.TOTAL_ALT_SLOT_SIZE_REQUESTS + ".rpSlot" + rpSlot);
-                altSizeIdsSet = true;
                 rp.setAlt_size_ids(rpSlots);
             }
             ext.setRp(rp);
@@ -1209,11 +1203,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final VelocityContext velocityContext = new VelocityContext();
         final String beaconUrl = getBeaconUrl();
         String admContent = getAdMarkUp();
-
-        if (altSizeIdsSet) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_ALT_SLOT_SIZE_RESPONSES);
-        }
-
         if (WAP.equalsIgnoreCase(sasParams.getSource())) {
             if (isSproutAd()) {
                 sproutAdNotSupported(WAP);

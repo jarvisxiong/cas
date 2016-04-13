@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.query.SiteEcpmQuery;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
@@ -15,6 +16,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String siteId;
     private final Integer countryId;
     private final Integer osId;
@@ -29,8 +31,6 @@ public class SiteEcpmEntity implements IdentifiableEntity<SiteEcpmQuery> {
 
     @Override
     public String getJSON() {
-        return String
-                .format("{\"siteId\":\"%s\",\"countryId\":%s,\"osId\":\"%s\",\"ecpm\":%s,\"networkEcpm\":\"%s\",\"modifiedOn\":\"%s\"}",
-                        siteId, countryId, osId, ecpm, networkEcpm, modifiedOn);
+        return GSON.toJson(this);
     }
 }

@@ -52,6 +52,7 @@ public class SlotSizeMapping {
         IX_SLOT_ID_MAP.put((short) 19, 50);
         IX_SLOT_ID_MAP.put((short) 21, 45);
         IX_SLOT_ID_MAP.put((short) 23, 46);
+        IX_SLOT_ID_MAP.put((short) 24, 43);
         IX_SLOT_ID_MAP.put((short) 29, 14);
         IX_SLOT_ID_MAP.put((short) 31, 67);
         IX_SLOT_ID_MAP.put((short) 32, 101);

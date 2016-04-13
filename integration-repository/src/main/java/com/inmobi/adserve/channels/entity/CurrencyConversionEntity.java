@@ -5,12 +5,14 @@ import java.sql.Timestamp;
 import lombok.Data;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Data
 public class CurrencyConversionEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String currencyId;
     private final Double conversionRate;
     private final Timestamp startDate;
@@ -44,7 +46,7 @@ public class CurrencyConversionEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
     @Override

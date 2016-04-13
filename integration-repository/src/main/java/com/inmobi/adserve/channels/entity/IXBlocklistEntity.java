@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.entity;
 
 import java.sql.Timestamp;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.query.IXBlocklistsQuery;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class IXBlocklistEntity implements IdentifiableEntity<IXBlocklistsQuery> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String blocklistName;
     private final String keyId;
     private final IXBlocklistKeyType keytype;
@@ -33,8 +35,6 @@ public class IXBlocklistEntity implements IdentifiableEntity<IXBlocklistsQuery> 
 
     @Override
     public String getJSON() {
-        return String.format("{\"blocklistName\":\"%s\",\"keyId\":\"%s\",\"keytype\":%s,\"blocklistType\":\"%s\", "
-                        + "\"blocklistSize\":\"%d\", \"modifiedOn\":\"%s\"}", blocklistName, keyId, keytype.toString(),
-                blocklistType.toString(), blocklistSize, modifiedOn);
+        return GSON.toJson(this);
     }
 }

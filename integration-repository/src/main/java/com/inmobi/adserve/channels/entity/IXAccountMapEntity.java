@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import lombok.Data;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 /**
@@ -13,6 +14,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Data
 public class IXAccountMapEntity implements IdentifiableEntity<Long> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final Long rpNetworkId;
     private final String inmobiAccountId;
     private final String networkName;
@@ -46,9 +48,7 @@ public class IXAccountMapEntity implements IdentifiableEntity<Long> {
 
     @Override
     public String getJSON() {
-        return String
-                .format("{\"rpNetworkId\":\"%s\",\"inmobiAccountId\":%s,\"networkName\":\"%s\",\"networkType\":%s,\"modifiedOn\":\"%s\"}",
-                        rpNetworkId, inmobiAccountId, networkName, networkType, modifiedOn);
+        return GSON.toJson(this);
     }
 
     @Override

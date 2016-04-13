@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 /**
@@ -14,6 +15,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 @Getter
 public class GeoZipEntity implements IdentifiableEntity<Integer> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final Integer zipId;
     private final String zipCode;
     private final Timestamp modifiedOn;
@@ -49,7 +51,7 @@ public class GeoZipEntity implements IdentifiableEntity<Integer> {
 
     @Override
     public String getJSON() {
-        return String.format("{\"zipId\":\"%s\",\"zipCode\":%s,\"modifiedOn\":\"%s\"}", zipId, zipCode, modifiedOn);
+        return GSON.toJson(this);
     }
 
 }

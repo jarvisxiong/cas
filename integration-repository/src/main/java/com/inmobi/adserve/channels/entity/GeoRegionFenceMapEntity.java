@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.entity;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Getter
 public class GeoRegionFenceMapEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String geoRegionName;
     private final Long countryId;
     private final List<Long> fenceIdsList;
@@ -49,9 +51,7 @@ public class GeoRegionFenceMapEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return String
-                .format("{\"GeoRegionName\":\"%s\",\"CountryId\":\"%s\",\"FenceIdsList\":%s,\"modifiedOn\":\"%s\"}",
-                        geoRegionName, countryId, fenceIdsList, modifiedOn);
+        return GSON.toJson(this);
     }
 
 }

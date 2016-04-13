@@ -166,8 +166,6 @@ public class InspectorStrings {
     public static final String TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS =
             "TotalResponsesWithThirdPartyViewabilityTrackers";
     public static final String TOTAL_VIEWABILITY_RESPONSES = "TotalViewabilityResponses";
-    public static final String TOTAL_ALT_SLOT_SIZE_REQUESTS = "TotalAltSizeRequests";
-    public static final String TOTAL_ALT_SLOT_SIZE_RESPONSES = "TotalAltSizeResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
     public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";

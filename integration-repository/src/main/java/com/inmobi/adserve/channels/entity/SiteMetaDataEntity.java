@@ -6,15 +6,15 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Getter
 public class SiteMetaDataEntity implements IdentifiableEntity<String> {
-
-    private static final long serialVersionUID = 1L;
-
+    private final static long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String siteId;
     private final String pubId;
     private final Boolean backFillEnabled;
@@ -63,6 +63,6 @@ public class SiteMetaDataEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 }

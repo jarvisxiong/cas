@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.entity;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 import lombok.Builder;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private static final long serialVersionUID = 1L;
+    private static final Gson GSON = new Gson();
     private static final long IOS_SITE_TYPE = 21;
     public static final long ANDROID_SITE_TYPE = 22;
 
@@ -59,9 +61,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return String
-                .format("{\"siteId\":\"%s\",\"siteTypeId\":%s,\"contentRating\":\"%s\",\"isCoppaEnabled\":%s,\"appType\":\"%s\"}",
-                        id, siteTypeId, contentRating, isCoppaEnabled, appType);
+        return GSON.toJson(this);
     }
 
     @Override
