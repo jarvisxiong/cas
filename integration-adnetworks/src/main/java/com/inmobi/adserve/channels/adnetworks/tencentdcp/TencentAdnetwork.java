@@ -65,7 +65,8 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
             final Dimension dim = slotSizeMapEntity.getDimension();
             final JSONObject additionalParams = entity.getAdditionalParams();
             if (null != additionalParams) {
-                slotId = additionalParams.getString(String.format(SLOT_FORMAT,(int)dim.getWidth(),(int)dim.getHeight()));
+                slotId =
+                        additionalParams.getString(String.format(SLOT_FORMAT, (int) dim.getWidth(), (int) dim.getHeight()));
             }
         } catch (Exception exception) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.MISSING_ADDITIONAL_PARAMS);
@@ -139,7 +140,7 @@ public class TencentAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public String getName() {
-        return advertiserName+DCP_KEY;
+        return advertiserName + DCP_KEY;
     }
 
 }
