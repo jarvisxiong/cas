@@ -209,7 +209,7 @@
                     setupViewableChangeTestBeacons();
                 </script>
                 ## ViewabilityTrackers have been added at the end to prevent the rest of the ad from failing for faulty viewability trackers
-                #if($Viewable && $ViewabilityTracker) $ViewabilityTracker #end
+                #if($ViewabilityTracker) $ViewabilityTracker #end
             </div>
         </div>
     </body>
