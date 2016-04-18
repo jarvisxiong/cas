@@ -171,8 +171,6 @@ public class InspectorStrings {
     public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
-    public static final String AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMissing";
-    public static final String AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMismatch";
     public static final String AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE =
             "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";

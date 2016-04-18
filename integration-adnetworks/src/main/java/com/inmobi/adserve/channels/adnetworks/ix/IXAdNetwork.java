@@ -1485,15 +1485,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // In-case of unexpected error in deserializeResponse(), the adStatus is set to TERM. Otherwise, it is already
         // set as NO_AD.
         LOG.debug("Started deserialising response from RP");
-
         if (StringUtils.isEmpty(response)) {
             return false;
         }
-
         if (!conformsToContract(response) || responseHasNonZeroStatusCode() || !conformsToValidBidStructure()) {
             return false;
         }
-
         // Configuring of adapter from bid response
         final SeatBid seatBid = bidResponse.getSeatbid().get(0);
         final Bid bid = seatBid.getBid().get(0);
@@ -1505,10 +1502,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         aqid = bid.getAqid();
         adjustbid = bid.getAdjustbid();
         nurl = bid.getNurl();
-
         dspId = seatBid.getBuyer();
-        final boolean status = updateRPAccountInfo(dspId);
-        if (!status) {
+        if (!updateRPAccountInfo(dspId)) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_INVALID_DSP_ID);
             adStatus = TERM;
             return false;
@@ -1516,7 +1511,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // bidderCurrency is set to USD by default
         bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = secondBidPriceInUsd = bid.getPrice();
         setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(originalBidPriceInUsd));
-
         dealId = bid.getDealid();
         if (dealId != null) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
@@ -1524,23 +1518,20 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     InspectorStrings.IX_DEAL_RESPONSES_FOR_ID + dealId);
             setDealRelatedMetadata();
         }
-        
-        adm = bid.getAdm();
         if (null != bid.getAdmobject()) {
             nativeObj = bid.getAdmobject().getNativeObj();
         }
+        adm = bid.getAdm();
         if (null != nativeObj) {
             // TODO: who consumes sampleAdvertiser log data
             // Done to maintain consistency in logging (See sampleAdvertiserLogging)
             adm = nativeObj.toString();
         }
-
         // Fetch bid.ext.rp.advid.
         if (null != bid.getExt() && null != bid.getExt().getRp()) {
             final RubiconExtension rp = bid.getExt().getRp();
             advId = rp.getAdvid();
         }
-
         // For video requests, validate that a valid XML is received.
         if (isSegmentVideoSupported || isSegmentRewardedVideoSupported || isSegmentPureVastSupported) {
             if (IXAdNetworkHelper.isAdmValidXML(getAdMarkUp())) {
@@ -1589,10 +1580,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
 
     protected void setDealRelatedMetadata() {
-        IXPackageEntity matchedPackageEntity;
+        IXPackageEntity matchedPackage;
         try {
-            matchedPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
-            winningPackageId = matchedPackageEntity.getId();
+            matchedPackage = repositoryHelper.queryIxPackageByDeal(dealId);
+            winningPackageId = matchedPackage.getId();
         } catch (final NoSuchObjectException exception) {
             LOG.error("Rubicon DealId not stored in ix_package_deals table, {}", dealId);
             return;
@@ -1601,18 +1592,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return;
         }
 
-        final int indexOfDealId = matchedPackageEntity.getDealIds().indexOf(dealId);
+        final int indexOfDealId = matchedPackage.getDealIds().indexOf(dealId);
         // Setting deal floor
-        dealFloor = matchedPackageEntity.getDealFloors().size() > indexOfDealId
-                ? matchedPackageEntity.getDealFloors().get(indexOfDealId)
+        dealFloor = matchedPackage.getDealFloors().size() > indexOfDealId
+                ? matchedPackage.getDealFloors().get(indexOfDealId)
                 : 0.0;
 
         // Setting used csids and data vendor cost
-        dataVendorCost = matchedPackageEntity.getDataVendorCost();
+        dataVendorCost = matchedPackage.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;
             usedCsIds = new HashSet<>();
-            final Set<Set<Integer>> csIdInPackages = matchedPackageEntity.getDmpFilterSegmentExpression();
+            final Set<Set<Integer>> csIdInPackages = matchedPackage.getDmpFilterSegmentExpression();
             for (final Set<Integer> smallSet : csIdInPackages) {
                 for (final Integer csIdInSet : smallSet) {
                     if (sasParams.getCsiTags().contains(csIdInSet)) {
@@ -1623,21 +1614,21 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // TODO: Clean up trump logic in ResponseSender
-        final String dealType = matchedPackageEntity.getAccessTypes().size() > indexOfDealId
-                ? matchedPackageEntity.getAccessTypes().get(indexOfDealId)
+        final String dealType = matchedPackage.getAccessTypes().size() > indexOfDealId
+                ? matchedPackage.getAccessTypes().get(indexOfDealId)
                 : RIGHT_TO_FIRST_REFUSAL_DEAL;
         if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
             isTrumpDeal = true;
         }
 
-        hasViewabilityDeal = matchedPackageEntity.isViewable();
+        hasViewabilityDeal = matchedPackage.isViewable();
         if (hasViewabilityDeal) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIEWABILITY_RESPONSES);
             LOG.debug("Viewability enabled for this request.");
         }
 
-        if (matchedPackageEntity.getViewabilityTrackers().size() > indexOfDealId) {
-            viewabilityTracker = matchedPackageEntity.getViewabilityTrackers().get(indexOfDealId);
+        if (matchedPackage.getViewabilityTrackers().size() > indexOfDealId) {
+            viewabilityTracker = matchedPackage.getViewabilityTrackers().get(indexOfDealId);
             if (StringUtils.isNotBlank(viewabilityTracker)) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Viewability Trackers detected.");
@@ -1654,8 +1645,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
 
         // Applying if agency rebate is applicable
-        agencyRebatePercentage = matchedPackageEntity.getAgencyRebatePercentages().size() > indexOfDealId
-                ? matchedPackageEntity.getAgencyRebatePercentages().get(indexOfDealId)
+        agencyRebatePercentage = matchedPackage.getAgencyRebatePercentages().size() > indexOfDealId
+                ? matchedPackage.getAgencyRebatePercentages().get(indexOfDealId)
                 : null;
         if (null != agencyRebatePercentage) {
             if (agencyRebatePercentage <= 0 || agencyRebatePercentage > 100) {
@@ -1667,35 +1658,20 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         // Setting agency/seat Id if not present in RP response
         if (null != agencyRebatePercentage) {
             isAgencyRebateDeal = true;
-            final String dealMetaDataSeatId = matchedPackageEntity.getRpAgencyIds().size() > indexOfDealId
-                    && null != matchedPackageEntity.getRpAgencyIds().get(indexOfDealId)
-                            ? String.valueOf(matchedPackageEntity.getRpAgencyIds().get(indexOfDealId))
-                            : null;
+            final List<Integer> agencyIds = matchedPackage.getRpAgencyIds();
+            // Overwrite the response seatId by SeatId in Deal Metadata, because in many response we get seatId = -1
+            seatId = agencyIds.size() > indexOfDealId && null != agencyIds.get(indexOfDealId)
+                    ? String.valueOf(agencyIds.get(indexOfDealId))
+                    : null;
             if (StringUtils.isEmpty(seatId)) {
+                // This has been enforced in the UI and DB.
                 InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE);
-                seatId = dealMetaDataSeatId;
-                LOG.info(
-                        "Agency Id missing in Agency Rebate Deal Response; replacing with the deal metadata agency id. DealId: {}",
-                        dealId);
-                if (StringUtils.isEmpty(seatId)) {
-                    // This has been enforced in the UI and DB.
-                    InspectorStats.incrementStatCount(getName(),
-                            InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
-                    LOG.error("Agency Id cannot be determined for Agency Rebate Deal.");
-                    agencyRebatePercentage = null;
-                    isAgencyRebateDeal = false;
-                }
-            } else if (!seatId.equals(dealMetaDataSeatId)) {
-                InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE);
-                LOG.error("Agency Id mismatch between response and deal metadata. DealId: {}, ReceivedSeatId: {}, "
-                        + "DealMetadataSeatId: {}", dealId, seatId, dealMetaDataSeatId);
+                        InspectorStrings.AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE);
+                LOG.error("Agency Id cannot be determined for Agency Rebate Deal.");
                 agencyRebatePercentage = null;
                 isAgencyRebateDeal = false;
             }
         }
-
         if (isAgencyRebateDeal) {
             // Setting bidPriceInLocal and bidPriceInUsd to the net bid.
             bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - agencyRebatePercentage / 100.0);

@@ -1783,7 +1783,7 @@ public class NewIXAdNetworkTest {
         Formatter.init();
 
         ixAdNetwork.setDealRelatedMetadata();
-        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(null)));
+        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(55.0)));
     }
 
     @Test
