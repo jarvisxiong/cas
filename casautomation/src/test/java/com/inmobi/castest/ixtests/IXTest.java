@@ -18,12 +18,6 @@ public class IXTest {
 
     @Test(testName = "Test3_1_1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_1_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_1", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_1".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -39,12 +33,6 @@ public class IXTest {
     @Test(testName = "Test3_1_2", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_1_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_2", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_2".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
-
         /* Deriving the parser output to assert for */
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TERMREQ));
 
@@ -56,12 +44,6 @@ public class IXTest {
 
     @Test(testName = "Test3_1_3", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_1_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
-
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_3", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_3".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TERMREQ));
@@ -75,12 +57,6 @@ public class IXTest {
     @Test(testName = "Test3_1_4", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_1_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_4", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_4".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
-
         /* Deriving the parser output to assert for */
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TERMREQ));
 
@@ -92,12 +68,6 @@ public class IXTest {
 
     @Test(testName = "Test3_1_5", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_1_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TERMREQ));
@@ -110,12 +80,6 @@ public class IXTest {
 
     @Test(testName = "Test3_2_1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_2_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -130,12 +94,6 @@ public class IXTest {
 
     @Test(testName = "Test3_2_2", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_2_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -150,12 +108,6 @@ public class IXTest {
 
     @Test(testName = "Test3_2_3", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_2_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -170,12 +122,6 @@ public class IXTest {
 
     @Test(testName = "Test3_2_4", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_2_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -190,12 +136,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -210,12 +150,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_2", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -230,12 +164,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_3", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -250,12 +178,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_4", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -270,12 +192,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_5", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_MULTSLOTICL));
@@ -288,12 +204,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_6", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_6(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -308,12 +218,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_7", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_7(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -328,12 +232,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_8", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_8(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -348,12 +246,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_9", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_9(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -368,12 +260,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_10", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_10(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -388,12 +274,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_11", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_11(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -408,12 +288,6 @@ public class IXTest {
 
     @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void Test3_4_12(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        //
-        // /* Set up the DB for Demand Supply Data */
-        // UpdateDBWithWAPAdGroupData.updateDBWithData("Test3_1_5", true);
-        //
-        // AdPoolRequestHelper.fireAdPoolRequestForIX("Test3_1_5".toUpperCase());
-        // /* Set up a search string that this test needs to search for */
 
         /* Deriving the parser output to assert for */
         parserOutput =
@@ -426,10 +300,6 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    /*
-     *
-     * Regex copy starts here
-     */
 
     @Test(testName = "Test3_4_12", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST3_3_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
@@ -1395,20 +1265,6 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "Test3_Native_Layout_Adapter_Fail", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST3_NATIVE_LAYOUT_ADAPTER_FAIL(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
-
-        parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL2));
-
-        Reporter.log(parserOutput, true);
-
-        Assert.assertTrue(parserOutput.equals("PASS"));
-    }
-
     @Test(testName = "TEST_NATIVE_NON_NATIVE_SITE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_NATIVE_NON_NATIVE_SITE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
@@ -1441,7 +1297,8 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_HAPPY_ALTERNATE_SIZES1(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES1(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1458,7 +1315,8 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES2", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_HAPPY_ALTERNATE_SIZES2(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES2(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1475,7 +1333,8 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES3", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_HAPPY_ALTERNATE_SIZES3(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES3(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1637,43 +1496,38 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
 
-    @Test(testName = "TEST_DEVICE_LANGUAGE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider
-        .class)
-    public void TEST_DEVICE_LANGUAGE(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser("locale:en", "language=en", "Package 10007 dropped in Language Targeting Filter", "Packages selected:"
-            + "  10006");
+    @Test(testName = "TEST_DEVICE_LANGUAGE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("locale:en", "language=en",
+                        "Package 10007 dropped in Language Targeting Filter", "Packages selected:" + "  10006");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST_DEVICE_LANGUAGE_NULL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider
-        .class)
-    public void TEST_DEVICE_LANGUAGE_NULL(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
-            + "Targeting Filter");
+    @Test(testName = "TEST_DEVICE_LANGUAGE_NULL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE_NULL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
+                        + "Targeting Filter");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST_DEVICE_LANGUAGE_API", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider
-        .class)
-    public void TEST_DEVICE_LANGUAGE_API(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser("locale:en", "language=en", "Package 10007 dropped in Language Targeting Filter", "Packages selected:"
-            + "  10006");
+    @Test(testName = "TEST_DEVICE_LANGUAGE_API", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE_API(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("locale:en", "language=en",
+                        "Package 10007 dropped in Language Targeting Filter", "Packages selected:" + "  10006");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST_DEVICE_LANGUAGE_NULL_API", dataProvider = "fender_ix_dp", dataProviderClass =
-        FenderDataProvider
-        .class)
-    public void TEST_DEVICE_LANGUAGE_NULL_API(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
-        parserOutput = LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
-            + "Targeting Filter");
+    @Test(testName = "TEST_DEVICE_LANGUAGE_NULL_API", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE_NULL_API(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput =
+                LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
+                        + "Targeting Filter");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1760,32 +1614,33 @@ public class IXTest {
     @Test(testName = "TEST_RP_ALT_SLOT_IDS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_RP_ALT_SLOT_IDS(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput =
-            LogParserHelper.logParser("SAS params are", "selectedSlots:[9, 4]", "IX request json is",
-                "\"size_id\":43", "\"alt_size_ids\":[44]");
+                LogParserHelper.logParser("SAS params are", "selectedSlots:[9, 4]", "IX request json is",
+                        "\"size_id\":43", "\"alt_size_ids\":[44]");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-            LogParserHelper.logParser("AdGroupIncId 123456789", "AppBundleId is : TEST_MARKET_ID_IOS");
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456789", "AppBundleId is : TEST_MARKET_ID_IOS");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         parserOutput =
-            LogParserHelper.logParser("AdGroupIncId 123456790", "AppBundleId is : TEST_APP_BUNDLE_ID_NOT_IOS");
+                LogParserHelper.logParser("AdGroupIncId 123456790", "AppBundleId is : TEST_APP_BUNDLE_ID_NOT_IOS");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-            LogParserHelper.logParser("AdGroupIncId 123456791", "AppBundleId is : null");
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456791", "AppBundleId is : null");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1801,7 +1656,7 @@ public class IXTest {
         final String complete = "Tracking added in VAST xml key is : event and value is : complete";
 
         parserOutput =
-                LogParserHelper.logParser(impression, error, clickTracking, start , firstQuartile, midPoint,
+                LogParserHelper.logParser(impression, error, clickTracking, start, firstQuartile, midPoint,
                         thirdQuartile, complete);
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -1813,7 +1668,8 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         VastPassAssert();
     }
 
@@ -1828,14 +1684,17 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         VastPassAssert();
     }
 
     @Test(testName = "TEST_VAST_AD_TYPE_TARGETING_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_AD_TYPE_TARGETING_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    public void TEST_VAST_AD_TYPE_TARGETING_FAIL(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
         parserOutput =
-                LogParserHelper.logParser("Failed in filter AdGroupAdTypeTargetingFilter  , adgroup TEST_VAST_AD_TYPE_TARGETING_FAIL");
+                LogParserHelper
+                        .logParser("Failed in filter AdGroupAdTypeTargetingFilter  , adgroup TEST_VAST_AD_TYPE_TARGETING_FAIL");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1847,16 +1706,15 @@ public class IXTest {
 
     @Test(testName = "TEST_SECURE_SEGMENT_FLAG", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_SECURE_SEGMENT_FLAG(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG");
+        parserOutput = LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_SECURE_SEGMENT_FLAG_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_SECURE_SEGMENT_FLAG_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG_NEGATIVE");
+    public void TEST_SECURE_SEGMENT_FLAG_NEGATIVE(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG_NEGATIVE");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
