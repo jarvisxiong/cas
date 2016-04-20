@@ -361,7 +361,7 @@ public class ResponseSenderTest {
         expect(mockIXAdNetwork.getDealId()).andReturn(null).times(1).andReturn(dealId).anyTimes();
         HashSet<Integer> temp = new HashSet<Integer>();
         temp.add(1);
-        expect(mockIXAdNetwork.getUsedCsIds()).andReturn(temp).times(1).andReturn(null).anyTimes();
+        expect(mockIXAdNetwork.getUsedCsIds()).andReturn(temp).times(2).andReturn(null).anyTimes();
         replayAll();
 
         ResponseSender responseSender = new ResponseSender();
@@ -398,25 +398,23 @@ public class ResponseSenderTest {
 
         adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         adInfo = adPoolResponse.getAds().get(0);
-
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.dealId, is(equalTo(dealId)));
         assertThat(adInfo.highestBid, is(equalTo(adjustBid)));
 
         adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         adInfo = adPoolResponse.getAds().get(0);
-
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.dealId, is(equalTo(dealId)));
         assertThat(adInfo.highestBid, is(equalTo(adjustBid)));
 
         adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         adInfo = adPoolResponse.getAds().get(0);
-
         assertThat(adInfo.auctionType, is(equalTo(AuctionType.TRUMP)));
         assertThat(adInfo.dealId, is(equalTo(dealId)));
         assertThat(adInfo.highestBid, is(equalTo(adjustBid)));
-        assertThat(adPoolResponse.isSetRequestPoolSpecificInfo(), is(equalTo(true)));
+        assertThat(adPoolResponse.isSetRequestPoolSpecificInfo(), is(equalTo(false)));
+        assertThat(adInfo.getMatched_csids().size(), is(equalTo(1)));
 
         adPoolResponse = responseSender.createThriftResponse(adMarkup, mockIXAdNetwork.getRepositoryHelper());
         assertThat(adPoolResponse.isSetRequestPoolSpecificInfo(), is(equalTo(false)));
