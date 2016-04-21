@@ -35,8 +35,13 @@
                         renderBeacons : [
                             #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}' #end
                             #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
+                            #if($AudienceVerificationTracker), '$AudienceVerificationTracker' #end
+                            #if($ThirdPartyImpressionTracker), '$ThirdPartyImpressionTracker' #end
                         ],
-                        clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end],
+                        clickBeacons : [
+                            #if($IMClickUrl) '${IMClickUrl}' #end
+                            #if($ThirdPartyClickTracker), '$ThirdPartyClickTracker' #end
+                        ],
                         viewableChangeBeacons : [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=vc-test' #end],
                         viewabilityBeacon1Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second' #end],
                         viewabilityBeacon2Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_two_second' #end],

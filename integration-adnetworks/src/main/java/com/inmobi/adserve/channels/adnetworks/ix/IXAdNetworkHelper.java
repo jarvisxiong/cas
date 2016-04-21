@@ -44,9 +44,11 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.SI_BLIND;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_BEACON_URL;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_CLICK_URL;
-import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.VIEWABILITY_TRACKER;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
@@ -86,6 +88,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -697,13 +700,14 @@ public class IXAdNetworkHelper {
      * @param clickUrl
      * @param adMarkup
      * @param winUrl
+     * @param thirdPartyTrackerMap
      * @return
      * @throws Exception
      */
     public static String videoAdBuilding(final TemplateTool tool, final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short processedSlotId, final String beaconUrl,
             final String clickUrl, final String adMarkup, final String winUrl, final boolean isRewardedVideoRequest,
-            final String viewabilityTracker, final boolean isViewabilityDeal) throws Exception {
+            final Map<String, String> thirdPartyTrackerMap, final boolean isViewabilityDeal) throws Exception {
         LOG.debug("videoAdBuilding");
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(VAST_CONTENT_JS_ESC, StringEscapeUtils.escapeJavaScript(adMarkup));
@@ -715,16 +719,42 @@ public class IXAdNetworkHelper {
         // JS escaped BeaconUrl
         velocityContext.put(IM_BEACON_URL, beaconUrl);
 
-        // Viewability Tracker
-        if (StringUtils.isNotBlank(viewabilityTracker)) {
-            velocityContext.put(VIEWABILITY_TRACKER, viewabilityTracker);
-        }
+        //adding all the third party trackers
+        thirdPartyTrackerMap.forEach(velocityContext::put);
 
         final GenericTemplateObject vastTemplFirst = new GenericTemplateObject();
         // JS escaped IM beacon and click URLs.
         vastTemplFirst.setBeaconUrl(StringEscapeUtils.escapeJavaScript(beaconUrl));
-        vastTemplFirst.setBillingUrl(StringEscapeUtils.escapeJavaScript(beaconUrl + BILLING_BEACON_SUFFIX));
+
+        // adding billing, audience verification and impression tracker into billing array for velocity macro
+        final List<String> billingUrlList = new ArrayList<>();
+
+        billingUrlList.add(StringEscapeUtils.escapeJavaScript(beaconUrl + BILLING_BEACON_SUFFIX));
+
+        final String audienceVerification = thirdPartyTrackerMap.get(AUDIENCE_VERIFICATION_TRACKER);
+        if (StringUtils.isNotBlank(audienceVerification)) {
+            billingUrlList.add(StringEscapeUtils.escapeJavaScript(audienceVerification));
+        }
+
+        final String thirdPartyImpressionTracker = thirdPartyTrackerMap.get(THIRD_PARTY_IMPRESSION_TRACKER);
+        if (StringUtils.isNotBlank(thirdPartyImpressionTracker)) {
+            billingUrlList.add(StringEscapeUtils.escapeJavaScript(thirdPartyImpressionTracker));
+        }
+
+        String[] billingUrlArray = new String[billingUrlList.size()];
+        vastTemplFirst.setBillingUrlArray(billingUrlList.toArray(billingUrlArray));
+
+        // adding third party click tracker into click array for velocity macro
+        final List<String> clickUrlList = new ArrayList<>();
+        final String thirdPartyClickTracker = thirdPartyTrackerMap.get(THIRD_PARTY_CLICK_TRACKER);
+        if (StringUtils.isNotBlank(thirdPartyClickTracker)) {
+            clickUrlList.add(StringEscapeUtils.escapeJavaScript(thirdPartyClickTracker));
+        }
+        final String clickUrlArray[] = new String[clickUrlList.size()];
+        vastTemplFirst.setClickUrlArray(clickUrlList.toArray(clickUrlArray));
+
         vastTemplFirst.setClickServerUrl(StringEscapeUtils.escapeJavaScript(clickUrl));
+
         // Namespace
         vastTemplFirst.setNs(Formatter.getIXNamespace());
 
@@ -774,12 +804,13 @@ public class IXAdNetworkHelper {
      * @param clickUrl
      * @param adMarkup
      * @param winUrl
+     * @param thirdPartyTrackerMap
      * @return
      * @throws Exception
      */
     public static String cauAdBuilding(final SASRequestParameters sasParams, final IXSlotMatcher matchedSlot,
             final String beaconUrl, final String clickUrl, final String adMarkup, final String winUrl,
-            final String viewabilityTracker, final boolean isViewabilityDeal) throws Exception {
+            final Map<String, String> thirdPartyTrackerMap, final boolean isViewabilityDeal) throws Exception {
         LOG.debug("cauAdBuilding");
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put(CAU_CONTENT_JS_ESC, adMarkup);
@@ -792,10 +823,9 @@ public class IXAdNetworkHelper {
         velocityContext.put(IM_BEACON_URL, beaconUrl);
         velocityContext.put(IM_CLICK_URL, StringEscapeUtils.escapeJavaScript(clickUrl));
 
-        // Viewability Tracker
-        if (StringUtils.isNotBlank(viewabilityTracker)) {
-            velocityContext.put(VIEWABILITY_TRACKER, viewabilityTracker);
-        }
+        //adding all the third party trackers
+        thirdPartyTrackerMap.forEach(velocityContext::put);
+
         velocityContext.put(VelocityTemplateFieldConstants.VIEWABILE, isViewabilityDeal);
 
         final GenericTemplateObject templateFirst = new GenericTemplateObject();
@@ -910,4 +940,16 @@ public class IXAdNetworkHelper {
         }
         return docElm;
     }
+
+    public static String replaceAudienceVerificationTrackerMacros(String audienceVerificationTracker,
+        final Map<String, String> macroData) {
+        audienceVerificationTracker = StringUtils.replace(audienceVerificationTracker, MacroData.$LIMIT_AD_TRACKING,
+            macroData.get(MacroData.$LIMIT_AD_TRACKING));
+        audienceVerificationTracker =
+            StringUtils.replace(audienceVerificationTracker, MacroData.$IMP_CB, macroData.get(MacroData.$IMP_CB));
+        audienceVerificationTracker = StringUtils.replace(audienceVerificationTracker, MacroData.$USER_ID_SHA256_HASHED,
+            DigestUtils.sha256Hex(macroData.get(MacroData.$USER_ID)));
+        return audienceVerificationTracker;
+    }
+
 }

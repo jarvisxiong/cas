@@ -282,7 +282,6 @@ public class ThriftRequestParser {
             params.setPubId(tSite.publisherId);
             final boolean isApp = tSite.isSetInventoryType() && tSite.inventoryType == InventoryType.APP;
             params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
-
             final SiteTemplateSettings sts = tSite.siteTemplateSettings;
             if (sts != null) {
                 // Set CAU

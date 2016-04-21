@@ -28,7 +28,7 @@ public class IXPackageEntity {
     private List<Double> dealFloors;
     private List<Integer> rpAgencyIds;
     private List<Double> agencyRebatePercentages;
-    private List<String> viewabilityTrackers;
+    private List<Map<String, String>> thirdPartyTrackerMapList;
     private Map<Integer, Range<Double>> osVersionTargeting;
     private Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
     private Pair<Boolean, Set<Integer>> sdkVersionTargeting;

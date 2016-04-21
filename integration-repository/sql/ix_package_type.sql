@@ -1,4 +1,4 @@
-CREATE TYPE ix_package_type_02112015 AS
+CREATE TYPE ix_package_type_16032016 AS
 (
     id                          INTEGER,
     name                        CHARACTER VARYING(128),
@@ -43,8 +43,6 @@ CREATE TYPE ix_package_type_02112015 AS
     deal_floors                 DOUBLE PRECISION[],
     rp_agency_ids               INTEGER[],
     agency_rebate_percentages   DOUBLE PRECISION[],
-    viewability_trackers        TEXT[]
+    third_party_tracker_json_list        TEXT[]
 );
-ALTER TYPE ix_package_type_02112015 OWNER TO postgres;
-
-
+ALTER TYPE ix_package_type_16032016 OWNER TO postgres;

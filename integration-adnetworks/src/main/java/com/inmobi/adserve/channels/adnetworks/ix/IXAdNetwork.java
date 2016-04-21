@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.replaceAudienceVerificationTrackerMacros;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.replaceViewabilityTrackerMacros;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE;
@@ -12,6 +14,10 @@ import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.VIEWABILITY_TRACKER;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_JS;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
@@ -79,8 +85,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses;
@@ -216,7 +222,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     @Getter
     private String aqid;
     private String nurl;
-    private String viewabilityTracker;
+    @Getter
+    private Map<String, String> thirdPartyTrackerMap = new HashMap<>();
     protected boolean isCoppaSet = false;
     private List<String> advertiserDomains;
     private List<Integer> creativeAttributes;
@@ -1238,10 +1245,9 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         velocityContext.put(VelocityTemplateFieldConstants.IM_BEACON_URL, beaconUrl);
         velocityContext.put(VelocityTemplateFieldConstants.IM_CLICK_URL, getClickUrl());
 
-        // Viewability Tracker
-        if (StringUtils.isNotBlank(viewabilityTracker)) {
-            velocityContext.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
-        }
+        // adding all the third party trackers
+        thirdPartyTrackerMap.forEach(velocityContext::put);
+
         velocityContext.put(VelocityTemplateFieldConstants.VIEWABILE, hasViewabilityDeal);
 
         try {
@@ -1284,7 +1290,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         try {
             responseContent = IXAdNetworkHelper.videoAdBuilding(templateConfiguration.getTemplateTool(), sasParams,
                     repositoryHelper, processedSlotId, getBeaconUrl(), getClickUrl(), getAdMarkUp(), nurl,
-                    isSegmentRewardedVideoSupported, viewabilityTracker, hasViewabilityDeal);
+                    isSegmentRewardedVideoSupported, thirdPartyTrackerMap, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1303,7 +1309,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_CAU_RESPONSES);
         try {
             responseContent = IXAdNetworkHelper.cauAdBuilding(sasParams, matchedCAU, getBeaconUrl(), getClickUrl(),
-                    getAdMarkUp(), nurl, viewabilityTracker, hasViewabilityDeal);
+                    getAdMarkUp(), nurl, thirdPartyTrackerMap, hasViewabilityDeal);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1627,21 +1633,14 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.debug("Viewability enabled for this request.");
         }
 
-        if (matchedPackage.getViewabilityTrackers().size() > indexOfDealId) {
-            viewabilityTracker = matchedPackage.getViewabilityTrackers().get(indexOfDealId);
-            if (StringUtils.isNotBlank(viewabilityTracker)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Viewability Trackers detected.");
-                    LOG.debug("Viewability Trackers before substitution: {}", viewabilityTracker);
-                }
-                viewabilityTracker = IXAdNetworkHelper.replaceViewabilityTrackerMacros(viewabilityTracker,
-                        casInternalRequestParameters, sasParams);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Viewability Trackers after substitution: {}", viewabilityTracker);
-                }
-                InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS);
-            }
+        if (matchedPackage.getThirdPartyTrackerMapList().size() > indexOfDealId) {
+            final Map<String, String> trackerMap = matchedPackage.getThirdPartyTrackerMapList().get(indexOfDealId);
+            final MacroData macroData = new MacroData(casInternalRequestParameters, sasParams);
+
+            setViewablityTrackers(trackerMap);
+            setAudienceVerificationTrackers(trackerMap, macroData);
+            setThirdPartyClickTracker(trackerMap, macroData);
+            setThirdPartyImpressionTracker(trackerMap, macroData);
         }
 
         // Applying if agency rebate is applicable
@@ -1678,6 +1677,51 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AGENCY_REBATE_DEAL_RESPONSES);
             LOG.info(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
                     dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
+        }
+    }
+
+    public void setThirdPartyImpressionTracker(final Map<String, String> trackerMap, final MacroData macroData) {
+        final String thirdPartyImpressionTracker = trackerMap.get(THIRD_PARTY_IMPRESSION_TRACKER);
+
+        if (StringUtils.isNotBlank(thirdPartyImpressionTracker)) {
+            LOG.debug("Third Party Impression Trackers detected.");
+
+            thirdPartyTrackerMap.put(THIRD_PARTY_IMPRESSION_TRACKER, thirdPartyImpressionTracker);
+        }
+    }
+
+    public void setThirdPartyClickTracker(final Map<String, String> trackerMap, final MacroData macroData) {
+        final String thirdPartyClickTracker = trackerMap.get(THIRD_PARTY_CLICK_TRACKER);
+        if (StringUtils.isNotBlank(thirdPartyClickTracker)) {
+            LOG.debug("Third Party Click Trackers detected.");
+
+            thirdPartyTrackerMap.put(THIRD_PARTY_CLICK_TRACKER,
+                thirdPartyClickTracker);
+        }
+    }
+
+    public void setAudienceVerificationTrackers(final Map<String, String> trackerMap, final MacroData macroData) {
+        String audienceVerificationTracker = trackerMap.get(AUDIENCE_VERIFICATION_TRACKER);
+        if (StringUtils.isNotBlank(audienceVerificationTracker)) {
+            LOG.debug("Audience Verification Trackers detected.");
+
+            thirdPartyTrackerMap.put(AUDIENCE_VERIFICATION_TRACKER,
+                replaceAudienceVerificationTrackerMacros(audienceVerificationTracker, macroData.getMacroMap()));
+        }
+    }
+
+    public void setViewablityTrackers(final Map<String, String> trackerMap) {
+        final String viewabilityTrackers = trackerMap.get(VIEWABILITY_TRACKER);
+        if (StringUtils.isNotBlank(viewabilityTrackers)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Viewability Trackers detected.");
+                LOG.debug("Viewability Trackers before substitution: {}", viewabilityTrackers);
+            }
+            thirdPartyTrackerMap.put(VIEWABILITY_TRACKER,
+                    replaceViewabilityTrackerMacros(viewabilityTrackers, casInternalRequestParameters, sasParams));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Viewability Trackers after substitution: {}", thirdPartyTrackerMap.get(VIEWABILITY_TRACKER));
+            }
         }
     }
 

@@ -6,6 +6,9 @@ public class VelocityTemplateFieldConstants {
     public static final String IM_CLICK_URL = "IMClickUrl";
     public static final String VIEWABILE = "Viewable";
     public static final String VIEWABILITY_TRACKER = "ViewabilityTracker";
+    public static final String AUDIENCE_VERIFICATION_TRACKER = "AudienceVerificationTracker";
+    public static final String THIRD_PARTY_IMPRESSION_TRACKER = "ThirdPartyImpressionTracker";
+    public static final String THIRD_PARTY_CLICK_TRACKER = "ThirdPartyClickTracker";
     public static final String PARTNER_BEACON_URL = "PartnerBeaconUrl";
     public static final String PARTNER_BEACON_LIST = "partnerBeacons";
     public static final String PARTNER_CLICK_URL = "PartnerClickUrl";

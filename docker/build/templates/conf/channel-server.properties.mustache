@@ -263,7 +263,7 @@ Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = IXPackageRepository
 Cache.IXPackageRepository.Manager = com.inmobi.adserve.channels.repository.IXPackageRepository
-Cache.IXPackageRepository.query = select * from ix_package_fun_05112015()
+Cache.IXPackageRepository.query = select * from ix_package_fun_16032016()
 Cache.IXPackageRepository.initialDelay = 0
 Cache.IXPackageRepository.refreshTime = 1867
 Cache.IXPackageRepository.dataSourceName = jdbc
@@ -324,7 +324,6 @@ Cache.IXBlocklistRepository.refreshTime = 601
 Cache.IXBlocklistRepository.isUpdatable = true
 Cache.IXBlocklistRepository.dataSourceName = jdbc
 
-{{#dcp}}
 adapter.adbaydcp.status=on
 adapter.adbaydcp.host=http://ad.about.co.kr/mad/json/InMobi/total01/bottom_middle
 adapter.adbaydcp.advertiserId=7f7edb117307402fa89afeadb56174d7
@@ -682,7 +681,6 @@ adapter.tencento2.advertiserId=674cb34c74804a5f90fca49aac985be3
 adapter.tencento2.partnerSegmentNo=1
 adapter.tencento2.class=com.inmobi.adserve.channels.adnetworks.tencentdcp.TencentAdnetwork
 
-{{/dcp}}
 
 {{#rtbd}}
 server.isRtbEnabled={{rtb_enabled}}

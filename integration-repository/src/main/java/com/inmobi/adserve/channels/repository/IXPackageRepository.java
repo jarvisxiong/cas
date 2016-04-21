@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.json.JSONObject;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -80,7 +82,7 @@ public class IXPackageRepository {
     private IndexedCollection<IXPackageEntity> packageIndex;
     private ScheduledDbReader reader;
     private static final Integer[][] EMPTY_2D_INTEGER_ARRAY = new Integer[0][];
-    private Logger logger;
+    private static Logger logger;
 
     public static final String ALL_SITE_ID = "A";
     public static final Integer ALL_COUNTRY_ID = -1;
@@ -259,10 +261,7 @@ public class IXPackageRepository {
                 final String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
                 final Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
 
-                String[] viewabilityTrackers = null;
-                if (null != rs.getArray("viewability_trackers")) {
-                    viewabilityTrackers = (String[]) rs.getArray("viewability_trackers").getArray();
-                }
+
 
                 Integer[] rpAgencyIds = null;
                 Double[] agencyRebatePercentages = null;
@@ -497,9 +496,13 @@ public class IXPackageRepository {
                 if (null != geoFenceRegion) {
                     entityBuilder.geoFenceRegion(geoFenceRegion);
                 }
-                if (null != viewabilityTrackers) {
-                    entityBuilder.viewabilityTrackers(Arrays.asList(viewabilityTrackers));
+
+                String[] thirdPartyTrackerJsonList = null;
+                if (null != rs.getArray("third_party_tracker_json_list")) {
+                    thirdPartyTrackerJsonList = (String[]) rs.getArray("third_party_tracker_json_list").getArray();
                 }
+                entityBuilder.thirdPartyTrackerMapList(getThirdPartyTrackerMapList(thirdPartyTrackerJsonList));
+
                 entityBuilder.dataVendorCost(dataVendorCost);
 
                 final IXPackageEntity entity = entityBuilder.build();
@@ -529,6 +532,29 @@ public class IXPackageRepository {
             packageIndex.clear();
             packageIndex.addAll(packageSet.values());
         }
+    }
+
+    protected static List<Map<String, String>> getThirdPartyTrackerMapList(final String[] thirdPartyTrackerJsonList) {
+        final ImmutableList.Builder<Map<String, String>> thirdPartyTrackerMapListBuilder = new ImmutableList.Builder();
+        if (null != thirdPartyTrackerJsonList) {
+            for (final String thirdPartyTrackerJson : thirdPartyTrackerJsonList) {
+                final ImmutableMap.Builder<String, String> thirdPartyTrackerMapBuilder = new ImmutableMap.Builder<>();
+                if (StringUtils.isNotBlank(thirdPartyTrackerJson)) {
+                    try {
+                        final JSONObject jsonObj = new JSONObject(thirdPartyTrackerJson);
+                        final Iterator iterator = jsonObj.keys();
+                        while(iterator.hasNext()) {
+                            final String key = (String)iterator.next();
+                            thirdPartyTrackerMapBuilder.put(key, jsonObj.getString(key));
+                        }
+                    } catch (final JSONException jse) {
+                        logger.error("Invalid third party tracker json: \nException: {}" + thirdPartyTrackerJson, jse);
+                    }
+                }
+                thirdPartyTrackerMapListBuilder.add(thirdPartyTrackerMapBuilder.build());
+            }
+        }
+        return thirdPartyTrackerMapListBuilder.build();
     }
 
     private void start() {

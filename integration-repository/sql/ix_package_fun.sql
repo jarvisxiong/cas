@@ -1,9 +1,9 @@
-CREATE FUNCTION ix_package_fun_05112015()
+CREATE FUNCTION ix_package_fun_16032016()
 RETURNS
-    SETOF ix_package_type_02112015 AS
+    SETOF ix_package_type_16032016 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_02112015%ROWTYPE;
+    row1    ix_package_type_16032016%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -51,7 +51,7 @@ SELECT
                 deals.deal_floors AS deal_floors,
                 deals.rp_agency_ids AS rp_agency_ids,
                 deals.agency_rebate_percentages AS agency_rebate_percentages,
-                deals.viewability_trackers AS viewability_trackers
+                deals.third_party_tracker_json_list AS third_party_tracker_json_list
                 from ix_packages JOIN (
                     select
                         makeList(rp_deal_id) AS deal_ids,
@@ -59,7 +59,7 @@ SELECT
                         makeList(access_type) AS access_types,
                         makeList(rp_agency_id) AS rp_agency_ids,
                         makeList(agency_rebate_percentage) AS agency_rebate_percentages,
-                        makeList(viewability_tracker) AS viewability_trackers,
+                        makeList(third_party_tracker_json) AS third_party_tracker_json_list,
                         package_id
                     from ix_package_deals
                     where (start_date is null or start_date <= now()+interval '1 minute')

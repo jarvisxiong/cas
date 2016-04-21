@@ -18,7 +18,9 @@ import java.awt.Dimension;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -31,6 +33,9 @@ import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -60,12 +65,14 @@ import com.inmobi.adserve.channels.types.IXBlocklistType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.template.config.DefaultConfiguration;
 import com.inmobi.template.gson.GsonManager;
+import com.inmobi.types.DeviceType;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -115,8 +122,10 @@ public class NewIXAdNetworkTest {
         replayAll();
     }
 
+    @BeforeTest
     @BeforeClass
     public static void setUp() throws IllegalAccessException {
+
         final DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
         defaultConfiguration.setGsonManager(new GsonManager());
         MemberMatcher.field(IXAdNetwork.class, "templateConfiguration").set(IXAdNetwork.class, defaultConfiguration);
@@ -1591,7 +1600,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(0.0)).anyTimes();
         expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
+        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
         replayAll();
 
         final Object[] constructerArgs =
@@ -1649,7 +1658,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(101.0)).anyTimes();
         expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
+        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
         replayAll();
 
         final Object[] constructerArgs =
@@ -1709,7 +1718,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(integerListWithNull).anyTimes();
         expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
+        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
         replayAll();
 
         final Object[] constructerArgs =
@@ -1767,7 +1776,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
         expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
+        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
         replayAll();
 
         final Object[] constructerArgs =
@@ -1824,7 +1833,7 @@ public class NewIXAdNetworkTest {
         expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
         expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
         expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getViewabilityTrackers()).andReturn(new ArrayList<>()).anyTimes();
+        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
         replayAll();
 
         final Object[] constructerArgs =
@@ -1841,5 +1850,111 @@ public class NewIXAdNetworkTest {
         ixAdNetwork.setDealRelatedMetadata();
         assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(55.0)));
         assertThat(ixAdNetwork.isAgencyRebateDeal(), is(equalTo(true)));
+    }
+
+    @DataProvider(name = "Valid Third Party Tracker Json List")
+    public Object[][] paramValidThirdPartyTrackerJsonList() {
+        final String viewabilityTracker = "viewabilityTracker";
+        final String audienceVerificiation = "audienceVerificiation";
+        final String thirdPartyImpressionTracker = "thirdPartyImpressionTracker";
+        final String thirdPartyClickTracker = "thirdPartyClickTracker";
+
+
+
+        Map<String, String> trackerMapWithOutEmptyValue = new HashMap<>();
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, audienceVerificiation);
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, thirdPartyImpressionTracker);
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, thirdPartyClickTracker);
+
+        Map<String, String> trackerMapWithEmptyAndNullValue = new HashMap<>();
+        trackerMapWithEmptyAndNullValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, "   ");
+        trackerMapWithEmptyAndNullValue.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, "");
+        trackerMapWithEmptyAndNullValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, "");
+        trackerMapWithEmptyAndNullValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
+
+        Map<String, String> trackerMapWithEmptyNullAndValidValue = new HashMap<>();
+        trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
+        trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, "");
+        trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, " ");
+        trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
+
+        Map<String, String> expectedMap = new HashMap<>();
+        expectedMap.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
+        expectedMap.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, null);
+        expectedMap.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, null);
+        expectedMap.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
+
+        Map<String, String> emptyTrackerMap = new HashMap<>();
+        Map<String, String> expectedTrackerMapNull = new HashMap<>();
+        expectedTrackerMapNull.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, null);
+        expectedTrackerMapNull.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, null);
+        expectedTrackerMapNull.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, null);
+        expectedTrackerMapNull.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
+
+        ArrayList<String> trackerList = new ArrayList<String>(){{
+                add(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER);
+                add(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER);
+                add(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER);
+                add(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER);}};
+
+        return new Object[][] {
+                {"EmptyTrackerMap", emptyTrackerMap, expectedTrackerMapNull, trackerList},
+                {"trackerMapWithOutEmptyValue", trackerMapWithOutEmptyValue, trackerMapWithOutEmptyValue, trackerList},
+                {"trackerMapWithEmptyAndNullValue", trackerMapWithEmptyAndNullValue, expectedTrackerMapNull, trackerList},
+                {"trackerMapWithEmptyNullAndValidValue", trackerMapWithEmptyNullAndValidValue, expectedMap, trackerList},
+        };
+    }
+
+
+    @org.testng.annotations.Test(dataProvider = "Valid Third Party Tracker Json List")
+    public void testValidThirdPartyTrackerJson(final String useCaseName, final  Map<String, String> trackerMap,
+            final  Map<String, String> expectedtrackerMap, final ArrayList<String> trackerList) throws Exception {
+
+        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
+        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
+        final Channel mockChannel = createMock(Channel.class);
+        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
+        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
+        final CasInternalRequestParameters mockCasInternalRequestParameters =
+            createMock(CasInternalRequestParameters.class);
+
+        expect(mockStatus.code()).andReturn(200).times(2);
+        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
+        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
+        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
+        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
+        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+        expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
+            .anyTimes();
+        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
+        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
+        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
+        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
+        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
+            .anyTimes();
+        expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
+        replayAll();
+
+        SASRequestParameters sasParam = new SASRequestParameters();
+        sasParam.setDeviceType(DeviceType.SMARTPHONE);
+        sasParam.setSiteIncId(1234l);
+        sasParam.setHandsetName("handset");
+        sasParam.setSdkVersion("sdkVer");
+        CasInternalRequestParameters casInt = new CasInternalRequestParameters();
+        casInt.setAuctionId("auctionId");
+        final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, null, advertiserName);
+        ixAdNetwork.configureParameters(sasParam, casInt, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
+        ixAdNetwork.setViewablityTrackers(trackerMap);
+        final MacroData macroData = new MacroData(casInt, sasParam);
+        ixAdNetwork.setAudienceVerificationTrackers(trackerMap, macroData);
+        ixAdNetwork.setThirdPartyImpressionTracker(trackerMap, macroData);
+        ixAdNetwork.setThirdPartyClickTracker(trackerMap, macroData);
+        Map<String, String> thirdPartyTrackerMap =  ixAdNetwork.getThirdPartyTrackerMap();
+        trackerList.forEach(t-> Assert.assertEquals(thirdPartyTrackerMap.get(t), expectedtrackerMap.get(t)));
     }
 }
