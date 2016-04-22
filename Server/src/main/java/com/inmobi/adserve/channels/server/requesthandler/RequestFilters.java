@@ -31,8 +31,6 @@ public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
     protected static final Long CHINA = 164l;
     protected static final Integer CHINA_MOBILE = 787;
-    protected static final Integer TEST_CHINA_CARRIER_ID = 788; // China Unicom
-    protected static final Short INMOBI_SLOT_FOR_300x250 = 10;
 
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
@@ -105,8 +103,7 @@ public class RequestFilters {
         }
 
         if (DemandSourceType.IX == dst &&
-                dropInChinaMobileTargetingFilter(sasParams.getProcessedMkSlot(), sasParams.getCountryId(),
-                        sasParams.getCarrierId())) {
+                dropInChinaMobileTargetingFilter(sasParams.getCountryId(), sasParams.getCarrierId())) {
             // Drop Request
             LOG.info("Request dropped since the China request is not from China Mobile or Test Carrier");
             hrh.setTerminationReason(CasConfigUtil.CHINA_MOBILE_TARGETING);
@@ -127,28 +124,9 @@ public class RequestFilters {
         return false;
     }
 
-
-    protected static boolean dropInChinaMobileTargetingFilter(final List<Short> processedMkSlot, final Long countryId,
-            final Integer carrierId) {
-        boolean dropInFilter = false;
-        // China Mobile hack. TODO: Need to enable targeting at segment level
-        if (CHINA == countryId && CollectionUtils.isNotEmpty(processedMkSlot)) {
-            if (CHINA_MOBILE == carrierId) {
-                // Removing slot for 300x250
-                processedMkSlot.remove(INMOBI_SLOT_FOR_300x250);
-            } else if (TEST_CHINA_CARRIER_ID == carrierId) {
-                // Only trying to include slot 300x250
-                if (processedMkSlot.contains(INMOBI_SLOT_FOR_300x250)) {
-                    processedMkSlot.clear();
-                    processedMkSlot.add(INMOBI_SLOT_FOR_300x250);
-                } else {
-                    processedMkSlot.clear();
-                }
-            } else {
-                dropInFilter = true;
-            }
-        }
-        return dropInFilter;
+    // China Mobile hack. TODO: Need to enable targeting at segment level
+    protected static boolean dropInChinaMobileTargetingFilter(final Long countryId, final Integer carrierId) {
+        return CHINA == countryId && CHINA_MOBILE != carrierId;
     }
 
     /**

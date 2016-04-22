@@ -135,9 +135,10 @@ public class ThriftRequestParser {
         // Set imei related fields
         if (Android.getValue() == params.getOsId() && GlobalConstant.CHINA_COUNTRY_CODE.equals(params.getCountryCode())) {
             if (tObject.isSetIem()) {
+                final String imei = StringUtils.lowerCase(tObject.getIem());
                 InspectorStats.incrementStatCount(IMEI, IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
-                casInternal.setImeiMD5(DigestUtils.md5Hex(tObject.getIem()));
-                casInternal.setImeiSHA1(DigestUtils.sha1Hex(tObject.getIem()));
+                casInternal.setImeiMD5(DigestUtils.md5Hex(imei));
+                casInternal.setImeiSHA1(DigestUtils.sha1Hex(imei));
             } else {
                 if (StringUtils.isNotBlank(casInternal.getUidO1())) {
                     final IMEIEntity entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(casInternal.getUidO1());
