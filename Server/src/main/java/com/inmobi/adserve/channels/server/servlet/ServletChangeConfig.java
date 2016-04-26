@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Path;
+
 // import javax.ws.rs.Path;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +29,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
  * @author ritwik.kumar
  */
 @Singleton
-// @Path("/configChange")
+@Path("/configChange")
 public class ServletChangeConfig implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletChangeConfig.class);
     private static final String ADAPTER = "adapter.";
