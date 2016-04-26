@@ -13,6 +13,9 @@
             }
             #${first.ns}ad{
                 display: none;
+                background: rgba(0,0,0,0.9);
+                width: 100%;
+                height: 100%;
             }
             #${first.ns}closeButton{
                 position: absolute;
@@ -28,7 +31,6 @@
                 padding:0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.8);
                 overflow: hidden;
             }
             ## Overriding creative centring
