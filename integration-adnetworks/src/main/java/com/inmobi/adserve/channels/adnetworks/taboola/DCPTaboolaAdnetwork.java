@@ -202,7 +202,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 pixelUrls.add(beacon);
                 appBuilder.setPixelUrls(pixelUrls);
                 final App app = (App) appBuilder.build();
-                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params);
+                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params, sasParams.isNoJsTracking());
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 

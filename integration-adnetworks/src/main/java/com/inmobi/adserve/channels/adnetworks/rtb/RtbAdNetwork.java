@@ -1041,7 +1041,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
             params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
             params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
-            responseContent = nativeResponseMaker.makeRTBDResponse(templateContext, params);
+            responseContent = nativeResponseMaker.makeRTBDResponse(templateContext, params, sasParams.isNoJsTracking());
         } catch (final Exception e) {
             adStatus = TERM;
             responseContent = DEFAULT_EMPTY_STRING;

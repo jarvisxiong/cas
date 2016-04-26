@@ -188,7 +188,6 @@ public class AdserveBackfillRequest {
         // This is not the task id. It is a unique id used between adserving and the sdk.
         final String def_adpool_requestGuid = WilburyUUID.getUUID(System.nanoTime()).toString();
         final String def_adpool_placementId = "1234";
-
         final String def_rqSslEnabled = "false";
         final boolean rqSslEnabled = Boolean.parseBoolean(AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_rqSslEnabled"),
                                                                                                       def_rqSslEnabled));
@@ -354,7 +353,6 @@ public class AdserveBackfillRequest {
         final String adpool_supplycapability =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("adpool_supplycapability"),
                         def_supplycapability);
-
         final String temp_geo_countryid =
                 AdserveBackfillRequest.defaultSetVariable(requestObject.get("geo_countryid"), def_geo_countryid);
         Integer geo_countryid = null;
@@ -760,7 +758,6 @@ public class AdserveBackfillRequest {
 
         // Placement related setters
         adPoolRequest.setPlacementId(adpool_placementId);
-
         return adPoolRequest;
     }
 

@@ -111,6 +111,9 @@ public class ThriftRequestParser {
         params.setAppBundleId(tObject.getAppBundleId());
         params.setRequestGuid(tObject.isSetRequestGuid() ? tObject.requestGuid : StringUtils.EMPTY);
 
+        if (tObject.isSetNoJsTracking()) {
+            params.setNoJsTracking(tObject.isNoJsTracking());
+        }
         // Fill param from Site Object
         setSiteObject(tObject, params, dst);
         // Fill params from Device Object

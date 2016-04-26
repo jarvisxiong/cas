@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.api;
 
+import static junit.framework.Assert.assertEquals;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -8,16 +9,21 @@ import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.tools.generic.MathTool;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
 
 import com.inmobi.adserve.contracts.rtb.response.Bid;
 import com.inmobi.adserve.contracts.rtb.response.BidResponse;
@@ -59,6 +65,7 @@ public class NativeResponseMakerTest {
         return templateConfiguration;
     }
 
+    @BeforeTest
     @BeforeClass
     public static void setUp() throws Exception {
         final TemplateConfiguration templateConfiguration = getTemplateConfiguration();
@@ -142,6 +149,74 @@ public class NativeResponseMakerTest {
                 "<img src=\\\"nUrl\\\" style=\\\"display:none;\\\" /><img src=\\\"winUrl\\\" style=\\\"display:none;\\\" /><img src=\\\"www.pixelUrl1.com\\\" style=\\\"display:none;\\\" /><img src=\\\"www.pixelUrl2.com\\\" style=\\\"display:none;\\\" />";
         final String actualOutput = nativeResponseMaker.getTrackingCode(params, mockApp);
         assertThat(actualOutput, is(equalTo(expectedOutput)));
+    }
+
+    @Test
+    public void testTrackingEventNoJs() {
+        final Map<String, String> params = new HashMap<>();
+        final App mockApp = createMock(App.class);
+        expect(mockApp.getPixelUrls()).andReturn(null).anyTimes();
+        expect(mockApp.getClickUrls()).andReturn(Arrays.asList("www.clickUrl1.com", "www.InmobiClickUrl1.com")).anyTimes();
+
+        replayAll();
+
+        params.put("nUrl", "nUrl");
+        params.put("winUrl", "winUrl");
+
+        final Map<Integer, Map<String, List<String>>> actualOutput = nativeResponseMaker.getEventTracking(mockApp, params);
+        System.out.println(actualOutput);
+    }
+
+    @DataProvider(name = "Data for NoJs EventTracking")
+    public Object[][] eventTrackingNoJsDataProvider() {
+        final List<String> pixelUrlArray1 = new ArrayList<>();
+        pixelUrlArray1.add("www.pixelUrl1.com");
+        pixelUrlArray1.add("www.pixelUrl2.com");
+
+        final List<String> clickUrlArray1 = new ArrayList<>();
+        clickUrlArray1.add("www.clickUrl1.com");
+        clickUrlArray1.add( "www.clickUrl2.com");
+
+        final String nUrl = "nurl";
+        final String winUrl = "winUrl";
+
+        return new Object[][] {
+            {"AllPresentV1", pixelUrlArray1, clickUrlArray1, nUrl, winUrl},
+            {"Winurl", null, null, null, winUrl},
+            {"PixelAndWinUrl", pixelUrlArray1, null, null, winUrl},
+            {"ClickAndWinUrl", null, clickUrlArray1, null, winUrl},
+            {"AllPresentV2", pixelUrlArray1, clickUrlArray1, nUrl, winUrl},
+            {"NurlAndWinUrl", null, null, nUrl, winUrl},
+            {"PixelNurlAndWinUrl", pixelUrlArray1, null, nUrl, winUrl},
+            {"ClickNurlAndWinUrl", null, clickUrlArray1, nUrl, winUrl},
+        };
+    }
+
+    @org.testng.annotations.Test(dataProvider = "Data for NoJs EventTracking")
+    public void testEventTrackingNoJs(final String testName, List<String> pixelUrlArray,
+        final List<String> clickUrlArray, final String nUrl, final String winUrl) {
+        if (null == pixelUrlArray && (StringUtils.isNotBlank(nUrl) || (StringUtils.isNotBlank(winUrl)))) {
+            pixelUrlArray = new ArrayList<>();
+        }
+        if (StringUtils.isNotBlank(nUrl)) {
+            pixelUrlArray.add(nUrl);
+        }
+        if (StringUtils.isNotBlank(winUrl)) {
+            pixelUrlArray.add(winUrl);
+        }
+
+        final Map<String, String> params = new HashMap<>();
+        final com.inmobi.template.context.App.Builder appBuilder = com.inmobi.template.context.App.newBuilder();
+        final com.inmobi.template.context.App.Builder contextBuilder = com.inmobi.template.context.App.newBuilder();
+        contextBuilder.setClickUrls(clickUrlArray);
+        contextBuilder.setPixelUrls(pixelUrlArray);
+        com.inmobi.template.context.App app = (App) contextBuilder.build();
+        params.put("nUrl", nUrl);
+        params.put("winUrl", winUrl);
+        final Map<Integer, Map<String, List<String>>> actualOutput = nativeResponseMaker.getEventTracking(app, params);
+
+        assertEquals(actualOutput.get(TrackerUIInteraction.VIEW.getValue()).get("urls"), pixelUrlArray);
+        assertEquals(actualOutput.get(TrackerUIInteraction.CLICK.getValue()).get("urls"), clickUrlArray);
     }
 
 }

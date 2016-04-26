@@ -78,7 +78,7 @@ public class NativeTemplateTester {
                     injector.getInstance(TemplateParser.class), injector.getInstance(TemplateDecorator.class),
                     injector.getInstance(TemplateConfiguration.class));
             final String responseContent = nativeResponseMaker
-                    .makeIXResponse((com.inmobi.template.context.App) contextBuilder.build(), params);
+                    .makeIXResponse((com.inmobi.template.context.App) contextBuilder.build(), params, false);
             System.out.println(responseContent);
         } catch (final Exception e) {
             e.printStackTrace();
