@@ -61,7 +61,7 @@ prod:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
                 cas_timer_handler_timeout_dcp: 600
-                cas_timer_handler_timeout_rtbd: 190
+                cas_timer_handler_timeout_rtbd: 230
             rtbd:
                 rtb_enabled: 'true'
                 rtbd_demand_density: '1'
