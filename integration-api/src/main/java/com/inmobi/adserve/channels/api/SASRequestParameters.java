@@ -70,6 +70,7 @@ public class SASRequestParameters {
     private String deviceMake;
     private String deviceModel;
     private int osId;
+    private String osMajorVersion;
     private Short rqMkAdcount;
     private String tid;
     private long handsetInternalId;
@@ -79,6 +80,7 @@ public class SASRequestParameters {
     private Integer state;
     private List<Short> rqMkSlot;
     private List<Short> processedMkSlot;
+    private Double derivedDeviceDensity;
     private Integer ipFileVersion;
     private boolean isRichMedia;
     private boolean isRewardedVideo;
@@ -90,7 +92,6 @@ public class SASRequestParameters {
     private Set<Integer> accountSegment;
     private int sst; // 0 for Network
     private String pubId;
-    private String osMajorVersion;
     private ConnectionType connectionType;
     private double marketRate;
     private IntegrationDetails integrationDetails;
@@ -117,6 +118,7 @@ public class SASRequestParameters {
     // note: requestGuid is different from the task id (the unique id between ump and other adpools)
     private String requestGuid;
     private String language;
+    private boolean noJsTracking = false;
 
     public enum HandSetOS {
         OTHERS(1), Linux_Smartphone_OS(2), Android(3), Nokia_OS(4), iOS(5), RIM_OS(6), MTK_Nucleus_OS(7), Symbian_OS(8), Windows_Mobile_OS(

@@ -24,7 +24,7 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTBD_EXT_OBJECT_DATA_SIGNALS: {
-                logLine = "\"ext\":{\"gender\":\"M\",\"age\":\"20\"}}";
+                logLine = "\"ext\":{\"gender\":\"M\",";
                 System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
                 break;
             }

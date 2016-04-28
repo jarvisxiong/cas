@@ -13,6 +13,9 @@
             }
             #${first.ns}ad{
                 display: none;
+                background: rgba(0,0,0,0.9);
+                width: 100%;
+                height: 100%;
             }
             #${first.ns}closeButton{
                 position: absolute;
@@ -28,7 +31,6 @@
                 padding:0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.8);
                 overflow: hidden;
             }
             ## Overriding creative centring
@@ -68,8 +70,13 @@
                         renderBeacons : [
                             #if($IMBeaconUrl) '${IMBeaconUrl}?b=${WIN_BID}${DEAL_GET_PARAM}','${IMBeaconUrl}?m=99&action=vc-test' #end
                             #if($PartnerBeaconUrl), '$PartnerBeaconUrl' #end
+                            #if($AudienceVerificationTracker), '$AudienceVerificationTracker' #end
+                            #if($ThirdPartyImpressionTracker), '$ThirdPartyImpressionTracker' #end
                         ],
-                        clickBeacons : [#if($IMClickUrl) '${IMClickUrl}' #end],
+                        clickBeacons : [
+                            #if($IMClickUrl) '${IMClickUrl}' #end
+                            #if($ThirdPartyClickTracker), '$ThirdPartyClickTracker' #end
+                        ],
                         viewabilityBeacon1Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second' #end],
                         viewabilityBeacon2Sec: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_two_second' #end],
                         viewabilityBeacon1SecSimple: [#if($IMBeaconUrl) '${IMBeaconUrl}?m=99&action=viewability_one_second_simple' #end],
@@ -455,6 +462,6 @@
             })();
         </script>
         ## ViewabilityTrackers have been added at the end to prevent the rest of the ad from failing for faulty viewability trackers
-        #if($Viewable && $ViewabilityTracker) $ViewabilityTracker #end
+        #if($ViewabilityTracker) $ViewabilityTracker #end
     </body>
 </html>

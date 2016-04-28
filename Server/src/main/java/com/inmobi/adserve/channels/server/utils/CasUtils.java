@@ -1,5 +1,10 @@
 package com.inmobi.adserve.channels.server.utils;
 
+
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
+import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
+import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS;
+
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +12,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -16,12 +21,12 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Singleton;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.Formatter;
+import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
-import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
-import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -30,14 +35,13 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 
 
-/**
- * @author abhishek.parwal
- * @author ritwik.kumar
- *
- */
 @Singleton
 public class CasUtils {
     private static final Logger LOG = LoggerFactory.getLogger(CasUtils.class);
+    protected static final String MINIMUM_SUPPORTED_IOS_VERSION_FOR_VIDEO_CONFIG_KEY =
+            "adtype.vast.minimumSupportedIOSVersion";
+    protected static final String MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_VIDEO_CONFIG_KEY =
+            "adtype.vast.minimumSupportedAndroidVersion";
     private final RepositoryHelper repositoryHelper;
 
     @Inject
@@ -55,12 +59,6 @@ public class CasUtils {
         return null;
     }
 
-    // No longer being used
-    public Double getRtbFloor(final CasContext casContext) {
-        final PricingEngineEntity pricingEngineEntity = casContext.getPricingEngineEntity();
-        return pricingEngineEntity == null ? 0 : pricingEngineEntity.getRtbFloor();
-    }
-
     /**
      *
      * @param httpRequest
@@ -72,18 +70,11 @@ public class CasUtils {
     }
 
     /**
-     *
+     * 
      * @param sasParams
      * @return
      */
-    public SiteEcpmEntity getNetworkSiteEcpm(final SASRequestParameters sasParams) {
-        return repositoryHelper.querySiteEcpmRepository(sasParams.getSiteId(), sasParams.getCountryId().intValue(),
-                sasParams.getOsId());
-    }
-
-    public boolean isVideoSupported(final SASRequestParameters sasParams) {
-        boolean isSupported = false;
-
+    public boolean isVideoSupportedSite(final SASRequestParameters sasParams) {
         LOG.debug("Checking for VAST video support");
         if (DemandSourceType.IX.getValue() != sasParams.getDst()) {
             LOG.debug("Not qualified for VAST video as DST was not IX");
@@ -92,6 +83,12 @@ public class CasUtils {
 
         if (RequestedAdType.VAST == sasParams.getRequestedAdType()) {
             return true;
+        }
+
+        if (SASParamsUtils.isNativeRequest(sasParams)) {
+            final NativeAdTemplateEntity hasVideoTemplate =
+                    repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), VAST);
+            return hasVideoTemplate != null;
         }
 
         if (RequestedAdType.INTERSTITIAL != sasParams.getRequestedAdType()) {
@@ -116,37 +113,47 @@ public class CasUtils {
         }
 
         // Check for minimum sdk version
-        final int minimumSdkVerForVAST = CasConfigUtil.getServerConfig()
-                .getInt("adtype.vast.minimumSupportedSdkVersion", 450);
+        final int minimumSdkVerForVAST =
+                CasConfigUtil.getServerConfig().getInt("adtype.vast.minimumSupportedSdkVersion", 450);
         if (!Formatter.isRequestFromSdkVersionOnwards(sasParams, minimumSdkVerForVAST)) {
             LOG.debug("Not qualified for VAST video as request failed minimum SDK check. Minimum Supported SDK: {}",
                     minimumSdkVerForVAST);
             return false;
         }
 
-        String osVersion = sasParams.getOsMajorVersion();
-        if (StringUtils.isNotEmpty(osVersion)) {
-            int osMajorVersion;
-            try {
-                if (osVersion.contains(".")) {
-                    osVersion = osVersion.substring(0, osVersion.indexOf("."));
-                }
-                osMajorVersion = Integer.parseInt(osVersion);
-            } catch (final NumberFormatException e) {
-                LOG.debug("Exception while parsing osMajorVersion {}", e);
-                return false;
-            }
+        return checkMinimumOSVersionForVideo(sasParams.getOsId(), sasParams.getOsMajorVersion(),
+                CasConfigUtil.getServerConfig());
+    }
 
-            // Only requests from Android 4.0 or iOS 6.0 and higher are supported.
-            if (sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue() && osMajorVersion >= 4
-                    || sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue() && osMajorVersion >= 6) {
-                isSupported = true;
-            } else {
-                LOG.debug("Not qualified for VAST video as only requests from Android 4.0 or iOS 6.0 and higher are "
-                        + "supported");
+    protected static boolean checkMinimumOSVersionForVideo(final int osId, final String osMajorVersionStr,
+            final Configuration serverConfig) {
+        boolean checkPassed = false;
+
+        try {
+            if (null != osMajorVersionStr) {
+                final double osVersion = Double.valueOf(osMajorVersionStr);
+                final String minOsVersionConfigKey;
+
+                if (Android.getValue() == osId) {
+                    minOsVersionConfigKey = MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_VIDEO_CONFIG_KEY;
+                } else if (iOS.getValue() == osId) {
+                    minOsVersionConfigKey = MINIMUM_SUPPORTED_IOS_VERSION_FOR_VIDEO_CONFIG_KEY;
+                } else {
+                    minOsVersionConfigKey = null;
+                }
+
+                if (null != minOsVersionConfigKey) {
+                    final double minimumOsVersion = serverConfig.getDouble(minOsVersionConfigKey);
+                    if (osVersion >= minimumOsVersion) {
+                        checkPassed = true;
+                    }
+                }
             }
+        } catch (final NumberFormatException nfe) {
+            LOG.debug("Exception while parsing osMajorVersion string. Failing OS check for video.");
         }
-        return isSupported;
+
+        return checkPassed;
     }
 
     /**

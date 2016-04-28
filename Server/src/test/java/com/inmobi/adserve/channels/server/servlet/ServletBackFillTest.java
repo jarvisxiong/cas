@@ -48,7 +48,7 @@ public class ServletBackFillTest {
         final CasUtils mockCasUtils = createMock(CasUtils.class);
         final SASRequestParameters sasRequestParameters = new SASRequestParameters();
 
-        expect(mockCasUtils.isVideoSupported(sasRequestParameters)).andReturn(false).anyTimes();
+        expect(mockCasUtils.isVideoSupportedSite(sasRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(sasRequestParameters).anyTimes();

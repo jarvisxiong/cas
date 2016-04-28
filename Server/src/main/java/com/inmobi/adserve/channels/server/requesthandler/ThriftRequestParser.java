@@ -1,5 +1,13 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
+import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
+import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI_BEING_SENT_FOR;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
@@ -14,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -40,6 +49,7 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SlotSizeMapping;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
+import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.types.AdAttributeType;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -59,8 +69,8 @@ public class ThriftRequestParser {
 
     private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
             "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
-    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES = Arrays.asList(AdTypeEnum.BANNER,
-            AdTypeEnum.VIDEO);
+    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES =
+            Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
             final CasInternalRequestParameters casInternal, final int dst) {
@@ -101,6 +111,9 @@ public class ThriftRequestParser {
         params.setAppBundleId(tObject.getAppBundleId());
         params.setRequestGuid(tObject.isSetRequestGuid() ? tObject.requestGuid : StringUtils.EMPTY);
 
+        if (tObject.isSetNoJsTracking()) {
+            params.setNoJsTracking(tObject.isNoJsTracking());
+        }
         // Fill param from Site Object
         setSiteObject(tObject, params, dst);
         // Fill params from Device Object
@@ -113,17 +126,30 @@ public class ThriftRequestParser {
         setCarrier(tObject, params);
         // Fill params from integration details object
         setIntegrationDetails(tObject, params);
-        // Set the iem field
-        if (tObject.isSetIem()) {
-            casInternal.setIem(tObject.getIem());
-            InspectorStats.incrementStatCount(InspectorStrings.IMEI, InspectorStrings.IMEI_BEING_SENT_FOR +
-                    DemandSourceType.findByValue(dst).toString());
-        }
+
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
             if (tObject.getUidParams().isSetRawUidValues()) {
                 params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+            }
+        }
+
+        // Set imei related fields
+        if (Android.getValue() == params.getOsId() && GlobalConstant.CHINA_COUNTRY_CODE.equals(params.getCountryCode())) {
+            if (tObject.isSetIem()) {
+                final String imei = StringUtils.lowerCase(tObject.getIem());
+                InspectorStats.incrementStatCount(IMEI, IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
+                casInternal.setImeiMD5(DigestUtils.md5Hex(imei));
+                casInternal.setImeiSHA1(DigestUtils.sha1Hex(imei));
+            } else {
+                if (StringUtils.isNotBlank(casInternal.getUidO1())) {
+                    final IMEIEntity entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(casInternal.getUidO1());
+                    if (entity != null) {
+                        InspectorStats.incrementStatCount(InspectorStrings.IMEI_MATCH);
+                        casInternal.setImeiMD5(entity.getImei());
+                    }
+                }
             }
         }
         if (tObject.isSetRqSslEnabled()) {
@@ -184,9 +210,8 @@ public class ThriftRequestParser {
         if (tObject.isSetGeo()) {
             // params.setLocSrc(tObject.geo.isSetLocationSource() ? tObject.geo.locationSource.name() :
             // GlobalConstant.LATLON);
-            params.setLocationSource(tObject.geo.isSetLocationSource()
-                    ? tObject.geo.getLocationSource()
-                    : LocationSource.LATLON);
+            params.setLocationSource(
+                    tObject.geo.isSetLocationSource() ? tObject.geo.getLocationSource() : LocationSource.LATLON);
             // TODO Change format in dcp
             String latLong = StringUtils.EMPTY;
             if (tObject.geo.latLong != null) {
@@ -197,13 +222,11 @@ public class ThriftRequestParser {
             params.setCountryId((long) tObject.geo.getCountryId()); // TODO: Evaluate if int->long casting is needed?
             final Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(
-                null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
-
+                    null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
             params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
             params.setState(
-                null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
-
+                    null != states && states.iterator().hasNext() ? tObject.geo.getStateIds().iterator().next() : null);
             params.setGeoFenceIds(tObject.geo.getFenceIds());
         }
     }
@@ -236,6 +259,9 @@ public class ThriftRequestParser {
             if (tDevice.isSetDisplayName()) {
                 params.setHandsetName(tDevice.getDisplayName());
             }
+            if (tDevice.isSetDerivedDensity()) {
+                params.setDerivedDeviceDensity(tDevice.getDerivedDensity());
+            }
         }
     }
 
@@ -260,7 +286,6 @@ public class ThriftRequestParser {
             params.setPubId(tSite.publisherId);
             final boolean isApp = tSite.isSetInventoryType() && tSite.inventoryType == InventoryType.APP;
             params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
-
             final SiteTemplateSettings sts = tSite.siteTemplateSettings;
             if (sts != null) {
                 // Set CAU
@@ -289,38 +314,34 @@ public class ThriftRequestParser {
                 params.setSiteEcpmEntity(CasConfigUtil.repositoryHelper.querySiteEcpmRepository(tSite.siteId,
                         tObject.geo.countryId, (int) tObject.device.osId));
             }
-            params.setSiteContentType(tSite.isSetSiteContentType()
-                    ? tSite.getSiteContentType()
-                    : ContentType.FAMILY_SAFE);
+            params.setSiteContentType(
+                    tSite.isSetSiteContentType() ? tSite.getSiteContentType() : ContentType.FAMILY_SAFE);
             params.setCategories(convertIntToLong(tSite.siteTaxonomies));
 
             final DemandSourceType dstEnum = DemandSourceType.findByValue(dst);
             double ecpmFloor = Math.max(tSite.ecpmFloor, tSite.cpmFloor);
             if (GlobalConstant.MIN_BID_FLOOR >= ecpmFloor) {
                 ecpmFloor = GlobalConstant.MIN_BID_FLOOR;
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
-                        + InspectorStrings.BID_FLOOR_TOO_LOW);
+                InspectorStats.incrementStatCount(AUCTION_STATS, dstEnum + BID_FLOOR_TOO_LOW);
             }
             params.setSiteFloor(ecpmFloor);
 
             final double marketRate = tObject.guidanceBid * 1.0 / Math.pow(10, 6);
-            if (0.0 >= marketRate) {
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
-                        + InspectorStrings.BID_GUIDANCE_ABSENT);
+            if (marketRate <= 0.0) {
+                InspectorStats.incrementStatCount(AUCTION_STATS, dstEnum + BID_GUIDANCE_ABSENT);
             }
-            if (marketRate == ecpmFloor) {
-                InspectorStats.incrementStatCount(InspectorStrings.AUCTION_STATS, dstEnum
-                        + InspectorStrings.BID_GUIDANCE_EQUAL_TO_UMP_FLOOR);
+            if (marketRate <= ecpmFloor) {
+                InspectorStats.incrementStatCount(AUCTION_STATS, dstEnum + BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR);
             }
             params.setMarketRate(marketRate);
 
             // Fill params for Pub Control - Supported Ad Types.
             List<AdTypeEnum> pubControlSupportedAdTypes = new ArrayList<>();
             if (tSite.isSetEnrichedSiteAllowedMediaAttributes()) {
-                for (final int i : tSite.getEnrichedSiteAllowedMediaAttributes()) {
-                    if (i == AdAttributeType.VIDEO.getValue()) {
+                for (final int adAttribVal : tSite.getEnrichedSiteAllowedMediaAttributes()) {
+                    if (adAttribVal == AdAttributeType.VIDEO.getValue()) {
                         pubControlSupportedAdTypes.add(AdTypeEnum.VIDEO);
-                    } else if (i == AdAttributeType.DEFAULT.getValue()) {
+                    } else if (adAttribVal == AdAttributeType.DEFAULT.getValue()) {
                         pubControlSupportedAdTypes.add(AdTypeEnum.BANNER);
                     } // Ignore other fields which are not relevant to us.
                 }
@@ -332,12 +353,6 @@ public class ThriftRequestParser {
             params.setPubControlSupportedAdTypes(pubControlSupportedAdTypes);
             if (tSite.isSetRewarded()) {
                 params.setRewardedVideo(tSite.isRewarded());
-            }
-
-            if (params.isRewardedVideo() && pubControlSupportedAdTypes.contains(AdTypeEnum.BANNER)) {
-                InspectorStats
-                    .incrementStatCount(InspectorStrings.ADPOOL_REQUEST_STATS,
-                        InspectorStrings.PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT);
             }
 
             // Fill params for pub control - Media preferences json.
@@ -414,7 +429,8 @@ public class ThriftRequestParser {
     }
 
     private void setUserIdParams(final CasInternalRequestParameters parameter, final UidParams uidParams) {
-        final Map<UidType, String> uidMap = uidParams.isSetRawUidValues() ? uidParams.getRawUidValues() : new HashMap<>();
+        final Map<UidType, String> uidMap =
+                uidParams.isSetRawUidValues() ? uidParams.getRawUidValues() : new HashMap<>();
         if (uidParams.isSetLimitIOSAdTracking()) {
             parameter.setTrackingAllowed(!uidParams.isLimitIOSAdTracking());
         }
@@ -499,9 +515,9 @@ public class ThriftRequestParser {
         }
         final List<Short> validSlots = new ArrayList<>();
         for (final Short slotId : selectedSlots) {
-            final boolean toAdd =
-                    isIX ? SlotSizeMapping.isIXSupportedSlot(slotId) : CasConfigUtil.repositoryHelper
-                            .querySlotSizeMapRepository(slotId) != null;
+            final boolean toAdd = isIX
+                    ? SlotSizeMapping.isIXSupportedSlot(slotId)
+                    : CasConfigUtil.repositoryHelper.querySlotSizeMapRepository(slotId) != null;
             if (toAdd) {
                 validSlots.add(slotId);
             }

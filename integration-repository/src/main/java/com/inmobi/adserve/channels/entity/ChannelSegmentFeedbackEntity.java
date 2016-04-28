@@ -3,14 +3,14 @@ package com.inmobi.adserve.channels.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Getter
 public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String> {
-
     private static final long serialVersionUID = 1L;
-
+    private final static Gson GSON = new Gson();
     private final String advertiserId;
     private final String adGroupId;
     private final double eCPM;
@@ -62,7 +62,7 @@ public class ChannelSegmentFeedbackEntity implements IdentifiableEntity<String> 
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
 }

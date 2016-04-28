@@ -3,15 +3,15 @@ package com.inmobi.adserve.channels.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Data
 @NoArgsConstructor
 public class SiteTaxonomyEntity implements IdentifiableEntity<String> {
-
-    private static final long serialVersionUID = 1L;
-
+    private final static long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private String id;
     private String name;
     private String parentId;
@@ -25,7 +25,7 @@ public class SiteTaxonomyEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
     @Override

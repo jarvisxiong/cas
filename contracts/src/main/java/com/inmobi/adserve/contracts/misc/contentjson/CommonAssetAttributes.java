@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CommonAssetAttributes {
     private NativeAdContentAsset adContentAsset;
-    // private String name;
     private boolean isOptional;
 }

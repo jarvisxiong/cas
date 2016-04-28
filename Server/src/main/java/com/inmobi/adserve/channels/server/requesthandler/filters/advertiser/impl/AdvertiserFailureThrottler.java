@@ -37,7 +37,7 @@ public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler
             final Map<String, AdapterConfig> advertiserIdConfigMap) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_FAILURE_TROTTLER_FILTER, advertiserIdConfigMap);
         AdvertiserFailureThrottler.advertiserIdConfigMap = advertiserIdConfigMap;
-        circuitBreakerMap = new ConcurrentHashMap<String, CircuitBreakerInterface>();
+        circuitBreakerMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -62,21 +62,20 @@ public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler
         return circuitBreakerMap.get(advertiserName);
     }
 
-
     /**
      * For every advertiser, failure counter is increased on every failure. Here failure means timeouts + terminates
      *
-     * @param advertiserid: Name of the advertiser
+     * @param advertiserId: Name of the advertiser
      * @param startTime: It it the time at which the request was received to us by the UMP
      */
-    public static void increamentRequestsThrottlerCounter(final String advertiserid, final long startTime) {
-        if (StringUtils.isNotEmpty(advertiserid)) {
-            CircuitBreakerInterface circuitBreaker = circuitBreakerMap.get(advertiserid);
+    public static void incrementFailureCounter(final String advertiserId, final long startTime) {
+        if (StringUtils.isNotEmpty(advertiserId)) {
+            CircuitBreakerInterface circuitBreaker = circuitBreakerMap.get(advertiserId);
             if (circuitBreaker == null) {
-                circuitBreaker = addCircuitBreakerEntryToMap(advertiserid);
+                circuitBreaker = addCircuitBreakerEntryToMap(advertiserId);
             }
             if (circuitBreaker != null) {
-                circuitBreaker.increamentFailureCounter(startTime);
+                circuitBreaker.incrementFailureCounter(startTime);
             }
         }
     }
@@ -84,16 +83,16 @@ public class AdvertiserFailureThrottler extends AbstractAdvertiserLevelThrottler
     /**
      * For every advertiser, request counter is increased on every request sent to the advertiser
      *
-     * @param advertiserid: Name of the advertiser
+     * @param advertiserId: Name of the advertiser
      * @param startTime: It it the time at which the request was received to us by the UMP
      */
-    public static void increamentRequestsCounter(final String advertiserid, final long startTime) {
-        CircuitBreakerInterface circuitBreaker = circuitBreakerMap.get(advertiserid);
+    public static void incrementTotalCounter(final String advertiserId, final long startTime) {
+        CircuitBreakerInterface circuitBreaker = circuitBreakerMap.get(advertiserId);
         if (circuitBreaker == null) {
-            circuitBreaker = addCircuitBreakerEntryToMap(advertiserid);
+            circuitBreaker = addCircuitBreakerEntryToMap(advertiserId);
         }
         if (circuitBreaker != null) {
-            circuitBreaker.increamentRequestCounter(startTime);
+            circuitBreaker.incrementTotalCounter(startTime);
         }
     }
 

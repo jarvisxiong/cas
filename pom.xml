@@ -2,18 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- javac.compiler.arguments -->
-    <!-- requireJavaVersion configurable -->
-    <!-- unlink cobertura-runtime version-->
     <parent>
         <groupId>com.inmobi</groupId>
         <artifactId>inmobi-parent</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.4</version>
     </parent>
 
     <groupId>com.inmobi.channels</groupId>
     <artifactId>cas</artifactId>
-    <version>6.24-SNAPSHOT</version>
+    <version>6.57-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.corp.inmobi.com/channel-adserve/cas</url>
 
@@ -27,12 +24,7 @@
     <properties>
         <!-- Parent pom overrides -->
         <project.build.targetJdk>1.8</project.build.targetJdk>
-        <plugin.surefire.version>2.19</plugin.surefire.version>
         <plugin.surefire.jvm.args>-Xms512m -Xmx1024m</plugin.surefire.jvm.args>
-
-        <!-- Hack to get -DskipTests working in parent pom 1.2.x-->
-        <skipTests>false</skipTests>
-        <check.skip.unitTest>${skipTests}</check.skip.unitTest>
 
         <scribe.version>2.1.0</scribe.version>
         <yammer.version>2.2.0</yammer.version>
@@ -66,7 +58,6 @@
         <module>integration-utils</module>
         <module>integration-api</module>
         <module>template</module>
-        <module>integration-tests</module>
     </modules>
 
     <dependencyManagement>
@@ -74,7 +65,7 @@
             <dependency>
                 <groupId>com.inmobi.commons</groupId>
                 <artifactId>datatypes-java-0.8</artifactId>
-                <version>1.6.125</version>
+                <version>1.6.144</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -391,7 +382,7 @@
             <dependency>
                 <groupId>com.aerospike</groupId>
                 <artifactId>aerospike-client</artifactId>
-                <version>3.0.27</version>
+                <version>3.1.7</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -494,7 +485,7 @@
                 <groupId>com.inmobi.commons</groupId>
                 <artifactId>casthrift</artifactId>
                 <classifier>thrift-0.8</classifier>
-                <version>2.25</version>
+                <version>2.28</version>
             </dependency>
             <dependency>
                 <groupId>com.inmobi.commons</groupId>
@@ -604,7 +595,7 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <!-- Disbling maven-duplicate-finder-plugin -->
+                    <!-- Disabling maven-duplicate-finder-plugin -->
                     <groupId>com.ning.maven.plugins</groupId>
                     <artifactId>maven-duplicate-finder-plugin</artifactId>
                     <configuration>
@@ -621,64 +612,6 @@
             <modules>
                 <module>casautomation</module>
             </modules>
-        </profile>
-        <profile>
-            <id>unit-coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <!-- Used for instrumenting the modules -->
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                        <configuration>
-                            <classifier>cobertura</classifier>
-                            <check />
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <!-- This is called for all modules except integration-tests where
-                                    it is suppressed -->
-                                <id>cobertura-instrument</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>instrument</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <!-- Suppressing the cobertura plugin defined in the parent pom -->
-                                <id>unit-test</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <!-- Used for generating the instrumented jars for cobertura -->
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>generate-test-sources</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <archive>
-                                        <manifest>
-                                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                            <addClasspath>true</addClasspath>
-                                        </manifest>
-                                        <manifestEntries>
-                                            <Implementation-Build>${buildNumber}/${ciBuildInfo}</Implementation-Build>
-                                        </manifestEntries>
-                                    </archive>
-                                    <classesDirectory>${basedir}/target/generated-classes/cobertura</classesDirectory>
-                                    <classifier>cobertura</classifier>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

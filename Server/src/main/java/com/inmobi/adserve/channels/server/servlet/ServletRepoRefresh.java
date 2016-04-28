@@ -15,7 +15,6 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.QUERY;
-import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_FILTER_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_METADATA_REPOSITORY;
@@ -225,13 +224,6 @@ public class ServletRepoRefresh implements Servlet {
                 resultSet = statement.executeQuery(query);
                 CasConfigUtil.repositoryHelper.getIxBlocklistRepository().newUpdateFromResultSetToOptimizeUpdate(
                         resultSet);
-            } else if (repoName.equalsIgnoreCase(SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY)) {
-                final String query =
-                        config.getCacheConfiguration().subset(SDK_VIEWABILITY_ELIGIBILITY_REPOSITORY).getString(QUERY)
-                                .replace(LAST_UPDATE, REPLACE_STRING);
-                resultSet = statement.executeQuery(query);
-                CasConfigUtil.repositoryHelper.getSdkViewabilityEligibilityRepository()
-                    .newUpdateFromResultSetToOptimizeUpdate(resultSet);
             } else {
                 // RepoName could not be matched
                 LOG.debug("RepoName: {} could not be matched", repoName);

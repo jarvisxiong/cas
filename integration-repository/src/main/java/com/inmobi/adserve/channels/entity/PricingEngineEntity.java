@@ -6,18 +6,19 @@ import java.util.Set;
 import lombok.Data;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.query.PricingEngineQuery;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Data
 public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuery> {
-
-    public static final byte[][] DEFAULT_SUPPLY_DEMAND_MAPPING = { {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    public static final byte[][] DEFAULT_SUPPLY_DEMAND_MAPPING = {{1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 0, 0, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
             {1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
             {1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},};
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final Integer countryId;
     private final Integer osId;
     private final double rtbFloor;
@@ -58,7 +59,7 @@ public class PricingEngineEntity implements IdentifiableEntity<PricingEngineQuer
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
     @Override

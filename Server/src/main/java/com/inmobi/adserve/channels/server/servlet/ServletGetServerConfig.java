@@ -28,7 +28,6 @@ public class ServletGetServerConfig implements Servlet {
             final Channel serverChannel) throws Exception {
         final Map<?, ?> adapterConfigMap = new TreeMap(ConfigurationConverter.getMap(CasConfigUtil.getServerConfig()));
         hrh.responseSender.sendResponse(GSON.toJson(adapterConfigMap), serverChannel);
-        
     }
 
     @Override

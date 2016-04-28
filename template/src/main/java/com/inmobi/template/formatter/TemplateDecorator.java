@@ -13,19 +13,38 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.inmobi.template.exception.TemplateException;
 
+/**
+ * 
+ * @author ritwik.kumar
+ *
+ */
 public class TemplateDecorator {
     private final static Logger LOG = LoggerFactory.getLogger(TemplateDecorator.class);
-
     private String contextCodeFile;
 
     @Inject
     public void addContextFile(@Named("ContextCodeFile") final String contextCodeVm) throws TemplateException {
         contextCodeFile = contextCodeVm;
         final String cc = getFileContent(contextCodeFile);
-        // Hack: ContextCode has been added to the Native Template Cache
         TemplateManager.getInstance().addToTemplateCache(contextCodeFile, cc);
     }
 
+    /**
+     * 
+     * @param velocityContext
+     * @return
+     * @throws TemplateException
+     */
+    public String getContextCode(final VelocityContext velocityContext) throws TemplateException {
+        return getTemplateContent(velocityContext, contextCodeFile);
+    }
+
+    /**
+     * 
+     * @param fileName
+     * @return
+     * @throws TemplateException
+     */
     private String getFileContent(final String fileName) throws TemplateException {
         try {
             final InputStream is = TemplateDecorator.class.getResourceAsStream(fileName);
@@ -36,11 +55,13 @@ public class TemplateDecorator {
 
     }
 
-    public String getContextCode(final VelocityContext velocityContext) throws TemplateException {
-        return getTemplateContent(velocityContext, contextCodeFile);
-    }
-
-
+    /**
+     * 
+     * @param velocityContext
+     * @param templateName
+     * @return
+     * @throws TemplateException
+     */
     private String getTemplateContent(final VelocityContext velocityContext, final String templateName)
             throws TemplateException {
         try {

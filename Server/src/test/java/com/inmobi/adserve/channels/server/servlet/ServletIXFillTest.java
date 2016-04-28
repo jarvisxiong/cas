@@ -86,7 +86,7 @@ public class ServletIXFillTest {
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(true).anyTimes();
-        expect(mockCasUtils.isVideoSupported(sasRequestParameters)).andReturn(false).anyTimes();
+        expect(mockCasUtils.isVideoSupportedSite(sasRequestParameters)).andReturn(false).anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.TOTAL_REQUESTS);
@@ -128,7 +128,7 @@ public class ServletIXFillTest {
         final MatchSegments mockMatchSegments = createMock(MatchSegments.class);
         final CasUtils mockCasUtils = createMock(CasUtils.class);
 
-        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false).anyTimes();
+        expect(mockCasUtils.isVideoSupportedSite(mockSASRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
@@ -197,7 +197,7 @@ public class ServletIXFillTest {
 
         expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
-        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false).anyTimes();
+        expect(mockCasUtils.isVideoSupportedSite(mockSASRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
@@ -276,7 +276,7 @@ public class ServletIXFillTest {
 
         expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
-        expect(mockCasUtils.isVideoSupported(mockSASRequestParameters)).andReturn(false).anyTimes();
+        expect(mockCasUtils.isVideoSupportedSite(mockSASRequestParameters)).andReturn(false).anyTimes();
         expect(mockTraceMarkerProvider.get()).andReturn(null).times(2);
         expect(mockResponseSender.getAuctionEngine()).andReturn(mockAuctionEngine).anyTimes();
         expect(mockHttpRequestHandler.getHttpRequest()).andReturn(mockHttpRequest).anyTimes();
@@ -299,8 +299,6 @@ public class ServletIXFillTest {
         expect(mockChannelSegmentFilterApplier
                 .getChannelSegments(mockList, mockSASRequestParameters, mockCasContext, null, null))
             .andReturn(mockChannelSegmentList).anyTimes();
-        expect(mockCasUtils.getNetworkSiteEcpm(mockSASRequestParameters)).andReturn(null).anyTimes();
-        expect(mockCasUtils.getRtbFloor(mockCasContext)).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).anyTimes();
         expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).anyTimes();

@@ -40,7 +40,6 @@ public class ServletLbStatus implements Servlet {
             hrh.responseSender.sendResponse("OK", serverChannel);
             return;
         }
-        // TODO: remove header validation
         final HttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
                         ServerStatusInfo.getStatusString(), Charset.defaultCharset()));

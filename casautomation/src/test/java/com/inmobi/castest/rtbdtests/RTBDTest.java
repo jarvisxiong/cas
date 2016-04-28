@@ -12,7 +12,7 @@ import com.inmobi.castest.commons.generichelper.LogParserHelper;
 import com.inmobi.castest.dataprovider.FenderDataProvider;
 import com.inmobi.castest.utils.common.ResponseBuilder;
 
-public class RTBD_NewTest {
+public class RTBDTest {
 
     private String searchStringInLog = new String();
     private String searchStringInLog1 = new String();
@@ -1435,22 +1435,17 @@ public class RTBD_NewTest {
     }
 
     @Test(testName = "TEST_DEVICE_LANGUAGE_RTB", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_DEVICE_LANGUAGE_RTB(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
+    public void TEST_DEVICE_LANGUAGE_RTB(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput =
-            LogParserHelper.logParser("RTB request json is", "\"language\":\"en\"");
+        parserOutput = LogParserHelper.logParser("RTB request json is", "\"language\":\"en\"");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST_DEVICE_LANGUAGE_RTB_API", dataProvider = "fender_rtbd_dp", dataProviderClass =
-        FenderDataProvider.class)
-    public void TEST_DEVICE_LANGUAGE_RTB_API(final String x, final ResponseBuilder responseBuilder)
-        throws Exception {
+    @Test(testName = "TEST_DEVICE_LANGUAGE_RTB_API", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_DEVICE_LANGUAGE_RTB_API(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput =
-            LogParserHelper.logParser("RTB request json is", "\"language\":\"en\"");
+        parserOutput = LogParserHelper.logParser("RTB request json is", "\"language\":\"en\"");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1460,45 +1455,45 @@ public class RTBD_NewTest {
     public void TESTIOS9_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
     }
+
     @Test(testName = "TEST_IEM", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IEM(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-            LogParserHelper.logParser("IEM=123456789123456");
+        parserOutput = LogParserHelper.logParser("IEM=123456789123456");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_IEM_WITH_O1", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IEM_WITH_O1(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("IEM=123456789123456", "O1=9e74e1b452e07afded40fd15b45aa9e6");
+        parserOutput = LogParserHelper.logParser("IEM=123456789123456", "O1=9e74e1b452e07afded40fd15b45aa9e6");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
 
     @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
+    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL(final String x, final ResponseBuilder responseBuilder)
+            throws IOException {
         final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":3,\"wmin\":480,\"hmin\":320}";
         final String logLine2 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
         final String logLine3 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
         final String logLine4 = "\"native\":{\"requestobj\":{\"layout\":1,\"adunit\":500,\"plcmtcnt\":1,\"seq\":0";
 
-        parserOutput =
-            LogParserHelper.logParser("RTB request json is", logLine1, logLine2, logLine3, logLine4);
+        parserOutput = LogParserHelper.logParser("RTB request json is", logLine1, logLine2, logLine3, logLine4);
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
+    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL(final String x, final ResponseBuilder responseBuilder)
+            throws IOException {
         final String logLine0 = "\"native\":{\"requestobj\":{\"layout\":6,\"adunit\":500,\"plcmtcnt\":1,\"seq\":0";
         final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":1,\"wmin\":300,\"hmin\":300}}";
         final String logLine2 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
         final String logLine3 = "{\"id\":3,\"required\":1,\"data\":{\"type\":2}}";
         final String logLine4 = "{\"id\":4,\"required\":1,\"img\":{\"type\":3,\"wmin\":300,\"hmin\":250}}";
         parserOutput =
-            LogParserHelper.logParser("RTB request json is", logLine0, logLine1, logLine2, logLine3, logLine4);
+                LogParserHelper.logParser("RTB request json is", logLine0, logLine1, logLine2, logLine3, logLine4);
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }

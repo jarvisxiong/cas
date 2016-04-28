@@ -109,6 +109,7 @@ public class IXPackageMatcherTest {
         final Pair<Boolean, Set<Integer>> emptyInclusion = ImmutablePair.of(false, ImmutableSet.of());
         final Pair<Boolean, Set<Integer>> filledExclusion = ImmutablePair.of(true, ImmutableSet.of(400, 600));
         final Pair<Boolean, Set<Integer>> filledInclusion = ImmutablePair.of(false, ImmutableSet.of(400, 600));
+        final Pair<Boolean, Set<Integer>> nullInclusion = ImmutablePair.of(false, null);
 
         return new Object[][] {
             {"testNullSdkWithEmptyExclusion", null, emptyExclusion, false, emptyExclusion, true},
@@ -159,6 +160,7 @@ public class IXPackageMatcherTest {
             {"testSaneSdkWithFilledExclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", filledExclusion, true, filledInclusion, false},
             {"testSaneSdkWithEmptyInclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", emptyInclusion, true, filledInclusion, false},
             {"testSaneSdkWithFilledInclusionViewabilityOnFilledInclusionEligibilityCase2", "a401", filledInclusion, true, filledInclusion, false},
+            {"testEmptyViewabilityInclusion", "a401", filledInclusion, true, nullInclusion, false},
         };
     }
 

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 
  * @author ritwik.kumar<br>
- * <br>
+ *         <br>
  *         Rubicon Supported Size Ids <br>
  *         Size ID 44: Mobile banner 2 (300x50)<br>
  *         Size ID 43: Mobile Banner 1 (320x50)<br>
@@ -27,7 +27,7 @@ import java.util.Map;
  *         Size ID 53: Tablet Full Page (1024x768)<br>
  *         Size ID 51: Tablet Portrait Banner (768x900)<br>
  *         Size ID 61: Full page (1000x1000)<br>
- * <br>
+ *         <br>
  *         InMobi supported slots<br>
  *         wap_prod_adserve=> select id, width, height, ad_type from serving_unit;<br>
  */
@@ -52,9 +52,12 @@ public class SlotSizeMapping {
         IX_SLOT_ID_MAP.put((short) 19, 50);
         IX_SLOT_ID_MAP.put((short) 21, 45);
         IX_SLOT_ID_MAP.put((short) 23, 46);
+        IX_SLOT_ID_MAP.put((short) 24, 43);
         IX_SLOT_ID_MAP.put((short) 29, 14);
+        IX_SLOT_ID_MAP.put((short) 31, 67);
         IX_SLOT_ID_MAP.put((short) 32, 101);
         IX_SLOT_ID_MAP.put((short) 33, 53);
+        IX_SLOT_ID_MAP.put((short) 39, 101);
 
         // Rubicon Slot Id to Dimension Map
         RP_SLOT_DIMENSION.put(44, new Dimension(300, 50));
@@ -77,15 +80,29 @@ public class SlotSizeMapping {
 
         // Mapped to 480*320 (width*height)
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 14, (short) 32);
-        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 31, (short) 32);
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 32, (short) 32);
-        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 39, (short) 32);
+
+        /* Mapped to 568*320 (width*height)
+         *
+         * For slot #31 and #39, the adPool request contains selected slot lists in the order of preference.
+         * The slot ids #14 and #32 are closer to #31 and #39 and are contained in the adPool request for these slots.
+         * With this change, we are honoring the order of preference in the AdPool request.
+         * Although, request for slot ids #32 and #39 will be sent as RP_SLOT 101 only to RP, but at our end we will
+         * distinguish between these two slots. Same for portrait slots #14 and #31.
+         * While templatizing the VAST response, appropriate width and height macros will be substituted in the template.
+         * Which will result into full screen (edge-to-edge) experience on slot #31 and #39 (568*320).
+         */
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 31, (short) 39);
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 39, (short) 39);
 
         // Mapped to 1024*768 (width*height)
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 16, (short) 33);
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 17, (short) 33);
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 33, (short) 33);
         OPTIMISED_VAST_SLOT_ID_MAP.put((short) 34, (short) 33);
+
+        // Mapped to 320x480 (width*height)
+        OPTIMISED_VAST_SLOT_ID_MAP.put((short) 0, (short) 32);
     }
 
     /**
@@ -106,7 +123,7 @@ public class SlotSizeMapping {
         return IX_SLOT_ID_MAP.get(inmobiSlot);
     }
 
-    public static Short getOptimisedVideoSlot(final int videoSlotId) {
+    public static Short getOptimisedVideoSlot(final short videoSlotId) {
         return OPTIMISED_VAST_SLOT_ID_MAP.get(videoSlotId);
     }
 }

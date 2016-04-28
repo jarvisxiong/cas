@@ -72,10 +72,11 @@ public class IMEIAerospikeRepository {
      * @param androidId
      * @return
      */
-    public IMEIEntity query(final String androidId) {
+    public IMEIEntity query(String androidId) {
         if (DataCenter.HKG1 != colo || StringUtils.isBlank(androidId)) {
             return null;
         }
+        androidId = StringUtils.lowerCase(androidId);
         final IMEIEntity imeiEntity = imeiCache.get(androidId);
         if (imeiEntity == null) {
             LOG.debug("Cache MISS : Querying aerospike for : androidId: {}", androidId);

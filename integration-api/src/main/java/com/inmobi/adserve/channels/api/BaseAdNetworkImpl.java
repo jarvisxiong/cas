@@ -2,26 +2,29 @@ package com.inmobi.adserve.channels.api;
 
 
 import static com.inmobi.adserve.channels.api.SlotSizeMapping.getOptimisedVideoSlot;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseFormat.HTML;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseFormat.JSON;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR;
+import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus.SUCCESS;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CHINA_COUNTRY_CODE;
-import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPC;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.TIME_OUT;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
-import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.PURE_VAST;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
+import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.STATIC;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
+import static com.inmobi.casthrift.ADCreativeType.BANNER;
+import static com.inmobi.casthrift.ADCreativeType.INTERSTITIAL_VIDEO;
+import static com.inmobi.casthrift.ADCreativeType.NATIVE;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -44,9 +47,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
-import com.inmobi.adserve.channels.util.CategoryList;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
-import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
@@ -66,15 +67,18 @@ import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
 import lombok.Getter;
 import lombok.Setter;
 
 
-// This abstract class have base functionality of TPAN adapters.
+/**
+ * This abstract class have base functionality of TPAN adapters
+ *
+ * @author ritwik.kumar
+ *
+ */
 public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private static final Logger LOG = LoggerFactory.getLogger(BaseAdNetworkImpl.class);
-
     protected Marker traceMarker;
     protected static final String USD = GlobalConstant.USD;
     protected static final String WAP = GlobalConstant.WAP;
@@ -126,14 +130,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String responseContent = DEFAULT_EMPTY_STRING;
     @Getter
     protected String adStatus = NO_AD;
-    protected ThirdPartyAdResponse.ResponseStatus errorStatus = ThirdPartyAdResponse.ResponseStatus.SUCCESS;
-    protected boolean isHTMLResponseSupported = true;
-    protected boolean isNativeResponseSupported = false;
+    protected ThirdPartyAdResponse.ResponseStatus errorStatus = SUCCESS;
+
     @Getter
-    protected boolean isVideoRequest = false;
-    protected boolean isPureVastRequest = false;
-    protected boolean isRewardedVideoRequest = false;
-    protected boolean isNativeRequest = false;
+    private boolean isNativeRequest = false;
+    @Getter
+    protected boolean isSegmentVideoSupported = false;
+    @Getter
+    protected boolean isSegmentPureVastSupported = false;
+    protected boolean isSegmentRewardedVideoSupported = false;
+    protected boolean isSegmentStaticSupported = false;
+
     protected boolean isRtbPartner = false;
     protected boolean isIxPartner = false;
     protected SASRequestParameters sasParams;
@@ -223,7 +230,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
         LOG.debug("Generating tracker urls for {} with impressionId: {}", getName(), impressionId);
         final InmobiAdTrackerBuilder builder =
-            getInmobiAdTrackerBuilderFactory().getBuilder(sasParams, impressionId, isCpc);
+                getInmobiAdTrackerBuilderFactory().getBuilder(sasParams, impressionId, isCpc);
         overrideInmobiAdTracker(builder);
         inmobiAdTracker = builder.buildInmobiAdTracker();
     }
@@ -317,7 +324,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             LOG.debug("sent jsadcode ... returning from make NingRequest");
             return true;
         }
-
         try {
             requestUrl = getRequestUri().toString();
             final RequestBuilder ningRequestBuilder = getNingRequestBuilder();
@@ -327,6 +333,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             startTime = System.currentTimeMillis();
             final boolean isTraceEnabled = casInternalRequestParameters.isTraceEnabled();
             getAsyncHttpClient().executeRequest(ningRequest, new AsyncCompletionHandler() {
+                /*
+                 * (non-Javadoc)
+                 * @see com.ning.http.client.AsyncCompletionHandler#onCompleted(com.ning.http.client.Response)
+                 */
                 @Override
                 public Response onCompleted(final Response response) throws Exception {
                     latency = System.currentTimeMillis() - startTime;
@@ -345,7 +355,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
                         final String responseStr = response.getResponseBody(UTF_8);
                         final HttpResponseStatus httpResponseStatus =
-                            HttpResponseStatus.valueOf(response.getStatusCode());
+                                HttpResponseStatus.valueOf(response.getStatusCode());
 
                         LOG.debug(traceMarker, "{} status code is {}", getName(), httpResponseStatus);
                         if (isByteResponseSupported) {
@@ -359,6 +369,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     return response;
                 }
 
+                /*
+                 * (non-Javadoc)
+                 * @see com.ning.http.client.AsyncCompletionHandler#onThrowable(java.lang.Throwable)
+                 */
                 @Override
                 public void onThrowable(final Throwable t) {
                     latency = System.currentTimeMillis() - startTime;
@@ -367,8 +381,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.incrementStatCount(InspectorStrings.IO_EXCEPTION);
                         InspectorStats.incrementStatCount(getName(), InspectorStrings.IO_EXCEPTION);
                     } else if (!(t instanceof java.util.concurrent.TimeoutException)) {
-                        InspectorStats.incrementStatCount(InspectorStrings.UNCAUGHT_EXCEPTIONS, t.getClass()
-                            .getSimpleName());
+                        InspectorStats.incrementStatCount(InspectorStrings.UNCAUGHT_EXCEPTIONS,
+                                t.getClass().getSimpleName());
                         InspectorStats.incrementStatCount(getName(), t.getClass().getSimpleName());
                         if (LOG.isDebugEnabled()) {
                             final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(t);
@@ -383,17 +397,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                     MDC.put("requestId", String.format("0x%08x", serverChannel.hashCode()));
                     LOG.debug("onThrowable isTraceEnabled {} scope : {}", isTraceEnabled, scope);
                     LOG.debug("error while fetching response from: {} {}", getName(), t);
-
-                    String dst;
-                    if (isRtbPartner()) {
-                        dst = "RTBD";
-                    } else if (isIxPartner()) {
-                        dst = "IX";
-                    } else {
-                        dst = "DCP";
-                    }
+                    final String dst = isRtbPartner() ? "RTBD" : isIxPartner() ? "IX" : "DCP";
                     InspectorStats.updateYammerTimerStats(dst, InspectorStrings.CLIENT_TIMER_LATENCY, latency);
-
 
                     if (t instanceof java.net.ConnectException) {
                         LOG.debug("{} connection timeout latency {}", getName(), latency);
@@ -433,13 +438,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (uri.getPort() == -1) {
             uri = new URIBuilder(uri).setPort(80).build();
         }
-
         return new RequestBuilder().setUrl(uri.toString())
-            .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-            .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-            .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-            .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
-            .setHeader(HttpHeaders.Names.HOST, uri.getHost());
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost());
     }
 
     /**
@@ -492,7 +496,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     public void cleanUp() {
         if (!isRequestCompleted()) {
             isRequestComplete = true;
-
             LOG.debug("inside cleanup for channel {}", getId());
             adStatus = TERM;
             responseStruct = new ThirdPartyAdResponse();
@@ -511,25 +514,23 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.setResponseFormat(isNativeRequest()
-            ? ThirdPartyAdResponse.ResponseFormat.JSON
-            : ThirdPartyAdResponse.ResponseFormat.HTML);
+        responseStruct.setResponseFormat(isNativeRequest() ? JSON : HTML);
         responseStruct.setResponse(getHttpResponseContent());
         responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
-            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NETWORK_ERROR);
+            responseStruct.setResponseStatus(FAILURE_NETWORK_ERROR);
         } else if (statusCode >= 300) {
-            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_REQUEST_ERROR);
+            responseStruct.setResponseStatus(FAILURE_REQUEST_ERROR);
         } else if (statusCode == 200) {
             if (StringUtils.isBlank(responseContent) || !AD_STRING.equalsIgnoreCase(adStatus)) {
                 adStatus = NO_AD;
-                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
+                responseStruct.setResponseStatus(FAILURE_NO_AD);
             } else {
-                responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.SUCCESS);
+                responseStruct.setResponseStatus(SUCCESS);
                 adStatus = AD_STRING;
             }
         } else if (statusCode >= 204) {
-            responseStruct.setResponseStatus(ThirdPartyAdResponse.ResponseStatus.FAILURE_NO_AD);
+            responseStruct.setResponseStatus(FAILURE_NO_AD);
         }
         responseStruct.setLatency(latency);
         responseStruct.setStartTime(startTime);
@@ -551,31 +552,31 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     @Override
     public boolean configureParameters(final SASRequestParameters param, final CasInternalRequestParameters casParams,
-                                       final ChannelSegmentEntity entity, final long slotId, final RepositoryHelper repositoryHelper) {
+            final ChannelSegmentEntity entity, final long slotId, final RepositoryHelper repositoryHelper) {
         sasParams = param;
         casInternalRequestParameters = casParams;
         externalSiteId = entity.getExternalSiteKey();
         this.repositoryHelper = repositoryHelper;
         impressionId = param.getImpressionId();
         // TODO: function is called again in createAppObject() in RtbAdNetwork with the same parameters
-        blindedSiteId = getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
+        blindedSiteId = BaseAdNetworkHelper.getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
-        // TODO: Move all supported ad type checks to ThriftRequestParser or AdGroupAdTypeTargetingFilter.
         isNativeRequest = SASParamsUtils.isNativeRequest(sasParams);
 
         // Checking the appropriate SecondaryAdFormatConstraints of an adgroup is a sufficient check for determining
         // vast video, rewarded video, etc support as the selected adgroup by this point, would have already had all
         // supply constraints checked in AdGroupAdTypeTargetingFilter
-        isVideoRequest = VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
-        isPureVastRequest = PURE_VAST == entity.getSecondaryAdFormatConstraints();
-        isRewardedVideoRequest = (REWARDED_VAST_VIDEO == entity.getSecondaryAdFormatConstraints());
+        isSegmentVideoSupported = VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
+        isSegmentPureVastSupported = PURE_VAST == entity.getSecondaryAdFormatConstraints();
+        isSegmentRewardedVideoSupported = REWARDED_VAST_VIDEO == entity.getSecondaryAdFormatConstraints();
+        isSegmentStaticSupported = STATIC == entity.getSecondaryAdFormatConstraints();
 
         selectedSlotId = (short) slotId;
-        processedSlotId = (isVideoRequest || isRewardedVideoRequest || isPureVastRequest)?
-            ObjectUtils.defaultIfNull(getOptimisedVideoSlot((short) slotId), (short) slotId) :
-            (short) slotId;
+        processedSlotId = isSegmentVideoSupported || isSegmentRewardedVideoSupported || isSegmentPureVastSupported
+                ? ObjectUtils.defaultIfNull(getOptimisedVideoSlot(selectedSlotId), selectedSlotId)
+                : selectedSlotId;
 
-        isCpc = getPricingModel(entity);
+        isCpc = BaseAdNetworkHelper.getPricingModel(entity);
         final boolean isConfigured = configureParameters();
         if (isConfigured) {
             replaceHostWithIP();
@@ -583,13 +584,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return isConfigured;
     }
 
-    private static final Boolean getPricingModel(final ChannelSegmentEntity entity) {
-        boolean isCpc = false;
-        if (null != entity.getPricingModel() && CPC.equalsIgnoreCase(entity.getPricingModel())) {
-            isCpc = true;
-        }
-        return isCpc;
-    }
 
     @Override
     public double getBidPriceInUsd() {
@@ -640,85 +634,19 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         LOG.debug("response length is {}", responseContent.length());
     }
 
-    /**
-     * @param siteIncId
-     * @param adGroupIncId
-     * @return
-     */
-    protected static String getBlindedSiteId(final long siteIncId, final long adGroupIncId) {
-        return new UUID(adGroupIncId, siteIncId).toString();
-    }
-
-    /**
-     * Generates blinded site uuid from siteIncId. For a given site Id, the generated blinded SiteId will always be
-     * same.
-     * <p/>
-     * NOTE: RTB uses a different logic where the blinded SiteId is a function of siteIncId+AdGroupIncId.
-     */
-    protected static String getBlindedSiteId(final long siteIncId) {
-        final byte[] byteArr = ByteBuffer.allocate(8).putLong(siteIncId).array();
-        return UUID.nameUUIDFromBytes(byteArr).toString();
-    }
 
     protected String getCategories(final char seperator) {
         return getCategories(seperator, true);
     }
 
     protected String getCategories(final char seperator, final boolean isAllRequired) {
-        return getCategories(seperator, isAllRequired, false);
+        return BaseAdNetworkHelper.getCategories(seperator, isAllRequired, false, sasParams, entity);
     }
 
     protected String getCategories(final char seperator, final boolean isAllRequired, final boolean isIABCategory) {
-        final StringBuilder sb = new StringBuilder();
-        Long[] segmentCategories = null;
-        boolean allTags = false;
-        if (entity != null) {
-            segmentCategories = entity.getCategoryTaxonomy();
-            allTags = entity.isAllTags();
-        }
-        if (allTags) {
-            if (isIABCategory) {
-                return getValueFromListAsString(IABCategoriesMap.getIABCategories(sasParams.getCategories()), seperator);
-
-            } else if (null != sasParams.getCategories()) {
-                for (int index = 0; index < sasParams.getCategories().size(); index++) {
-                    final String category = CategoryList.getCategory(sasParams.getCategories().get(index).intValue());
-                    appendCategories(sb, category, seperator);
-                    if (!isAllRequired) {
-                        break;
-                    }
-                }
-            }
-        } else {
-            for (int index = 0; index < sasParams.getCategories().size(); index++) {
-                String category = null;
-                final int cat = sasParams.getCategories().get(index).intValue();
-                for (int i = 0; i < segmentCategories.length; i++) {
-                    if (cat == segmentCategories[i]) {
-                        if (isIABCategory) {
-                            category =
-                                getValueFromListAsString(IABCategoriesMap.getIABCategories(segmentCategories[i]),
-                                    seperator);
-                        } else {
-                            category = CategoryList.getCategory(cat);
-                        }
-                        appendCategories(sb, category, seperator);
-                    }
-                }
-                if (!isAllRequired && null != category) {
-                    break;
-                }
-            }
-        }
-        if (sb.length() > 0) {
-            sb.setLength(sb.length() - 1);
-            return sb.toString();
-        }
-        if (isIABCategory) {
-            return "IAB24";
-        }
-        return "miscellenous";
+        return BaseAdNetworkHelper.getCategories(seperator, isAllRequired, isIABCategory, sasParams, entity);
     }
+
 
     /**
      * function returns the unique device id
@@ -744,17 +672,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return casInternalRequestParameters.getUid();
         }
         return null;
-    }
-
-    /**
-     * @param sb
-     * @param category
-     */
-    private void appendCategories(final StringBuilder sb, final String category, final char seperator) {
-        LOG.debug("category is {}", category);
-        if (category != null) {
-            sb.append(category).append(seperator);
-        }
     }
 
     @Override
@@ -794,47 +711,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return connectionLatency;
     }
 
-    protected String getURLEncode(final String param, final String format) {
-        String encodedString = DEFAULT_EMPTY_STRING;
-        String decoded = param;
-
-        if (StringUtils.isNotBlank(param)) {
-            try {
-                String tobeEndoded = param;
-                decoded = URLDecoder.decode(tobeEndoded, format);
-                while (!tobeEndoded.equalsIgnoreCase(decoded)) {
-                    tobeEndoded = decoded;
-                    decoded = URLDecoder.decode(tobeEndoded, format);
-                }
-            } catch (final UnsupportedEncodingException uee) {
-                LOG.debug("Error during decode in getURLEncode() for {} for string {}, exception raised {}", getName(),
-                    param, uee);
-            }
-            try {
-                encodedString = URLEncoder.encode(decoded.trim(), format);
-            } catch (final UnsupportedEncodingException e) {
-                LOG.debug("Error during encode in getURLEncode() for {} for string {}, exception raised {}", getName(),
-                    param, e);
-            }
-        }
-        return encodedString;
-    }
-
-    protected String getValueFromListAsString(final List<String> list) {
-        return getValueFromListAsString(list, ',');
-    }
-
-    protected String getValueFromListAsString(final List<String> list, final char seperatar) {
-        if (list.isEmpty()) {
-            return DEFAULT_EMPTY_STRING;
-        }
-        final StringBuilder s = new StringBuilder(list.get(0));
-        for (int i = 1; i < list.size(); i++) {
-            s.append(seperatar).append(list.get(i));
-        }
-        return s.toString();
-    }
-
     @Override
     public boolean useJsAdTag() {
         return false;
@@ -850,55 +726,20 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     }
 
-    public boolean isNativeRequest() {
-        return isNativeRequest;
-    }
-
     public boolean isCAURequest() {
         return CollectionUtils.isNotEmpty(sasParams.getCauMetadataSet());
     }
 
     @Override
     public ADCreativeType getCreativeType() {
-        if (isNativeRequest()) {
-            return ADCreativeType.NATIVE;
-        } else if (isVideoRequest || isRewardedVideoRequest || isPureVastRequest) {
-            return ADCreativeType.INTERSTITIAL_VIDEO;
+        if (isNativeRequest() && isSegmentStaticSupported) {
+            return NATIVE;
+        } else if (isSegmentVideoSupported || isSegmentRewardedVideoSupported || isSegmentPureVastSupported) {
+            return INTERSTITIAL_VIDEO;
         } else {
-            return ADCreativeType.BANNER;
+            return BANNER;
         }
     }
-
-    public static String getHashedValue(final String message, final String hashingType) {
-        try {
-            final MessageDigest md = MessageDigest.getInstance(hashingType);
-            final byte[] array = md.digest(message.getBytes(CharsetUtil.UTF_8));
-            final StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString(array[i] & 0xFF | 0x100).substring(1, 3));
-            }
-            return sb.toString();
-        } catch (final java.security.NoSuchAlgorithmException e) {
-            LOG.debug("exception raised in BaseAdNetwork {}", e);
-        }
-        return null;
-    }
-
-    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName, final int paramValue,
-                                             final boolean isFirstParam) {
-        return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
-    }
-
-    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-                                             final String paramValue, final boolean isFirstParam) {
-        return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
-    }
-
-    protected StringBuilder appendQueryParam(final StringBuilder builder, final String paramName,
-                                             final double paramValue, final boolean isFirstParam) {
-        return builder.append(isFirstParam ? '?' : '&').append(paramName).append('=').append(paramValue);
-    }
-
 
     @Override
     public String getAuctionId() {
@@ -955,47 +796,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         return null;
     }
 
-    protected boolean isInterstitial() {
-        if (10 == selectedSlotId // 300X250
-            || 14 == selectedSlotId // 320X480
-            || 16 == selectedSlotId // 768X1024
-            || 17 == selectedSlotId /* 800x1280 */
-            || 32 == selectedSlotId // 480x320
-            || 33 == selectedSlotId // 1024x768
-            || 34 == selectedSlotId) /* 1280x800 */{
-            return true;
-        }
-        return false;
-    }
-
     protected boolean isIOS() {
         return sasParams.getOsId() == SASRequestParameters.HandSetOS.iOS.getValue();
     }
 
     protected boolean isAndroid() {
         return sasParams.getOsId() == SASRequestParameters.HandSetOS.Android.getValue();
-    }
-
-    protected boolean isApp() {
-        if (StringUtils.isBlank(sasParams.getSource())) {
-            return false;
-        } else {
-            return APP.equalsIgnoreCase(sasParams.getSource());
-        }
-    }
-
-    // Response is empty or null or status code other than 200.
-    public boolean isValidResponse(final String response, final HttpResponseStatus status) {
-        statusCode = status.code();
-        if (null == response || response.trim().isEmpty() || statusCode != 200) {
-            if (200 == statusCode) {
-                statusCode = 500;
-            }
-            responseContent = DEFAULT_EMPTY_STRING;
-            return false;
-        } else {
-            return true;
-        }
     }
 
     /**
@@ -1006,8 +812,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getGPID(final boolean considerDnt) {
         final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
         return StringUtils.isNotBlank(casInternalRequestParameters.getGpid()) && trackIFA
-            ? casInternalRequestParameters.getGpid()
-            : null;
+                ? casInternalRequestParameters.getGpid()
+                : null;
     }
 
     /**
@@ -1034,8 +840,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected String getUidIFA(final boolean considerDnt) {
         final boolean trackIFA = considerDnt ? casInternalRequestParameters.isTrackingAllowed() : true;
         return StringUtils.isNotBlank(casInternalRequestParameters.getUidIFA()) && trackIFA
-            ? casInternalRequestParameters.getUidIFA()
-            : null;
+                ? casInternalRequestParameters.getUidIFA()
+                : null;
     }
 
     @Override
@@ -1071,12 +877,12 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 }
             } catch (final URISyntaxException e) {
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(traceMarker, "URISyntaxException " + ExceptionBlock.getStackTrace(e), this.getClass()
-                        .getSimpleName());
+                    LOG.error(traceMarker, "URISyntaxException " + ExceptionBlock.getStackTrace(e),
+                            this.getClass().getSimpleName());
                 }
             }
         }
-        host = ipRepository.getIPAddress(getName(), host, traceMarker);
+        host = ipRepository.getIPAddress(getName(), host);
     }
 
     private void setVirtualHost(final RequestBuilder ningRequestBuilder) {

@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Path;
+
 // import javax.ws.rs.Path;
 
 import org.apache.commons.lang.StringUtils;
@@ -18,7 +20,6 @@ import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.utils.CasUtils;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -28,7 +29,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
  * @author ritwik.kumar
  */
 @Singleton
-// @Path("/configChange")
+@Path("/configChange")
 public class ServletChangeConfig implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(ServletChangeConfig.class);
     private static final String ADAPTER = "adapter.";
@@ -44,7 +45,6 @@ public class ServletChangeConfig implements Servlet {
         } catch (final JSONException exeption) {
             LOG.debug("Encountered Json Error while creating json object inside servlet, {}", exeption);
             hrh.setTerminationReason(CasConfigUtil.JSON_PARSING_ERROR);
-            InspectorStats.incrementStatCount(InspectorStrings.JSON_PARSING_ERROR, InspectorStrings.COUNT);
             hrh.responseSender.sendResponse("Incorrect Json", serverChannel);
             return;
         }

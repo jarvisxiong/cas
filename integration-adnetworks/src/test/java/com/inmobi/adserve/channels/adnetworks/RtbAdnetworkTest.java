@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.thrift.TException;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,10 +51,10 @@ import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.common.request.nativead.Data;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
+import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -172,7 +170,7 @@ public class RtbAdnetworkTest {
                 .anyTimes();
         replay(repositoryHelper);
 
-        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb", true);
+        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb");
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
@@ -307,8 +305,8 @@ public class RtbAdnetworkTest {
 
         sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        sas.setWapSiteUACEntity(builder.build());
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
 
@@ -325,8 +323,8 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is not null, then it should set primary category name from uac.
         sas.setSource("app");
         builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Social");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Social");
+        sas.setWapSiteUACEntity(builder.build());
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
         // Setting primary category name from uac.
@@ -573,7 +571,6 @@ public class RtbAdnetworkTest {
         AdapterTestHelper.setBeaconAndClickStubs();
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
                 repositoryHelper);
-        final TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
         final Gson gson = new Gson();
         rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
         assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
@@ -602,10 +599,10 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        builder.setTransparencyEnabled(true);
-        builder.setSiteUrl("www.inmobi.com");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        builder.isTransparencyEnabled(true);
+        builder.siteUrl("www.inmobi.com");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -636,8 +633,8 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -697,12 +694,12 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        builder.setTransparencyEnabled(true);
-        builder.setSiteUrl("www.inmobi.com");
-        builder.setBundleId("com.android.app.bundleId");
-        builder.setMarketId("com.android.app.marketId");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        builder.isTransparencyEnabled(true);
+        builder.siteUrl("www.inmobi.com");
+        builder.bundleId("com.android.app.bundleId");
+        builder.marketId("com.android.app.marketId");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -733,8 +730,8 @@ public class RtbAdnetworkTest {
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
-        builder.setAppType("Games");
-        sas.setWapSiteUACEntity(new WapSiteUACEntity(builder));
+        builder.appType("Games");
+        sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
         rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
@@ -985,7 +982,7 @@ public class RtbAdnetworkTest {
         nativeContentJsonObject.setOtherAssets(Arrays.asList(otherAsset));
 
         final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
-            .nativeTemplateId(4408950071453012585l)
+            .templateId(4408950071453012585l)
             .contentJson(nativeContentJsonObject)
             .imageKey("imageKey")
             .mandatoryKey("mandatoryKey")
@@ -1070,7 +1067,7 @@ public class RtbAdnetworkTest {
     public void verifyNativeOnRtbWhenEntityNull(final NativeAdContentUILayoutType layoutType, final String mandatoryKey,
                                                 final String imageKey) throws Exception {
         final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
-            .nativeTemplateId(4408950071453012585l)
+            .templateId(4408950071453012585l)
             .contentJson(null)
             .imageKey(imageKey)
             .mandatoryKey(mandatoryKey)

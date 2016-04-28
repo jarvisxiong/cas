@@ -9,50 +9,53 @@
                 height:100%;
                 position: relative;
             }
+            #im_1011_ad{
+                background:rgba(0,0,0,0.9);
+            }
             .im_1011_beacon{
                 display: none;
             }
         </style>
     </head>
     <body>
-        #if($IMAIBaseUrl)
-            <script type="text/javascript" src="${IMAIBaseUrl}"></script>
-        #end
-        $PartnerHtmlCode
-        #if($SDK450Onwards&&$isInterstitial)
-            <script type="text/javascript">
-                var readyHandler=function(){
-                    _im_imai.fireAdReady();
-                    _im_imai.removeEventListener('ready',readyHandler);
-                };
-                _im_imai.addEventListener('ready',readyHandler);
-            </script>
-        #end
-        <script type="text/javascript">
-            window['im_1011_fireBeacon'] = function(beaconUrl) {
-                if (undefined === beaconUrl) {
-                  return;
-                }
-                var x = document.createElement("img");
-                x.setAttribute("src", beaconUrl);
-                x.className = "im_1011_beacon";
-                document.body.appendChild(x);
-            };
-            (function() {
-                #if($IMClickUrl)
-                    var clickHandler = function() {
-                        document.removeEventListener('click', clickHandler);
-                        window['im_1011_fireBeacon']('${IMClickUrl}');
+        #if($IMAIBaseUrl)<script type="text/javascript" src="${IMAIBaseUrl}"></script>#end
+        <div id="im_1011_ad" style="width:100%;height:100%">
+            $PartnerHtmlCode
+            #if($SDK450Onwards&&$isInterstitial)
+                <script type="text/javascript">
+                    var readyHandler=function(){
+                        _im_imai.fireAdReady();
+                        _im_imai.removeEventListener('ready',readyHandler);
                     };
-                    document.addEventListener('click', clickHandler);
-                #end
-            })();
-        </script>
-        #if($IMBeaconUrl)
-            <img src='${IMBeaconUrl}?b=${WIN_BID}' height=1 width=1 border=0 />
-        #end
-        #if($PartnerBeaconUrl)
-            <img src='$PartnerBeaconUrl' height=1 width=1 border=0 />
-        #end
+                    _im_imai.addEventListener('ready',readyHandler);
+                </script>
+            #end
+            <script type="text/javascript">
+                window['im_1011_fireBeacon'] = function(beaconUrl) {
+                    if (undefined === beaconUrl) {
+                      return;
+                    }
+                    var x = document.createElement("img");
+                    x.setAttribute("src", beaconUrl);
+                    x.className = "im_1011_beacon";
+                    document.body.appendChild(x);
+                };
+                (function() {
+                    #if($IMClickUrl)
+                        var clickHandler = function() {
+                            document.removeEventListener('click', clickHandler);
+                            window['im_1011_fireBeacon']('${IMClickUrl}');
+                        };
+                        document.addEventListener('click', clickHandler);
+                    #end
+                })();
+            </script>
+            #if($IMBeaconUrl)
+                <img src='${IMBeaconUrl}?b=${WIN_BID}' height=1 width=1 border=0 />
+            #end
+            #if($PartnerBeaconUrl)
+                <img src='$PartnerBeaconUrl' height=1 width=1 border=0 />
+            #end
+        </div>
     </body>
 </html>

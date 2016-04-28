@@ -1,5 +1,9 @@
 package com.inmobi.adserve.channels.server;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.TERMINATED_REQUESTS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.THRIFT_PARSING_ERROR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +29,6 @@ import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParser;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -67,7 +70,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
     protected void decode(final ChannelHandlerContext ctx, final DefaultFullHttpRequest request, final List<Object> out)
             throws Exception {
         final SASRequestParameters sasParams = new SASRequestParameters();
-        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final CasInternalRequestParameters casInternal = new CasInternalRequestParameters();
         String terminationReason = null;
 
         try {
@@ -83,17 +86,11 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 sasParams.setAutomationTestId(automationTestId);
             }
 
-            final Servlet servlet = servletProvider.get();
-            final String servletName = servlet.getName();
+            final String servlet = servletProvider.get().getName();
+            final Integer dst = "ixFill".equalsIgnoreCase(servlet) ?
+                    8 : "rtbdFill".equalsIgnoreCase(servlet) ? 
+                            6 : "BackFill".equalsIgnoreCase(servlet) ? 2 : null;
 
-            Integer dst = null;
-            if ("rtbdFill".equalsIgnoreCase(servletName)) {
-                dst = 6;
-            } else if ("BackFill".equalsIgnoreCase(servletName)) {
-                dst = 2;
-            } else if ("ixFill".equalsIgnoreCase(servletName)) {
-                dst = 8;
-            }
             LOG.debug("Method is  {}", request.getMethod());
             boolean isTraceEnabled = false;
             if (request.getMethod() == HttpMethod.POST && null != dst) {
@@ -104,12 +101,11 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                     request.content().getBytes(0, adPoolRequestBytes);
                     tDeserializer.deserialize(adPoolRequest, adPoolRequestBytes);
                     isTraceEnabled = adPoolRequest.isDeprecatedTraceRequest();
-                    thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternalRequestParameters,
-                            dst);
+                    thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternal, dst);
                 } catch (final TException ex) {
                     terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
                     LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
-                    InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
+                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, THRIFT_PARSING_ERROR);
                 }
             } else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
                 String rawContent = null;
@@ -121,26 +117,22 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 }
                 LOG.debug("adPoolRequest: {}", rawContent);
                 final AdPoolRequest adPoolRequest = new AdPoolRequest();
-
                 if (StringUtils.isNotEmpty(rawContent)) {
                     final byte[] decodedContent = urlCodec.decode(rawContent.getBytes(CharsetUtil.UTF_8));
                     final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                     try {
                         tDeserializer.deserialize(adPoolRequest, decodedContent);
-                        thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams,
-                                casInternalRequestParameters, dst);
+                        isTraceEnabled = adPoolRequest.isDeprecatedTraceRequest();
+                        thriftRequestParser.parseRequestParameters(adPoolRequest, sasParams, casInternal, dst);
                     } catch (final TException ex) {
                         terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
                         LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
-                        InspectorStats
-                                .incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
+                        InspectorStats.incrementStatCount(TERMINATED_REQUESTS, THRIFT_PARSING_ERROR);
                     }
                 } else {
                     terminationReason = CasConfigUtil.THRIFT_PARSING_ERROR;
                     LOG.error(traceMarker, "Error in de serializing thrift as adPoolRequest was empty.");
-                    InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR, InspectorStrings.COUNT);
-                    InspectorStats.incrementStatCount(InspectorStrings.THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST,
-                            InspectorStrings.COUNT);
+                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST);
                 }
             }
             LOG.debug("isTraceEnabled {} ", isTraceEnabled);
@@ -148,8 +140,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                 scope.seed(Marker.class, isTraceEnabled ? NettyRequestScope.TRACE_MAKER : null);
             }
         } finally {
-            out.add(new RequestParameterHolder(sasParams, casInternalRequestParameters, request.getUri(),
-                    terminationReason, request));
+            out.add(new RequestParameterHolder(sasParams, casInternal, request.getUri(), terminationReason, request));
             request.retain();
 
             final ChannelPipeline pipeline = ctx.pipeline();
@@ -162,7 +153,6 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             if (channelHandlerMap.containsKey("casExceptionHandler")) {
                 pipeline.remove("casExceptionHandler");
             }
-
             pipeline.addLast("casExceptionHandler", injector.getInstance(CasExceptionHandler.class));
         }
     }

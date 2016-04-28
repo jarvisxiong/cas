@@ -81,6 +81,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             final boolean stripLatlong = segmentFlagSet.contains(5);
             final boolean interstitialOnly = segmentFlagSet.contains(8);
             final boolean nonInterstitialOnly = segmentFlagSet.contains(9);
+            final boolean secure = segmentFlagSet.contains(11);
             boolean allTags = false;
             final Integer[] catTax = (Integer[]) row.getArray("category_taxomony");
             Long[] categoryTaxomony;
@@ -144,6 +145,7 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
             builder.setAppUrlEnabled(appUrlEnabled);
             builder.setInterstitialOnly(interstitialOnly);
             builder.setNonInterstitialOnly(nonInterstitialOnly);
+            builder.setSecure(secure);
             builder.setStripUdId(stripUdId);
             builder.setStripLatlong(stripLatlong);
             builder.setStripZipCode(stripZipCode);
@@ -288,8 +290,8 @@ public class ChannelAdGroupRepository extends AbstractStatsMaintainingDBReposito
     }
 
     public Collection<ChannelSegmentEntity> getEntities(final long slotId, final long category, final long country,
-            final Integer targetingPlatform, final Integer siteRating, final Integer osId, final Integer dst) {
-        return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId,
+            final Integer targetingPlatform, final Integer siteRating, final Integer osId, final boolean secure, final Integer dst) {
+        return ChannelSegmentMatchingCache.getEntities(slotId, category, country, targetingPlatform, siteRating, osId, secure,
                 dst);
     }
 

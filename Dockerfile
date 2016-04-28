@@ -1,10 +1,11 @@
-# Base Image
 FROM dockerhub.corp.inmobi.com/idp/docker-jvm-8
 MAINTAINER dcp-engg@inmobi.com
 
+# Creating useful aliases
+COPY docker/bash/bash_aliases /root/.bash_aliases
+
 # Using a newer version of supervisor for environment variable substitution support in configs
 RUN pip install supervisor==3.1.3
-# Use "supervisorctl -c /etc/supervisor/supervisord.conf" inside the container to access the supervisord cli
 
 # Change /opt/inmobi/cas to /opt/mkhoj/cas in the below segment for backward compatibility
 ENV CAS_BASE_DIRECTORY /opt/inmobi/cas
@@ -55,7 +56,7 @@ CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 #note: IDP_NODE is equivalent to the CONTAINER_NAME
 
 # Useful Docker run Commands:
-# 1) Build: docker built -t cas_image .
+# 1) Build: docker build -t cas_image .
 # 2) Run: docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e HOST_NAME=localhost -e IDP_NODE=cas1234 --name=cas_container cas_image
 # 3) All in one: docker build -t cas_image .; docker rm cas_container; docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=cas1234 --name=cas_container cas_image
 # 4) ssh into running container: docker exec -it cas_container /bin/bash

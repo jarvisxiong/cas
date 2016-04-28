@@ -23,12 +23,8 @@ public class ServletInvalid implements Servlet {
     @Override
     public void handleRequest(final HttpRequestHandler hrh, final QueryStringDecoder queryStringDecoder,
             final Channel serverChannel) throws Exception {
-        // invalid request
-        // TODO: remove header validation
-        final HttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(
-                        "Page not Found", Charset.defaultCharset()), true);
-
+        final HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND,
+                Unpooled.copiedBuffer("Page not Found", Charset.defaultCharset()), true);
         final ChannelFuture future = serverChannel.writeAndFlush(response);
         future.addListener(ChannelFutureListener.CLOSE);
     }

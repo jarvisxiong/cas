@@ -175,13 +175,14 @@ public class MatchSegments {
         }
         // adding -1 for all osIds
         final int[] osIds = new int[] {-1, osId};
+        final boolean secure = sasParams.isSecureRequest();
 
         for (final long slotId : slotIdsFromUmp) {
             for (final long category : categories) {
                 for (final long countryId : countries) {
                     for (final int os : osIds) {
                         final Collection<ChannelSegmentEntity> filteredEntities =
-                                loadEntities(slotId, category, countryId, targetingPlatform, siteRating, os,
+                                loadEntities(slotId, category, countryId, targetingPlatform, siteRating, os, secure,
                                         sasParams.getDst(), traceMarker);
                         LOG.debug(traceMarker, "Found {} adGroups", filteredEntities.size());
                         allFilteredEntities.addAll(filteredEntities);
@@ -207,14 +208,14 @@ public class MatchSegments {
 
     // Loads entities and updates cache if required.
     private Collection<ChannelSegmentEntity> loadEntities(final long slotId, final long category, final long country,
-            final Integer targetingPlatform, final Integer siteRating, final int osId, final Integer dst,
+            final Integer targetingPlatform, final Integer siteRating, final int osId, final boolean secure, final Integer dst,
             final Marker traceMarker) {
         LOG.debug(
                 traceMarker,
-                "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {} dst: {}",
-                slotId, category, country, targetingPlatform, siteRating, osId, dst);
+                "Loading adgroups for slot: {} category: {} country: {} targetingPlatform: {} siteRating: {} osId: {} "
+                        + "secure : {} dst: {}", slotId, category, country, targetingPlatform, siteRating, osId, secure, dst);
         return channelAdGroupRepository
-                .getEntities(slotId, category, country, targetingPlatform, siteRating, osId, dst);
+                .getEntities(slotId, category, country, targetingPlatform, siteRating, osId, secure, dst);
     }
 
     private List<AdvertiserMatchedSegmentDetail> insertChannelSegmentToResultSet(

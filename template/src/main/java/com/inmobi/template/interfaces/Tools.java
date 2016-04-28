@@ -8,6 +8,14 @@ import java.util.List;
  *
  */
 public abstract class Tools {
+
+    /**
+     * 
+     * @param context
+     * @return
+     */
+    public abstract String getVastXMl(final Context context);
+
     /**
      * 
      * @param context

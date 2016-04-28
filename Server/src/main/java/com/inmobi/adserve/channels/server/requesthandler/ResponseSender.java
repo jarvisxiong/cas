@@ -59,7 +59,6 @@ import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
-import com.inmobi.casthrift.umprr.Csids;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
@@ -103,8 +102,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final String SDK_500_DCP_WRAPPING_AD_JSON =
             "{\"requestId\":\"%s\",\"ads\":[{\"pubContent\":\"%s\"}]}";
     private static final String DCP_NATIVE_WRAPPING_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[%s]}";
-    private static Set<String> SUPPORTED_RESPONSE_FORMATS = Sets.newHashSet("html", "xhtml", "axml", "imai", "native",
-            "json", "vast");
+    private static Set<String> SUPPORTED_RESPONSE_FORMATS =
+            Sets.newHashSet("html", "xhtml", "axml", "imai", "native", "json", "vast");
 
     /**
      * At IX-Rubicon, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then the return
@@ -305,10 +304,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     protected AdPoolResponse createThriftResponse(final String finalResponse, final RepositoryHelper repositoryHelper) {
         final AdPoolResponse adPoolResponse = new AdPoolResponse();
-        final AdInfo rtbdAd = new AdInfo();
         final AdIdChain adIdChain = new AdIdChain();
-        final Csids csids = new Csids();
-
         final ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
         final ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
 
@@ -320,6 +316,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
         adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
 
+        final AdInfo rtbdAd = new AdInfo();
         rtbdAd.setPricingModel(PricingModel.CPM);
 
         // TODO: Create method and write UT
@@ -330,11 +327,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
                     final String dealId = ixAdNetwork.getDealId();
                     final long highestBid = (long) (ixAdNetwork.getAdjustbid() * Math.pow(10, 6));
-                    IXPackageEntity dealIXPackageEntity = null;
+                    IXPackageEntity pckgEntity = null;
                     // Checking whether a dealId was provided in the bid response
                     if (dealId != null) {
                         try {
-                            dealIXPackageEntity = repositoryHelper.queryIxPackageByDeal(dealId);
+                            pckgEntity = repositoryHelper.queryIxPackageByDeal(dealId);
                         } catch (final NoSuchObjectException exception) {
                             LOG.error("For the dealId, we dont have entry in our system {}", dealId);
                             InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
@@ -343,21 +340,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
                             InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
                         }
                     }
-                    if (null != dealIXPackageEntity) {
-                        if (ixAdNetwork.isExternalPersonaDeal()) {
-                            csids.setMatchedCsids(ixAdNetwork.getUsedCsIds());
-                            final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-                            try {
-                                adPoolResponse.setRequestPoolSpecificInfo(serializer.serialize(csids));
-                            } catch (final TException exc) {
-                                LOG.error("Could not send csId to UMP, thrift exception {}", exc);
-                            }
+                    if (null != pckgEntity) {
+                        if (ixAdNetwork.isExternalPersonaDeal() && CollectionUtils.isNotEmpty(ixAdNetwork.getUsedCsIds())) {
+                            rtbdAd.setMatched_csids(new ArrayList<>(ixAdNetwork.getUsedCsIds()));
                         }
-
-                        final int indexOfDealId = dealIXPackageEntity.getDealIds().indexOf(dealId);
-                        final String dealType =
-                                dealIXPackageEntity.getAccessTypes().size() > indexOfDealId ? dealIXPackageEntity
-                                        .getAccessTypes().get(indexOfDealId) : RIGHT_TO_FIRST_REFUSAL_DEAL;
+                        final int indexOfDealId = pckgEntity.getDealIds().indexOf(dealId);
+                        final String dealType = pckgEntity.getAccessTypes().size() > indexOfDealId
+                                ? pckgEntity.getAccessTypes().get(indexOfDealId)
+                                : RIGHT_TO_FIRST_REFUSAL_DEAL;
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
                         rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
@@ -397,21 +387,20 @@ public class ResponseSender extends HttpRequestHandlerBase {
         // Setting render unit id
         final String renderUnitId = ImpressionIdGenerator.getInstance().resetWilburyIntKey(impressionId, 0L);
         final UUID renderUnitUUID = UUID.fromString(renderUnitId);
-        rtbdAd.setRenderUnitId(new GUID(renderUnitUUID.getMostSignificantBits(),
-            renderUnitUUID.getLeastSignificantBits()));
+        rtbdAd.setRenderUnitId(
+                new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID.getLeastSignificantBits()));
 
         rtbdAd.setSlotServed(getRtbResponse().getAdNetworkInterface().getSelectedSlotId());
         final Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
         rtbdAd.setCreative(rtbdCreative);
         adPoolResponse.setAds(Arrays.asList(rtbdAd));
-        adPoolResponse
-                .setMinChargedValue((long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math
-                    .pow(10, 6)));
+        adPoolResponse.setMinChargedValue(
+                (long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
         if (!GlobalConstant.USD.equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
-            rtbdAd.setBidInOriginalCurrency((long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math
-                    .pow(10, 6)));
+            rtbdAd.setBidInOriginalCurrency(
+                    (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
         }
         return adPoolResponse;
     }
@@ -425,9 +414,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), responseString);
                 LOG.debug("Rewrapping native JSON for DCP traffic. Wrapped Response is: {}", responseString);
             } else if (Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
-                responseString =
-                        String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                                new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
+                responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                        new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
                 LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
             }
         }
@@ -491,14 +479,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
             try {
-                responseBytes =
-                        inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
-                                encryptionKey.getInitializationVector());
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}", new String(
-                            encryptionKey.getAesKey(), CharsetUtil.UTF_8),
-                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8), new String(
-                                    responseBytes, CharsetUtil.UTF_8));
+                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}",
+                            new String(encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8),
+                            new String(responseBytes, CharsetUtil.UTF_8));
                 }
             } catch (InmobiSecureException | InvalidMessageException e) {
                 LOG.info("Exception while encrypting response from {}", e);
@@ -690,8 +677,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             try {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             } catch (final Exception exception) {
-                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index, rankList.get(index)
-                        .getAdNetworkInterface(), exception);
+                LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index,
+                        rankList.get(index).getAdNetworkInterface(), exception);
             }
         }
 
@@ -703,8 +690,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
             try {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             } catch (final Exception exception) {
-                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index, rtbList.get(index)
-                        .getAdNetworkInterface(), exception);
+                LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index,
+                        rtbList.get(index).getAdNetworkInterface(), exception);
             }
         }
 
@@ -849,8 +836,8 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public enum ResponseFormat {
-        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode"), JSON("json"),
-        VAST("vast");
+        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode"), JSON(
+                "json"), VAST("vast");
 
         private String[] formats;
 

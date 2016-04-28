@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.casthrift.ADCreativeType.BANNER;
+import static com.inmobi.casthrift.ADCreativeType.NATIVE;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 
 import java.util.ArrayList;
@@ -51,70 +53,59 @@ public class AsyncRequestMaker {
             final Set<String> advertiserSet, final Channel channel, final RepositoryHelper repositoryHelper,
             final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalGlobal,
             final List<ChannelSegment> rtbSegments) throws Exception {
-
-        final List<ChannelSegment> segments = new ArrayList<ChannelSegment>();
+        final List<ChannelSegment> segments = new ArrayList<>();
         LOG.debug("Total channels available for sending requests {}", rows.size());
-
         /*
          NOTE: For a request that qualifies the in-banner video criteria, at this point we don't know whether an
-         interstitial video response will be sent or Banner.
-         At this point, the creative type is set to Banner for video supported requests. If the request gets fullfiled
+         interstitial video response will be sent or Banner. Same applies for Static Native vs Native Video.
+         At this point, the creative type is set to Banner/Native for video supported requests. If the request gets fulfilled
          with a video ad, creative type will be chosen accordingly.
          Setting the creativeType to BANNER for DCP native requests
-        */
-        final ADCreativeType creativeType =
-                sasParams.getDst() == DCP.getValue() ? ADCreativeType.BANNER : SASParamsUtils
-                        .isNativeRequest(sasParams) ? ADCreativeType.NATIVE : ADCreativeType.BANNER;
+         */
+        final boolean isNative = SASParamsUtils.isNativeRequest(sasParams);
+        final ADCreativeType creativeType = sasParams.getDst() == DCP.getValue() ? BANNER : isNative ? NATIVE : BANNER;
         LOG.debug("Creative type is : {}", creativeType);
-
         int index = 0;
         for (final ChannelSegment row : rows) {
-            final ChannelSegmentEntity channelSegmentEntity = row.getChannelSegmentEntity();
-            final AdNetworkInterface network =
-                    segmentFactory.getChannel(channelSegmentEntity.getAdvertiserId(), adapterConfig, null, null, base,
-                            channel, advertiserSet);
+            final ChannelSegmentEntity csEntity = row.getChannelSegmentEntity();
+            final AdNetworkInterface network = segmentFactory.getChannel(csEntity.getAdvertiserId(), adapterConfig,
+                    null, null, base, channel, advertiserSet);
             if (null == network) {
-                LOG.debug("No adapter found for adGroup: {}", channelSegmentEntity.getAdgroupId());
+                LOG.debug("No adapter found for adGroup: {}", csEntity.getAdgroupId());
                 continue;
             }
-            LOG.debug("adapter found for adGroup: {} advertiserid is {} is {}", channelSegmentEntity.getAdgroupId(),
+            LOG.debug("adapter found for adGroup: {} advertiserid is {} is {}", csEntity.getAdgroupId(),
                     row.getChannelSegmentEntity().getAdvertiserId(), network.getName());
-            if (null == repositoryHelper.queryChannelRepository(channelSegmentEntity.getChannelId())) {
-                LOG.debug("No channel entity found for channel id: {}", channelSegmentEntity.getChannelId());
+            if (null == repositoryHelper.queryChannelRepository(csEntity.getChannelId())) {
+                LOG.debug("No channel entity found for channel id: {}", csEntity.getChannelId());
                 continue;
             }
 
-            final long incId = channelSegmentEntity.getIncId(creativeType);
+            final long incId = csEntity.getIncId(creativeType);
             if (incId == -1) {
-                LOG.debug("Could not find incId for adGroup {} and creativeType {}",
-                        channelSegmentEntity.getAdgroupId());
+                LOG.debug("Could not find incId for adGroup {} and creativeType {}", csEntity.getAdgroupId());
                 continue;
             }
 
             // Replacing int key in auction id to generate impression id
-            sasParams.setImpressionId(ImpressionIdGenerator.getInstance().resetWilburyIntKey(
-                    casInternalGlobal.getAuctionId(), incId));
+            sasParams.setImpressionId(
+                    ImpressionIdGenerator.getInstance().resetWilburyIntKey(casInternalGlobal.getAuctionId(), incId));
 
             final CasInternalRequestParameters casInternal = getLocalCasInternal(sasParams, casInternalGlobal);
-
             if (DemandSourceType.IX.getValue() == sasParams.getDst()) {
-                casInternal.setAuctionId(ImpressionIdGenerator.getInstance().resetWilburyIntKey(
-                        casInternalGlobal.getAuctionId(), sasParams.getSiteIncId() + index));
-                LOG.debug("IX Multi format: {} auction id is {}", channelSegmentEntity.getSecondaryAdFormatConstraints()
-                        + " " + sasParams.getRequestedAdType(), casInternal.getAuctionId());
+                casInternal.setAuctionId(ImpressionIdGenerator.getInstance()
+                        .resetWilburyIntKey(casInternalGlobal.getAuctionId(), sasParams.getSiteIncId() + index));
+                LOG.debug("IX Multi format: {} {} auction id is {}", csEntity.getSecondaryAdFormatConstraints(),
+                        sasParams.getRequestedAdType(), casInternal.getAuctionId());
                 ++index;
             }
-
-            controlEnrichment(casInternal, channelSegmentEntity);
+            controlEnrichment(casInternal, csEntity);
             sasParams.setAdIncId(incId);
             LOG.debug("impression id is {}", sasParams.getImpressionId());
-
-            LOG.debug("Sending request to Channel of advertiserId {}", channelSegmentEntity.getAdvertiserId());
-            LOG.debug("external site key is {}", channelSegmentEntity.getExternalSiteKey());
-
+            LOG.debug("Sending request to Channel of advertiserId {}", csEntity.getAdvertiserId());
+            LOG.debug("external site key is {}", csEntity.getExternalSiteKey());
             network.disableIPResolution(config.getBoolean("isIPRepositoryDisabled", true));
-
-            if (network.configureParameters(sasParams, casInternal, channelSegmentEntity, row.getRequestedSlotId(),
+            if (network.configureParameters(sasParams, casInternal, csEntity, row.getRequestedSlotId(),
                     repositoryHelper)) {
                 InspectorStats.incrementStatCount(network.getName(), InspectorStrings.SUCCESSFUL_CONFIGURE);
                 row.setAdNetworkInterface(network);
@@ -152,11 +143,13 @@ public class AsyncRequestMaker {
         casInternal.setAppUrl(sasParams.getAppUrl());
         casInternal.setTraceEnabled(casGlobal.isTraceEnabled());
         casInternal.setSiteAccountType(casGlobal.getSiteAccountType());
-        casInternal.setIem(casGlobal.getIem());
+        casInternal.setImeiMD5(casGlobal.getImeiMD5());
+        casInternal.setImeiSHA1(casGlobal.getImeiSHA1());
         return casInternal;
     }
 
-    private void controlEnrichment(final CasInternalRequestParameters casInternal, final ChannelSegmentEntity csEntity) {
+    private void controlEnrichment(final CasInternalRequestParameters casInternal,
+            final ChannelSegmentEntity csEntity) {
         LOG.debug("In controlEnrichment AdGroup Id = {}, Advertiser Id = {}", csEntity.getAdgroupId(),
                 csEntity.getAdvertiserId());
         if (csEntity.isStripUdId()) {
@@ -170,7 +163,8 @@ public class AsyncRequestMaker {
             casInternal.setUidIDUS1(null);
             casInternal.setUidSO1(null);
             casInternal.setTrackingAllowed(false);
-            casInternal.setIem(null);
+            casInternal.setImeiMD5(null);
+            casInternal.setImeiSHA1(null);
         }
         if (csEntity.isStripZipCode()) {
             LOG.debug("Stripping ZIP Codes");
@@ -194,9 +188,10 @@ public class AsyncRequestMaker {
             InspectorStats.incrementStatCount(channelSegment.getAdNetworkInterface().getName(),
                     InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
-                LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}", channelSegment
-                        .getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity().getChannelId());
-                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
+                LOG.debug("Successfully sent request to channel of  advertiser id {} and channel id {}",
+                        channelSegment.getChannelSegmentEntity().getId(),
+                        channelSegment.getChannelSegmentEntity().getChannelId());
+                AdvertiserFailureThrottler.incrementTotalCounter(channelSegment.getAdNetworkInterface().getId(),
                         System.currentTimeMillis());
             } else {
                 itr.remove();
@@ -209,9 +204,9 @@ public class AsyncRequestMaker {
                     InspectorStrings.TOTAL_INVOCATIONS);
             if (channelSegment.getAdNetworkInterface().makeAsyncRequest()) {
                 LOG.debug("Successfully sent request to rtb channel of  advertiser id {} and channel id {}",
-                        channelSegment.getChannelSegmentEntity().getId(), channelSegment.getChannelSegmentEntity()
-                                .getChannelId());
-                AdvertiserFailureThrottler.increamentRequestsCounter(channelSegment.getAdNetworkInterface().getId(),
+                        channelSegment.getChannelSegmentEntity().getId(),
+                        channelSegment.getChannelSegmentEntity().getChannelId());
+                AdvertiserFailureThrottler.incrementTotalCounter(channelSegment.getAdNetworkInterface().getId(),
                         System.currentTimeMillis());
             } else {
                 rtbItr.remove();

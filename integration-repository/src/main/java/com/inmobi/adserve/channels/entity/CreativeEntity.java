@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.entity;
 import lombok.Data;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.adserve.channels.query.CreativeQuery;
 import com.inmobi.adserve.channels.types.CreativeExposure;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
@@ -10,8 +11,8 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 @Data
 public class CreativeEntity implements IdentifiableEntity<CreativeQuery> {
-
     private static final long serialVersionUID = 1L;
+    private final static Gson GSON = new Gson();
     private final String advertiserId;
     private final String creativeId;
     private final CreativeExposure exposureLevel;
@@ -42,7 +43,7 @@ public class CreativeEntity implements IdentifiableEntity<CreativeQuery> {
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
     @Override

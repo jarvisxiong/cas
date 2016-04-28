@@ -36,6 +36,8 @@ public class CasUtilsTest {
         Configuration mockServerConfig = createMock(Configuration.class);
         expect(CasConfigUtil.getServerConfig()).andReturn(mockServerConfig).anyTimes();
         expect(mockServerConfig.getInt("adtype.vast.minimumSupportedSdkVersion", 450)).andReturn(450).anyTimes();
+        expect(mockServerConfig.getDouble("adtype.vast.minimumSupportedAndroidVersion")).andReturn(4.0).anyTimes();
+        expect(mockServerConfig.getDouble("adtype.vast.minimumSupportedIOSVersion")).andReturn(6.0).anyTimes();
         replayAll();
 
         final SasParamsTestData[] testData = {
@@ -74,7 +76,7 @@ public class CasUtilsTest {
             IntegrationDetails integrationDetails = new IntegrationDetails();
             integrationDetails.setIntegrationType(data.integrationType);
             sasParams.setIntegrationDetails(integrationDetails);
-            final boolean testResult = casUtils.isVideoSupported(sasParams);
+            final boolean testResult = casUtils.isVideoSupportedSite(sasParams);
             assertEquals(data.expectedResult, testResult);
         }
     }

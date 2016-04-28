@@ -11,7 +11,7 @@ BEGIN
 	        pnt.ui_layout_id,
 	        pnt.content_json,
 	        at.binary_template,
-	        GREATEST(at.modified_on, pnt.modified_on)
+	        GREATEST(at.modified_on, pnt.modified_on) as modified_on
 	    FROM placement_native_template as pnt, ad_template as at
 	    WHERE
 	        pnt.template_id = at.id

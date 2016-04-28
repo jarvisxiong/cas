@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +24,11 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.NativeConstraints;
+import com.inmobi.adserve.channels.repository.NativeConstraints.Mandatory;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
 import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
 import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
@@ -45,7 +48,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
  */
 public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final Logger LOG = LoggerFactory.getLogger(DCPTaboolaAdnetwork.class);
-
     private static final String APP_NAME = "app.name";
     private static final String THUMBNAIL_WIDTH = "rec.thumbnail.width";
     private static final String THUMBNAIL_HEIGHT = "rec.thumbnail.height";
@@ -57,10 +59,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
     private static final String READ_MORE = "Read More";
-    private static final int defaultIconWidthAndHeight = 150;
-
-    @Inject
-    protected static TemplateConfiguration templateConfiguration;
+    private static final int ICON_DEFAULT_DIMENSION = 150;
 
     private String iconUrl;
     private String notificationUrl;
@@ -68,10 +67,10 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private int thumbnailHeight = 0;
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isScreenshotResponse = false;
-
     private NativeAdTemplateEntity templateEntity;
     protected final Gson gson;
-
+    @Inject
+    protected static TemplateConfiguration templateConfiguration;
 
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
@@ -95,13 +94,14 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         iconUrl = config.getString("taboola.icon");
         notificationUrl = config.getString("taboola.notification");
 
-        if (sasParams.getWapSiteUACEntity() != null && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
+        if (sasParams.getWapSiteUACEntity() != null
+                && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
         } else {
             LOG.info("Uac is not initialized for site {} in Taboola", sasParams.getSiteId());
             return false;
         }
-        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId());
+        templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), STATIC);
         if (templateEntity == null) {
             LOG.error("No template is available for PlacementId {}", sasParams.getPlacementId());
             return false;
@@ -118,6 +118,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getSiteName(), format), false);
         }
+
+        // TODO: IX/RTBD pass the market id in the bundle id field, investigate why
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getBundleId())) {
             appendQueryParam(requestBuilder, SOURCE_ID, wapSiteUACEntity.getBundleId(), false);
         }
@@ -183,7 +185,6 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 final List<Icon> icons = new ArrayList<>();
 
                 final List<Screenshot> screenshotList = new ArrayList<>();
-
                 if (isScreenshotResponse) {
                     setStaticIconForScreenshotResponse(icons);
                     updateScreenshotList(taboolaNative, screenshotList);
@@ -201,9 +202,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 pixelUrls.add(beacon);
                 appBuilder.setPixelUrls(pixelUrls);
                 final App app = (App) appBuilder.build();
-                responseContent =
-                        nativeResponseMaker.makeDCPNativeResponse(app, params,
-                                repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId()));
+                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params, sasParams.isNoJsTracking());
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 
@@ -211,13 +210,13 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                 adStatus = NO_AD;
                 responseContent = DEFAULT_EMPTY_STRING;
             }
-        } catch (final Exception e) {
+        } catch (final Exception exp) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
-            LOG.error(
-                    "Some exception is caught while filling the native template for placementId = {}, advertiser = {}, "
-                            + "exception = {}", sasParams.getPlacementId(), getName(), e);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_PARSE_RESPONSE_EXCEPTION);
+            final String msg = String.format("Exception with native template for placementId = %s , advertiser = %s",
+                    sasParams.getPlacementId(), getName());
+            LOG.error(msg, exp);
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.NATIVE_VM_TEMPLATE_ERROR);
         }
     }
 
@@ -225,9 +224,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     protected void overrideInmobiAdTracker(final InmobiAdTrackerBuilder builder) {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
-
-            if (isNativeRequest && null != templateEntity) {
-                trackerBuilder.setNativeTemplateId(templateEntity.getId());
+            if (isNativeRequest() && null != templateEntity) {
+                trackerBuilder.setNativeTemplateId(templateEntity.getTemplateId());
             }
         }
     }
@@ -236,8 +234,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         final Icon.Builder iconBuilder = Icon.newBuilder();
         // static icon url is 300x300 size
         iconBuilder.setUrl(iconUrl);
-        iconBuilder.setW(300);
-        iconBuilder.setH(300);
+        iconBuilder.setW(180);
+        iconBuilder.setH(180);
         icons.add((Icon) iconBuilder.build());
     }
 
@@ -262,10 +260,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     private void updateNativeParams(final Map<String, String> params, final String nurl, final String beacon) {
-        params.put("beaconUrl", beacon);
-        params.put("impressionId", impressionId);
-        params.put("placementId", String.valueOf(sasParams.getPlacementId()));
-        params.put("nUrl", nurl);
+        params.put(NativeResponseMaker.BEACON_URL_PARAM, beacon);
+        params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
+        params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
         params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
     }
 
@@ -285,15 +282,15 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
         if (nativeContentObject == null) {
-            setDimentionForHandwritenTemplate();
+            setDimensionForCustomTemplates();
         } else {
             for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
                 final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
+                final NativeAdContentAsset adContentAsset = attributes.getAdContentAsset();
                 final Dimension dimensions = imageAsset.getDimension();
                 thumbnailHeight = dimensions.getHeight();
                 thumbnailWidth = dimensions.getWidth();
-
-                if (attributes.getAdContentAsset() == NativeAdContentAsset.SCREENSHOT) {
+                if (adContentAsset == NativeAdContentAsset.SCREENSHOT) {
                     isScreenshotResponse = true;
                     break;
                 }
@@ -302,27 +299,22 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         return true;
     }
 
-    private void setDimentionForHandwritenTemplate() {
-        final List<NativeConstraints.Mandatory> mandatoryKeys =
-                NativeConstraints.getDCPMandatoryList(templateEntity.getMandatoryKey());
-
-        for (final NativeConstraints.Mandatory mandatory : mandatoryKeys) {
+    private void setDimensionForCustomTemplates() {
+        final List<Mandatory> mandatoryKeys = NativeConstraints.getMandatoryList(templateEntity.getMandatoryKey());
+        for (final Mandatory mandatory : mandatoryKeys) {
             switch (mandatory) {
                 case ICON:
-                    thumbnailHeight = defaultIconWidthAndHeight;
-                    thumbnailWidth = defaultIconWidthAndHeight;
+                    thumbnailHeight = ICON_DEFAULT_DIMENSION;
+                    thumbnailWidth = ICON_DEFAULT_DIMENSION;
                     break;
                 case SCREEN_SHOT:
-                    final Image screen = NativeConstraints.getDCPImage(templateEntity.getImageKey());
+                    final Image screen = NativeConstraints.getImage(templateEntity.getImageKey());
                     thumbnailHeight = screen.getHmin();
                     thumbnailWidth = screen.getWmin();
+                    isScreenshotResponse = true;
                     break;
                 default:
                     break;
-            }
-            if (mandatory == NativeConstraints.Mandatory.SCREEN_SHOT) {
-                isScreenshotResponse = true;
-                break;
             }
         }
     }

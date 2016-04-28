@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -348,5 +349,85 @@ public class IXPackageRepositoryTest {
     public void testExtractSdkVersionTargeting(final String useCaseName, String sdkVersionTargetingJson,
         final Pair<Boolean, Set<Integer>> metaData) throws Exception {
         Assert.assertTrue(metaData.equals(extractSdkVersionTargeting(sdkVersionTargetingJson)));
+    }
+
+    @DataProvider(name = "Third Party Tracker Json List")
+    public Object[][] paramThirdPartyTrackerJsonList() {
+        final String VIEWABILITY_TRACKER = "ViewabilityTracker";
+        final String AUDIENCE_VERIFICATION_TRACKER = "AudienceVerification";
+        final String THIRD_PARTY_IMPRESSION_TRACKER = "ThirdPartyImpressionTracker";
+        final String THIRD_PARTY_CLICK_TRACKER = "ThirdPartyClickTracker";
+
+        final  Map<String, String> trackerMap = new HashMap<>();
+        trackerMap.put(AUDIENCE_VERIFICATION_TRACKER, "<script>var text = '\"audience\":\"tracker\"';\n" + "var a = 5;\n"
+                + "var b = 6;\n" + "var d = a + b;\n" + "var e = a/b;\n" + "</script>");
+        trackerMap.put(THIRD_PARTY_CLICK_TRACKER, "<script>var text = '\"tpct\":\"tracker\"';\n" + "var a = 5;\n"
+                + "var b = 6;\n" + "var d = a + b;\n" + "var e = a/b;\n" + "</script>");
+        trackerMap.put(THIRD_PARTY_IMPRESSION_TRACKER, "<script>var text = '\"tpit\":\"tracker\"';\n" + "var a = 5;\n"
+                + "var b = 6;\n" + "var d = a + b;\n" + "var e = a/b;\n" + "</script>");
+        trackerMap.put(VIEWABILITY_TRACKER, "<script>var text = '\"viewability\":\"tracker\"';\n"
+                + "var a = 5;\n" + "var b = 6;\n" + "var d = a + b;\n" + "var e = a/b;\n" + "</script>");
+
+        final String trackerValidJsonStr  =  "{\"ViewabilityTracker\":\"<script>var text = "
+                + "'\\\"viewability\\\":\\\"tracker\\\"';\\nvar a = 5;\\nvar b = 6;\\nvar d = a + b;\\nvar e = a/b;"
+                + "\\n</script>\",\"AudienceVerification\":\"<script>var text = '\\\"audience\\\":\\\"tracker\\\"';"
+                + "\\nvar a = 5;\\nvar b = 6;\\nvar d = a + b;\\nvar e = a/b;\\n</script>\","
+                + "\"ThirdPartyImpressionTracker\":\"<script>var text = '\\\"tpit\\\":\\\"tracker\\\"';\\nvar a = 5;"
+                + "\\nvar b = 6;\\nvar d = a + b;\\nvar e = a/b;\\n</script>\","
+                + "\"ThirdPartyClickTracker\":\"<script>var text = '\\\"tpct\\\":\\\"tracker\\\"';\\nvar a = 5;\\nvar"
+                + " b = 6;\\nvar d = a + b;\\nvar e = a/b;\\n</script>\"}";
+
+        final String validJsonList[]  = {trackerValidJsonStr, trackerValidJsonStr};
+        final String validEmptyJsonList[] = {"{}", "{}", "{}"};
+        final String nullList[] = {null, null, null};
+        final String emptyStringList[] = {"", "", ""};
+        final String nullWithEmptyStringList[] = {"", null, "", null, null};
+        final String emptyNullAndValidJsonList[]  = {trackerValidJsonStr, "", "{}", null};
+        final String invalidJsonList[]  = {"{", "}", "+123", null};
+        final String invalidAndValidJsonList[]  = {"{", trackerValidJsonStr, "+123", null, "{}", ""};
+
+
+
+        return new Object[][] {
+                {"ValidJsonList", validJsonList, trackerMap},
+                {"EmptyJsonObjectList", validEmptyJsonList, trackerMap},
+                {"nullList", nullList, trackerMap},
+                {"emptyStringList", emptyStringList, trackerMap},
+                {"nullWithEmptyStringList", nullWithEmptyStringList, trackerMap},
+                {"nullCheck", null, trackerMap},
+                {"emptyNullAndValidJsonList", emptyNullAndValidJsonList, trackerMap},
+                {"invalidJsonList", invalidJsonList, trackerMap},
+                {"invalidAndValidJsonList", invalidAndValidJsonList, trackerMap},
+        };
+    }
+
+
+    @Test(dataProvider = "Third Party Tracker Json List")
+    public void testThirdPartyTrackerJson(final String useCaseName, final String[] thirdPartyTrackerJsonList,
+            final  Map<String, String> trackerMap) throws Exception {
+
+        Configuration mockConfig = createMock(Configuration.class);
+        Logger mockLogger = createMock(Logger.class);
+        EasyMock.expect(mockConfig.getString("query")).andReturn("select * from ix_packages;").once();
+        EasyMock.expect(mockConfig.getInt("initialDelay")).andReturn(1).once();
+        EasyMock.expect(mockConfig.getInt("refreshTime")).andReturn(300).once();
+        EasyMock.replay(mockConfig);
+
+        IXPackageRepository repository = new IXPackageRepository();
+        repository.init(mockLogger, NoOpDataSource.getNoOpDataSource(), mockConfig, "dummy");
+
+        List<Map<String, String>>
+                thridPartyTrackerMapList = repository.getThirdPartyTrackerMapList(thirdPartyTrackerJsonList);
+        System.out.println(thridPartyTrackerMapList.toString());
+        thridPartyTrackerMapList.forEach(t-> {
+            Assert.assertTrue(null != t);
+            if (t.isEmpty()) {
+                // when jsonStrin is notValidJson, validJsonButEmpty, emptyString or null  then the trackers will be null only
+                trackerMap.forEach((k,v)-> Assert.assertEquals(t.get(k), null));
+            } else {
+                trackerMap.forEach((k, v) -> Assert.assertEquals(t.get(k), v));
+            }
+        });
+
     }
 }

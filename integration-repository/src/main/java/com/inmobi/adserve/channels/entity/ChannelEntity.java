@@ -6,14 +6,14 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.google.gson.Gson;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 
 @Getter
 public class ChannelEntity implements IdentifiableEntity<String> {
-
     private static final long serialVersionUID = 1L;
-
+    private final static Gson GSON = new Gson();
     private final String channelId;
     private final String name;
     private final String username;
@@ -131,7 +131,7 @@ public class ChannelEntity implements IdentifiableEntity<String> {
 
     @Override
     public String getJSON() {
-        return null;
+        return GSON.toJson(this);
     }
 
     @Override

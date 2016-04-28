@@ -2,11 +2,15 @@ package com.inmobi.adserve.channels.api;
 
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.json.JSONException;
@@ -16,11 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
-import com.inmobi.adserve.channels.repository.NativeConstraints;
-import com.inmobi.adserve.contracts.dcp.backward.Image;
 import com.inmobi.template.context.App;
-import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
@@ -31,10 +31,16 @@ import lombok.Data;
 public class NativeResponseMaker {
     private static final Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
     private static final String ERROR_STR = "%s can't be null.";
-
+    public static final String NAMESPACE_PARAM = "NAMESPACE";
+    public static final String TEMPLATE_ID_PARAM = "templateId";
+    public static final String BEACON_URL_PARAM = "beaconUrl";
+    public static final String CLICK_URL_PARAM = "clickUrl";
+    public static final String WIN_URL_PARAM = "winUrl";
+    public static final String NURL_URL_PARAM = "nUrl";
     private final TemplateParser templateParser;
     private final TemplateDecorator templateDecorator;
     private final Gson gson;
+    private static final String URLS = "urls";
 
     @Inject
     public NativeResponseMaker(final TemplateParser templateParser, final TemplateDecorator templateDecorator,
@@ -44,84 +50,88 @@ public class NativeResponseMaker {
         this.templateDecorator = templateDecorator;
     }
 
-    public String makeDCPNativeResponse(final App app, final Map<String, String> params,
-            final NativeAdTemplateEntity templateEntity) throws Exception {
-        validateResponse(app, templateEntity);
-        final VelocityContext vc = getVelocityContext(app, params);
-        vc.put("NAMESPACE", Formatter.getDCPNamespace());
-
-        return createNativeAd(vc, app, params.get("placementId"));
+    public String makeDCPNativeResponse(final App app, final Map<String, String> params, final boolean noJsTracking) throws Exception {
+        final VelocityContext vcContextCode = getVCForContextCode(app, params);
+        vcContextCode.put(NAMESPACE_PARAM, Formatter.getDCPNamespace());
+        return createNativeAd(vcContextCode, app, params, noJsTracking);
     }
 
-    public String makeIXResponse(final App app, final Map<String, String> params) throws Exception {
-        Preconditions.checkNotNull(params, ERROR_STR, "params");
-        Preconditions.checkNotNull(params.containsKey("placementId"), ERROR_STR, "placementId");
-        final VelocityContext vc = getVelocityContext(app, params);
-        vc.put("NAMESPACE", Formatter.getIXNamespace());
-
-        return createNativeAd(vc, app, params.get("placementId"));
+    public String makeRTBDResponse(final App app, final Map<String, String> params, final boolean noJsTracking) throws Exception {
+        final VelocityContext vcContextCode = getVCForContextCode(app, params);
+        vcContextCode.put(NAMESPACE_PARAM, Formatter.getRTBDNamespace());
+        return createNativeAd(vcContextCode, app, params, noJsTracking);
     }
 
-    private String createNativeAd(final VelocityContext vc, final App app, final String placementId) throws Exception {
-        final String namespace = (String) vc.get("NAMESPACE");
-        final String pubContent = templateParser.format(app, placementId);
-        final String contextCode = templateDecorator.getContextCode(vc);
-        LOG.debug("Making response for placementId : {} ", placementId);
-        LOG.debug("namespace : {}", namespace);
+    public String makeIXResponse(final App app, final Map<String, String> params, final boolean noJsTracking) throws Exception {
+        final VelocityContext vcContextCode = getVCForContextCode(app, params);
+        vcContextCode.put(NAMESPACE_PARAM, Formatter.getIXNamespace());
+        return createNativeAd(vcContextCode, app, params, noJsTracking);
+    }
+
+    private String createNativeAd(final VelocityContext vc, final App app, final Map<String, String> params,
+        final boolean noJsTracking) throws Exception {
+        final String templateId = params.get(TEMPLATE_ID_PARAM);
+        final String pubContent = templateParser.format(app, templateId);
+        LOG.debug("Making response for placementId : {} ", templateId);
         LOG.debug("pubContent : {}", pubContent);
-        LOG.debug("contextCode : {}", contextCode);
-        return makeNativeAd(pubContent, contextCode, namespace);
-    }
-
-    private void validateResponse(final App app, final NativeAdTemplateEntity templateEntity) throws Exception {
-        final String mandatoryKey = templateEntity.getMandatoryKey();
-        final List<Integer> mandatoryList = NativeConstraints.getRTBDMandatoryList(mandatoryKey);
-        for (final Integer integer : mandatoryList) {
-            switch (integer) {
-                case NativeConstraints.ICON_INDEX:
-                    if (app.getIcons() == null || app.getIcons().isEmpty()
-                            || StringUtils.isEmpty(app.getIcons().get(0).getUrl())) {
-                        throw new Exception(String.format(ERROR_STR, "Icon"));
-                    }
-                    break;
-                case NativeConstraints.SCREEN_SHOT_INDEX:
-                    if (app.getScreenshots() == null || app.getScreenshots().isEmpty()) {
-                        throw new Exception(String.format(ERROR_STR, "Image"));
-                    }
-                    break;
-                case NativeConstraints.TITLE_INDEX:
-                    if (StringUtils.isEmpty(app.getTitle())) {
-                        throw new Exception(String.format(ERROR_STR, "Title"));
-                    }
-                    break;
-                case NativeConstraints.DESCRIPTION_INDEX:
-                    if (StringUtils.isEmpty(app.getDesc())) {
-                        throw new Exception(String.format(ERROR_STR, "Description"));
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        final Image image = NativeConstraints.getRTBImage(templateEntity.getImageKey());
-        if (image != null) {
-            final Screenshot screenShot = app.getScreenshots().get(0);
-            if (!(screenShot.getW() >= image.getMinwidth() && screenShot.getW() <= image.getMaxwidth())) {
-                throw new Exception(String.format("Expected image constraints are %s. But got image attributes : %s ",
-                        image, screenShot));
-            }
+        if (noJsTracking) {
+            final Map<Integer, Map<String, List<String>>> eventTracking = getEventTracking(app, params);
+            final String landingPage = app.getOpeningLandingUrl();
+            LOG.debug("landingPage : {}", landingPage);
+            LOG.debug("eventTracking : {}", eventTracking);
+            return makeNativeAd(pubContent, null, null, landingPage, eventTracking);
+        } else {
+            final String contextCode = templateDecorator.getContextCode(vc);
+            final String namespace = (String) vc.get(NAMESPACE_PARAM);
+            LOG.debug("namespace : {}", namespace);
+            LOG.debug("contextCode : {}", contextCode);
+            return makeNativeAd(pubContent, contextCode, namespace, null, null);
         }
     }
 
+    /**
+     * Render and ClientFill are empty in case of IX
+    */
+    protected Map<Integer, Map<String, List<String>>> getEventTracking( App app, Map<String, String> params) {
+        final Map<Integer, Map<String, List<String>>> eventTracking = new HashMap<>();
+        //click Tracker
+        final Map<String, List<String>> clickMap = new HashMap<>();
 
-    private VelocityContext getVelocityContext(final App app, final Map<String, String> params) {
+        final List<String> clickUrls = app.getClickUrls();
+        clickMap.put(URLS, CollectionUtils.isNotEmpty(clickUrls) ? clickUrls :  Collections.EMPTY_LIST);
+
+        //View or Impression Tracker
+        final Map<String, List<String>> impressionMap = new HashMap<>();
+        List<String> impressionTrackers = new ArrayList<>();
+        final List<String> pixelUrls = app.getPixelUrls();
+        if (CollectionUtils.isNotEmpty(pixelUrls)) {
+            impressionTrackers.addAll(pixelUrls);
+        }
+        final String nUrl = params.get(NURL_URL_PARAM);
+        if (StringUtils.isNotBlank(nUrl)) {
+            impressionTrackers.add(nUrl);
+        }
+        final String winUrl = params.get(WIN_URL_PARAM);
+        if (StringUtils.isNotBlank(winUrl)) {
+            impressionTrackers.add(winUrl);
+        }
+        impressionMap.put(URLS, impressionTrackers);
+
+        eventTracking.put(TrackerUIInteraction.CLICK.getValue(), clickMap);
+        eventTracking.put(TrackerUIInteraction.VIEW.getValue(), impressionMap);
+        return eventTracking;
+    }
+
+    private VelocityContext getVCForContextCode(final App app, final Map<String, String> params) {
+        Preconditions.checkNotNull(params, ERROR_STR, "params");
+        Preconditions.checkNotNull(params.containsKey(TEMPLATE_ID_PARAM), ERROR_STR, TEMPLATE_ID_PARAM);
+
         final VelocityContext context = new VelocityContext();
         context.put("LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("OLD_LANDING_PAGE", app.getOpeningLandingUrl());
         context.put("TRACKING_CODE", getTrackingCode(params, app));
-        context.put("BEACON_URL", params.get("beaconUrl"));
-        context.put("CLICK_TRACKER", getClickUrl(app, params.get("clickUrl")));
+        context.put("BEACON_URL", params.get(BEACON_URL_PARAM));
+        context.put("CLICK_TRACKER", getClickUrl(app, params.get(CLICK_URL_PARAM)));
         context.put(IMAI_BASE_URL, params.get(IMAI_BASE_URL));
         return context;
     }
@@ -133,7 +143,7 @@ public class NativeResponseMaker {
     protected String getTrackingCode(final Map<String, String> params, final App app) {
         final StringBuilder bcu = new StringBuilder();
         try {
-            final String nUrl = params.get("nUrl");
+            final String nUrl = params.get(NURL_URL_PARAM);
             if (nUrl != null) {
                 bcu.append(constructBeaconUrl(nUrl));
             }
@@ -142,7 +152,7 @@ public class NativeResponseMaker {
             LOG.debug("Exception while parsing response {}", e);
         }
 
-        final String winUrl = params.get("winUrl");
+        final String winUrl = params.get(WIN_URL_PARAM);
         if (!StringUtils.isEmpty(winUrl)) {
             bcu.append(constructBeaconUrl(winUrl));
         }
@@ -158,7 +168,10 @@ public class NativeResponseMaker {
 
     private String getClickUrl(final App app, final String inmobiClickUrl) {
         final StringBuilder ct = new StringBuilder();
-        final List<String> clickUrls = app.getClickUrls();
+        List<String> clickUrls = app.getClickUrls();
+        if (null == clickUrls) {
+            clickUrls = new ArrayList<>();
+        }
         if (StringUtils.isNotBlank(inmobiClickUrl)) {
             clickUrls.add(inmobiClickUrl);
         }
@@ -175,10 +188,11 @@ public class NativeResponseMaker {
         return ct.toString();
     }
 
-    public String makeNativeAd(String pubContent, final String contextCode, final String namespace)
+    public String makeNativeAd(String pubContent, final String contextCode, final String namespace,
+        final String landingPage, final Map<Integer, Map<String, List<String>>> eventTracking)
             throws JSONException {
         pubContent = base64(pubContent);
-        final NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace);
+        final NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace, landingPage, eventTracking);
         return gson.toJson(nativeAd);
     }
 
@@ -193,6 +207,8 @@ public class NativeResponseMaker {
         private final String pubContent;
         private final String contextCode;
         private final String namespace;
+        private final String landingPage;
+        private final Map<Integer, Map<String, List<String>>> eventTracking;
     }
 
 }

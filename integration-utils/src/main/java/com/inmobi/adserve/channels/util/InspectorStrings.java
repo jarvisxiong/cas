@@ -16,6 +16,7 @@ public class InspectorStrings {
     public static final String IX_REQUESTS = "IXRequests";
     public static final String TOTAL_NATIVE_REQUESTS = "TotalNativeRequests";
     public static final String TOTAL_NATIVE_RESPONSES = "TotalNativeResponses";
+    public static final String TOTAL_NATIVE_VIDEO_RESPONSES = "TotalNativeVideoResponses";
     public static final String NON_AD_REQUESTS = "NonAdRequests";
     public static final String TOTAL_INVOCATIONS = "TotalInvocations";
     public static final String SUCCESSFUL_CONFIGURE = "SuccessfulConfigure";
@@ -31,26 +32,38 @@ public class InspectorStrings {
     public static final String CONNECTION_TIMEOUT = "ConnectionTimeout";
     public static final String TOTAL_TERMINATE = "TotalTerminate";
     public static final String SUCCESSFUL_REQUESTS = "success";
-    public static final String INVALID_SERVLET_REQUEST = "InvalidServletRequest";
+    public static final String MISSING_ADDITIONAL_PARAMS = "MissingAdditionalParam";
+
+    // Request filters
+    public static final String TERMINATED_REQUESTS = "TerminateRequests";
     public static final String JSON_PARSING_ERROR = "Terminated_JsonError";
     public static final String THRIFT_PARSING_ERROR = "Terminated_ThriftError";
     public static final String THRIFT_PARSING_ERROR_EMPTY_ADPOOLREQUEST = "Terminated_ThriftError.EmptyAdPoolRequest";
+    public static final String PROCESSING_ERROR = "Terminated_ServerError";
+    public static final String MISSING_SITE_ID = "Terminated_NoSiteId";
+    public static final String INCOMPATIBLE_SITE_TYPE = "Terminated_IncompatibleSite";
+    public static final String BANNER_NOT_ALLOWED = "Terminated_BannerNotAllowedFilter";
+    public static final String INVALID_SLOT_REQUEST = "Terminated_InInvalidSlotRequest";
+    public static final String CHINA_MOBILE_TARGETING = "Terminated_ChinaMobileTargeting";
+    public static final String NO_SUPPORTED_SLOTS = "Terminated_NoSupportedSlots";
+    public static final String MISSING_CATEGORY = "Terminated_MissingCategory";
+    public static final String LOW_SDK_VERSION = "Terminated_LowSdkVersion";
+    public static final String NO_SAS_PARAMS = "Terminated_NoSASParams";
+    public static final String INVALID_SERVLET_REQUEST = "Terminated_InvalidServletRequest";
+
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";
     public static final String RESPONSE_CONTRACT_NOT_HONOURED = "ResponseContractNotHonoured";
-    public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Banner)";
-    public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Native)";
-    public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(Video)";
-    public static final String PURE_VAST_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(PureVast)";
-    public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse(CAU)";
+    public static final String BANNER_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-Banner";
+    public static final String NATIVE_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-Native";
+    public static final String VIDEO_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-Video";
+    public static final String PURE_VAST_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-PureVast";
+    public static final String CAU_PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse-CAU";
     public static final String NATIVE_VM_TEMPLATE_ERROR = "NativeVMTemplateError";
-    public static final String PROCESSING_ERROR = "Terminated_ServerError";
-    public static final String MISSING_SITE_ID = "Terminated_NoSite";
     public static final String CLIENT_TIMER_LATENCY = "ClientTimerLatency";
     public static final String CAS_TIMEOUT_HANDLER_LATENCY = "CasTimeoutHandlerLatency";
     public static final String TIMER_LATENCY = "timerLatency";
     public static final String TIMEOUT_EXCEPTION = "TimeoutException";
     public static final String IO_EXCEPTION = "IOException";
-    public static final String INCOMPATIBLE_SITE_TYPE = "Terminated_IncompatibleSite";
     public static final String PERCENT_ROLL_OUT = "PercentRollout";
     public static final String NO_MATCH_SEGMENT_LATENCY = "NoMatchSegmentLatency";
     public static final String NO_MATCH_SEGMENT_COUNT = "NoMatchSegmentCount";
@@ -63,7 +76,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_SEGMENT_PER_REQUEST_FILTER = "DroppedInSegmentPerRequestFilter";
     public static final String TOTAL_MATCHED_SEGMENTS = "TotalMatchedSegments";
     public static final String TOTAL_SELECTED_SEGMENTS = "TotalSelectedSegments";
-    public static final String LOW_SDK_VERSION = "LowSdkVersion";
     public static final String SERVER_IMPRESSION = "Impression";
     public static final String CHANNEL_EXCEPTION = "ChannelException";
     public static final String DROPPED_IN_UDID_FILTER = "DroppedInUdidFilter";
@@ -86,7 +98,7 @@ public class InspectorStrings {
     public static final String SITE_FEEDBACK_LATENCY = "SiteFeedbackLatency";
     public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
     public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
-    public static final String MISSING_CATEGORY = "MissingCategory";
+
 
     public static final String IMEI_CACHE_MISS = "IMEICacheMiss";
     public static final String IMEI_CACHE_HIT = "IMEICacheHit";
@@ -96,7 +108,7 @@ public class InspectorStrings {
     public static final String IMEI_MATCH = "IMEI-MATCH-UidO1";
 
     public static final String IMEI = "Imei";
-    public static final String IMEI_BEING_SENT_FOR ="ImeiBeingSentFor";
+    public static final String IMEI_BEING_SENT_FOR = "ImeiBeingSentFor";
 
     public static final String UNEXPECTED_CONDITION = "UnexpectedCondition";
     public static final String VAST_OUT_WITH_SDK = "VastOutWithSDK";
@@ -118,16 +130,12 @@ public class InspectorStrings {
             "DroppedInSupplyDemandClassificationFilter";
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
-    public static final String DROPPED_IN_BANNER_NOT_ALLOWED_FILTER = "DroppedInBannerNotAllowedFilter";
-    // public static final String DROPPED_CUSTOM_TEMPLATE_NOT_ALLOWED_FILTER = "DroppedCustomTemplateNotAllowedFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
     public static final String DROPPED_IN_DAILY_IMP_COUNT_FILTER = "DroppedInDailyImpressionCountFilter";
-    public static final String DROPPED_IN_INVALID_SLOT_REQUEST_FILTER = "DroppedInInvalidSlotRequestFilter";
     public static final String IX_SENT_AS_TRANSPARENT = "IXSentAsTransparent";
     public static final String IX_SENT_AS_BLIND = "IXSentAsBlind";
     public static final String IX_ZONE_ID_NOT_PRESENT = "IXZoneIdNotPresent";
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
-    public static final String INVALID_ADV_ID = "NoAdvertiserId";
     public static final String UNKNOWN_ADV_ID = "ADFromUnknownAdvId";
     public static final String DROPPED_INVALID_DSP_ID = "DroppedDueToInvalidDspId";
     public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
@@ -144,27 +152,23 @@ public class InspectorStrings {
     public static final String TOTAL_VIDEO_REQUESTS = "TotalVideoRequests";
     public static final String TOTAL_VAST_VIDEO_REQUESTS = "TotalVASTVideoRequests";
     public static final String TOTAL_PURE_VAST_REQUESTS = "TotalPureVASTRequests";
-    public static final String TOTAL_PURE_VAST_REQUESTS_FOR_OTHER_THAN_API = "TotalPureVASTRequestsForOtherThanApi";
+    public static final String TOTAL_NATIVE_VAST_REQUESTS = "TotalNativeVASTRequests";
     public static final String TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL = "TotalPureVASTRequestsForProtocol_";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
-    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING = "totalPureVastResponseInlineOrWrapperMissing";
-    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING = "totalPureVastResponseTrackingEventsMissing";
+    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
+            "totalPureVastResponseInlineOrWrapperMissing";
+    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING =
+            "totalPureVastResponseTrackingEventsMissing";
     public static final String TOTAL_REWARDED_VAST_VIDEO_REQUESTS = "TotalRewardedVASTVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
     public static final String TOTAL_REWARDED_VAST_VIDEO_RESPONSES = "TotalRewardedVASTVideoResponses";
-    public static final String TOTAL_RESPONSES_WITH_THIRD_PARTY_VIEWABILITY_TRACKERS =
-            "TotalResponsesWithThirdPartyViewabilityTrackers";
     public static final String TOTAL_VIEWABILITY_RESPONSES = "TotalViewabilityResponses";
-    public static final String TOTAL_ALT_SLOT_SIZE_REQUESTS = "TotalAltSizeRequests";
-    public static final String TOTAL_ALT_SLOT_SIZE_RESPONSES = "TotalAltSizeResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
     public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
-    public static final String AGENCY_ID_MISSING_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMissing";
-    public static final String AGENCY_ID_MISMATCH_IN_REBATE_DEAL_RESPONSE = "AgencyRebateDealResponse.AgencyIdMismatch";
     public static final String AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE =
             "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
@@ -173,14 +177,14 @@ public class InspectorStrings {
     // Request metrics
     public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
     public static final String PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT =
-            "PubControlsAlsoContainsBannerForRewardedPlacement(Approx)";
+            "PubControlsAlsoContainsBannerForRewardedPlacement";
 
     // Auction Level Stats
     public static final String AUCTION_STATS = "AuctionStats";
     // public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
     public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
     public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
-    public static final String BID_GUIDANCE_EQUAL_TO_UMP_FLOOR = "-BidGuidanceIsEqualToUmpFloor";
+    public static final String BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR = "-BidGuidanceIsLessOrEqualToFloor";
     public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
     public static final String MULTI_FORMAT_AUCTIONS_TOTAL = "IX-MultiFormatAuctions.TotalAuctions";
     public static final String MULTI_FORMAT_AUCTIONS_NO_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithNoTrumpDeals";
@@ -191,7 +195,7 @@ public class InspectorStrings {
     public static final String MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS = "IX-MultiFormatAuctions.TotalVastVideoWins";
     public static final String MULTI_FORMAT_AUCTIONS_STATIC_WINS = "IX-MultiFormatAuctions.TotalStaticWins";
 
-    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout (=2)
+    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout
     public static final String TOTAL_MULTI_FORMAT_REQUESTS = "IX-TotalMultiFormatRequests";
     public static final String TOTAL_SINGLE_FORMAT_REQUESTS = "IX-TotalSingleFormatRequests";
 
@@ -207,13 +211,11 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_GEO_REGION_FILTER = "DroppedInPackageGeoRegionTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
     public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
-
-
+    public static final String DROPPED_IN_PACKAGE_SDK_VERSION_FILTER = "DroppedInPackageSDKVersionTargetingFilter";
 
     // More than one segments were present during the IX/Hosted auctions
     // (This will never be incremented as extra segments will be dropped in partner count filter)
     public static final String INVALID_AUCTION = "InvalidAuction";
-    public static final String DROPPED_IN_PACKAGE_SDK_VERSION_FILTER = "DroppedInPackageSDKVersionTargetingFilter";
 
     // IX Response Object Status Code Strings
     public static final String IX_INVALID_REQUEST = "NO_AD.InvalidRequest";
@@ -231,8 +233,15 @@ public class InspectorStrings {
     public static final String LATENCY_FOR_MEASURING_AT_POINT_ = "LatencyForMeasuringAtPoint_";
 
     // IP repository Strings
-    public static final String URI_SYNTAX_EXCEPTION = "URISyntaxException";
-    public static final String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
+    public static final String NULL_URI = "NullURI";
     public static final String NULL_HOST_NAME = "NullHostName";
-    public static final String NULL_IP_ADDRESS = "NullIPAddress";
+    
+    // Stats related to Native Image Analysis
+    public static final String NATIVE_IMAGE_NOT_PROPER = "NativeImageWidthOrHeightSmall-";
+    public static final String NATIVE_IMAGE_AR_DIFF_MORE_10_PERCENT = "NativeImageArDiffMoreThan10Percent-";
+    public static final String NATIVE_IMAGE_WIDTH_MODIFIED = "NativeImageWidthModified-";
+    public static final String ALL_NATIVE_ASSETS_DEFAULT= "AllNativeAssetsDefault";
+
+    public static final String TOTAL_SECURE_REQUEST = "TotalSecureRequest";
+    public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 }

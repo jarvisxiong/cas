@@ -7,6 +7,7 @@ import com.inmobi.phoenix.data.RepositoryQuery;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Created by ishanbhatnagar on 1/6/15.
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class IXBlocklistsQuery implements RepositoryQuery {
     private String keyId;
     private IXBlocklistKeyType keyType;

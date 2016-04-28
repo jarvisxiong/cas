@@ -1847,7 +1847,7 @@ TEST_VAST_AD_TYPE_TARGETING_FAIL:
    geo_countryid : '125'
    ad_type_targeting : '2'
 
-TEST_VAST_VIDEO_SLOT_FAIL:
+TEST_VAST_VIDEO_SLOT_PASS:
 -  integration_type : 'ANDROID_API'
    adpool_requestedadtype: 'VAST'
    site_inventorytype : 'APP' #forreq
@@ -1855,3 +1855,18 @@ TEST_VAST_VIDEO_SLOT_FAIL:
    adpool_selectedslots : '9'
    geo_countryid : '125'
    ad_type_targeting : '3'
+
+TEST_SECURE_SEGMENT_FLAG:
+-  adpool_selectedslots : '9'
+   geo_countryid : '125'
+   ad_type_targeting : '3'
+   segment_flags : '{11}'
+   adpool_rqSslEnabled : 'true'
+
+TEST_SECURE_SEGMENT_FLAG_NEGATIVE:
+-  adpool_selectedslots : '9'
+   geo_countryid : '125'
+   ad_type_targeting : '3'
+   segment_flags : '{5}'
+   adpool_rqSslEnabled : 'true'
+
