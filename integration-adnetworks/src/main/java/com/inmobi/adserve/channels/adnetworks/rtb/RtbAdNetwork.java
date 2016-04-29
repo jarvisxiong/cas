@@ -1035,8 +1035,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             final Map<String, String> params = new HashMap<>();
             params.put(NativeResponseMaker.BEACON_URL_PARAM, getBeaconUrl());
             params.put(NativeResponseMaker.CLICK_URL_PARAM, getClickUrl());
-            params.put(NativeResponseMaker.WIN_URL_PARAM,
-                    getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM + RTBCallbackMacros.DEAL_GET_PARAM);
+            params.put(NativeResponseMaker.WIN_URL_PARAM, getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM);
             // params.put("appId", app.getId());
             params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
             params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
