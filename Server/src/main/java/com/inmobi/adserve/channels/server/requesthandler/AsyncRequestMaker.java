@@ -69,7 +69,7 @@ public class AsyncRequestMaker {
         for (final ChannelSegment row : rows) {
             final ChannelSegmentEntity csEntity = row.getChannelSegmentEntity();
             final AdNetworkInterface network = segmentFactory.getChannel(csEntity.getAdvertiserId(), adapterConfig,
-                    null, null, base, channel, advertiserSet);
+                    null, null, base, channel, advertiserSet, sasParams);
             if (null == network) {
                 LOG.debug("No adapter found for adGroup: {}", csEntity.getAdgroupId());
                 continue;

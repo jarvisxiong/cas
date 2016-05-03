@@ -1,14 +1,19 @@
 package com.inmobi.adserve.channels.api.config;
 
+import java.util.Random;
+
 import javax.annotation.Nullable;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
+import com.inmobi.casthrift.DataCenter;
 
 import lombok.EqualsAndHashCode;
 
@@ -18,16 +23,24 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode
 public class AdapterConfig implements CasConfig {
+    private static final String UJ1 = DataCenter.UJ1.name().toLowerCase();
+    private static final String UH1 = DataCenter.UH1.name().toLowerCase();
     private final Configuration adapterConfig;
     private final String dcName;
     private final String adapterName;
     private final Class<AdNetworkInterface> adapterClass;
     private final ServerConfig serverConfig;
+    private static boolean hostConfigurable;
+    private static Integer HUNDRED_IN_PERCENTAGE = 100;
+    private static Logger LOG;
+    private static final Random RANDOM = new Random();
+
 
     @SuppressWarnings("unchecked")
     @AssistedInject
-    public AdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName, @Nullable
-    @Named("dcName") final String dcName, final ServerConfig serverConfig) {
+    public AdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName,
+        @Nullable @Named("dcName") final String dcName, final ServerConfig serverConfig) {
+        LOG = LoggerFactory.getLogger(getClass().getName());
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
@@ -66,7 +79,7 @@ public class AdapterConfig implements CasConfig {
     /**
      * @return the adapterHost based on Data Center
      */
-    public String getAdapterHost() {
+    public String getAdapterHost(final String dcName) {
         String adapterHost = adapterConfig.getString("host." + dcName);
         if (StringUtils.isBlank(adapterHost)) {
             adapterHost = adapterConfig.getString("host.default");
@@ -75,6 +88,22 @@ public class AdapterConfig implements CasConfig {
             adapterHost = adapterConfig.getString("host");
         }
         return adapterHost;
+    }
+
+    public String getDcName(final Integer stateCode) {
+        return ((serverConfig.getRoutingUH1ToUJ1Percentage() >= RANDOM.nextInt(HUNDRED_IN_PERCENTAGE)) && StringUtils.equals(dcName, UH1) &&
+            null != stateCode && serverConfig.getUSAWestStatesCodes().contains(stateCode)) ? UJ1 : dcName;
+    }
+
+    /**
+     * @return the adapterHost based on Data Center and stateCode of USA
+     */
+    public String getAdapterHost(final Integer stateCode) {
+        return getAdapterHost(getDcName(stateCode));
+    }
+
+    public String getAdapterHost() {
+        return getAdapterHost(dcName);
     }
 
     /**

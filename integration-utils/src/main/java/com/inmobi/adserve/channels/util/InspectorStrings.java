@@ -244,4 +244,11 @@ public class InspectorStrings {
 
     public static final String TOTAL_SECURE_REQUEST = "TotalSecureRequest";
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
+
+    public static final String TOTAL_UH1_TO_RP_WEST = "TotalUH1ToRPWest";
+    public static final String TOTAL_UH1_TO_RP_WEST_FILL = "TotalUH1ToRPWestFILL";
+    public static final String TOTAL_UH1_TO_RP_WEST_NO_FILL = "TotalUH1ToRPWestNOFILL";
+    public static final String UH1_TO_RP_WEST_LATENCY = "UH1ToRPWestLatency";
+    public static final String UH1_TO_RP_WEST_CONNECTION_LATENCY = "UH1ToRPWestConnectionLatency";
+    public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
 }

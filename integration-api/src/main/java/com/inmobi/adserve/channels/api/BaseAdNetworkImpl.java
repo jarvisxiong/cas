@@ -891,4 +891,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         }
         ningRequestBuilder.setVirtualHost(publicHostName);
     }
+
+    public String getHostName() {
+        return this.host;
+    }
 }

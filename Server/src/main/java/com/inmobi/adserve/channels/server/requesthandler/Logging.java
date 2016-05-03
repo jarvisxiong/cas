@@ -74,6 +74,7 @@ public class Logging {
     private static boolean enableFileLogging;
     private static boolean enableDatabusLogging;
     private static int totalCount;
+    private static String RP_USA_WEST_HOST_END_POINT = "exapi-us-west";
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return SAMPLED_ADVERTISER_LOG_NOS;
@@ -249,7 +250,15 @@ public class Logging {
                 }
             }
             channels.add(channel);
-
+            String prefixUh1ToRPWest = StringUtils.EMPTY;
+            final String hostName = adNetwork.getHostName();
+            if (hostName.contains(RP_USA_WEST_HOST_END_POINT)) {
+                prefixUh1ToRPWest = InspectorStrings.UH1_TO_RP_WEST_PREFIX;
+                InspectorStats.incrementStatCount(adNetwork.getName() , InspectorStrings.TOTAL_UH1_TO_RP_WEST);
+                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.UH1_TO_RP_WEST_LATENCY, adResponse.getLatency());
+                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.UH1_TO_RP_WEST_CONNECTION_LATENCY,
+                    adNetwork.getConnectionLatency());
+            }
             // Incrementing inspectors
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.getLatency());
@@ -258,9 +267,15 @@ public class Logging {
             switch (adResponse.getAdStatus()) {
                 case GlobalConstant.AD_STRING:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
+                    if (StringUtils.isNotBlank(prefixUh1ToRPWest)) {
+                        InspectorStats.incrementStatCount(adNetwork.getName(), prefixUh1ToRPWest + InspectorStrings.TOTAL_FILLS);
+                    }
                     break;
                 case GlobalConstant.NO_AD:
                     InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
+                    if (StringUtils.isNotBlank(prefixUh1ToRPWest)) {
+                        InspectorStats.incrementStatCount(adNetwork.getName(), prefixUh1ToRPWest + InspectorStrings.TOTAL_NO_FILLS);
+                    }
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 case GlobalConstant.TIME_OUT:

@@ -348,4 +348,9 @@ public interface AdNetworkInterface {
      * Returns the bid guidance that was forwarded to the partner. Returns null if no value was forwarded.
      */
     Double getForwardedBidGuidance();
+
+    /**
+     * Return the host
+     */
+    String getHostName();
 }

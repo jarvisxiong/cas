@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.config.AdapterConfig;
 
 import io.netty.bootstrap.Bootstrap;
@@ -23,6 +24,7 @@ import io.netty.channel.Channel;
 public class SegmentFactory {
     private final static Logger LOG = LoggerFactory.getLogger(SegmentFactory.class);
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
+    private final static Long USA_COUNTRY_ID = 94l;
 
     @Inject
     public SegmentFactory(final Map<String, AdapterConfig> advertiserIdConfigMap) {
@@ -43,10 +45,14 @@ public class SegmentFactory {
      */
     public AdNetworkInterface getChannel(final String advertiserId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
-            final Channel channel, final Set<String> advertiserSet) {
+            final Channel channel, final Set<String> advertiserSet, final SASRequestParameters sasParam) {
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
         final String adapterName = adapterConfig.getAdapterName();
-        final String adapterHost = adapterConfig.getAdapterHost();
+
+        final String adapterHost;
+        adapterHost = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx()
+            ? adapterConfig.getAdapterHost(sasParam.getState()) : adapterConfig.getAdapterHost();
+
         if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterName))) {
             return null;
         }

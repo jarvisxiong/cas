@@ -68,6 +68,7 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Logging.class, InspectorStats.class, CircuitBreakerImpl.class, AdvertiserFailureThrottler.class})
 public class LoggingTest {
+    private static final String DEFAULT_HOST = "http://default.host";
     private static Configuration mockConfig;
     private static int sampledadvertisercount = 5;
     private Set<String> emptySet = new HashSet<String>();
@@ -487,6 +488,7 @@ public class LoggingTest {
 
         expect(mockAdNetworkInterface.getCreativeType())
                 .andReturn(adCreativeType).anyTimes();
+        expect(mockAdNetworkInterface.getHostName()).andReturn(DEFAULT_HOST).anyTimes();
 
         replayAll();
 
@@ -580,8 +582,10 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getCreativeType())
                 .andReturn(adCreativeType).anyTimes();
         expect(mockIXAdNetwork.getEntity()).andReturn(mockChannelSegmentEntityForIncId).anyTimes();
+        expect(mockIXAdNetwork.getHostName()).andReturn(DEFAULT_HOST).anyTimes();
         expect(mockChannelSegmentEntityForIncId.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
         expect(mockChannelSegmentEntityForIncId.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
+
 
         replayAll();
 
@@ -677,6 +681,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getCreativeType())
                 .andReturn(adCreativeType).anyTimes();
         expect(mockIXAdNetwork.getEntity()).andReturn(mockChannelSegmentEntityForIncId).anyTimes();
+        expect(mockIXAdNetwork.getHostName()).andReturn(DEFAULT_HOST).anyTimes();
         expect(mockChannelSegmentEntityForIncId.getAdgroupIncId()).andReturn(adgroupIncId).anyTimes();
         expect(mockChannelSegmentEntityForIncId.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
 

@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.api.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,6 +32,9 @@ public class ServerConfig implements CasConfig {
     private final List auctionCreativeValidatorFilterExcludedList;
     @SuppressWarnings("rawtypes")
     private final List auctionIUrlFilterExcludedList;
+    private final static List<Integer> usaWestStatesCode = new ArrayList<>();
+    private static final Integer NEGATIVE_ONE = -1;
+    private static Integer routingUH1ToUJ1Percentage = NEGATIVE_ONE;
 
     @Inject
     public ServerConfig(@ServerConfiguration final Configuration serverConfiguration,
@@ -47,6 +51,15 @@ public class ServerConfig implements CasConfig {
                 serverConfiguration.getList("auction.exclude.AuctionCreativeValidatorFilter", Lists.newArrayList());
         auctionIUrlFilterExcludedList =
                 serverConfiguration.getList("auction.exclude.AuctionIUrlFilter", Lists.newArrayList());
+
+        final List<String> stateCodeStrList = serverConfiguration.getList("usa.stateCodes", Lists.newArrayList());
+        for (String code : stateCodeStrList) {
+            try {
+                usaWestStatesCode.add(Integer.parseInt(code));
+            } catch (NumberFormatException e) {
+            }
+        }
+        routingUH1ToUJ1Percentage = serverConfiguration.getInteger("routingFromUH1ToUJ1Percentage", NEGATIVE_ONE);
     }
 
     public double getRevenueWindow() {
@@ -134,4 +147,11 @@ public class ServerConfig implements CasConfig {
         }
     }
 
+    public Integer getRoutingUH1ToUJ1Percentage() {
+        return routingUH1ToUJ1Percentage;
+    }
+
+    public List<Integer> getUSAWestStatesCodes() {
+        return usaWestStatesCode;
+    }
 }
