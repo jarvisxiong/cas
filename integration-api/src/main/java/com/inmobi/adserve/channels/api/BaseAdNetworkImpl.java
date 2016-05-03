@@ -18,6 +18,7 @@ import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatCon
 import static com.inmobi.casthrift.ADCreativeType.BANNER;
 import static com.inmobi.casthrift.ADCreativeType.INTERSTITIAL_VIDEO;
 import static com.inmobi.casthrift.ADCreativeType.NATIVE;
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,6 +46,7 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IMEIEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
@@ -176,7 +178,14 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     private boolean isIPResolutionDisabled = true;
     private String publicHostName;
     protected boolean isByteResponseSupported = false;
+    protected WapSiteUACEntity wapSiteUACEntity;
+    protected boolean isWapSiteUACEntity = false;
 
+    /**
+     * 
+     * @param baseRequestHandler
+     * @param serverChannel
+     */
     public BaseAdNetworkImpl(final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         this.baseRequestHandler = baseRequestHandler;
         this.serverChannel = serverChannel;
@@ -577,11 +586,37 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                 : selectedSlotId;
 
         isCpc = BaseAdNetworkHelper.getPricingModel(entity);
+        if (sasParams.getWapSiteUACEntity() != null) {
+            wapSiteUACEntity = sasParams.getWapSiteUACEntity();
+            isWapSiteUACEntity = true;
+        }
         final boolean isConfigured = configureParameters();
         if (isConfigured) {
             replaceHostWithIP();
         }
         return isConfigured;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    @Override
+    public String getAppBundleId() {
+        String marketId = sasParams.getAppBundleId();
+        if (isWapSiteUACEntity) {
+            if (wapSiteUACEntity.isOverrideMarketId()) {
+                return wapSiteUACEntity.getMarketId();
+            }
+            if (wapSiteUACEntity.isIOS()) {
+                marketId = StringUtils.isNumeric(sasParams.getAppBundleId())
+                        ? sasParams.getAppBundleId()
+                        : wapSiteUACEntity.getMarketId();
+            } else {
+                marketId = defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
+            }
+        }
+        return marketId;
     }
 
 

@@ -50,7 +50,6 @@ import com.inmobi.adserve.channels.entity.CcidMapEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -171,8 +170,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private String adm;
     private String bidderCurrency;
     private final List<String> blockedAdvertisers = Lists.newArrayList();
-    private WapSiteUACEntity wapSiteUACEntity;
-    private boolean isWapSiteUACEntity = false;
     private NativeAdTemplateEntity templateEntity;
     private com.inmobi.adserve.contracts.common.response.nativead.Native nativeObj;
     private Map<Integer, Asset> mandatoryAssetMap;
@@ -213,12 +210,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                     advertiserName);
             return false;
         }
-
-        if (sasParams.getWapSiteUACEntity() != null) {
-            wapSiteUACEntity = sasParams.getWapSiteUACEntity();
-            isWapSiteUACEntity = true;
-        }
-
         // Creating site/app Object
         App app = null;
         Site site = null;
@@ -560,9 +551,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setName(wapSiteUACEntity.getSiteName());
         }
 
-        String marketId = isWapSiteUACEntity ? wapSiteUACEntity.getMarketId() : null;
-        // TODO: This should use the same logic as IX
-        marketId = StringUtils.isNotEmpty(marketId) ? marketId : sasParams.getAppBundleId();
+        final String marketId = getAppBundleId();
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
         }

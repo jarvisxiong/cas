@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.api.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,7 +13,7 @@ import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 
 /**
  * @author abhishek.parwal
- * 
+ *
  */
 @Singleton
 public class ServerConfig implements CasConfig {
@@ -32,9 +31,7 @@ public class ServerConfig implements CasConfig {
     private final List auctionCreativeValidatorFilterExcludedList;
     @SuppressWarnings("rawtypes")
     private final List auctionIUrlFilterExcludedList;
-    private final static List<Integer> usaWestStatesCode = new ArrayList<>();
     private static final Integer NEGATIVE_ONE = -1;
-    private static Integer routingUH1ToUJ1Percentage = NEGATIVE_ONE;
 
     @Inject
     public ServerConfig(@ServerConfiguration final Configuration serverConfiguration,
@@ -51,15 +48,6 @@ public class ServerConfig implements CasConfig {
                 serverConfiguration.getList("auction.exclude.AuctionCreativeValidatorFilter", Lists.newArrayList());
         auctionIUrlFilterExcludedList =
                 serverConfiguration.getList("auction.exclude.AuctionIUrlFilter", Lists.newArrayList());
-
-        final List<String> stateCodeStrList = serverConfiguration.getList("usa.stateCodes", Lists.newArrayList());
-        for (String code : stateCodeStrList) {
-            try {
-                usaWestStatesCode.add(Integer.parseInt(code));
-            } catch (NumberFormatException e) {
-            }
-        }
-        routingUH1ToUJ1Percentage = serverConfiguration.getInteger("routingFromUH1ToUJ1Percentage", NEGATIVE_ONE);
     }
 
     public double getRevenueWindow() {
@@ -147,11 +135,20 @@ public class ServerConfig implements CasConfig {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getRoutingUH1ToUJ1Percentage() {
-        return routingUH1ToUJ1Percentage;
+        return serverConfiguration.getInteger("routingFromUH1ToUJ1Percentage", NEGATIVE_ONE);
     }
 
-    public List<Integer> getUSAWestStatesCodes() {
-        return usaWestStatesCode;
+    /**
+     *
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getUSWestStatesCodes() {
+        return serverConfiguration.getList("usa.stateCodes", Lists.newArrayList());
     }
 }

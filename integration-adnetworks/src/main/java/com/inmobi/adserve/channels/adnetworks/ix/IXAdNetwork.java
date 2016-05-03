@@ -22,7 +22,6 @@ import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MAN
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.DISPLAY_MANAGER_INMOBI_SDK;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ONE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 import java.awt.Dimension;
 import java.net.URI;
@@ -79,7 +78,6 @@ import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.ChannelAdGroupRepository;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
@@ -247,9 +245,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private List<Integer> packageIds;
     private List<String> iabCategories;
     private final String sproutUniqueIdentifierRegex;
-
-    private WapSiteUACEntity wapSiteUACEntity;
-    private boolean isWapSiteUACEntity = false;
     @Getter
     private ChannelSegmentEntity dspChannelSegmentEntity;
     private Map<Integer, Asset> mandatoryAssetMap;
@@ -293,12 +288,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     advertiserName);
             return false;
         }
-
-        if (sasParams.getWapSiteUACEntity() != null) {
-            wapSiteUACEntity = sasParams.getWapSiteUACEntity();
-            isWapSiteUACEntity = true;
-        }
-
         // If UAC is set try fetching IAB Categories based on it, set iabCategories before creating app/site
         if (isWapSiteUACEntity) {
             iabCategories = IABCategoriesMap.getIABCategoriesFromUAC(wapSiteUACEntity.getCategories());
@@ -874,43 +863,21 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return app;
     }
 
-    public String getAppBundleId() {
-        if (null != wapSiteUACEntity) {
-            if (wapSiteUACEntity.isIOS()) {
-                return defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
-            } else {
-                return defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
-            }
-        } else {
-            return sasParams.getAppBundleId();
-        }
-    }
-
     private void setParamsForTransparentApp(final App app, final CommonExtension ext) {
         app.setId(sasParams.getSiteId());
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
-
-        final String marketId;
-        if (wapSiteUACEntity.isIOS()) {
-            marketId = defaultIfEmpty(wapSiteUACEntity.getMarketId(), sasParams.getAppBundleId());
-        } else {
-            marketId = wapSiteUACEntity.isOverrideMarketId()
-                    ? wapSiteUACEntity.getMarketId()
-                    : defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
-        }
+        final String marketId = getAppBundleId();
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
         }
-
         // Set either of title or Name, giving priority to title
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             app.setName(wapSiteUACEntity.getAppTitle());
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
             app.setName(wapSiteUACEntity.getSiteName());
         }
-
         final String blindId = BaseAdNetworkHelper.getBlindedSiteId(sasParams.getSiteIncId());
         final String blindBundle = String.format(BLIND_BUNDLE_APP_FORMAT, blindId);
         final Blind blindForApp = new Blind();
@@ -1695,8 +1662,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotBlank(thirdPartyClickTracker)) {
             LOG.debug("Third Party Click Trackers detected.");
 
-            thirdPartyTrackerMap.put(THIRD_PARTY_CLICK_TRACKER,
-                thirdPartyClickTracker);
+            thirdPartyTrackerMap.put(THIRD_PARTY_CLICK_TRACKER, thirdPartyClickTracker);
         }
     }
 
@@ -1706,7 +1672,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             LOG.debug("Audience Verification Trackers detected.");
 
             thirdPartyTrackerMap.put(AUDIENCE_VERIFICATION_TRACKER,
-                replaceAudienceVerificationTrackerMacros(audienceVerificationTracker, macroData.getMacroMap()));
+                    replaceAudienceVerificationTrackerMacros(audienceVerificationTracker, macroData.getMacroMap()));
         }
     }
 

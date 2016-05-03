@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-// import javax.ws.rs.Path;
-
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,15 +61,13 @@ public class ServletChangeConfig implements Servlet {
             while (itr.hasNext()) {
                 final String configKey = itr.next().toString();
                 String replacedString = null;
-                if (configKey.startsWith(ADAPTER)
-                        && CasConfigUtil.getAdapterConfig().containsKey(
-                                replacedString = configKey.replace(ADAPTER, StringUtils.EMPTY))) {
+                if (configKey.startsWith(ADAPTER) && CasConfigUtil.getAdapterConfig()
+                        .containsKey(replacedString = configKey.replace(ADAPTER, StringUtils.EMPTY))) {
                     CasConfigUtil.getAdapterConfig().setProperty(replacedString, jObject.getString(configKey));
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getAdapterConfig().getString(replacedString)).append("\n");
-                } else if (configKey.startsWith(SERVER)
-                        && CasConfigUtil.getServerConfig().containsKey(
-                                replacedString = configKey.replace(SERVER, StringUtils.EMPTY))) {
+                } else if (configKey.startsWith(SERVER) && CasConfigUtil.getServerConfig()
+                        .containsKey(replacedString = configKey.replace(SERVER, StringUtils.EMPTY))) {
                     CasConfigUtil.getServerConfig().setProperty(replacedString, jObject.getString(configKey));
                     updates.append(configKey).append("=")
                             .append(CasConfigUtil.getServerConfig().getString(replacedString)).append("\n");

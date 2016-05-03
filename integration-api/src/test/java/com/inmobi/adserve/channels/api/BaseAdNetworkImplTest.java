@@ -50,6 +50,7 @@ import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilde
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
@@ -266,6 +267,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getUserAgent()).andReturn("test-user-agent");
         expect(mockSasParam.getRemoteHostIp()).andReturn("9.9.9.9");
+        expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
@@ -366,6 +368,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+        expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
@@ -414,6 +417,43 @@ public class BaseAdNetworkImplTest {
         verifyAll();
     }
 
+    @Test
+    public void testGetAppBundleId() throws Exception {
+        final SASRequestParameters sasParams = new SASRequestParameters();
+        sasParams.setAppBundleId("com.default");
+
+        // isWapSiteUACEntity = false test
+        final String[] mockedMethods = {"isNativeRequest"};
+        final BaseAdNetworkImpl baseAdNetwork = createPartialMock(BaseAdNetworkImpl.class, mockedMethods);
+        MemberMatcher.field(BaseAdNetworkImpl.class, "sasParams").set(baseAdNetwork, sasParams);
+        MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.FALSE);
+        assertEquals("com.default", baseAdNetwork.getAppBundleId());
+
+        // Override test
+        final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+        builder.marketId("uac.marketId");
+        builder.overrideMarketId(true);
+        MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
+        MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
+        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
+
+        // IOS Test
+        builder.overrideMarketId(false);
+        builder.siteTypeId(21);
+        MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
+        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
+        sasParams.setAppBundleId("123");
+        assertEquals("123", baseAdNetwork.getAppBundleId());
+
+        // Android Test
+        builder.siteTypeId(22);
+        MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
+        sasParams.setAppBundleId("com.default");
+        assertEquals("com.default", baseAdNetwork.getAppBundleId());
+        sasParams.setAppBundleId(null);
+        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
+    }
+
     /**
      * This method tests various small methods of BaseAdNetworkImpl.
      */
@@ -433,7 +473,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getOsId()).andReturn(3).times(1).andReturn(5).times(1);
         expect(mockSasParam.getSource()).andReturn("WAP").times(1);
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
-
+        expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -507,6 +547,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockCasInternalRequestParameters.isTrackingAllowed()).andReturn(true).anyTimes();
+        expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)
                 .andReturn("IFA0000000000000000000000000000").times(2);
         expect(mockCasInternalRequestParameters.getGpid()).andReturn(null).times(5)

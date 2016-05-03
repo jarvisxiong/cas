@@ -481,14 +481,10 @@ public class Logging {
                 if (null != adNetworkInterface.getForwardedBidGuidance()) {
                     request.setBidGuidance(adNetworkInterface.getForwardedBidGuidance());
                 }
-                if (adNetworkInterface instanceof IXAdNetwork) {
-                    final String appBundleId = ((IXAdNetwork) adNetworkInterface).getAppBundleId();
-                    if (StringUtils.isNotBlank(appBundleId)) {
-                        request.setAppBundleId(appBundleId);
-                        LOG.debug("AppBundleId is : {}", appBundleId);
-                    } else {
-                        LOG.debug("AppBundleId is : null");
-                    }
+                final String appBundleId = adNetworkInterface.getAppBundleId();
+                if (StringUtils.isNotBlank(appBundleId)) {
+                    request.setAppBundleId(appBundleId);
+                    LOG.debug("AppBundleId is : {}", appBundleId);
                 }
             }
 
@@ -527,8 +523,8 @@ public class Logging {
         }
 
         if (null != casInternalRequestParameters) {
-            if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiMD5()) ||
-                    StringUtils.isNotBlank(casInternalRequestParameters.getImeiSHA1())) {
+            if (StringUtils.isNotBlank(casInternalRequestParameters.getImeiMD5())
+                    || StringUtils.isNotBlank(casInternalRequestParameters.getImeiSHA1())) {
                 request.setImeiPresent(true);
             }
         }

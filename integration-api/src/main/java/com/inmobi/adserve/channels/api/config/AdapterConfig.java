@@ -6,8 +6,6 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -30,17 +28,14 @@ public class AdapterConfig implements CasConfig {
     private final String adapterName;
     private final Class<AdNetworkInterface> adapterClass;
     private final ServerConfig serverConfig;
-    private static boolean hostConfigurable;
     private static Integer HUNDRED_IN_PERCENTAGE = 100;
-    private static Logger LOG;
     private static final Random RANDOM = new Random();
 
 
     @SuppressWarnings("unchecked")
     @AssistedInject
     public AdapterConfig(@Assisted final Configuration adapterConfig, @Assisted final String adapterName,
-        @Nullable @Named("dcName") final String dcName, final ServerConfig serverConfig) {
-        LOG = LoggerFactory.getLogger(getClass().getName());
+            @Nullable @Named("dcName") final String dcName, final ServerConfig serverConfig) {
         this.adapterConfig = adapterConfig;
         this.adapterName = adapterName;
         this.dcName = dcName;
@@ -90,9 +85,15 @@ public class AdapterConfig implements CasConfig {
         return adapterHost;
     }
 
+    /**
+     * 
+     * @param stateCode
+     * @return
+     */
     public String getDcName(final Integer stateCode) {
-        return ((serverConfig.getRoutingUH1ToUJ1Percentage() >= RANDOM.nextInt(HUNDRED_IN_PERCENTAGE)) && StringUtils.equals(dcName, UH1) &&
-            null != stateCode && serverConfig.getUSAWestStatesCodes().contains(stateCode)) ? UJ1 : dcName;
+        return ((serverConfig.getRoutingUH1ToUJ1Percentage() >= RANDOM.nextInt(HUNDRED_IN_PERCENTAGE))
+                && StringUtils.equals(dcName, UH1) && null != stateCode
+                && serverConfig.getUSWestStatesCodes().contains(String.valueOf(stateCode))) ? UJ1 : dcName;
     }
 
     /**

@@ -40,13 +40,13 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
     protected final Map<String, Map<String, String>> overrides = new HashMap<>();
 
     // not static so as to be able to use the existing repository logger
+    @SuppressWarnings("unchecked")
     public void initOverrides(Configuration config, final org.apache.log4j.Logger logger) {
         try {
             config = config.subset(CONFIG_OVERRIDE_KEY_FOR_SITE);
-
-            final Iterator configIterator = config.getKeys();
+            final Iterator<String> configIterator = config.getKeys();
             while (configIterator.hasNext()) {
-                final String key = (String) configIterator.next();
+                final String key = configIterator.next();
                 final String[] keyMeta = key.split(CONFIG_OVERRIDE_SPLIT_CHAR);
                 if (keyMeta.length != 2) {
                     logger.error("Faulty override key structure. Faulty config line: " + key);
@@ -58,9 +58,8 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
                     if (!ALLOWED_FIELDS_FOR_OVERRIDE.contains(field)) {
                         logger.error("Unsupported override field. Faulty config line: " + key);
                         continue;
-                    } else{
+                    } else {
                         final String value = config.getString(key);
-
                         if (overrides.containsKey(siteId)) {
                             overrides.get(siteId).put(field, value);
                         } else {
@@ -113,7 +112,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             if (overrides.containsKey(id)) {
                 final Map<String, String> overridesMap = overrides.get(id);
                 for (final Map.Entry<String, String> entry : overridesMap.entrySet()) {
-                    switch(entry.getKey()) {
+                    switch (entry.getKey()) {
                         case SITE_URL:
                             siteUrl = entry.getValue();
                             break;
@@ -184,8 +183,7 @@ public class WapSiteUACRepository extends AbstractStatsMaintainingDBRepository<W
             return new DBEntity<>(entity, modifiedOn);
         } catch (final Exception exp) {
             logger.error("Error in resultset row", exp);
-            return new DBEntity<>(new EntityError<>(id,
-                    "ERROR_IN_EXTRACTING_WAP_SITE_UAC"), modifiedOn);
+            return new DBEntity<>(new EntityError<>(id, "ERROR_IN_EXTRACTING_WAP_SITE_UAC"), modifiedOn);
         }
 
     }

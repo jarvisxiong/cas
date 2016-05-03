@@ -33,7 +33,7 @@ public class SegmentFactory {
 
     /**
      * Call the Specific Adapter of the Ad Networks
-     * 
+     *
      * @param advertiserId
      * @param config
      * @param dcpClientBootstrap
@@ -49,9 +49,9 @@ public class SegmentFactory {
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
         final String adapterName = adapterConfig.getAdapterName();
 
-        final String adapterHost;
-        adapterHost = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx()
-            ? adapterConfig.getAdapterHost(sasParam.getState()) : adapterConfig.getAdapterHost();
+        final String adapterHost = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx()
+                ? adapterConfig.getAdapterHost(sasParam.getState())
+                : adapterConfig.getAdapterHost();
 
         if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterName))) {
             return null;

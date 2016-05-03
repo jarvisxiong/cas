@@ -1141,6 +1141,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParams.getRFormat()).andReturn("banner").anyTimes();
+        expect(mockSasParams.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
 
@@ -1863,9 +1864,12 @@ public class NewIXAdNetworkTest {
 
         Map<String, String> trackerMapWithOutEmptyValue = new HashMap<>();
         trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
-        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, audienceVerificiation);
-        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, thirdPartyImpressionTracker);
-        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, thirdPartyClickTracker);
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER,
+                audienceVerificiation);
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER,
+                thirdPartyImpressionTracker);
+        trackerMapWithOutEmptyValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER,
+                thirdPartyClickTracker);
 
         Map<String, String> trackerMapWithEmptyAndNullValue = new HashMap<>();
         trackerMapWithEmptyAndNullValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, "   ");
@@ -1874,7 +1878,8 @@ public class NewIXAdNetworkTest {
         trackerMapWithEmptyAndNullValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
 
         Map<String, String> trackerMapWithEmptyNullAndValidValue = new HashMap<>();
-        trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER, viewabilityTracker);
+        trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER,
+                viewabilityTracker);
         trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER, "");
         trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, " ");
         trackerMapWithEmptyNullAndValidValue.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
@@ -1892,33 +1897,35 @@ public class NewIXAdNetworkTest {
         expectedTrackerMapNull.put(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER, null);
         expectedTrackerMapNull.put(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER, null);
 
-        ArrayList<String> trackerList = new ArrayList<String>(){{
+        ArrayList<String> trackerList = new ArrayList<String>() {
+            private static final long serialVersionUID = 1L;
+            {
                 add(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER);
                 add(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER);
                 add(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER);
-                add(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER);}};
-
-        return new Object[][] {
-                {"EmptyTrackerMap", emptyTrackerMap, expectedTrackerMapNull, trackerList},
-                {"trackerMapWithOutEmptyValue", trackerMapWithOutEmptyValue, trackerMapWithOutEmptyValue, trackerList},
-                {"trackerMapWithEmptyAndNullValue", trackerMapWithEmptyAndNullValue, expectedTrackerMapNull, trackerList},
-                {"trackerMapWithEmptyNullAndValidValue", trackerMapWithEmptyNullAndValidValue, expectedMap, trackerList},
+                add(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER);
+            }
         };
+
+        return new Object[][] {{"EmptyTrackerMap", emptyTrackerMap, expectedTrackerMapNull, trackerList},
+                {"trackerMapWithOutEmptyValue", trackerMapWithOutEmptyValue, trackerMapWithOutEmptyValue, trackerList},
+                {"trackerMapWithEmptyAndNullValue", trackerMapWithEmptyAndNullValue, expectedTrackerMapNull,
+                        trackerList},
+                {"trackerMapWithEmptyNullAndValidValue", trackerMapWithEmptyNullAndValidValue, expectedMap,
+                        trackerList},};
     }
 
 
     @org.testng.annotations.Test(dataProvider = "Valid Third Party Tracker Json List")
-    public void testValidThirdPartyTrackerJson(final String useCaseName, final  Map<String, String> trackerMap,
-            final  Map<String, String> expectedtrackerMap, final ArrayList<String> trackerList) throws Exception {
+    public void testValidThirdPartyTrackerJson(final String useCaseName, final Map<String, String> trackerMap,
+            final Map<String, String> expectedtrackerMap, final ArrayList<String> trackerList) throws Exception {
 
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
         final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
         final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
-            createMock(CasInternalRequestParameters.class);
+                createMock(CasInternalRequestParameters.class);
 
         expect(mockStatus.code()).andReturn(200).times(2);
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
@@ -1928,15 +1935,16 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
-            .anyTimes();
+                .anyTimes();
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints()).andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
+        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
+                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-            .anyTimes();
+                .anyTimes();
         expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
         replayAll();
 
@@ -1954,7 +1962,7 @@ public class NewIXAdNetworkTest {
         ixAdNetwork.setAudienceVerificationTrackers(trackerMap, macroData);
         ixAdNetwork.setThirdPartyImpressionTracker(trackerMap, macroData);
         ixAdNetwork.setThirdPartyClickTracker(trackerMap, macroData);
-        Map<String, String> thirdPartyTrackerMap =  ixAdNetwork.getThirdPartyTrackerMap();
-        trackerList.forEach(t-> Assert.assertEquals(thirdPartyTrackerMap.get(t), expectedtrackerMap.get(t)));
+        Map<String, String> thirdPartyTrackerMap = ixAdNetwork.getThirdPartyTrackerMap();
+        trackerList.forEach(t -> Assert.assertEquals(thirdPartyTrackerMap.get(t), expectedtrackerMap.get(t)));
     }
 }

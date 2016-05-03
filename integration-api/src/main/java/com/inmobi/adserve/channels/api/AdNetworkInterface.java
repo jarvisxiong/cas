@@ -350,6 +350,12 @@ public interface AdNetworkInterface {
     Double getForwardedBidGuidance();
 
     /**
+     * 
+     * @return
+     */
+    String getAppBundleId();
+
+    /**
      * Return the host
      */
     String getHostName();
