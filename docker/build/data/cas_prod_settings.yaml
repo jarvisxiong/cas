@@ -514,8 +514,8 @@ skyhook:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
-            beacon_url_prefix: 'et2-cn.w.inmobi.com/c.asm'
-            click_url_prefix: 'c2-cn.w.inmobi.com/c.asm'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
