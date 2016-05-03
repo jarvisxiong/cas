@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -24,6 +22,8 @@ import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender.ResponseFormat;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.messaging.publisher.AbstractMessagePublisher;
+
+import junit.framework.TestCase;
 
 public class ServerTest extends TestCase {
     private ResponseSender responseSender;
@@ -58,7 +58,7 @@ public class ServerTest extends TestCase {
         responseSender = new ResponseSender();
 
         final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig, "hostName");
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockConfig, "hostName", "corp");
     }
 
     public void prepareLogging() throws Exception {

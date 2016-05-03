@@ -660,10 +660,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                     ? InspectorStrings.TOTAL_NATIVE_VAST_REQUESTS
                     : InspectorStrings.TOTAL_PURE_VAST_REQUESTS;
             InspectorStats.incrementStatCount(getName(), statName);
-            if (null != sasParams.getVastProtocols()) {
-                sasParams.getVastProtocols().parallelStream().forEach(t -> InspectorStats.incrementStatCount(getName(),
-                        InspectorStrings.TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL + t));
-            }
         }
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
         return video;

@@ -88,7 +88,7 @@ public class LoggingTest {
         expect(mockConfig.getInt("sampledadvertisercount")).andReturn(sampledadvertisercount).anyTimes();
         replayAll();
 
-        Logging.init(mockDataBusPublisher, "null", "null", "null", mockConfig, "hostName");
+        Logging.init(mockDataBusPublisher, "null", "null", "null", mockConfig, "hostName", "corp");
     }
 
     /**

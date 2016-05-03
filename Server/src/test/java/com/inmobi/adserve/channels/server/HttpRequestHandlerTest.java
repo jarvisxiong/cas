@@ -85,7 +85,7 @@ public class HttpRequestHandlerTest extends TestCase {
                 new CasNettyModule(config.getServerConfiguration())).with(new TestScopeModule()));
 
         final AbstractMessagePublisher mockAbstractMessagePublisher = createMock(AbstractMessagePublisher.class);
-        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockServerConfig, "hostName");
+        Logging.init(mockAbstractMessagePublisher, "cas-rr", "cas-advertisement", "null", mockServerConfig, "hostName", "corp");
         aDomains.add("a.com");
         cAttributes.add(1);
     }

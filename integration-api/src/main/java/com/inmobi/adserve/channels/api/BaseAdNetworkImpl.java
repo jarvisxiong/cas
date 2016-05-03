@@ -155,6 +155,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Getter
     @Setter
     protected String host;
+    protected String hostNameBeforeIPReplace;
     protected String impressionId;
     protected String source;
     protected String blindedSiteId;
@@ -591,6 +592,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             isWapSiteUACEntity = true;
         }
         final boolean isConfigured = configureParameters();
+        hostNameBeforeIPReplace = host;
         if (isConfigured) {
             replaceHostWithIP();
         }
@@ -928,6 +930,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     public String getHostName() {
-        return this.host;
+        return this.hostNameBeforeIPReplace;
     }
 }

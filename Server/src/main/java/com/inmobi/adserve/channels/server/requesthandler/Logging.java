@@ -44,6 +44,7 @@ import com.inmobi.casthrift.CasAdChain;
 import com.inmobi.casthrift.CasAdvertisementLog;
 import com.inmobi.casthrift.Channel;
 import com.inmobi.casthrift.ContentRating;
+import com.inmobi.casthrift.DataCenter;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.casthrift.Gender;
 import com.inmobi.casthrift.Geo;
@@ -66,6 +67,7 @@ public class Logging {
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static final String BANNER = "BANNER";
     private static final String NO = "NO";
+    private static final String UH1 = DataCenter.UH1.name().toLowerCase() ;
     private static String containerName;
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
@@ -74,7 +76,8 @@ public class Logging {
     private static boolean enableFileLogging;
     private static boolean enableDatabusLogging;
     private static int totalCount;
-    private static String RP_USA_WEST_HOST_END_POINT = "exapi-us-west";
+    private static String dataCentreName;
+    private static final String RP_USA_WEST_HOST_END_POINT = "exapi-us-west";
 
     public static ConcurrentHashMap<String, String> getSampledadvertiserlognos() {
         return SAMPLED_ADVERTISER_LOG_NOS;
@@ -82,7 +85,7 @@ public class Logging {
 
     public static void init(final AbstractMessagePublisher dataBusPublisher, final String rrLogKey,
             final String advertisementLogKey, final String umpAdsLogKey, final Configuration config,
-            final String containerNameStr) {
+            final String containerNameStr, final String dcName) {
         Logging.dataBusPublisher = dataBusPublisher;
         Logging.rrLogKey = rrLogKey;
         Logging.sampledAdvertisementLogKey = advertisementLogKey;
@@ -91,6 +94,7 @@ public class Logging {
         enableDatabusLogging = config.getBoolean("enableDatabusLogging");
         totalCount = config.getInt("sampledadvertisercount");
         containerName = containerNameStr;
+        dataCentreName = dcName;
     }
 
     // Writing Request Response Logs
@@ -252,12 +256,10 @@ public class Logging {
             channels.add(channel);
             String prefixUh1ToRPWest = StringUtils.EMPTY;
             final String hostName = adNetwork.getHostName();
-            if (hostName.contains(RP_USA_WEST_HOST_END_POINT)) {
+            if (StringUtils.equals(dataCentreName, UH1) && hostName.contains(RP_USA_WEST_HOST_END_POINT)) {
                 prefixUh1ToRPWest = InspectorStrings.UH1_TO_RP_WEST_PREFIX;
                 InspectorStats.incrementStatCount(adNetwork.getName() , InspectorStrings.TOTAL_UH1_TO_RP_WEST);
                 InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.UH1_TO_RP_WEST_LATENCY, adResponse.getLatency());
-                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.UH1_TO_RP_WEST_CONNECTION_LATENCY,
-                    adNetwork.getConnectionLatency());
             }
             // Incrementing inspectors
             InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);

@@ -153,7 +153,6 @@ public class InspectorStrings {
     public static final String TOTAL_VAST_VIDEO_REQUESTS = "TotalVASTVideoRequests";
     public static final String TOTAL_PURE_VAST_REQUESTS = "TotalPureVASTRequests";
     public static final String TOTAL_NATIVE_VAST_REQUESTS = "TotalNativeVASTRequests";
-    public static final String TOTAL_PURE_VAST_REQUESTS_FOR_PROTOCOL = "TotalPureVASTRequestsForProtocol_";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
     public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
             "totalPureVastResponseInlineOrWrapperMissing";
@@ -246,9 +245,6 @@ public class InspectorStrings {
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 
     public static final String TOTAL_UH1_TO_RP_WEST = "TotalUH1ToRPWest";
-    public static final String TOTAL_UH1_TO_RP_WEST_FILL = "TotalUH1ToRPWestFILL";
-    public static final String TOTAL_UH1_TO_RP_WEST_NO_FILL = "TotalUH1ToRPWestNOFILL";
     public static final String UH1_TO_RP_WEST_LATENCY = "UH1ToRPWestLatency";
-    public static final String UH1_TO_RP_WEST_CONNECTION_LATENCY = "UH1ToRPWestConnectionLatency";
     public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
 }

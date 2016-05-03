@@ -206,7 +206,7 @@ public class ChannelServer {
             final String advertisementLogKey = configurationLoader.getServerConfiguration().getString("adsLogKey");
             final String umpAdsLogKey = configurationLoader.getServerConfiguration().getString("umpAdsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey,
-                    configurationLoader.getServerConfiguration(), containerName);
+                    configurationLoader.getServerConfiguration(), containerName, dataCentreName);
 
             // Initializing graphite stats
             RepositoryStats.init(configurationLoader.getMetricsConfiguration(), containerName);
