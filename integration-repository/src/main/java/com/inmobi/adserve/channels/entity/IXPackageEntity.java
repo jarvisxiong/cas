@@ -36,4 +36,5 @@ public class IXPackageEntity {
     private String geoFenceRegion;
     private Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints;
     private final Set<String> languageTargetingSet;
+    private final Integer geocookieId;
 }

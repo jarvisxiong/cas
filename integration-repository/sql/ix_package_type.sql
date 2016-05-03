@@ -1,4 +1,4 @@
-CREATE TYPE ix_package_type_16032016 AS
+CREATE TYPE ix_package_type_21042016 AS
 (
     id                          INTEGER,
     name                        CHARACTER VARYING(128),
@@ -38,6 +38,7 @@ CREATE TYPE ix_package_type_16032016 AS
     data_vendor_cost            DOUBLE PRECISION,
     city_ids                    INTEGER[],
     modified_by                 CHARACTER VARYING(100),
+    geocookie_id                INTEGER,
     access_types                CHARACTER VARYING(32)[],
     deal_ids                    CHARACTER VARYING[],
     deal_floors                 DOUBLE PRECISION[],
@@ -45,4 +46,4 @@ CREATE TYPE ix_package_type_16032016 AS
     agency_rebate_percentages   DOUBLE PRECISION[],
     third_party_tracker_json_list        TEXT[]
 );
-ALTER TYPE ix_package_type_16032016 OWNER TO postgres;
+ALTER TYPE ix_package_type_21042016 OWNER TO postgres;

@@ -20,6 +20,7 @@ import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatCon
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,11 +72,12 @@ public class IXPackageMatcher {
     private static final Set<Integer> vastAllowedSdksForViewability = ImmutableSortedSet.of(
             402,403,404,410,411,430,440,441,442,443,450,451,453,456);
 
-    public static List<Integer> findMatchingPackageIds(final SASRequestParameters sasParams,
+    public static Map<Integer, Boolean> findMatchingPackageIds(final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short selectedSlotId,
             final ChannelSegmentEntity adGroupEntity) {
         LOG.debug("Inside IX Package Matcher");
-        final List<Integer> matchedPackageIds = new ArrayList<>();
+        Set<Integer> csiTags = sasParams.getCsiTags();
+        final HashMap<Integer, Boolean> matchedPackageToGeocookieServedMap = new HashMap();
 
         // TODO: Do package matching on the intersection of ump selected slots and those present in the adgroup
         final Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
@@ -88,7 +90,6 @@ public class IXPackageMatcher {
                     sasParams.getOsId(), sasParams.getSiteId(), sasParams.getCountryId().intValue(), selectedSlotId,
                     resultSet.size());
         }
-
         int matchedPackagesCount = 0;
         int droppedInPackageDMPFilter = 0;
         int droppedInPackageManufModelFilter = 0;
@@ -102,6 +103,7 @@ public class IXPackageMatcher {
 
         // TODO: Refactor into proper filters
         for (final IXPackageEntity packageEntity : resultSet) {
+            boolean servedByGeocookie = false;
             if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
                 final boolean failsAdTypeTargetingFilter =
                         !checkForAdTypeTargeting(adGroupEntity.getSecondaryAdFormatConstraints(),
@@ -164,9 +166,9 @@ public class IXPackageMatcher {
                     droppedInSdkVersionFilter += 1;
                     continue;
                 }
-
                 // Add to matchedPackageIds only if at least one fence from the set of request fence ids
                 // is present in the set of fence ids defined in the package.
+                // But if the package is selected because of its geoCookieTargeting do not drop it.
                 if (StringUtils.isNotEmpty(packageEntity.getGeoFenceRegion())) {
                     final String geoRegionNameCountryCombo =
                             packageEntity.getGeoFenceRegion() + "_" + sasParams.getCountryId();
@@ -177,13 +179,20 @@ public class IXPackageMatcher {
                     if (null == geoRegionFenceMapEntity
                             || null != geoRegionFenceMapEntity.getFenceIdsList()
                             && (null == sasParams.getGeoFenceIds() || !CollectionUtils.containsAny(
-                                    sasParams.getGeoFenceIds(), geoRegionFenceMapEntity.getFenceIdsList()))) {
-                        LOG.debug("Package {} dropped in Geo Fence Filter", packageEntity.getId());
-                        droppedInPackageGeoRegionFilter += 1;
-                        continue;
+                            sasParams.getGeoFenceIds(), geoRegionFenceMapEntity.getFenceIdsList()))) {
+                        LOG.debug("Package {} does not match geo Fences, check if it geocookieTargeted", packageEntity.getId());
+                        if (packageEntity.getGeocookieId() != null && csiTags.contains(packageEntity.getGeocookieId())) {
+                            servedByGeocookie = true;
+                        }
+                        else {
+                            LOG.debug("Package {} with geocookie {} dropped in Geo Fence Filter", packageEntity.getId(),
+                                    packageEntity.getGeocookieId());
+                            droppedInPackageGeoRegionFilter += 1;
+                            continue;
+                        }
                     }
                 }
-                matchedPackageIds.add(packageEntity.getId());
+                matchedPackageToGeocookieServedMap.put(packageEntity.getId(), servedByGeocookie);
                 InspectorStats.incrementStatCount(PACKAGE_AND_DEAL_STATS,
                         IX_PACKAGE_REQUEST_FOR_ID + packageEntity.getId());
                 // Break the loop if we reach the threshold.
@@ -208,11 +217,11 @@ public class IXPackageMatcher {
         incrementPackageFilterStat(DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
 
         String matchedPackageIdStr = "";
-        for (Integer i : matchedPackageIds){
+        for (Integer i : matchedPackageToGeocookieServedMap.keySet()){
             matchedPackageIdStr += " " + i;
         }
         LOG.debug("Packages selected: {}", matchedPackageIdStr);
-        return matchedPackageIds;
+        return matchedPackageToGeocookieServedMap;
     }
 
     private static void incrementPackageFilterStat(final String dropInFilterStat, final int increment) {

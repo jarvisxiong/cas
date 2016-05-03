@@ -225,7 +225,8 @@ public class IXPackageRepository {
                 String[] geoSourceTypes = null;
                 final String geoFenceRegion = rs.getString("geo_fence_region");
                 final Array languageArray = rs.getArray("language_targeting_list");
-                final Set<String> languageTargetingSet = new HashSet<String>();;
+                final Set<String> languageTargetingSet = new HashSet<String>();
+                final Integer geocookieId = rs.getInt("geocookie_id");
                 if (null != languageArray) {
                     if (null != languageArray.getArray()) {
                         final String[] languageTargetingList = (String[]) languageArray.getArray();
@@ -477,6 +478,10 @@ public class IXPackageRepository {
                 entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
                 entityBuilder.languageTargetingSet(languageTargetingSet);
                 entityBuilder.secondaryAdFormatConstraints(secondaryAdFormatConstraints);
+
+                if (null != geocookieId) {
+                    entityBuilder.geocookieId(geocookieId);
+                }
 
                 if (null != dealIds) {
                     entityBuilder.dealIds(Arrays.asList(dealIds));

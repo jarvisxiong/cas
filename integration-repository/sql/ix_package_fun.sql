@@ -1,9 +1,9 @@
-CREATE FUNCTION ix_package_fun_16032016()
+CREATE FUNCTION ix_package_fun_21042016()
 RETURNS
-    SETOF ix_package_type_16032016 AS
+    SETOF ix_package_type_21042016 AS
 $BODY$
 DECLARE
-    row1    ix_package_type_16032016%ROWTYPE;
+    row1    ix_package_type_21042016%ROWTYPE;
 BEGIN
     FOR row1 IN
 
@@ -46,6 +46,10 @@ SELECT
                 ix_packages.data_vendor_cost AS data_vendor_cost,
                 ix_packages.city_ids AS city_ids,
                 ix_packages.modified_by AS modified_by,
+                CASE
+	            When ix_packages.geocookie_status = true THEN ix_packages.geocookie_id
+	            ELSE null
+	        END AS geocookie_id,
                 deals.access_types as access_types,
                 deals.deal_ids AS deal_ids,
                 deals.deal_floors AS deal_floors,

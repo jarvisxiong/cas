@@ -243,6 +243,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Set<Integer> usedCsIds;
     @Getter
     private List<Integer> packageIds;
+    private  Map<Integer, Boolean> packageToGeocookieServed;
     private List<String> iabCategories;
     private final String sproutUniqueIdentifierRegex;
     @Getter
@@ -465,7 +466,11 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Find matching packages
         final long startTime = System.currentTimeMillis();
-        packageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity);
+        packageToGeocookieServed = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity);
+        if (packageToGeocookieServed != null && !packageToGeocookieServed.isEmpty()) {
+            packageIds = new ArrayList<Integer>();
+            packageIds.addAll(packageToGeocookieServed.keySet());
+        }
         final long endTime = System.currentTimeMillis();
         InspectorStats.updateYammerTimerStats(DemandSourceType.findByValue(sasParams.getDst()).name(),
                 InspectorStrings.IX_PACKAGE_MATCH_LATENCY, endTime - startTime);
@@ -1570,12 +1575,18 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         dealFloor = matchedPackage.getDealFloors().size() > indexOfDealId
                 ? matchedPackage.getDealFloors().get(indexOfDealId)
                 : 0.0;
-
+        if (packageToGeocookieServed != null &&
+                packageToGeocookieServed.get(winningPackageId) != null && packageToGeocookieServed.get(winningPackageId)) {
+            usedCsIds = new HashSet<>();
+            usedCsIds.add(matchedPackage.getGeocookieId());
+        }
         // Setting used csids and data vendor cost
         dataVendorCost = matchedPackage.getDataVendorCost();
         if (dataVendorCost > 0.0) {
             isExternalPersonaDeal = true;
-            usedCsIds = new HashSet<>();
+            if (usedCsIds == null) {
+                usedCsIds = new HashSet<>();
+            }
             final Set<Set<Integer>> csIdInPackages = matchedPackage.getDmpFilterSegmentExpression();
             for (final Set<Integer> smallSet : csIdInPackages) {
                 for (final Integer csIdInSet : smallSet) {
