@@ -2,6 +2,20 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapIntegrationDetailsToRequestSource;
 import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapRequestedAdTypeToAdFormat;
+import static com.inmobi.adserve.channels.util.InspectorStrings.LATENCY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NO_MATCH_SEGMENT_COUNT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NO_MATCH_SEGMENT_LATENCY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.SERVER_IMPRESSION;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TIMER_LATENCY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_FILLS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NATIVE_REQUESTS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NO_FILLS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUESTS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_TERMINATE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_TIMEOUT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.UH1_TO_RP_WEST_PREFIX;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +45,6 @@ import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.Ad;
@@ -67,7 +80,7 @@ public class Logging {
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static final String BANNER = "BANNER";
     private static final String NO = "NO";
-    private static final String UH1 = DataCenter.UH1.name().toLowerCase() ;
+    private static final String UH1 = DataCenter.UH1.name().toLowerCase();
     private static String containerName;
     private static AbstractMessagePublisher dataBusPublisher;
     private static String rrLogKey;
@@ -106,22 +119,21 @@ public class Logging {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Inside rrLogging");
         }
-        InspectorStats.incrementStatCount(InspectorStrings.LATENCY, totalTime);
+        InspectorStats.incrementStatCount(LATENCY, totalTime);
 
         if (null != sasParams) {
             final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.LATENCY, totalTime);
+            InspectorStats.incrementStatCount(dst + "-" + LATENCY, totalTime);
             if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
-                InspectorStats.incrementStatCount(InspectorStrings.NO_MATCH_SEGMENT_LATENCY, totalTime);
+                InspectorStats.incrementStatCount(NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(dst + "-" + NO_MATCH_SEGMENT_COUNT);
+                InspectorStats.incrementStatCount(dst + "-" + NO_MATCH_SEGMENT_LATENCY, totalTime);
+                InspectorStats.incrementStatCount(NO_MATCH_SEGMENT_LATENCY, totalTime);
             }
             if (SASParamsUtils.isNativeRequest(sasParams)) {
-                InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS);
+                InspectorStats.incrementStatCount(dst + "-" + TOTAL_NATIVE_REQUESTS);
                 if (rankList == null || rankList.isEmpty()) {
-                    InspectorStats.incrementStatCount(dst + "-" + InspectorStrings.TOTAL_NATIVE_REQUESTS + "-"
-                            + InspectorStrings.NO_MATCH_SEGMENT_COUNT);
+                    InspectorStats.incrementStatCount(dst + "-" + TOTAL_NATIVE_REQUESTS + "-" + NO_MATCH_SEGMENT_COUNT);
                 }
             }
         }
@@ -142,7 +154,7 @@ public class Logging {
         // Logging real time stats for graphite
         if (null != sasParams) {
             final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
-            InspectorStats.updateYammerTimerStats(dst.name(), InspectorStrings.TIMER_LATENCY, totalTime);
+            InspectorStats.updateYammerTimerStats(dst.name(), TIMER_LATENCY, totalTime);
         }
     }
 
@@ -206,9 +218,7 @@ public class Logging {
             return new ArrayList<>();
         }
         if (CollectionUtils.isNotEmpty(rankList) && rankList.get(0).getAdNetworkInterface() instanceof IXAdNetwork) {
-            final String statName = rankList.size() > 1
-                    ? InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS
-                    : InspectorStrings.TOTAL_SINGLE_FORMAT_REQUESTS;
+            final String statName = rankList.size() > 1 ? TOTAL_MULTI_FORMAT_REQUESTS : TOTAL_SINGLE_FORMAT_REQUESTS;
             InspectorStats.incrementStatCount(rankList.get(0).getAdNetworkInterface().getName(), statName);
         }
 
@@ -254,45 +264,42 @@ public class Logging {
                 }
             }
             channels.add(channel);
-            String prefixUh1ToRPWest = StringUtils.EMPTY;
+
             final String hostName = adNetwork.getHostName();
-            if (StringUtils.equals(dataCentreName, UH1) && hostName.contains(RP_USA_WEST_HOST_END_POINT)) {
-                prefixUh1ToRPWest = InspectorStrings.UH1_TO_RP_WEST_PREFIX;
-                InspectorStats.incrementStatCount(adNetwork.getName() , InspectorStrings.TOTAL_UH1_TO_RP_WEST);
-                InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.UH1_TO_RP_WEST_LATENCY, adResponse.getLatency());
-            }
+            final boolean isCrossColo =
+                    StringUtils.equals(dataCentreName, UH1) && hostName.contains(RP_USA_WEST_HOST_END_POINT);
             // Incrementing inspectors
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_REQUESTS);
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.LATENCY, adResponse.getLatency());
-            InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.CONNECTION_LATENCY,
-                    adNetwork.getConnectionLatency());
+            incrementStats(adNetwork.getName(), TOTAL_REQUESTS, isCrossColo, 1);
+            incrementStats(adNetwork.getName(), LATENCY, isCrossColo, adResponse.getLatency());
             switch (adResponse.getAdStatus()) {
                 case GlobalConstant.AD_STRING:
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_FILLS);
-                    if (StringUtils.isNotBlank(prefixUh1ToRPWest)) {
-                        InspectorStats.incrementStatCount(adNetwork.getName(), prefixUh1ToRPWest + InspectorStrings.TOTAL_FILLS);
-                    }
+                    incrementStats(adNetwork.getName(), TOTAL_FILLS, isCrossColo, 1);
                     break;
                 case GlobalConstant.NO_AD:
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_NO_FILLS);
-                    if (StringUtils.isNotBlank(prefixUh1ToRPWest)) {
-                        InspectorStats.incrementStatCount(adNetwork.getName(), prefixUh1ToRPWest + InspectorStrings.TOTAL_NO_FILLS);
-                    }
+                    incrementStats(adNetwork.getName(), TOTAL_NO_FILLS, isCrossColo, 1);
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 case GlobalConstant.TIME_OUT:
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TIMEOUT);
-                    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TIMEOUT);
+                    incrementStats(adNetwork.getName(), TOTAL_TIMEOUT, isCrossColo, 1);
+                    InspectorStats.incrementStatCount(TOTAL_TIMEOUT);
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 default:
-                    InspectorStats.incrementStatCount(adNetwork.getName(), InspectorStrings.TOTAL_TERMINATE);
-                    InspectorStats.incrementStatCount(InspectorStrings.TOTAL_TERMINATE);
+                    incrementStats(adNetwork.getName(), TOTAL_TERMINATE, isCrossColo, 1);
+                    InspectorStats.incrementStatCount(TOTAL_TERMINATE);
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
             }
         }
         return channels;
+    }
+
+    private static void incrementStats(final String adNetworkName, final String statName, final boolean isCrossColo,
+            final long count) {
+        InspectorStats.incrementStatCount(adNetworkName, statName, count);
+        if (isCrossColo) {
+            InspectorStats.incrementStatCount(adNetworkName, UH1_TO_RP_WEST_PREFIX + statName, count);
+        }
     }
 
     public static CasAdChain createCasAdChain(final ChannelSegment channelSegment) {
@@ -442,7 +449,7 @@ public class Logging {
                 return impression;
             }
 
-            InspectorStats.incrementStatCount(adNetworkInterface.getName(), InspectorStrings.SERVER_IMPRESSION);
+            InspectorStats.incrementStatCount(adNetworkInterface.getName(), SERVER_IMPRESSION);
             final AdIdChain adChain = new AdIdChain(channelSegmentEntity.getAdId(adNetworkInterface.getCreativeType()),
                     channelSegmentEntity.getAdgroupId(), channelSegmentEntity.getCampaignId(),
                     channelSegmentEntity.getAdvertiserId(), channelSegmentEntity.getExternalSiteKey());

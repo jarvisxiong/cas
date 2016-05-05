@@ -167,7 +167,6 @@ public class LoggingTest {
         double demandDensity = 15.0;
         double longTermRevenue = 30.0;
         int publisherYield = 13;
-        final boolean imeiPresent = false;
 
         Short age = 11;
         Short selectedSlot = 11;
@@ -467,7 +466,6 @@ public class LoggingTest {
         expect(mockChannelSegmentEntity.getDst()).andReturn(dst).anyTimes();
         expect(mockAdNetworkInterface.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
-        expect(mockAdNetworkInterface.getConnectionLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
         expect(mockAdNetworkInterface.getId()).andReturn("ID").anyTimes();
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();
@@ -557,7 +555,6 @@ public class LoggingTest {
         expect(mockChannelSegmentEntity.getDst()).andReturn(dst).anyTimes();
         expect(mockAdNetworkInterface.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
-        expect(mockAdNetworkInterface.getConnectionLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
         expect(mockIXAdNetwork.getOriginalBidPriceInUsd()).andReturn(bidPriceInUSD).times(2);
         expect(mockIXAdNetwork.getAgencyRebatePercentage()).andReturn(null).times(2);
@@ -656,7 +653,6 @@ public class LoggingTest {
         expect(mockChannelSegmentEntity.getDst()).andReturn(dst).anyTimes();
         expect(mockAdNetworkInterface.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
-        expect(mockAdNetworkInterface.getConnectionLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
         expect(mockIXAdNetwork.getDspId()).andReturn(dspId).times(2);
         expect(mockIXAdNetwork.getAdvId()).andReturn(advId).times(2);

@@ -148,7 +148,6 @@ public class AuctionEngineIXTest extends PowerMockTestCase {
         expect(mockAdnetworkInterface.getName()).andReturn(adNetworkName).anyTimes();
         expect(mockAdnetworkInterface.getRequestUrl()).andReturn("url").anyTimes();
         expect(mockAdnetworkInterface.getHttpResponseContent()).andReturn("DummyResponsecontent").anyTimes();
-        expect(mockAdnetworkInterface.getConnectionLatency()).andReturn(2l).anyTimes();
         expect(mockAdnetworkInterface.getId()).andReturn("2").anyTimes();
         expect(mockAdnetworkInterface.getLatency()).andReturn(latencyValue).anyTimes();
         expect(mockAdnetworkInterface.getBidPriceInUsd()).andReturn(bidValue).anyTimes();

@@ -83,8 +83,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses;
@@ -221,7 +221,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private String aqid;
     private String nurl;
     @Getter
-    private Map<String, String> thirdPartyTrackerMap = new HashMap<>();
+    private final Map<String, String> thirdPartyTrackerMap = new HashMap<>();
     protected boolean isCoppaSet = false;
     private List<String> advertiserDomains;
     private List<Integer> creativeAttributes;
@@ -243,7 +243,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Set<Integer> usedCsIds;
     @Getter
     private List<Integer> packageIds;
-    private  Map<Integer, Boolean> packageToGeocookieServed;
+    private Map<Integer, Boolean> packageToGeocookieServed;
     private List<String> iabCategories;
     private final String sproutUniqueIdentifierRegex;
     @Getter
@@ -466,7 +466,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         // Find matching packages
         final long startTime = System.currentTimeMillis();
-        packageToGeocookieServed = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity);
+        packageToGeocookieServed =
+                IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity);
         if (packageToGeocookieServed != null && !packageToGeocookieServed.isEmpty()) {
             packageIds = new ArrayList<Integer>();
             packageIds.addAll(packageToGeocookieServed.keySet());
@@ -1571,8 +1572,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         dealFloor = matchedPackage.getDealFloors().size() > indexOfDealId
                 ? matchedPackage.getDealFloors().get(indexOfDealId)
                 : 0.0;
-        if (packageToGeocookieServed != null &&
-                packageToGeocookieServed.get(winningPackageId) != null && packageToGeocookieServed.get(winningPackageId)) {
+        if (packageToGeocookieServed != null && packageToGeocookieServed.get(winningPackageId) != null
+                && packageToGeocookieServed.get(winningPackageId)) {
             usedCsIds = new HashSet<>();
             usedCsIds.add(matchedPackage.getGeocookieId());
         }
@@ -1586,7 +1587,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             final Set<Set<Integer>> csIdInPackages = matchedPackage.getDmpFilterSegmentExpression();
             for (final Set<Integer> smallSet : csIdInPackages) {
                 for (final Integer csIdInSet : smallSet) {
-                    if (sasParams.getCsiTags().contains(csIdInSet)) {
+                    if (sasParams.getCsiTags() != null && sasParams.getCsiTags().contains(csIdInSet)) {
                         usedCsIds.add(csIdInSet);
                     }
                 }
@@ -1674,7 +1675,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     public void setAudienceVerificationTrackers(final Map<String, String> trackerMap, final MacroData macroData) {
-        String audienceVerificationTracker = trackerMap.get(AUDIENCE_VERIFICATION_TRACKER);
+        final String audienceVerificationTracker = trackerMap.get(AUDIENCE_VERIFICATION_TRACKER);
         if (StringUtils.isNotBlank(audienceVerificationTracker)) {
             LOG.debug("Audience Verification Trackers detected.");
 

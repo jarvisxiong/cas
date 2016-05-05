@@ -289,13 +289,6 @@ public interface AdNetworkInterface {
     ThirdPartyAdResponse getResponseStruct();
 
     /**
-     * return connection latency
-     *
-     * @return
-     */
-    long getConnectionLatency();
-
-    /**
      * @return
      */
     boolean useJsAdTag();

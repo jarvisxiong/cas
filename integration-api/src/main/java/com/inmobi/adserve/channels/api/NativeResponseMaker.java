@@ -50,26 +50,29 @@ public class NativeResponseMaker {
         this.templateDecorator = templateDecorator;
     }
 
-    public String makeDCPNativeResponse(final App app, final Map<String, String> params, final boolean noJsTracking) throws Exception {
+    public String makeDCPNativeResponse(final App app, final Map<String, String> params, final boolean noJsTracking)
+            throws Exception {
         final VelocityContext vcContextCode = getVCForContextCode(app, params);
         vcContextCode.put(NAMESPACE_PARAM, Formatter.getDCPNamespace());
         return createNativeAd(vcContextCode, app, params, noJsTracking);
     }
 
-    public String makeRTBDResponse(final App app, final Map<String, String> params, final boolean noJsTracking) throws Exception {
+    public String makeRTBDResponse(final App app, final Map<String, String> params, final boolean noJsTracking)
+            throws Exception {
         final VelocityContext vcContextCode = getVCForContextCode(app, params);
         vcContextCode.put(NAMESPACE_PARAM, Formatter.getRTBDNamespace());
         return createNativeAd(vcContextCode, app, params, noJsTracking);
     }
 
-    public String makeIXResponse(final App app, final Map<String, String> params, final boolean noJsTracking) throws Exception {
+    public String makeIXResponse(final App app, final Map<String, String> params, final boolean noJsTracking)
+            throws Exception {
         final VelocityContext vcContextCode = getVCForContextCode(app, params);
         vcContextCode.put(NAMESPACE_PARAM, Formatter.getIXNamespace());
         return createNativeAd(vcContextCode, app, params, noJsTracking);
     }
 
     private String createNativeAd(final VelocityContext vc, final App app, final Map<String, String> params,
-        final boolean noJsTracking) throws Exception {
+            final boolean noJsTracking) throws Exception {
         final String templateId = params.get(TEMPLATE_ID_PARAM);
         final String pubContent = templateParser.format(app, templateId);
         LOG.debug("Making response for placementId : {} ", templateId);
@@ -91,18 +94,17 @@ public class NativeResponseMaker {
 
     /**
      * Render and ClientFill are empty in case of IX
-    */
-    protected Map<Integer, Map<String, List<String>>> getEventTracking( App app, Map<String, String> params) {
-        final Map<Integer, Map<String, List<String>>> eventTracking = new HashMap<>();
-        //click Tracker
+     */
+    protected Map<Integer, Map<String, List<String>>> getEventTracking(final App app,
+            final Map<String, String> params) {
+        // click Tracker
         final Map<String, List<String>> clickMap = new HashMap<>();
-
         final List<String> clickUrls = app.getClickUrls();
-        clickMap.put(URLS, CollectionUtils.isNotEmpty(clickUrls) ? clickUrls :  Collections.EMPTY_LIST);
+        clickMap.put(URLS, CollectionUtils.isNotEmpty(clickUrls) ? clickUrls : Collections.emptyList());
 
-        //View or Impression Tracker
+        // View or Impression Tracker
         final Map<String, List<String>> impressionMap = new HashMap<>();
-        List<String> impressionTrackers = new ArrayList<>();
+        final List<String> impressionTrackers = new ArrayList<>();
         final List<String> pixelUrls = app.getPixelUrls();
         if (CollectionUtils.isNotEmpty(pixelUrls)) {
             impressionTrackers.addAll(pixelUrls);
@@ -117,6 +119,7 @@ public class NativeResponseMaker {
         }
         impressionMap.put(URLS, impressionTrackers);
 
+        final Map<Integer, Map<String, List<String>>> eventTracking = new HashMap<>();
         eventTracking.put(TrackerUIInteraction.CLICK.getValue(), clickMap);
         eventTracking.put(TrackerUIInteraction.VIEW.getValue(), impressionMap);
         return eventTracking;
@@ -189,7 +192,7 @@ public class NativeResponseMaker {
     }
 
     public String makeNativeAd(String pubContent, final String contextCode, final String namespace,
-        final String landingPage, final Map<Integer, Map<String, List<String>>> eventTracking)
+            final String landingPage, final Map<Integer, Map<String, List<String>>> eventTracking)
             throws JSONException {
         pubContent = base64(pubContent);
         final NativeAd nativeAd = new NativeAd(pubContent, contextCode, namespace, landingPage, eventTracking);

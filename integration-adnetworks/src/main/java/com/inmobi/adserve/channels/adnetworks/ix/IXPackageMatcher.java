@@ -18,10 +18,8 @@ import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatCon
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.STATIC;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,25 +63,23 @@ public class IXPackageMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(IXPackageMatcher.class);
     public static final int PACKAGE_MAX_LIMIT = 35;
 
-    private static final Set<Integer> bannerAllowedSdksForViewability = ImmutableSortedSet.of(
-            300,364,365,370,371,381,400,402,403,404,410,411,430,440,441,442,443,451,452,453,454,455);
-    private static final Set<Integer> interstitialAllowedSdksForViewability = ImmutableSortedSet.of(
-            442,443,452,454,456);
-    private static final Set<Integer> vastAllowedSdksForViewability = ImmutableSortedSet.of(
-            402,403,404,410,411,430,440,441,442,443,450,451,453,456);
+    private static final Set<Integer> bannerAllowedSdksForViewability = ImmutableSortedSet.of(300, 364, 365, 370, 371,
+            381, 400, 402, 403, 404, 410, 411, 430, 440, 441, 442, 443, 451, 452, 453, 454, 455);
+    private static final Set<Integer> interstitialAllowedSdksForViewability =
+            ImmutableSortedSet.of(442, 443, 452, 454, 456);
+    private static final Set<Integer> vastAllowedSdksForViewability =
+            ImmutableSortedSet.of(402, 403, 404, 410, 411, 430, 440, 441, 442, 443, 450, 451, 453, 456);
 
     public static Map<Integer, Boolean> findMatchingPackageIds(final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short selectedSlotId,
             final ChannelSegmentEntity adGroupEntity) {
         LOG.debug("Inside IX Package Matcher");
-        Set<Integer> csiTags = sasParams.getCsiTags();
-        final HashMap<Integer, Boolean> matchedPackageToGeocookieServedMap = new HashMap();
+        final HashMap<Integer, Boolean> matchedPackageToGeocookieServedMap = new HashMap<>();
 
         // TODO: Do package matching on the intersection of ump selected slots and those present in the adgroup
         final Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
-        final ResultSet<IXPackageEntity> resultSet =
-                repositoryHelper.queryIXPackageRepository(sasParams.getOsId(), sasParams.getSiteId(), sasParams
-                        .getCountryId().intValue(), selectedSlotId);
+        final ResultSet<IXPackageEntity> resultSet = repositoryHelper.queryIXPackageRepository(sasParams.getOsId(),
+                sasParams.getSiteId(), sasParams.getCountryId().intValue(), selectedSlotId);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Number of packages selected after OS({}), Site({}), Country({}) and Slot({}) filtration: {}",
@@ -116,7 +112,7 @@ public class IXPackageMatcher {
                 }
 
                 final boolean failedInLanguageTargetingFilter =
-                    !checkForLanguageTargeting(sasParams.getLanguage(), packageEntity);
+                        !checkForLanguageTargeting(sasParams.getLanguage(), packageEntity);
                 if (failedInLanguageTargetingFilter) {
                     LOG.debug("Package {} dropped in Language Targeting Filter", packageEntity.getId());
                     droppedInPackageLanguageTargetingFilter += 1;
@@ -148,7 +144,8 @@ public class IXPackageMatcher {
                 }
 
                 Set<Integer> viewabilityInclusionList = null;
-                final SecondaryAdFormatConstraints adgroupSecondaryAdFormat = adGroupEntity.getSecondaryAdFormatConstraints();
+                final SecondaryAdFormatConstraints adgroupSecondaryAdFormat =
+                        adGroupEntity.getSecondaryAdFormatConstraints();
                 if (STATIC == adgroupSecondaryAdFormat) {
                     if (BANNER == sasParams.getRequestedAdType()) {
                         viewabilityInclusionList = bannerAllowedSdksForViewability;
@@ -159,9 +156,8 @@ public class IXPackageMatcher {
                     viewabilityInclusionList = vastAllowedSdksForViewability;
                 }
 
-                if (!checkForSDKVersionTargeting(sasParams.getSdkVersion(),
-                        packageEntity.getSdkVersionTargeting(), packageEntity.isViewable(),
-                        new ImmutablePair<>(false, viewabilityInclusionList))) {
+                if (!checkForSDKVersionTargeting(sasParams.getSdkVersion(), packageEntity.getSdkVersionTargeting(),
+                        packageEntity.isViewable(), new ImmutablePair<>(false, viewabilityInclusionList))) {
                     LOG.debug("Package {} dropped in SDK Version Filter", packageEntity.getId());
                     droppedInSdkVersionFilter += 1;
                     continue;
@@ -172,19 +168,19 @@ public class IXPackageMatcher {
                 if (StringUtils.isNotEmpty(packageEntity.getGeoFenceRegion())) {
                     final String geoRegionNameCountryCombo =
                             packageEntity.getGeoFenceRegion() + "_" + sasParams.getCountryId();
-                    final GeoRegionFenceMapEntity geoRegionFenceMapEntity =
-                            repositoryHelper
-                                    .queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(geoRegionNameCountryCombo);
+                    final GeoRegionFenceMapEntity geoRegionFenceMapEntity = repositoryHelper
+                            .queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(geoRegionNameCountryCombo);
 
                     if (null == geoRegionFenceMapEntity
-                            || null != geoRegionFenceMapEntity.getFenceIdsList()
-                            && (null == sasParams.getGeoFenceIds() || !CollectionUtils.containsAny(
-                            sasParams.getGeoFenceIds(), geoRegionFenceMapEntity.getFenceIdsList()))) {
-                        LOG.debug("Package {} does not match geo Fences, check if it geocookieTargeted", packageEntity.getId());
-                        if (packageEntity.getGeocookieId() != null && csiTags.contains(packageEntity.getGeocookieId())) {
+                            || null != geoRegionFenceMapEntity.getFenceIdsList() && (null == sasParams.getGeoFenceIds()
+                                    || !CollectionUtils.containsAny(sasParams.getGeoFenceIds(),
+                                            geoRegionFenceMapEntity.getFenceIdsList()))) {
+                        LOG.debug("Package {} does not match geo Fences, check if it geocookieTargeted",
+                                packageEntity.getId());
+                        if (packageEntity.getGeocookieId() != null && sasParams.getCsiTags() != null
+                                && sasParams.getCsiTags().contains(packageEntity.getGeocookieId())) {
                             servedByGeocookie = true;
-                        }
-                        else {
+                        } else {
                             LOG.debug("Package {} with geocookie {} dropped in Geo Fence Filter", packageEntity.getId(),
                                     packageEntity.getGeocookieId());
                             droppedInPackageGeoRegionFilter += 1;
@@ -217,7 +213,7 @@ public class IXPackageMatcher {
         incrementPackageFilterStat(DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
 
         String matchedPackageIdStr = "";
-        for (Integer i : matchedPackageToGeocookieServedMap.keySet()){
+        for (final Integer i : matchedPackageToGeocookieServedMap.keySet()) {
             matchedPackageIdStr += " " + i;
         }
         LOG.debug("Packages selected: {}", matchedPackageIdStr);
@@ -228,13 +224,15 @@ public class IXPackageMatcher {
         InspectorStats.incrementStatCount(PACKAGE_FILTER_STATS, dropInFilterStat, increment);
     }
 
-    private static boolean checkForLanguageTargeting(final String reqLanguage , final IXPackageEntity packageEntity) {
+    private static boolean checkForLanguageTargeting(final String reqLanguage, final IXPackageEntity packageEntity) {
         final Set<String> languageTargetingSet = packageEntity.getLanguageTargetingSet();
-        return ((null == languageTargetingSet) ? true : (languageTargetingSet.isEmpty() ? true : languageTargetingSet
-            .contains(reqLanguage)));
+        return null == languageTargetingSet
+                ? true
+                : languageTargetingSet.isEmpty() ? true : languageTargetingSet.contains(reqLanguage);
     }
 
-    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
+    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags,
+            final Set<Set<Integer>> dmpFilterExpression) {
         if (CollectionUtils.isEmpty(csiReqTags)) {
             return false;
         } else {
@@ -417,10 +415,9 @@ public class IXPackageMatcher {
         reqCarrierId.init(Collections.singleton((long) sasParams.getCarrierId())); // TODO: fix long->int cast in
         // ThriftRequestParser
 
-        final InventoryTypeEnum reqInventoryEnum =
-                GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource())
-                        ? InventoryTypeEnum.APP
-                        : InventoryTypeEnum.BROWSER;
+        final InventoryTypeEnum reqInventoryEnum = GlobalConstant.APP.equalsIgnoreCase(sasParams.getSource())
+                ? InventoryTypeEnum.APP
+                : InventoryTypeEnum.BROWSER;
         reqInventoryType.init(Collections.singleton(reqInventoryEnum));
 
         if (null != sasParams.getConnectionType()) {

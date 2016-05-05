@@ -4,13 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -95,28 +98,32 @@ public class ChangeServletUtil {
         final boolean isPilot = "PILOT".equalsIgnoreCase(colo);
         // perform operation
         for (final String curColo : COLO) {
+            final List<String> baseUrlList = new ArrayList<>();
             for (int i = 1000; i <= BOX_LIMIT; i++) {
                 if (isPilot && i != 1001) {
                     continue;
                 }
-                try {
-                    final String baseUrl = String.format(URL_BASE_PATTERN, i, curColo);
-                    final String lbstatusUrl = baseUrl + URL_STATUS_PATTERN;
-                    final boolean isUp = isHostUp(lbstatusUrl);
-                    if (!isUp) {
-                        System.out.println(String.format("%s -> is UP->%s", lbstatusUrl, isUp));
-                    }
-                    if (isUp) {
-                        final String url = baseUrl + getActionUrl();
-                        final String output = IOUtils.toString(new URL(url));
-                        printResult(url, output);
-                    }
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+                final String baseUrl = String.format(URL_BASE_PATTERN, i, curColo);
+                baseUrlList.add(baseUrl);
             }
+            baseUrlList.parallelStream().forEach(baseUrl -> execute(baseUrl));
         }
 
+    }
+
+    private void execute(final String baseUrl) {
+        try {
+            final String lbstatusUrl = baseUrl + URL_STATUS_PATTERN;
+            final boolean isUp = isHostUp(lbstatusUrl);
+            System.out.println(String.format("%s -> is UP->%s", lbstatusUrl, isUp));
+            if (isUp) {
+                final String url = baseUrl + getActionUrl();
+                final String output = IOUtils.toString(new URL(url));
+                printResult(url, output);
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -166,7 +173,8 @@ public class ChangeServletUtil {
     private boolean isHostUp(final String url) {
         try {
             final String ok = IOUtils.toString(new URL(url));
-            return "OK".equalsIgnoreCase(ok);
+            return StringUtils.isNotEmpty(ok);
+            // return "OK".equalsIgnoreCase(ok);
         } catch (final Exception e) {
             // System.err.println(e.getMessage());
         }

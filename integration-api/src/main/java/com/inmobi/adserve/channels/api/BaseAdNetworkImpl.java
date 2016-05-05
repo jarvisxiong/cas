@@ -167,7 +167,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     private Map<?, ?> responseHeaders;
     private long latency;
-    private long connectionLatency;
     private ThirdPartyAdResponse responseStruct;
     private String adapterName;
 
@@ -740,12 +739,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Override
     public double getSecondBidPriceInUsd() {
         return -1;
-    }
-
-
-    @Override
-    public long getConnectionLatency() {
-        return connectionLatency;
     }
 
     @Override

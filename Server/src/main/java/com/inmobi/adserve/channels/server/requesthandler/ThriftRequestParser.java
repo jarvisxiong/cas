@@ -136,15 +136,18 @@ public class ThriftRequestParser {
         }
 
         // Set imei related fields
-        if (Android.getValue() == params.getOsId() && GlobalConstant.CHINA_COUNTRY_CODE.equals(params.getCountryCode())) {
+        if (Android.getValue() == params.getOsId()
+                && GlobalConstant.CHINA_COUNTRY_CODE.equals(params.getCountryCode())) {
             if (tObject.isSetIem()) {
                 final String imei = StringUtils.lowerCase(tObject.getIem());
-                InspectorStats.incrementStatCount(IMEI, IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
+                InspectorStats.incrementStatCount(IMEI,
+                        IMEI_BEING_SENT_FOR + DemandSourceType.findByValue(dst).toString());
                 casInternal.setImeiMD5(DigestUtils.md5Hex(imei));
                 casInternal.setImeiSHA1(DigestUtils.sha1Hex(imei));
             } else {
                 if (StringUtils.isNotBlank(casInternal.getUidO1())) {
-                    final IMEIEntity entity = CasConfigUtil.repositoryHelper.queryIMEIRepository(casInternal.getUidO1());
+                    final IMEIEntity entity =
+                            CasConfigUtil.repositoryHelper.queryIMEIRepository(casInternal.getUidO1());
                     if (entity != null) {
                         InspectorStats.incrementStatCount(InspectorStrings.IMEI_MATCH);
                         casInternal.setImeiMD5(entity.getImei());
@@ -356,9 +359,9 @@ public class ThriftRequestParser {
             }
 
             // Fill params for pub control - Media preferences json.
-            final String mediaPreferencesJson =
-                    tSite.isSetMediaPreferences() ? tSite.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
-            params.setPubControlPreferencesJson(mediaPreferencesJson);
+
+            params.setPubControlPreferencesJson(
+                    tSite.isSetMediaPreferences() ? tSite.mediaPreferences : DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES);
         }
     }
 

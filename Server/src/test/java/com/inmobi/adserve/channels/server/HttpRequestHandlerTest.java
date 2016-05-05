@@ -642,7 +642,6 @@ public class HttpRequestHandlerTest extends TestCase {
         expect(adNetworkInterface1.getId()).andReturn("SampleRTBId").anyTimes();
         expect(adNetworkInterface1.getHttpResponseContent()).andReturn("SampleRTBResponseContent").anyTimes();
         expect(adNetworkInterface1.getRequestUrl()).andReturn("SampleRTBURL").anyTimes();
-        expect(adNetworkInterface1.getConnectionLatency()).andReturn(23l).anyTimes();
         expect(adNetworkInterface1.getAuctionId()).andReturn("auctionId").anyTimes();
         expect(adNetworkInterface1.getRtbImpressionId()).andReturn("impressionId").anyTimes();
         expect(adNetworkInterface1.getImpressionId()).andReturn("impressionId").anyTimes();
