@@ -21,6 +21,7 @@ import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.DeviceType;
 import com.inmobi.adserve.adpool.Education;
+import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.Ethnicity;
 import com.inmobi.adserve.adpool.Geo;
 import com.inmobi.adserve.adpool.IntegrationDetails;

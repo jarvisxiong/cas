@@ -38,6 +38,7 @@ import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
+import com.inmobi.adserve.channels.server.requesthandler.ResponseFormat;
 import com.inmobi.adserve.channels.server.requesthandler.ResponseSender;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
@@ -136,7 +137,7 @@ public class ServletIXFillTest {
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
-        expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
+        expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters))
             .andReturn(new ArrayList<AdvertiserMatchedSegmentDetail>());
@@ -205,7 +206,7 @@ public class ServletIXFillTest {
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
-        expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
+        expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).anyTimes();
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
@@ -285,7 +286,7 @@ public class ServletIXFillTest {
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
-        expect(mockResponseSender.getResponseFormat()).andReturn(ResponseSender.ResponseFormat.XHTML).anyTimes();
+        expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(mockList).anyTimes();
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();

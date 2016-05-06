@@ -71,17 +71,17 @@ public class ResponseSenderTest {
         ResponseSender responseSender = new ResponseSender();
 
         responseSender.setSasParams(null);
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.HTML)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.HTML)));
 
         responseSender.setSasParams(mockSASRequestParameters);
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.JS_AD_CODE)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.HTML)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.XHTML)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.XHTML)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.HTML)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.IMAI)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.NATIVE)));
-        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseSender.ResponseFormat.JS_AD_CODE)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.JS_AD_CODE)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.HTML)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.XHTML)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.XHTML)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.HTML)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.IMAI)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.NATIVE)));
+        assertThat(responseSender.getResponseFormat(), is(equalTo(ResponseFormat.JS_AD_CODE)));
     }
 
     @Test

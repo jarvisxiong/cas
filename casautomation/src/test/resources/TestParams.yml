@@ -749,7 +749,7 @@ TEST1_SDK500_NATIVE_AD:
    site_siteid : '9eb350a1706643c6a44bc18fca31ae0f'
    adpool_placementId : '1431975542156823'
    integration_type: ANDROID_SDK
-   integration_version: '500'
+   integration_version: '530'
    requestguid: 'test'
 
 TEST1_SDK450_NATIVE_AD:
@@ -1870,3 +1870,8 @@ TEST_SECURE_SEGMENT_FLAG_NEGATIVE:
    segment_flags : '{5}'
    adpool_rqSslEnabled : 'true'
 
+TEST1_SDK530_NON_NATIVE_DCP_WITHOUT_ENCRYPTION:
+ - adpool_responseformat: 'HTML'
+   integration_type: ANDROID_SDK
+   integration_version: '530'
+   requestguid: 'test'

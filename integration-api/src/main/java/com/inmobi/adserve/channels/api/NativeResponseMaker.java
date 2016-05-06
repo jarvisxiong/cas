@@ -20,13 +20,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.inmobi.adserve.contracts.ump.NativeAd;
 import com.inmobi.template.context.App;
 import com.inmobi.template.exception.TemplateException;
 import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
 import com.inmobi.template.interfaces.TemplateConfiguration;
-
-import lombok.Data;
 
 public class NativeResponseMaker {
     private static final Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
@@ -205,13 +204,6 @@ public class NativeResponseMaker {
         return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
     }
 
-    @Data
-    private static class NativeAd {
-        private final String pubContent;
-        private final String contextCode;
-        private final String namespace;
-        private final String landingPage;
-        private final Map<Integer, Map<String, List<String>>> eventTracking;
-    }
+
 
 }

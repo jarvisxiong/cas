@@ -1,25 +1,39 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.AD_IMAI_START_TAG;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.DCP_NATIVE_WRAPPING_AD_JSON;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.END_TAG;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.NO_AD_HTML;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.NO_AD_IMAI;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.NO_AD_JS_ADCODE;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.NO_AD_VAST;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.NO_AD_XHTML;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.SDK_500_DCP_WRAPPING_AD_JSON;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.START_TAG;
+import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.SUPPORTED_RESPONSE_FORMATS;
 import static com.inmobi.adserve.channels.util.Utils.ExceptionBlock.getStackTrace;
 import static com.inmobi.casthrift.DemandSourceType.DCP;
 import static com.inmobi.casthrift.DemandSourceType.IX;
 import static com.inmobi.casthrift.DemandSourceType.RTBD;
 
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 
 import javax.inject.Inject;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.thirdparty.guava.common.collect.Sets;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -29,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.inject.Provider;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
@@ -57,6 +71,7 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.contracts.ump.NativeAd;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.commons.security.api.InmobiSession;
@@ -84,32 +99,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final int ENCRYPTED_SDK_BASE_VERSION = 430;
 
     private final static Logger LOG = LoggerFactory.getLogger(ResponseSender.class);
+    private static final int STORYBOARD_SDK_BASE_VERSION = 530;
+    private static final Gson gson = new Gson();
 
-    private static final String START_TAG =
-            "<AdResponse><Ads number=\"1\"><Ad type=\"rm\" width=\"%s\" height=\"%s\"><![CDATA[";
-    private static final String END_TAG = " ]]></Ad></Ads></AdResponse>";
-    private static final String AD_IMAI_START_TAG = "<!DOCTYPE html>";
-    private static final String NO_AD_IMAI = StringUtils.EMPTY;
-    private static final String NO_AD_XHTML = "<AdResponse><Ads></Ads></AdResponse>";
-    private static final String NO_AD_VAST = "<AdResponse><Ads></Ads></AdResponse>";
-    private static final String NO_AD_HTML = "<!-- mKhoj: No advt for this position -->";
-    private static final String NO_AD_JS_ADCODE = "<html><head><title></title><style type=\"text/css\">"
-            + " body {margin: 0; overflow: hidden; background-color: transparent}"
-            + " </style></head><body class=\"nofill\"><!-- NO FILL -->"
-            + "<script type=\"text/javascript\" charset=\"utf-8\">"
-            + "parent.postMessage('{\"topic\":\"nfr\",\"container\" : \"%s\"}', '*');</script></body></html>";
-    private static final String SDK_500_DCP_WRAPPING_NO_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[]}";
-    private static final String SDK_500_DCP_WRAPPING_AD_JSON =
-            "{\"requestId\":\"%s\",\"ads\":[{\"pubContent\":\"%s\"}]}";
-    private static final String DCP_NATIVE_WRAPPING_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[%s]}";
-    private static Set<String> SUPPORTED_RESPONSE_FORMATS =
-            Sets.newHashSet("html", "xhtml", "axml", "imai", "native", "json", "vast");
 
-    /**
-     * At IX-Rubicon, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then the return
-     * ad from IX will alse be absent.
-     */
-    protected static final String PRIVATE_AUCTION_DEAL = "PRIVATE_AUCTION_DEAL";
 
     /**
      * At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then
@@ -117,11 +110,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
      */
     protected static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
 
-    /**
-     * At IX-Rubicon, bid will be taken by open auction from all DSP's, but the with DSP who have this deal, they will
-     * get additional info like geo, bidLandScaping etc
-     */
-    protected static final String PREFERRED_DEAL = "PREFERRED_DEAL";
 
     @Setter
     @Getter
@@ -215,40 +203,30 @@ public class ResponseSender extends HttpRequestHandlerBase {
         selectedAdIndex = getRankIndex(selectedAdNetwork);
 
         sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(),
-                selectedAdNetwork.getRepositoryHelper());
+            selectedAdNetwork.getRepositoryHelper());
     }
 
     // send Ad Response
     private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel,
-            final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
+        final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
         }
 
+
         LOG.debug("ad received so trying to send ad response");
         String finalResponse = adResponse.getResponse();
         final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
-        if (slotSizeMapEntity != null) {
-            LOG.debug("slot served is {}", selectedSlotId);
-
-            final ResponseFormat rFormat = getResponseFormat();
-            if (rFormat == ResponseFormat.XHTML) {
-                final Dimension dim = slotSizeMapEntity.getDimension();
-                final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
-                finalResponse = startElement + finalResponse + END_TAG;
-            } else if ((rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON)
-                    && RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
-                finalResponse = AD_IMAI_START_TAG + finalResponse;
-            }
-        } else {
-            LOG.info("invalid slot, so not returning response, even though we got an ad");
-            InspectorStats.incrementStatCount(InspectorStrings.TOTAL_NO_FILLS);
-            if (getResponseFormat() == ResponseFormat.XHTML) {
-                finalResponse = NO_AD_XHTML;
-            }
-            sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
-            return;
+        LOG.debug("slot served is {}", selectedSlotId);
+        final ResponseFormat rFormat = getResponseFormat();
+        if (rFormat == ResponseFormat.XHTML) {
+            final Dimension dim = slotSizeMapEntity.getDimension();
+            final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
+            finalResponse = startElement + finalResponse + END_TAG;
+        } else if ((rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON)
+            && RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
+            finalResponse = AD_IMAI_START_TAG + finalResponse;
         }
 
         if (sasParams.getDst() == DCP.getValue()) {
@@ -265,7 +243,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
                     final byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
                     sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(),
-                            serverChannel);
+                        serverChannel);
                     incrementStatsForFills(sasParams.getDst());
                 } catch (final TException e) {
                     LOG.error("Error in serializing the adPool response ", e);
@@ -341,13 +319,14 @@ public class ResponseSender extends HttpRequestHandlerBase {
                         }
                     }
                     if (null != pckgEntity) {
-                        if (ixAdNetwork.isExternalPersonaDeal() && CollectionUtils.isNotEmpty(ixAdNetwork.getUsedCsIds())) {
+                        if (ixAdNetwork.isExternalPersonaDeal() && CollectionUtils
+                            .isNotEmpty(ixAdNetwork.getUsedCsIds())) {
                             rtbdAd.setMatched_csids(new ArrayList<>(ixAdNetwork.getUsedCsIds()));
                         }
                         final int indexOfDealId = pckgEntity.getDealIds().indexOf(dealId);
-                        final String dealType = pckgEntity.getAccessTypes().size() > indexOfDealId
-                                ? pckgEntity.getAccessTypes().get(indexOfDealId)
-                                : RIGHT_TO_FIRST_REFUSAL_DEAL;
+                        final String dealType = pckgEntity.getAccessTypes().size() > indexOfDealId ?
+                            pckgEntity.getAccessTypes().get(indexOfDealId) :
+                            RIGHT_TO_FIRST_REFUSAL_DEAL;
                         rtbdAd.setDealId(dealId);
                         rtbdAd.setHighestBid(highestBid);
                         rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
@@ -388,19 +367,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
         final String renderUnitId = ImpressionIdGenerator.getInstance().resetWilburyIntKey(impressionId, 0L);
         final UUID renderUnitUUID = UUID.fromString(renderUnitId);
         rtbdAd.setRenderUnitId(
-                new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID.getLeastSignificantBits()));
+            new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID.getLeastSignificantBits()));
 
         rtbdAd.setSlotServed(getRtbResponse().getAdNetworkInterface().getSelectedSlotId());
         final Creative rtbdCreative = new Creative();
         rtbdCreative.setValue(finalResponse);
         rtbdAd.setCreative(rtbdCreative);
-        adPoolResponse.setAds(Arrays.asList(rtbdAd));
+        adPoolResponse.setAds(Collections.singletonList(rtbdAd));
         adPoolResponse.setMinChargedValue(
-                (long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
+            (long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
         if (!GlobalConstant.USD.equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
             rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
             rtbdAd.setBidInOriginalCurrency(
-                    (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
+                (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
         }
         return adPoolResponse;
     }
@@ -408,32 +387,103 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // send response to the caller
     @SuppressWarnings("rawtypes")
     private void sendResponse(final HttpResponseStatus status, String responseString, final Map responseHeaders,
-            final Channel serverChannel) {
-        if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
-            if (RequestedAdType.NATIVE == sasParams.getRequestedAdType()) {
-                responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), responseString);
-                LOG.debug("Rewrapping native JSON for DCP traffic. Wrapped Response is: {}", responseString);
-            } else if (Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
-                responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                        new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
-                LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
+        final Channel serverChannel) {
+        final byte[] bytes = DCP.getValue() == sasParams.getDst() ?
+            processDCPResponse(responseString) :
+            responseString.getBytes(Charsets.UTF_8);
+
+        if (bytes == null) {
+            sendNoAdResponse(serverChannel);
+        }
+        sendResponse(status, bytes, responseHeaders, serverChannel);
+    }
+
+    private byte[] processDCPResponse(String responseString) {
+        final boolean storyBoardSdkSupport =
+            Formatter.isRequestFromSdkVersionOnwards(sasParams, STORYBOARD_SDK_BASE_VERSION);
+        final boolean encryptedSdkBaseSupport =
+            Formatter.isRequestFromSdkVersionOnwards(sasParams, ENCRYPTED_SDK_BASE_VERSION);
+
+        // for native we have already base64encoded response string so we are reverting in case of sdk greater than 530
+        if (RequestedAdType.NATIVE == sasParams.getRequestedAdType()) {
+            responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                storyBoardSdkSupport ? getJSEscapeWithoutBase64(responseString) : responseString);
+            LOG.debug("Rewrapping native JSON for DCP traffic. Wrapped Response is: {}", responseString);
+        } else if (Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
+            responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                storyBoardSdkSupport ?
+                    StringEscapeUtils.escapeJavaScript(responseString) :
+                    new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
+            LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
+        }
+        try {
+            return encryptResponseIfRequired(responseString.getBytes(Charsets.UTF_8), encryptedSdkBaseSupport,
+                storyBoardSdkSupport);
+        } catch (RuntimeException  e) {
+            return null;
+        }
+    }
+
+    private byte[] encryptResponseIfRequired(byte[] responseBytes, final boolean encryptedSdkBaseSupport,
+        final boolean storyBoardSdkSupport) {
+        if (sasParams.getEncryptionKey() != null && responseBytes.length > 0 && encryptedSdkBaseSupport) {
+            LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
+            final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
+            final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
+            responseBytes = storyBoardSdkSupport ? compressResponseBytes(responseBytes) : responseBytes;
+            try {
+                responseBytes = inmobiSession
+                    .write(responseBytes, encryptionKey.getAesKey(), encryptionKey.getInitializationVector());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}",
+                        new String(encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                        new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8),
+                        new String(responseBytes, CharsetUtil.UTF_8));
+                }
+            } catch (InmobiSecureException | InvalidMessageException e) {
+                LOG.info("Exception while encrypting response from {}", e);
+                throw new RuntimeException(e);
             }
         }
+        return responseBytes;
+    }
 
-        final byte[] bytes = responseString.getBytes(Charsets.UTF_8);
-        sendResponse(status, bytes, responseHeaders, serverChannel);
+    /**
+     * @param responseBytes bytes to compress
+     * @return compressed Bytes
+     */
+    public byte[] compressResponseBytes(final byte[] responseBytes) {
+        byte[] compressedBytes;
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
+            gzipOutputStream.write(responseBytes);
+            gzipOutputStream.close();
+            compressedBytes = outputStream.toByteArray();
+            outputStream.close();
+        } catch (final IOException ie) {
+            LOG.error("Exception thrown while compressing response.", ie);
+            throw new RuntimeException(ie);
+        }
+        return compressedBytes;
+    }
+
+    private String getJSEscapeWithoutBase64(final String nativeResponse) {
+        final NativeAd nativeAd = gson.fromJson(nativeResponse, NativeAd.class);
+        final String jsEscapePubContentWithoutBase64 =
+            StringEscapeUtils.escapeJavaScript(new String(Base64.decodeBase64(nativeAd.getPubContent())));
+        final NativeAd nativeAdWithoutbase64 =
+            new NativeAd(jsEscapePubContentWithoutBase64, nativeAd.getContextCode(), nativeAd.getNamespace(),
+                nativeAd.getLandingPage(), nativeAd.getEventTracking());
+        return gson.toJson(nativeAdWithoutbase64);
     }
 
     // send response to the caller
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
-            final Channel serverChannel) {
+        final Channel serverChannel) {
         LOG.debug("Inside send Response");
-        if (responseBytes.length > 0) {
-            responseBytes = encryptResponseIfRequired(responseBytes);
-        }
         final FullHttpResponse response =
-                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
+            new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
         if (null != responseHeaders) {
             for (final Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
                 response.headers().add(entry.getKey().toString(), responseHeaders.get(entry.getValue()));
@@ -465,34 +515,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
             cleanUp();
             LOG.debug("successfully called cleanUp()");
         }
-    }
-
-    /**
-     * @param responseBytes
-     * @return
-     */
-    private byte[] encryptResponseIfRequired(byte[] responseBytes) {
-        if (sasParams.getSdkVersion() != null
-                && Integer.parseInt(sasParams.getSdkVersion().substring(1)) >= ENCRYPTED_SDK_BASE_VERSION
-                && sasParams.getDst() == 2 && sasParams.getEncryptionKey() != null) {
-            LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
-            final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
-            final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
-            try {
-                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
-                        encryptionKey.getInitializationVector());
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}",
-                            new String(encryptionKey.getAesKey(), CharsetUtil.UTF_8),
-                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8),
-                            new String(responseBytes, CharsetUtil.UTF_8));
-                }
-            } catch (InmobiSecureException | InvalidMessageException e) {
-                LOG.info("Exception while encrypting response from {}", e);
-                throw new RuntimeException(e);
-            }
-        }
-        return responseBytes;
     }
 
     // send response to the caller
@@ -535,8 +557,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     defaultContent = NO_AD_IMAI;
 
                     if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
-                        defaultContent = String.format(SDK_500_DCP_WRAPPING_NO_AD_JSON, sasParams.getRequestGuid());
-                        LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", defaultContent);
+                        defaultContent =
+                            String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), StringUtils.EMPTY);
+                        LOG.debug("Wrapping in JSON for DCP. Wrapped Response is: {}", defaultContent);
                     }
 
                     break;
@@ -546,10 +569,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     defaultContent = StringUtils.EMPTY;
 
                     // Native on dcp
-                    if (DemandSourceType.DCP.getValue() == sasParams.getDst()
-                            && Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
-                        defaultContent = String.format(SDK_500_DCP_WRAPPING_NO_AD_JSON, sasParams.getRequestGuid());
-                        LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", defaultContent);
+                    if (DemandSourceType.DCP.getValue() == sasParams.getDst() && Formatter
+                        .isRequestFromSdkVersionOnwards(sasParams, 500)) {
+                        defaultContent =
+                            String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), StringUtils.EMPTY);
+                        LOG.debug("Wrapping in JSON for SDK > 500 & DCP. Wrapped Response is: {}", defaultContent);
                     }
                     break;
                 case XHTML:
@@ -572,7 +596,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         }
         sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
-                getResponseBytes(sasParams.getDst(), defaultContent), new HashMap<String, String>(), serverChannel);
+            getResponseBytes(sasParams.getDst(), defaultContent), new HashMap<String, String>(), serverChannel);
     }
 
     private HttpResponseStatus getResponseStatus(final int dstType, final HttpResponseStatus httpResponseStatus) {
@@ -597,7 +621,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     /**
-     *
      * @return true if request contains Iframe Id and is a request from js adcode.
      */
     private boolean isJsAdRequest() {
@@ -678,7 +701,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             } catch (final Exception exception) {
                 LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index,
-                        rankList.get(index).getAdNetworkInterface(), exception);
+                    rankList.get(index).getAdNetworkInterface(), exception);
             }
         }
 
@@ -691,7 +714,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             } catch (final Exception exception) {
                 LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index,
-                        rtbList.get(index).getAdNetworkInterface(), exception);
+                    rtbList.get(index).getAdNetworkInterface(), exception);
             }
         }
 
@@ -714,7 +737,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         if (CollectionUtils.isNotEmpty(dcpList) && CollectionUtils.isNotEmpty(rtbList)) {
             LOG.debug("Both DCP and RTBD/IX channel segment lists cannot be populated at the same time. "
-                    + "Aborting Logging");
+                + "Aborting Logging");
             return;
         } else if (CollectionUtils.isNotEmpty(dcpList)) {
             if (DemandSourceType.DCP.getValue() != sasParams.getDst()) {
@@ -743,7 +766,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
 
             Logging.rrLogging(traceMarker, adResponseChannelSegment, list, sasParams, casInternalRequestParameters,
-                    terminationReason, totalTime);
+                terminationReason, totalTime);
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
@@ -833,31 +856,5 @@ public class ResponseSender extends HttpRequestHandlerBase {
         } else {
             reassignRanks(adNetworkInterface, channel);
         }
-    }
-
-    public enum ResponseFormat {
-        XHTML("axml", "xhtml"), HTML("html"), IMAI("imai"), NATIVE("native"), JS_AD_CODE("jsAdCode"), JSON(
-                "json"), VAST("vast");
-
-        private String[] formats;
-
-        private static final Map<String, ResponseFormat> STRING_TO_FORMAT_MAP = Maps.newHashMap();
-
-        static {
-            for (final ResponseFormat responseFormat : ResponseFormat.values()) {
-                for (final String format : responseFormat.formats) {
-                    STRING_TO_FORMAT_MAP.put(format.toLowerCase(), responseFormat);
-                }
-            }
-        }
-
-        private ResponseFormat(final String... formats) {
-            this.formats = formats;
-        }
-
-        public static ResponseFormat getValue(final String format) {
-            return STRING_TO_FORMAT_MAP.get(format.toLowerCase());
-        }
-
     }
 }
