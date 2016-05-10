@@ -14,6 +14,8 @@ public class IXTest {
 
     private String searchStringInLog = new String();
     private String parserOutput = new String();
+    private String parserOutput1 = new String();
+    private String parserOutput2 = new String();
     private String response = new String();
 
     @Test(testName = "Test3_1_1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
@@ -1472,6 +1474,75 @@ public class IXTest {
 
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
+    @Test(testName = "TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_WITHOUT_VIEWABILITY));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_TRACKERDEAL_WITH_VIEWABILITY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_WITH_VIEWABILITY(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_WITH_VIEWABILITY));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("FAIL"));
+    }
+    @Test(testName = "TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+    @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("FAIL"));
+    }
+    @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("FAIL"));
+    }
+    @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO));
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("FAIL"));
+    }
+    @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_WITH_MULTIPLE_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_AUDIENCE_WITH_MULTIPLE_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO));
+        Reporter.log(parserOutput, true);
+        parserOutput1 = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO));
+        Reporter.log(parserOutput, true);
+        parserOutput2 = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO));
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("FAIL")&& parserOutput1.equals("FAIL") && parserOutput2.equals("FAIL"));
+    }
 
     @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_PACKAGES_CSIDDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {
@@ -1640,7 +1711,7 @@ public class IXTest {
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID(final String x, final ResponseBuilder responseBuilder)
             throws Exception {
-        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456791", "AppBundleId is : null");
+        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456791", "appBundleId=null");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }

@@ -1,10 +1,13 @@
 package com.inmobi.castest.dataprovider;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.inmobi.castest.commons.dbhelper.E2EDataGen;
+import com.inmobi.castest.e2eautomationtest.AndroidTestHelper;
 import org.testng.annotations.DataProvider;
 
 import com.inmobi.adserve.adpool.AdPoolResponse;
@@ -26,6 +29,16 @@ public class FenderDataProvider {
         responseBuilder = AdPoolRequestHelper.fireAdPoolRequestForIX(method.getName().toUpperCase());
 
         return new Object[][] {{method.getName(), responseBuilder}};
+    }
+
+    @DataProvider(name = "fender_e2e_dp")
+    public static Object[][] createDataForE2EIX(final Method method) throws Exception {
+
+        System.out.println(method.getName());
+
+        AndroidTestHelper.Androidhelper(method.getName());
+
+        return new Object[][] {{method.getName()}};
     }
 
     @DataProvider(name = "fender_rtbd_dp")
@@ -54,11 +67,10 @@ public class FenderDataProvider {
         System.out.println("Executing " + method.getName() + "from " + method.getDeclaringClass().getName() + "suite");
 
         adPoolResponse =
-                AdPoolRequestHelper.fireAdPoolRequestForBrand(method.getName().toUpperCase(), method
-                        .getDeclaringClass().getName());
+            AdPoolRequestHelper.fireAdPoolRequestForBrand(method.getName().toUpperCase(), method.getDeclaringClass().getName());
 
         validationsMap =
-                JsonDataIOHelper.readValidations(method.getName().toUpperCase(), method.getDeclaringClass().getName());
+            JsonDataIOHelper.readValidations(method.getName().toUpperCase(), method.getDeclaringClass().getName());
 
         return new Object[][] {{method.getName(), adPoolResponse, validationsMap}};
     }

@@ -16,14 +16,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.inmobi.castest.utils.common.CasDBDetails;
+import com.inmobi.castest.utils.common.CasE2EDBDetails;
 
 public class ConnectionManager {
     private static Connection connection = null;
-    private static final String DB_URL = "jdbc:postgresql://" + CasDBDetails.getDbHost() + ":"
-            + CasDBDetails.getDbPort() + "/" + CasDBDetails.getDbName();
+
+    private static String DB_URL =null;
 
     public Connection getDBConnection() throws SQLException {
         connection = null;
+
+        if(CasDBDetails.isE2e()){
+
+            DB_URL="jdbc:postgresql://" + CasE2EDBDetails.getDbHost() + ":"+ CasE2EDBDetails.getDbPort() + "/" + CasE2EDBDetails.getDbName();
+        }
+        else{
+
+            DB_URL="jdbc:postgresql://" + CasDBDetails.getDbHost() + ":"+ CasDBDetails.getDbPort() + "/" + CasDBDetails.getDbName();
+        }
+
         try {
             Class.forName("org.postgresql.Driver");
             System.out.println("before");

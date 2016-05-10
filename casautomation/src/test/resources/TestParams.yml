@@ -1636,6 +1636,54 @@ TEST_STUDIO_NEGATIVE :
 TEST_IX_PACKAGES_NORMALDEAL :
 - geo_countryid : '150'
 
+TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY :
+- geo_countryid : '152'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_WITH_VIEWABILITY :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_IX_TRACKERDEAL_AUDIENCE_WITH_MULTIPLE_MACRO :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  integration_version: '451'
+  adpool_requestedadtype: 'BANNER'
+
 TEST_IX_PACKAGES_CSIDDEAL :
 - geo_countryid : '200'
   userprofile_csitags : '1,4'

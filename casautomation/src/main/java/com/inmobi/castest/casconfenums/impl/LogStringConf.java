@@ -109,6 +109,14 @@ public class LogStringConf {
                 logLine = "dst:IX,";
                 break;
             }
+            case MSG_E2E_IX_ANDROID_INTERSTITAL:{
+                logLine = "ad_format:INT";
+                break;
+            }
+            case MSG_E2E_IX_ANDROID_BANNER:{
+                logLine = "ad_format:RICH_BANNER";
+                break;
+            }
             case MSG_IX_ADRRFLAG2: {
                 logLine = "requestDst:IX";
                 break;
@@ -337,6 +345,34 @@ public class LogStringConf {
             }
             case MSG_IX_PACKAGE_NORMAL: {
                 logLine = "\"target\":{\"packages\":[\"10001\"]";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_WITHOUT_VIEWABILITY: {
+                logLine = "\"target\":{\"packages\":[\"10012\"]";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_WITH_VIEWABILITY: {
+                logLine = "\"target\":{\"packages\":[\"10011\"]";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON: {
+                logLine = "http://www.viewability_tracker.com/";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON: {
+                logLine = "https://ViewabilityTracker_thirdpartyjson.com/";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO: {
+                logLine = "$LIMIT_AD_TRACKING";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO: {
+                logLine = "$IMP_CB";
+                break;
+            }
+            case MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO: {
+                logLine = "$USER_ID_SHA256_HASHED";
                 break;
             }
             default: {

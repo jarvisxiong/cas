@@ -1,0 +1,46 @@
+#e2e cases
+TEST_FOR_ANDROID_BANNER :
+ - testName : 'test_for_android_banner'
+   os_id : '3'
+   adpool_selectedslots : '15'
+   ad_number : '1'
+
+TEST_FOR_ANDROID_VIDEO:
+ - testName: 'test_for_android_video'
+   os_id: '5'
+   adpool_selectedslots: '14'
+   ad_number: '2'
+   ad_type_targeting: '2'
+   adpool_requestadtype : 'INTERSTITIAL'
+
+TEST_FOR_ANDROID_INTERSTITAL :
+ - testName : 'test_for_android_interstital'
+   os_id : '3'
+   adpool_selectedslots : '14'
+   ad_number : '3'
+   ad_type_targeting : '0'
+
+#TEST_FOR_ANDROID_LANDSCPAE_VIDEO:
+ #- testName: 'test_for_android_landscape_video'
+  # os_id: '3'
+   #adpool_selectedslots: '32'
+   #ad_number: '5'
+   #ad_type_targeting: '1'
+
+TEST_FOR_IOS_VIDEO:
+ - testName: 'test_for_ios_video'
+   os_id: '5'
+   adpool_selectedslots: '14'
+   ad_number: '4'
+   ad_type_targeting: '2'
+   adpool_requestadtype : 'INTERSTITIAL'
+
+TEST_FOR_IOS_BANNER :
+ - testName : 'test_for_ios_banner'
+   os_id : '5'
+   adpool_selectedslots : '15'
+   ad_number : '6'
+   adpool_requestadtype : 'BANNER'
+
+
+

@@ -10,6 +10,11 @@ public class FenderTestIOHelper {
         return YamlDataIOHelper.readTestParams(testName);
 
     }
+    public static Map<String, String> setE2ETestParams(final String testName) throws FileNotFoundException {
+
+        return YamlDataIOHelper.readE2ETestParams(testName);
+
+    }
 
     public static String getPartnerDetails(final String testCaseName) throws FileNotFoundException {
         return YamlDataIOHelper.readTestIndex().get(testCaseName.toUpperCase());

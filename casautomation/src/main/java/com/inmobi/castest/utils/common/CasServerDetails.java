@@ -4,6 +4,9 @@ public class CasServerDetails {
     private final static String MAC_DOCKER_MACHINE_DEFAULT_IP = "192.168.99.100";
 
     private final static String CAS_SERVER_IP = System.getProperty("cas_end_point") != null ? System
+//            .getProperty("cas_end_point") : "localhost";
+            // ^Default IP of Docker Machine on Mac
+
             .getProperty("cas_end_point") : MAC_DOCKER_MACHINE_DEFAULT_IP;
 
     private final static String CAS_SERVER_ENDPOINT = "http://" + CAS_SERVER_IP + ":8800/";

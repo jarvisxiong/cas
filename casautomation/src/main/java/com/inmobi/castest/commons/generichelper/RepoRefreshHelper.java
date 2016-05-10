@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.inmobi.castest.utils.common.CasE2EDBDetails;
 import net.sf.json.JSONObject;
 
 import org.apache.http.client.ClientProtocolException;
@@ -21,7 +22,11 @@ public class RepoRefreshHelper {
         final JSONObject jsonParams = new JSONObject();
         jsonParams.put("DBHost", CasDBDetails.getDbHost());
         jsonParams.put("DBPort", CasDBDetails.getDbPort());
-        jsonParams.put("DBSnapshot", CasDBDetails.getDbName());
+        if (CasDBDetails.isE2e()) {
+            jsonParams.put("DBSnapshot", CasE2EDBDetails.getDbName());
+        } else {
+            jsonParams.put("DBSnapshot", CasDBDetails.getDbName());
+        }
         jsonParams.put("DBUser", CasDBDetails.getDbUserName());
         jsonParams.put("DBPassword", CasDBDetails.getDbPassword());
 

@@ -60,18 +60,18 @@ public class WAPGroupDBManipulation {
 
         // update realtime_dcp_feedback table
 
-        final ArrayList<Map> resultSetOfRealTimeDcpFeedback =
-                QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectRealTimeDcpFeedback,
-                        wapChannelAdgroupObject, advertiser_id_list));
-        System.out.println("***RESULT SET 3 SIZE***  : " + resultSetOfRealTimeDcpFeedback.size());
-
-        if (resultSetOfRealTimeDcpFeedback.size() == 0) {
-            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertRealtimeDcpFeedbackQuery,
-                    wapChannelAdgroupObject));
-        } else {
-            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateRealtimeDCPFeedbackQuery,
-                    wapChannelAdgroupObject));
-        }
+//        final ArrayList<Map> resultSetOfRealTimeDcpFeedback =
+//                QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectRealTimeDcpFeedback,
+//                        wapChannelAdgroupObject, advertiser_id_list));
+//        System.out.println("***RESULT SET 3 SIZE***  : " + resultSetOfRealTimeDcpFeedback.size());
+//
+//        if (resultSetOfRealTimeDcpFeedback.size() == 0) {
+//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertRealtimeDcpFeedbackQuery,
+//                    wapChannelAdgroupObject));
+//        } else {
+//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateRealtimeDCPFeedbackQuery,
+//                    wapChannelAdgroupObject));
+//        }
 
         // update dcp_advertiser_burn table
         final ArrayList<Map> resultSetOfDcpAdvertiserBurnQuery =
@@ -88,18 +88,18 @@ public class WAPGroupDBManipulation {
         }
 
         // update earnings_dcp_feedback table
-        final ArrayList<Map> resultSetOfEarningsFeedbackQuery =
-                QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectEarningsFeedBackQuery,
-                        wapChannelAdgroupObject));
-        System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfEarningsFeedbackQuery.size());
-
-        if (resultSetOfEarningsFeedbackQuery.size() == 0) {
-            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertEarningsDcpFeedbackQuery,
-                    wapChannelAdgroupObject));
-        } else {
-            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updatEarningsDcpFeedBackQuery,
-                    wapChannelAdgroupObject));
-        }
+////        final ArrayList<Map> resultSetOfEarningsFeedbackQuery =
+////                QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectEarningsFeedBackQuery,
+////                        wapChannelAdgroupObject));
+////        System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfEarningsFeedbackQuery.size());
+//
+//        if (resultSetOfEarningsFeedbackQuery.size() == 0) {
+//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertEarningsDcpFeedbackQuery,
+//                    wapChannelAdgroupObject));
+//        } else {
+//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updatEarningsDcpFeedBackQuery,
+//                    wapChannelAdgroupObject));
+//        }
 
         final ArrayList<Map> resultSetOfDcpChnSiteIncExc =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_DCP_CHN_SITE_INC_EXC,
@@ -142,6 +142,9 @@ public class WAPGroupDBManipulation {
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deletePricingEngine, wapChannelAdgroupObject));
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertPricingEngine, wapChannelAdgroupObject));
+    }
+    public static void DeleteWapchannelAdgroupLikeTest(final Map<String, String> wapChannelAdgroupObject) throws SQLException, ClassNotFoundException {
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAPCHANNEL_ADGROUP_LIKE_TEST, wapChannelAdgroupObject));
     }
 
     public static void DeleteIXPackageData(final Map<String, String> wapChannelAdgroupObject,
