@@ -10,7 +10,7 @@
                 position: relative;
             }
             #im_1011_ad{
-                background:rgba(0,0,0,0.9);
+                background:rgba(0,0,0,0.8);
             }
             .im_1011_beacon{
                 display: none;

@@ -7,7 +7,7 @@
         <style type="text/css">
             #im_1011_ad{
                 display:table;
-                background:rgba(0,0,0,0.9);
+                background:rgba(0,0,0,0.8);
             }
             #im_1011_p{
                 vertical-align:middle;
