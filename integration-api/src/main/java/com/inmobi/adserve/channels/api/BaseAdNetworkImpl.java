@@ -18,7 +18,6 @@ import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatCon
 import static com.inmobi.casthrift.ADCreativeType.BANNER;
 import static com.inmobi.casthrift.ADCreativeType.INTERSTITIAL_VIDEO;
 import static com.inmobi.casthrift.ADCreativeType.NATIVE;
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -604,22 +603,9 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
      */
     @Override
     public String getAppBundleId() {
-        String marketId = sasParams.getAppBundleId();
-        if (isWapSiteUACEntity) {
-            if (wapSiteUACEntity.isOverrideMarketId()) {
-                return wapSiteUACEntity.getMarketId();
-            }
-            if (wapSiteUACEntity.isIOS()) {
-                marketId = StringUtils.isNumeric(sasParams.getAppBundleId())
-                        ? sasParams.getAppBundleId()
-                        : wapSiteUACEntity.getMarketId();
-            } else {
-                marketId = defaultIfEmpty(sasParams.getAppBundleId(), wapSiteUACEntity.getMarketId());
-            }
-        }
-        return marketId;
+        return isWapSiteUACEntity && StringUtils.isNotBlank(wapSiteUACEntity.getMarketId())
+                ? wapSiteUACEntity.getMarketId() : sasParams.getAppBundleId();
     }
-
 
     @Override
     public double getBidPriceInUsd() {

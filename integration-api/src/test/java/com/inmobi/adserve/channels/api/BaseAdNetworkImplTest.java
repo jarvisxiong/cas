@@ -429,29 +429,22 @@ public class BaseAdNetworkImplTest {
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.FALSE);
         assertEquals("com.default", baseAdNetwork.getAppBundleId());
 
-        // Override test
+        // preference over sasParam appBundleId test
         final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
         builder.marketId("uac.marketId");
-        builder.overrideMarketId(true);
         MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
         assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
 
-        // IOS Test
-        builder.overrideMarketId(false);
-        builder.siteTypeId(21);
+        // wapSiteUACEntity have null market id
+        builder.marketId(null);
         MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
-        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
-        sasParams.setAppBundleId("123");
-        assertEquals("123", baseAdNetwork.getAppBundleId());
-
-        // Android Test
-        builder.siteTypeId(22);
-        MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
-        sasParams.setAppBundleId("com.default");
+        MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
         assertEquals("com.default", baseAdNetwork.getAppBundleId());
+
+        //both are null
         sasParams.setAppBundleId(null);
-        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
+        assertEquals(null, baseAdNetwork.getAppBundleId());
     }
 
     /**
