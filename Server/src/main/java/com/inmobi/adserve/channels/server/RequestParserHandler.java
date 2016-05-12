@@ -89,11 +89,11 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
             final String servlet = servletProvider.get().getName();
             final Integer dst = "ixFill".equalsIgnoreCase(servlet) ?
                     8 : "rtbdFill".equalsIgnoreCase(servlet) ? 
-                            6 : "BackFill".equalsIgnoreCase(servlet) ? 2 : null;
+                            6 : "BackFill".equalsIgnoreCase(servlet) ? 2 : -1;
 
             LOG.debug("Method is  {}", request.getMethod());
             boolean isTraceEnabled = false;
-            if (request.getMethod() == HttpMethod.POST && null != dst) {
+            if (request.getMethod() == HttpMethod.POST && dst != -1) {
                 final AdPoolRequest adPoolRequest = new AdPoolRequest();
                 final TDeserializer tDeserializer = new TDeserializer(new TBinaryProtocol.Factory());
                 try {
@@ -107,7 +107,7 @@ public class RequestParserHandler extends MessageToMessageDecoder<DefaultFullHtt
                     LOG.debug(traceMarker, "Error in de serializing thrift ", ex);
                     InspectorStats.incrementStatCount(TERMINATED_REQUESTS, THRIFT_PARSING_ERROR);
                 }
-            } else if (request.getMethod() == HttpMethod.GET && null != dst && params.containsKey("adPoolRequest")) {
+            } else if (request.getMethod() == HttpMethod.GET && dst != -1 && params.containsKey("adPoolRequest")) {
                 String rawContent = null;
                 if (!params.isEmpty()) {
                     final List<String> values = params.get("adPoolRequest");
