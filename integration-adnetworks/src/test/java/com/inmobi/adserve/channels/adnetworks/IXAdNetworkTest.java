@@ -98,6 +98,7 @@ public class IXAdNetworkTest {
         expect(mockConfig.getStringArray("ix.blockedAdvertisers")).andReturn(new String[] {"king.com", "supercell.net",
                 "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
         expect(mockConfig.getList("ix.globalBlind")).andReturn(new ArrayList<>(Arrays.asList("1", "2"))).anyTimes();
+        expect(mockConfig.getDouble(advertiserName + ".rubiconCutsInDeal", 0.0)).andReturn(0.0725).anyTimes();
         replay(mockConfig);
     }
 

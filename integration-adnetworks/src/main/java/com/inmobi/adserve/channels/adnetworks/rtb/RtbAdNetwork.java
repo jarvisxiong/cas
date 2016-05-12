@@ -1,5 +1,12 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.*;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
@@ -737,31 +744,56 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public String replaceRTBMacros(String url) {
-        url = url.replaceAll(RTBCallbackMacros.AUCTION_ID_INSENSITIVE, bidResponse.getId());
-        url = url.replaceAll(RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
+        if (url.contains(AUCTION_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_CURRENCY_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_BID_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_SEAT_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_IMP_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_AD_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+
+        url = url.replaceAll(AUCTION_ID_INSENSITIVE, bidResponse.getId());
+        url = url.replaceAll(AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
 
         // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
         if (2 == sasParams.getDst()) {
+            if (url.contains(AUCTION_PRICE_ENCRYPTED_INSENSITIVE)) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_ENCRYPTED_MACRO_REPLACE);
+            }
+            if (url.contains(AUCTION_PRICE_INSENSITIVE)) {
+                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
+            }
             LOG.info("replaceRTBMacros for DST=2, URL->{}", url);
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
+            url = url.replaceAll(AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
+            url = url.replaceAll(AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
         }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE,
+            url = url.replaceAll(AUCTION_AD_ID_INSENSITIVE,
                     bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
         }
         if (null != bidResponse.getBidid()) {
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
+            url = url.replaceAll(AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url = url.replaceAll(RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE,
+            url = url.replaceAll(AUCTION_SEAT_ID_INSENSITIVE,
                     bidResponse.getSeatbid().get(0).getSeat());
         }
         if (null == bidRequest) {
             LOG.info(traceMarker, "bidrequest is null");
             return url;
         }
-        url = url.replaceAll(RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
+        url = url.replaceAll(AUCTION_IMP_ID_INSENSITIVE, bidRequest.getImp().get(0).getId());
 
         LOG.debug(traceMarker, "String after replaceMacros is {}", url);
         return url;
@@ -832,8 +864,8 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         String admContent = getAdMarkUp();
 
         final int admSize = admContent.length();
-        final String winUrl = beaconUrl + RTBCallbackMacros.WIN_BID_GET_PARAM;
-        admContent = admContent.replace(RTBCallbackMacros.AUCTION_WIN_URL, winUrl);
+        final String winUrl = beaconUrl + WIN_BID_GET_PARAM;
+        admContent = admContent.replace(AUCTION_WIN_URL, winUrl);
         final int admAfterMacroSize = admContent.length();
 
         if (WAP.equalsIgnoreCase(sasParams.getSource())) {
@@ -1024,7 +1056,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             final Map<String, String> params = new HashMap<>();
             params.put(NativeResponseMaker.BEACON_URL_PARAM, getBeaconUrl());
             params.put(NativeResponseMaker.CLICK_URL_PARAM, getClickUrl());
-            params.put(NativeResponseMaker.WIN_URL_PARAM, getBeaconUrl() + RTBCallbackMacros.WIN_BID_GET_PARAM);
+            params.put(NativeResponseMaker.WIN_URL_PARAM, getBeaconUrl() + WIN_BID_GET_PARAM);
             // params.put("appId", app.getId());
             params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
             params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);

@@ -119,6 +119,7 @@ public class NewIXAdNetworkTest {
                 .anyTimes();
         expect(mockConfig.getString("clickSecureURLPrefix", "https://c2.w.inmobi.com/c.asm")).andReturn("ClickPrefix")
                 .anyTimes();
+        expect(mockConfig.getDouble(advertiserName + ".rubiconCutsInDeal", 0.0)).andReturn(0.0725).anyTimes();
         replayAll();
     }
 

@@ -252,6 +252,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private Map<Integer, Asset> nonMandatoryAssetMap;
     private IXSlotMatcher matchedCAU;
     private NativeAdTemplateEntity templateEntity;
+    private static final String RUBICON_CUTS_IN_DEAL = ".rubiconCutsInDeal";
+    private final double rubiconCutsInDeal;
 
     @SuppressWarnings("unchecked")
     public IXAdNetwork(final Configuration config, final Bootstrap clientBootstrap,
@@ -274,6 +276,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         sproutUniqueIdentifierRegex =
                 config.getString(advertiserName + ".sprout.uniqueIdentifierRegex", "(?s).*data-creative[iI]d.*");
         gson = templateConfiguration.getGsonManager().getGsonInstance();
+        rubiconCutsInDeal = config.getDouble(advertiserName + RUBICON_CUTS_IN_DEAL, 0.0);
     }
 
     @Override
@@ -965,6 +968,24 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private String replaceIXMacros(String url) {
+        if (url.contains(AUCTION_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_CURRENCY_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_PRICE_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_BID_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_SEAT_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
+        }
+        if (url.contains(AUCTION_IMP_ID_INSENSITIVE)) {
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
+        }
         url = url.replaceAll(AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(AUCTION_CURRENCY_INSENSITIVE, USD);
         url = url.replaceAll(AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
@@ -1484,10 +1505,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             return false;
         }
         // bidderCurrency is set to USD by default
-        bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = secondBidPriceInUsd = bid.getPrice();
+        final Double bidPrice = bid.getPrice();
+        bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = secondBidPriceInUsd = bidPrice;
         setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(originalBidPriceInUsd));
         dealId = bid.getDealid();
         if (dealId != null) {
+            //subtracting bid price in case of PMP
+            bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = secondBidPriceInUsd = bidPrice * (1.0 - rubiconCutsInDeal);
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_RESPONSES);
             InspectorStats.incrementStatCount(InspectorStrings.PACKAGE_AND_DEAL_STATS,
                     InspectorStrings.IX_DEAL_RESPONSES_FOR_ID + dealId);

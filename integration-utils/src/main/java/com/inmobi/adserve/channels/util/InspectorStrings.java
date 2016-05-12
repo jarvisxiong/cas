@@ -245,4 +245,13 @@ public class InspectorStrings {
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 
     public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
+    public static final String TOTAL_WIN_PRICE_MACRO_REPLACE = "TotalWinPriceMacroReplace";
+    public static final String TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionIdInsensitiveMacroReplace" ;
+    public static final String TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE = "TotalAuctionCurrencyMacroReplace";
+    public static final String TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE = "TotalAuctionPriceMacroReplace" ;
+    public static final String TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionBidIdMacroReplace";
+    public static final String TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE = "TotalSeatIdMacroReplace";
+    public static final String TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionImpressionIdMacroReplace";
+    public static final String TOTAL_AUCTION_PRICE_ENCRYPTED_MACRO_REPLACE = "TotalAuctionPriceEncryptedMacroReplace";
+    public static final String TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionAdIdMacroReplace";
 }
