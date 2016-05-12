@@ -1,20 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
-import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -38,10 +23,22 @@ import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.interfaces.TemplateConfiguration;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 
 /**
  * Created by thushara.v on 25/05/15.
@@ -58,6 +55,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String USER_REFERRER = "user.referrer";
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
+    private static final String AD_COUNT = "rec.count";
     private static final String READ_MORE = "Read More";
     private static final int ICON_DEFAULT_DIMENSION = 150;
 
@@ -68,6 +66,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private WapSiteUACEntity wapSiteUACEntity;
     private boolean isScreenshotResponse = false;
     private NativeAdTemplateEntity templateEntity;
+    private final List<String> oemSiteIds;
+
     protected final Gson gson;
     @Inject
     protected static TemplateConfiguration templateConfiguration;
@@ -79,6 +79,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
+        oemSiteIds = config.getList("taboola.oemSites");
 
     }
 
@@ -112,7 +113,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder requestBuilder = new StringBuilder(host);
-
+        appendQueryParam(requestBuilder, AD_COUNT, oemSiteIds.contains(sasParams.getSiteId()) ?
+                sasParams.getRqMkAdcount() :
+                1, false);
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getAppTitle(), format), false);
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
@@ -169,40 +172,43 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             final String beacon = getBeaconUrl();
             final TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
             if (taboolaResponse.getList().length > 0) {
+                StringBuilder responseBuilder = new StringBuilder();
                 final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId());
-                updateNativeParams(params, nurl, beacon);
-                final App.Builder appBuilder = App.newBuilder();
-                final NativeJson taboolaNative = taboolaResponse.getList()[0];
-                String title = taboolaNative.getBranding();
-                String description = taboolaNative.getName();
-                if (null == title) {
-                    title = description;
-                    description = taboolaNative.getDescription();
-                }
-                appBuilder.setTitle(title);
-                appBuilder.setOpeningLandingUrl(taboolaNative.getUrl());
-                appBuilder.setId(taboolaNative.getId());
-                final List<Icon> icons = new ArrayList<>();
+                for(NativeJson taboolaNative:taboolaResponse.getList()) {
+                    final App.Builder appBuilder = App.newBuilder();
+                    updateNativeParams(params, nurl, beacon);
+                    String title = taboolaNative.getBranding();
+                    String description = taboolaNative.getName();
+                    if (null == title) {
+                        title = description;
+                        description = taboolaNative.getDescription();
+                    }
+                    appBuilder.setTitle(title);
+                    appBuilder.setOpeningLandingUrl(taboolaNative.getUrl());
+                    appBuilder.setId(taboolaNative.getId());
+                    final List<Icon> icons = new ArrayList<>();
 
-                final List<Screenshot> screenshotList = new ArrayList<>();
-                if (isScreenshotResponse) {
-                    setStaticIconForScreenshotResponse(icons);
-                    updateScreenshotList(taboolaNative, screenshotList);
-                } else {
-                    updateIconList(taboolaNative, icons);
+                    final List<Screenshot> screenshotList = new ArrayList<>();
+                    if (isScreenshotResponse) {
+                        setStaticIconForScreenshotResponse(icons);
+                        updateScreenshotList(taboolaNative, screenshotList);
+                    } else {
+                        updateIconList(taboolaNative, icons);
+                    }
+                    appBuilder.setIcons(icons);
+                    appBuilder.setScreenshots(screenshotList);
+                    appBuilder.setAdImpressionId(impressionId);
+                    appBuilder.setActionText(READ_MORE);
+                    if (null != description) {
+                        appBuilder.setDesc(description);
+                    }
+                    final List<String> pixelUrls = new ArrayList<>();
+                    pixelUrls.add(beacon);
+                    appBuilder.setPixelUrls(pixelUrls);
+                    final App app = (App) appBuilder.build();
+                    responseBuilder.append(nativeResponseMaker.makeDCPNativeResponse(app, params, sasParams.isNoJsTracking())).append(",");
                 }
-                appBuilder.setIcons(icons);
-                appBuilder.setScreenshots(screenshotList);
-                appBuilder.setAdImpressionId(impressionId);
-                appBuilder.setActionText(READ_MORE);
-                if (null != description) {
-                    appBuilder.setDesc(description);
-                }
-                final List<String> pixelUrls = new ArrayList<>();
-                pixelUrls.add(beacon);
-                appBuilder.setPixelUrls(pixelUrls);
-                final App app = (App) appBuilder.build();
-                responseContent = nativeResponseMaker.makeDCPNativeResponse(app, params, sasParams.isNoJsTracking());
+                responseContent = responseBuilder.substring(0,responseBuilder.length()-1);
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 

@@ -1,28 +1,5 @@
 package com.inmobi.adserve.channels.adnetworks;
 
-import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.assertEquals;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.replay;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.support.membermodification.MemberMatcher;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import com.inmobi.adserve.channels.adnetworks.taboola.DCPTaboolaAdnetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -42,10 +19,31 @@ import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
 import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.template.config.DefaultConfiguration;
 import com.inmobi.template.gson.GsonManager;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.replay;
 
 /**
  * Created by thushara.v on 19/06/15.
@@ -59,12 +57,13 @@ public class DCPTaboolaAdnetworkTest {
     private static final String loggerConf = "/tmp/channel-server.properties";
     private static final Bootstrap clientBootstrap = null;
     private static final String taboolaHost =
-            "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init";
+            "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.visible=false&source.type=text&user.session=init";
     private static final String taboolaNotification =
             "http://api.taboola.com//json/inmobi/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s";
     private static final String taboolaIcon = "http://api2.taboola.com/taboola";
     private static final String taboolaStatus = "on";
     private static final String taboolaAdvId = "taboolaadv1";
+
     private static Configuration mockConfig = null;
     private static DCPTaboolaAdnetwork dcptaboolaAdNetwork;
     private static RepositoryHelper repositoryHelper;
@@ -80,6 +79,7 @@ public class DCPTaboolaAdnetworkTest {
         expect(mockConfig.getString("taboola.icon")).andReturn(taboolaIcon).anyTimes();
         expect(mockConfig.getString("taboola.notification")).andReturn(taboolaNotification).anyTimes();
         expect(mockConfig.getString("taboola.advertiserId")).andReturn(taboolaAdvId).anyTimes();
+        expect(mockConfig.getList("taboola.oemSites")).andReturn(new ArrayList<>(Arrays.asList("5a5b2dcb31804111b3830a686bbe8db6"))).anyTimes();
         expect(mockConfig.getString("debug")).andReturn(debug).anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
         expect(mockConfig.getString("log4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/channel-server.properties");
@@ -236,7 +236,8 @@ public class DCPTaboolaAdnetworkTest {
         casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
         sasParams.setSiteIncId(6575868);
         sasParams.setOsId(SASRequestParameters.HandSetOS.Android.getValue());
-        sasParams.setSiteId("abcd");
+        sasParams.setSiteId("5a5b2dcb31804111b3830a686bbe8db6");
+        sasParams.setRqMkAdcount((short)2);
         final String externalKey = "inmobi";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(taboolaAdvId, null, null, null,
@@ -248,7 +249,7 @@ public class DCPTaboolaAdnetworkTest {
                 repositoryHelper);
         final String actualUrl = dcptaboolaAdNetwork.getRequestUri().toString();
         final String expectedUrl =
-                "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.count=1&rec.visible=false&source.type=text&user.session=init&app.name=Taboola&source.id=a.b.c&source.placement=00000000-0000-0000-0000-0000006456fc&source.url=http://abc.com&user.realip=206.29.182.240&user.agent=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&rec.thumbnail.height=200&rec.thumbnail.width=200&user.id=202cb962ac59075b964b07152d234b70";
+                "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.visible=false&source.type=text&user.session=init&rec.count=2&app.name=Taboola&source.id=a.b.c&source.placement=00000000-0000-0000-0000-0000006456fc&source.url=http://abc.com&user.realip=206.29.182.240&user.agent=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&rec.thumbnail.height=200&rec.thumbnail.width=200&user.id=202cb962ac59075b964b07152d234b70";
         assertEquals(actualUrl, expectedUrl);
 
     }
