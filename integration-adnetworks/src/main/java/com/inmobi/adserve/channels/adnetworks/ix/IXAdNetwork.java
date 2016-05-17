@@ -3,12 +3,18 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.replaceAudienceVerificationTrackerMacros;
 import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.replaceViewabilityTrackerMacros;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_GET_PARAM;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
@@ -83,8 +89,8 @@ import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Asset;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.common.response.nativead.DefaultResponses;
@@ -968,22 +974,22 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private String replaceIXMacros(String url) {
-        if (url.contains(AUCTION_ID_INSENSITIVE)) {
+        if (AUCTION_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_CURRENCY_INSENSITIVE)) {
+        if (AUCTION_CURRENCY_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_PRICE_INSENSITIVE)) {
+        if (AUCTION_PRICE_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_BID_ID_INSENSITIVE)) {
+        if (AUCTION_BID_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_SEAT_ID_INSENSITIVE)) {
+        if (AUCTION_SEAT_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_IMP_ID_INSENSITIVE)) {
+        if (AUCTION_IMP_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
         }
         url = url.replaceAll(AUCTION_ID_INSENSITIVE, bidResponse.getId());

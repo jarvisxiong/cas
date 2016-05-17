@@ -1,12 +1,22 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.*;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE_PATTERN;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE_PATTERN;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_WIN_URL;
+import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
@@ -744,22 +754,22 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public String replaceRTBMacros(String url) {
-        if (url.contains(AUCTION_ID_INSENSITIVE)) {
+        if (AUCTION_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_CURRENCY_INSENSITIVE)) {
+        if (AUCTION_CURRENCY_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_BID_ID_INSENSITIVE)) {
+        if (AUCTION_BID_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_SEAT_ID_INSENSITIVE)) {
+        if (AUCTION_SEAT_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_IMP_ID_INSENSITIVE)) {
+        if (AUCTION_IMP_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
         }
-        if (url.contains(AUCTION_AD_ID_INSENSITIVE)) {
+        if (AUCTION_AD_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
             InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE);
         }
 
@@ -768,10 +778,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
         // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
         if (2 == sasParams.getDst()) {
-            if (url.contains(AUCTION_PRICE_ENCRYPTED_INSENSITIVE)) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_ENCRYPTED_MACRO_REPLACE);
-            }
-            if (url.contains(AUCTION_PRICE_INSENSITIVE)) {
+            if (AUCTION_PRICE_INSENSITIVE_PATTERN.matcher(url).find()) {
                 InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
             }
             LOG.info("replaceRTBMacros for DST=2, URL->{}", url);

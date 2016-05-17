@@ -252,6 +252,5 @@ public class InspectorStrings {
     public static final String TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionBidIdMacroReplace";
     public static final String TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE = "TotalSeatIdMacroReplace";
     public static final String TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionImpressionIdMacroReplace";
-    public static final String TOTAL_AUCTION_PRICE_ENCRYPTED_MACRO_REPLACE = "TotalAuctionPriceEncryptedMacroReplace";
     public static final String TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionAdIdMacroReplace";
 }
