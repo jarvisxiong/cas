@@ -43,6 +43,7 @@ prod:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     uh1:
@@ -87,6 +88,7 @@ prod:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     lhr1:
@@ -131,6 +133,7 @@ prod:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     hkg1:
@@ -175,6 +178,7 @@ prod:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
 pilot:
@@ -220,6 +224,7 @@ pilot:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     uh1:
@@ -264,6 +269,7 @@ pilot:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     lhr1:
@@ -308,6 +314,7 @@ pilot:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     hkg1:
@@ -352,6 +359,7 @@ pilot:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
 non_prod:
@@ -397,6 +405,7 @@ non_prod:
             debug_log_type: 'DEBUG'
             flush_debug_log: 'true'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
 
     automation:
@@ -441,6 +450,7 @@ non_prod:
             debug_log_type: 'DEBUG'
             flush_debug_log: 'true'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
 
 skyhook:
@@ -486,6 +496,7 @@ skyhook:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
 
     hkg1:
@@ -514,8 +525,8 @@ skyhook:
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
-            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
-            click_url_prefix: 'c2.w.inmobi.com/c.asm'
+            beacon_url_prefix: 'et2-cn.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2-cn.w.inmobi.com/c.asm'
             t_segmentno: '-1'
             automation_tests_enabled: 'false'
             circuit_breaker_disabled: 'false'
@@ -530,4 +541,5 @@ skyhook:
             debug_log_type: 'ERROR'
             flush_debug_log: 'false'
 
+        graphite_host_prefix: 'cn-metrics-relay'
         graphite_prefix_base: 'prod'
