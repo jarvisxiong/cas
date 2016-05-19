@@ -25,6 +25,7 @@ import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.ning.http.client.RequestBuilder;
 import com.smaato.soma.oapi.Response;
 import com.smaato.soma.oapi.Response.Ads.Ad;
+import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -49,10 +50,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String IFA_TRACKING = "iosadtracking";
     private static final String GPID = "googleadid";
     private static final String GPID_TRACKING = "googlednt";
-    private static final String OPEN_UDID = "openudid";
     private static final String ANDROID_ID = "androidid";
-    private static final String ODIN1 = "odin";
-    // private static final String VERSION = "apiver";
+    private static final String VERSION = "apiver";
+    private static final String ResponseType = "response";
+    private static final String ResponseValue = "XML";
 
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
@@ -70,8 +71,14 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String FALSE = "false";
     private static final String LAT_LONG_FORMAT = "%s,%s";
     private static Map<Integer, String> slotIdMap;
+    private static final String coppa = "coppa";
+    private static final String deviceId = "divid";
+    private static String deviceIdValue;
+    private static final short AGE_LIMIT_FOR_COPPA = 8;
+    protected int isCoppaSet = 0;
 
     private final String publisherId;
+    private final String apiVersion;
 
     private transient String latitude;
     private transient String longitude;
@@ -95,22 +102,23 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
-            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+                              final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         publisherId = config.getString("smaato.pubId");
+        apiVersion = config.getString("smaato.apiVersion");
     }
 
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-                || StringUtils.isBlank(externalSiteId)) {
+            || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for smaato so exiting adapter");
             LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
         host = config.getString("smaato.host");
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
-                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+            && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
             final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
@@ -145,9 +153,9 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder url = new StringBuilder(host);
-        // appendQueryParam(url, VERSION, apiVersion, true);
 
         appendQueryParam(url, ADSPACEID, externalSiteId, true);
+        appendQueryParam(url,VERSION,apiVersion,false);
         appendQueryParam(url, PUBID, publisherId, false);
         appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
         appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
@@ -155,6 +163,13 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, FORMAT_STRICT, FALSE, false);
         appendQueryParam(url, DIMENSION, dimension, false);
         appendQueryParam(url, DIMENSION_STRICT, TRUE, false);
+        appendQueryParam(url, ResponseType, ResponseValue, false);
+        if(sasParams.getAge()!=null) {
+            if (sasParams.getAge() <= AGE_LIMIT_FOR_COPPA) {
+                isCoppaSet = 1;
+            }
+        }
+        appendQueryParam(url,coppa,isCoppaSet,false);
 
         // TODO map the udids
         final String ifa = getUidIFA(false);
@@ -164,16 +179,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
             appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
-            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.getUidIDUS1(), false);
-        }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
-            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.getUid(), false);
-        }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
-            appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidSO1(), false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
-            appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidO1(), false);
         }
 
         final String gpId = getGPID(false);
@@ -188,7 +193,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LATLONG, getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format),
-                    false);
+                false);
         }
         if (StringUtils.isNotBlank(sasParams.getGender())) {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
@@ -206,6 +211,8 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         if (null != sasParams.getAge()) {
             appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
         }
+        deviceIdValue = "smt-"+externalSiteId;
+        appendQueryParam(url, deviceId, deviceIdValue, false);
 
         LOG.debug("Smaato url is {}", url);
         return new URI(url.toString());
@@ -219,13 +226,13 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         return new RequestBuilder().setUrl(uri.toString())
-                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-                .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
-                .setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp())
-                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
-                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
+            .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+            .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+            .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+            .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
+            .setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp())
+            .setHeader(HttpHeaders.Names.HOST, uri.getHost())
+            .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
     }
 
     @Override
@@ -289,6 +296,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
+                LOG.debug("GSB = {}",responseContent);
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
