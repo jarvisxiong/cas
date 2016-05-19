@@ -245,6 +245,12 @@ public class InspectorStrings {
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 
     public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
+
+    public static final String ONLY_OLD_CSIDS_SET = "OnlyOldCSIDsSet";
+    public static final String ONLY_NEW_CSIDS_SET = "OnlyNewCSIDsSet";
+    public static final String CSIDS_MIGRATION_SANE = "CSIDMigrationSane";
+    public static final String CSIDS_MIGRATION_NOT_SANE = "CSIDMigrationNotSane";
+
     public static final String TOTAL_WIN_PRICE_MACRO_REPLACE = "TotalWinPriceMacroReplace";
     public static final String TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionIdInsensitiveMacroReplace" ;
     public static final String TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE = "TotalAuctionCurrencyMacroReplace";

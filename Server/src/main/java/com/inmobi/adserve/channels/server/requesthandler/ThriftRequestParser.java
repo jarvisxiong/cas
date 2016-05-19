@@ -5,8 +5,12 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.CSIDS_MIGRATION_NOT_SANE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.CSIDS_MIGRATION_SANE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI_BEING_SENT_FOR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.ONLY_NEW_CSIDS_SET;
+import static com.inmobi.adserve.channels.util.InspectorStrings.ONLY_OLD_CSIDS_SET;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -190,7 +194,30 @@ public class ThriftRequestParser {
                 params.setAge((short) age);
             }
             if (tObject.user.isSetUserProfile()) {
-                params.setCsiTags(tObject.user.userProfile.csiTags);
+                final Set<Integer> csiTagsOld = tObject.user.userProfile.csiTags;
+                params.setCsiTags(csiTagsOld);
+
+                Set<Integer> csiTagsNew = null;
+                if (tObject.user.userProfile.isSetTUserProfile()) {
+                    if (tObject.user.userProfile.tUserProfile.isSetCsiIds()) {
+                        csiTagsNew = ImmutableSet.copyOf(tObject.user.userProfile.getTUserProfile().getCsiIds());
+                    }
+                }
+
+                final boolean csiTagsOldSet = CollectionUtils.isNotEmpty(csiTagsOld);
+                final boolean csiTagsNewSet = CollectionUtils.isNotEmpty(csiTagsNew);
+
+                if (csiTagsOldSet && !csiTagsNewSet) {
+                    InspectorStats.incrementStatCount(ONLY_OLD_CSIDS_SET);
+                } else if (!csiTagsOldSet && csiTagsNewSet) {
+                    InspectorStats.incrementStatCount(ONLY_NEW_CSIDS_SET);
+                } else if (csiTagsOldSet && csiTagsNewSet) {
+                    if (csiTagsNew.containsAll(csiTagsOld)) {
+                        InspectorStats.incrementStatCount(CSIDS_MIGRATION_SANE);
+                    } else {
+                        InspectorStats.incrementStatCount(CSIDS_MIGRATION_NOT_SANE);
+                    }
+                }
             }
 
             if (tObject.user.gender != null) {
