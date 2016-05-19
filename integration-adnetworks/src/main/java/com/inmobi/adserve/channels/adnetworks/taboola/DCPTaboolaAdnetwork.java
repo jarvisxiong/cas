@@ -14,11 +14,11 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
-import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
-import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
-import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
+// import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
+// import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
+// import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
+// import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
+// import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
@@ -75,12 +75,12 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
 
+    @SuppressWarnings("unchecked")
     public DCPTaboolaAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
             final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
         oemSiteIds = config.getList("taboola.oemSites");
-
     }
 
     @Override
@@ -113,9 +113,8 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder requestBuilder = new StringBuilder(host);
-        appendQueryParam(requestBuilder, AD_COUNT, oemSiteIds.contains(sasParams.getSiteId()) ?
-                sasParams.getRqMkAdcount() :
-                1, false);
+        appendQueryParam(requestBuilder, AD_COUNT,
+                oemSiteIds.contains(sasParams.getSiteId()) ? sasParams.getRqMkAdcount() : 1, false);
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getAppTitle(), format), false);
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
@@ -174,7 +173,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             if (taboolaResponse.getList().length > 0) {
                 StringBuilder responseBuilder = new StringBuilder();
                 final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId());
-                for(NativeJson taboolaNative:taboolaResponse.getList()) {
+                for (NativeJson taboolaNative : taboolaResponse.getList()) {
                     final App.Builder appBuilder = App.newBuilder();
                     updateNativeParams(params, nurl, beacon);
                     String title = taboolaNative.getBranding();
@@ -206,9 +205,11 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                     pixelUrls.add(beacon);
                     appBuilder.setPixelUrls(pixelUrls);
                     final App app = (App) appBuilder.build();
-                    responseBuilder.append(nativeResponseMaker.makeDCPNativeResponse(app, params, sasParams.isNoJsTracking())).append(",");
+                    responseBuilder
+                            .append(nativeResponseMaker.makeDCPNativeResponse(app, params, sasParams.isNoJsTracking()))
+                            .append(",");
                 }
-                responseContent = responseBuilder.substring(0,responseBuilder.length()-1);
+                responseContent = responseBuilder.substring(0, responseBuilder.length() - 1);
                 adStatus = AD_STRING;
                 LOG.debug(traceMarker, "response length is {}", responseContent.length());
 
@@ -286,10 +287,10 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (LOG.isDebugEnabled()) {
             LOG.debug(templateEntity.toString());
         }
-        final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-        if (nativeContentObject == null) {
-            setDimensionForCustomTemplates();
-        } else {
+        /*final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
+        if (nativeContentObject == null) { */
+        setDimensionForCustomTemplates();
+        /*} else {
             for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
                 final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
                 final NativeAdContentAsset adContentAsset = attributes.getAdContentAsset();
@@ -301,7 +302,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
                     break;
                 }
             }
-        }
+        }*/
         return true;
     }
 

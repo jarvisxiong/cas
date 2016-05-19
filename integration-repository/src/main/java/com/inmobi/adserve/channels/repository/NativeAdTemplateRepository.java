@@ -43,6 +43,7 @@ public class NativeAdTemplateRepository
         final Long placementId = row.getLong("placement_id");
         final Timestamp modifiedOn = row.getTimestamp("modified_on");
         TemplateClass templateClass = STATIC;
+        String errorMsg = "ERROR_IN_READING_NATIVE_TEMPLATE";
         try {
             final Long templateId = row.getLong("native_template_id");
             final Integer uiLayoutId = (Integer) row.getObject("ui_layout_id");
@@ -77,7 +78,8 @@ public class NativeAdTemplateRepository
             // Get fields from ad Template Binary
             final List<String> demandJpath = adTemplate.getDemandConstraints().getJsonPath();
             if (demandJpath == null) {
-                throw new RepositoryException("No keys, jsonpath found");
+                errorMsg = "No jsonpath found";
+                throw new RepositoryException(errorMsg);
             }
 
             String mandatoryKey = null, imageKey = null;
@@ -97,14 +99,16 @@ public class NativeAdTemplateRepository
             if (STATIC == templateClass) {
                 final boolean isImageReqButNull = NativeConstraints.isImageRequired(mandatoryKey) && imageKey == null;
                 if (mandatoryKey == null || isImageReqButNull) {
-                    throw new RepositoryException("No mandatory/image Key for STATIC templateClass");
+                    errorMsg = "No mandatory/image Key for STATIC templateClass. JPath is " + demandJpath.toString();
+                    throw new RepositoryException(errorMsg);
                 }
             }
             builder.templateClass(templateClass);
             // Add template Content
             final String templateContent = adTemplate.getDetails().getContent();
             if (StringUtils.isEmpty(templateContent)) {
-                throw new RepositoryException("No template content for templateId ->" + templateId);
+                errorMsg = "No template content for templateId ->" + templateId;
+                throw new RepositoryException(errorMsg);
             }
             builder.template(templateContent);
             // Add Template to VM Cache
@@ -118,10 +122,8 @@ public class NativeAdTemplateRepository
             return new DBEntity<NativeAdTemplateEntity, NativeAdTemplateQuery>(templateEntity, modifiedOn);
         } catch (final Exception e) {
             logger.error("Error in resultset row", e);
-            return new DBEntity<NativeAdTemplateEntity, NativeAdTemplateQuery>(
-                    new EntityError<NativeAdTemplateQuery>(new NativeAdTemplateQuery(placementId, templateClass),
-                            "ERROR_IN_READING_NATIVE_TEMPLATE"),
-                    modifiedOn);
+            return new DBEntity<NativeAdTemplateEntity, NativeAdTemplateQuery>(new EntityError<NativeAdTemplateQuery>(
+                    new NativeAdTemplateQuery(placementId, templateClass), errorMsg), modifiedOn);
         }
     }
 

@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +28,7 @@ public class ChangeServletUtil {
     private static final String URL_GET_SERVER_PATTERN = "getServerConfig";
     private static final String URL_GET_STATS_PATTERN = "stat";
     private static final String URL_CHANGE_PATTERN = "configChange?update=%s";
-    private static final int BOX_LIMIT = 1018;
+    private static final int BOX_LIMIT = 1016;
 
     private static final Set<String> COLO = new HashSet<>();
     private final BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
@@ -97,8 +96,8 @@ public class ChangeServletUtil {
 
         final boolean isPilot = "PILOT".equalsIgnoreCase(colo);
         // perform operation
+        final List<String> baseUrlList = new ArrayList<>();
         for (final String curColo : COLO) {
-            final List<String> baseUrlList = new ArrayList<>();
             for (int i = 1000; i <= BOX_LIMIT; i++) {
                 if (isPilot && i != 1001) {
                     continue;
@@ -106,9 +105,8 @@ public class ChangeServletUtil {
                 final String baseUrl = String.format(URL_BASE_PATTERN, i, curColo);
                 baseUrlList.add(baseUrl);
             }
-            baseUrlList.parallelStream().forEach(baseUrl -> execute(baseUrl));
         }
-
+        baseUrlList.parallelStream().forEach(baseUrl -> execute(baseUrl));
     }
 
     private void execute(final String baseUrl) {
@@ -173,8 +171,7 @@ public class ChangeServletUtil {
     private boolean isHostUp(final String url) {
         try {
             final String ok = IOUtils.toString(new URL(url));
-            return StringUtils.isNotEmpty(ok);
-            // return "OK".equalsIgnoreCase(ok);
+            return "OK".equalsIgnoreCase(ok);
         } catch (final Exception e) {
             // System.err.println(e.getMessage());
         }

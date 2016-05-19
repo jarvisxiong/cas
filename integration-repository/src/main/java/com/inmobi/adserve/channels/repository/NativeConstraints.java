@@ -32,7 +32,7 @@ public class NativeConstraints {
             Lists.newArrayList(Mandatory.ICON, Mandatory.TITLE, Mandatory.DESCRIPTION, Mandatory.SCREEN_SHOT);
 
     // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/SCREENSHOT.java
-    // key, aspect ratio, minW, maxW, minH, maxH
+    // key, ar, minW, maxW, minH, maxH
     private static final String[] INM_TAG_A083 = new String[] {"inmTag.a083", "0.83", "250", "250", "300", "300"};
     private static final String[] INM_TAG_A067 = new String[] {"inmTag.a067", "0.67", "320", "800", "480", "1200"};
     private static final String[] INM_TAG_A056 = new String[] {"inmTag.a056", "0.56", "320", "720", "568", "1280"};
@@ -41,11 +41,12 @@ public class NativeConstraints {
     private static final String[] INM_TAG_A177 = new String[] {"inmTag.a177", "1.77", "568", "1280", "320", "720"};
     private static final String[] INM_TAG_A191 = new String[] {"inmTag.a191", "1.91", "600", "1200", "313", "627"};
     private static final String[] INM_TAG_A64 = new String[] {"inmTag.a64", "6.4", "320", "320", "50", "50"};
-    private static final String[] INM_TAG_A808 = new String[] {"inmTag.a808", "12", "728", "728", "90", "90"};
+    private static final String[] INM_TAG_A809 = new String[] {"inmTag.a809", "8.09", "728", "728", "90", "90"};
+    private static final String[] INM_TAG_A1_OEM = new String[] {"inmTag.a1.oem", "1", "396", "396", "396", "396"};
     private static final String[][] IMAGE_ARR_KEYS = new String[][] {INM_TAG_A083, INM_TAG_A067, INM_TAG_A056,
-            INM_TAG_A12, INM_TAG_A15, INM_TAG_A177, INM_TAG_A191, INM_TAG_A64, INM_TAG_A808};
+            INM_TAG_A12, INM_TAG_A15, INM_TAG_A177, INM_TAG_A191, INM_TAG_A64, INM_TAG_A809, INM_TAG_A1_OEM};
+    // INM_TAG_A1_OEM is a image size only used by OEM and only for Sponsored Content which is served by Taboola
 
-    // private static final Map<String, List<Mandatory>> DCP_MANDATORY = new HashMap<>();
     private static final Map<String, List<Mandatory>> MANDATORY_MAP = new HashMap<>();
     private static final Map<String, Image> IMG_MAP = new HashMap<>();
 
@@ -63,7 +64,6 @@ public class NativeConstraints {
             // final int maxW = Integer.parseInt(arr[3]);
             final int minH = Integer.parseInt(arr[4]);
             IMG_MAP.put(key, getNativeImage(minW, minH));
-
         }
     }
 
@@ -129,6 +129,5 @@ public class NativeConstraints {
         }
         return img;
     }
-
 
 }
