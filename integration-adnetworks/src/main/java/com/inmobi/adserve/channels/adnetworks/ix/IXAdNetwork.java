@@ -19,7 +19,9 @@ import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
 import static com.inmobi.adserve.channels.api.trackers.MovieBoardResponseMaker.TEMPLATE_ID_PARAM;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.MOVIEBOARD;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED;
@@ -638,6 +640,13 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "Creating video object");
         boolean soundOn = false;
         boolean isSkippable = true;
+
+        // Presence of these has already been checked in CasUtils
+        if (isMovieBoardRequest()) {
+            templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), MOVIEBOARD);
+        } else if (isNativeRequest()) {
+            templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), VAST);
+        }
 
         try {
             final JSONObject siteVideoPreferencesJson = new JSONObject(sasParams.getPubControlPreferencesJson());

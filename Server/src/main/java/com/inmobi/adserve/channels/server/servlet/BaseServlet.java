@@ -113,8 +113,8 @@ public abstract class BaseServlet implements Servlet {
             return;
         }
 
-        final boolean isVideoSupported = casUtils.isVideoSupportedSite(sasParams);
         sasParams.setMovieBoardRequest(SASParamsUtils.isRequestEligibleForMovieBoard(sasParams));
+        final boolean isVideoSupported = casUtils.isVideoSupportedSite(sasParams);
         sasParams.setVideoSupported(isVideoSupported);
         LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
 
