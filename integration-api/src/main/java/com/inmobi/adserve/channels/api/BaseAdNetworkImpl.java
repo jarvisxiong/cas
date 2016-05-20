@@ -136,6 +136,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @Getter
     private boolean isNativeRequest = false;
     @Getter
+    private boolean isMovieBoardRequest = false;
+    @Getter
     protected boolean isSegmentVideoSupported = false;
     @Getter
     protected boolean isSegmentPureVastSupported = false;
@@ -522,7 +524,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return responseStruct;
         }
         responseStruct = new ThirdPartyAdResponse();
-        responseStruct.setResponseFormat(isNativeRequest() ? JSON : HTML);
+        responseStruct.setResponseFormat(isNativeRequest() || isMovieBoardRequest() ? JSON : HTML);
         responseStruct.setResponse(getHttpResponseContent());
         responseStruct.setResponseHeaders(getResponseHeaders());
         if (statusCode >= 400) {
@@ -570,6 +572,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         blindedSiteId = BaseAdNetworkHelper.getBlindedSiteId(param.getSiteIncId(), entity.getAdgroupIncId());
         this.entity = entity;
         isNativeRequest = SASParamsUtils.isNativeRequest(sasParams);
+        isMovieBoardRequest = sasParams.isMovieBoardRequest();
 
         // Checking the appropriate SecondaryAdFormatConstraints of an adgroup is a sufficient check for determining
         // vast video, rewarded video, etc support as the selected adgroup by this point, would have already had all

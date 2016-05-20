@@ -1,11 +1,17 @@
 package com.inmobi.adserve.channels.server.utils;
 
 
-import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.MOVIEBOARD;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_REQUEST_DROPPED_AS_MIN_OS_CHECK_FAILED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING;
+import static com.inmobi.segment.impl.AdTypeEnum.INLINE_BANNER;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +29,10 @@ import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.Formatter;
 import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.PricingEngineEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
+import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
@@ -38,10 +44,31 @@ import io.netty.handler.codec.http.HttpRequest;
 @Singleton
 public class CasUtils {
     private static final Logger LOG = LoggerFactory.getLogger(CasUtils.class);
-    protected static final String MINIMUM_SUPPORTED_IOS_VERSION_FOR_VIDEO_CONFIG_KEY =
+    static final String MINIMUM_SUPPORTED_IOS_VERSION_FOR_VIDEO_CONFIG_KEY =
             "adtype.vast.minimumSupportedIOSVersion";
-    protected static final String MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_VIDEO_CONFIG_KEY =
+    static final String MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_VIDEO_CONFIG_KEY =
             "adtype.vast.minimumSupportedAndroidVersion";
+    private static final String MINIMUM_SUPPORTED_IOS_VERSION_FOR_INLINE_BANNER_CONFIG_KEY =
+            "adtype.inlineBanner.minimumSupportedIOSVersion";
+    private static final String MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_INLINE_BANNER_CONFIG_KEY =
+            "adtype.inlineBanner.minimumSupportedAndroidVersion";
+    private static final HashMap<Integer, HashMap<AdTypeEnum, String>> OS_AD_TYPE_MINVERSION_KEY_MAP = new HashMap<>();
+
+    static {
+        final HashMap<AdTypeEnum, String> ANDROID_AD_TYPE_MIN_VERSION_MAP = new HashMap<>();
+        ANDROID_AD_TYPE_MIN_VERSION_MAP.put(AdTypeEnum.VAST, MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_VIDEO_CONFIG_KEY);
+        ANDROID_AD_TYPE_MIN_VERSION_MAP.put(
+                INLINE_BANNER, MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_INLINE_BANNER_CONFIG_KEY);
+
+        final HashMap<AdTypeEnum, String> IOS_AD_TYPE_MIN_VERSION_MAP = new HashMap<>();
+        IOS_AD_TYPE_MIN_VERSION_MAP.put(AdTypeEnum.VAST, MINIMUM_SUPPORTED_IOS_VERSION_FOR_VIDEO_CONFIG_KEY);
+        IOS_AD_TYPE_MIN_VERSION_MAP.put(
+                INLINE_BANNER, MINIMUM_SUPPORTED_IOS_VERSION_FOR_INLINE_BANNER_CONFIG_KEY);
+
+        OS_AD_TYPE_MINVERSION_KEY_MAP.put(Android.getValue(), ANDROID_AD_TYPE_MIN_VERSION_MAP);
+        OS_AD_TYPE_MINVERSION_KEY_MAP.put(iOS.getValue(), IOS_AD_TYPE_MIN_VERSION_MAP);
+    }
+
     private final RepositoryHelper repositoryHelper;
 
     @Inject
@@ -85,10 +112,28 @@ public class CasUtils {
             return true;
         }
 
+        // TODO: The definition of isVideoSupported has been overloaded too much. Figure out a better way
         if (SASParamsUtils.isNativeRequest(sasParams)) {
-            final NativeAdTemplateEntity hasVideoTemplate =
-                    repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), VAST);
-            return hasVideoTemplate != null;
+            LOG.debug("Request is eligible for native 1.0 video, checking for valid template");
+            final boolean hasVideoTemplate =
+                    null != repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), VAST);
+
+            if (!hasVideoTemplate)
+                InspectorStats.incrementStatCount(NATIVE_VIDEO_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING);
+
+            return hasVideoTemplate;
+        }
+
+        if (sasParams.isMovieBoardRequest()) {
+            LOG.debug("Request is eligible for movieBoard, enforcing min os constraints and checking for valid template");
+            final boolean hasMovieBoardTemplate = (
+                    null != repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), MOVIEBOARD));
+
+            if (!hasMovieBoardTemplate)
+                InspectorStats.incrementStatCount(MOVIE_BOARD_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING);
+
+            return hasMovieBoardTemplate && checkMinimumOSVersionForAdType(sasParams.getOsId(),
+                    sasParams.getOsMajorVersion(), CasConfigUtil.getServerConfig(), INLINE_BANNER);
         }
 
         if (RequestedAdType.INTERSTITIAL != sasParams.getRequestedAdType()) {
@@ -121,31 +166,33 @@ public class CasUtils {
             return false;
         }
 
-        return checkMinimumOSVersionForVideo(sasParams.getOsId(), sasParams.getOsMajorVersion(),
-                CasConfigUtil.getServerConfig());
+        return checkMinimumOSVersionForAdType(sasParams.getOsId(), sasParams.getOsMajorVersion(),
+                CasConfigUtil.getServerConfig(), AdTypeEnum.VAST);
     }
 
-    protected static boolean checkMinimumOSVersionForVideo(final int osId, final String osMajorVersionStr,
-            final Configuration serverConfig) {
+    protected static boolean checkMinimumOSVersionForAdType(final int osId, final String osMajorVersionStr,
+                                                            final Configuration serverConfig, final AdTypeEnum adTypeEnum) {
+        LOG.debug("Checking OS version for the requested adType");
         boolean checkPassed = false;
 
+        Integer osIdInteger = osId;
+        if (!(OS_AD_TYPE_MINVERSION_KEY_MAP.containsKey(osIdInteger)
+                && OS_AD_TYPE_MINVERSION_KEY_MAP.get(osIdInteger).containsKey(adTypeEnum))) {
+            LOG.debug("Cannot find os or adType in OS_AD_TYPE_MINVERSION_KEY_MAP, {}. Failing OS check.",
+                    OS_AD_TYPE_MINVERSION_KEY_MAP);
+            InspectorStats.incrementStatCount(MOVIE_BOARD_REQUEST_DROPPED_AS_MIN_OS_CHECK_FAILED);
+            return false;
+        }
         try {
             if (null != osMajorVersionStr) {
                 final double osVersion = Double.valueOf(osMajorVersionStr);
-                final String minOsVersionConfigKey;
-
-                if (Android.getValue() == osId) {
-                    minOsVersionConfigKey = MINIMUM_SUPPORTED_ANDROID_VERSION_FOR_VIDEO_CONFIG_KEY;
-                } else if (iOS.getValue() == osId) {
-                    minOsVersionConfigKey = MINIMUM_SUPPORTED_IOS_VERSION_FOR_VIDEO_CONFIG_KEY;
-                } else {
-                    minOsVersionConfigKey = null;
-                }
+                final String minOsVersionConfigKey = OS_AD_TYPE_MINVERSION_KEY_MAP.get(osIdInteger).get(adTypeEnum);
 
                 if (null != minOsVersionConfigKey) {
                     final double minimumOsVersion = serverConfig.getDouble(minOsVersionConfigKey);
                     if (osVersion >= minimumOsVersion) {
                         checkPassed = true;
+                        LOG.debug("OS Version check passed");
                     }
                 }
             }

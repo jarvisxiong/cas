@@ -12,6 +12,7 @@ import org.slf4j.Marker;
 import com.google.inject.Provider;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
+import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SiteFilterEntity;
@@ -113,6 +114,7 @@ public abstract class BaseServlet implements Servlet {
         }
 
         final boolean isVideoSupported = casUtils.isVideoSupportedSite(sasParams);
+        sasParams.setMovieBoardRequest(SASParamsUtils.isRequestEligibleForMovieBoard(sasParams));
         sasParams.setVideoSupported(isVideoSupported);
         LOG.debug("isVideoSupported for this request is {}", isVideoSupported);
 

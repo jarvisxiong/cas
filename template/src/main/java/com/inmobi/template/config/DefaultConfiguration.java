@@ -1,5 +1,6 @@
 package com.inmobi.template.config;
 
+import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 
 import com.google.inject.Inject;
@@ -20,6 +21,9 @@ public class DefaultConfiguration implements TemplateConfiguration {
 
     @Inject
     private MathTool mathTool;
+
+    @Inject
+    private ListTool listTool;
 
     @Inject
     private TemplateTool templateTool;

@@ -1,5 +1,6 @@
 package com.inmobi.template.module;
 
+import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 
 import com.google.inject.AbstractModule;
@@ -35,6 +36,7 @@ public class TemplateModule extends AbstractModule {
     private Class<? extends TemplateConfiguration> defaultTemplateInitializer() {
         bind(Tools.class).to(ToolsImpl.class).asEagerSingleton();
         bind(MathTool.class).asEagerSingleton();
+        bind(ListTool.class).asEagerSingleton();
         bind(TemplateTool.class).asEagerSingleton();
         bind(GsonManager.class).asEagerSingleton();
         return DefaultConfiguration.class;

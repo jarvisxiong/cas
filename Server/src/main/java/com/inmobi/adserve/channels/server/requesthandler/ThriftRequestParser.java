@@ -111,7 +111,12 @@ public class ThriftRequestParser {
         params.setSst(tObject.isSetSupplySource() ? tObject.supplySource.getValue() : 0);
         params.setEncryptionKey(tObject.getEncryptionKeys());
         params.setReferralUrl(tObject.referralUrl);
+
+        if (tObject.isSetPoolParamsDeprecated()) {
+            params.setAdPoolParamsMap(tObject.getPoolParamsDeprecated());
+        }
         params.setIntegrationDetails(tObject.getIntegrationDetails());
+        params.setSupplyCapabilities(tObject.isSetSupplyCapabilities() ? tObject.getSupplyCapabilities() : new HashSet<>());
         params.setAppBundleId(tObject.getAppBundleId());
         params.setRequestGuid(tObject.isSetRequestGuid() ? tObject.requestGuid : StringUtils.EMPTY);
 
@@ -216,6 +221,9 @@ public class ThriftRequestParser {
                         InspectorStats.incrementStatCount(CSIDS_MIGRATION_SANE);
                     } else {
                         InspectorStats.incrementStatCount(CSIDS_MIGRATION_NOT_SANE);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Mismatch in CSIDs. Old: {}, New: {} ", csiTagsOldSet, csiTagsNewSet);
+                        }
                     }
                 }
             }

@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.server.utils;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS;
 
+import com.inmobi.adserve.supply.AdType;
+import com.inmobi.segment.impl.AdTypeEnum;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -38,6 +40,6 @@ public class ParameterisedCasUtilsTests {
 
     @Test(dataProvider = "Minimum OS Version for Video")
     public void testMinimumOSVersionForVideo(final String testCaseName, final int osId, final String osMajorVersionStr, final Configuration serverConfig, final boolean result) {
-        Assert.assertEquals(result, CasUtils.checkMinimumOSVersionForVideo(osId, osMajorVersionStr, serverConfig));
+        Assert.assertEquals(result, CasUtils.checkMinimumOSVersionForAdType(osId, osMajorVersionStr, serverConfig, AdTypeEnum.VAST));
     }
 }

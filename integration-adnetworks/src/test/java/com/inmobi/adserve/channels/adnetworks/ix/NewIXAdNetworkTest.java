@@ -1145,6 +1145,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+        expect(mockSasParams.isMovieBoardRequest()).andReturn(false).anyTimes();
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};

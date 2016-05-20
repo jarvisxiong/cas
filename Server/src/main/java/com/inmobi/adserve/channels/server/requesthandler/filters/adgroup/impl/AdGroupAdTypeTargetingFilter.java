@@ -35,7 +35,7 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
             ImmutableList.of(14L, 16L, 17L, 31L, 32L, 33L, 34L, 39L);
 
     @Inject
-    protected AdGroupAdTypeTargetingFilter(final Provider<Marker> traceMarkerProvider) {
+    AdGroupAdTypeTargetingFilter(final Provider<Marker> traceMarkerProvider) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_AD_TYPE_TARGETING_FILTER);
     }
 
@@ -45,25 +45,33 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
         final boolean returnValue;
         final ChannelSegmentEntity csEntity = channelSegment.getChannelSegmentEntity();
         final boolean isRequestAdTypeVast = RequestedAdType.VAST == sasParams.getRequestedAdType();
+        final boolean isRequestAdTypeInlineBanner = RequestedAdType.INLINE_BANNER == sasParams.getRequestedAdType();
+
+        LOG.debug("Secondary AdFormat for adgroup {} is {}", csEntity.getId(), csEntity.getSecondaryAdFormatConstraints());
+
+        // TODO: Makes sense to split this into multiple filters for each demand ad type
         switch (csEntity.getSecondaryAdFormatConstraints()) {
             case VAST_VIDEO:
-                returnValue = sasParams.isRewardedVideo() || isRequestAdTypeVast
+                returnValue = sasParams.isRewardedVideo() || isRequestAdTypeVast    
+                        || isRequestAdTypeInlineBanner
                         || !checkVideoEligibility(csEntity.getSlotIds(), sasParams);
                 break;
             case PURE_VAST:
-                returnValue = sasParams.isRewardedVideo()
-                        || !(isRequestAdTypeVast || SASParamsUtils.isNativeRequest(sasParams))
-                        || !sasParams.isVideoSupported();
+                returnValue = sasParams.isRewardedVideo() || !sasParams.isVideoSupported()
+                        || !(isRequestAdTypeVast || SASParamsUtils.isNativeRequest(sasParams)
+                        || sasParams.isMovieBoardRequest());
                 break;
             case REWARDED_VAST_VIDEO:
                 returnValue = !sasParams.isRewardedVideo() || isRequestAdTypeVast
+                        || isRequestAdTypeInlineBanner
                         || !checkVideoEligibility(csEntity.getSlotIds(), sasParams);
                 break;
             case STATIC:
                 // Not enforcing interstitial slots. Assuming that this is correctly handled in UMP.
                 final List<AdTypeEnum> supportedAdTypes = sasParams.getPubControlSupportedAdTypes();
                 returnValue = CollectionUtils.isEmpty(supportedAdTypes) || isRequestAdTypeVast
-                        || !supportedAdTypes.contains(AdTypeEnum.BANNER) || sasParams.isRewardedVideo();
+                        || !supportedAdTypes.contains(AdTypeEnum.BANNER) || sasParams.isRewardedVideo()
+                        || isRequestAdTypeInlineBanner;
                 break;
             default:
                 InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE);
@@ -73,12 +81,6 @@ public final class AdGroupAdTypeTargetingFilter extends AbstractAdGroupLevelFilt
         return returnValue;
     }
 
-    /**
-     * 
-     * @param channelSegmentSlotIds
-     * @param sasParams
-     * @return
-     */
     private boolean checkVideoEligibility(final Long[] channelSegmentSlotIds, final SASRequestParameters sasParams) {
         final boolean videoSupplyConstraintsMatch = sasParams.isVideoSupported();
         final boolean videoDemandConstraintsMatch =

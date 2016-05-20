@@ -271,6 +271,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
+        expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockCasInternal.isTraceEnabled()).andReturn(true);
         expect(mockChannel.isOpen()).andReturn(true).times(1);
@@ -369,6 +370,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
+        expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
@@ -464,9 +466,10 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getAge()).andReturn((short) 11).times(3);
         expect(mockSasParam.getDst()).andReturn(2).times(1).andReturn(6).times(1).andReturn(8).times(1);
         expect(mockSasParam.getOsId()).andReturn(3).times(1).andReturn(5).times(1);
-        expect(mockSasParam.getSource()).andReturn("WAP").times(1);
+        expect(mockSasParam.getSource()).andReturn("WAP").anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
+        expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -539,8 +542,10 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRFormat()).andReturn("banner").anyTimes();
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
-        expect(mockCasInternalRequestParameters.isTrackingAllowed()).andReturn(true).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
+        expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+
+        expect(mockCasInternalRequestParameters.isTrackingAllowed()).andReturn(true).anyTimes();
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)
                 .andReturn("IFA0000000000000000000000000000").times(2);
         expect(mockCasInternalRequestParameters.getGpid()).andReturn(null).times(5)

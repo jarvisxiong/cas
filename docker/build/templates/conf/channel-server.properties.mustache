@@ -58,6 +58,8 @@ server.enableAutomationTests={{automation_tests_enabled}}
 server.adtype.vast.minimumSupportedSdkVersion=450
 server.adtype.vast.minimumSupportedIOSVersion=8
 server.adtype.vast.minimumSupportedAndroidVersion=4.4
+server.adtype.inlineBanner.minimumSupportedIOSVersion=7
+server.adtype.inlineBanner.minimumSupportedAndroidVersion=4
 
 server.clickmaker.ipFileVersion = 1
 server.clickmaker.clickURLPrefix = http://{{{click_url_prefix}}}
@@ -170,7 +172,7 @@ Cache.CreativeRepository.dataSourceName = jdbc
 
 Cache.Name = NativeAdTemplateRepository
 Cache.NativeAdTemplateRepository.Manager = com.inmobi.adserve.channels.repository.NativeAdTemplateRepository
-Cache.NativeAdTemplateRepository.query = select * from placement_native_template_fun('${last_update}')
+Cache.NativeAdTemplateRepository.query = select * from placement_native_template_fun_movieboard('${last_update}')
 Cache.NativeAdTemplateRepository.initialDelay = 300
 Cache.NativeAdTemplateRepository.refreshTime = 1277
 Cache.NativeAdTemplateRepository.isUpdatable = true

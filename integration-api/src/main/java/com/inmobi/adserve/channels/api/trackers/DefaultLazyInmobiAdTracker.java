@@ -32,7 +32,6 @@ import com.inmobi.types.eventserver.RenderInfo;
 import com.inmobi.types.eventserver.RenderUnitInfo;
 
 import io.netty.util.CharsetUtil;
-
 import lombok.Builder;
 
 /**

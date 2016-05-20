@@ -3,8 +3,6 @@ package com.inmobi.template.context;
 import java.util.List;
 import java.util.Map;
 
-import com.inmobi.template.interfaces.Context;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,6 +10,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
+// TODO: Use lombok builder for this
 public final class App extends AbstractContext {
     private final String title;
     private final String desc;
@@ -29,7 +28,6 @@ public final class App extends AbstractContext {
     @Setter
     private String adImpressionId;
 
-
     private App(final Builder builder) {
         title = builder.title;
         desc = builder.desc;
@@ -45,6 +43,7 @@ public final class App extends AbstractContext {
         clickUrls = builder.clickUrls;
         adImpressionId = builder.adImpressionId;
         actionText = builder.actionText;
+
         setValues(params);
     }
 
@@ -121,7 +120,7 @@ public final class App extends AbstractContext {
         @Setter
         private String adImpressionId;
 
-        public Context build() {
+        public App build() {
             return new App(this);
         }
     }

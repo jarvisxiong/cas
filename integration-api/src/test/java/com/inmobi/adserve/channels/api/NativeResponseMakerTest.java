@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -61,6 +62,7 @@ public class NativeResponseMakerTest {
         templateConfiguration.setGsonManager(gsonManager);
         templateConfiguration.setTool(new ToolsImpl(gsonManager));
         templateConfiguration.setMathTool(new MathTool());
+        templateConfiguration.setListTool(new ListTool());
 
         return templateConfiguration;
     }

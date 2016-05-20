@@ -31,4 +31,5 @@ public class GlobalConstant {
     public static final String NON_WIFI = "NON_WIFI";
     public static final String PROD = "prod";
     public static final String NON_PROD = "non_prod";
+    public static final String SDK_TIMESTAMP_SUFFIX = "&__t=$TS";
 }
