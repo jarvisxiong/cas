@@ -1,6 +1,7 @@
 package com.inmobi.adserve.channels.api;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
@@ -200,13 +202,6 @@ public class NativeResponseMakerTest {
         if (null == pixelUrlArray && (StringUtils.isNotBlank(nUrl) || (StringUtils.isNotBlank(winUrl)))) {
             pixelUrlArray = new ArrayList<>();
         }
-        if (StringUtils.isNotBlank(nUrl)) {
-            pixelUrlArray.add(nUrl);
-        }
-        if (StringUtils.isNotBlank(winUrl)) {
-            pixelUrlArray.add(winUrl);
-        }
-
         final Map<String, String> params = new HashMap<>();
         final com.inmobi.template.context.App.Builder appBuilder = com.inmobi.template.context.App.newBuilder();
         final com.inmobi.template.context.App.Builder contextBuilder = com.inmobi.template.context.App.newBuilder();
@@ -217,8 +212,26 @@ public class NativeResponseMakerTest {
         params.put("winUrl", winUrl);
         final Map<Integer, Map<String, List<String>>> actualOutput = nativeResponseMaker.getEventTracking(app, params);
 
-        assertEquals(actualOutput.get(TrackerUIInteraction.VIEW.getValue()).get("urls"), pixelUrlArray);
-        assertEquals(actualOutput.get(TrackerUIInteraction.CLICK.getValue()).get("urls"), clickUrlArray);
+        if (StringUtils.isNotBlank(nUrl)) {
+            pixelUrlArray.add(nUrl);
+        }
+        if (StringUtils.isNotBlank(winUrl)) {
+            pixelUrlArray.add(winUrl);
+        }
+        if (CollectionUtils.isNotEmpty(pixelUrlArray)) {
+            assertEquals(actualOutput.get(TrackerUIInteraction.RENDER.getValue()).get("urls"), pixelUrlArray);
+            assertEquals(actualOutput.get(18).get("urls"), pixelUrlArray);
+        } else {
+            assertTrue(CollectionUtils.isEmpty(actualOutput.get(TrackerUIInteraction.RENDER.getValue()).get("urls")));
+            assertTrue(CollectionUtils.isEmpty(actualOutput.get(18).get("urls")));
+        }
+        if (CollectionUtils.isNotEmpty(clickUrlArray)) {
+            assertEquals(actualOutput.get(TrackerUIInteraction.CLICK.getValue()).get("urls"), clickUrlArray);
+            assertEquals(actualOutput.get(8).get("urls"), clickUrlArray);
+        } else {
+            assertTrue(CollectionUtils.isEmpty(actualOutput.get(TrackerUIInteraction.CLICK.getValue()).get("urls")));
+            assertTrue(CollectionUtils.isEmpty(actualOutput.get(8).get("urls")));
+        }
     }
 
 }

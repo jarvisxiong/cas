@@ -102,25 +102,25 @@ public class NativeResponseMaker {
         clickMap.put(URLS, CollectionUtils.isNotEmpty(clickUrls) ? clickUrls : Collections.emptyList());
 
         // View or Impression Tracker
-        final Map<String, List<String>> impressionMap = new HashMap<>();
-        final List<String> impressionTrackers = new ArrayList<>();
+        final Map<String, List<String>> renderMap = new HashMap<>();
+        final List<String> renderTrackers = new ArrayList<>();
         final List<String> pixelUrls = app.getPixelUrls();
         if (CollectionUtils.isNotEmpty(pixelUrls)) {
-            impressionTrackers.addAll(pixelUrls);
+            renderTrackers.addAll(pixelUrls);
         }
         final String nUrl = params.get(NURL_URL_PARAM);
         if (StringUtils.isNotBlank(nUrl)) {
-            impressionTrackers.add(nUrl);
+            renderTrackers.add(nUrl);
         }
         final String winUrl = params.get(WIN_URL_PARAM);
         if (StringUtils.isNotBlank(winUrl)) {
-            impressionTrackers.add(winUrl);
+            renderTrackers.add(winUrl);
         }
-        impressionMap.put(URLS, impressionTrackers);
+        renderMap.put(URLS, renderTrackers);
 
         final Map<Integer, Map<String, List<String>>> eventTracking = new HashMap<>();
         eventTracking.put(TrackerUIInteraction.CLICK.getValue(), clickMap);
-        eventTracking.put(TrackerUIInteraction.VIEW.getValue(), impressionMap);
+        eventTracking.put(TrackerUIInteraction.RENDER.getValue(), renderMap);
         return eventTracking;
     }
 
