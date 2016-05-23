@@ -111,7 +111,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public boolean configureParameters() {
         if (StringUtils.isBlank(sasParams.getRemoteHostIp()) || StringUtils.isBlank(sasParams.getUserAgent())
-            || StringUtils.isBlank(externalSiteId)) {
+                || StringUtils.isBlank(externalSiteId)) {
             LOG.debug("mandatory parameters missing for smaato so exiting adapter");
             LOG.info("Configure parameters inside Smaato returned false");
             return false;
@@ -193,7 +193,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
         if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
             appendQueryParam(url, LATLONG, getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format),
-                false);
+                    false);
         }
         if (StringUtils.isNotBlank(sasParams.getGender())) {
             appendQueryParam(url, GENDER, sasParams.getGender(), false);
@@ -226,13 +226,13 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         return new RequestBuilder().setUrl(uri.toString())
-            .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
-            .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
-            .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
-            .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
-            .setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp())
-            .setHeader(HttpHeaders.Names.HOST, uri.getHost())
-            .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
+                .setHeader(HttpHeaders.Names.USER_AGENT, sasParams.getUserAgent())
+                .setHeader(HttpHeaders.Names.ACCEPT_LANGUAGE, "en-us")
+                .setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.BYTES)
+                .setHeader("x-mh-User-Agent", sasParams.getUserAgent())
+                .setHeader("x-mh-X-Forwarded-For", sasParams.getRemoteHostIp())
+                .setHeader(HttpHeaders.Names.HOST, uri.getHost())
+                .setHeader("X-Forwarded-For", sasParams.getRemoteHostIp());
     }
 
     @Override

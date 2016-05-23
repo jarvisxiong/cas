@@ -89,22 +89,22 @@ public class DCPSmaatoAdnetworkTest {
         prepareMockConfig();
         Formatter.init();
         LifecycleInjector
-            .builder()
-            .withModules(Modules.combine(new AbstractModule() {
+                .builder()
+                .withModules(Modules.combine(new AbstractModule() {
 
-                @Override
-                public void configure() {
-                    bind(AsyncHttpClientProvider.class).toInstance(createMock(AsyncHttpClientProvider.class));
-                    bind(JaxbHelper.class).asEagerSingleton();
-                    bind(DocumentBuilderHelper.class).asEagerSingleton();
-                    install(new FactoryModuleBuilder()
-                        .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
-                        .build(Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
-                    requestStaticInjection(BaseAdNetworkImpl.class);
-                }
-            }), new TestScopeModule())
-            .usingBasePackages("com.inmobi.adserve.channels.server.netty",
-                "com.inmobi.adserve.channels.api.provider").build().createInjector();
+                    @Override
+                    public void configure() {
+                        bind(AsyncHttpClientProvider.class).toInstance(createMock(AsyncHttpClientProvider.class));
+                        bind(JaxbHelper.class).asEagerSingleton();
+                        bind(DocumentBuilderHelper.class).asEagerSingleton();
+                        install(new FactoryModuleBuilder()
+                            .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
+                            .build(Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
+                        requestStaticInjection(BaseAdNetworkImpl.class);
+                    }
+                }), new TestScopeModule())
+                .usingBasePackages("com.inmobi.adserve.channels.server.netty",
+                    "com.inmobi.adserve.channels.api.provider").build().createInjector();
         final SlotSizeMapEntity slotSizeMapEntityFor4 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
         replay(slotSizeMapEntityFor4);
@@ -122,15 +122,15 @@ public class DCPSmaatoAdnetworkTest {
         replay(slotSizeMapEntityFor15);
         repositoryHelper = createMock(RepositoryHelper.class);
         expect(repositoryHelper.querySlotSizeMapRepository((short) 4))
-            .andReturn(slotSizeMapEntityFor4).anyTimes();
+                .andReturn(slotSizeMapEntityFor4).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 9))
-            .andReturn(slotSizeMapEntityFor9).anyTimes();
+                .andReturn(slotSizeMapEntityFor9).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 11))
-            .andReturn(slotSizeMapEntityFor11).anyTimes();
+                .andReturn(slotSizeMapEntityFor11).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 14))
-            .andReturn(slotSizeMapEntityFor14).anyTimes();
+                .andReturn(slotSizeMapEntityFor14).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 15))
-            .andReturn(slotSizeMapEntityFor15).anyTimes();
+                .andReturn(slotSizeMapEntityFor15).anyTimes();
         replay(repositoryHelper);
         dcpSmaatoAdNetwork = new DCPSmaatoAdnetwork(mockConfig, null, base, serverChannel);
 
@@ -149,19 +149,19 @@ public class DCPSmaatoAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
-            .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("23e2ewq445545");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
+                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-            dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 11, repositoryHelper));
+                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 11, repositoryHelper));
     }
 
     @Test
@@ -170,15 +170,15 @@ public class DCPSmaatoAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
         sasParams
-            .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, null,
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, null,
+                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
             dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
     }
@@ -198,7 +198,7 @@ public class DCPSmaatoAdnetworkTest {
                 null, false, false, false, false, false, false, false, false, false, false, null,
                 new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-            dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
+                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -221,16 +221,16 @@ public class DCPSmaatoAdnetworkTest {
         sasParams.setAge(Short.valueOf("32"));
         final String externalKey = "6378ef4a7db50d955c90f7dffb05ee20";
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                    new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
 
             final String expectedUrl =
-                "http://f101.smaato.com/oapi/reqAd.jsp?adspace=6378ef4a7db50d955c90f7dffb05ee20&apiver=2.0&pub=923867039&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&devip=178.190.64.146&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&response=XML&coppa=0&googleadid=TEST_GPID&googlednt=false&gps=37.4429%2C-122.1514&gender=m&kws=Business&width=320&height=50&age=32&divid=smt-6378ef4a7db50d955c90f7dffb05ee20";
+                    "http://f101.smaato.com/oapi/reqAd.jsp?adspace=6378ef4a7db50d955c90f7dffb05ee20&apiver=2.0&pub=923867039&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&devip=178.190.64.146&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&response=XML&coppa=0&googleadid=TEST_GPID&googlednt=false&gps=37.4429%2C-122.1514&gender=m&kws=Business&width=320&height=50&age=32&divid=smt-6378ef4a7db50d955c90f7dffb05ee20";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -253,15 +253,15 @@ public class DCPSmaatoAdnetworkTest {
 
         final String externalKey = "01212121";
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                    new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
             final String expectedUrl =
-                "http://f101.smaato.com/oapi/reqAd.jsp?adspace=01212121&apiver=2.0&pub=923867039&device=Mozilla&devip=206.29.182.240&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&response=XML&coppa=0&gps=38.5%2C-122.1514&kws=Business%2CBooks+%26+Reference&width=320&height=50&divid=smt-01212121";
+                    "http://f101.smaato.com/oapi/reqAd.jsp?adspace=01212121&apiver=2.0&pub=923867039&device=Mozilla&devip=206.29.182.240&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&response=XML&coppa=0&gps=38.5%2C-122.1514&kws=Business%2CBooks+%26+Reference&width=320&height=50&divid=smt-01212121";
             assertEquals(expectedUrl, actualUrl);
 
         }
@@ -278,15 +278,15 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "19100";
 
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         AdapterTestHelper.setBeaconAndClickStubs();
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         final String response =
-            "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>CFF4454048445012E09748993D22E78C.ip-10-0-37-13</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"IMG\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link>http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/getAd.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13</link><action target=\"http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13\" acc=\"server\"/><beacons/></ad></ads></response>";
+                "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>CFF4454048445012E09748993D22E78C.ip-10-0-37-13</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"IMG\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link>http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/getAd.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13</link><action target=\"http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13\" acc=\"server\"/><beacons/></ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpSmaatoAdNetwork.getHttpResponseStatusCode());
         assertEquals(
@@ -305,22 +305,22 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "19100";
 
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         AdapterTestHelper.setBeaconAndClickStubs();
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         final String response =
-            "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>FD724737F15BB1C4AFA28D6D34B56D33.soma-i-008a489f62d8a2fda</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"RICHMEDIA\" width=\"320\" height=\"480\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><mediadata><![CDATA[<div id='adelphic_ads' style='margin:0;padding:0;border:0;width:320;height:480;'><div class=\"celtra-ad-v3\">  <!-- externalCreativeId = raw 777417 -->  <!-- externalSiteId     = raw 8261121 -->  <!-- externalSupplierId = raw 23 -->  <img src=\"data:image/png,celtra\" style=\"display: none\" onerror=\"        (function(img) {            var params = {'clickUrl':'https://events-us-east-1.ipredictive.com/d/track/click?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&ez_p=&ro=1','expandDirection':'undefined','preferredClickThroughWindow':'','clickEvent':'advertiser','externalAdServer':'Adelphic','tagVersion':'3'};            [].slice.apply(img.parentNode.childNodes).forEach(function(n) { var decfs = { urldecode: decodeURIComponent, htmldecode: function(v) { var d = document.createElement('div'); d.innerHTML = v; return d.textContent; }, eval: function(v) { return eval(v); }, raw: function(v) { return v; } }; var m; if (n.nodeType == 8 && (m = n.textContent.match(/^\\s+([\\w.]+)(\\[.+\\])?\\s+=\\s+(\\w+)\\s+(.*)$/i))) { try { params[m[1]+(m[2] || '')] = decfs[m[3]](m[4].replace(/^\\s+|\\s+$/g, '')); } catch (e) {} } });            var req = document.createElement('script');            req.id = params.scriptId = 'celtra-script-' + (window.celtraScriptIndex = (window.celtraScriptIndex||0)+1);            params.clientTimestamp = new Date/1000;            params.clientTimeZoneOffsetInMinutes = new Date().getTimezoneOffset();            var src = (window.location.protocol == 'https:' ? 'https' : 'http') + '://ads.celtra.com/3d1274c0/web.js?';            for (var k in params) {                src += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);            }            req.src = src;            img.parentNode.insertBefore(req, img.nextSibling);        })(this);    \"> </div> <img src=\"?https://t.mookie1.com/t/v1/event?migSource=mig&migAction=mobiletracking-imp&migClientId=6405&migParam1=31497&migParam2=38E31250-DD17-4C48-A9B9-15B8B9AE5D02\"width=1\" height=\"1\"> <img src=\"https://tps30.doubleverify.com/visit.jpg?ctx=1362594&cmp=9473293&sid=1416456&plc=128890855&num=&adid=&advid=892261&adsrv=1&region=30&btreg=&btadsrv=&crt=&crtname=&chnl=&unit=&pid=&uid=&tagtype=&dvtagver=6.1.img&\" alt=\"\" width=\"0\" height=\"0\"><img src='https://events-us-east-1.ipredictive.com/d/csimp/pixel?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&au_pc=2.85500000&uid=yGjuDj* Connection #0 to host 52.2.61.35 left intact\n"
-                + "wvvT0Nhpl%2BBawO8tiYGs%2FkS1j9OmU7tws0UitJVbOb%2FNWhZxDjG5o%2BHP%2Bx&rr=1463658814533' style='display:none' height='1' width='1'></img><img src='https://tracker.samplicio.us/tracker/c87908c3-57c6-4faf-afb9-cbd785429a43/pixel.gif?sid=xaxisSITE&pid=265357&crid=777417'  height='1' width='1' style='display:none'></img></div><script type=\"text/javascript\" src=\"https://c.betrad.com/surly.js#;ad_w=320;ad_h=480;coid=1839;nid=15932;\"></script>]]></mediadata><link></link><action target=\"\" type=\"\"/><beacons><beacon>http://54.173.162.0/oapi/getAd;jsessionid=FD724737F15BB1C4AFA28D6D34B56D33.soma-i-008a489f62d8a2fda</beacon></beacons></ad></ads></response>";
+                "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>FD724737F15BB1C4AFA28D6D34B56D33.soma-i-008a489f62d8a2fda</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"RICHMEDIA\" width=\"320\" height=\"480\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><mediadata><![CDATA[<div id='adelphic_ads' style='margin:0;padding:0;border:0;width:320;height:480;'><div class=\"celtra-ad-v3\">  <!-- externalCreativeId = raw 777417 -->  <!-- externalSiteId     = raw 8261121 -->  <!-- externalSupplierId = raw 23 -->  <img src=\"data:image/png,celtra\" style=\"display: none\" onerror=\"        (function(img) {            var params = {'clickUrl':'https://events-us-east-1.ipredictive.com/d/track/click?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&ez_p=&ro=1','expandDirection':'undefined','preferredClickThroughWindow':'','clickEvent':'advertiser','externalAdServer':'Adelphic','tagVersion':'3'};            [].slice.apply(img.parentNode.childNodes).forEach(function(n) { var decfs = { urldecode: decodeURIComponent, htmldecode: function(v) { var d = document.createElement('div'); d.innerHTML = v; return d.textContent; }, eval: function(v) { return eval(v); }, raw: function(v) { return v; } }; var m; if (n.nodeType == 8 && (m = n.textContent.match(/^\\s+([\\w.]+)(\\[.+\\])?\\s+=\\s+(\\w+)\\s+(.*)$/i))) { try { params[m[1]+(m[2] || '')] = decfs[m[3]](m[4].replace(/^\\s+|\\s+$/g, '')); } catch (e) {} } });            var req = document.createElement('script');            req.id = params.scriptId = 'celtra-script-' + (window.celtraScriptIndex = (window.celtraScriptIndex||0)+1);            params.clientTimestamp = new Date/1000;            params.clientTimeZoneOffsetInMinutes = new Date().getTimezoneOffset();            var src = (window.location.protocol == 'https:' ? 'https' : 'http') + '://ads.celtra.com/3d1274c0/web.js?';            for (var k in params) {                src += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);            }            req.src = src;            img.parentNode.insertBefore(req, img.nextSibling);        })(this);    \"> </div> <img src=\"?https://t.mookie1.com/t/v1/event?migSource=mig&migAction=mobiletracking-imp&migClientId=6405&migParam1=31497&migParam2=38E31250-DD17-4C48-A9B9-15B8B9AE5D02\"width=1\" height=\"1\"> <img src=\"https://tps30.doubleverify.com/visit.jpg?ctx=1362594&cmp=9473293&sid=1416456&plc=128890855&num=&adid=&advid=892261&adsrv=1&region=30&btreg=&btadsrv=&crt=&crtname=&chnl=&unit=&pid=&uid=&tagtype=&dvtagver=6.1.img&\" alt=\"\" width=\"0\" height=\"0\"><img src='https://events-us-east-1.ipredictive.com/d/csimp/pixel?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&au_pc=2.85500000&uid=yGjuDj* Connection #0 to host 52.2.61.35 left intact\n"
+                    + "wvvT0Nhpl%2BBawO8tiYGs%2FkS1j9OmU7tws0UitJVbOb%2FNWhZxDjG5o%2BHP%2Bx&rr=1463658814533' style='display:none' height='1' width='1'></img><img src='https://tracker.samplicio.us/tracker/c87908c3-57c6-4faf-afb9-cbd785429a43/pixel.gif?sid=xaxisSITE&pid=265357&crid=777417'  height='1' width='1' style='display:none'></img></div><script type=\"text/javascript\" src=\"https://c.betrad.com/surly.js#;ad_w=320;ad_h=480;coid=1839;nid=15932;\"></script>]]></mediadata><link></link><action target=\"\" type=\"\"/><beacons><beacon>http://54.173.162.0/oapi/getAd;jsessionid=FD724737F15BB1C4AFA28D6D34B56D33.soma-i-008a489f62d8a2fda</beacon></beacons></ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpSmaatoAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><div id='adelphic_ads' style='margin:0;padding:0;border:0;width:320;height:480;'><div class=\"celtra-ad-v3\">  <!-- externalCreativeId = raw 777417 -->  <!-- externalSiteId     = raw 8261121 -->  <!-- externalSupplierId = raw 23 -->  <img src=\"data:image/png,celtra\" style=\"display: none\" onerror=\"        (function(img) {            var params = {'clickUrl':'https://events-us-east-1.ipredictive.com/d/track/click?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&ez_p=&ro=1','expandDirection':'undefined','preferredClickThroughWindow':'','clickEvent':'advertiser','externalAdServer':'Adelphic','tagVersion':'3'};            [].slice.apply(img.parentNode.childNodes).forEach(function(n) { var decfs = { urldecode: decodeURIComponent, htmldecode: function(v) { var d = document.createElement('div'); d.innerHTML = v; return d.textContent; }, eval: function(v) { return eval(v); }, raw: function(v) { return v; } }; var m; if (n.nodeType == 8 && (m = n.textContent.match(/^\\s+([\\w.]+)(\\[.+\\])?\\s+=\\s+(\\w+)\\s+(.*)$/i))) { try { params[m[1]+(m[2] || '')] = decfs[m[3]](m[4].replace(/^\\s+|\\s+$/g, '')); } catch (e) {} } });            var req = document.createElement('script');            req.id = params.scriptId = 'celtra-script-' + (window.celtraScriptIndex = (window.celtraScriptIndex||0)+1);            params.clientTimestamp = new Date/1000;            params.clientTimeZoneOffsetInMinutes = new Date().getTimezoneOffset();            var src = (window.location.protocol == 'https:' ? 'https' : 'http') + '://ads.celtra.com/3d1274c0/web.js?';            for (var k in params) {                src += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);            }            req.src = src;            img.parentNode.insertBefore(req, img.nextSibling);        })(this);    \"> </div> <img src=\"?https://t.mookie1.com/t/v1/event?migSource=mig&migAction=mobiletracking-imp&migClientId=6405&migParam1=31497&migParam2=38E31250-DD17-4C48-A9B9-15B8B9AE5D02\"width=1\" height=\"1\"> <img src=\"https://tps30.doubleverify.com/visit.jpg?ctx=1362594&cmp=9473293&sid=1416456&plc=128890855&num=&adid=&advid=892261&adsrv=1&region=30&btreg=&btadsrv=&crt=&crtname=&chnl=&unit=&pid=&uid=&tagtype=&dvtagver=6.1.img&\" alt=\"\" width=\"0\" height=\"0\"><img src='https://events-us-east-1.ipredictive.com/d/csimp/pixel?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&au_pc=2.85500000&uid=yGjuDj* Connection #0 to host 52.2.61.35 left intact\n"
-                + "wvvT0Nhpl%2BBawO8tiYGs%2FkS1j9OmU7tws0UitJVbOb%2FNWhZxDjG5o%2BHP%2Bx&rr=1463658814533' style='display:none' height='1' width='1'></img><img src='https://tracker.samplicio.us/tracker/c87908c3-57c6-4faf-afb9-cbd785429a43/pixel.gif?sid=xaxisSITE&pid=265357&crid=777417'  height='1' width='1' style='display:none'></img></div><script type=\"text/javascript\" src=\"https://c.betrad.com/surly.js#;ad_w=320;ad_h=480;coid=1839;nid=15932;\"></script><img src='http://54.173.162.0/oapi/getAd;jsessionid=FD724737F15BB1C4AFA28D6D34B56D33.soma-i-008a489f62d8a2fda' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
-            dcpSmaatoAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><div id='adelphic_ads' style='margin:0;padding:0;border:0;width:320;height:480;'><div class=\"celtra-ad-v3\">  <!-- externalCreativeId = raw 777417 -->  <!-- externalSiteId     = raw 8261121 -->  <!-- externalSupplierId = raw 23 -->  <img src=\"data:image/png,celtra\" style=\"display: none\" onerror=\"        (function(img) {            var params = {'clickUrl':'https://events-us-east-1.ipredictive.com/d/track/click?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&ez_p=&ro=1','expandDirection':'undefined','preferredClickThroughWindow':'','clickEvent':'advertiser','externalAdServer':'Adelphic','tagVersion':'3'};            [].slice.apply(img.parentNode.childNodes).forEach(function(n) { var decfs = { urldecode: decodeURIComponent, htmldecode: function(v) { var d = document.createElement('div'); d.innerHTML = v; return d.textContent; }, eval: function(v) { return eval(v); }, raw: function(v) { return v; } }; var m; if (n.nodeType == 8 && (m = n.textContent.match(/^\\s+([\\w.]+)(\\[.+\\])?\\s+=\\s+(\\w+)\\s+(.*)$/i))) { try { params[m[1]+(m[2] || '')] = decfs[m[3]](m[4].replace(/^\\s+|\\s+$/g, '')); } catch (e) {} } });            var req = document.createElement('script');            req.id = params.scriptId = 'celtra-script-' + (window.celtraScriptIndex = (window.celtraScriptIndex||0)+1);            params.clientTimestamp = new Date/1000;            params.clientTimeZoneOffsetInMinutes = new Date().getTimezoneOffset();            var src = (window.location.protocol == 'https:' ? 'https' : 'http') + '://ads.celtra.com/3d1274c0/web.js?';            for (var k in params) {                src += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);            }            req.src = src;            img.parentNode.insertBefore(req, img.nextSibling);        })(this);    \"> </div> <img src=\"?https://t.mookie1.com/t/v1/event?migSource=mig&migAction=mobiletracking-imp&migClientId=6405&migParam1=31497&migParam2=38E31250-DD17-4C48-A9B9-15B8B9AE5D02\"width=1\" height=\"1\"> <img src=\"https://tps30.doubleverify.com/visit.jpg?ctx=1362594&cmp=9473293&sid=1416456&plc=128890855&num=&adid=&advid=892261&adsrv=1&region=30&btreg=&btadsrv=&crt=&crtname=&chnl=&unit=&pid=&uid=&tagtype=&dvtagver=6.1.img&\" alt=\"\" width=\"0\" height=\"0\"><img src='https://events-us-east-1.ipredictive.com/d/csimp/pixel?zid=smaato_1_0_1&sid=50a0c4d0-1db8-11e6-ae5c-25ccbedaa5f2&crid=777417&adid=5492&oid=265357&cid=31497&spid=45&pubid=23&site_id=8261121&auid=265577&au_pc=2.85500000&uid=yGjuDj* Connection #0 to host 52.2.61.35 left intact\n"
+                    + "wvvT0Nhpl%2BBawO8tiYGs%2FkS1j9OmU7tws0UitJVbOb%2FNWhZxDjG5o%2BHP%2Bx&rr=1463658814533' style='display:none' height='1' width='1'></img><img src='https://tracker.samplicio.us/tracker/c87908c3-57c6-4faf-afb9-cbd785429a43/pixel.gif?sid=xaxisSITE&pid=265357&crid=777417'  height='1' width='1' style='display:none'></img></div><script type=\"text/javascript\" src=\"https://c.betrad.com/surly.js#;ad_w=320;ad_h=480;coid=1839;nid=15932;\"></script><img src='http://54.173.162.0/oapi/getAd;jsessionid=FD724737F15BB1C4AFA28D6D34B56D33.soma-i-008a489f62d8a2fda' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+                dcpSmaatoAdNetwork.getHttpResponseContent());
     }
 
 
@@ -333,26 +333,26 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "19100";
 
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         final String response =
-            "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"TXT\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link></link><action target=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" acc=\"server\"/><adtext>Please visit smaato.com! </adtext><beacons><beacon>http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/getBeacon.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</beacon><beacon>http://abc.com</beacon></beacons></ad></ads></response>";
+                "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"TXT\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link></link><action target=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" acc=\"server\"/><adtext>Please visit smaato.com! </adtext><beacons><beacon>http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/getBeacon.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</beacon><beacon>http://abc.com</beacon></beacons></ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpSmaatoAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-            "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\" content=\"text/html; charset=utf-8\"/></head><style>body, html {margin: 0; padding: 0; overflow: hidden;}.template_120_20 { width: 120px; height: 19px; }.template_168_28 { width: 168px; height: 27px; }.template_216_36 { width: 216px; height: 35px;}.template_300_50 {width: 300px; height: 49px;}.template_320_50 {width: 320px; height: 49px;}.template_320_48 {width: 320px; height: 47px;}.template_468_60 {width: 468px; height: 59px;}.template_728_90 {width: 728px; height: 89px;}.container { overflow: hidden; position: relative;}.adbg { border-top: 1px solid #00577b; background: #003229;background: -moz-linear-gradient(top, #003e57 0%, #003229 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #003e57), color-stop(100%, #003229));background: -webkit-linear-gradient(top, #003e57 0%, #003229 100%);background: -o-linear-gradient(top, #003e57 0%, #003229 100%);background: -ms-linear-gradient(top, #003e57 0%, #003229 100%);background: linear-gradient(top, #003e57 0%, #003229 100%); }.right-image { position: absolute; top: 0; right: 5px; display: table-cell; vertical-align: middle}.right-image-cell { padding-left:4px!important;white-space: nowrap; vertical-align: middle; height: 100%; width:40px;background:url(http://r.edge.inmobicdn.net/IphoneActionsData/line.png) repeat-y left top; } .adtable,.adtable td{border: 0; padding: 0; margin:0;}.adtable {padding:5px;}.adtext-cell {width:100%}.adtext-cell-div {font-family:helvetica;color:#fff;float:left;v-allign:middle}.template_120_20 .adtable{padding-top:0px;}.template_120_20 .adtable .adtext-cell div{font-size: 0.42em!important;}.template_168_28 .adtable{padding-top: 2px;}.template_168_28 .adtable .adtext-cell div{font-size: 0.5em!important;}.template_168_28 .adtable .adimg{width:18px;height:18px; }.template_216_36 .adtable{padding-top: 3px;}.template_216_36 .adtable .adtext-cell div{font-size: 0.6em!important;padding-left:3px;}.template_216_36 .adtable .adimg{width:25px;height:25px;}.template_300_50 .adtable{padding-top: 7px;}.template_300_50 .adtable .adtext-cell div{font-size: 0.8em!important;padding-left:4px;}.template_300_50 .adtable .adimg{width:30px;height:30px;}.template_320_48 .adtable{padding-top: 6px;}.template_320_48 .adtable .adtext-cell div{font-size: 0.8em!important;padding-left:4px;}.template_320_48 .adtable .adimg{width:30px;height:30px;}.template_320_50 .adtable{padding-top: 7px;}.template_320_50 .adtable .adtext-cell div{font-size: 0.8em!important;padding-left:4px;}.template_320_50 .adtable .adimg{width:30px;height:30px;}.template_468_60 .adtable{padding-top:10px;}.template_468_60 .adtable .adtext-cell div{font-size: 1.1em!important;padding-left:8px;}.template_468_60 .adtable .adimg{width:35px;height:35px;}.template_728_90 .adtable{padding-top:19px;}.template_728_90 .adtable .adtext-cell div{font-size: 1.4em!important;padding-left:10px;}.template_728_90 .adtable .adimg{width:50px;height:50px;}</style><body style=\"margin:0;padding:0;overflow: hidden;\"><a style=\"text-decoration:none; \" href=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" onclick=\"document.getElementById('click').src='$IMClickUrl';\" target=\"_blank\"><div class=\"container template_320_50 adbg\"><table class=\"adtable\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td class=\"adtext-cell\"><div class=\"adtext-cell-div\" style=\"font-weight:bold;\">Please visit smaato.com! </div></div></td><td class=\"right-image-cell\">&nbsp<img width=\"28\" height=\"28\" class=\"adimg\" border=\"0\" src=\"http://r.edge.inmobicdn.net/IphoneActionsData/web.png\" /></td></tr></table></div></a><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 \"display:none;\"/><img src=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/getBeacon.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" height=\"1\" width=\"1\" border=\"0\" style=\"display:none;\"/><img src='http://abc.com' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
-            dcpSmaatoAdNetwork.getHttpResponseContent());
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\" content=\"text/html; charset=utf-8\"/></head><style>body, html {margin: 0; padding: 0; overflow: hidden;}.template_120_20 { width: 120px; height: 19px; }.template_168_28 { width: 168px; height: 27px; }.template_216_36 { width: 216px; height: 35px;}.template_300_50 {width: 300px; height: 49px;}.template_320_50 {width: 320px; height: 49px;}.template_320_48 {width: 320px; height: 47px;}.template_468_60 {width: 468px; height: 59px;}.template_728_90 {width: 728px; height: 89px;}.container { overflow: hidden; position: relative;}.adbg { border-top: 1px solid #00577b; background: #003229;background: -moz-linear-gradient(top, #003e57 0%, #003229 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #003e57), color-stop(100%, #003229));background: -webkit-linear-gradient(top, #003e57 0%, #003229 100%);background: -o-linear-gradient(top, #003e57 0%, #003229 100%);background: -ms-linear-gradient(top, #003e57 0%, #003229 100%);background: linear-gradient(top, #003e57 0%, #003229 100%); }.right-image { position: absolute; top: 0; right: 5px; display: table-cell; vertical-align: middle}.right-image-cell { padding-left:4px!important;white-space: nowrap; vertical-align: middle; height: 100%; width:40px;background:url(http://r.edge.inmobicdn.net/IphoneActionsData/line.png) repeat-y left top; } .adtable,.adtable td{border: 0; padding: 0; margin:0;}.adtable {padding:5px;}.adtext-cell {width:100%}.adtext-cell-div {font-family:helvetica;color:#fff;float:left;v-allign:middle}.template_120_20 .adtable{padding-top:0px;}.template_120_20 .adtable .adtext-cell div{font-size: 0.42em!important;}.template_168_28 .adtable{padding-top: 2px;}.template_168_28 .adtable .adtext-cell div{font-size: 0.5em!important;}.template_168_28 .adtable .adimg{width:18px;height:18px; }.template_216_36 .adtable{padding-top: 3px;}.template_216_36 .adtable .adtext-cell div{font-size: 0.6em!important;padding-left:3px;}.template_216_36 .adtable .adimg{width:25px;height:25px;}.template_300_50 .adtable{padding-top: 7px;}.template_300_50 .adtable .adtext-cell div{font-size: 0.8em!important;padding-left:4px;}.template_300_50 .adtable .adimg{width:30px;height:30px;}.template_320_48 .adtable{padding-top: 6px;}.template_320_48 .adtable .adtext-cell div{font-size: 0.8em!important;padding-left:4px;}.template_320_48 .adtable .adimg{width:30px;height:30px;}.template_320_50 .adtable{padding-top: 7px;}.template_320_50 .adtable .adtext-cell div{font-size: 0.8em!important;padding-left:4px;}.template_320_50 .adtable .adimg{width:30px;height:30px;}.template_468_60 .adtable{padding-top:10px;}.template_468_60 .adtable .adtext-cell div{font-size: 1.1em!important;padding-left:8px;}.template_468_60 .adtable .adimg{width:35px;height:35px;}.template_728_90 .adtable{padding-top:19px;}.template_728_90 .adtable .adtext-cell div{font-size: 1.4em!important;padding-left:10px;}.template_728_90 .adtable .adimg{width:50px;height:50px;}</style><body style=\"margin:0;padding:0;overflow: hidden;\"><a style=\"text-decoration:none; \" href=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" onclick=\"document.getElementById('click').src='$IMClickUrl';\" target=\"_blank\"><div class=\"container template_320_50 adbg\"><table class=\"adtable\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td class=\"adtext-cell\"><div class=\"adtext-cell-div\" style=\"font-weight:bold;\">Please visit smaato.com! </div></div></td><td class=\"right-image-cell\">&nbsp<img width=\"28\" height=\"28\" class=\"adimg\" border=\"0\" src=\"http://r.edge.inmobicdn.net/IphoneActionsData/web.png\" /></td></tr></table></div></a><img src='http://c2.w.inmobi.com/c.asm/4/b/bx5/yaz/2/b/a5/m/0/0/0/202cb962ac59075b964b07152d234b70/4f8d98e2-4bbd-40bc-87e5-22da170600f9/-1/1/9cddca11?beacon=true' height=1 width=1 border=0 \"display:none;\"/><img src=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/getBeacon.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" height=\"1\" width=\"1\" border=\"0\" style=\"display:none;\"/><img src='http://abc.com' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                dcpSmaatoAdNetwork.getHttpResponseContent());
     }
 
     @Test
     public void testDCPSmaatoParseNoAd() throws Exception {
         AdapterTestHelper.setBeaconAndClickStubs();
         final String response =
-            "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>EBA0BE9C7F4F31B61574F95D298511A9.f116</sessionid><status>error</status><user><id>900</id></user><error><code>42</code><desc>Currently no ad available</desc></error></response>";
+                "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>EBA0BE9C7F4F31B61574F95D298511A9.f116</sessionid><status>error</status><user><id>900</id></user><error><code>42</code><desc>Currently no ad available</desc></error></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(500, dcpSmaatoAdNetwork.getHttpResponseStatusCode());
     }
@@ -376,16 +376,16 @@ public class DCPSmaatoAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
-            .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
-            new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                    "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
+                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpSmaatoAdNetwork.getImpressionId());
     }
