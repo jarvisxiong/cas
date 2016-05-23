@@ -296,7 +296,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
                     return;
                 }
                 responseContent = Formatter.getResponseFromTemplate(t, context, sasParams, getBeaconUrl());
-                LOG.debug("GSB = {}",responseContent);
                 adStatus = AD_STRING;
             } catch (final Exception exception) {
                 adStatus = NO_AD;
