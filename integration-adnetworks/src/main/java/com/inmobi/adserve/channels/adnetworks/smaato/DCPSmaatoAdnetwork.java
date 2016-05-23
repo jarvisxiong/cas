@@ -102,7 +102,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
-           final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+            final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         publisherId = config.getString("smaato.pubId");
         apiVersion = config.getString("smaato.apiVersion");
@@ -118,7 +118,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
         host = config.getString("smaato.host");
         if (StringUtils.isNotBlank(casInternalRequestParameters.getLatLong())
-            && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
+                && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
             final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
             latitude = latlong[0];
             longitude = latlong[1];
