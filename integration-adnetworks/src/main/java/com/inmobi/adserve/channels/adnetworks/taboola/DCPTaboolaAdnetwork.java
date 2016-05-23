@@ -271,6 +271,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
         params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
         params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+        params.put(NativeResponseMaker.CLICK_URL_PARAM, getClickUrl());
     }
 
     @Override
