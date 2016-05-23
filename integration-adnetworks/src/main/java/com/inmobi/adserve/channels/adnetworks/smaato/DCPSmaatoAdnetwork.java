@@ -102,7 +102,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     }
 
     public DCPSmaatoAdnetwork(final Configuration config, final Bootstrap clientBootstrap,
-                              final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
+           final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel) {
         super(config, clientBootstrap, baseRequestHandler, serverChannel);
         publisherId = config.getString("smaato.pubId");
         apiVersion = config.getString("smaato.apiVersion");
