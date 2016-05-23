@@ -18,9 +18,22 @@ import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTI
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_GET_PARAM;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
+import static com.inmobi.adserve.channels.api.trackers.MovieBoardResponseMaker.TEMPLATE_ID_PARAM;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.MOVIEBOARD;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.VIEWABILITY_TRACKER;
@@ -79,6 +92,7 @@ import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
+import com.inmobi.adserve.channels.api.trackers.MovieBoardResponseMaker;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
@@ -126,6 +140,7 @@ import com.inmobi.adserve.contracts.ix.response.SeatBid;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.template.context.Icon;
+import com.inmobi.template.context.MovieBoardAdData;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
@@ -169,6 +184,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static final List<Integer> VIDEO_PROTOCOLS = Lists.newArrayList(VideoProtocols.VAST_2_0_WRAPPER.getValue());
     private static final List<String> VIDEO_MIMES = Lists.newArrayList("video/mp4"); // Supported video mimes
     private static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
+    public static final boolean VAST_XML_GENERATED_BY_ADPOOL = true;
     @Inject
     protected static TemplateConfiguration templateConfiguration;
     @Inject
@@ -178,6 +194,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     private static NativeBuilderFactory nativeBuilderfactory;
     @Inject
     private static NativeResponseMaker nativeResponseMaker;
+    @Inject
+    private static MovieBoardResponseMaker movieBoardResponseMaker;
     protected final Gson gson;
     private final String userName;
     private final String password;
@@ -619,9 +637,17 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private Video createVideoObject() {
-        LOG.debug(traceMarker, "createVideoObject");
+        LOG.debug(traceMarker, "Creating video object");
         boolean soundOn = false;
         boolean isSkippable = true;
+
+        // Presence of these has already been checked in CasUtils
+        if (isMovieBoardRequest()) {
+            templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), MOVIEBOARD);
+        } else if (isNativeRequest()) {
+            templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), VAST);
+        }
+
         try {
             final JSONObject siteVideoPreferencesJson = new JSONObject(sasParams.getPubControlPreferencesJson());
             soundOn = siteVideoPreferencesJson.getJSONObject("video").getBoolean("soundOn");
@@ -668,7 +694,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (isSegmentPureVastSupported) {
             final String statName = isNativeRequest()
                     ? InspectorStrings.TOTAL_NATIVE_VAST_REQUESTS
-                    : InspectorStrings.TOTAL_PURE_VAST_REQUESTS;
+                    : isMovieBoardRequest() ? InspectorStrings.TOTAL_MOVIEBOARD_REQUESTS
+                                            : InspectorStrings.TOTAL_PURE_VAST_REQUESTS;
             InspectorStats.incrementStatCount(getName(), statName);
         }
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_VIDEO_REQUESTS);
@@ -975,22 +1002,22 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
     private String replaceIXMacros(String url) {
         if (AUCTION_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
+            InspectorStats.incrementStatCount(getName(), TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
         }
         if (AUCTION_CURRENCY_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
+            InspectorStats.incrementStatCount(getName(), TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
         }
         if (AUCTION_PRICE_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
+            InspectorStats.incrementStatCount(getName(), TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
         }
         if (AUCTION_BID_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
+            InspectorStats.incrementStatCount(getName(), TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
         }
         if (AUCTION_SEAT_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
+            InspectorStats.incrementStatCount(getName(), TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
         }
         if (AUCTION_IMP_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
+            InspectorStats.incrementStatCount(getName(), TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
         }
         url = url.replaceAll(AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(AUCTION_CURRENCY_INSENSITIVE, USD);
@@ -1076,6 +1103,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 nativeAdBuilding();
             } else if (isNativeRequest() && isSegmentPureVastSupported) {
                 nativeVideoAdBuilding();
+            } else if (isMovieBoardRequest()) {
+                movieBoardVideoAdBuilding();
             } else if (isSegmentPureVastSupported) {
                 pureVastAdBuilding();
             } else if (isSegmentVideoSupported || isSegmentRewardedVideoSupported) {
@@ -1090,7 +1119,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         LOG.debug(traceMarker, "response content is {}", responseContent);
     }
 
-    protected boolean isSproutAd() {
+    boolean isSproutAd() {
         final String adm = getAdMarkUp();
         boolean isSproutAd = false;
         if (null != adm) {
@@ -1103,7 +1132,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         return isSproutAd;
     }
 
-    protected boolean updateRPAccountInfo(final String rpAccIdStr) {
+    boolean updateRPAccountInfo(final String rpAccIdStr) {
         LOG.debug(traceMarker, "Inside updateRPAccountInfo");
         String inmobiAccId = unknownAdvertiserId;
         try {
@@ -1230,7 +1259,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             }
 
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
-                velocityContext.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+                velocityContext.put(IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }
         }
 
@@ -1262,13 +1291,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         InspectorStats.incrementStatCount(getName(), InspectorStrings.DROPPED_AS_SPROUT_ADS_ARE_NOT_SUPPORTED + where);
         responseContent = DEFAULT_EMPTY_STRING;
         adStatus = NO_AD;
-        return;
     }
 
     private void pureVastAdBuilding() {
         LOG.debug(traceMarker, "pureVastAdBuilding");
         try {
-            responseContent = IXAdNetworkHelper.pureVastAdBuilding(getAdMarkUp(), getBeaconUrl(), getClickUrl());
+            responseContent = IXAdNetworkHelper.pureVastAdBuilding(getAdMarkUp(), getBeaconUrl(), getClickUrl(), false);
         } catch (final Exception e) {
             adStatus = NO_AD;
             responseContent = DEFAULT_EMPTY_STRING;
@@ -1315,41 +1343,92 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    protected void nativeVideoAdBuilding() {
-        LOG.debug(traceMarker, "nativeVideoAdBuilding");
+    private void nativeVideoAdBuilding() {
+        LOG.debug(traceMarker, "Inside Native 1.0 Video Ad Building");
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_VIDEO_RESPONSES);
+
+        String vastXml;
         try {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_VIDEO_RESPONSES);
-            String vastXml = IXAdNetworkHelper.pureVastAdBuilding(getAdMarkUp(), getBeaconUrl(), getClickUrl());
+            vastXml = IXAdNetworkHelper.pureVastAdBuilding(getAdMarkUp(), getBeaconUrl(), getClickUrl(), false);
+            LOG.debug("vastXml generated by IX before macro replacement is {}", vastXml);
             vastXml = replaceIXMacros(vastXml);
-
-            final com.inmobi.template.context.App.Builder contextBuilder = com.inmobi.template.context.App.newBuilder();
-            contextBuilder.setVastContent(vastXml);
-            contextBuilder.setTitle(DefaultResponses.DEFAULT_TITLE);
-            contextBuilder.setActionText(DefaultResponses.DEFAULT_CTA);
-            contextBuilder.setDesc(DefaultResponses.DEFAULT_DESC);
-            contextBuilder.setRating(DefaultResponses.DEFAULT_RATING);
-            // Add Icons
-            final Icon.Builder iconbuilder = Icon.newBuilder();
-            iconbuilder.setUrl(DefaultResponses.DEFAULT_ICON.getUrl());
-            iconbuilder.setW(DefaultResponses.DEFAULT_ICON.getW());
-            iconbuilder.setH(DefaultResponses.DEFAULT_ICON.getH());
-            contextBuilder.setIcons(Collections.singletonList((Icon) iconbuilder.build()));
-
-            final Map<String, String> params = new HashMap<>();
-            templateEntity = repositoryHelper.queryNativeAdTemplateRepository(sasParams.getPlacementId(), VAST);
-            params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
-            params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
-            responseContent = nativeResponseMaker
-                    .makeIXResponse((com.inmobi.template.context.App) contextBuilder.build(), params, true);
+            LOG.debug("vastXml generated by IX after macro replacement is {}", vastXml);
         } catch (final Exception e) {
-            adStatus = TERM;
-            responseContent = DEFAULT_EMPTY_STRING;
-            LOG.info(traceMarker, "Some exception in nativeVideoAdBuilding", e);
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.PURE_VAST_PARSE_RESPONSE_EXCEPTION);
+            pureVastExceptionResponse();
+            LOG.info(traceMarker, "Exception while creating pure vast xml for native 1.0 video.", e);
+            InspectorStats.incrementStatCount(getName(), NATIVE_VIDEO_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED);
+            return;
+        }
+
+        final com.inmobi.template.context.App.Builder nativeVideoContext = com.inmobi.template.context.App.newBuilder();
+        nativeVideoContext.setVastContent(vastXml);
+        nativeVideoContext.setTitle(DefaultResponses.DEFAULT_TITLE);
+        nativeVideoContext.setActionText(DefaultResponses.DEFAULT_CTA);
+        nativeVideoContext.setDesc(DefaultResponses.DEFAULT_DESC);
+        nativeVideoContext.setRating(DefaultResponses.DEFAULT_RATING);
+        // Add Icons
+        final Icon.Builder iconbuilder = Icon.newBuilder();
+        iconbuilder.setUrl(DefaultResponses.DEFAULT_ICON.getUrl());
+        iconbuilder.setW(DefaultResponses.DEFAULT_ICON.getW());
+        iconbuilder.setH(DefaultResponses.DEFAULT_ICON.getH());
+        nativeVideoContext.setIcons(Collections.singletonList((Icon) iconbuilder.build()));
+
+        final Map<String, String> params = new HashMap<>();
+        params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
+        params.put(IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+        try {
+            responseContent = nativeResponseMaker.makeIXResponse(nativeVideoContext.build(), params, true);
+        } catch (final Exception e) {
+            LOG.info(traceMarker, "Exception while making IXResponse in nativeVideoAdBuilding", e);
+            InspectorStats.incrementStatCount(getName(), NATIVE_VIDEO_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED);
+            pureVastExceptionResponse();
         }
     }
 
-    protected void nativeAdBuilding() {
+    private void pureVastExceptionResponse() {
+        adStatus = TERM;
+        responseContent = DEFAULT_EMPTY_STRING;
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.PURE_VAST_PARSE_RESPONSE_EXCEPTION);
+    }
+
+    private void movieBoardVideoAdBuilding() {
+        LOG.debug(traceMarker, "Inside Movie Board Ad Building");
+        InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_MOVIEBOARD_RESPONSES);
+
+        String vastXml;
+        try {
+            vastXml = IXAdNetworkHelper.pureVastAdBuilding(getAdMarkUp(), getBeaconUrl(), getClickUrl(), true);
+
+            LOG.debug("vastXml generated by IX before macro replacement is {}", vastXml);
+            vastXml = replaceIXMacros(vastXml);
+            LOG.debug("vastXml generated by IX after macro replacement is {}", vastXml);
+        } catch (final Exception e) {
+            pureVastExceptionResponse();
+            LOG.info(traceMarker, "Exception while creating pure vast xml for movie board. ", e);
+            InspectorStats.incrementStatCount(getName(), MOVIE_BOARD_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED);
+            return;
+        }
+
+        final MovieBoardAdData.Builder movieBoardContext = MovieBoardAdData.newBuilder();
+        movieBoardContext.setVastXml(VAST_XML_GENERATED_BY_ADPOOL);
+        movieBoardContext.setVastContent(vastXml);
+        movieBoardContext.setCreativeObjectList(movieBoardResponseMaker.getCreativeListForMovieBoardTemplate());
+        movieBoardContext.setRequestJsonObject(
+                movieBoardResponseMaker.getRequestJsonForMovieBoardTemplate(sasParams.getMovieboardParentViewWidth()));
+
+        final Map<String, String> params = new HashMap<>();
+        params.put(TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
+        params.put(IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+        try {
+            responseContent = movieBoardResponseMaker.makeIXMovieBoardVideoResponse(movieBoardContext.build(), params);
+        } catch (final Exception e) {
+            LOG.info(traceMarker, "Exception while generating movie board response.", e);
+            InspectorStats.incrementStatCount(getName(), MOVIE_BOARD_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED);
+            pureVastExceptionResponse();
+        }
+    }
+
+    void nativeAdBuilding() {
         LOG.debug(traceMarker, "nativeAdBuilding");
         InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_RESPONSES);
         try {
@@ -1369,7 +1448,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             params.put(NativeResponseMaker.WIN_URL_PARAM, getBeaconUrl() + WIN_BID_GET_PARAM + DEAL_GET_PARAM);
             params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
             params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
-            params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+            params.put(IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             responseContent = nativeResponseMaker.makeIXResponse(templateContext, params, sasParams.isNoJsTracking());
         } catch (final Exception e) {
             adStatus = TERM;
@@ -1751,7 +1830,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 trackerBuilder.setMatchedCsids(ImmutableList.copyOf(usedCsIds));
                 trackerBuilder.setEnrichmentCost(dataVendorCost);
             }
-            if (isNativeRequest() && null != templateEntity) {
+
+            if ((isNativeRequest() || isMovieBoardRequest()) && null != templateEntity) {
                 trackerBuilder.setNativeTemplateId(templateEntity.getTemplateId());
             }
             trackerBuilder.setChargedBid(originalBidPriceInUsd);

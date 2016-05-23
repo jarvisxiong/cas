@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.WAP;
+import static java.util.Collections.singletonList;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -137,15 +139,17 @@ public class ServletIXFillTest {
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
+        expect(mockSASRequestParameters.getSource()).andReturn(WAP).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
-        expect(mockMatchSegments.matchSegments(mockSASRequestParameters))
-            .andReturn(new ArrayList<AdvertiserMatchedSegmentDetail>());
+        expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(new ArrayList<>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
 
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
+        expectLastCall().anyTimes();
+        mockSASRequestParameters.setMovieBoardRequest(false);
         expectLastCall().anyTimes();
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
         expectLastCall().anyTimes();
@@ -212,6 +216,7 @@ public class ServletIXFillTest {
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
         expect(mockMatchSegments.getRepositoryHelper()).andReturn(mockRepositoryHelper).anyTimes();
         expect(mockSASRequestParameters.getSiteId()).andReturn(TestUtils.SampleStrings.siteId).anyTimes();
+        expect(mockSASRequestParameters.getSource()).andReturn(WAP).anyTimes();
         expect(mockRepositoryHelper.querySiteMetaDetaRepository(TestUtils.SampleStrings.siteId)).andReturn(null)
             .anyTimes();
         expect(mockChannelSegmentFilterApplier
@@ -221,6 +226,8 @@ public class ServletIXFillTest {
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
+        expectLastCall().anyTimes();
+        mockSASRequestParameters.setMovieBoardRequest(false);
         expectLastCall().anyTimes();
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);
@@ -271,9 +278,9 @@ public class ServletIXFillTest {
         final CasUtils mockCasUtils = createMock(CasUtils.class);
         final AsyncRequestMaker mockAsyncRequestMaker = createNiceMock(AsyncRequestMaker.class);
 
-        final List<AdvertiserMatchedSegmentDetail> mockList = Arrays.asList(new AdvertiserMatchedSegmentDetail(null));
+        final List<AdvertiserMatchedSegmentDetail> mockList = singletonList(new AdvertiserMatchedSegmentDetail(null));
         final List<ChannelSegment> mockChannelSegmentList =
-            Arrays.asList(new ChannelSegment(null, null, null, null, null, null, 0.5));
+                singletonList(new ChannelSegment(null, null, null, null, null, null, 0.5));
 
         expectNew(CasContext.class).andReturn(mockCasContext).anyTimes();
 
@@ -305,11 +312,14 @@ public class ServletIXFillTest {
         expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).anyTimes();
         expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).anyTimes();
         expect(mockSASRequestParameters.getUAdapters()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.getSource()).andReturn(WAP).anyTimes();
         expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).anyTimes();
 
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
         mockSASRequestParameters.setVideoSupported(false);
+        expectLastCall().anyTimes();
+        mockSASRequestParameters.setMovieBoardRequest(false);
         expectLastCall().anyTimes();
 
         InspectorStats.incrementStatCount(InspectorStrings.IX_REQUESTS);

@@ -154,10 +154,10 @@ public class IXAdNetworkHelperTest {
     private static final String error = "<Error><![CDATA[http://some/beacon/url/?m=99&action=vast-error&label=[ERRORCODE]]]></Error>";
     private static final String start = "<Tracking event=\"start\"><![CDATA[http://some/beacon/url/?m=10]]></Tracking>";
     private static final String billing = "<Tracking event=\"start\"><![CDATA[http://some/beacon/url/?b=${WIN_BID}${DEAL_GET_PARAM}]]></Tracking>";
-    private static final String firstQuartile = "<Tracking event=\"firstQuartile\"><![CDATA[http://some/beacon/url/?m=12&q=1&mid=video&__t=0]]></Tracking>";
-    private static final String midPoint = "<Tracking event=\"midpoint\"><![CDATA[http://some/beacon/url/?m=12&q=2&mid=video&__t=0]]></Tracking>";
-    private static final String thirdQuartile = "<Tracking event=\"thirdQuartile\"><![CDATA[http://some/beacon/url/?m=12&q=3&mid=video&__t=0]]></Tracking>";
-    private static final String complete = "<Tracking event=\"complete\"><![CDATA[http://some/beacon/url/?m=13&mid=video&__t=0]]></Tracking>";
+    private static final String firstQuartile = "<Tracking event=\"firstQuartile\"><![CDATA[http://some/beacon/url/?m=12&q=1&mid=video]]></Tracking>";
+    private static final String midPoint = "<Tracking event=\"midpoint\"><![CDATA[http://some/beacon/url/?m=12&q=2&mid=video]]></Tracking>";
+    private static final String thirdQuartile = "<Tracking event=\"thirdQuartile\"><![CDATA[http://some/beacon/url/?m=12&q=3&mid=video]]></Tracking>";
+    private static final String complete = "<Tracking event=\"complete\"><![CDATA[http://some/beacon/url/?m=13&mid=video]]></Tracking>";
     private static final String clickTracking = "<ClickTracking><![CDATA[http://some/click/url/]]></ClickTracking>";
     private static final String beaconclickTracking = "<ClickTracking><![CDATA[http://some/beacon/url/?m=8]]></ClickTracking>";
     private static final String videoClicksTag = "<VideoClicks>";
@@ -303,7 +303,7 @@ public class IXAdNetworkHelperTest {
             final String videoClicksTag, final String trackingEventsTagCheck) throws Exception {
 
         try {
-            final String responseContent = IXAdNetworkHelper.pureVastAdBuilding(adMarkup, beaconUrl, clickUrl);
+            final String responseContent = IXAdNetworkHelper.pureVastAdBuilding(adMarkup, beaconUrl, clickUrl, false);
             assertTrue(responseContent.contains(impression));
             assertTrue(responseContent.contains(error));
             assertTrue(responseContent.contains(start));
@@ -339,7 +339,7 @@ public class IXAdNetworkHelperTest {
     public void testVastNegativeAdBuilding(final String testName, final String clickUrl, final String beaconUrl,
             final String adMarkup) throws Exception {
         try {
-            IXAdNetworkHelper.pureVastAdBuilding(adMarkup, beaconUrl, clickUrl);
+            IXAdNetworkHelper.pureVastAdBuilding(adMarkup, beaconUrl, clickUrl, false);
             Assert.assertTrue(false);
         } catch (final Exception e) {
             Assert.assertTrue(true);

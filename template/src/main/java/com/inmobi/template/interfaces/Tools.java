@@ -2,6 +2,9 @@ package com.inmobi.template.interfaces;
 
 import java.util.List;
 
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.codec.binary.Base64;
+
 /**
  * 
  * @author ritwik.kumar
@@ -15,6 +18,8 @@ public abstract class Tools {
      * @return
      */
     public abstract String getVastXMl(final Context context);
+
+    public abstract Object getAdUnitTrackersJson(final  Context context);
 
     /**
      * 
@@ -47,6 +52,10 @@ public abstract class Tools {
      */
     public abstract String nativeAd(final Context context, final String pubContent);
 
+    public abstract Object evalJsonPath(final String json, final String jsonPathExpression);
+
+    public abstract Object evalJsonPath(Object jsonObject, String jsonPathExpression);
+
     /**
      * 
      * @param value
@@ -73,6 +82,11 @@ public abstract class Tools {
      */
     public Object boltObject() {
         return null;
+    }
+
+    public String base64(String content) {
+        final Base64 base64 = new Base64();
+        return base64.encodeAsString(content.getBytes(Charsets.UTF_8));
     }
 
 }

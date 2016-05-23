@@ -4,6 +4,7 @@ import java.io.StringWriter;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.tools.generic.MathTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +25,13 @@ public class TemplateParser {
     private final static Logger LOG = LoggerFactory.getLogger(TemplateParser.class);
     private final Tools tools;
     private final MathTool mTool;
+    private final ListTool listTool;
 
     @Inject
     public TemplateParser(final TemplateConfiguration tc) {
         tools = tc.getTool();
         mTool = tc.getMathTool();
+        listTool = tc.getListTool();
     }
 
     /**
@@ -39,6 +42,7 @@ public class TemplateParser {
         final VelocityContext velocityContext = new VelocityContext();
         velocityContext.put("tool", tools);
         velocityContext.put("math", mTool);
+        velocityContext.put("list", listTool);
         return velocityContext;
     }
 
@@ -53,8 +57,15 @@ public class TemplateParser {
         LOG.debug("Formating Template for placement : {}", templateId);
         try {
             final VelocityContext velocityContext = getVelocityContext();
-            velocityContext.put("first", context);
-            velocityContext.put("same_ar_screenshots", context.get(KeyConstants.APP_SCREENSHOTS));
+            // If Ad is a MovieBoard ad, set velocityContext to be consumed by MovieBoard template
+            if (null != context.get(KeyConstants.AD_MOVIEBOARD)) {
+                LOG.debug("Setting context to be consumed by MovieBoard template");
+                velocityContext.put("ad",context);
+                velocityContext.put("vastXml", context.get(KeyConstants.AD_VAST_XML));
+            } else {
+                velocityContext.put("first", context);
+                velocityContext.put("same_ar_screenshots", context.get(KeyConstants.APP_SCREENSHOTS));
+            }
 
             final Template template = TemplateManager.getInstance().getTemplate(templateId);
             final StringWriter writer = new StringWriter();

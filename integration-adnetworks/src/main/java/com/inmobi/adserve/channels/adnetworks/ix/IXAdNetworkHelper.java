@@ -1,8 +1,14 @@
-/**
- *
- */
 package com.inmobi.adserve.channels.adnetworks.ix;
 
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.COMPLETE;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.CREATIVE_VIEW;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.FIRST_QUARTILE;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.MEDIA_PAUSE;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.MEDIA_UNPAUSE;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.MIDPOINT;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.SKIP;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.START;
+import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.VastTrackingEventsTypeEnum.THIRD_QUARTILE;
 import static com.inmobi.adserve.channels.api.BaseAdNetworkHelper.getHashedValue;
 import static com.inmobi.adserve.channels.api.Formatter.TemplateType.CAU;
 import static com.inmobi.adserve.channels.api.Formatter.TemplateType.INTERSTITIAL_REWARDED_VAST_VIDEO;
@@ -45,12 +51,13 @@ import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_MD5_HASHED;
 import static com.inmobi.adserve.channels.util.SproutTemplateConstants.USER_ID_SHA1_HASHED;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
-import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER;
-import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_BEACON_URL;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IM_CLICK_URL;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER;
+import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.NON_WIFI;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.SDK_TIMESTAMP_SUFFIX;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.WIFI;
@@ -159,31 +166,20 @@ public class IXAdNetworkHelper {
     private static final ImmutableList<IXBlocklistType> supportedBlocklistTypes =
             ImmutableList.of(ADVERTISERS, INDUSTRY_IDS, CREATIVE_ATTRIBUTE_IDS);
 
-    private static final String IMPRESSION_TAG = "Impression";
-    private static final String ERROR_TAG = "Error";
-    private static final String TRACKING_TAG = "Tracking";
-    private static final String CLICK_TRACKING_TAG = "ClickTracking";
-    private static final String EVENT_ATTR = "event";
-    private static final String START = "start";
-    private static final String FIRST_QUARTILE = "firstQuartile";
-    private static final String MIDPOINT = "midpoint";
-    private static final String THIRD_QUARTILE = "thirdQuartile";
-    private static final String COMPLETE = "complete";
-    private static final String TRACKING_EVENTS_TAG = "TrackingEvents";
-    private static final String IN_LINE_TAG = "InLine";
-    private static final String WRAPPER_TAG = "Wrapper";
-    private static final String VIDEO_CLICKS_TAG = "VideoClicks";
-
     // below are the suffix to base beacon URL for generating various beacon events.
     private static final String RENDER_BEACON_SUFFIX = "?m=18";
     private static final String CLICK_BEACON_SUFFIX = "?m=8";
     private static final String ERROR_BEACON_SUFFIX = "?m=99&action=vast-error&label=[ERRORCODE]";
     private static final String BILLING_BEACON_SUFFIX = "?b=${WIN_BID}${DEAL_GET_PARAM}";
     private static final String MEDIA_START_BEACON_SUFFIX = "?m=10";
-    private static final String Q1_BEACON_SUFFIX = "?m=12&q=1&mid=video&__t=0";
-    private static final String Q2_BEACON_SUFFIX = "?m=12&q=2&mid=video&__t=0";
-    private static final String Q3_BEACON_SUFFIX = "?m=12&q=3&mid=video&__t=0";
-    private static final String Q4_BEACON_SUFFIX = "?m=13&mid=video&__t=0";
+    private static final String CREATIVE_VIEW_BEACON_SUFFIX = "?m=1";
+    private static final String MEDIA_PAUSE_BEACON_SUFFIX = "?m=14";
+    private static final String MEDIA_UNPAUSE_BEACON_SUFFIX = "?m=17";
+    private static final String MEDIA_SKIP_BEACON_SUFFIX = "?m=99&action=skip";
+    private static final String Q1_BEACON_SUFFIX = "?m=12&q=1&mid=video";
+    private static final String Q2_BEACON_SUFFIX = "?m=12&q=2&mid=video";
+    private static final String Q3_BEACON_SUFFIX = "?m=12&q=3&mid=video";
+    private static final String Q4_BEACON_SUFFIX = "?m=13&mid=video";
 
     private static Transformer transformer;
 
@@ -797,16 +793,6 @@ public class IXAdNetworkHelper {
      * $first.supplyHeight <br>
      * $first.cauElementJsonObject <br>
      * $CAUContentJSEsc
-     *
-     * @param sasParams
-     * @param matchedSlot
-     * @param beaconUrl
-     * @param clickUrl
-     * @param adMarkup
-     * @param winUrl
-     * @param thirdPartyTrackerMap
-     * @return
-     * @throws Exception
      */
     public static String cauAdBuilding(final SASRequestParameters sasParams, final IXSlotMatcher matchedSlot,
             final String beaconUrl, final String clickUrl, final String adMarkup, final String winUrl,
@@ -844,7 +830,7 @@ public class IXAdNetworkHelper {
         return Formatter.getResponseFromTemplate(CAU, velocityContext, sasParams, null);
     }
 
-    public static String pureVastAdBuilding(String adMarkUp, final String beaconUrl, final String clickUrl)
+    static String pureVastAdBuilding(String adMarkUp, final String beaconUrl, final String clickUrl, boolean addSdkTimeStamp)
             throws ParserConfigurationException, IOException, SAXException, TransformerException {
         final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setIgnoringComments(true);
@@ -852,20 +838,25 @@ public class IXAdNetworkHelper {
         
         final DocumentBuilder builder = domFactory.newDocumentBuilder();
         final Document doc = builder.parse(new InputSource(new ByteArrayInputStream(adMarkUp.getBytes(UTF_8))));
-        final NodeList trackingEventsNode = doc.getElementsByTagName(TRACKING_EVENTS_TAG);
-        final NodeList inlineNode = doc.getElementsByTagName(IN_LINE_TAG);
-        final NodeList wrapperNode = doc.getElementsByTagName(WRAPPER_TAG);
+        final NodeList trackingEventsNode = doc.getElementsByTagName(VastHtmlTags.TRACKING_EVENTS_TAG.htmlTag);
+        final NodeList inlineNode = doc.getElementsByTagName(VastHtmlTags.IN_LINE_TAG.htmlTag);
+        final NodeList wrapperNode = doc.getElementsByTagName(VastHtmlTags.WRAPPER_TAG.htmlTag);
 
-        final String impressionUriStr = beaconUrl + RENDER_BEACON_SUFFIX;
-        final String errorUriStr = beaconUrl + ERROR_BEACON_SUFFIX;
+        final StringBuilder impressionUriStr = new StringBuilder(beaconUrl).append(RENDER_BEACON_SUFFIX);
+        final StringBuilder errorUriStr = new StringBuilder(beaconUrl).append(ERROR_BEACON_SUFFIX);
+
+        if (addSdkTimeStamp) {
+            impressionUriStr.append(SDK_TIMESTAMP_SUFFIX);
+            errorUriStr.append(SDK_TIMESTAMP_SUFFIX);
+        }
 
         if (0 != inlineNode.getLength()) {
-            addInXml(doc, inlineNode, IMPRESSION_TAG, null, null, impressionUriStr);
-            addInXml(doc, inlineNode, ERROR_TAG, null, null, errorUriStr);
+            addInXml(doc, inlineNode, VastHtmlTags.IMPRESSION_TAG.htmlTag, null, null, impressionUriStr.toString());
+            addInXml(doc, inlineNode, VastHtmlTags.ERROR_TAG.htmlTag, null, null, errorUriStr.toString());
             addClickTracking(doc, inlineNode, clickUrl, beaconUrl);
         } else if (0 != wrapperNode.getLength()) {
-            addInXml(doc, wrapperNode, IMPRESSION_TAG, null, null, impressionUriStr);
-            addInXml(doc, wrapperNode, ERROR_TAG, null, null, errorUriStr);
+            addInXml(doc, wrapperNode, VastHtmlTags.IMPRESSION_TAG.htmlTag, null, null, impressionUriStr.toString());
+            addInXml(doc, wrapperNode, VastHtmlTags.ERROR_TAG.htmlTag, null, null, errorUriStr.toString());
             addClickTracking(doc, wrapperNode, clickUrl, beaconUrl);
         } else {
             InspectorStats.incrementStatCount(TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING);
@@ -873,19 +864,42 @@ public class IXAdNetworkHelper {
         }
 
         if (0 != trackingEventsNode.getLength()) {
-            final String startUriStr = beaconUrl + MEDIA_START_BEACON_SUFFIX;
-            final String billingUriStr = beaconUrl + BILLING_BEACON_SUFFIX;
-            final String firstQuartileUriStr = beaconUrl + Q1_BEACON_SUFFIX;
-            final String midPointUriStr = beaconUrl + Q2_BEACON_SUFFIX;
-            final String thirdQuartileUriStr = beaconUrl + Q3_BEACON_SUFFIX;
-            final String completeUriStr = beaconUrl + Q4_BEACON_SUFFIX;
+            final StringBuilder startUriStr = new StringBuilder(beaconUrl).append(MEDIA_START_BEACON_SUFFIX);
+            final StringBuilder billingUriStr = new StringBuilder(beaconUrl).append(BILLING_BEACON_SUFFIX);
+            final StringBuilder firstQuartileUriStr = new StringBuilder(beaconUrl).append(Q1_BEACON_SUFFIX);
+            final StringBuilder midPointUriStr = new StringBuilder(beaconUrl).append(Q2_BEACON_SUFFIX);
+            final StringBuilder thirdQuartileUriStr = new StringBuilder(beaconUrl).append(Q3_BEACON_SUFFIX);
+            final StringBuilder completeUriStr = new StringBuilder(beaconUrl).append(Q4_BEACON_SUFFIX);
+            final StringBuilder viewUriStr = new StringBuilder(beaconUrl).append(CREATIVE_VIEW_BEACON_SUFFIX);
+            final StringBuilder pauseUriStr = new StringBuilder(beaconUrl).append(MEDIA_PAUSE_BEACON_SUFFIX);
+            final StringBuilder unpauseUriStr = new StringBuilder(beaconUrl).append(MEDIA_UNPAUSE_BEACON_SUFFIX);
+            final StringBuilder skipUriStr = new StringBuilder(beaconUrl).append(MEDIA_SKIP_BEACON_SUFFIX);
 
-            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, START, startUriStr);
-            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, START, billingUriStr);
-            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, FIRST_QUARTILE, firstQuartileUriStr);
-            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, MIDPOINT, midPointUriStr);
-            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, THIRD_QUARTILE, thirdQuartileUriStr);
-            addInXml(doc, trackingEventsNode, TRACKING_TAG, EVENT_ATTR, COMPLETE, completeUriStr);
+            if (addSdkTimeStamp) {
+                startUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                billingUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                firstQuartileUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                midPointUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                thirdQuartileUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                completeUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                viewUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                pauseUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                unpauseUriStr.append(SDK_TIMESTAMP_SUFFIX);
+                skipUriStr.append(SDK_TIMESTAMP_SUFFIX);
+            }
+
+            final String eventTag = VastHtmlTags.EVENT_ATTR.htmlTag;
+            final String trackingTag = VastHtmlTags.TRACKING_TAG.htmlTag;
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, START.eventTag, startUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, START.eventTag, billingUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, FIRST_QUARTILE.eventTag, firstQuartileUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, MIDPOINT.eventTag, midPointUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, THIRD_QUARTILE.eventTag, thirdQuartileUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, COMPLETE.eventTag, completeUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, CREATIVE_VIEW.eventTag, viewUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, MEDIA_PAUSE.eventTag, pauseUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, MEDIA_UNPAUSE.eventTag, unpauseUriStr.toString());
+            addInXml(doc, trackingEventsNode, trackingTag, eventTag, SKIP.eventTag, skipUriStr.toString());
         } else {
             InspectorStats.incrementStatCount(TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING);
             throw new ParserConfigurationException();
@@ -900,16 +914,16 @@ public class IXAdNetworkHelper {
 
     private static void addClickTracking(final Document doc, final NodeList parentNodeList, final String clickUrl,
             final String beaconUrl) {
-        final NodeList videoClickNode = doc.getElementsByTagName(VIDEO_CLICKS_TAG);
+        final NodeList videoClickNode = doc.getElementsByTagName(VastHtmlTags.VIDEO_CLICKS_TAG.htmlTag);
         final String beaconClickuUriStr = beaconUrl + CLICK_BEACON_SUFFIX;
         if (0 == videoClickNode.getLength()) {
-            final Element docElm = doc.createElement(VIDEO_CLICKS_TAG);
+            final Element docElm = doc.createElement(VastHtmlTags.VIDEO_CLICKS_TAG.htmlTag);
             parentNodeList.item(0).appendChild(docElm);
-            addInXml(doc, docElm, CLICK_TRACKING_TAG, null, null, clickUrl);
-            addInXml(doc, docElm, CLICK_TRACKING_TAG, null, null, beaconClickuUriStr);
+            addInXml(doc, docElm, VastHtmlTags.CLICK_TRACKING_TAG.htmlTag, null, null, clickUrl);
+            addInXml(doc, docElm, VastHtmlTags.CLICK_TRACKING_TAG.htmlTag, null, null, beaconClickuUriStr);
         } else {
-            addInXml(doc, videoClickNode, CLICK_TRACKING_TAG, null, null, clickUrl);
-            addInXml(doc, videoClickNode, CLICK_TRACKING_TAG, null, null, beaconClickuUriStr);
+            addInXml(doc, videoClickNode, VastHtmlTags.CLICK_TRACKING_TAG.htmlTag, null, null, clickUrl);
+            addInXml(doc, videoClickNode, VastHtmlTags.CLICK_TRACKING_TAG.htmlTag, null, null, beaconClickuUriStr);
         }
     }
 
@@ -941,8 +955,8 @@ public class IXAdNetworkHelper {
         return docElm;
     }
 
-    public static String replaceAudienceVerificationTrackerMacros(String audienceVerificationTracker,
-        final Map<String, String> macroData) {
+    static String replaceAudienceVerificationTrackerMacros(String audienceVerificationTracker,
+            final Map<String, String> macroData) {
         audienceVerificationTracker = StringUtils.replace(audienceVerificationTracker, MacroData.$LIMIT_AD_TRACKING,
             macroData.get(MacroData.$LIMIT_AD_TRACKING));
         audienceVerificationTracker =
@@ -950,6 +964,42 @@ public class IXAdNetworkHelper {
         audienceVerificationTracker = StringUtils.replace(audienceVerificationTracker, MacroData.$USER_ID_SHA256_HASHED,
             DigestUtils.sha256Hex(macroData.get(MacroData.$USER_ID)));
         return audienceVerificationTracker;
+    }
+
+    enum VastTrackingEventsTypeEnum {
+        START("start"),
+        FIRST_QUARTILE("firstQuartile"),
+        MIDPOINT("midpoint"),
+        THIRD_QUARTILE("thirdQuartile"),
+        COMPLETE("complete"),
+        CREATIVE_VIEW("creativeView"),
+        MEDIA_PAUSE("pause"),
+        MEDIA_UNPAUSE("resume"),
+        SKIP("skip");
+
+        private final String eventTag;
+
+        VastTrackingEventsTypeEnum(String eventTag) {
+            this.eventTag = eventTag;
+        }
+    }
+
+    private enum VastHtmlTags {
+        IMPRESSION_TAG("Impression"),
+        ERROR_TAG("Error"),
+        TRACKING_TAG("Tracking"),
+        CLICK_TRACKING_TAG("ClickTracking"),
+        EVENT_ATTR("event"),
+        TRACKING_EVENTS_TAG("TrackingEvents"),
+        IN_LINE_TAG("InLine"),
+        WRAPPER_TAG("Wrapper"),
+        VIDEO_CLICKS_TAG("VideoClicks");
+
+        private final String htmlTag;
+
+        VastHtmlTags(String htmlTag) {
+            this.htmlTag = htmlTag;
+        }
     }
 
 }

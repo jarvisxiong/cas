@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.MOVIEBOARD;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
 import static com.inmobi.adserve.channels.server.CasConfigUtil.JSON_PARSING_ERROR;
@@ -141,6 +142,8 @@ public class ServletGetSegment implements Servlet {
                     final long placementId = Long.parseLong(id);
                     segmentInfo.put("VAST", repositoryHelper.queryNativeAdTemplateRepository(placementId, VAST));
                     segmentInfo.put("STATIC", repositoryHelper.queryNativeAdTemplateRepository(placementId, STATIC));
+                    segmentInfo.put("MOVIEBOARD",
+                            repositoryHelper.queryNativeAdTemplateRepository(placementId, MOVIEBOARD));
                 } else if (repoName.equalsIgnoreCase(GEO_ZIP_REPOSITORY)) {
                     entity = repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(CAU_METADATA_REPOSITORY)) {

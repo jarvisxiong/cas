@@ -13,8 +13,17 @@ public interface KeyConstants {
     
     public static final String AD_TITLE ="ad.title";
     public static final String AD_VASTCONTENT = "ad.vastContent";
+    public static final String AD_CTA_TEXT = "ad.cta.text";
     public static final String AD_ICON = "ad.icons";
-
+    public static final String AD_CREATIVELIST = "ad.creativeList";
+    public static final String AD_NOJSOBJECT = "ad.noJsObject";
+    public static final String AD_UNIT_TRACKERS = "ad.unit.trackers";
+    public static final String AD_VAST_XML = "ad.isvastxml";
+    // Set corresponding to true in Context only for MovieBoard Ads
+    public static final String AD_MOVIEBOARD = "ad.movieboard";
+    public static final String AD_MOVIEBOARDD = "ad.movieboardd";
+    public static final String PARENT_VIEW_WIDTH = "parent.view.width";
+    public static final String AD_PARENT_VIEW_WIDTH = "ad.requestJson.aParams.parentViewWidth";
     public static final String IMNATIVE_APP_CREATIVE = "imNative.creative";
     public static final String IMNATIVE_IMAGE = "imNative.creative.image";
     public static final String IMNATIVE_CREATIVE_ICON = "imNative.creative.icon";

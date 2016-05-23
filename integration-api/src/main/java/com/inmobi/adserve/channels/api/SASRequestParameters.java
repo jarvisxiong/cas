@@ -43,6 +43,9 @@ public class SASRequestParameters {
     private Long placementId;
     private ContentType siteContentType;
     private String sdkVersion;
+    //Supply Capabilites supported by sdk/device
+    private Set<Integer> supplyCapabilities;
+
     private long siteIncId;
     private long adIncId;
     private String adcode;
@@ -94,6 +97,7 @@ public class SASRequestParameters {
     private String pubId;
     private ConnectionType connectionType;
     private double marketRate;
+    private Map<String, String> adPoolParamsMap;
     private IntegrationDetails integrationDetails;
     private String appBundleId;
     private String normalizedUserId;
@@ -106,6 +110,8 @@ public class SASRequestParameters {
     private WapSiteUACEntity wapSiteUACEntity;
     private SiteEcpmEntity siteEcpmEntity;
     private boolean isVideoSupported;
+    private boolean isMovieBoardRequest;
+    private Integer movieboardParentViewWidth;
     private String referralUrl;
     private String automationTestId;
     private Set<Long> cauMetadataSet;

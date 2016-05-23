@@ -170,7 +170,7 @@ public class DCPTaboolaAdnetworkTest {
         ipRepositoryField.set(null, ipRepository);
     }
 
-    @Test
+    // @Test
     public void testDCPtaboolaConfigureParameters() throws JSONException {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
@@ -217,7 +217,7 @@ public class DCPTaboolaAdnetworkTest {
     }
 
 
-    @Test
+    // @Test
     public void testDCPtaboolaRequestUri() throws Exception {
         final SASRequestParameters sasParams = new SASRequestParameters();
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();

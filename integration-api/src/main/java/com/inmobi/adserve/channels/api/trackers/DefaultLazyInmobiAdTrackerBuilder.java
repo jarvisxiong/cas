@@ -11,10 +11,6 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 
-/**
- * Created by ishanbhatnagar on 14/5/15.
- */
-
 
 /**
  * Builder for the DefaultLazyInmobiAdTracker

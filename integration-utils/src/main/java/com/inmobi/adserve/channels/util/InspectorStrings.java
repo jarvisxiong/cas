@@ -17,6 +17,7 @@ public class InspectorStrings {
     public static final String TOTAL_NATIVE_REQUESTS = "TotalNativeRequests";
     public static final String TOTAL_NATIVE_RESPONSES = "TotalNativeResponses";
     public static final String TOTAL_NATIVE_VIDEO_RESPONSES = "TotalNativeVideoResponses";
+    public static final String TOTAL_MOVIEBOARD_RESPONSES = "TotalMovieBoardResponses";
     public static final String NON_AD_REQUESTS = "NonAdRequests";
     public static final String TOTAL_INVOCATIONS = "TotalInvocations";
     public static final String SUCCESSFUL_CONFIGURE = "SuccessfulConfigure";
@@ -26,7 +27,6 @@ public class InspectorStrings {
     public static final String IX_FILLS = "IXFills";
     public static final String DCP_FILLS = "DCPFills";
     public static final String LATENCY = "Latency";
-    public static final String CONNECTION_LATENCY = "ConnectionLatency";
     public static final String COUNT = "Count";
     public static final String TOTAL_TIMEOUT = "TotalTimeout";
     public static final String CONNECTION_TIMEOUT = "ConnectionTimeout";
@@ -110,9 +110,6 @@ public class InspectorStrings {
     public static final String IMEI = "Imei";
     public static final String IMEI_BEING_SENT_FOR = "ImeiBeingSentFor";
 
-    public static final String UNEXPECTED_CONDITION = "UnexpectedCondition";
-    public static final String VAST_OUT_WITH_SDK = "VastOutWithSDK";
-
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
@@ -153,6 +150,8 @@ public class InspectorStrings {
     public static final String TOTAL_VAST_VIDEO_REQUESTS = "TotalVASTVideoRequests";
     public static final String TOTAL_PURE_VAST_REQUESTS = "TotalPureVASTRequests";
     public static final String TOTAL_NATIVE_VAST_REQUESTS = "TotalNativeVASTRequests";
+    public static final String TOTAL_MOVIEBOARD_REQUESTS = "TotalMovieBoardRequests";
+    public static final String TOTAL_MOVIEBOARD_TEMPLATES = "TotalMovieBoardTemplates";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
     public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
             "totalPureVastResponseInlineOrWrapperMissing";
@@ -212,10 +211,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SDK_VERSION_FILTER = "DroppedInPackageSDKVersionTargetingFilter";
 
-    // More than one segments were present during the IX/Hosted auctions
-    // (This will never be incremented as extra segments will be dropped in partner count filter)
-    public static final String INVALID_AUCTION = "InvalidAuction";
-
     // IX Response Object Status Code Strings
     public static final String IX_INVALID_REQUEST = "NO_AD.InvalidRequest";
     public static final String IX_NO_MATCH = "NO_AD.NoAdMatchedCriteria";
@@ -245,7 +240,12 @@ public class InspectorStrings {
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 
     public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
-    public static final String TOTAL_WIN_PRICE_MACRO_REPLACE = "TotalWinPriceMacroReplace";
+
+    public static final String ONLY_OLD_CSIDS_SET = "OnlyOldCSIDsSet";
+    public static final String ONLY_NEW_CSIDS_SET = "OnlyNewCSIDsSet";
+    public static final String CSIDS_MIGRATION_SANE = "CSIDMigrationSane";
+    public static final String CSIDS_MIGRATION_NOT_SANE = "CSIDMigrationNotSane";
+
     public static final String TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionIdInsensitiveMacroReplace" ;
     public static final String TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE = "TotalAuctionCurrencyMacroReplace";
     public static final String TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE = "TotalAuctionPriceMacroReplace" ;
@@ -253,4 +253,16 @@ public class InspectorStrings {
     public static final String TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE = "TotalSeatIdMacroReplace";
     public static final String TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionImpressionIdMacroReplace";
     public static final String TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionAdIdMacroReplace";
+
+    // Native 1.0 Video errors
+    public static final String NATIVE_VIDEO_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING = "NativeVideoResponse.DroppedAsTemplateWasMissing";
+    public static final String NATIVE_VIDEO_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED = "NativeVideoResponse.DroppedAsVastXMLGenerationFailed";
+    public static final String NATIVE_VIDEO_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED = "NativeVideoResponse.DroppedAsTemplateMergingFailed";
+
+    // Movieboard errors
+    public static final String MOVIE_BOARD_REQUEST_DROPPED_AS_MIN_OS_CHECK_FAILED = "MovieBoardRequest.DroppedAsMinOSCheckFailed";
+    public static final String MOVIE_BOARD_REQUEST_DROPPED_AS_PARENT_VIEW_WIDTH_WAS_INVALID = "MovieBoardRequest.DroppedAsParentViewWidthWasInvalid";
+    public static final String MOVIE_BOARD_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING = "MovieBoardRequest.DroppedAsTemplateWasMissing";
+    public static final String MOVIE_BOARD_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED = "MovieBoardResponse.DroppedAsVastXMLGenerationFailed";
+    public static final String MOVIE_BOARD_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED = "MovieBoardResponse.DroppedAsTemplateMergingFailed";
 }

@@ -1,11 +1,14 @@
 package com.inmobi.adserve.channels.repository;
 
-import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.VAST_KEY;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.MOVIEBOARD_REQUIRED_JPATH_KEYS;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.MOVIEBOARD;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.VAST_KEY;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -16,9 +19,14 @@ import com.google.gson.JsonParseException;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.query.NativeAdTemplateQuery;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
 import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.adtemplate.platform.AdTemplate;
+import com.inmobi.adtemplate.platform.AdTemplateDemandConstraints;
+import com.inmobi.adtemplate.platform.CardDetail;
+import com.inmobi.adtemplate.platform.MultiCardConstraints;
 import com.inmobi.phoenix.batteries.data.AbstractStatsMaintainingDBRepository;
 import com.inmobi.phoenix.batteries.data.DBEntity;
 import com.inmobi.phoenix.batteries.data.EntityError;
@@ -43,6 +51,7 @@ public class NativeAdTemplateRepository
         final Long placementId = row.getLong("placement_id");
         final Timestamp modifiedOn = row.getTimestamp("modified_on");
         TemplateClass templateClass = STATIC;
+        String errorMsg = "ERROR_IN_READING_NATIVE_TEMPLATE";
         try {
             final Long templateId = row.getLong("native_template_id");
             final Integer uiLayoutId = (Integer) row.getObject("ui_layout_id");
@@ -64,10 +73,12 @@ public class NativeAdTemplateRepository
                     // Ignored
                 }
             }
-            try {
-                builder.contentJson(GSON.fromJson(contentJson, NativeContentJsonObject.class));
-            } catch (final JsonParseException jpe) {
-                // Ignored
+            if (null != contentJson) {
+                try {
+                    builder.contentJson(GSON.fromJson(contentJson, NativeContentJsonObject.class));
+                } catch (final JsonParseException jpe) {
+                    // Ignored
+                }
             }
 
             // Deserialize ad Template Binary
@@ -75,9 +86,18 @@ public class NativeAdTemplateRepository
             final AdTemplate adTemplate = new com.inmobi.adtemplate.platform.AdTemplate();
             deserializer.deserialize(adTemplate, Base64.decodeBase64(binaryTemplate));
             // Get fields from ad Template Binary
-            final List<String> demandJpath = adTemplate.getDemandConstraints().getJsonPath();
-            if (demandJpath == null) {
-                throw new RepositoryException("No keys, jsonpath found");
+            List<String> demandJpath = null;
+            if (adTemplate.isMultiCardTemplate() && checkIfMovieBoardTemplate(adTemplate.getMultiCardConstraints())) {
+                templateClass = MOVIEBOARD;
+                InspectorStats.incrementStatCount(InspectorStrings.TOTAL_MOVIEBOARD_TEMPLATES);
+            } else {
+                final AdTemplateDemandConstraints adTemplateDemandConstraints = adTemplate.getDemandConstraints();
+                demandJpath = (null != adTemplateDemandConstraints ?
+                        adTemplateDemandConstraints.getJsonPath() : null);
+            }
+
+            if (demandJpath == null && templateClass != MOVIEBOARD) {
+                throw new RepositoryException("No jsonpath found for non MOVIEBOARD template");
             }
 
             String mandatoryKey = null, imageKey = null;
@@ -94,17 +114,20 @@ public class NativeAdTemplateRepository
                     }
                 }
             }
+
             if (STATIC == templateClass) {
                 final boolean isImageReqButNull = NativeConstraints.isImageRequired(mandatoryKey) && imageKey == null;
                 if (mandatoryKey == null || isImageReqButNull) {
-                    throw new RepositoryException("No mandatory/image Key for STATIC templateClass");
+                    errorMsg = "No mandatory/image Key for STATIC templateClass. JPath is " + demandJpath.toString();
+                    throw new RepositoryException(errorMsg);
                 }
             }
             builder.templateClass(templateClass);
             // Add template Content
             final String templateContent = adTemplate.getDetails().getContent();
             if (StringUtils.isEmpty(templateContent)) {
-                throw new RepositoryException("No template content for templateId ->" + templateId);
+                errorMsg = "No template content for templateId ->" + templateId;
+                throw new RepositoryException(errorMsg);
             }
             builder.template(templateContent);
             // Add Template to VM Cache
@@ -115,14 +138,40 @@ public class NativeAdTemplateRepository
             templateMgr.getTemplate(templateId);
             // Build NativeAdTemplateEntity
             final NativeAdTemplateEntity templateEntity = builder.build();
-            return new DBEntity<NativeAdTemplateEntity, NativeAdTemplateQuery>(templateEntity, modifiedOn);
+            return new DBEntity<>(templateEntity, modifiedOn);
         } catch (final Exception e) {
             logger.error("Error in resultset row", e);
-            return new DBEntity<NativeAdTemplateEntity, NativeAdTemplateQuery>(
-                    new EntityError<NativeAdTemplateQuery>(new NativeAdTemplateQuery(placementId, templateClass),
-                            "ERROR_IN_READING_NATIVE_TEMPLATE"),
-                    modifiedOn);
+            return new DBEntity<>(new EntityError<>(new NativeAdTemplateQuery(placementId, templateClass), errorMsg), modifiedOn);
         }
+    }
+
+    private boolean checkIfMovieBoardTemplate(final Map<Integer, MultiCardConstraints> multiCardConstraintsMap) {
+        if (null == multiCardConstraintsMap) {
+            return false;
+        }
+
+        boolean movieBoardTemplate = true;
+        for (final MultiCardConstraints multiCardConstraints : multiCardConstraintsMap.values()) {
+            for (final CardDetail cardDetail : multiCardConstraints.getCardDetails().values()) {
+
+                boolean cardHasMovieBoardJpaths = false;
+                if (cardDetail.isSetDemandConstraints()) {
+                    final AdTemplateDemandConstraints cardDemandConstraints = cardDetail.getDemandConstraints();
+                    if (cardDemandConstraints.isSetJsonPath() && cardDemandConstraints.getJsonPath().size() > 0) {
+                        cardHasMovieBoardJpaths = true;
+                        for (final String requiredJPaths : MOVIEBOARD_REQUIRED_JPATH_KEYS) {
+                            if (!cardDemandConstraints.getJsonPath().contains(requiredJPaths)) {
+                                cardHasMovieBoardJpaths = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                movieBoardTemplate = movieBoardTemplate && cardHasMovieBoardJpaths;
+            }
+        }
+
+        return movieBoardTemplate;
     }
 
 
