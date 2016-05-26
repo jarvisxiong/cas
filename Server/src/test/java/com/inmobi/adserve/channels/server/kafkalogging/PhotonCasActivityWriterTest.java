@@ -35,7 +35,7 @@ import com.inmobi.user.photon.datatypes.activity.NestedActivityRecord;
 @PrepareForTest({MessagePublisherFactory.class})
 public class PhotonCasActivityWriterTest extends TestCase {
 
-    private static final String CHANNEL_SERVER_CONFIG_FILE = "/opt/inmobi/cas/conf/channel-server.properties";
+    private static final String CHANNEL_SERVER_CONFIG_FILE = "channel-server.properties";
     private PhotonCasActivityWriter photonCasActivityWriter;
 
     @Override
