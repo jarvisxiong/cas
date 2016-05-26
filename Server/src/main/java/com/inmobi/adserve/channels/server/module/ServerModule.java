@@ -6,11 +6,11 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;

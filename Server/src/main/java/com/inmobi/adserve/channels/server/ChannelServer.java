@@ -79,6 +79,7 @@ import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.SlotSizeMapRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
 import com.inmobi.adserve.channels.repository.stats.RepositoryStats;
+import com.inmobi.adserve.channels.server.kafkalogging.PhotonCasActivityWriter;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -207,7 +208,7 @@ public class ChannelServer {
             final String umpAdsLogKey = configurationLoader.getServerConfiguration().getString("umpAdsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey,
                     configurationLoader.getServerConfiguration(), containerName, dataCentreName);
-
+            PhotonCasActivityWriter.init(configurationLoader.getServerConfiguration(), channelServerHelper.isProdEnvironment());
             // Initializing graphite stats
             RepositoryStats.init(configurationLoader.getMetricsConfiguration(), containerName);
             InspectorStats.init(configurationLoader.getMetricsConfiguration(), containerName);

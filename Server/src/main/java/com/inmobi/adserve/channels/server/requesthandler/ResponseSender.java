@@ -67,6 +67,7 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.server.kafkalogging.PhotonCasActivityWriter;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
@@ -81,6 +82,7 @@ import com.inmobi.commons.security.util.exception.InvalidMessageException;
 import com.inmobi.types.AdIdChain;
 import com.inmobi.types.GUID;
 import com.inmobi.types.PricingModel;
+import com.inmobi.user.photon.datatypes.activity.NestedActivityRecord;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -132,6 +134,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     @Setter
     @Inject
     private static Provider<Marker> traceMarkerProvider;
+    
+    private PhotonCasActivityWriter photonCasActivityWriter;
+
 
     public String getTerminationReason() {
         return terminationReason;
@@ -195,6 +200,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (null != traceMarkerProvider) {
             traceMarker = traceMarkerProvider.get();
         }
+        photonCasActivityWriter = PhotonCasActivityWriter.getInstance();
     }
 
     @Override
@@ -770,6 +776,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
+            final NestedActivityRecord nestedActivityRecord =
+                    photonCasActivityWriter.getNestedActivityRecord(adResponseChannelSegment, sasParams);
+            photonCasActivityWriter.publish(nestedActivityRecord);
         } catch (final JSONException exception) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Exception raised in ResponseSender {}", exception);

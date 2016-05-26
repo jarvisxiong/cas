@@ -133,7 +133,11 @@ server.aerospike.boostTimeFrame=3
 server.aerospike.imeiNamespae=device_imei
 server.aerospike.imeiSet=imei
 {{/aerospike}}
-    
+
+{{#kafka}}
+server.kafka.host_list={{kafka_host}}
+server.cas_photon_activity=casPhotonActivity    
+{{/kafka}}
 {{/database}}
 
 #refreshTime is set as different prime numbers to avoid refresh of all repos at their LCM.
