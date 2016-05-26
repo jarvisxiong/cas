@@ -8,6 +8,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.NO_MATCH_SEGMENT
 import static com.inmobi.adserve.channels.util.InspectorStrings.SERVER_IMPRESSION;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TIMER_LATENCY;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_FILLS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_MISMATCH_BUNDLE_ID_FOR_DST;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_MULTI_FORMAT_REQUESTS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NATIVE_REQUESTS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NO_FILLS;
@@ -18,7 +19,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_TIMEOUT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.UH1_TO_RP_WEST_PREFIX;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -250,7 +251,7 @@ public class Logging {
 
                 if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
                         || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
-                    channel.setIxAds(Arrays.asList(createIxAd(ixAdNetwork)));
+                    channel.setDeprecatedIxAds(Collections.singletonList(createIxAd(ixAdNetwork)));
                 }
 
                 final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
@@ -346,15 +347,15 @@ public class Logging {
         }
         // Log all the package Ids which were sent to RP.
         if (CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
-            ixAd.setPackageIds(ixAdNetwork.getPackageIds());
+            ixAd.setDeprecatedPackageIds(ixAdNetwork.getPackageIds());
 
             // Log winning dealId
             if (StringUtils.isNotEmpty(ixAdNetwork.getDealId())) {
-                ixAd.setWinningDealId(ixAdNetwork.getDealId());
+                ixAd.setDeprecatedWinningDealId(ixAdNetwork.getDealId());
             }
             // Log winning PackageId
             if (null != ixAdNetwork.getWinningPackageId()) {
-                ixAd.setWinningPackageId(ixAdNetwork.getWinningPackageId());
+                ixAd.setDeprecatedWinningPackageId(ixAdNetwork.getWinningPackageId());
             }
 
             // Log highest Bid
@@ -364,7 +365,7 @@ public class Logging {
 
             // Log agency rebate percentage
             if (null != ixAdNetwork.getAgencyRebatePercentage()) {
-                ixAd.setAgencyRebatePercentage(ixAdNetwork.getAgencyRebatePercentage());
+                ixAd.setDeprecatedAgencyRebatePercentage(ixAdNetwork.getAgencyRebatePercentage());
             }
         }
 
@@ -494,6 +495,12 @@ public class Logging {
                 if (StringUtils.isNotBlank(appBundleId)) {
                     request.setAppBundleId(appBundleId);
                     LOG.debug("AppBundleId is : {}", appBundleId);
+                }
+                request.setNappScore(sasParams.getNappScore().getValue());
+                final boolean mismatchedBundleId = sasParams.isBundleIdMismatched();
+                request.setMissMatchBundleId(mismatchedBundleId);
+                if (mismatchedBundleId) {
+                    InspectorStats.incrementStatCount(TOTAL_MISMATCH_BUNDLE_ID_FOR_DST + sasParams.getDst());
                 }
             }
 

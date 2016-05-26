@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -14,31 +29,14 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
-// import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
-// import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
-// import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
-// import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
-// import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.interfaces.TemplateConfiguration;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 
 /**
  * Created by thushara.v on 25/05/15.

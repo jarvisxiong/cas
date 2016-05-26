@@ -21,7 +21,6 @@ import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.DeviceType;
 import com.inmobi.adserve.adpool.Education;
-import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.Ethnicity;
 import com.inmobi.adserve.adpool.Geo;
 import com.inmobi.adserve.adpool.IntegrationDetails;
@@ -39,6 +38,8 @@ import com.inmobi.adserve.adpool.UidParams;
 import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.adpool.User;
 import com.inmobi.adserve.adpool.UserProfile;
+import com.inmobi.fds.thrift.mapp.MappResponse;
+import com.inmobi.fds.thrift.mapp.Score;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.types.ContentRating;
 import com.inmobi.types.Gender;
@@ -49,6 +50,7 @@ import com.inmobi.types.SupplySource;
 import io.netty.util.CharsetUtil;
 
 public class AdserveBackfillRequest {
+    private static final String DEFAULT_NAPP_SCORE = "100";
 
     public static String defaultSetVariable(final String reqString, final String default_val) {
         final String nullString = "NULL";
@@ -718,8 +720,6 @@ public class AdserveBackfillRequest {
         // uidParams.putToRawUidValues(UidType.O1, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
         // uidParams.putToLoggedUidParams(UidType.UDID, "61b6a7bfd92e9b767e508cd70a442f2a");
         // uidParams.putToLoggedUidParams(UidType.O1, "6c1ed2a7a2131e913b902ab82907fd0bfaafa320");
-
-
         adPoolRequest.setUidParams(uidParams);
 
         if (null != adpool_iem) {
@@ -759,6 +759,17 @@ public class AdserveBackfillRequest {
 
         // Placement related setters
         adPoolRequest.setPlacementId(adpool_placementId);
+
+        //setting napp score
+        final byte nappScore =
+                Byte.parseByte(AdserveBackfillRequest.defaultSetVariable(requestObject.get("napp_score"),
+                        DEFAULT_NAPP_SCORE));
+        final MappResponse mappResponse = new MappResponse();
+        final Score score = new Score();
+        score.setScore(nappScore);
+        mappResponse.setEffectiveScore(score);
+        adPoolRequest.setMappResponse(mappResponse);
+
         return adPoolRequest;
     }
 

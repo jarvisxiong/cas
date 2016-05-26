@@ -602,7 +602,7 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
 
     /**
      * 
-     * @return
+     * @return app bundle Id
      */
     @Override
     public String getAppBundleId() {

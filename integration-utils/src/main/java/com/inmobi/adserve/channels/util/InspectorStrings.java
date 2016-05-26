@@ -265,4 +265,10 @@ public class InspectorStrings {
     public static final String MOVIE_BOARD_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING = "MovieBoardRequest.DroppedAsTemplateWasMissing";
     public static final String MOVIE_BOARD_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED = "MovieBoardResponse.DroppedAsVastXMLGenerationFailed";
     public static final String MOVIE_BOARD_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED = "MovieBoardResponse.DroppedAsTemplateMergingFailed";
+
+    public static final String TOTAL_MISMATCH_BUNDLE_ID_FOR_DST = "TotalMismatchBundleIdForDST_";
+    public static final String TOTAL_REQUEST_FOR_NAPP_SCORE = "TotalRequestForNappScore";
+    public static final String TOTAL_REQUEST_WITHOUT_NAPP_SCORE = "TotalRequestWithoutNappScore";
+    public static final String TOTAL_REQUEST_FOR_UNKNOWN_NAPP_SCORE = "TotalRequestForUnknownNappScore";
+    public static final java.lang.String TOTAL_REQUEST_WITHOUT_MAPPRESPONSE = "TotalRequestWithoutMappResponse";
 }

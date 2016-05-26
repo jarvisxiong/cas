@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
@@ -125,6 +127,15 @@ public class SASRequestParameters {
     private String requestGuid;
     private String language;
     private boolean noJsTracking = false;
+    private NappScore nappScore;
+
+    /**
+     * @return true if bundle ids are mismatched
+     */
+    public boolean isBundleIdMismatched() {
+        return (null != wapSiteUACEntity) ? !StringUtils.equalsIgnoreCase(wapSiteUACEntity.getBundleId(), appBundleId) :
+                false;
+    }
 
     public enum HandSetOS {
         OTHERS(1), Linux_Smartphone_OS(2), Android(3), Nokia_OS(4), iOS(5), RIM_OS(6), MTK_Nucleus_OS(7), Symbian_OS(8), Windows_Mobile_OS(
@@ -142,4 +153,15 @@ public class SASRequestParameters {
         }
     }
 
+    public enum NappScore {
+        CONFIDENT_BAD_SCORE(10), MAYBE_BAD_SCORE(40), UNKNOWN_SCORE(90), CONFIDENT_GOOD_SCORE(100);
+        private final int id;
+
+        NappScore (final int id) {
+            this.id = id;
+        }
+        public int getValue() {
+            return id;
+        }
+    }
 }

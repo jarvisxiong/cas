@@ -46,7 +46,7 @@ public class WapSiteUACEntity implements IdentifiableEntity<String> {
     private final String siteName;
     // App title as fetched from UAC
     private final String appTitle;
-    // Bundle Id of App - e.g. com.rovio.angrybirds for both IOS and Android
+    // Bundle Id of App - e.g. com.rovio.angrybirds for both IOS and Android source is wap_site_uac
     private final String bundleId;
     // last modified time of this table
     private final Timestamp modifiedOn;

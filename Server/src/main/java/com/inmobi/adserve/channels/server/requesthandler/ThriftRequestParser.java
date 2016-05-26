@@ -1,6 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
+
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.populateNappScore;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
@@ -16,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,11 +73,6 @@ import io.netty.util.CharsetUtil;
 @Singleton
 public class ThriftRequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
-
-    private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
-            "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
-    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES =
-            Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
 
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
             final CasInternalRequestParameters casInternal, final int dst) {
@@ -167,6 +165,9 @@ public class ThriftRequestParser {
         if (tObject.isSetRqSslEnabled()) {
             params.setSecureRequest(tObject.rqSslEnabled);
         }
+
+        //setting the napp score for supply
+        populateNappScore(params, tObject.getMappResponse());
 
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
     }
