@@ -424,7 +424,7 @@ non_prod:
                 rtb2_status: 'on'
             ix:
                 ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
-                ix_default_url: 'http://10.14.118.66:8889/getIXBid'
+                ix_default_url: 'http://web1027.ads.corp.inmobi.com/getIXBid'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
@@ -469,7 +469,7 @@ non_prod:
                 rtb2_status: 'on'
             ix:
                 ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
-                ix_default_url: 'http://10.14.118.66:8889/getIXBid'
+                ix_default_url: 'http://web1027.ads.corp.inmobi.com/getIXBid'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
