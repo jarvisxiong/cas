@@ -48,7 +48,7 @@ public class ServerTest extends TestCase {
     public void setUp() throws Exception {
         if (count == 0) {
             prepareLogging();
-            config = ConfigurationLoader.getInstance("/opt/mkhoj/conf/cas/channel-server.properties");
+            config = ConfigurationLoader.getInstance("channel-server.properties");
             count++;
         }
         prepareConfig();
