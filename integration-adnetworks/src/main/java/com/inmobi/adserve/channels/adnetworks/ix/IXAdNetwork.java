@@ -1565,8 +1565,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         }
         // bidderCurrency is set to USD by default
         final Double bidPrice = bid.getPrice();
-        bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = secondBidPriceInUsd = bidPrice;
-        setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(originalBidPriceInUsd));
+        bidPriceInLocal = bidPriceInUsd = secondBidPriceInUsd = originalBidPriceInUsd = bidPrice;
 
         final String dealId = bid.getDealid();
         final Optional<DealEntity> dealEntityOptional = repositoryHelper.queryDealById(dealId, QUERY_IN_OLD_REPO);
@@ -1578,7 +1577,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             dealAttributionMetadata = generateDealAttributionMetadata(shortlistedTargetingSegmentIds, deal.getPackageId(), sasParams.getCsiTags(), repositoryHelper, geoCookieWasUsed);
 
             //subtracting RP's cut in case of PMP
-            bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd = secondBidPriceInUsd = bidPrice * (1.0 - rubiconCutsInDeal);
+            final Double bidAfterRemovingRPsCut = originalBidPriceInUsd * (1.0 - rubiconCutsInDeal);
+            bidPriceInLocal = bidPriceInUsd = secondBidPriceInUsd = bidAfterRemovingRPsCut;
             InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_DEAL_RESPONSES);
             InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
 
@@ -1590,7 +1590,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (deal.isAgencyRebateToBeApplied()) {
                 InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_AGENCY_REBATE_DEAL_RESPONSES);
                 seatId = String.valueOf(deal.getExternalAgencyId());
-                bidPriceInLocal = bidPriceInUsd = originalBidPriceInUsd * (1.0 - deal.getAgencyRebatePercentage() / 100.0);
+                bidPriceInLocal = bidPriceInUsd = secondBidPriceInUsd = secondBidPriceInUsd * (1.0 - deal.getAgencyRebatePercentage() / 100.0);
                 LOG.info(traceMarker, "Agency Rebate Applied, dealId: {}, agencyId: {}, originalBid: {}, newBid: {}",
                         dealId, seatId, originalBidPriceInUsd, bidPriceInUsd);
             }
@@ -1604,13 +1604,15 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
                 setThirdPartyClickTracker(trackerMap, macroData);
                 setThirdPartyImpressionTracker(trackerMap, macroData);
             }
+            setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(bidAfterRemovingRPsCut));
 
         } else if (StringUtils.isNotBlank(dealId)) {
             InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_DEAL_RESPONSES);
             InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED);
             return false;
+        } else {
+            setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(originalBidPriceInUsd));
         }
-
 
         if (null != bid.getAdmobject()) {
             nativeObj = bid.getAdmobject().getNativeObj();

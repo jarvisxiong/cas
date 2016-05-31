@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.configuration.Configuration;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -24,12 +22,15 @@ import com.inmobi.adserve.adpool.UidType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.util.ConfigurationLoader;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.messaging.publisher.MessagePublisherFactory;
 import com.inmobi.user.photon.datatypes.activity.NestedActivityRecord;
+
+import junit.framework.TestCase;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MessagePublisherFactory.class})
@@ -113,7 +114,7 @@ public class PhotonCasActivityWriterTest extends TestCase {
         expect(ixAdNetwork.getCreativeId()).andReturn("creativeId").anyTimes();
         expect(ixAdNetwork.getDspId()).andReturn("dspId").anyTimes();
         expect(ixAdNetwork.getDst()).andReturn(DemandSourceType.IX).anyTimes();
-        expect(ixAdNetwork.getDealId()).andReturn("12345").anyTimes();
+        expect(ixAdNetwork.getDeal()).andReturn(DealEntity.newBuilder().id("12345").build()).anyTimes();
         replay(ixAdNetwork);
 
         return new ChannelSegment(channelSegmentEntity, null, null, null, null, ixAdNetwork, 0);

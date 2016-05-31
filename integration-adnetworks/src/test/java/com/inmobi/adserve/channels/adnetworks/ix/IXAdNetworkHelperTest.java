@@ -450,7 +450,7 @@ public class IXAdNetworkHelperTest {
 
         for (int i=0; i<(1<<deviceId.length); i++) {
             final String tmpDeviceId[] = new String[7];
-            for (int j=0; j<deviceId.lengreth; j++) {
+            for (int j=0; j<deviceId.length; j++) {
                 if (0 != (i & (1<<j))) {
                     tmpDeviceId[j] = deviceId[j];
                 }

@@ -168,6 +168,7 @@ public class PhotonCasActivityWriter {
         final ChannelSegmentEntity channelSegmentEntity = channelSegment.getChannelSegmentEntity();
         final AdNetworkInterface adNetworkInterface = channelSegment.getAdNetworkInterface();
 
+        // TODO: Do this for RTBD
         if (null == channelSegmentEntity || null == adNetworkInterface || !(adNetworkInterface instanceof IXAdNetwork)) {
             if (log.isDebugEnabled()) {
                 log.debug("channelSegmentEntity or adNetworkInterface is null or adnetwork not instance of IXAdNetwork");
@@ -191,10 +192,9 @@ public class PhotonCasActivityWriter {
         final String advertiserId = ixAdNetwork.getAdvId();
         final String dspId = ixAdNetwork.getDspId();
         final String creativeId = ixAdNetwork.getCreativeId();
-        final String dealId = ixAdNetwork.getDealId();
-        final NestedActivityRecord nestedActivityRecord =
-                getNestedActivityRecord(userId, impressionId, creativeId, dspId, advertiserId, dealId);
-        return nestedActivityRecord;
+        final String dealId = (null != ixAdNetwork.getDeal()) ? ixAdNetwork.getDeal().getId() : null;
+
+        return getNestedActivityRecord(userId, impressionId, creativeId, dspId, advertiserId, dealId);
     }
 
 }

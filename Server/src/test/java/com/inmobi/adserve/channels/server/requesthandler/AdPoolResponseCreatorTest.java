@@ -20,11 +20,11 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.thirdparty.guava.common.collect.ImmutableSet;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
