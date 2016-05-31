@@ -9,7 +9,7 @@ public class CasServerDetails {
 
             .getProperty("cas_end_point") : MAC_DOCKER_MACHINE_DEFAULT_IP;
 
-    private final static String CAS_SERVER_ENDPOINT = "http://" + MAC_DOCKER_MACHINE_DEFAULT_IP + ":8800/";
+    private final static String CAS_SERVER_ENDPOINT = "http://" + CAS_SERVER_IP + ":8800/";
 
     private final static String LOG_FILE_PATH = "/opt/inmobi/cas/logs/debug/";
 
