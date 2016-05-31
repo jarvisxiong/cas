@@ -41,7 +41,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
 
-public abstract class BaseServlet implements Servlet {
+abstract class BaseServlet implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
     protected final Provider<Marker> traceMarkerProvider;
 
@@ -51,20 +51,9 @@ public abstract class BaseServlet implements Servlet {
     private final AsyncRequestMaker asyncRequestMaker;
     private final List<AdvertiserLevelFilter> advertiserLevelFilters;
     private final List<AdGroupLevelFilter> adGroupLevelFilters;
-    protected final CasUtils casUtils;
+    private final CasUtils casUtils;
 
-    /**
-     *
-     * @param matchSegments
-     * @param traceMarkerProvider
-     * @param channelSegmentFilterApplier
-     * @param casUtils
-     * @param requestFilters
-     * @param asyncRequestMaker
-     * @param advertiserLevelFilters
-     * @param adGroupLevelFilters
-     */
-    protected BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
+    BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
             final ChannelSegmentFilterApplier channelSegmentFilterApplier, final CasUtils casUtils,
             final RequestFilters requestFilters, final AsyncRequestMaker asyncRequestMaker,
             final List<AdvertiserLevelFilter> advertiserLevelFilters,
@@ -79,10 +68,6 @@ public abstract class BaseServlet implements Servlet {
         this.adGroupLevelFilters = adGroupLevelFilters;
     }
 
-    /**
-     *
-     * @return
-     */
     protected abstract boolean isEnabled();
 
     @Override
@@ -144,7 +129,7 @@ public abstract class BaseServlet implements Servlet {
             return;
         }
         specificEnrichment(casContext, sasParams, casInternal);
-        auctionEngine.casInternalRequestParameters = casInternal;
+        auctionEngine.casParams = casInternal;
         auctionEngine.sasParams = sasParams;
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());

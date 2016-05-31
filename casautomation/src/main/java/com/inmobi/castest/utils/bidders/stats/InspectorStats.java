@@ -21,11 +21,10 @@ import com.yammer.metrics.reporting.GraphiteReporter;
 
 public class InspectorStats {
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>> ingrapherCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>>();
+            new ConcurrentHashMap<>();
     private static Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>>();
-    private static Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, Histogram>>();
+            new ConcurrentHashMap<>();
+    private static Map<String, ConcurrentHashMap<String, Histogram>> yammerTimerStats = new ConcurrentHashMap<>();
 
     private static String STATS = "stats";
     private static String WORK_FLOW = "WorkFlow";
@@ -61,8 +60,7 @@ public class InspectorStats {
         if (ingrapherCounterStats.get(key) == null) {
             synchronized (parameter) {
                 if (ingrapherCounterStats.get(key) == null) {
-                    ingrapherCounterStats.put(key,
-                            new ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>>());
+                    ingrapherCounterStats.put(key, new ConcurrentHashMap<>());
                 }
 
             }
@@ -71,7 +69,7 @@ public class InspectorStats {
         if (ingrapherCounterStats.get(key).get(STATS) == null) {
             synchronized (parameter) {
                 if (ingrapherCounterStats.get(key).get(STATS) == null) {
-                    ingrapherCounterStats.get(key).put(STATS, new ConcurrentHashMap<String, AtomicLong>());
+                    ingrapherCounterStats.get(key).put(STATS, new ConcurrentHashMap<>());
                 }
 
             }
@@ -91,12 +89,12 @@ public class InspectorStats {
     }
 
     public static void incrementYammerCount(final String key, final String parameter, final long value) {
-        final String fullKey = key + "." + parameter;
+        final String fullKey = key + '.' + parameter;
 
         if (yammerCounterStats.get(key) == null) {
             synchronized (parameter) {
                 if (yammerCounterStats.get(key) == null) {
-                    yammerCounterStats.put(key, new ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>());
+                    yammerCounterStats.put(key, new ConcurrentHashMap<>());
                 }
             }
         }
@@ -104,7 +102,7 @@ public class InspectorStats {
         if (yammerCounterStats.get(key).get(STATS) == null) {
             synchronized (parameter) {
                 if (yammerCounterStats.get(key).get(STATS) == null) {
-                    yammerCounterStats.get(key).put(STATS, new ConcurrentHashMap<String, Counter>());
+                    yammerCounterStats.get(key).put(STATS, new ConcurrentHashMap<>());
                 }
             }
         }
@@ -122,11 +120,11 @@ public class InspectorStats {
     }
 
     public static void updateYammerTimerStats(final String dst, final String parameter, final long value) {
-        final String fullKey = dst + "." + parameter;
+        final String fullKey = dst + '.' + parameter;
         if (yammerTimerStats.get(dst) == null) {
             synchronized (parameter) {
                 if (yammerTimerStats.get(dst) == null) {
-                    yammerTimerStats.put(dst, new ConcurrentHashMap<String, Histogram>());
+                    yammerTimerStats.put(dst, new ConcurrentHashMap<>());
                 }
             }
         }

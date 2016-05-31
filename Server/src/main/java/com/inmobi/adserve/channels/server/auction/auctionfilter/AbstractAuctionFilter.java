@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
@@ -16,8 +14,10 @@ import com.inmobi.adserve.channels.server.constants.FilterOrder;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.casthrift.DemandSourceType;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class AbstractAuctionFilter implements AuctionFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractAuctionFilter.class);
 
     protected final Provider<Marker> traceMarkerProvider;
     protected Boolean isApplicableRTBD; // Whether the filter is applicable to RTBD
@@ -51,11 +51,11 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
 
             if (result) {
                 iterator.remove();
-                LOG.debug(traceMarker, "Failed in auction filter {}  , advertiser {}", this.getClass().getSimpleName(),
+                log.debug(traceMarker, "Failed in auction filter {}  , advertiser {}", this.getClass().getSimpleName(),
                         channelSegment.getAdNetworkInterface().getName());
                 incrementStats(channelSegment);
             } else {
-                LOG.debug(traceMarker, "Passed in auction filter {} ,  advertiser {}", this.getClass().getSimpleName(),
+                log.debug(traceMarker, "Passed in auction filter {} ,  advertiser {}", this.getClass().getSimpleName(),
                         channelSegment.getAdNetworkInterface().getName());
             }
         }

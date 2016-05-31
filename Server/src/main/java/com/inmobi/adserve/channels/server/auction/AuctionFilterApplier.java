@@ -4,13 +4,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.google.inject.Singleton;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 
 @Singleton
-public class AuctionFilterApplier {
+public final class AuctionFilterApplier {
 
     private final List<AuctionFilter> auctionFilters;
 
@@ -19,14 +21,19 @@ public class AuctionFilterApplier {
         this.auctionFilters = auctionFilters;
     }
 
-    public List<ChannelSegment> applyFilters(final List<ChannelSegment> rtbdSegments,
-            final CasInternalRequestParameters casInternalRequestParameters) {
+    List<ChannelSegment> applyFilters(final List<ChannelSegment> segments, final CasInternalRequestParameters casParams) {
         for (final AuctionFilter auctionFilter : auctionFilters) {
-            // Assuming that the dst of each channelSegment is the same
-            if (!rtbdSegments.isEmpty() && auctionFilter.isApplicable(rtbdSegments.get(0).getAdNetworkInterface())) {
-                auctionFilter.filter(rtbdSegments, casInternalRequestParameters);
+            if (CollectionUtils.isEmpty(segments)) {
+                break;
+            }
+
+            // Assuming that the dst of all segments is the same
+            final boolean isFilterApplicable = auctionFilter.isApplicable(segments.get(0).getAdNetworkInterface());
+
+            if (isFilterApplicable) {
+                auctionFilter.filter(segments, casParams);
             }
         }
-        return rtbdSegments;
+        return segments;
     }
 }

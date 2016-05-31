@@ -162,7 +162,7 @@ do
     
     #echo "str is ${str}"
     #delimitor="|"
-    str=$str
+    str=${str}
 done
 
 echo ${str}

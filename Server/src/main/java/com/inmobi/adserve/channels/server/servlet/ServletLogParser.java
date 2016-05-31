@@ -39,8 +39,7 @@ public class ServletLogParser implements Servlet {
         // Handle POST request
         if (request.getMethod() == HttpMethod.POST) {
             @SuppressWarnings("deprecation")
-            final String jObject =
-                    URLDecoder.decode(((FullHttpRequest) request).content().toString(CharsetUtil.UTF_8)).toString();
+            final String jObject = URLDecoder.decode(((FullHttpRequest) request).content().toString(CharsetUtil.UTF_8));
             final String[] array = jObject.split("&");
             targetStrings = array[0].split("=")[1];
             logFilePath = array[1].split("=")[1];

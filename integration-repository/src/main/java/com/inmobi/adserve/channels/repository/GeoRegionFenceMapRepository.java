@@ -15,14 +15,13 @@ import com.inmobi.phoenix.data.RepositoryManager;
 import com.inmobi.phoenix.data.RepositoryQuery;
 import com.inmobi.phoenix.exception.RepositoryException;
 
-/**
- * Created by ishanbhatnagar on 25/2/15.
- */
+
 public class GeoRegionFenceMapRepository extends AbstractStatsMaintainingDBRepository<GeoRegionFenceMapEntity, String> implements RepositoryManager {
     @Override
     public DBEntity<GeoRegionFenceMapEntity, String> buildObjectFromRow(ResultSetRow resultSetRow) throws RepositoryException {
         final NullAsZeroResultSetRow row = new NullAsZeroResultSetRow(resultSetRow);
 
+        // TODO: migrate to geo region id
         final String geoRegionName = row.getString("geo_region_name");
         final Long countryId = row.getLong("country_id");
         final Timestamp modifiedOn = row.getTimestamp("modified_on");
@@ -33,17 +32,16 @@ public class GeoRegionFenceMapRepository extends AbstractStatsMaintainingDBRepos
             }
 
             final GeoRegionFenceMapEntity.Builder builder = GeoRegionFenceMapEntity.newBuilder();
-            builder.setGeoRegionName(geoRegionName);
-            builder.setCountryId(countryId);
-            builder.setFenceIdsList(fenceIdsList);
-            builder.setModifiedOn(modifiedOn);
+            builder.geoRegionName(geoRegionName);
+            builder.countryId(countryId);
+            builder.fenceIdsList(fenceIdsList);
+            builder.modifiedOn(modifiedOn);
 
             final GeoRegionFenceMapEntity entity = builder.build();
-            return new DBEntity<GeoRegionFenceMapEntity, String>(entity, modifiedOn);
+            return new DBEntity<>(entity, modifiedOn);
         } catch (final Exception exp) {
             logger.error("Error in resultset row", exp);
-            return new DBEntity<GeoRegionFenceMapEntity, String>(new EntityError<String>(geoRegionName,
-                    "ERROR_IN_EXTRACTING_GEO_REGION_FENCE_MAP"), modifiedOn);
+            return new DBEntity<>(new EntityError<>(geoRegionName, "ERROR_IN_EXTRACTING_GEO_REGION_FENCE_MAP"), modifiedOn);
         }
     }
 

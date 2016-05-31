@@ -26,7 +26,6 @@ prod:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
@@ -34,7 +33,7 @@ prod:
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -76,14 +75,13 @@ prod:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -125,14 +123,13 @@ prod:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -174,14 +171,13 @@ prod:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -224,14 +220,13 @@ pilot:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -273,14 +268,13 @@ pilot:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -322,14 +316,13 @@ pilot:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -371,14 +364,13 @@ pilot:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -400,7 +392,51 @@ non_prod:
             database:
                db_host: 10.14.118.77
                db_port: 5499
-               database: ix
+               database: wap_prod_adserve20160222
+               cas_user: brand_user
+               cas_pass: brand@123
+
+               aerospike:
+                   aerospike_host: as.corp.inmobi.com
+                   aerospike_port: 3000
+            timeout:
+                ning_timeout_dcp: 5000
+                ning_timeout_rtbd: 5000
+                cas_timer_handler_timeout_dcp: 5000
+                cas_timer_handler_timeout_rtbd: 5000
+            rtbd:
+                rtb_enabled: 'true'
+                rtbd_demand_density: '0'
+                rtbd_long_term_revenue: '0'
+                rtbd_publisher_yield: '12'
+            ix:
+                ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
+                ix_default_url: 'http://10.14.118.66:8889/getIXBid'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
+            t_segmentno: '-1'
+            automation_enabled: 'true'
+            circuit_breaker_disabled: 'true'
+
+        scribe:
+            mondemand_address: 'localhost'
+            mondemand_port: '12555'
+            scribe_endpoint1: 'databus.vip.nonprod.inmobi.com'
+
+        logging:
+            log_type: 'ERROR'
+            debug_log_type: 'DEBUG'
+            flush_debug_log: 'true'
+
+        graphite_host_prefix: 'cas-metrics-relay'
+        graphite_prefix_base: 'non_prod'
+
+    debug:
+        cas:
+            database:
+               db_host: 10.14.118.77
+               db_port: 5499
+               database: wap_prod_adserve20160222
                cas_user: brand_user
                cas_pass: brand@123
 
@@ -421,14 +457,13 @@ non_prod:
                 rtbd_demand_density: '0'
                 rtbd_long_term_revenue: '0'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'on'
             ix:
                 ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
                 ix_default_url: 'http://web1027.ads.corp.inmobi.com/getIXBid'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'true'
+            automation_enabled: 'true'
             circuit_breaker_disabled: 'true'
 
         scribe:
@@ -466,14 +501,13 @@ non_prod:
                 rtbd_demand_density: '0'
                 rtbd_long_term_revenue: '0'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'on'
             ix:
                 ix_advertiser_id: 'f55c9d46d7704f8789015a64153a7012'
                 ix_default_url: 'http://web1027.ads.corp.inmobi.com/getIXBid'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'true'
+            automation_enabled: 'true'
             circuit_breaker_disabled: 'true'
 
         scribe:
@@ -516,14 +550,13 @@ skyhook:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
             click_url_prefix: 'c2.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:
@@ -565,14 +598,13 @@ skyhook:
                 rtbd_demand_density: '1'
                 rtbd_long_term_revenue: '1.3'
                 rtbd_publisher_yield: '12'
-                rtb2_status: 'off'
             ix:
                 ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
                 ix_default_url: 'NA'
             beacon_url_prefix: 'et2-cn.w.inmobi.com/c.asm'
             click_url_prefix: 'c2-cn.w.inmobi.com/c.asm'
             t_segmentno: '-1'
-            automation_tests_enabled: 'false'
+            automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
 
         scribe:

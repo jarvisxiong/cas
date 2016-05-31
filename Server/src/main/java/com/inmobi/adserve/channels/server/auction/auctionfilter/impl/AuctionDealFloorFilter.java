@@ -6,34 +6,40 @@ import javax.inject.Singleton;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
-import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
+import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
+import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
 @Singleton
 public class AuctionDealFloorFilter extends AbstractAuctionFilter {
+    private static final double ZERO = 0d;
 
     @Inject
     protected AuctionDealFloorFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_DEAL_FLOOR_FILTER, serverConfiguration);
-        isApplicableRTBD = false;
-        isApplicableIX = false;
+        isApplicableRTBD = true;
+        isApplicableIX = true;
     }
 
+    // TODO: Should data vendor cost be consumed?
     @Override
-    protected boolean failedInFilter(final ChannelSegment rtbSegment, final CasInternalRequestParameters casInternal) {
-        if (rtbSegment.getAdNetworkInterface() instanceof IXAdNetwork) {
-            final IXAdNetwork ixAdNetwork = (IXAdNetwork) rtbSegment.getAdNetworkInterface();
-            if (ixAdNetwork.isExternalPersonaDeal()) {
-                if ((ixAdNetwork.getBidPriceInUsd() < casInternal.getSiteFloor() + ixAdNetwork.getDataVendorCost())
-                        || (ixAdNetwork.getBidPriceInUsd() < ixAdNetwork.getDealFloor())) {
-                    return true;
-                }
-            }
+    protected boolean failedInFilter(final ChannelSegment channelSegment, final CasInternalRequestParameters casInternal) {
+
+        final AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
+        final DealEntity deal = adNetwork.getDeal();
+
+        final double dealFloorInUSD;
+        if (null != deal) {
+            dealFloorInUSD = CasConfigUtil.repositoryHelper.calculatePriceInUSD(deal.getFloor(), deal.getCurrency());
+        } else {
+            dealFloorInUSD = ZERO;
         }
-        return false;
+        return adNetwork.getBidPriceInUsd() < dealFloorInUSD;
     }
+
 }

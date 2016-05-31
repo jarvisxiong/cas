@@ -29,5 +29,6 @@ public final class Bid {
     private String cid;
     private String crid;
     private List<Integer> attr;
+    private String dealid;
     private BidExtensions ext;
 }

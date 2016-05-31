@@ -28,13 +28,4 @@ velocity.log*
 
 # vim swap files
 *.swp
-
 *-repo
-
-# IDE files #
-*.ipr
-*.iws
-*.iml
-.idea
-.project
-.settings

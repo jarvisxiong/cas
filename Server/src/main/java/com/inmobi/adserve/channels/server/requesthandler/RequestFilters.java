@@ -29,7 +29,7 @@ import com.inmobi.casthrift.DemandSourceType;
 
 public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
-    protected static final Long CHINA = 164l;
+    protected static final Long CHINA = 164L;
     protected static final Integer CHINA_MOBILE = 787;
 
 
@@ -57,7 +57,7 @@ public class RequestFilters {
 
         if (CollectionUtils.isEmpty(sasParams.getCategories())) {
             LOG.info("Category field is not present in the request so sending noad");
-            sasParams.setCategories(new ArrayList<Long>());
+            sasParams.setCategories(new ArrayList<>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_CATEGORY + dstName);
             return true;

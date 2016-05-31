@@ -403,7 +403,6 @@ public class IXAdNetworkHelper {
                 }
 
                 if (!imageUrlBlank) {
-                    isAnyAssetNonDefault = true;
                     LOG.debug("Found Non Default IMAGE of type {}", reqImg.getType());
                 }
                 if (isIcon) {

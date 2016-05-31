@@ -14,8 +14,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
@@ -27,8 +25,10 @@ import com.inmobi.template.formatter.TemplateDecorator;
 import com.inmobi.template.formatter.TemplateParser;
 import com.inmobi.template.interfaces.TemplateConfiguration;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class NativeResponseMaker {
-    private static final Logger LOG = LoggerFactory.getLogger(NativeResponseMaker.class);
     private static final String ERROR_STR = "%s can't be null.";
     public static final String NAMESPACE_PARAM = "NAMESPACE";
     public static final String TEMPLATE_ID_PARAM = "templateId";
@@ -74,26 +74,26 @@ public class NativeResponseMaker {
             final boolean noJsTracking) throws Exception {
         final String templateId = params.get(TEMPLATE_ID_PARAM);
         final String pubContent = templateParser.format(app, templateId);
-        LOG.debug("Making response for placementId : {} ", templateId);
-        LOG.debug("pubContent : {}", pubContent);
+        log.debug("Making response for placementId : {} ", templateId);
+        log.debug("pubContent : {}", pubContent);
         if (noJsTracking) {
             final Map<Integer, Map<String, List<String>>> eventTracking = getEventTracking(app, params);
             final String landingPage = app.getOpeningLandingUrl();
-            LOG.debug("landingPage : {}", landingPage);
-            LOG.debug("eventTracking : {}", eventTracking);
+            log.debug("landingPage : {}", landingPage);
+            log.debug("eventTracking : {}", eventTracking);
             return makeNativeAd(pubContent, null, null, landingPage, eventTracking);
         } else {
             final String contextCode = templateDecorator.getContextCode(vc);
             final String namespace = (String) vc.get(NAMESPACE_PARAM);
-            LOG.debug("namespace : {}", namespace);
-            LOG.debug("contextCode : {}", contextCode);
+            log.debug("namespace : {}", namespace);
+            log.debug("contextCode : {}", contextCode);
             return makeNativeAd(pubContent, contextCode, namespace, null, null);
         }
     }
 
     /**
      * Render and ClientFill are empty in case of IX
-     */
+    */
     protected Map<Integer, Map<String, List<String>>> getEventTracking(final App app,
             final Map<String, String> params) {
         // click Tracker
@@ -151,7 +151,7 @@ public class NativeResponseMaker {
             }
 
         } catch (final Exception e) {
-            LOG.debug("Exception while parsing response {}", e);
+            log.debug("Exception while parsing response {}", e);
         }
 
         final String winUrl = params.get(WIN_URL_PARAM);
@@ -190,7 +190,7 @@ public class NativeResponseMaker {
         return ct.toString();
     }
 
-    public String makeNativeAd(String pubContent, final String contextCode, final String namespace,
+    protected String makeNativeAd(String pubContent, final String contextCode, final String namespace,
             final String landingPage, final Map<Integer, Map<String, List<String>>> eventTracking)
             throws JSONException {
         pubContent = base64(pubContent);
@@ -198,12 +198,10 @@ public class NativeResponseMaker {
         return gson.toJson(nativeAd);
     }
 
-    public String base64(final String input) {
+    protected String base64(final String input) {
         // The escaping is not url safe, the input is decoded as base64 utf-8 string
         final Base64 base64 = new Base64();
         return base64.encodeAsString(input.getBytes(Charsets.UTF_8));
     }
-
-
 
 }

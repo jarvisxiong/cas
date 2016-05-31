@@ -139,9 +139,9 @@ public class WAPGroupDBManipulation {
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertSiteEcpm, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deletePricingEngine, wapChannelAdgroupObject));
+        //QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deletePricingEngine, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertPricingEngine, wapChannelAdgroupObject));
+        //QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertPricingEngine, wapChannelAdgroupObject));
     }
     public static void DeleteWapchannelAdgroupLikeTest(final Map<String, String> wapChannelAdgroupObject) throws SQLException, ClassNotFoundException {
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAPCHANNEL_ADGROUP_LIKE_TEST, wapChannelAdgroupObject));

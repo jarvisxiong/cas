@@ -11,6 +11,7 @@ import static com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatu
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CHINA_COUNTRY_CODE;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.TIME_OUT;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
+import static com.inmobi.adserve.channels.util.demand.enums.AuctionType.FIRST_PRICE;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.PURE_VAST;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.STATIC;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -46,6 +48,8 @@ import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilderFactory;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IMEIEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealAttributionMetadata;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.scope.NettyRequestScope;
 import com.inmobi.adserve.channels.util.DocumentBuilderHelper;
@@ -54,6 +58,7 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.JaxbHelper;
 import com.inmobi.adserve.channels.util.Utils.ExceptionBlock;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import com.inmobi.adserve.channels.util.demand.enums.AuctionType;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -167,12 +172,26 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     protected final Channel serverChannel;
 
     private Map<?, ?> responseHeaders;
-    private long latency;
+    @Getter
+    protected long latency;
     private ThirdPartyAdResponse responseStruct;
     private String adapterName;
 
     protected Double forwardedBidFloor;
     protected Double forwardedBidGuidance;
+
+    @Getter
+    protected Set<Long> shortlistedTargetingSegmentIds;
+    @Getter
+    protected Set<Integer> forwardedPackageIds;
+    @Getter
+    protected Set<String> forwardedDealIds;
+    @Getter
+    protected AuctionType auctionType;
+    @Getter
+    protected DealEntity deal;
+    @Getter
+    protected DealAttributionMetadata dealAttributionMetadata;
 
     @Inject
     protected static IPRepository ipRepository;
@@ -193,6 +212,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
         if (traceMarkerProvider != null) {
             traceMarker = traceMarkerProvider.get();
         }
+
+        auctionType = FIRST_PRICE;
     }
 
     @Override
@@ -621,18 +642,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     @Override
-    public boolean isInternal() {
-        return false;
-    }
-
-    @Override
     public void impressionCallback() {
         // Do nothing
-    }
-
-    @Override
-    public void noImpressionCallBack() {
-        // Do Nothing
     }
 
     @Override
@@ -697,11 +708,6 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
             return casInternalRequestParameters.getUid();
         }
         return null;
-    }
-
-    @Override
-    public long getLatency() {
-        return latency;
     }
 
     @Override

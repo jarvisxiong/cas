@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks.rtb;
 
+import static com.inmobi.adserve.channels.adnetworks.ix.TargetingSegmentMatcherV2.getMatchingTargetingSegmentIds;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
@@ -18,9 +19,20 @@ import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTI
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_WIN_URL;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+import static com.inmobi.adserve.channels.entity.pmp.DealAttributionMetadata.generateDealAttributionMetadata;
+import static com.inmobi.adserve.channels.repository.RepositoryHelper.DO_NOT_QUERY_IN_OLD_REPO;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DEAL_FORWARDED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.DEAL_RESPONSES;
+import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_REQUEST_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_RESPONSE_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_DEAL_RESPONSES;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.SHA1;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.UTF_8;
+import static com.inmobi.adserve.channels.util.demand.enums.AuctionType.SECOND_PRICE;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
+import static java.lang.Math.max;
 
 import java.awt.Dimension;
 import java.net.URI;
@@ -32,9 +44,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -49,6 +64,7 @@ import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper;
+import com.inmobi.adserve.channels.adnetworks.ix.PackageMatcherDelegateV2;
 import com.inmobi.adserve.channels.api.BaseAdNetworkHelper;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -64,9 +80,9 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
-import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
 import com.inmobi.adserve.channels.util.IABCountriesMap;
 import com.inmobi.adserve.channels.util.InspectorStats;
@@ -80,9 +96,11 @@ import com.inmobi.adserve.contracts.rtb.request.AppExt;
 import com.inmobi.adserve.contracts.rtb.request.AppStore;
 import com.inmobi.adserve.contracts.rtb.request.Banner;
 import com.inmobi.adserve.contracts.rtb.request.BidRequest;
+import com.inmobi.adserve.contracts.rtb.request.Deal;
 import com.inmobi.adserve.contracts.rtb.request.Device;
 import com.inmobi.adserve.contracts.rtb.request.Geo;
 import com.inmobi.adserve.contracts.rtb.request.Impression;
+import com.inmobi.adserve.contracts.rtb.request.PMP;
 import com.inmobi.adserve.contracts.rtb.request.Site;
 import com.inmobi.adserve.contracts.rtb.request.User;
 import com.inmobi.adserve.contracts.rtb.response.Bid;
@@ -109,6 +127,7 @@ import lombok.Setter;
  * @author ritwik.kumar
  */
 public class RtbAdNetwork extends BaseAdNetworkImpl {
+    public static final boolean GEO_COOKIE_NOT_SUPPORTED = false;
     public static ImpressionCallbackHelper impressionCallbackHelper;
     public static final List<String> CURRENCIES_SUPPORTED =
             new ArrayList<>(Arrays.asList(USD, "CNY", "JPY", "EUR", "KRW", "RUB"));
@@ -163,6 +182,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Getter
     @Setter
     private String callbackUrl;
+    @Getter
     private double bidPriceInUsd;
     private double bidPriceInLocal;
 
@@ -217,6 +237,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         blockedAdvertisers.addAll(BLOCKED_ADVERTISER_LIST);
         bidderCurrency = config.getString(advertiserName + ".currency", USD);
         gson = templateConfiguration.getGsonManager().getGsonInstance();
+        auctionType = SECOND_PRICE;
     }
 
     @Override
@@ -290,11 +311,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         bidRequest = new BidRequest(casInternalRequestParameters.getAuctionId(), impresssionlist);
         bidRequest.setTmax(tmax);
         bidRequest.setAt(AUCTION_TYPE);
-        bidRequest.setCur(Collections.<String>emptyList());
-        final List<String> seatList = new ArrayList<String>();
+        bidRequest.setCur(Collections.emptyList());
+        final List<String> seatList = new ArrayList<>();
         seatList.add(advertiserId);
         bidRequest.setWseat(seatList);
-        final HashSet<String> bCatSet = new HashSet<String>();
+        final HashSet<String> bCatSet = new HashSet<>();
 
         if (null != casInternalRequestParameters.getBlockedIabCategories()) {
             bCatSet.addAll(casInternalRequestParameters.getBlockedIabCategories());
@@ -307,7 +328,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             bCatSet.addAll(IABCategoriesMap.getIABCategories(IABCategoriesMap.FAMILY_SAFE_BLOCK_CATEGORIES));
         }
 
-        final List<String> bCatList = new ArrayList<String>(bCatSet);
+        final List<String> bCatList = new ArrayList<>(bCatSet);
         bidRequest.setBcat(bCatList);
 
         if (null != casInternalRequestParameters.getBlockedAdvertisers()) {
@@ -376,9 +397,38 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         impression.setBidfloorcur(bidderCurrency);
         // Set interstitial or not
         impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
+
+        shortlistedTargetingSegmentIds = getMatchingTargetingSegmentIds(sasParams, repositoryHelper, processedSlotId, entity);
+
+        final Map<Integer, Boolean> packageToGeoCookieServed = PackageMatcherDelegateV2.getMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity, shortlistedTargetingSegmentIds, getName(), DO_NOT_QUERY_IN_OLD_REPO);
+
+        if (null != packageToGeoCookieServed && !packageToGeoCookieServed.isEmpty()) {
+            forwardedPackageIds = packageToGeoCookieServed.keySet();
+        }
+
+        final Set<DealEntity> deals = repositoryHelper.queryDealsByPackageIds(forwardedPackageIds, RTBD, advertiserId);
+
+        if (CollectionUtils.isNotEmpty(deals)) {
+            final List<Deal> dealsList = new ArrayList<>();
+            forwardedDealIds = new HashSet<>();
+
+            for (final DealEntity dealEntity : deals) {
+                final String id = dealEntity.getId();
+                forwardedDealIds.add(id);
+                final Deal deal = new Deal(id, max(dealEntity.getFloor(), casInternalRequestParameters.getAuctionBidFloor()), dealEntity.getCurrency(), dealEntity.getAuctionType().getValue());
+                dealsList.add(deal);
+                InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, DEAL_FORWARDED  + id);
+            }
+            final PMP pmp = new PMP();
+            pmp.setDeals(dealsList);
+            impression.setPmp(pmp);
+
+            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_DEAL_REQUESTS);
+        }
+
         forwardedBidFloor = casInternalRequestParameters.getAuctionBidFloor();
         forwardedBidGuidance = sasParams.getMarketRate();
-        impression.setBidfloor(calculatePriceInLocal(forwardedBidFloor));
+        impression.setBidfloor(repositoryHelper.calculatePriceInLocal(forwardedBidFloor, bidderCurrency));
         LOG.debug(traceMarker, "Bid floor is {} {}", impression.getBidfloor(), impression.getBidfloorcur());
 
         if (null != sasParams.getSdkVersion()) {
@@ -467,7 +517,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
 
 
-        final Map<String, String> siteExtensions = new HashMap<String, String>();
+        final Map<String, String> siteExtensions = new HashMap<>();
         String siteRating;
         if (ContentType.FAMILY_SAFE == sasParams.getSiteContentType()) {
             // Family safe
@@ -703,7 +753,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             deviceExtensions.put("age", sasParams.getAge().toString());
         }
         if (null != sasParams.getGender()) {
-            deviceExtensions.put("gender", sasParams.getGender().toString());
+            deviceExtensions.put("gender", sasParams.getGender());
         }
         device.setExt(deviceExtensions);
         return deviceExtensions;
@@ -724,7 +774,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         content.append("{\"bidid\"=").append(bidResponse.getBidid()).append(",\"seat\"=")
                 .append(bidResponse.getSeatbid().get(0).getSeat());
         content.append(",\"bid\"=").append(bidResponse.getSeatbid().get(0).getBid().get(0).getId()).append(",\"adid\"=")
-                .append(bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()).append("}");
+                .append(bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()).append('}');
 
         final byte[] body = content.toString().getBytes(CharsetUtil.UTF_8);
 
@@ -942,7 +992,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
                 bidderCurrency = bidResponse.getCur();
             }
             bidPriceInLocal = bidResponse.getSeatbid().get(0).getBid().get(0).getPrice();
-            bidPriceInUsd = calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency);
+            bidPriceInUsd = repositoryHelper.calculatePriceInUSD(getBidPriceInLocal(), bidderCurrency);
             responseSeatId = bidResponse.getSeatbid().get(0).getSeat();
             final Bid bid = bidResponse.getSeatbid().get(0).getBid().get(0);
             adm = bid.getAdm();
@@ -953,6 +1003,29 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             advertiserDomains = bid.getAdomain();
             creativeAttributes = bid.getAttr();
             responseAuctionId = bidResponse.getId();
+
+            final String dealId = bid.getDealid();
+
+            final Optional<DealEntity> dealEntityOptional = repositoryHelper.queryDealById(dealId, DO_NOT_QUERY_IN_OLD_REPO);
+            if (dealEntityOptional.isPresent()) {
+                deal = dealEntityOptional.get();
+                auctionType = deal.getAuctionType();
+
+                if (StringUtils.isNotBlank(deal.getCurrency())) {
+                    bidderCurrency = deal.getCurrency();
+                }
+
+                dealAttributionMetadata = generateDealAttributionMetadata(shortlistedTargetingSegmentIds, deal.getPackageId(), sasParams.getCsiTags(), repositoryHelper, GEO_COOKIE_NOT_SUPPORTED);
+
+                InspectorStats.incrementStatCount(advertiserName, TOTAL_DEAL_RESPONSES);
+                InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
+
+            } else if (StringUtils.isNotBlank(dealId)) {
+                InspectorStats.incrementStatCount(advertiserName, TOTAL_DEAL_RESPONSES);
+                InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED);
+                return false;
+            }
+
             if (null != bid.getAdmobject()) {
                 nativeObj = bid.getAdmobject().getNativeObj();
             }
@@ -975,31 +1048,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         }
     }
 
-    private double calculatePriceInUSD(final double price, final String currencyCode) {
-        if (StringUtils.isEmpty(currencyCode) || USD.equalsIgnoreCase(currencyCode)) {
-            return price;
-        } else {
-            final CurrencyConversionEntity currencyConversionEntity =
-                    repositoryHelper.queryCurrencyConversionRepository(currencyCode);
-            if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()
-                    && currencyConversionEntity.getConversionRate() > 0.0) {
-                return price / currencyConversionEntity.getConversionRate();
-            }
-        }
-        return price;
-    }
 
-    private double calculatePriceInLocal(final double price) {
-        if (USD.equalsIgnoreCase(bidderCurrency)) {
-            return price;
-        }
-        final CurrencyConversionEntity currencyConversionEntity =
-                repositoryHelper.queryCurrencyConversionRepository(bidderCurrency);
-        if (null != currencyConversionEntity && null != currencyConversionEntity.getConversionRate()) {
-            return price * currencyConversionEntity.getConversionRate();
-        }
-        return price;
-    }
 
     @Override
     public String getId() {
@@ -1016,6 +1065,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (builder instanceof DefaultLazyInmobiAdTrackerBuilder) {
             final DefaultLazyInmobiAdTrackerBuilder trackerBuilder = (DefaultLazyInmobiAdTrackerBuilder) builder;
 
+            if (null != dealAttributionMetadata && dealAttributionMetadata.isDataVendorAttributionRequired()) {
+                trackerBuilder.setMatchedCsids(dealAttributionMetadata.getUsedCsids());
+                trackerBuilder.setEnrichmentCost(dealAttributionMetadata.getDataVendorCost());
+            }
+
             if (isNativeRequest() && null != templateEntity) {
                 trackerBuilder.setNativeTemplateId(templateEntity.getTemplateId());
             }
@@ -1025,7 +1079,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public void setSecondBidPrice(final Double price) {
         secondBidPriceInUsd = price;
-        secondBidPriceInLocal = calculatePriceInLocal(price);
+        secondBidPriceInLocal = repositoryHelper.calculatePriceInLocal(price, bidderCurrency);
         LOG.debug("secondBidPriceInUsd {}, secondBidPriceInLocal {} {}", secondBidPriceInUsd, secondBidPriceInLocal,
                 bidderCurrency);
         LOG.debug(traceMarker, "responseContent before replaceMacros is {}", responseContent);
@@ -1101,11 +1155,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public double getSecondBidPriceInUsd() {
         return secondBidPriceInUsd;
-    }
-
-    @Override
-    public double getBidPriceInUsd() {
-        return bidPriceInUsd;
     }
 
     @Override

@@ -5,6 +5,7 @@ import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +32,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 
+import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.adnetworks.tapit.DCPTapitAdNetwork;
@@ -39,6 +42,7 @@ import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.adserve.channels.server.circuitbreaker.CircuitBreakerImpl;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplierTest;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
@@ -71,13 +75,13 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 public class LoggingTest {
     private static final String DEFAULT_HOST = "http://default.host";
     private static Configuration mockConfig;
-    private static int sampledadvertisercount = 5;
-    private Set<String> emptySet = new HashSet<String>();
+    private static final int sampledadvertisercount = 5;
+    private final Set<String> emptySet = new HashSet<>();
 
     @BeforeClass
     public static void setUp() {
         mockConfig = createMock(Configuration.class);
-        AbstractMessagePublisher mockDataBusPublisher = createNiceMock(AbstractMessagePublisher.class);
+        final AbstractMessagePublisher mockDataBusPublisher = createNiceMock(AbstractMessagePublisher.class);
 
         expect(mockConfig.getString("debug")).andReturn("debug").anyTimes();
         expect(mockConfig.getString("slf4jLoggerConf")).andReturn("/opt/mkhoj/conf/cas/logger.xml");
@@ -106,22 +110,22 @@ public class LoggingTest {
      */
     @Test
     public void testRequestResponseLoggingVariation1() throws Exception {
-        String terminationReason = "TERMINATION_REASON";
-        String host = "hostName";
+        final String terminationReason = "TERMINATION_REASON";
+        final String host = "hostName";
 
         mockStaticNice(InspectorStats.class);
         mockStaticNice(InetAddress.class);
-        InetAddress mockInetAddress = createMock(InetAddress.class);
+        final InetAddress mockInetAddress = createMock(InetAddress.class);
 
         expect(InetAddress.getLocalHost()).andReturn(mockInetAddress).times(1);
         expect(mockInetAddress.getHostName()).andReturn(host).times(1);
 
         replayAll();
 
-        AdRR adRR = Logging.getAdRR(null, null, null, null, terminationReason);
-        Request request = adRR.getRequest();
-        User user = request.getUser();
-        HandsetMeta handsetMeta = request.getHandset();
+        final AdRR adRR = Logging.getAdRR(null, null, null, null, terminationReason);
+        final Request request = adRR.getRequest();
+        final User user = request.getUser();
+        final HandsetMeta handsetMeta = request.getHandset();
 
         assertThat(adRR.getTermination_reason(), is(equalTo(terminationReason)));
         assertThat(adRR.isIs_terminated(), is(equalTo(true)));
@@ -205,6 +209,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
         expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
         expect(mockAdNetworkInterface.getSelectedSlotId()).andReturn(selectedSlot).anyTimes();
+        expect(mockAdNetworkInterface.getDeal()).andReturn(null).anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
@@ -305,7 +310,7 @@ public class LoggingTest {
     @Test
     public void testCreativeLoggingNoLoggingDone() throws Exception {
         Logging.creativeLogging(null, null);
-        Logging.creativeLogging(new ArrayList<ChannelSegment>(), null);
+        Logging.creativeLogging(new ArrayList<>(), null);
 
         AdNetworkInterface mockAdNetworkInterface = createMock(AdNetworkInterface.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
@@ -465,15 +470,28 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
         expect(mockAdNetworkInterface.getId()).andReturn("ID").anyTimes();
+        expect(mockAdNetworkInterface.getDeal()).andReturn(null).anyTimes();
+        expect(mockAdNetworkInterface.getForwardedPackageIds()).andReturn(null).anyTimes();
+        expect(mockAdNetworkInterface.getForwardedDealIds()).andReturn(null).anyTimes();
+        expect(mockAdNetworkInterface.getShortlistedTargetingSegmentIds()).andReturn(null).anyTimes();
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();
         expect(mockThirdPartyAdResponse.getStartTime()).andReturn(startTime).anyTimes();
-        expect(mockAdNetworkInterface.getAdStatus()).andReturn(adStatus[0]).times(1).andReturn(adStatus[1]).times(1)
-                .andReturn(adStatus[2]).times(1).andReturn(adStatus[3]).times(1);
-        expect(mockThirdPartyAdResponse.getAdStatus()).andReturn(adStatus[0]).times(1).andReturn(adStatus[1]).times(1)
-                .andReturn(adStatus[2]).times(1).andReturn(adStatus[3]).times(1);
-        expect(mockAdNetworkInterface.getCreativeId()).andReturn(creativeId).times(1).andReturn(null).anyTimes();
+        expect(mockAdNetworkInterface.getAdStatus())
+                .andReturn(adStatus[0]).times(1)
+                .andReturn(adStatus[1]).times(1)
+                .andReturn(adStatus[2]).times(1)
+                .andReturn(adStatus[3]).times(1);
+        expect(mockThirdPartyAdResponse.getAdStatus())
+                .andReturn(adStatus[0]).times(2)
+                .andReturn(adStatus[1]).times(2)
+                .andReturn(adStatus[2]).times(2)
+                .andReturn(adStatus[3]).times(2);
+        expect(mockAdNetworkInterface.getCreativeId())
+                .andReturn(creativeId).times(1)
+                .andReturn(null).anyTimes();
 
-        expect(mockAdNetworkInterface.getCreativeType()).andReturn(adCreativeType).anyTimes();
+        expect(mockAdNetworkInterface.getCreativeType())
+                .andReturn(adCreativeType).anyTimes();
         expect(mockAdNetworkInterface.getHostName()).andReturn(DEFAULT_HOST).anyTimes();
 
 
@@ -513,7 +531,7 @@ public class LoggingTest {
         String advId = "TEST_ADV_ID";
         String seatId = "TEST_SEAT_ID";
         String aqId = "TEST_AQ_ID";
-        List<Integer> packageIds = Arrays.asList(1, 2, 3);
+        Set<Integer> packageIds = ImmutableSet.of(1,2,3);
         int winningPackageId = 2;
         String dealId = "TEST_DEAL_ID";
         String adStatus = "AD";
@@ -545,16 +563,16 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
-        expect(mockIXAdNetwork.getOriginalBidPriceInUsd()).andReturn(bidPriceInUSD).times(2);
-        expect(mockIXAdNetwork.getAgencyRebatePercentage()).andReturn(null).times(2);
+        expect(mockAdNetworkInterface.getForwardedPackageIds()).andReturn(packageIds).anyTimes();
+        expect(mockAdNetworkInterface.getDeal()).andReturn(DealEntity.newBuilder().id(dealId).packageId(winningPackageId).build()).anyTimes();
+        expect(mockAdNetworkInterface.getShortlistedTargetingSegmentIds()).andReturn(null).anyTimes();
+        expect(mockAdNetworkInterface.getForwardedDealIds()).andReturn(null).anyTimes();
+        expect(mockIXAdNetwork.getOriginalBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
         expect(mockIXAdNetwork.getDspId()).andReturn(dspId).times(2);
         expect(mockIXAdNetwork.getAdvId()).andReturn(advId).times(2);
-        expect(mockIXAdNetwork.getSeatId()).andReturn(seatId).times(2);
+        expect(mockIXAdNetwork.getSeatId()).andReturn(seatId).anyTimes();
         expect(mockIXAdNetwork.getAqid()).andReturn(aqId).times(2);
-        expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIds).times(2);
-        expect(mockIXAdNetwork.getWinningPackageId()).andReturn(winningPackageId).times(2);
         expect(mockIXAdNetwork.getAdjustbid()).andReturn(0.8).times(2);
-        expect(mockIXAdNetwork.getDealId()).andReturn(dealId).times(2);
 
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getAdStatus()).andReturn(adStatus).times(1);
@@ -589,7 +607,7 @@ public class LoggingTest {
         assertThat(ixAd.getAdvId(), is(equalTo(advId)));
         assertThat(ixAd.getSeatId(), is(equalTo(seatId)));
         assertThat(ixAd.getAqId(), is(equalTo(aqId)));
-        assertThat(ixAd.getDeprecatedPackageIds(), is(equalTo(packageIds)));
+        assertTrue(CollectionUtils.isEqualCollection(ixAd.getDeprecatedPackageIds(),packageIds));
         assertThat(ixAd.getDeprecatedWinningPackageId(), is(equalTo(winningPackageId)));
         assertThat(ixAd.getDeprecatedWinningDealId(), is(equalTo(dealId)));
         assertThat(ixAd.getRpAdgroupIncId(), is(equalTo(adgroupIncId)));
@@ -605,7 +623,7 @@ public class LoggingTest {
         String advId = "TEST_ADV_ID";
         String seatId = "TEST_SEAT_ID";
         String aqId = "TEST_AQ_ID";
-        List<Integer> packageIds = Arrays.asList(1, 2, 3);
+        Set<Integer> packageIds = ImmutableSet.of(1,2,3);
         int winningPackageId = 2;
         String dealId = "TEST_DEAL_ID";
         String adStatus = "AD";
@@ -639,16 +657,16 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getBidPriceInUsd()).andReturn(bidPriceInUSD).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("Name").anyTimes();
+        expect(mockAdNetworkInterface.getForwardedPackageIds()).andReturn(packageIds).anyTimes();
+        expect(mockAdNetworkInterface.getDeal()).andReturn(DealEntity.newBuilder().id(dealId).packageId(winningPackageId).build()).anyTimes();
+        expect(mockAdNetworkInterface.getShortlistedTargetingSegmentIds()).andReturn(null).anyTimes();
+        expect(mockAdNetworkInterface.getForwardedDealIds()).andReturn(null).anyTimes();
         expect(mockIXAdNetwork.getDspId()).andReturn(dspId).times(2);
         expect(mockIXAdNetwork.getAdvId()).andReturn(advId).times(2);
-        expect(mockIXAdNetwork.getSeatId()).andReturn(seatId).times(2);
+        expect(mockIXAdNetwork.getSeatId()).andReturn(seatId).anyTimes();
         expect(mockIXAdNetwork.getAqid()).andReturn(aqId).times(2);
-        expect(mockIXAdNetwork.getPackageIds()).andReturn(packageIds).times(2);
-        expect(mockIXAdNetwork.getWinningPackageId()).andReturn(winningPackageId).times(2);
         expect(mockIXAdNetwork.getAdjustbid()).andReturn(0.8).times(2);
-        expect(mockIXAdNetwork.getDealId()).andReturn(dealId).times(2);
-        expect(mockIXAdNetwork.getOriginalBidPriceInUsd()).andReturn(originalBidPriceInUSD).times(2);
-        expect(mockIXAdNetwork.getAgencyRebatePercentage()).andReturn(agencyRebatePercentage).anyTimes();
+        expect(mockIXAdNetwork.getOriginalBidPriceInUsd()).andReturn(originalBidPriceInUSD).anyTimes();
 
         expect(mockThirdPartyAdResponse.getLatency()).andReturn(latency).anyTimes();
         expect(mockAdNetworkInterface.getAdStatus()).andReturn(adStatus).times(1);
@@ -682,7 +700,7 @@ public class LoggingTest {
         assertThat(ixAd.getAdvId(), is(equalTo(advId)));
         assertThat(ixAd.getSeatId(), is(equalTo(seatId)));
         assertThat(ixAd.getAqId(), is(equalTo(aqId)));
-        assertThat(ixAd.getDeprecatedPackageIds(), is(equalTo(packageIds)));
+        assertTrue(CollectionUtils.isEqualCollection(ixAd.getDeprecatedPackageIds(),packageIds));
         assertThat(ixAd.getDeprecatedWinningPackageId(), is(equalTo(winningPackageId)));
         assertThat(ixAd.getDeprecatedWinningDealId(), is(equalTo(dealId)));
     }
@@ -854,6 +872,7 @@ public class LoggingTest {
         expect(mockAdNetworkInterface.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockAdNetworkInterface.getName()).andReturn("name").anyTimes();
         expect(mockAdNetworkInterface.getId()).andReturn("Id").anyTimes();
+        expect(mockAdNetworkInterface.getDeal()).andReturn(null).anyTimes();
 
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
@@ -916,6 +935,8 @@ public class LoggingTest {
         expect(mockIXAdNetwork.getImpressionId()).andReturn(impressionId).anyTimes();
         expect(mockIXAdNetwork.getName()).andReturn("name").anyTimes();
         expect(mockIXAdNetwork.getId()).andReturn("Id").anyTimes();
+        expect(mockIXAdNetwork.getDeal()).andReturn(null).anyTimes();
+        expect(mockIXAdNetwork.getForwardedDealIds()).andReturn(null).anyTimes();
         expect(mockChannelSegmentEntity.getAdId(adCreativeType)).andReturn(adId).anyTimes();
         expect(mockChannelSegmentEntity.getAdgroupId()).andReturn(adgroupId).anyTimes();
         expect(mockChannelSegmentEntity.getIncId(adCreativeType)).andReturn(adIncId).anyTimes();

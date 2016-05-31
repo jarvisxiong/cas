@@ -167,11 +167,11 @@ public abstract class BaseStats {
         gauge.setValue(value);
     }
 
-    private class MetricGauge extends Gauge<Long> {
+    private static class MetricGauge extends Gauge<Long> {
         @Setter
         private Long value;
 
-        public MetricGauge(final Long value) {
+        MetricGauge(final Long value) {
             this.value = value;
         }
 

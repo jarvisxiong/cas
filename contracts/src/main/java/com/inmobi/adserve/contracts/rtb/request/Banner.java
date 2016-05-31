@@ -4,9 +4,7 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * Created by avinash.kumar on 12/14/15.
- */
+
 @Data
 public final class Banner {
     private String id;

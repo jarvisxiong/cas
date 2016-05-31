@@ -1,6 +1,3 @@
-/**
- * Copyright (c) 2015. InMobi, All Rights Reserved.
- */
 package com.inmobi.adserve.channels.adnetworks.ix;
 
 import static com.inmobi.template.context.MovieBoardAdData.*;

@@ -3,11 +3,8 @@ package com.inmobi.adserve.channels.util.demand.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Created by ishan.bhatnagar on 8/31/15.
- */
 
-// This should ideally be defined in the API module.
+// This should ideally be defined in the API module or in cas-thrift
 // TODO: Remove dependency of API module on repository module
 @RequiredArgsConstructor
 public enum SecondaryAdFormatConstraints {

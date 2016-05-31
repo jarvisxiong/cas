@@ -99,7 +99,6 @@ public class InspectorStrings {
     public static final String SITE_FEEDBACK_REQUESTS_TO_AEROSPIKE = "SiteFeedbackRequestsToAerospike";
     public static final String SITE_FEEDBACK_FAILED_TO_LOAD_FROM_AEROSPIKE = "SiteFeedbackFailedToLoadFromAerospike";
 
-
     public static final String IMEI_CACHE_MISS = "IMEICacheMiss";
     public static final String IMEI_CACHE_HIT = "IMEICacheHit";
     public static final String IMEI_REQUESTS_TO_AEROSPIKE = "IMEIRequestsToAerospike";
@@ -135,11 +134,6 @@ public class InspectorStrings {
     public static final String IX_SITE_ID_NOT_PRESENT = "IXSiteIdNotPresent";
     public static final String UNKNOWN_ADV_ID = "ADFromUnknownAdvId";
     public static final String DROPPED_INVALID_DSP_ID = "DroppedDueToInvalidDspId";
-    public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
-    public static final String IX_DEAL_NON_EXISTING = "IxDealNonExisting";
-    public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
-    public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
-    public static final String IX_DEAL_RESPONSES_FOR_ID = "IXDealResponsesForId-";
     public static final String TOTAL_VALID_SPROUT_RESPONSES = "TotalValidSproutResponses";
     public static final String TOTAL_RICH_MEDIA_REQUESTS = "TotalRichMediaRequests";
     public static final String TOTAL_UMP_CAU_REQUESTS = "TotalUMPCAURequests";
@@ -167,41 +161,30 @@ public class InspectorStrings {
     public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
-    public static final String AGENCY_ID_CANNOT_BE_DETERMINED_IN_REBATE_DEAL_RESPONSE =
-            "AgencyRebateDealResponse.AgencyIdIndeterminate";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";
     public static final String DROPPED_IN_SECURE_NOT_SUPPORTED_FILTER = "DroppedInSecureNotSupportedFilter";
 
-    // Request metrics
-    public static final String ADPOOL_REQUEST_STATS = "AdPoolRequestStats";
-    public static final String PUB_CONTROLS_ALSO_CONTAINS_BANNER_FOR_REWARDED_PLACEMENT =
-            "PubControlsAlsoContainsBannerForRewardedPlacement";
 
-    // Auction Level Stats
-    public static final String AUCTION_STATS = "AuctionStats";
-    // public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
-    public static final String CLEARING_PRICE_WON = "ClearingPriceWonOverSecondHighestBid";
-    public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
-    public static final String BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR = "-BidGuidanceIsLessOrEqualToFloor";
-    public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
-    public static final String MULTI_FORMAT_AUCTIONS_TOTAL = "IX-MultiFormatAuctions.TotalAuctions";
-    public static final String MULTI_FORMAT_AUCTIONS_NO_TRUMP = "IX-MultiFormatAuctions.TotalAuctionsWithNoTrumpDeals";
-    public static final String MULTI_FORMAT_AUCTIONS_SINGLE_TRUMP =
-            "IX-MultiFormatAuctions.TotalAuctionsWithOnlyOneTrumpDeal";
-    public static final String MULTI_FORMAT_AUCTIONS_MULTIPLE_TRUMP =
-            "IX-MultiFormatAuctions.TotalAuctionsWithMultipleTrumpDeals";
-    public static final String MULTI_FORMAT_AUCTIONS_VAST_VIDEO_WINS = "IX-MultiFormatAuctions.TotalVastVideoWins";
-    public static final String MULTI_FORMAT_AUCTIONS_STATIC_WINS = "IX-MultiFormatAuctions.TotalStaticWins";
+    /**
+     *  Stats related to PMP
+     */
 
-    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout
-    public static final String TOTAL_MULTI_FORMAT_REQUESTS = "IX-TotalMultiFormatRequests";
-    public static final String TOTAL_SINGLE_FORMAT_REQUESTS = "IX-TotalSingleFormatRequests";
+    // Targeting Segment Filter Stats
+    public static final String TARGETING_SEGMENT_FILTER_STATS = "TargetingSegmentFilterStats";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_MANUF_MODEL_FILTER = "DroppedInManufModelFilter";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_COUNTRY_CITY_FILTER = "DroppedInCountryCityFilter";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_OS_VERSION_FILTER = "DroppedInOsVersionFilter";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_CSID_MATCH_FILTER = "DroppedInCsidMatchFilter";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_SDK_VERSION_FILTER = "DroppedInSdkVersionFilter";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_GEO_REGION_INCLUSION_FILTER = "DroppedInGeoRegionInclusionFilter";
+    public static final String DROPPED_IN_TARGETING_SEGMENT_GEO_REGION_EXCLUSION_FILTER = "DroppedInGeoRegionExclusionFilter";
 
-    // Package Filter Level Stats
-    public static final String PACKAGE_AND_DEAL_STATS = "PackageAndDealsStats";
+    // Package (V2) Filter Stats
+    public static final String PACKAGE_V2_FILTER_STATS = "PackageV2FilterStats";
+    public static final String DROPPED_IN_PACKAGE_V2_VIEWABILITY_SDK_VERSIONS_ENFORCER_FILTER = "DroppedInViewabilitySdkVersionsEnforcerFilter";
+
+    // Package Filter Stats
     public static final String PACKAGE_FILTER_STATS = "PackageFilterStats";
-    public static final String IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT = "IXPackageThresholdExceededCount";
-    public static final String IX_PACKAGE_REQUEST_FOR_ID = "IXPackageRequestForId-";
     public static final String DROPPED_IN_PACKAGE_DMP_FILTER = "DroppedInPackageDMPFilter";
     public static final String DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER = "DroppedInPackageAdTypeTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_MANUF_MODEL_FILTER = "DroppedInPackageManufModelTargetingFilter";
@@ -210,6 +193,53 @@ public class InspectorStrings {
     public static final String DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER = "DroppedInPackageSegmentSubsetFilter";
     public static final String DROPPED_IN_PACKAGE_LANGUAGE_TARGETING_FILTER = "DroppedInPackageLanguageTargetingFilter";
     public static final String DROPPED_IN_PACKAGE_SDK_VERSION_FILTER = "DroppedInPackageSDKVersionTargetingFilter";
+
+    // General Stats for PMP
+    public static final String OVERALL_PMP_STATS = "OverallPMPStats";
+    public static final String OVERALL_PMP_REQUEST_STATS = "OverallPMPRequestStats";
+    public static final String OVERALL_PMP_RESPONSE_STATS = "OverallPMPResponseStats";
+    public static final String OVERALL_PMP_ERROR_STATS = "OverallPMPErrorStats";
+    public static final String FORWARDED_PACKAGES_LIST_TRUNCATED = "ForwardedPackagesListTruncated";
+    public static final String TOTAL_DEAL_REQUESTS = "TotalDealRequests";
+    public static final String TOTAL_DEAL_RESPONSES = "TotalDealResponses";
+    public static final String PACKAGE_FORWARDED = "PackageForwarded-"; // Packages may be implicitly forwarded as deals
+    public static final String DEAL_FORWARDED = "DealForwarded-"; // TODO
+    public static final String DEAL_RESPONSES = "DealResponses-";
+
+    // Deal errors
+    public static final String RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED = "ResponseDroppedAsUnknownDealWasReceived";
+    public static final String BADLY_CONFIGURED_DEAL = "BadlyConfiguredDeal-";
+    public static final String BADLY_CONFIGURED_TARGETING_SEGMENT = "BadlyConfiguredTargetingSegment-";
+
+    // Latency metrics for Targeting Segments, Packages and Deals.
+    public static final String TARGETING_SEGMENTS_MATCH_LATENCY = "TargetingSegmentsMatchLatency";
+    public static final String PACKAGES_V2_MATCH_LATENCY = "PackagesV2MatchLatency";
+    public static final String IX_PACKAGE_MATCH_LATENCY = "IxPackageMatchLatency";
+
+    /**
+     *  Stats related to the auction
+     */
+
+    // General Stats for the Auction
+    public static final String AUCTION_STATS = "AuctionStats";
+    public static final String ALL_SEGMENTS_DROPPED_IN_AUCTION_FILTERS = "AllSegmentsDroppedInAuctionFilters";
+    public static final String TOTAL_AUCTIONS_CONDUCTED = "-TotalAuctionsConducted";
+    public static final String AUCTIONS_WON_BY_TRUMP_DEALS = "-TotalAuctionsWonByTrumpDeals";
+    public static final String AUCTIONS_WON_BY_NON_TRUMP_DEALS = "-TotalAuctionsWonByNonTrumpDeals";
+    public static final String AUCTIONS_WITH_NO_COMPETITION = "-TotalAuctionsWithNoCompetition";
+    public static final String AUCTIONS_WITH_OPPORTUNITY_LOSS = "-TotalAuctionsWithOpportunityLoss";
+    public static final String OPPORTUNITY_LOSS_IN_100xCPM = "-OpportunityLossIn100xCPM";
+    public static final String AUCTIONS_WON_AT_CLEARING_PRICE = "-TotalAuctionsWonAtClearingPrice";
+    public static final String EFFECTIVELY_FIRST_PRICE_SECOND_PRICE_AUCTIONS = "-TotalEffectivelyFirstPriceSecondPriceAuctions";
+
+    // public static final String NO_MATCH_SEGMENT_STATS = "DetailedNoMatchSegmentStats";
+    public static final String BID_GUIDANCE_ABSENT = "-BidGuidanceAbsent";
+    public static final String BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR = "-BidGuidanceIsLessOrEqualToFloor";
+    public static final String BID_FLOOR_TOO_LOW = "-BidFloorTooLow";
+
+    // Total Requests to RP = IX-TotalSingleFormatRequests + IX-TotalMultiFormatRequests * fanout
+    public static final String TOTAL_MULTI_FORMAT_REQUESTS = "IX-TotalMultiFormatRequests";
+    public static final String TOTAL_SINGLE_FORMAT_REQUESTS = "IX-TotalSingleFormatRequests";
 
     // IX Response Object Status Code Strings
     public static final String IX_INVALID_REQUEST = "NO_AD.InvalidRequest";

@@ -18,7 +18,7 @@ import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
 import com.inmobi.adserve.channels.server.api.Servlet;
 import com.inmobi.adserve.channels.server.logging.MarkerAndLevelFilter;
-import com.inmobi.adserve.channels.util.Utils.TestUtils;
+import com.inmobi.adserve.channels.util.Utils.TestUtils.SampleServletQueries;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -26,9 +26,6 @@ import ch.qos.logback.classic.turbo.TurboFilter;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
-/**
- * Created by ishanbhatnagar on 31/10/14.
- */
 
 @Singleton
 @Path("/changeLogLevel")
@@ -37,7 +34,7 @@ public class ServletChangeLogLevel implements Servlet {
     private static final String INVALID_LOGGER_NAME =
             "Invalid Logger Name or Incorrect Query Format.\n"
             + "Valid logger names are: debug, advertiser, sampledadvertiser, repository\n"
-            + "Valid Query Format: " + TestUtils.SampleServletQueries.servletChangeLogLevel;
+            + "Valid Query Format: " + SampleServletQueries.servletChangeLogLevel;
     private static final String INVALID_LOGGER_LEVEL =
             "Invalid Logger Level. Valid logger levels are: DEBUG, INFO, WARN, ERROR, OFF";
     private static final String TIMER_ALREADY_RUNNING_ERROR = "Aborting request to change log level as a timer thread "
@@ -45,7 +42,7 @@ public class ServletChangeLogLevel implements Servlet {
 
     private static ScheduledFuture<?> scheduledFuture = null;
 
-    private static long  defaultDelayTime = 15000;   // 15 seconds
+    private static long  defaultDelayTime =  15000;   // 15 seconds
     private static Level defaultAdvertiserLoggerLevel;
     private static Level defaultSampledAdvertiserLoggerLevel;
     private static Level defaultRepositoryLoggerLevel;
@@ -114,7 +111,7 @@ public class ServletChangeLogLevel implements Servlet {
                 return;
             }
 
-            final ch.qos.logback.classic.Level level = getLevel(levelName);
+            final Level level = getLevel(levelName);
 
             if (null == level) {
                 LOG.error(INVALID_LOGGER_LEVEL);
@@ -132,7 +129,7 @@ public class ServletChangeLogLevel implements Servlet {
                  * So in this case, we change the level of the turboFilter instead of changing the level of the logger.
                  */
 
-                Iterator<TurboFilter> itr = ((ch.qos.logback.classic.LoggerContext)LoggerFactory.getILoggerFactory())
+                Iterator<TurboFilter> itr = ((LoggerContext)LoggerFactory.getILoggerFactory())
                         .getTurboFilterList().iterator();
                 while(itr.hasNext()) {
                     TurboFilter filter = itr.next();
@@ -148,31 +145,28 @@ public class ServletChangeLogLevel implements Servlet {
             String successMessage = "Successfully changed log level of " + loggerName
                     + " and all it's descendants to " + levelName;
 
-            Runnable servletChangeLogLevelTimerTask = new Runnable() {
-                @Override
-                public void run() {
-                    // Resets log levels to default values
-                    if (params.containsKey("debug")) {
-                        Iterator<TurboFilter> itr =
-                                ((ch.qos.logback.classic.LoggerContext) LoggerFactory.getILoggerFactory())
-                                        .getTurboFilterList().iterator();
-                        while (itr.hasNext()) {
-                            TurboFilter filter = itr.next();
-                            if (filter instanceof MarkerAndLevelFilter) {
-                                ((MarkerAndLevelFilter) filter).setLevel(defaultTurboFilterLevel);
-                                break;
-                            }
+            Runnable servletChangeLogLevelTimerTask = () -> {
+                // Resets log levels to default values
+                if (params.containsKey("debug")) {
+                    Iterator<TurboFilter> itr =
+                            ((LoggerContext) LoggerFactory.getILoggerFactory())
+                                    .getTurboFilterList().iterator();
+                    while (itr.hasNext()) {
+                        TurboFilter filter = itr.next();
+                        if (filter instanceof MarkerAndLevelFilter) {
+                            ((MarkerAndLevelFilter) filter).setLevel(defaultTurboFilterLevel);
+                            break;
                         }
-                    } else if (params.containsKey("advertiser")){
-                        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
-                                .setLevel(defaultAdvertiserLoggerLevel);
-                    } else if (params.containsKey("sampledadvertiser")){
-                        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
-                                .setLevel(defaultSampledAdvertiserLoggerLevel);
-                    } else if (params.containsKey("repository")){
-                        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
-                                .setLevel(defaultRepositoryLoggerLevel);
                     }
+                } else if (params.containsKey("advertiser")){
+                    ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
+                            .setLevel(defaultAdvertiserLoggerLevel);
+                } else if (params.containsKey("sampledadvertiser")){
+                    ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
+                            .setLevel(defaultSampledAdvertiserLoggerLevel);
+                } else if (params.containsKey("repository")){
+                    ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerName))
+                            .setLevel(defaultRepositoryLoggerLevel);
                 }
             };
 
@@ -195,17 +189,17 @@ public class ServletChangeLogLevel implements Servlet {
         return "changeLogLevel";
     }
 
-    private ch.qos.logback.classic.Level getLevel(String sArg) {
+    private Level getLevel(String sArg) {
         if (null != sArg) {
             sArg = sArg.toUpperCase();
         }
-        ch.qos.logback.classic.Level level = null;
+        Level level = null;
         switch(sArg) {
-            case "DEBUG": level = ch.qos.logback.classic.Level.DEBUG;   break;
-            case "WARN":  level = ch.qos.logback.classic.Level.WARN;    break;
-            case "INFO":  level = ch.qos.logback.classic.Level.INFO;    break;
-            case "ERROR": level = ch.qos.logback.classic.Level.ERROR;   break;
-            case "OFF":   level = ch.qos.logback.classic.Level.OFF;     break;
+            case "DEBUG": level = Level.DEBUG;   break;
+            case "WARN":  level = Level.WARN;    break;
+            case "INFO":  level = Level.INFO;    break;
+            case "ERROR": level = Level.ERROR;   break;
+            case "OFF":   level = Level.OFF;     break;
         }
         return level;
     }

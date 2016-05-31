@@ -2,7 +2,7 @@ package com.inmobi.adserve.channels.api.trackers;
 
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.ZERO;
 
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -106,7 +106,7 @@ public class DefaultLazyInmobiAdTrackerBuilder extends InmobiAdTrackerBuilder {
         }
     }
 
-    public void setMatchedCsids(final List<Integer> matchedCsidList) {
+    public void setMatchedCsids(final Set<Integer> matchedCsidList) {
         builder.matchedCsids(matchedCsidList);
     }
 

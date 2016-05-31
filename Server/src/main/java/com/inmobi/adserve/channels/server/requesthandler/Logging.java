@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -44,6 +45,8 @@ import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealAttributionMetadata;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl.AdvertiserFailureThrottler;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
@@ -66,6 +69,7 @@ import com.inmobi.casthrift.HandsetMeta;
 import com.inmobi.casthrift.Impression;
 import com.inmobi.casthrift.InventoryType;
 import com.inmobi.casthrift.IxAd;
+import com.inmobi.casthrift.PMP;
 import com.inmobi.casthrift.PricingModel;
 import com.inmobi.casthrift.RTBDAuctionInfo;
 import com.inmobi.casthrift.Request;
@@ -76,8 +80,7 @@ import com.inmobi.messaging.publisher.AbstractMessagePublisher;
 
 
 public class Logging {
-    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS =
-            new ConcurrentHashMap<String, String>(2000);
+    public static final ConcurrentHashMap<String, String> SAMPLED_ADVERTISER_LOG_NOS = new ConcurrentHashMap<>(2000);
     private static final Logger LOG = LoggerFactory.getLogger(Logging.class);
     private static final String BANNER = "BANNER";
     private static final String NO = "NO";
@@ -134,7 +137,7 @@ public class Logging {
             if (SASParamsUtils.isNativeRequest(sasParams)) {
                 InspectorStats.incrementStatCount(dst + "-" + TOTAL_NATIVE_REQUESTS);
                 if (rankList == null || rankList.isEmpty()) {
-                    InspectorStats.incrementStatCount(dst + "-" + TOTAL_NATIVE_REQUESTS + "-" + NO_MATCH_SEGMENT_COUNT);
+                    InspectorStats.incrementStatCount(dst + "-" + TOTAL_NATIVE_REQUESTS + '-' + NO_MATCH_SEGMENT_COUNT);
                 }
             }
         }
@@ -214,7 +217,7 @@ public class Logging {
         }
     }
 
-    public static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
+    static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
         if (null == rankList) {
             return new ArrayList<>();
         }
@@ -237,21 +240,13 @@ public class Logging {
             if (bid > 0) {
                 channel.setBid(bid);
             }
-            /**
-             * Logging IX specific fields in ixAdInfo. Populating this only if, 1) we get an AD response from IX or, 2)
-             * forward any package to RP.
-             */
+
             if (adNetwork instanceof IXAdNetwork) {
                 // Logging the original bid in case of agency rebate deals
                 final IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
                 final double originalBid = ixAdNetwork.getOriginalBidPriceInUsd();
                 if (originalBid > 0) {
                     channel.setBid(originalBid);
-                }
-
-                if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
-                        || CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
-                    channel.setDeprecatedIxAds(Collections.singletonList(createIxAd(ixAdNetwork)));
                 }
 
                 final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
@@ -264,6 +259,22 @@ public class Logging {
                             rpAdIncId);
                 }
             }
+
+            /**
+             * Logging PMP specific fields in ixAdInfo. Populating this only if, 1) we get an AD response  or, 2)
+             * forward any packages/deals
+             */
+            if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
+                    || CollectionUtils.isNotEmpty(adNetwork.getForwardedPackageIds())
+                    || CollectionUtils.isNotEmpty(adNetwork.getForwardedDealIds())) {
+                if (adNetwork instanceof IXAdNetwork) {
+                    final IxAd ixAd = createIXAd((IXAdNetwork) adNetwork);
+                    channel.setDeprecatedIxAds(Collections.singletonList(ixAd));
+                    channel.setIxAd(ixAd);
+                }
+                channel.setPmpObject(createPMPObject(adNetwork));
+            }
+
             channels.add(channel);
 
             final String hostName = adNetwork.getHostName();
@@ -322,7 +333,7 @@ public class Logging {
         return casAdChain;
     }
 
-    public static IxAd createIxAd(final IXAdNetwork ixAdNetwork) {
+    protected static IxAd createIXAd(final IXAdNetwork ixAdNetwork) {
         final IxAd ixAd = new IxAd();
 
         if (StringUtils.isNotEmpty(ixAdNetwork.getDspId())) {
@@ -338,45 +349,79 @@ public class Logging {
             ixAd.setSeatId(ixAdNetwork.getSeatId());
         }
 
+        // TODO: Why is this object duplicated?
         final ChannelSegmentEntity channelSegmentEntity = ixAdNetwork.getEntity();
-        if (null != channelSegmentEntity && null != ixAdNetwork) {
+        if (null != channelSegmentEntity) {
             ixAd.setRpAdgroupIncId(channelSegmentEntity.getAdgroupIncId());
             final long adIncId = channelSegmentEntity.getIncId(ixAdNetwork.getCreativeType());
             ixAd.setRpAdIncId(adIncId);
             LOG.debug("AdGroupIncId {} adIncId {}", channelSegmentEntity.getAdgroupIncId(), adIncId);
         }
-        // Log all the package Ids which were sent to RP.
-        if (CollectionUtils.isNotEmpty(ixAdNetwork.getPackageIds())) {
-            ixAd.setDeprecatedPackageIds(ixAdNetwork.getPackageIds());
 
-            // Log winning dealId
-            if (StringUtils.isNotEmpty(ixAdNetwork.getDealId())) {
-                ixAd.setDeprecatedWinningDealId(ixAdNetwork.getDealId());
-            }
-            // Log winning PackageId
-            if (null != ixAdNetwork.getWinningPackageId()) {
-                ixAd.setDeprecatedWinningPackageId(ixAdNetwork.getWinningPackageId());
-            }
+        // Log highest Bid
+        if (null != ixAdNetwork.getAdjustbid()) {
+            ixAd.setHighestBid(ixAdNetwork.getAdjustbid());
+        }
 
-            // Log highest Bid
-            if (null != ixAdNetwork.getAdjustbid()) {
-                ixAd.setHighestBid(ixAdNetwork.getAdjustbid());
-            }
+        final Set<Integer> forwardedPackages = ixAdNetwork.getForwardedPackageIds();
+        if (CollectionUtils.isNotEmpty(forwardedPackages)) {
+            ixAd.setDeprecatedPackageIds(new ArrayList<>(forwardedPackages));
+        }
 
-            // Log agency rebate percentage
-            if (null != ixAdNetwork.getAgencyRebatePercentage()) {
-                ixAd.setDeprecatedAgencyRebatePercentage(ixAdNetwork.getAgencyRebatePercentage());
+        final DealEntity deal = ixAdNetwork.getDeal();
+        if (null != deal) {
+            ixAd.setDeprecatedWinningDealId(deal.getId());
+            ixAd.setDeprecatedWinningPackageId(deal.getPackageId());
+
+            if (deal.isAgencyRebateToBeApplied()) {
+                ixAd.setDeprecatedAgencyRebatePercentage(deal.getAgencyRebatePercentage());
             }
         }
 
         return ixAd;
     }
 
+    public static PMP createPMPObject(final AdNetworkInterface adNetwork) {
+        final PMP pmp = new PMP();
+
+        if (adNetwork instanceof IXAdNetwork) {
+            final IXAdNetwork ixAdNetwork = (IXAdNetwork) adNetwork;
+            if (StringUtils.isNotBlank(ixAdNetwork.getSeatId())) {
+                pmp.setSeatId(ixAdNetwork.getSeatId());
+            }
+        }
+
+        final Set<Integer> forwardedPackages = adNetwork.getForwardedPackageIds();
+        if (CollectionUtils.isNotEmpty(forwardedPackages)) {
+            pmp.setForwardedPackageIds(forwardedPackages);
+        }
+
+        final Set<String> forwardedDeals = adNetwork.getForwardedDealIds();
+        if (CollectionUtils.isNotEmpty(forwardedDeals)) {
+            pmp.setForwardedDealIds(forwardedDeals);
+        }
+
+        final Set<Long> targetingSegmentsShortlisted = adNetwork.getShortlistedTargetingSegmentIds();
+        if (CollectionUtils.isNotEmpty(targetingSegmentsShortlisted)) {
+            pmp.setTargetingSegmentIdsShortlisted(targetingSegmentsShortlisted);
+        }
+
+        final DealEntity deal = adNetwork.getDeal();
+        if (null != deal) {
+            pmp.setDealId(deal.getId());
+            if (adNetwork instanceof IXAdNetwork) {
+                if (deal.isAgencyRebateToBeApplied()) {
+                    pmp.setAgencyRebatePercentage(deal.getAgencyRebatePercentage());
+                }
+            }
+        }
+
+        return pmp;
+    }
+
     protected static AdRR getAdRR(final ChannelSegment channelSegment, final List<ChannelSegment> rankList,
             final SASRequestParameters sasParams, final CasInternalRequestParameters casInternalRequestParameters,
             String terminationReason) {
-
-        AdRR adRR;
 
         boolean isTerminated = false;
         if (null != terminationReason) {
@@ -409,7 +454,8 @@ public class Logging {
                 getRequestObject(sasParams, casInternalRequestParameters, adsServed, requestSlot, slotServed, rankList);
         final List<Channel> channels = createChannelsLog(rankList);
 
-        // Container name must equal the hostname for now.
+        // Container name must be equal to the hostname for now.
+        final AdRR adRR;
         adRR = new AdRR(containerName, timestamp, request, impressions, isTerminated, terminationReason);
         adRR.setAuction_info(getAuctionInfo(sasParams, casInternalRequestParameters));
         adRR.setTime_stamp(new Date().getTime());
@@ -447,7 +493,7 @@ public class Logging {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("channelSegmentEntity or adNetworkInterface is null");
                 }
-                return impression;
+                return null;
             }
 
             InspectorStats.incrementStatCount(adNetworkInterface.getName(), SERVER_IMPRESSION);
@@ -471,6 +517,19 @@ public class Logging {
 
             impression = new Impression(adNetworkInterface.getImpressionId(), ad);
             impression.setAdChain(createCasAdChain(channelSegment));
+
+            final DealEntity deal = adNetworkInterface.getDeal();
+            if (null != deal) {
+                impression.setDealId(deal.getId());
+
+                final DealAttributionMetadata dealAttributionMetadata = adNetworkInterface.getDealAttributionMetadata();
+                if (null != dealAttributionMetadata) {
+                    final Set<Long> targetingSegmentsUsed = dealAttributionMetadata.getTargetingSegmentsUsed();
+                    if (CollectionUtils.isNotEmpty(targetingSegmentsUsed)) {
+                        impression.setTargetingSegmentIdsUsed(targetingSegmentsUsed);
+                    }
+                }
+            }
         }
         return impression;
     }
@@ -607,7 +666,7 @@ public class Logging {
         return handsetMeta;
     }
 
-    public static AdStatus getAdStatus(final String adStatus) {
+    static AdStatus getAdStatus(final String adStatus) {
         if (GlobalConstant.AD_STRING.equalsIgnoreCase(adStatus)) {
             return AdStatus.AD;
         } else if (GlobalConstant.NO_AD.equals(adStatus)) {
@@ -622,7 +681,7 @@ public class Logging {
         return LoggerFactory.getLogger(logger);
     }
 
-    public static void advertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
+    static void advertiserLogging(final List<ChannelSegment> rankList, final Configuration config) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Inside advertiserLogging");
         }
@@ -670,7 +729,6 @@ public class Logging {
             LOG.debug("Inside sampledAdvertiserLogging");
         }
         final Logger sampledAdvertiserLogger = LoggerFactory.getLogger(config.getString("sampledadvertiser"));
-
         final char sep = 0x01;
         final StringBuilder log = new StringBuilder();
         if (LOG.isDebugEnabled()) {

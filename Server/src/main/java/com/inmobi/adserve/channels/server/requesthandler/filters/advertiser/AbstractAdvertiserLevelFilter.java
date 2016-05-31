@@ -24,11 +24,6 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     private final String inspectorString;
     private FilterOrder order;
 
-    /**
-     * 
-     * @param traceMarkerProvider
-     * @param inspectorString
-     */
     protected AbstractAdvertiserLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.inspectorString = inspectorString;
@@ -48,31 +43,22 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
              */
             final ChannelSegment channelSegment = matchedSegmentDetail.getChannelSegmentList().get(0);
             final boolean result = failedInFilter(channelSegment, sasParams);
-            final String advertiserId = channelSegment.getChannelEntity().getAccountId();
+            final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
+            final String filterName = this.getClass().getSimpleName();
             if (result) {
                 iterator.remove();
-                LOG.debug(traceMarker, "Failed in filter {}  , advertiser {}", this.getClass().getSimpleName(),
-                        advertiserId);
+                LOG.debug(traceMarker, "Failed in filter: {}, advertiser: {}", filterName, advertiserId);
                 incrementStats(matchedSegmentDetail.getChannelSegmentList());
             } else {
-                LOG.debug(traceMarker, "Passed in filter {} ,  advertiser {}", this.getClass().getSimpleName(),
-                        advertiserId);
+                LOG.debug(traceMarker, "Passed in filter: {}, advertiser: {}", filterName, advertiserId);
             }
         }
     }
 
-    /**
-     * @param channelSegments
-     */
-    protected void incrementStats(final List<ChannelSegment> channelSegments) {
+    private void incrementStats(final List<ChannelSegment> channelSegments) {
         channelSegments.get(0).incrementInspectorStats(inspectorString, channelSegments.size());
     }
 
-    /**
-     * @param channelSegment
-     * @param sasParams
-     * @return {@link boolean}
-     */
     protected abstract boolean failedInFilter(final ChannelSegment channelSegment, final SASRequestParameters sasParams);
 
     @Override

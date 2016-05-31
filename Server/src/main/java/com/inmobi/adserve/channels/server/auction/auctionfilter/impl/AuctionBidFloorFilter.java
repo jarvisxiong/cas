@@ -26,9 +26,9 @@ public class AuctionBidFloorFilter extends AbstractAuctionFilter {
     /**
      * This filter fails channelSegments which have bid lower than the effective auction bid floor.<br>
      * For RTBD, the effective auction bid floor is set to<br>
-     * max(casInternalRequestParameters.getAuctionBidFloor(), demandDensity (=alpha*omega))<br>
+     * max(casParams.getAuctionBidFloor(), demandDensity (=alpha*omega))<br>
      * otherwise, it is set to<br>
-     * casInternalRequestParameters.getAuctionBidFloor()
+     * casParams.getAuctionBidFloor()
      *
      * @param rtbSegment
      * @param casInternalRequestParameters

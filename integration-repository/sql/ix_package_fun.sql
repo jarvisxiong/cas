@@ -1,4 +1,5 @@
-CREATE FUNCTION ix_package_fun_21042016()
+-- modifying old ix packages function
+CREATE FUNCTION ix_package_fun_03052016()
 RETURNS
     SETOF ix_package_type_21042016 AS
 $BODY$
@@ -47,7 +48,7 @@ SELECT
                 ix_packages.city_ids AS city_ids,
                 ix_packages.modified_by AS modified_by,
                 CASE
-	            When ix_packages.geocookie_status = true THEN ix_packages.geocookie_id
+	                When ix_packages.geocookie_status = true THEN ix_packages.geocookie_id
 	            ELSE null
 	        END AS geocookie_id,
                 deals.access_types as access_types,
@@ -72,6 +73,7 @@ SELECT
                 )
                 AS deals ON deals.package_id = ix_packages.id
                 where is_active=true
+                and (targeting_segment_ids is null or COALESCE(array_length(targeting_segment_ids, 1), 0) = 0)
                 and (start_date is null or start_date <= now()+interval '1 minute')
                 and (end_date is null or end_date >= now())
 LOOP

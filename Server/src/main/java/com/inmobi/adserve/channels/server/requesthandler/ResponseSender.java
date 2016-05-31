@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.server.requesthandler.AdPoolResponseCreator.createAdPoolResponse;
 import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.AD_IMAI_START_TAG;
 import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.DCP_NATIVE_WRAPPING_AD_JSON;
 import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.END_TAG;
@@ -19,12 +20,10 @@ import static com.inmobi.casthrift.DemandSourceType.RTBD;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 import javax.inject.Inject;
@@ -45,15 +44,9 @@ import org.slf4j.Marker;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.inject.Provider;
-import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
-import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
-import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.AuctionType;
-import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -61,8 +54,6 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -70,18 +61,13 @@ import com.inmobi.adserve.channels.server.auction.AuctionEngine;
 import com.inmobi.adserve.channels.server.kafkalogging.PhotonCasActivityWriter;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ump.NativeAd;
-import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
 import com.inmobi.commons.security.util.exception.InvalidMessageException;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.GUID;
-import com.inmobi.types.PricingModel;
 import com.inmobi.user.photon.datatypes.activity.NestedActivityRecord;
 
 import io.netty.buffer.Unpooled;
@@ -104,8 +90,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final int STORYBOARD_SDK_BASE_VERSION = 530;
     private static final Gson gson = new Gson();
 
-
-
     /**
      * At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then
      * the bid is considered from the remaining DSP's.
@@ -125,6 +109,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private int rankIndexToProcess;
     private int selectedAdIndex;
     private boolean requestCleaned;
+    @Getter
     private final AuctionEngine auctionEngine;
     private final Object lock = new Object();
     private String terminationReason;
@@ -220,7 +205,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
             return;
         }
 
-
         LOG.debug("ad received so trying to send ad response");
         String finalResponse = adResponse.getResponse();
         final SlotSizeMapEntity slotSizeMapEntity = repositoryHelper.querySlotSizeMapRepository(selectedSlotId);
@@ -239,15 +223,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
             incrementStatsForFills(sasParams.getDst());
         } else {
-            final String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
-            final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse(), repositoryHelper);
-            LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
-            if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
+            final AdPoolResponse adPoolResponse = createAdPoolResponse(auctionEngine.getAuctionResponse(),
+                    adResponse.getResponse(), auctionEngine.getHighestBid());
+
+            LOG.debug("{} response json to UMP: {}", sasParams.getDemandSourceType(), adPoolResponse);
+            if (null == adPoolResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(serverChannel);
             } else {
                 try {
                     final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-                    final byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
+                    final byte[] serializedResponse = serializer.serialize(adPoolResponse);
                     sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(),
                         serverChannel);
                     incrementStatsForFills(sasParams.getDst());
@@ -286,113 +271,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    protected AdPoolResponse createThriftResponse(final String finalResponse, final RepositoryHelper repositoryHelper) {
-        final AdPoolResponse adPoolResponse = new AdPoolResponse();
-        final AdIdChain adIdChain = new AdIdChain();
-        final ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
-        final ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
 
-        adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
-        adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
-        adIdChain.setCampaign_guid(channelSegmentEntity.getCampaignId());
-        adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
-        adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
-        adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
-        adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
-
-        final AdInfo rtbdAd = new AdInfo();
-        rtbdAd.setPricingModel(PricingModel.CPM);
-
-        // TODO: Create method and write UT
-        switch (getRtbResponse().getAdNetworkInterface().getDst()) {
-            case IX: // If IX,
-                // Set IX specific parameters
-                if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
-                    final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
-                    final String dealId = ixAdNetwork.getDealId();
-                    final long highestBid = (long) (ixAdNetwork.getAdjustbid() * Math.pow(10, 6));
-                    IXPackageEntity pckgEntity = null;
-                    // Checking whether a dealId was provided in the bid response
-                    if (dealId != null) {
-                        try {
-                            pckgEntity = repositoryHelper.queryIxPackageByDeal(dealId);
-                        } catch (final NoSuchObjectException exception) {
-                            LOG.error("For the dealId, we dont have entry in our system {}", dealId);
-                            InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
-                        } catch (final NonUniqueObjectException exception) {
-                            LOG.error("For the dealId, we dont have entry in our system {}", dealId);
-                            InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
-                        }
-                    }
-                    if (null != pckgEntity) {
-                        if (ixAdNetwork.isExternalPersonaDeal() && CollectionUtils
-                            .isNotEmpty(ixAdNetwork.getUsedCsIds())) {
-                            rtbdAd.setMatched_csids(new ArrayList<>(ixAdNetwork.getUsedCsIds()));
-                        }
-                        final int indexOfDealId = pckgEntity.getDealIds().indexOf(dealId);
-                        final String dealType = pckgEntity.getAccessTypes().size() > indexOfDealId ?
-                            pckgEntity.getAccessTypes().get(indexOfDealId) :
-                            RIGHT_TO_FIRST_REFUSAL_DEAL;
-                        rtbdAd.setDealId(dealId);
-                        rtbdAd.setHighestBid(highestBid);
-                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
-                        if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
-                            // At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if
-                            // the bid is absent, then
-                            // get additional info like geo, bidLandScaping etc
-                            rtbdAd.setAuctionType(AuctionType.TRUMP);
-                        }
-                    } else {
-                        // otherwise auction type is set to FIRST_PRICE
-                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
-                    }
-                }
-                break;
-
-            case RTBD:
-                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-                break;
-            default: // For DCP, auction type is set to SECOND_PRICE
-                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-                break;
-        }
-
-        final List<AdIdChain> adIdChains = new ArrayList<>();
-        adIdChains.add(adIdChain);
-        rtbdAd.setDeprecatedAdIds(adIdChains);
-
-        final long bid = (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
-        rtbdAd.setPrice(bid);
-        rtbdAd.setBid(bid);
-
-        final String impressionId = getRtbResponse().getAdNetworkInterface().getImpressionId();
-        final UUID uuid = UUID.fromString(impressionId);
-        rtbdAd.setDeprecatedImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
-
-        // Setting render unit id
-        final String renderUnitId = ImpressionIdGenerator.getInstance().resetWilburyIntKey(impressionId, 0L);
-        final UUID renderUnitUUID = UUID.fromString(renderUnitId);
-        rtbdAd.setRenderUnitId(
-            new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID.getLeastSignificantBits()));
-
-        rtbdAd.setSlotServed(getRtbResponse().getAdNetworkInterface().getSelectedSlotId());
-        final Creative rtbdCreative = new Creative();
-        rtbdCreative.setValue(finalResponse);
-        rtbdAd.setCreative(rtbdCreative);
-        adPoolResponse.setAds(Collections.singletonList(rtbdAd));
-        adPoolResponse.setMinChargedValue(
-            (long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
-        if (!GlobalConstant.USD.equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
-            rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
-            rtbdAd.setBidInOriginalCurrency(
-                (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
-        }
-        return adPoolResponse;
-    }
 
     // send response to the caller
     @SuppressWarnings("rawtypes")
-    private void sendResponse(final HttpResponseStatus status, String responseString, final Map responseHeaders,
+    private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
         final Channel serverChannel) {
         final byte[] bytes = DCP.getValue() == sasParams.getDst() ?
             processDCPResponse(responseString) :
@@ -526,11 +409,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     // send response to the caller
     public void sendResponse(final String responseString, final Channel serverChannel) {
         sendResponse(HttpResponseStatus.OK, responseString, null, serverChannel);
-    }
-
-    @Override
-    public AuctionEngine getAuctionEngine() {
-        return auctionEngine;
     }
 
     @Override

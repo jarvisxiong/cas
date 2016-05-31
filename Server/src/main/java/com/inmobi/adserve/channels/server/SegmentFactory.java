@@ -24,7 +24,7 @@ import io.netty.channel.Channel;
 public class SegmentFactory {
     private final static Logger LOG = LoggerFactory.getLogger(SegmentFactory.class);
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
-    private final static Long USA_COUNTRY_ID = 94l;
+    private final static Long USA_COUNTRY_ID = 94L;
 
     @Inject
     public SegmentFactory(final Map<String, AdapterConfig> advertiserIdConfigMap) {

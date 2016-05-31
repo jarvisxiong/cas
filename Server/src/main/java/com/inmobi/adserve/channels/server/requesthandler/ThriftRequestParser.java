@@ -79,6 +79,7 @@ public class ThriftRequestParser {
         LOG.debug("Inside parameter parser : ThriftParser");
         params.setAllParametersJson(tObject.toString());
         params.setDst(dst);
+        params.setDemandSourceType(DemandSourceType.findByValue(dst));
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
         params.setRqMkSlot(tObject.selectedSlots);
@@ -262,6 +263,7 @@ public class ThriftRequestParser {
             final Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(
                     null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
+            params.setCities(cities);
             params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
             params.setState(
@@ -323,8 +325,10 @@ public class ThriftRequestParser {
             params.setSiteIncId(tSite.siteIncId);
             params.setAppUrl(tSite.siteUrl);
             params.setPubId(tSite.publisherId);
-            final boolean isApp = tSite.isSetInventoryType() && tSite.inventoryType == InventoryType.APP;
-            params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
+            if (tSite.isSetInventoryType()) {
+                params.setSource(tSite.inventoryType == InventoryType.APP ? GlobalConstant.APP : GlobalConstant.WAP);
+                params.setInventoryType(tSite.inventoryType);
+            }
             final SiteTemplateSettings sts = tSite.siteTemplateSettings;
             if (sts != null) {
                 // Set CAU

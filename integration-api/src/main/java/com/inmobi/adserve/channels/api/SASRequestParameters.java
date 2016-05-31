@@ -14,8 +14,10 @@ import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.DeviceType;
+import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
 
 import lombok.Data;
@@ -82,6 +84,7 @@ public class SASRequestParameters {
     private String handsetName;
     private Integer carrierId;
     private Integer city;
+    private Set<Integer> cities;
     private Integer state;
     private List<Short> rqMkSlot;
     private List<Short> processedMkSlot;
@@ -94,9 +97,11 @@ public class SASRequestParameters {
     private Set<String> uAdapters;
 
     private int dst; // This will describe the type of request dcp, rtbd or ix
+    private DemandSourceType demandSourceType;
     private Set<Integer> accountSegment;
     private int sst; // 0 for Network
     private String pubId;
+    private InventoryType inventoryType;
     private ConnectionType connectionType;
     private double marketRate;
     private Map<String, String> adPoolParamsMap;

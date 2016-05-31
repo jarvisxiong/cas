@@ -38,9 +38,14 @@ public class AdGroupAutomationFrameworkFilterTest {
         mockStatic(CasConfigUtil.class);
         Configuration mockConfig = createMock(Configuration.class);
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
+        ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
 
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
+        expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
+        expect(mockChannelSegmentEntity.getAdgroupId()).andReturn("").anyTimes();
+        expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn("").anyTimes();
+        expect(mockChannelSegmentEntity.getAutomationTestId()).andReturn(null).anyTimes();
         expect(mockConfig.getBoolean("enableAutomationTests", false)).andReturn(true).anyTimes();
         expect(mockSASRequestParameters.getAutomationTestId()).andReturn(null).anyTimes();
 
