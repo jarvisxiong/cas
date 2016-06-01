@@ -299,6 +299,6 @@ public class InspectorStrings {
     public static final String TOTAL_MISMATCH_BUNDLE_ID_FOR_DST = "TotalMismatchBundleIdForDST_";
     public static final String TOTAL_REQUEST_FOR_NAPP_SCORE = "TotalRequestForNappScore";
     public static final String TOTAL_REQUEST_WITHOUT_NAPP_SCORE = "TotalRequestWithoutNappScore";
-    public static final String TOTAL_REQUEST_FOR_UNKNOWN_NAPP_SCORE = "TotalRequestForUnknownNappScore";
-    public static final java.lang.String TOTAL_REQUEST_WITHOUT_MAPPRESPONSE = "TotalRequestWithoutMappResponse";
+    public static final String TOTAL_REQUEST_WITH_SCORE_GREATER_THAN_100 = "TotalRequestWithScoreGreaterThan100";
+    public static final String TOTAL_REQUEST_WITHOUT_MAPP_RESPONSE = "TotalRequestWithoutMappResponse";
 }
