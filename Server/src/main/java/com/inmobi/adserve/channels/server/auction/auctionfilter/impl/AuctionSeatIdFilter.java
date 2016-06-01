@@ -18,7 +18,7 @@ public class AuctionSeatIdFilter extends AbstractAuctionFilter {
     @Inject
     public AuctionSeatIdFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_RTB_SEATID_MIS_MATCH_FILTER, serverConfiguration);
-        isApplicableRTBD = false; // TODO: REVERT THIS!!!!!!!!!!!!!
+        isApplicableRTBD = true;
         isApplicableIX = false;
     }
 
