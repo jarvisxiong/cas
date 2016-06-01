@@ -65,6 +65,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private boolean isScreenshotResponse = false;
     private NativeAdTemplateEntity templateEntity;
     private final List<String> oemSiteIds;
+    private boolean isOemSite;
 
     protected final Gson gson;
     @Inject
@@ -92,9 +93,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         host = String.format(config.getString("taboola.host"), externalSiteId);
         iconUrl = config.getString("taboola.icon");
         notificationUrl = config.getString("taboola.notification");
-
+        isOemSite = oemSiteIds.contains(sasParams.getSiteId());
         if (sasParams.getWapSiteUACEntity() != null
-                && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
+                && (sasParams.getWapSiteUACEntity().isTransparencyEnabled() || isOemSite)) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
         } else {
             LOG.info("Uac is not initialized for site {} in Taboola", sasParams.getSiteId());
@@ -112,7 +113,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         final StringBuilder requestBuilder = new StringBuilder(host);
         appendQueryParam(requestBuilder, AD_COUNT,
-                oemSiteIds.contains(sasParams.getSiteId()) ? sasParams.getRqMkAdcount() : 1, false);
+                isOemSite ? sasParams.getRqMkAdcount() : 1, false);
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getAppTitle(), format), false);
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
