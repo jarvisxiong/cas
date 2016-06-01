@@ -399,6 +399,9 @@ non_prod:
                aerospike:
                    aerospike_host: as.corp.inmobi.com
                    aerospike_port: 3000
+
+               kafka:
+                   kafka_host: 'pf-qa1001.data.corp.inmobi.com:9092'
             timeout:
                 ning_timeout_dcp: 5000
                 ning_timeout_rtbd: 5000
@@ -491,6 +494,9 @@ non_prod:
                aerospike:
                    aerospike_host: as.corp.inmobi.com
                    aerospike_port: 3000
+
+               kafka:
+                   kafka_host: 'pf-qa1001.data.corp.inmobi.com:9092'
             timeout:
                 ning_timeout_dcp: 5000
                 ning_timeout_rtbd: 5000
