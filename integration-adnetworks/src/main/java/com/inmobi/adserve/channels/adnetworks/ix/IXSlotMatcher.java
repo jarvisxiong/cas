@@ -92,7 +92,7 @@ public class IXSlotMatcher {
 
         }
         if (matchedRPSlotId == null) {
-            LOG.error("No matching slot found for CAU Set {}", cauSet);
+            LOG.info("No matching slot found for CAU Set {}", cauSet);
         }
         LOG.debug("matchedRPSlotId {}", matchedRPSlotId);
         LOG.debug("matchedCAUId {}", matchedCAUId);

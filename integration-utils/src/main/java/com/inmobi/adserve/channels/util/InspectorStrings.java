@@ -222,7 +222,7 @@ public class InspectorStrings {
 
     // General Stats for the Auction
     public static final String AUCTION_STATS = "AuctionStats";
-    public static final String ALL_SEGMENTS_DROPPED_IN_AUCTION_FILTERS = "AllSegmentsDroppedInAuctionFilters";
+    public static final String ALL_SEGMENTS_DROPPED_IN_AUCTION_FILTERS = "-AllSegmentsDroppedInAuctionFilters";
     public static final String TOTAL_AUCTIONS_CONDUCTED = "-TotalAuctionsConducted";
     public static final String AUCTIONS_WON_BY_TRUMP_DEALS = "-TotalAuctionsWonByTrumpDeals";
     public static final String AUCTIONS_WON_BY_NON_TRUMP_DEALS = "-TotalAuctionsWonByNonTrumpDeals";

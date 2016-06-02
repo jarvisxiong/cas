@@ -1037,7 +1037,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             return true;
         } catch (final JsonParseException e) {
-            LOG.error(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
+            LOG.info(traceMarker, "Deserialisation failed as response does not conform to gson contract: {}",
                     e.getMessage());
             InspectorStats.incrementStatCount(getName(), InspectorStrings.RESPONSE_CONTRACT_NOT_HONOURED);
             return false;

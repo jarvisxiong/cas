@@ -126,7 +126,7 @@ public class AuctionEngine implements AuctionEngineInterface {
                 final AdNetworkInterface adn = cs.getAdNetworkInterface();
                 final String adnName = adn.getName();
                 final String impressionId = adn.getImpressionId();
-                final double bid = adn.getBidPriceInLocal();
+                final double bid = adn.getBidPriceInUsd();
                 final long latency = adn.getLatency();
                 final DealEntity deal = adn.getDeal();
                 final AuctionType auctionType = adn.getAuctionType();
@@ -202,7 +202,7 @@ public class AuctionEngine implements AuctionEngineInterface {
                 }
                 log.debug("Effective Second Highest Bid: {}", secondHighestBid);
 
-                if (highestBid == winnerBid) {
+                if (secondHighestBid == winnerBid) {
                     InspectorStats.incrementStatCount(AUCTION_STATS, dst + EFFECTIVELY_FIRST_PRICE_SECOND_PRICE_AUCTIONS);
                 }
 

@@ -64,11 +64,9 @@ public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
             responseSender.sendNoAdResponse(ctx.channel());
             final String exceptionClass = exception.getClass().getSimpleName();
             InspectorStats.incrementStatCount(exceptionClass, COUNT);
-            if (LOG.isDebugEnabled(traceMarker)) {
-                LOG.debug(traceMarker, "Error caught", exception);
-                final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(exception);
-                LOG.debug(traceMarker, message);
-            }
+            LOG.error(traceMarker, "Error caught", exception);
+            final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(exception);
+            LOG.error(traceMarker, message);
         } finally {
             requestParameterHolder.getHttpRequest().release();
         }
