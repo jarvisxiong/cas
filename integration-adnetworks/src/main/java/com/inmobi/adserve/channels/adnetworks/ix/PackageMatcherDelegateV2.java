@@ -7,7 +7,9 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.PACKAGE_FORWARDE
 import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,8 +31,6 @@ public class PackageMatcherDelegateV2 {
 
     private static final int PACKAGE_MAX_LIMIT = 35;
     private static final boolean GEO_COOKIE_NOT_SUPPORTED = false;
-
-    private static final Comparator<Entry<Integer, Boolean>> RANDOM_SHUFFLE = new PackageShuffler();
 
     public static Map<Integer, Boolean> getMatchingPackageIds (final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short selectedSlotId,
@@ -66,8 +66,9 @@ public class PackageMatcherDelegateV2 {
                 InspectorStats.incrementStatCount(advertiserName, FORWARDED_PACKAGES_LIST_TRUNCATED);
             }
 
-            packages = packages.entrySet().stream()
-                    .sorted(RANDOM_SHUFFLE).limit(PACKAGE_MAX_LIMIT).collect(toMap(Entry::getKey, Entry::getValue));
+            final List<Entry<Integer, Boolean>> packagesList = new ArrayList<>(packages.entrySet());
+            Collections.shuffle(packagesList);
+            packages = packagesList.stream().limit(PACKAGE_MAX_LIMIT).collect(toMap(Entry::getKey, Entry::getValue));
 
             packages.keySet().forEach(
                     id -> InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, PACKAGE_FORWARDED + id)

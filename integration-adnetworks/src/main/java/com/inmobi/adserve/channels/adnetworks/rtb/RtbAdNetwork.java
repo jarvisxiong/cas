@@ -2,20 +2,11 @@ package com.inmobi.adserve.channels.adnetworks.rtb;
 
 import static com.inmobi.adserve.channels.adnetworks.ix.TargetingSegmentMatcherV2.getMatchingTargetingSegmentIds;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_AD_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE_PATTERN;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_WIN_URL;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
@@ -804,37 +795,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     }
 
     public String replaceRTBMacros(String url) {
-        if (AUCTION_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_CURRENCY_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_BID_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_SEAT_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_IMP_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_AD_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-
         url = url.replaceAll(AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
 
-        // Condition changed from sasParams.getDst() != 6 to == 2 to avoid unnecessary IX RTBMacro Replacements
-        if (2 == sasParams.getDst()) {
-            if (AUCTION_PRICE_INSENSITIVE_PATTERN.matcher(url).find()) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
-            }
-            LOG.info("replaceRTBMacros for DST=2, URL->{}", url);
-            url = url.replaceAll(AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
-            url = url.replaceAll(AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInLocal));
-        }
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
             url = url.replaceAll(AUCTION_AD_ID_INSENSITIVE,
                     bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());

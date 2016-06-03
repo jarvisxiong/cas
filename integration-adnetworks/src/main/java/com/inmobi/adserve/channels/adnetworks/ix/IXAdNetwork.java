@@ -4,18 +4,10 @@ import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.replac
 import static com.inmobi.adserve.channels.adnetworks.ix.IXAdNetworkHelper.replaceViewabilityTrackerMacros;
 import static com.inmobi.adserve.channels.adnetworks.ix.TargetingSegmentMatcherV2.getMatchingTargetingSegmentIds;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_BID_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_CURRENCY_INSENSITIVE_PATTERN;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_IMP_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_ENCRYPTED_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_PRICE_INSENSITIVE_PATTERN;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE;
-import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.AUCTION_SEAT_ID_INSENSITIVE_PATTERN;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_GET_PARAM;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.DEAL_ID_INSENSITIVE;
 import static com.inmobi.adserve.channels.adnetworks.rtb.RTBCallbackMacros.WIN_BID_GET_PARAM;
@@ -32,12 +24,6 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RES
 import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_RESPONSE_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER;
@@ -975,34 +961,12 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
     }
 
     private String replaceIXMacros(String url) {
-        if (AUCTION_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(advertiserName, TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_CURRENCY_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(advertiserName, TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_PRICE_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(advertiserName, TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_BID_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(advertiserName, TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_SEAT_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(advertiserName, TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        if (AUCTION_IMP_ID_INSENSITIVE_PATTERN.matcher(url).find()) {
-            InspectorStats.incrementStatCount(advertiserName, TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE);
-        }
-        url = url.replaceAll(AUCTION_ID_INSENSITIVE, bidResponse.getId());
         url = url.replaceAll(AUCTION_CURRENCY_INSENSITIVE, USD);
         url = url.replaceAll(AUCTION_PRICE_ENCRYPTED_INSENSITIVE, encryptedBid);
         url = url.replaceAll(AUCTION_PRICE_INSENSITIVE, Double.toString(secondBidPriceInUsd));
 
         if (null != bidResponse.getBidid()) {
             url = url.replaceAll(AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
-        }
-        if (null != seatId) {
-            url = url.replaceAll(AUCTION_SEAT_ID_INSENSITIVE, seatId);
         }
 
         // TODO: Clean this up as billing does not consume deal

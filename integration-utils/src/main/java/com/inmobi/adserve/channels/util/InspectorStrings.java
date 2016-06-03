@@ -116,9 +116,6 @@ public class InspectorStrings {
     public static final String DROPPED_IN_RTB_SEATID_MIS_MATCH_FILTER = "DroppedInRtbSeatidMisMatchFilter";
     public static final String DROPPED_IN_RTB_IMPRESSION_ID_MIS_MATCH_FILTER = "DroppedInRtbImpressionIdMisMatchFilter";
     public static final String DROPPED_IN_CREATIVE_ID_MISSING_FILTER = "DroppedInCreativeIdMissingFilter";
-    public static final String DROPPED_IN_SAMPLE_IMAGE_URL_MISSING_FILTER = "DroppedInSampleImageUrlMissingFilter";
-    public static final String DROPPED_IN_ADVERTISER_DOMAINS_MISSING_FILTER = "DroppedInAdvertiserDomainsFilter";
-    public static final String DROPPED_IN_CREATIVE_ATTRIBUTES_MISSING_FILTER = "DroppedInCreativeAttributesFilter";
     public static final String DROPPED_IN_CREATIVE_VALIDATOR_FILTER = "DroppedInCreativeValidatorFilter";
     public static final String DROPPED_IN_AUCTION_IX_IMPRESSION_ID_FILTER = "DroppedInAuctionIxImpressionIdFilter";
     public static final String DROPPED_IN_ACCOUNT_SEGMENT_FILTER = "DroppedInAccountSegmentFilter";
@@ -270,19 +267,6 @@ public class InspectorStrings {
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 
     public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
-
-    public static final String ONLY_OLD_CSIDS_SET = "OnlyOldCSIDsSet";
-    public static final String ONLY_NEW_CSIDS_SET = "OnlyNewCSIDsSet";
-    public static final String CSIDS_MIGRATION_SANE = "CSIDMigrationSane";
-    public static final String CSIDS_MIGRATION_NOT_SANE = "CSIDMigrationNotSane";
-
-    public static final String TOTAL_AUCTION_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionIdInsensitiveMacroReplace" ;
-    public static final String TOTAL_AUCTION_CURRENCY_INSENSITIVE_MACRO_REPLACE = "TotalAuctionCurrencyMacroReplace";
-    public static final String TOTAL_AUCTION_PRICE_INSENSITIVE_MACRO_REPLACE = "TotalAuctionPriceMacroReplace" ;
-    public static final String TOTAL_AUCTION_BID_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionBidIdMacroReplace";
-    public static final String TOTAL_AUCTION_SEAT_ID_INSENSITIVE_MACRO_REPLACE = "TotalSeatIdMacroReplace";
-    public static final String TOTAL_AUCTION_IMP_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionImpressionIdMacroReplace";
-    public static final String TOTAL_AUCTION_AD_ID_INSENSITIVE_MACRO_REPLACE = "TotalAuctionAdIdMacroReplace";
 
     // Native 1.0 Video errors
     public static final String NATIVE_VIDEO_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING = "NativeVideoResponse.DroppedAsTemplateWasMissing";
