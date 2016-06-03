@@ -415,10 +415,8 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
                         InspectorStats.incrementStatCount(InspectorStrings.UNCAUGHT_EXCEPTIONS,
                                 t.getClass().getSimpleName());
                         InspectorStats.incrementStatCount(getName(), t.getClass().getSimpleName());
-                        if (LOG.isDebugEnabled()) {
-                            final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(t);
-                            LOG.debug(traceMarker, message);
-                        }
+                        final String message = "stack trace is -> " + ExceptionBlock.getCustomStackTrace(t);
+                        LOG.error(traceMarker, message);
                     }
 
                     if (isRequestCompleted() || !serverChannel.isOpen()) {
