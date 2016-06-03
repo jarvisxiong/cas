@@ -14,7 +14,6 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -26,7 +25,6 @@ import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseFormat;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
@@ -124,10 +122,7 @@ abstract class BaseServlet implements Servlet {
         // Incrementing Adapter Specific Total Selected Segments Stats
         incrementTotalSelectedSegmentStats(filteredSegments);
 
-        if (!commonEnrichment(hrh, sasParams, casInternal)) {
-            hrh.responseSender.sendNoAdResponse(serverChannel);
-            return;
-        }
+        commonEnrichment(hrh, sasParams, casInternal);
         specificEnrichment(casContext, sasParams, casInternal);
         auctionEngine.casParams = casInternal;
         auctionEngine.sasParams = sasParams;
@@ -179,31 +174,10 @@ abstract class BaseServlet implements Servlet {
 
     /**
      * Enrichment common for all ad pools
-     *
-     * @param hrh
-     * @param sasParams
-     * @param sasParams
-     * @param casInternal
      */
-    protected final boolean commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
+    private void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal) {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
-        // Set imai content if r-format is imai
-        String imaiBaseUrl = null;
-        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI
-                || hrh.responseSender.getResponseFormat() == ResponseFormat.JSON) {
-            final String sdkVersion = sasParams.getSdkVersion();
-            final SdkMraidMapEntity sdkMraidMapEntity =
-                    CasConfigUtil.repositoryHelper.querySdkMraidMapRepository(sdkVersion);
-            if (null == sdkMraidMapEntity) {
-                LOG.error(traceMarkerProvider.get(), "Mraid Path not found for Sdk version: {}", sdkVersion);
-                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND + sdkVersion);
-                return false;
-            }
-            imaiBaseUrl = sdkMraidMapEntity.getMraidPath();
-        }
-        sasParams.setImaiBaseUrl(imaiBaseUrl);
-        LOG.debug("imai base url is {}", imaiBaseUrl);
 
         final SiteMetaDataEntity siteMetaDataEntity =
                 matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
@@ -214,20 +188,15 @@ abstract class BaseServlet implements Servlet {
         casInternal.setSiteAccountType(AccountType.SELF_SERVE);
         casInternal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(sasParams.getSiteIncId()));
         LOG.debug("Auction id generated is {}", casInternal.getAuctionId());
-        return true;
     }
 
     /**
      * Specific Enrichment for all ad pools
-     *
-     * @param casContext
-     * @param sasParams
-     * @param casInternal
      */
     protected abstract void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal);
 
-    protected static List<String> getBlockedIabCategories(final String siteId) {
+    static List<String> getBlockedIabCategories(final String siteId) {
         List<String> blockedCategories = null;
         if (null != siteId) {
             final SiteFilterEntity siteFilterEntity =

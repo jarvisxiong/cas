@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.server.CasConfigUtil.repositoryHelper;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_FOR_NAPP_SCORE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_WITHOUT_MAPP_RESPONSE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_WITHOUT_NAPP_SCORE;
@@ -8,28 +9,31 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_WI
 import java.util.Arrays;
 import java.util.List;
 
+import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters.NappScore;
+import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.fds.thrift.mapp.MappResponse;
 import com.inmobi.fds.thrift.mapp.Score;
 import com.inmobi.segment.impl.AdTypeEnum;
 
-/**
- * Created by avinash.kumar on 5/25/16.
- */
-public class ThriftRequestParserHelper {
-    public static final short CONFIDENT_GOOD_SCORE = 100;
-    public static final short UNKNOWN_SCORE = 90;
-    public static final short MAYBE_BAD_SCORE = 40;
-    public static final short CONFIDENT_BAD_SCORE = 10;
+import lombok.extern.slf4j.Slf4j;
 
-    public static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
+@Slf4j
+class ThriftRequestParserHelper {
+    private static final short CONFIDENT_GOOD_SCORE = 100;
+    private static final short UNKNOWN_SCORE = 90;
+    private static final short MAYBE_BAD_SCORE = 40;
+    private static final short CONFIDENT_BAD_SCORE = 10;
+
+    static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
             "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
-    public static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES =
+    static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES =
             Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
 
-    public static void populateNappScore(final SASRequestParameters params, final MappResponse mappResponse) {
+    static void populateNappScore(final SASRequestParameters params, final MappResponse mappResponse) {
         if (null != mappResponse) {
             final Score effectiveScore = mappResponse.getEffectiveScore();
             if (null != effectiveScore) {
@@ -63,4 +67,31 @@ public class ThriftRequestParserHelper {
             InspectorStats.incrementStatCount(TOTAL_REQUEST_WITHOUT_MAPP_RESPONSE);
         }
     }
+
+    static String getMraidPath(final String sdkVersion) {
+        final String mraidPath;
+
+        final SdkMraidMapEntity mraidEntity = repositoryHelper.querySdkMraidMapRepository(sdkVersion);
+        if (null != mraidEntity) {
+            mraidPath = mraidEntity.getMraidPath();
+            log.debug("Mraid path is: {}", mraidPath);
+        } else {
+            mraidPath = null;
+            log.error("Mraid Path not found for sdk version: {}", sdkVersion);
+            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND + sdkVersion);
+        }
+        return mraidPath;
+    }
+
+    static String getSdkVersion(final IntegrationType integrationType, final Integer version) {
+        if (null != version) {
+            if (integrationType == IntegrationType.ANDROID_SDK) {
+                return "a" + version;
+            } else if (integrationType == IntegrationType.IOS_SDK) {
+                return "i" + version;
+            }
+        }
+        return null;
+    }
+
 }

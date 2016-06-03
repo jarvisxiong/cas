@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.adpool.IntegrationMethod.SDK;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BANNER_NOT_ALLOWED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.CHINA_MOBILE_TARGETING;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
@@ -7,6 +8,8 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_SLOT_REQ
 import static com.inmobi.adserve.channels.util.InspectorStrings.JSON_PARSING_ERROR;
 import static com.inmobi.adserve.channels.util.InspectorStrings.LOW_SDK_VERSION;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_CATEGORY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_MRAID_PATH;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_SDK_VERSION;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_SITE_ID;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NO_SAS_PARAMS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NO_SUPPORTED_SLOTS;
@@ -17,9 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -31,6 +36,7 @@ public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
     protected static final Long CHINA = 164L;
     protected static final Integer CHINA_MOBILE = 787;
+    public static final int MINIMUM_SUPPORTED_SDK_VERSION = 300;
 
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
@@ -85,20 +91,27 @@ public class RequestFilters {
             return true;
         }
 
-        final String tempSdkVersion = sasParams.getSdkVersion();
-        LOG.debug("sdk-version : {}", tempSdkVersion);
-        if (null != tempSdkVersion) {
-            try {
-                final String ia = tempSdkVersion.substring(0, 1);
-                if (("i".equalsIgnoreCase(ia) || "a".equalsIgnoreCase(ia))
-                        && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
-                    LOG.info("Terminating request as sdkVersion is less than 3");
+
+        final IntegrationDetails integrationDetails = sasParams.getIntegrationDetails();
+        if (null != integrationDetails && SDK == integrationDetails.getIntegrationMethod()) {
+            if (integrationDetails.isSetIntegrationVersion()) {
+                final int sdkVersion = integrationDetails.getIntegrationVersion();
+                if (sdkVersion < MINIMUM_SUPPORTED_SDK_VERSION) {
+                    LOG.error("Terminating request as sdkVersion was less than 300");
                     hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
                     InspectorStats.incrementStatCount(TERMINATED_REQUESTS, LOW_SDK_VERSION + dstName);
                     return true;
+                } else if (StringUtils.isBlank(sasParams.getImaiBaseUrl())) {
+                    LOG.error("Terminating request as mraid path could not be determined");
+                    hrh.setTerminationReason(CasConfigUtil.MISSING_MRAID_PATH);
+                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_MRAID_PATH + sdkVersion);
+                    return true;
                 }
-            } catch (final Exception exception) {
-                LOG.info("Invalid sdk-version, Exception raised {}", exception);
+            } else {
+                LOG.error("Terminating request as the sdk version could not be determined");
+                hrh.setTerminationReason(CasConfigUtil.UNKNOWN_SDK_VERSION);
+                InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_SDK_VERSION + dstName);
+                return true;
             }
         }
 

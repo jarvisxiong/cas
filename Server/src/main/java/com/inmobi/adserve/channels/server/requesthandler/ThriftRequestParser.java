@@ -3,6 +3,8 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getMraidPath;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getSdkVersion;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.populateNappScore;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
@@ -39,6 +41,7 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -277,13 +280,22 @@ public class ThriftRequestParser {
 
     private void setIntegrationDetails(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetIntegrationDetails()) {
-            final IntegrationDetails tIntDetails = tObject.integrationDetails;
-            params.setRqIframe(tIntDetails.iFrameId);
-            if (tIntDetails.isSetAdCodeType()) {
-                params.setAdcode(tIntDetails.adCodeType.toString());
+            final IntegrationDetails details = tObject.getIntegrationDetails();
+
+            if (details.isSetAdCodeType()) {
+                params.setAdcode(details.adCodeType.toString());
             }
-            params.setSdkVersion(getSdkVersion(tIntDetails.integrationType, tIntDetails.integrationVersion));
-            params.setAdcode(getAdCode(tIntDetails.integrationType));
+            params.setRqIframe(details.iFrameId);
+            params.setAdcode(getAdCode(details.integrationType));
+
+            final IntegrationMethod integrationMethod = details.getIntegrationMethod();
+            if (IntegrationMethod.SDK == integrationMethod) {
+                final Integer integrationVersion = details.isSetIntegrationVersion() ?
+                        details.getIntegrationVersion() : null;
+                final String sdkVersion = getSdkVersion(details.integrationType, integrationVersion);
+                params.setSdkVersion(sdkVersion);
+                params.setImaiBaseUrl(getMraidPath(sdkVersion));
+            }
         }
     }
 
@@ -509,15 +521,6 @@ public class ThriftRequestParser {
             return "JS";
         }
         return "NON-JS";
-    }
-
-    public String getSdkVersion(final IntegrationType integrationType, final int version) {
-        if (integrationType == IntegrationType.ANDROID_SDK) {
-            return "a" + version;
-        } else if (integrationType == IntegrationType.IOS_SDK) {
-            return "i" + version;
-        }
-        return null;
     }
 
     public List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {

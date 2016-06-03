@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>com.inmobi.commons</groupId>
                 <artifactId>datatypes-java-0.8</artifactId>
-                <version>1.6.144</version>
+                <version>1.6.157</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>

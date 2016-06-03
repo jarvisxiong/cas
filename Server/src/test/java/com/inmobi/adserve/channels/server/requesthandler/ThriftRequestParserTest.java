@@ -139,7 +139,6 @@ public class ThriftRequestParserTest extends TestCase {
 
     @Test
     public void testParseRequestParameters() {
-
         final Site site = new Site();
         site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);
         site.setCpcFloor(1);
@@ -173,7 +172,7 @@ public class ThriftRequestParserTest extends TestCase {
         geo.setLocationSource(LocationSource.LATLON);
         geo.setLatLong(new LatLong(12d, 12d));
 
-        final Set<Integer> stateIds = new HashSet<Integer>();
+        final Set<Integer> stateIds = new HashSet<>();
         stateIds.add(123);
         geo.setStateIds(stateIds);
 
@@ -220,14 +219,12 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getCountryCode(), "US");
         assertEquals(sasRequestParameters.getCountryId(), new Long(94));
         assertEquals(sasRequestParameters.getImpressionId(), null); // Internal, Populated in cas
-        assertEquals(sasRequestParameters.getClurl(), null); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getSiteId(), "siteId");
         assertEquals(sasRequestParameters.getSiteContentType(), ContentType.FAMILY_SAFE);
-        assertEquals(sasRequestParameters.getSdkVersion(), "i231");
         assertEquals(sasRequestParameters.getSiteIncId(), 12345);
         assertEquals(sasRequestParameters.getAdIncId(), 0); // Internal, Populated in cas
         assertEquals(sasRequestParameters.getAdcode(), "NON-JS");
-        assertEquals(sasRequestParameters.getCategories(), Collections.<Long>emptyList());
+        assertEquals(sasRequestParameters.getCategories(), Collections.emptyList());
         assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
         assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));

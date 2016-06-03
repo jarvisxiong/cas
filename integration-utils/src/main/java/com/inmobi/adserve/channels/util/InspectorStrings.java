@@ -49,6 +49,8 @@ public class InspectorStrings {
     public static final String MISSING_CATEGORY = "Terminated_MissingCategory";
     public static final String LOW_SDK_VERSION = "Terminated_LowSdkVersion";
     public static final String NO_SAS_PARAMS = "Terminated_NoSASParams";
+    public static final String MISSING_MRAID_PATH = "Terminated_NoMraidPath-";
+    public static final String MISSING_SDK_VERSION = "Terminated_NoSDKVersion-";
     public static final String INVALID_SERVLET_REQUEST = "Terminated_InvalidServletRequest";
 
     public static final String PARSE_RESPONSE_EXCEPTION = "ExceptionInParseResponse";

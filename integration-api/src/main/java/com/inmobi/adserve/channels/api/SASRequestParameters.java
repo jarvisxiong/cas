@@ -42,7 +42,6 @@ public class SASRequestParameters {
     private LocationSource locationSource;
     private Set<Long> geoFenceIds;
     private String impressionId;
-    private String clurl;
     private String siteId;
     private Long placementId;
     private ContentType siteContentType;
