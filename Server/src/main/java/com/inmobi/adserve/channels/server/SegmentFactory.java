@@ -33,15 +33,6 @@ public class SegmentFactory {
 
     /**
      * Call the Specific Adapter of the Ad Networks
-     *
-     * @param advertiserId
-     * @param config
-     * @param dcpClientBootstrap
-     * @param rtbClientBootstrap
-     * @param base
-     * @param channel
-     * @param advertiserSet
-     * @return
      */
     public AdNetworkInterface getChannel(final String advertiserId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,

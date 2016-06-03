@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import org.slf4j.Marker;
 
 import com.google.inject.Provider;
+import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
@@ -33,13 +34,16 @@ public class AuctionDealFloorFilter extends AbstractAuctionFilter {
         final AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
         final DealEntity deal = adNetwork.getDeal();
 
+        final Double discount = adNetwork instanceof IXAdNetwork ?
+                CasConfigUtil.getAdapterConfig().getDouble("ix.rubiconCutsInDeal", 0.0) : 0.0;
+
         final double dealFloorInUSD;
         if (null != deal) {
             dealFloorInUSD = CasConfigUtil.repositoryHelper.calculatePriceInUSD(deal.getFloor(), deal.getCurrency());
         } else {
             dealFloorInUSD = ZERO;
         }
-        return adNetwork.getBidPriceInUsd() < dealFloorInUSD;
+        return adNetwork.getBidPriceInUsd() < dealFloorInUSD * (1 - discount);
     }
 
 }
