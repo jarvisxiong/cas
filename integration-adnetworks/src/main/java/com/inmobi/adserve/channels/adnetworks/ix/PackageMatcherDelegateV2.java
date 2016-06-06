@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class PackageMatcherDelegateV2 {
             }
         }
 
-        if (null != packages) {
+        if (null != packages && !packages.isEmpty()) {
             if (packages.size() > PACKAGE_MAX_LIMIT) {
                 InspectorStats.incrementStatCount(OVERALL_PMP_STATS, FORWARDED_PACKAGES_LIST_TRUNCATED);
                 InspectorStats.incrementStatCount(advertiserName, FORWARDED_PACKAGES_LIST_TRUNCATED);
@@ -74,7 +75,11 @@ public class PackageMatcherDelegateV2 {
                     id -> InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, PACKAGE_FORWARDED + id)
             );
 
-            log.debug("Overall packages shortlisted: {}", packages.keySet().toArray());
+            if (log.isDebugEnabled()) {
+                log.debug("Overall packages shortlisted: {}", Arrays.toString(packages.keySet().toArray()));
+            }
+        } else {
+            log.debug("No packages shortlisted");
         }
 
         return packages;

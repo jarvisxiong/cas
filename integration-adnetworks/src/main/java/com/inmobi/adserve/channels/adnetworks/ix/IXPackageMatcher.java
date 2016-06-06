@@ -211,7 +211,9 @@ class IXPackageMatcher {
                 droppedInPackageLanguageTargetingFilter);
         incrementPackageFilterStat(DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
 
-        log.debug("Packages selected: {}", Arrays.toString(matchedPackages.keySet().toArray()));
+        if (log.isDebugEnabled()) {
+            log.debug("Packages selected: {}", Arrays.toString(matchedPackages.keySet().toArray()));
+        }
         return matchedPackages;
     }
 

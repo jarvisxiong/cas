@@ -206,7 +206,8 @@ public class InspectorStrings {
     public static final String DEAL_RESPONSES = "DealResponses-";
 
     // Deal errors
-    public static final String RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED = "ResponseDroppedAsUnknownDealWasReceived";
+    public static final String RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED = "ResponseDroppedAsUnknownDealWasReceived-";
+    public static final String RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED = "ResponseDroppedAsNonForwardedDealWasReceived-";
     public static final String BADLY_CONFIGURED_DEAL = "BadlyConfiguredDeal-";
     public static final String BADLY_CONFIGURED_TARGETING_SEGMENT = "BadlyConfiguredTargetingSegment-";
 

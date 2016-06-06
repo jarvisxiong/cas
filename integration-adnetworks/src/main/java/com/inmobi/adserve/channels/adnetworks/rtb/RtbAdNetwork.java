@@ -16,6 +16,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.DEAL_FORWARDED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DEAL_RESPONSES;
 import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_REQUEST_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_RESPONSE_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_DEAL_RESPONSES;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.MD5;
@@ -969,22 +970,33 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
             final String dealId = bid.getDealid();
 
-            final Optional<DealEntity> dealEntityOptional = repositoryHelper.queryDealById(dealId, DO_NOT_QUERY_IN_OLD_REPO);
+            final Optional<DealEntity> dealEntityOptional =
+                    repositoryHelper.queryDealById(dealId, DO_NOT_QUERY_IN_OLD_REPO);
             if (dealEntityOptional.isPresent()) {
+                InspectorStats.incrementStatCount(advertiserName, TOTAL_DEAL_RESPONSES);
+                InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
+
                 deal = dealEntityOptional.get();
+                final Integer packageId = deal.getPackageId();
+
+                if (CollectionUtils.isEmpty(forwardedPackageIds) || !forwardedPackageIds.contains(packageId)) {
+                    InspectorStats.incrementStatCount(advertiserName,
+                            RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED + dealId);
+                    return false;
+                }
+
                 auctionType = deal.getAuctionType();
 
                 if (StringUtils.isNotBlank(deal.getCurrency())) {
                     bidderCurrency = deal.getCurrency();
                 }
 
-                dealAttributionMetadata = generateDealAttributionMetadata(shortlistedTargetingSegmentIds, deal.getPackageId(), sasParams.getCsiTags(), repositoryHelper, GEO_COOKIE_NOT_SUPPORTED);
-
-                InspectorStats.incrementStatCount(advertiserName, TOTAL_DEAL_RESPONSES);
-                InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
-
+                dealAttributionMetadata =
+                        generateDealAttributionMetadata(shortlistedTargetingSegmentIds, deal.getPackageId(), sasParams
+                                .getCsiTags(), repositoryHelper, GEO_COOKIE_NOT_SUPPORTED);
             } else if (StringUtils.isNotBlank(dealId)) {
                 InspectorStats.incrementStatCount(advertiserName, TOTAL_DEAL_RESPONSES);
+                InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
                 InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED);
                 return false;
             }

@@ -1,6 +1,8 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
 import static com.inmobi.adserve.adpool.IntegrationMethod.SDK;
+import static com.inmobi.adserve.adpool.IntegrationType.ANDROID_SDK;
+import static com.inmobi.adserve.adpool.IntegrationType.IOS_SDK;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BANNER_NOT_ALLOWED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.CHINA_MOBILE_TARGETING;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -94,24 +97,27 @@ public class RequestFilters {
 
         final IntegrationDetails integrationDetails = sasParams.getIntegrationDetails();
         if (null != integrationDetails && SDK == integrationDetails.getIntegrationMethod()) {
-            if (integrationDetails.isSetIntegrationVersion()) {
-                final int sdkVersion = integrationDetails.getIntegrationVersion();
-                if (sdkVersion < MINIMUM_SUPPORTED_SDK_VERSION) {
-                    LOG.error("Terminating request as sdkVersion was less than 300");
-                    hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
-                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, LOW_SDK_VERSION + dstName);
-                    return true;
-                } else if (StringUtils.isBlank(sasParams.getImaiBaseUrl())) {
-                    LOG.error("Terminating request as mraid path could not be determined");
-                    hrh.setTerminationReason(CasConfigUtil.MISSING_MRAID_PATH);
-                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_MRAID_PATH + sdkVersion);
+            final IntegrationType integrationType = integrationDetails.getIntegrationType();
+            if (IOS_SDK == integrationType || ANDROID_SDK == integrationType) {
+                if (integrationDetails.isSetIntegrationVersion()) {
+                    final int sdkVersion = integrationDetails.getIntegrationVersion();
+                    if (sdkVersion < MINIMUM_SUPPORTED_SDK_VERSION) {
+                        LOG.info("Terminating request as sdkVersion was less than 300");
+                        hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
+                        InspectorStats.incrementStatCount(TERMINATED_REQUESTS, LOW_SDK_VERSION + dstName);
+                        return true;
+                    } else if (StringUtils.isBlank(sasParams.getImaiBaseUrl())) {
+                        LOG.info("Terminating request as mraid path could not be determined");
+                        hrh.setTerminationReason(CasConfigUtil.MISSING_MRAID_PATH);
+                        InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_MRAID_PATH + sdkVersion);
+                        return true;
+                    }
+                } else {
+                    LOG.info("Terminating request as the sdk version could not be determined");
+                    hrh.setTerminationReason(CasConfigUtil.UNKNOWN_SDK_VERSION);
+                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_SDK_VERSION + dstName);
                     return true;
                 }
-            } else {
-                LOG.error("Terminating request as the sdk version could not be determined");
-                hrh.setTerminationReason(CasConfigUtil.UNKNOWN_SDK_VERSION);
-                InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_SDK_VERSION + dstName);
-                return true;
             }
         }
 

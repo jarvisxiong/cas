@@ -23,6 +23,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_RESP
 import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_RESPONSE_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
@@ -1535,7 +1536,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         final Optional<DealEntity> dealEntityOptional = repositoryHelper.queryDealById(dealId, QUERY_IN_OLD_REPO);
 
         if (dealEntityOptional.isPresent()) {
+            InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_DEAL_RESPONSES);
+            InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
+
             deal = dealEntityOptional.get();
+            final Integer packageId = deal.getPackageId();
+
+            if (CollectionUtils.isEmpty(forwardedPackageIds) || !forwardedPackageIds.contains(packageId)) {
+                InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED + dealId);
+                return false;
+            }
 
             final boolean geoCookieWasUsed = null != packageToGeocookieServed ? packageToGeocookieServed.get(deal.getPackageId()) : false;
             dealAttributionMetadata = generateDealAttributionMetadata(shortlistedTargetingSegmentIds, deal.getPackageId(), sasParams.getCsiTags(), repositoryHelper, geoCookieWasUsed);
@@ -1543,8 +1553,6 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             //subtracting RP's cut in case of PMP
             final Double bidAfterRemovingRPsCut = originalBidPriceInUsd * (1.0 - rubiconCutsInDeal);
             bidPriceInLocal = bidPriceInUsd = secondBidPriceInUsd = bidAfterRemovingRPsCut;
-            InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_DEAL_RESPONSES);
-            InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
 
             if (deal.isToBeBilledOnViewability()) {
                 InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_VIEWABILITY_RESPONSES);
@@ -1572,7 +1580,8 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
 
         } else if (StringUtils.isNotBlank(dealId)) {
             InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_DEAL_RESPONSES);
-            InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED);
+            InspectorStats.incrementStatCount(OVERALL_PMP_RESPONSE_STATS, DEAL_RESPONSES + dealId);
+            InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED + dealId);
             return false;
         } else {
             setEncryptedBid(ImpressionIdGenerator.getInstance().getEncryptedBid(originalBidPriceInUsd));

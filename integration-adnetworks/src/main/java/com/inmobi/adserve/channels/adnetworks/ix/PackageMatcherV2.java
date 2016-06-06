@@ -14,6 +14,7 @@ import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatCon
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -87,7 +88,9 @@ class PackageMatcherV2 {
 
         incrementPackageFilterStats(DROPPED_IN_PACKAGE_V2_VIEWABILITY_SDK_VERSIONS_ENFORCER_FILTER, droppedInViewabilitySdkVersionsEnforcerFilter);
 
-        log.debug("Packages (V2) selected: {}", matchedPackageIds.toArray());
+        if (log.isDebugEnabled()) {
+            log.debug("Packages (V2) selected: {}", Arrays.toString(matchedPackageIds.toArray()));
+        }
         return matchedPackageIds;
     }
 

@@ -434,7 +434,8 @@ public class IXPackageRepository extends AbstractCQEngineRepository {
             final Set<DealEntity> dealsSet = ImmutableSet.copyOf(newIXDealsSet);
             // TODO: Investigate whether this can cause any problems in the future
             indexedPackages.clear();
-            newIXDealsSet.clear();
+            indexedDeals.clear();
+
             indexedDeals.addAll(dealsSet);
             indexedPackages.addAll(packagesSet);
         }

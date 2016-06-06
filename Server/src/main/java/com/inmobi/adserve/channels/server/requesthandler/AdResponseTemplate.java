@@ -14,7 +14,7 @@ public class AdResponseTemplate {
     public static final String AD_IMAI_START_TAG = "<!DOCTYPE html>";
     public static final String NO_AD_IMAI = StringUtils.EMPTY;
     public static final String NO_AD_XHTML = "<AdResponse><Ads></Ads></AdResponse>";
-    public static final String NO_AD_VAST = "<AdResponse><Ads></Ads></AdResponse>";
+    public static final String NO_AD_VAST = "<VAST version=\"2.0\"></VAST>"; // SERV-4724
     public static final String DCP_NATIVE_WRAPPING_AD_JSON = "{\"requestId\":\"%s\",\"ads\":[%s]}";
 
     public static final String NO_AD_HTML = "<!-- mKhoj: No advt for this position -->";

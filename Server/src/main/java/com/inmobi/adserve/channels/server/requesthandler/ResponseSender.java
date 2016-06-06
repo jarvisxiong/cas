@@ -90,13 +90,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final int STORYBOARD_SDK_BASE_VERSION = 530;
     private static final Gson gson = new Gson();
 
-    /**
-     * At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then
-     * the bid is considered from the remaining DSP's.
-     */
-    protected static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
-
-
     @Setter
     @Getter
     private SASRequestParameters sasParams;
