@@ -114,6 +114,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_RTB_BALANCE_FILTER = "DroppedInRtbBalanceFilter";
     public static final String DROPPED_IN_RTB_BID_FLOOR_FILTER = "DroppedInRtbBidFloorFilter";
     public static final String DROPPED_IN_DEAL_FLOOR_FILTER = "DroppedInDealFloorFilter";
+    public static final String POTENTIALLY_DROPPED_IN_DEAL_FLOOR_FILTER = "PotentiallyDroppedInDealFloorFilter";
     public static final String DROPPED_IN_RTB_AUCTION_ID_MIS_MATCH_FILTER = "DroppedInRtbAuctionIdMisMatchFilter";
     public static final String DROPPED_IN_RTB_SEATID_MIS_MATCH_FILTER = "DroppedInRtbSeatidMisMatchFilter";
     public static final String DROPPED_IN_RTB_IMPRESSION_ID_MIS_MATCH_FILTER = "DroppedInRtbImpressionIdMisMatchFilter";
@@ -157,7 +158,7 @@ public class InspectorStrings {
     public static final String TOTAL_VIEWABILITY_RESPONSES = "TotalViewabilityResponses";
     public static final String INVALID_VIDEO_RESPONSE_COUNT = "InvalidVideoResponseCount";
     public static final String INVALID_MEDIA_PREFERENCES_JSON = "InvalidMediaPreferencesJson";
-    public static final String DROPPED_AS_MRAID_PATH_NOT_FOUND = "DroppedAsMraidPathWasMissing-";
+    public static final String MRAID_PATH_NOT_FOUND = "MraidPathWasMissing-";
     public static final String UNCAUGHT_EXCEPTIONS = "UncaughtExceptions";
     public static final String TRACKER_BEING_FETCHED_BEFORE_GENERATION = "trackerBeingFetchedBeforeGeneration";
     public static final String TOTAL_AGENCY_REBATE_DEAL_RESPONSES = "TotalAgencyRebateDealResponses";

@@ -151,8 +151,8 @@ public class Logging {
             final TSerializer tSerializer = new TSerializer(new TBinaryProtocol.Factory());
             final Message msg = new Message(tSerializer.serialize(adRR));
             dataBusPublisher.publish(rrLogKey, msg);
-            if (LOG.isDebugEnabled(traceMarker)) {
-                LOG.debug(traceMarker, "ADRR is : {}", adRR);
+            if (LOG.isInfoEnabled(traceMarker)) {
+                LOG.info(traceMarker, "ADRR is : {}", adRR);
             }
         }
         // Logging real time stats for graphite

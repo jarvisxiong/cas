@@ -293,8 +293,10 @@ public class ThriftRequestParser {
                 final Integer integrationVersion = details.isSetIntegrationVersion() ?
                         details.getIntegrationVersion() : null;
                 final String sdkVersion = getSdkVersion(details.integrationType, integrationVersion);
-                params.setSdkVersion(sdkVersion);
-                params.setImaiBaseUrl(getMraidPath(sdkVersion));
+                if (null != sdkVersion) {
+                    params.setSdkVersion(sdkVersion);
+                    params.setImaiBaseUrl(getMraidPath(sdkVersion));
+                }
             }
         }
     }

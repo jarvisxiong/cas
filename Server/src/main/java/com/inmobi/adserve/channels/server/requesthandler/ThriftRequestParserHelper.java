@@ -78,7 +78,7 @@ class ThriftRequestParserHelper {
         } else {
             mraidPath = null;
             log.info("Mraid Path not found for sdk version: {}", sdkVersion);
-            InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND + sdkVersion);
+            InspectorStats.incrementStatCount(InspectorStrings.MRAID_PATH_NOT_FOUND + sdkVersion);
         }
         return mraidPath;
     }

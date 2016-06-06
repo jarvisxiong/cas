@@ -23,6 +23,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.MOVIE_BOARD_RESP
 import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_TEMPLATE_MERGING_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NATIVE_VIDEO_RESPONSE_DROPPED_AS_VAST_XML_GENERATION_FAILED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.OVERALL_PMP_RESPONSE_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.POTENTIALLY_DROPPED_IN_DEAL_FLOOR_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.RESPONSE_DROPPED_AS_UNKNOWN_DEAL_WAS_RECEIVED;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER;
@@ -1545,6 +1546,10 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
             if (CollectionUtils.isEmpty(forwardedPackageIds) || !forwardedPackageIds.contains(packageId)) {
                 InspectorStats.incrementStatCount(advertiserName, RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED + dealId);
                 return false;
+            }
+
+            if (originalBidPriceInUsd < deal.getFloor()) {
+                InspectorStats.incrementStatCount(advertiserName, POTENTIALLY_DROPPED_IN_DEAL_FLOOR_FILTER);
             }
 
             final boolean geoCookieWasUsed = null != packageToGeocookieServed ? packageToGeocookieServed.get(deal.getPackageId()) : false;

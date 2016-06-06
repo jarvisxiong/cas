@@ -16,6 +16,9 @@ import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionF
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Singleton
 public class AuctionDealFloorFilter extends AbstractAuctionFilter {
     private static final double ZERO = 0d;
@@ -23,27 +26,24 @@ public class AuctionDealFloorFilter extends AbstractAuctionFilter {
     @Inject
     protected AuctionDealFloorFilter(final Provider<Marker> traceMarkerProvider, final ServerConfig serverConfiguration) {
         super(traceMarkerProvider, InspectorStrings.DROPPED_IN_DEAL_FLOOR_FILTER, serverConfiguration);
-        isApplicableRTBD = true;
-        isApplicableIX = true;
+        isApplicableRTBD = false;
+        isApplicableIX = false;
     }
 
     // TODO: Should data vendor cost be consumed?
     @Override
-    protected boolean failedInFilter(final ChannelSegment channelSegment, final CasInternalRequestParameters casInternal) {
+    protected boolean failedInFilter(final ChannelSegment segment, final CasInternalRequestParameters casParams) {
 
-        final AdNetworkInterface adNetwork = channelSegment.getAdNetworkInterface();
-        final DealEntity deal = adNetwork.getDeal();
+        final AdNetworkInterface adn = segment.getAdNetworkInterface();
+        final DealEntity deal = adn.getDeal();
 
-        final Double discount = adNetwork instanceof IXAdNetwork ?
-                CasConfigUtil.getAdapterConfig().getDouble("ix.rubiconCutsInDeal", 0.0) : 0.0;
+        final Double bid = adn instanceof IXAdNetwork ?
+                ((IXAdNetwork)adn).getOriginalBidPriceInUsd() : adn.getBidPriceInUsd();
 
-        final double dealFloorInUSD;
-        if (null != deal) {
-            dealFloorInUSD = CasConfigUtil.repositoryHelper.calculatePriceInUSD(deal.getFloor(), deal.getCurrency());
-        } else {
-            dealFloorInUSD = ZERO;
-        }
-        return adNetwork.getBidPriceInUsd() < dealFloorInUSD * (1 - discount);
+        final double dealFloorInUSD = null != deal ?
+                CasConfigUtil.repositoryHelper.calculatePriceInUSD(deal.getFloor(), deal.getCurrency()) : ZERO;
+
+        return bid < dealFloorInUSD;
     }
 
 }
