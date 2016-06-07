@@ -38,7 +38,7 @@ import org.json.JSONException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
+import com.googlecode.cqengine.CQEngine;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.index.hash.HashIndex;
 import com.googlecode.cqengine.index.unique.UniqueIndex;
@@ -81,8 +81,8 @@ public class IXPackageRepository extends AbstractCQEngineRepository {
 
         super.init(logger, dataSource, config, instanceName, new IXPackageReaderDelegate());
 
-        indexedPackages = new ConcurrentIndexedCollection<>();
-        indexedDeals = new ConcurrentIndexedCollection<>();
+        indexedPackages = CQEngine.newInstance();
+        indexedDeals = CQEngine.newInstance();
 
         indexedPackages.addIndex(HashIndex.onAttribute(SITE_ID));
         indexedPackages.addIndex(HashIndex.onAttribute(COUNTRY_ID));

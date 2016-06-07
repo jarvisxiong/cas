@@ -3,12 +3,14 @@ package com.inmobi.adserve.channels.repository.pmp;
 
 import static com.googlecode.cqengine.query.QueryFactory.all;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.MultiValueAttribute;
 import com.googlecode.cqengine.attribute.MultiValueNullableAttribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
-import com.googlecode.cqengine.query.option.QueryOptions;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.IntegrationMethod;
@@ -32,198 +34,198 @@ public final class TargetingSegmentAttributes {
 
     public static final Attribute<TargetingSegmentEntity, DemandSourceType> DST_IDS = new MultiValueAttribute<TargetingSegmentEntity, DemandSourceType>("dsts") {
         @Override
-        public Iterable<DemandSourceType> getValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getDsts();
+        public List<DemandSourceType> getValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getDsts());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, String> DSP_IDS = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("dsps", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getDsps();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getDsps());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, InventoryType> INC_INVENTORY_TYPES = new MultiValueNullableAttribute<TargetingSegmentEntity, InventoryType>("includedInventoryType", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<InventoryType> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedInventoryTypes();
+        public List<InventoryType> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedInventoryTypes());
         }
     };
     
     public static final Attribute<TargetingSegmentEntity, InventoryType> EXC_INVENTORY_TYPES = new MultiValueNullableAttribute<TargetingSegmentEntity, InventoryType>("excludedInventoryType", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<InventoryType> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedInventoryTypes();
+        public List<InventoryType> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedInventoryTypes());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, ContentType> INC_SITE_CONTENT_TYPES = new MultiValueNullableAttribute<TargetingSegmentEntity, ContentType>("includedSiteContentRatings", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<ContentType> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedSiteContentTypes();
+        public List<ContentType> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedSiteContentTypes());
         }
     };
     
     public static final Attribute<TargetingSegmentEntity, ContentType> EXC_SITE_CONTENT_TYPES = new MultiValueNullableAttribute<TargetingSegmentEntity, ContentType>("excludedSiteContentRatings", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<ContentType> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedSiteContentTypes();
+        public List<ContentType> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedSiteContentTypes());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, ConnectionType> INC_CONNECTION_TYPES = new MultiValueNullableAttribute<TargetingSegmentEntity, ConnectionType>("includedConnectionTypes", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<ConnectionType> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedConnectionTypes();
+        public List<ConnectionType> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedConnectionTypes());
         }
     };
     
     public static final Attribute<TargetingSegmentEntity, ConnectionType> EXC_CONNECTION_TYPES = new MultiValueNullableAttribute<TargetingSegmentEntity, ConnectionType>("excludedConnectionTypes", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<ConnectionType> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedConnectionTypes();
+        public List<ConnectionType> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedConnectionTypes());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, LocationSource> INC_LOCATION_SOURCES = new MultiValueNullableAttribute<TargetingSegmentEntity, LocationSource>("includedLocationSources", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<LocationSource> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedLocationSources();
+        public List<LocationSource> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedLocationSources());
         }
     };
     
     public static final Attribute<TargetingSegmentEntity, LocationSource> EXC_LOCATION_SOURCES = new MultiValueNullableAttribute<TargetingSegmentEntity, LocationSource>("excludedLocationSources", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<LocationSource> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedLocationSources();
+        public List<LocationSource> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedLocationSources());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, IntegrationMethod> INC_INTEGRATION_METHODS = new MultiValueNullableAttribute<TargetingSegmentEntity, IntegrationMethod>("includedIntegrationMethods", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<IntegrationMethod> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedIntegrationMethod();
+        public List<IntegrationMethod> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedIntegrationMethod());
         }
     };
     
     public static final Attribute<TargetingSegmentEntity, IntegrationMethod> EXC_INTEGRATION_METHODS = new MultiValueNullableAttribute<TargetingSegmentEntity, IntegrationMethod>("excludedIntegrationMethods", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<IntegrationMethod> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedIntegrationMethod();
+        public List<IntegrationMethod> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedIntegrationMethod());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Short> INC_SLOTS = new MultiValueNullableAttribute<TargetingSegmentEntity, Short>("includedSlots", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Short> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedSlots();
+        public List<Short> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedSlots());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Short> EXC_SLOTS = new MultiValueNullableAttribute<TargetingSegmentEntity, Short>("excludedSlots", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Short> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedSlots();
+        public List<Short> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedSlots());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, SecondaryAdFormatConstraints> INC_AD_FORMATS = new MultiValueNullableAttribute<TargetingSegmentEntity, SecondaryAdFormatConstraints>("includedAdTypes", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<SecondaryAdFormatConstraints> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedAdTypes();
+        public List<SecondaryAdFormatConstraints> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedAdTypes());
         }
     };
     
     public static final Attribute<TargetingSegmentEntity, SecondaryAdFormatConstraints> EXC_AD_FORMATS = new MultiValueNullableAttribute<TargetingSegmentEntity, SecondaryAdFormatConstraints>("excludedAdTypes", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<SecondaryAdFormatConstraints> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedAdTypes();
+        public List<SecondaryAdFormatConstraints> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedAdTypes());
         }
     };
 
 
     public static final Attribute<TargetingSegmentEntity, String> INC_PUBLISHERS = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("includedPublishers", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedPublishers();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedPublishers());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, String> EXC_PUBLISHERS = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("excludedPublishers", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedPublishers();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedPublishers());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, String> INC_SITES = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("includedSites", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedSites();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedSites());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, String> EXC_SITES = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("excludedSites", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedSites();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedSites());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Long> INC_CARRIERS = new MultiValueNullableAttribute<TargetingSegmentEntity, Long>("includedCarriers", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Long> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedCarriers();
+        public List<Long> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedCarriers());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Long> EXC_CARRIERS = new MultiValueNullableAttribute<TargetingSegmentEntity, Long>("excludedCarriers", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Long> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedCarriers();
+        public List<Long> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedCarriers());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, String> INC_LANGUAGES = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("includedLanguages", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getIncludedLanguages();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getIncludedLanguages());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, String> EXC_LANGUAGES = new MultiValueNullableAttribute<TargetingSegmentEntity, String>("excludedLanguages", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<String> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getExcludedLanguages();
+        public List<String> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getExcludedLanguages());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Integer> OS_IDS = new MultiValueNullableAttribute<TargetingSegmentEntity, Integer>("osSet", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Integer> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getOsSet();
+        public List<Integer> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getOsSet());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Integer> COUNTRY_IDS = new MultiValueNullableAttribute<TargetingSegmentEntity, Integer>("countries", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Integer> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getCountries();
+        public List<Integer> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getCountries());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Long> MANUF_IDS = new MultiValueNullableAttribute<TargetingSegmentEntity, Long>("manufacturers", COLLECTION_MIGHT_BE_NULL) {
         @Override
-        public Iterable<Long> getNullableValues(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getManufacturers();
+        public List<Long> getNullableValues(final TargetingSegmentEntity o) {
+            return new ArrayList<>(o.getManufacturers());
         }
     };
 
     public static final Attribute<TargetingSegmentEntity, Long> TARGETING_SEGMENT_ID = new SimpleAttribute<TargetingSegmentEntity, Long>("id") {
         @Override
-        public Long getValue(TargetingSegmentEntity tse, QueryOptions qo) {
-            return tse.getId();
+        public Long getValue(final TargetingSegmentEntity o) {
+            return o.getId();
         }
     };
 

@@ -6,11 +6,11 @@ import static lombok.AccessLevel.PRIVATE;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.MultiValueAttribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
-import com.googlecode.cqengine.query.option.QueryOptions;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.Country;
@@ -31,8 +31,8 @@ public final class DeprecatedIXPackageAttributes {
     public static final Attribute<IXPackageEntity, String> SITE_ID = new MultiValueAttribute<IXPackageEntity, String>(
             "site_id") {
         @Override
-        public Iterable<String> getValues(IXPackageEntity pe, QueryOptions qo) {
-            final Segment segment = pe.getSegment();
+        public List<String> getValues(final IXPackageEntity o) {
+            final Segment segment = o.getSegment();
 
             Collection<String> siteIds = null;
             final SegmentParameter<?> siteIdParam = segment.getSegmentParameters().get(SiteId.class.getName());
@@ -49,8 +49,8 @@ public final class DeprecatedIXPackageAttributes {
     public static final Attribute<IXPackageEntity, Integer> COUNTRY_ID =
             new MultiValueAttribute<IXPackageEntity, Integer>("country_id") {
                 @Override
-                public Iterable<Integer> getValues(IXPackageEntity pe, QueryOptions qo) {
-                    final Segment segment = pe.getSegment();
+                public List<Integer> getValues(final IXPackageEntity o) {
+                    final Segment segment = o.getSegment();
                     Collection<Integer> countryIds = null;
                     final SegmentParameter<?> countryIdParam =
                             segment.getSegmentParameters().get(Country.class.getName());
@@ -67,8 +67,8 @@ public final class DeprecatedIXPackageAttributes {
     public static final Attribute<IXPackageEntity, Integer> OS_ID = new MultiValueAttribute<IXPackageEntity, Integer>(
             "os_id") {
         @Override
-        public Iterable<Integer> getValues(IXPackageEntity pe, QueryOptions qo) {
-            final Segment segment = pe.getSegment();
+        public List<Integer> getValues(final IXPackageEntity o) {
+            final Segment segment = o.getSegment();
 
             Collection<Integer> osIds = null;
             final SegmentParameter<?> osIdParam = segment.getSegmentParameters().get(DeviceOs.class.getName());
@@ -85,8 +85,8 @@ public final class DeprecatedIXPackageAttributes {
     public static final Attribute<IXPackageEntity, Integer> SLOT_ID =
             new MultiValueAttribute<IXPackageEntity, Integer>("slot_id") {
                 @Override
-                public Iterable<Integer> getValues(IXPackageEntity pe, QueryOptions qo) {
-                    final Segment segment = pe.getSegment();
+                public List<Integer> getValues(final IXPackageEntity o) {
+                    final Segment segment = o.getSegment();
 
                     Collection<Integer> slotIds = null;
                     final SegmentParameter<?> slotIdParam = segment.getSegmentParameters().get(SlotId.class.getName());
@@ -102,8 +102,8 @@ public final class DeprecatedIXPackageAttributes {
 
     public static final Attribute<IXPackageEntity, Integer> PACKAGE_ID = new SimpleAttribute<IXPackageEntity, Integer>("packageId") {
         @Override
-        public Integer getValue(IXPackageEntity ixPe, QueryOptions qo) {
-            return ixPe.getId();
+        public Integer getValue(final IXPackageEntity o) {
+            return o.getId();
         }
     };
 }

@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.repository.pmp;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.attribute.SimpleNullableAttribute;
-import com.googlecode.cqengine.query.option.QueryOptions;
 import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.casthrift.DemandSourceType;
 
@@ -18,29 +17,29 @@ public final class DealAttributes {
 
     public static final Attribute<DealEntity, String> DEAL_ID = new SimpleAttribute<DealEntity, String>("id") {
         @Override
-        public String getValue(final DealEntity de, final QueryOptions qo) {
-            return de.getId();
+        public String getValue(final DealEntity o) {
+            return o.getId();
         }
     };
 
     public static final Attribute<DealEntity, Integer> PACKAGE_ID = new SimpleAttribute<DealEntity, Integer>("packageId") {
         @Override
-        public Integer getValue(final DealEntity de, final QueryOptions qo) {
-            return de.getPackageId();
+        public Integer getValue(final DealEntity o) {
+            return o.getPackageId();
         }
     };
 
     public static final Attribute<DealEntity, DemandSourceType> DST_ID = new SimpleAttribute<DealEntity, DemandSourceType>("dst") {
         @Override
-        public DemandSourceType getValue(final DealEntity de, final QueryOptions qo) {
-            return de.getDst();
+        public DemandSourceType getValue(final DealEntity o) {
+            return o.getDst();
         }
     };
 
     public static final Attribute<DealEntity, String> DSP_ID = new SimpleNullableAttribute<DealEntity, String>("dsp") {
         @Override
-        public String getValue(final DealEntity de, final QueryOptions qo) {
-            return de.getDsp();
+        public String getValue(final DealEntity o) {
+            return o.getDsp();
         }
     };
 }

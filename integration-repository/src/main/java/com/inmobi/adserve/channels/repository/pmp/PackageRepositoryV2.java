@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
+import com.googlecode.cqengine.CQEngine;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.index.compound.CompoundIndex;
 import com.googlecode.cqengine.index.hash.HashIndex;
@@ -97,9 +97,9 @@ public class PackageRepositoryV2 extends AbstractCQEngineRepository {
         super.init(logger, dataSource, config, instanceName, new PackageReaderDelegateV2());
 
         // Creating CQ Engine Collections
-        indexedTargetingSegments = new ConcurrentIndexedCollection<>();
-        indexedPackages = new ConcurrentIndexedCollection<>();
-        indexedDeals = new ConcurrentIndexedCollection<>();
+        indexedTargetingSegments = CQEngine.newInstance();
+        indexedPackages = CQEngine.newInstance();
+        indexedDeals = CQEngine.newInstance();
 
         // Indexes
         indexedTargetingSegments.addIndex(CompoundIndex.onAttributes(DST_IDS, DSP_IDS, INC_INVENTORY_TYPES, EXC_INVENTORY_TYPES, INC_SITE_CONTENT_TYPES, EXC_SITE_CONTENT_TYPES));
