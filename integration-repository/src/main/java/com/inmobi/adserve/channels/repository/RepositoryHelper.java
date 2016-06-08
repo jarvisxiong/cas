@@ -488,10 +488,12 @@ public class RepositoryHelper {
     public ResultSet<IXPackageEntity> queryIXPackageRepository(final int osId, final String siteId,
             final int countryId, final int slotId) {
         // Prepare query for CQEngine repository
-        final Query<IXPackageEntity> query = and(in(OS_ID, osId, ALL_OS_ID),
-                        in(SITE_ID, siteId, ALL_SITE_ID),
-                        in(COUNTRY_ID, countryId, ALL_COUNTRY_ID),
-                        in(SLOT_ID, slotId, ALL_SLOT_ID));
+        final Query<IXPackageEntity> query = and(
+                    or(equal(OS_ID, osId), equal(OS_ID, ALL_OS_ID)),
+                    or(equal(SITE_ID, siteId), equal(SITE_ID, ALL_SITE_ID)),
+                    or(equal(COUNTRY_ID, countryId), equal(COUNTRY_ID, ALL_COUNTRY_ID)),
+                    or(equal(SLOT_ID, slotId), equal(SLOT_ID, ALL_SLOT_ID))
+        );
         return ixPackageRepository.getIndexedPackages().retrieve(query);
     }
 

@@ -3,14 +3,13 @@ package com.inmobi.adserve.channels.repository.pmp;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.MultiValueAttribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
+import com.googlecode.cqengine.query.option.QueryOptions;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.Country;
@@ -31,8 +30,8 @@ public final class DeprecatedIXPackageAttributes {
     public static final Attribute<IXPackageEntity, String> SITE_ID = new MultiValueAttribute<IXPackageEntity, String>(
             "site_id") {
         @Override
-        public List<String> getValues(final IXPackageEntity o) {
-            final Segment segment = o.getSegment();
+        public Iterable<String> getValues(IXPackageEntity pe, QueryOptions qo) {
+            final Segment segment = pe.getSegment();
 
             Collection<String> siteIds = null;
             final SegmentParameter<?> siteIdParam = segment.getSegmentParameters().get(SiteId.class.getName());
@@ -42,15 +41,15 @@ public final class DeprecatedIXPackageAttributes {
             if (siteIds == null || siteIds.isEmpty()) {
                 siteIds = Collections.singleton(ALL_SITE_ID);
             }
-            return new ArrayList<>(siteIds);
+            return siteIds;
         }
     };
 
     public static final Attribute<IXPackageEntity, Integer> COUNTRY_ID =
             new MultiValueAttribute<IXPackageEntity, Integer>("country_id") {
                 @Override
-                public List<Integer> getValues(final IXPackageEntity o) {
-                    final Segment segment = o.getSegment();
+                public Iterable<Integer> getValues(IXPackageEntity pe, QueryOptions qo) {
+                    final Segment segment = pe.getSegment();
                     Collection<Integer> countryIds = null;
                     final SegmentParameter<?> countryIdParam =
                             segment.getSegmentParameters().get(Country.class.getName());
@@ -60,15 +59,15 @@ public final class DeprecatedIXPackageAttributes {
                     if (countryIds == null || countryIds.isEmpty()) {
                         countryIds = Collections.singleton(ALL_COUNTRY_ID);
                     }
-                    return new ArrayList<>(countryIds);
+                    return countryIds;
                 }
             };
 
     public static final Attribute<IXPackageEntity, Integer> OS_ID = new MultiValueAttribute<IXPackageEntity, Integer>(
             "os_id") {
         @Override
-        public List<Integer> getValues(final IXPackageEntity o) {
-            final Segment segment = o.getSegment();
+        public Iterable<Integer> getValues(IXPackageEntity pe, QueryOptions qo) {
+            final Segment segment = pe.getSegment();
 
             Collection<Integer> osIds = null;
             final SegmentParameter<?> osIdParam = segment.getSegmentParameters().get(DeviceOs.class.getName());
@@ -78,15 +77,15 @@ public final class DeprecatedIXPackageAttributes {
             if (osIds == null || osIds.isEmpty()) {
                 osIds = Collections.singleton(ALL_OS_ID);
             }
-            return new ArrayList<>(osIds);
+            return osIds;
         }
     };
 
     public static final Attribute<IXPackageEntity, Integer> SLOT_ID =
             new MultiValueAttribute<IXPackageEntity, Integer>("slot_id") {
                 @Override
-                public List<Integer> getValues(final IXPackageEntity o) {
-                    final Segment segment = o.getSegment();
+                public Iterable<Integer> getValues(IXPackageEntity pe, QueryOptions qo) {
+                    final Segment segment = pe.getSegment();
 
                     Collection<Integer> slotIds = null;
                     final SegmentParameter<?> slotIdParam = segment.getSegmentParameters().get(SlotId.class.getName());
@@ -96,14 +95,14 @@ public final class DeprecatedIXPackageAttributes {
                     if (slotIds == null || slotIds.isEmpty()) {
                         slotIds = Collections.singleton(ALL_SLOT_ID);
                     }
-                    return new ArrayList<>(slotIds);
+                    return slotIds;
                 }
             };
 
     public static final Attribute<IXPackageEntity, Integer> PACKAGE_ID = new SimpleAttribute<IXPackageEntity, Integer>("packageId") {
         @Override
-        public Integer getValue(final IXPackageEntity o) {
-            return o.getId();
+        public Integer getValue(IXPackageEntity ixPe, QueryOptions qo) {
+            return ixPe.getId();
         }
     };
 }

@@ -344,7 +344,10 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public boolean makeAsyncRequest() {
-        LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("In Adapter {}", this.getClass().getSimpleName());
+        }
+
         if (useJsAdTag()) {
             startTime = System.currentTimeMillis();
             buildInmobiAdTracker();

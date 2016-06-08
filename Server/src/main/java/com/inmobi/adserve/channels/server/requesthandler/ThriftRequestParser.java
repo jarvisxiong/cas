@@ -75,7 +75,8 @@ public class ThriftRequestParser {
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
             final CasInternalRequestParameters casInternal, final int dst) {
         LOG.debug("Inside parameter parser : ThriftParser");
-        params.setAllParametersJson(tObject.toString());
+        LOG.debug("AdPoolRequest: {}", tObject);
+
         params.setDst(dst);
         params.setDemandSourceType(DemandSourceType.findByValue(dst));
         // Fill params from AdPoolRequest Object
@@ -168,7 +169,7 @@ public class ThriftRequestParser {
         //setting the napp score for supply
         populateNappScore(params, tObject.getMappResponse());
 
-        LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
+        LOG.debug("Successfully parsed tObject, SAS params are : {}", params);
     }
 
     private void setCarrier(final AdPoolRequest tObject, final SASRequestParameters params) {

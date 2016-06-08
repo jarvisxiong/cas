@@ -26,12 +26,14 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
     private final String inspectorString;
     private FilterOrder order;
     private final ServerConfig serverConfiguration;
+    private final String className;
 
     protected AbstractAuctionFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString,
             final ServerConfig serverConfiguration) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.inspectorString = inspectorString;
         this.serverConfiguration = serverConfiguration;
+        this.className = this.getClass().getSimpleName();
     }
 
     @Override
@@ -51,11 +53,11 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
 
             if (result) {
                 iterator.remove();
-                log.debug(traceMarker, "Failed in auction filter {}  , advertiser {}", this.getClass().getSimpleName(),
+                log.debug(traceMarker, "Failed in auction filter {}, advertiser {}", className,
                         channelSegment.getAdNetworkInterface().getName());
                 incrementStats(channelSegment);
             } else {
-                log.debug(traceMarker, "Passed in auction filter {} ,  advertiser {}", this.getClass().getSimpleName(),
+                log.debug(traceMarker, "Passed in auction filter {}, advertiser {}", className,
                         channelSegment.getAdNetworkInterface().getName());
             }
         }
@@ -89,7 +91,7 @@ public abstract class AbstractAuctionFilter implements AuctionFilter {
 
     @Override
     public boolean isApplicable(final String advertiserId) {
-        return !serverConfiguration.getExcludedAdvertisers(this.getClass().getSimpleName()).contains(advertiserId);
+        return !serverConfiguration.getExcludedAdvertisers(className).contains(advertiserId);
     }
 
     @Override

@@ -23,10 +23,12 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
     private final Provider<Marker> traceMarkerProvider;
     private final String inspectorString;
     private FilterOrder order;
+    private final String className;
 
     protected AbstractAdvertiserLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.inspectorString = inspectorString;
+        this.className = this.getClass().getSimpleName();
     }
 
     @Override
@@ -44,13 +46,13 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
             final ChannelSegment channelSegment = matchedSegmentDetail.getChannelSegmentList().get(0);
             final boolean result = failedInFilter(channelSegment, sasParams);
             final String advertiserId = channelSegment.getChannelSegmentEntity().getAdvertiserId();
-            final String filterName = this.getClass().getSimpleName();
+
             if (result) {
                 iterator.remove();
-                LOG.debug(traceMarker, "Failed in filter: {}, advertiser: {}", filterName, advertiserId);
+                LOG.debug(traceMarker, "Failed in filter: {}, advertiser: {}", className, advertiserId);
                 incrementStats(matchedSegmentDetail.getChannelSegmentList());
             } else {
-                LOG.debug(traceMarker, "Passed in filter: {}, advertiser: {}", filterName, advertiserId);
+                LOG.debug(traceMarker, "Passed in filter: {}, advertiser: {}", className, advertiserId);
             }
         }
     }
@@ -71,3 +73,4 @@ public abstract class AbstractAdvertiserLevelFilter implements AdvertiserLevelFi
         return order;
     }
 }
+

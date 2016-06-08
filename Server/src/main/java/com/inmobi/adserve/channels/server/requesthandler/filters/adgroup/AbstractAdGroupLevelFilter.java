@@ -19,10 +19,12 @@ public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
     protected final Provider<Marker> traceMarkerProvider;
     private final String inspectorString;
     private FilterOrder order;
+    private final String className;
 
     protected AbstractAdGroupLevelFilter(final Provider<Marker> traceMarkerProvider, final String inspectorString) {
         this.traceMarkerProvider = traceMarkerProvider;
         this.inspectorString = inspectorString;
+        this.className = this.getClass().getSimpleName();
     }
 
     @Override
@@ -37,11 +39,11 @@ public abstract class AbstractAdGroupLevelFilter implements AdGroupLevelFilter {
             if (result) {
                 iterator.remove();
                 log.debug(traceMarker, "Failed in filter: {}, adgroup: {}, advertiser: {}",
-                        this.getClass().getSimpleName(), adgroupId, advertiserId);
+                        className, adgroupId, advertiserId);
                 incrementStats(channelSegment);
             } else {
                 log.debug(traceMarker, "Passed in filter: {}, adgroup: {}, advertiser: {}",
-                        this.getClass().getSimpleName(), adgroupId, advertiserId);
+                        className, adgroupId, advertiserId);
             }
         }
     }

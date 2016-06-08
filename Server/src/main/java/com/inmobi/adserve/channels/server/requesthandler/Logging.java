@@ -128,7 +128,7 @@ public class Logging {
         if (null != sasParams) {
             final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
             InspectorStats.incrementStatCount(dst + "-" + LATENCY, totalTime);
-            if (null != sasParams.getAllParametersJson() && (rankList == null || rankList.isEmpty())) {
+            if (CollectionUtils.isEmpty(rankList)) {
                 InspectorStats.incrementStatCount(NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + NO_MATCH_SEGMENT_COUNT);
                 InspectorStats.incrementStatCount(dst + "-" + NO_MATCH_SEGMENT_LATENCY, totalTime);
