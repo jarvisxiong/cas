@@ -14,6 +14,7 @@ public class InspectorStrings {
     public static final String RULE_ENGINE_REQUESTS = "RuleEngineRequests";
     public static final String BACK_FILL_REQUESTS = "BackFillRequests";
     public static final String IX_REQUESTS = "IXRequests";
+    public static final String IX_REQUEST_DROPPED_FOR_NAPP_SCORE_40 = "IXRequestDroppedForNappScore40";
     public static final String TOTAL_NATIVE_REQUESTS = "TotalNativeRequests";
     public static final String TOTAL_NATIVE_RESPONSES = "TotalNativeResponses";
     public static final String TOTAL_NATIVE_VIDEO_RESPONSES = "TotalNativeVideoResponses";

@@ -3,10 +3,12 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import static com.inmobi.adserve.adpool.IntegrationMethod.SDK;
 import static com.inmobi.adserve.adpool.IntegrationType.ANDROID_SDK;
 import static com.inmobi.adserve.adpool.IntegrationType.IOS_SDK;
+import static com.inmobi.adserve.channels.api.SASRequestParameters.NappScore.MAYBE_BAD_SCORE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BANNER_NOT_ALLOWED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.CHINA_MOBILE_TARGETING;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_SLOT_REQUEST;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IX_REQUEST_DROPPED_FOR_NAPP_SCORE_40;
 import static com.inmobi.adserve.channels.util.InspectorStrings.JSON_PARSING_ERROR;
 import static com.inmobi.adserve.channels.util.InspectorStrings.LOW_SDK_VERSION;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_CATEGORY;
@@ -21,6 +23,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.THRIFT_PARSING_E
 import java.util.ArrayList;
 import java.util.List;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters.NappScore;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -63,6 +66,14 @@ public class RequestFilters {
 
         final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
         final String dstName = dst != null ? "-" + dst.name() : "-UNKNOWN_DST";
+
+        final NappScore nappScore = sasParams.getNappScore();
+        if (MAYBE_BAD_SCORE == nappScore && dst == DemandSourceType.IX) {
+            LOG.debug("Terminating IX request as NappScore : {}", nappScore.name());
+            hrh.setTerminationReason(CasConfigUtil.NAPP_SCORE_LESS_THAN_40);
+            InspectorStats.incrementStatCount(TERMINATED_REQUESTS, IX_REQUEST_DROPPED_FOR_NAPP_SCORE_40);
+            return true;
+        }
 
         if (CollectionUtils.isEmpty(sasParams.getCategories())) {
             LOG.info("Category field is not present in the request so sending noad");
