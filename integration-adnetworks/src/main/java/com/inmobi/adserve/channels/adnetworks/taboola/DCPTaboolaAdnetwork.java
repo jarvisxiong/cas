@@ -171,7 +171,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             final TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
             if (taboolaResponse.getList().length > 0) {
                 StringBuilder responseBuilder = new StringBuilder();
-                final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId());
+                final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId(),taboolaResponse.getSession());
                 for (NativeJson taboolaNative : taboolaResponse.getList()) {
                     final App.Builder appBuilder = App.newBuilder();
                     updateNativeParams(params, nurl, beacon);
