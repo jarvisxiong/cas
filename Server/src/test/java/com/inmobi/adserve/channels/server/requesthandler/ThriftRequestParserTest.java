@@ -5,33 +5,18 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import com.inmobi.adserve.adpool.*;
+import com.inmobi.adserve.adpool.ResponseFormat;
+import com.inmobi.user.photon.datatypes.attribute.core.CoreAttributes;
+import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
+import com.inmobi.user.photon.datatypes.commons.attribute.ValueProperties;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.inmobi.adserve.adpool.AdCodeType;
-import com.inmobi.adserve.adpool.AdPoolRequest;
-import com.inmobi.adserve.adpool.Carrier;
-import com.inmobi.adserve.adpool.ContentType;
-import com.inmobi.adserve.adpool.Device;
-import com.inmobi.adserve.adpool.DeviceType;
-import com.inmobi.adserve.adpool.Geo;
-import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationType;
-import com.inmobi.adserve.adpool.LatLong;
-import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.adpool.ResponseFormat;
-import com.inmobi.adserve.adpool.Site;
-import com.inmobi.adserve.adpool.SupplyContentType;
-import com.inmobi.adserve.adpool.User;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
@@ -478,7 +463,100 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getDst(), 6);
         assertEquals(sasRequestParameters.getProcessedMkSlot(), Arrays.asList((short) 3, (short) 4, (short) 1, (short) 10, (short) 9, (short) 11, (short) 12));
         selectedSlots.clear();
+    }
 
 
+    @Test
+    public void testSasParamCSITagUpdateLogic() {
+        final Site site = new Site();
+        site.setContentRatingDeprecated(ContentRating.FAMILY_SAFE);
+        site.setCpcFloor(1);
+        site.setEcpmFloor(3.2);
+        site.setInventoryType(InventoryType.APP);
+        site.setSiteId("siteId");
+        site.setSiteIncId(12345);
+        site.setPublisherId("publisherId");
+        site.setSiteUrl("siteUrl");
+        final Device device = new Device();
+        final Carrier carrier = new Carrier();
+        final User user = new User();
+        final Geo geo = new Geo();
+        final Set<Integer> stateIds = new HashSet<Integer>();
+        final IntegrationDetails integrationDetails = new IntegrationDetails();
+        final AdPoolRequest adPoolRequest = new AdPoolRequest();
+        adPoolRequest.setSite(site);
+        adPoolRequest.setDevice(device);
+        adPoolRequest.setCarrier(carrier);
+        adPoolRequest.setUser(user);
+        adPoolRequest.setGeo(geo);
+        adPoolRequest.setRequestedAdType(RequestedAdType.INTERSTITIAL);
+        final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        final SASRequestParameters sasRequestParameters = new SASRequestParameters();
+
+        // userProfileCSiTAG and coreAttribute CSIIds are null
+        try {
+            thriftRequestParser
+                    .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+            Assert.assertTrue(sasRequestParameters.getCsiTags() != null);
+        } catch (final Exception e) {
+            Assert.assertFalse(true);
+        }
+
+        // userProfileCSiTAG not null and coreAttribute CSIIds are null
+        final Set<Integer> umpCSITag = new HashSet<>();
+        umpCSITag.add(1);
+        final UserProfile userProfile = new UserProfile();
+        userProfile.setCsiTags(umpCSITag);
+        adPoolRequest.getUser().setUserProfile(userProfile);
+        try {
+            thriftRequestParser
+                    .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+            Assert.assertEquals(sasRequestParameters.getCsiTags(), umpCSITag);
+        } catch (final Exception e) {
+            Assert.assertFalse(true);
+        }
+
+        // userProfileCSiTAG  null and coreAttribute CSIIds are not null
+        final Map<Integer, ValueProperties> valuePropertiesMap = new HashMap<>();
+        valuePropertiesMap.put(1, new ValueProperties());
+
+        final Map<String, Map<Integer, ValueProperties>> valueMap = new HashMap<>();
+        valueMap.put("BRAND", valuePropertiesMap);
+
+        final IntAttribute intAttribute = new IntAttribute();
+        intAttribute.setValueMap(valueMap);
+
+        final CoreAttributes coreAttributes = new CoreAttributes();
+        coreAttributes.setCsids(intAttribute);
+
+        userProfile.setCsiTags(null);
+        adPoolRequest.getUser().setUserProfile(userProfile);
+        adPoolRequest.setCoreAttributes(coreAttributes);
+        final Set<Integer> expectedSet = new HashSet<>();
+        expectedSet.add(1);
+        try {
+            thriftRequestParser
+                    .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+            Assert.assertEquals(sasRequestParameters.getCsiTags(), expectedSet);
+        } catch (final Exception e) {
+            e.printStackTrace();
+            Assert.assertFalse(true);
+        }
+
+        // userProfileCSiTAG  not null and coreAttribute CSIIds are not null
+        umpCSITag.add(2);
+        userProfile.setCsiTags(umpCSITag);
+        adPoolRequest.getUser().setUserProfile(userProfile);
+        adPoolRequest.setCoreAttributes(coreAttributes);
+        expectedSet.add(1);
+        expectedSet.add(2);
+        try {
+            thriftRequestParser
+                    .parseRequestParameters(adPoolRequest, sasRequestParameters, casInternalRequestParameters, 6);
+            Assert.assertEquals(sasRequestParameters.getCsiTags(), expectedSet);
+        } catch (final Exception e) {
+            e.printStackTrace();
+            Assert.assertFalse(true);
+        }
     }
 }

@@ -19,6 +19,7 @@ prod:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -48,7 +49,10 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1010.user.uj1.inmobi.com 192.168.96.185:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uj1.inmobi.com 192.168.96.186:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uj1.inmobi.com 192.168.96.188:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     uh1:
         cas:
             database:
@@ -68,6 +72,7 @@ prod:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 250
             rtbd:
@@ -96,7 +101,10 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     lhr1:
         cas:
             database:
@@ -116,6 +124,7 @@ prod:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -144,6 +153,10 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_servers:
+          - 'usr1011.user.lhr1.inmobi.com 10.72.94.130:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.lhr1.inmobi.com 10.72.90.122:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.lhr1.inmobi.com 10.72.94.131:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
 
     hkg1:
         cas:
@@ -164,6 +177,7 @@ prod:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -192,7 +206,11 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1010.user.hkg1.inmobi.com 10.56.62.127:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.hkg1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.hkg1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.hkg1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
 pilot:
     uj1:
         cas:
@@ -213,6 +231,7 @@ pilot:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -241,7 +260,10 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1010.user.uj1.inmobi.com 192.168.96.185:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uj1.inmobi.com 192.168.96.186:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uj1.inmobi.com 192.168.96.188:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     uh1:
         cas:
             database:
@@ -261,6 +283,7 @@ pilot:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 250
             rtbd:
@@ -289,7 +312,10 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     lhr1:
         cas:
             database:
@@ -309,6 +335,7 @@ pilot:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -337,7 +364,10 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1011.user.lhr1.inmobi.com 10.72.94.130:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.lhr1.inmobi.com 10.72.90.122:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.lhr1.inmobi.com 10.72.94.131:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     hkg1:
         cas:
             database:
@@ -357,6 +387,7 @@ pilot:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -385,7 +416,11 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1010.user.hkg1.inmobi.com 10.56.62.127:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.hkg1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.hkg1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.hkg1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
 non_prod:
     corp:
         cas:
@@ -405,6 +440,7 @@ non_prod:
             timeout:
                 ning_timeout_dcp: 5000
                 ning_timeout_rtbd: 5000
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 5000
                 cas_timer_handler_timeout_rtbd: 5000
             rtbd:
@@ -433,7 +469,10 @@ non_prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
-
+        photon_servers:
+          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     debug:
         cas:
             database:
@@ -453,6 +492,7 @@ non_prod:
             timeout:
                 ning_timeout_dcp: 5000
                 ning_timeout_rtbd: 5000
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 5000
                 cas_timer_handler_timeout_rtbd: 5000
             rtbd:
@@ -481,7 +521,10 @@ non_prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
-
+        photon_servers:
+          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     automation:
         cas:
             database:
@@ -500,6 +543,7 @@ non_prod:
             timeout:
                 ning_timeout_dcp: 5000
                 ning_timeout_rtbd: 5000
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 5000
                 cas_timer_handler_timeout_rtbd: 5000
             rtbd:
@@ -528,7 +572,10 @@ non_prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
-
+        photon_servers:
+          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
 skyhook:
     uj1:
         cas:
@@ -549,6 +596,7 @@ skyhook:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -577,7 +625,8 @@ skyhook:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
-
+        photon_servers:
+          - 'usr1003.user.uj1.inmobi.com 192.168.96.144:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 300'
     hkg1:
         cas:
             database:
@@ -597,6 +646,7 @@ skyhook:
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
                 cas_timer_handler_timeout_dcp: 600
                 cas_timer_handler_timeout_rtbd: 190
             rtbd:
@@ -625,3 +675,5 @@ skyhook:
 
         graphite_host_prefix: 'cn-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_servers:
+          - 'internal-skyhook-photon.vip.hkg1.inmobi.com'

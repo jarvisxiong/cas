@@ -1790,6 +1790,13 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
 
+    @Test(testName = "TEST_PHOTON_UID_PRESENT", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_PHOTON_UID_PRESENT(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroup : TEST_PHOTON_UID_PRESENT");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
 
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)

@@ -314,6 +314,7 @@ public class NewIXAdNetworkTest {
                 .anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
@@ -388,6 +389,7 @@ public class NewIXAdNetworkTest {
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
         expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
         expect(mockRepositoryHelper.queryDealById(anyObject(String.class), eq(true))).andReturn(Optional.empty()).anyTimes();
@@ -467,6 +469,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
@@ -546,6 +549,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
@@ -853,6 +857,7 @@ public class NewIXAdNetworkTest {
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockRepositoryHelper.queryDealById(anyObject(String.class), eq(true))).andReturn(Optional.empty()).anyTimes();
 
         final String response = TestUtils.SampleStrings.ixNativeResponseJson;
@@ -970,6 +975,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.junit.Test;
 
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;

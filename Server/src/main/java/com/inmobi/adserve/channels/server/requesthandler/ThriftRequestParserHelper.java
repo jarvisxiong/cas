@@ -7,7 +7,9 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_WI
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_WITH_SCORE_GREATER_THAN_100;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -19,7 +21,10 @@ import com.inmobi.fds.thrift.mapp.MappResponse;
 import com.inmobi.fds.thrift.mapp.Score;
 import com.inmobi.segment.impl.AdTypeEnum;
 
+import com.inmobi.user.photon.datatypes.attribute.core.CoreAttributes;
+import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 
 @Slf4j
 class ThriftRequestParserHelper {
@@ -94,4 +99,14 @@ class ThriftRequestParserHelper {
         return null;
     }
 
+    public static void updateCsiTags(final Set<Integer> csiTags, final CoreAttributes core) {
+        final Set<Integer> coreCSIIds = new HashSet<>();
+        if (null != core && core.isSetCsids()) {
+            final IntAttribute intAttr = core.getCsids();
+            if (intAttr.isSetValueMap()) {
+                intAttr.getValueMap().forEach((s,t) -> coreCSIIds.addAll(t.keySet()));
+            }
+        }
+        csiTags.addAll(coreCSIIds);
+    }
 }

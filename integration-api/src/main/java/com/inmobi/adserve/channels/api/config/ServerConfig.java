@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.Configuration;
 
 import com.google.common.collect.Lists;
@@ -15,9 +16,12 @@ import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
  * @author abhishek.parwal
  *
  */
+@Slf4j
 @Singleton
 public class ServerConfig implements CasConfig {
 
+    private static final int DEFAULT_PHOTON_NING_TIMEOUT = 10;
+    private static final int DEFAULT_MAX_PHOTON_OUTGOING_CONNECTION = 200;
     private final Configuration serverConfiguration;
     @SuppressWarnings("unused")
     private final Configuration rtbConfiguration;
@@ -150,5 +154,46 @@ public class ServerConfig implements CasConfig {
     @SuppressWarnings("unchecked")
     public List<String> getUSWestStatesCodes() {
         return serverConfiguration.getList("usa.stateCodes", Lists.newArrayList());
+    }
+
+    public String getPhotonEndPoint() {
+        return serverConfiguration.getString("photon.haproxy_endpoint");
+    }
+
+    public String getPhotonHeaderKey() {
+        return serverConfiguration.getString("photon.headerKey");
+    }
+
+    public String getPhotonHeaderValue() {
+        return serverConfiguration.getString("photon.headerValue");
+    }
+
+    public int getMaxPhotonOutGoingConnections() {
+        try {
+            return serverConfiguration.getInt("photon.outGoingMaxConnections", DEFAULT_MAX_PHOTON_OUTGOING_CONNECTION);
+        } catch (final Exception e) {
+            log.error("Exception while parsing Photon maximum out connection from config : {}", e.getMessage());
+            return DEFAULT_MAX_PHOTON_OUTGOING_CONNECTION;
+        }
+    }
+
+    public int getNingTimeoutInMillisForPhoton() {
+        try {
+            return serverConfiguration.getInt("photon.ning_timeout", DEFAULT_PHOTON_NING_TIMEOUT);
+        } catch (final Exception e) {
+            log.error("Exception while parsing photon ning timeout from config : {}", e.getMessage());
+            return DEFAULT_PHOTON_NING_TIMEOUT;
+        }
+    }
+
+    public int getNumOfWorkerThread() {
+        try {
+            final int numOfWorkerThread = serverConfiguration.getInt("worker.thread.count", 0);
+            log.debug("Number of worker thread : {}", numOfWorkerThread);
+            return numOfWorkerThread;
+        } catch (final Exception e) {
+            log.error("Exception while parsing worker thread count from config : {}", e.getMessage());
+            return 0;
+        }
     }
 }

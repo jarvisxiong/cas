@@ -1,10 +1,12 @@
 package com.inmobi.adserve.channels.api;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.adpool.ConnectionType;
@@ -19,6 +21,8 @@ import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.DeviceType;
 import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
+import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
+import com.ning.http.client.ListenableFuture;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -131,6 +135,9 @@ public class SASRequestParameters {
     private boolean noJsTracking = false;
     private NappScore nappScore;
 
+    private String selectedUserId;
+    private Pair<Long, ListenableFuture<BrandAttributes>> brandAttrFuturePair;
+    private boolean coppaEnabled;
     private boolean isRequestFromSDK;
     private String sdkVersion;
     private boolean deeplinkingSupported;

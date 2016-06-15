@@ -225,6 +225,8 @@ public class RtbAdnetworkTest {
         expect(serverConfig.getNingTimeoutInMillisForRTB()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxDcpOutGoingConnections()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxRtbOutGoingConnections()).andReturn(200).anyTimes();
+        expect(serverConfig.getNingTimeoutInMillisForPhoton()).andReturn(200).anyTimes();
+        expect(serverConfig.getMaxPhotonOutGoingConnections()).andReturn(200).anyTimes();
         replay(serverConfig);
         final AsyncHttpClientProvider asyncHttpClientProvider = new AsyncHttpClientProvider(serverConfig);
         asyncHttpClientProvider.setup();

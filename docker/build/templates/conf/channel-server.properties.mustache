@@ -98,6 +98,15 @@ server.scribePublisherConf={{CAS_BASE_DIRECTORY}}/conf/messaging-publisher-conf.
 server.routingFromUH1ToUJ1Percentage=40
 server.usa.stateCodes=10993,12131,12539,28962,13365,17188,28963,18469,19855,20598,22140,23451,28994,11326,12869,28970,14690,15118,16121,28965,17799,29000,20372,21892,22839,28978
 
+#photon
+server.photon.enable=true
+server.photon.haproxy_endpoint=http://localhost:8083/profile
+server.photon.ning_timeout=5
+server.photon.outGoingMaxConnections=200
+server.photon.headerKey=photon-cid
+server.photon.headerValue=direct-brand
+server.worker.thread.count=85
+
 graphite.host={{graphite_host_prefix}}.cas.{{IDP_CLUSTER}}.inmobi.com
 graphite.port=2020
 graphite.intervalInMinutes=1

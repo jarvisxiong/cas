@@ -83,6 +83,11 @@ SCRIBE_PID=$!
 ${CAS_BASE_DIRECTORY}/bin/scribe-emitter/cas-emit-scribe-agent-stats "$@" &
 SCRIBE_STATS_PID=$!
 
+# starting HAProxy
+exec /usr/sbin/haproxy -f ${CAS_BASE_DIRECTORY}/conf/haproxy.cfg &
+HAPROXY_PID=$!
+echo "Haproxy pid is: $HAPROXY_PID"
+
 # Graceful shutdown for only prod environments
 if ! [ "$IDP_ENVIRONMENT" == "non_prod" ];
 then
@@ -98,7 +103,8 @@ then
         kill $SCRIBE_PID;\
         echo Waiting 5 more seconds for SCRIBE_STATS to finish;\
         sleep 5;\
-        kill $SCRIBE_STATS_PID;" SIGTERM SIGINT
+        kill $SCRIBE_STATS_PID;\
+        kill $HAPROXY_PID;" SIGTERM SIGINT
 else
     echo Graceful Shutdown disabled;
     trap "echo Killing cas and scribe indiscriminantly;\

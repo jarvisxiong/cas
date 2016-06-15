@@ -273,6 +273,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockCasInternal.isTraceEnabled()).andReturn(true);
         expect(mockChannel.isOpen()).andReturn(true).times(1);
         replayAll();
@@ -319,6 +320,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getCarrierId()).andReturn(0);
         expect(mockSasParam.getIpFileVersion()).andReturn(0);
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
 
         replayAll();
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -371,6 +373,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
@@ -470,6 +473,8 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
+
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -544,6 +549,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
 
         expect(mockCasInternalRequestParameters.isTrackingAllowed()).andReturn(true).anyTimes();
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)

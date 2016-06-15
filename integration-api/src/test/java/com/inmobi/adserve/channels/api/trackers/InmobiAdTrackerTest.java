@@ -71,6 +71,7 @@ public class InmobiAdTrackerTest {
         expect(mockSasParams.getIntegrationDetails()).andReturn(new IntegrationDetails().setIntegrationType(
                 IntegrationType.ANDROID_SDK).setIntegrationVersion(370).setIntegrationMethod(IntegrationMethod.SDK))
                 .anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
 
         expect(mockConfiguration.getString("key.1.value")).andReturn("clickmaker.key.1.value").anyTimes();
         expect(mockConfiguration.getString("key.2.value")).andReturn("clickmaker.key.2.value").anyTimes();

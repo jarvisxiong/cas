@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -24,6 +26,7 @@ import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
+import com.inmobi.adserve.channels.server.requesthandler.PhotonHelper;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
@@ -34,6 +37,9 @@ import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
+import com.ning.http.client.ListenableFuture;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -117,6 +123,18 @@ abstract class BaseServlet implements Servlet {
             LOG.debug(traceMarker, "All segments dropped in filters");
             hrh.responseSender.sendNoAdResponse(serverChannel);
             return;
+        }
+
+        final boolean isPhotonEnable = CasConfigUtil.getServerConfig().getBoolean("photon.enable", false);
+        if (!sasParams.isCoppaEnabled() && isPhotonEnable && (sasParams.getDemandSourceType() == DemandSourceType.IX
+                || sasParams.getDemandSourceType() == DemandSourceType.RTBD)) {
+            final String userId = sasParams.getSelectedUserId();
+            if (StringUtils.isNotBlank(userId)) {
+                ListenableFuture<BrandAttributes> brandAttributesFuture = PhotonHelper.getBrandAttribute(userId);
+                sasParams.setBrandAttrFuturePair(Pair.of(System.currentTimeMillis(), brandAttributesFuture));
+            }
+        } else {
+            //LOG.debug("Photon Criteria doesn't match due to PhotonEnable is {} and Demand Source Type is {}", isPhotonEnable, sasParams.getDst());
         }
 
         // Incrementing Adapter Specific Total Selected Segments Stats

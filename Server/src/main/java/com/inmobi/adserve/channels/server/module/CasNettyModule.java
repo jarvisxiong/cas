@@ -3,12 +3,14 @@ package com.inmobi.adserve.channels.server.module;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.inmobi.adserve.channels.adnetworks.ix.EnrichmentHelper;
 import org.apache.commons.configuration.Configuration;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
+import com.inmobi.adserve.channels.adnetworks.ix.PackageMatcherDelegateV2;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
@@ -17,10 +19,12 @@ import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ConnectionLimitHandler;
 import com.inmobi.adserve.channels.server.netty.CasNettyServer;
+import com.inmobi.adserve.channels.server.requesthandler.PhotonHelper;
 import com.inmobi.adserve.channels.util.annotations.ServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.ServerConfiguration;
 import com.inmobi.adserve.channels.util.annotations.StatServerChannelInitializer;
 import com.inmobi.adserve.channels.util.annotations.WorkerExecutorService;
+import com.ning.http.client.AsyncHttpClient;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -71,4 +75,19 @@ public class CasNettyModule extends AbstractModule {
         return new ConnectionLimitHandler(serverConfig);
     }
 
+    @Singleton
+    @Provides
+    PhotonHelper providePhotonHelper(final ServerConfig serverConfig, final AsyncHttpClientProvider asyncHttpClientProvider) {
+        final AsyncHttpClient asyncHttpClient = asyncHttpClientProvider.getPhotonAsyncHttpClient();
+        final String endpoint = serverConfig.getPhotonEndPoint();
+        final String headerKey = serverConfig.getPhotonHeaderKey();
+        final String headerValue = serverConfig.getPhotonHeaderValue();
+        return  new PhotonHelper(asyncHttpClient, endpoint, headerKey, headerValue);
+    }
+
+    @Singleton
+    @Provides
+    EnrichmentHelper provideEnrichmentHelper(final ServerConfig serverConfig) {
+        return new EnrichmentHelper(serverConfig.getNingTimeoutInMillisForPhoton() + 1);
+    }
 }

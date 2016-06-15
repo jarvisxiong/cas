@@ -1,0 +1,32 @@
+global
+    log /dev/log local0 crit
+    maxconn 200000
+
+defaults
+    log global
+    mode http
+    option httplog
+    option dontlognull
+    option dontlog-normal
+    retries 1
+    option redispatch
+    maxconn 200000
+    timeout connect 200
+    timeout client 1000
+    timeout server 1000
+
+listen stats
+    bind :8082
+    stats uri /haproxy-status
+    stats enable
+
+listen photon-service-8100
+    bind *:8083
+    balance roundrobin
+    option httpchk GET /lbstatus
+    option http-tunnel
+    maxconn 20000
+    mode http
+{{#photon_servers}}
+    server {{.}}
+{{/photon_servers}}

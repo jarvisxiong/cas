@@ -123,9 +123,9 @@ public class UpdateDBWithWAPAdGroupData {
 
     public static void main(final String[] args) throws Exception {
 
-        //updateDBWithAllData();
+        updateDBWithAllData();
         updateDBWithIXPackageData();
-        //RepoRefreshHelper.RefreshRepo();
+        RepoRefreshHelper.RefreshRepo();
 
     }
 

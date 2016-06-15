@@ -1910,6 +1910,9 @@ TEST_SECURE_SEGMENT_FLAG:
    ad_type_targeting : '3'
    segment_flags : '{11}'
    adpool_rqSslEnabled : 'true'
+   uidparams_rawuidvalues_o1: '0002e17f-4df0-4067-8776-27ff6efac8de'
+   uidparam_selecteduidtypevalue: '2'
+   adpool_requestedadtype: 'VAST'
 
 TEST_SECURE_SEGMENT_FLAG_NEGATIVE:
 -  adpool_selectedslots : '9'
@@ -1923,3 +1926,8 @@ TEST1_SDK530_NON_NATIVE_DCP_WITHOUT_ENCRYPTION:
    integration_type: ANDROID_SDK
    integration_version: '530'
    requestguid: 'test'
+
+TEST_PHOTON_UID_PRESENT:
+ - uidparams_rawuidvalues_o1: '0002e17f-4df0-4067-8776-27ff6efac8de'
+   uidparam_selecteduidtypevalue: '2'
+

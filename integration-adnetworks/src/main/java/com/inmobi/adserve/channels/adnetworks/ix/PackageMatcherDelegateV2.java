@@ -33,9 +33,9 @@ public class PackageMatcherDelegateV2 {
     private static final int PACKAGE_MAX_LIMIT = 35;
     private static final boolean GEO_COOKIE_NOT_SUPPORTED = false;
 
-    public static Map<Integer, Boolean> getMatchingPackageIds (final SASRequestParameters sasParams,
-            final RepositoryHelper repositoryHelper, final Short selectedSlotId,
-            final ChannelSegmentEntity entity, final Set<Long> targetingSegments, final String advertiserName, final boolean checkInOldRepo) {
+    public static Map<Integer, Boolean> getMatchingPackageIds(final SASRequestParameters sasParams,
+            final RepositoryHelper repositoryHelper, final Short selectedSlotId, final ChannelSegmentEntity entity,
+            final Set<Long> targetingSegments, final String advertiserName, final boolean checkInOldRepo) {
 
         if (log.isDebugEnabled()) {
             if (checkInOldRepo) {
@@ -45,14 +45,17 @@ public class PackageMatcherDelegateV2 {
             }
         }
 
-        final Set<Integer> packageV2Ids = PackageMatcherV2.getMatchingPackageIds(targetingSegments, repositoryHelper, sasParams, entity);
-        Map<Integer, Boolean> packages =
-                CollectionUtils.isNotEmpty(packageV2Ids) ?
-                        packageV2Ids.stream().collect(toMap(packageId -> packageId, packageId -> GEO_COOKIE_NOT_SUPPORTED)) :
-                        null;
+        EnrichmentHelper.enrichCSIIdsWrapper(sasParams);
+
+        final Set<Integer> packageV2Ids =
+                PackageMatcherV2.getMatchingPackageIds(targetingSegments, repositoryHelper, sasParams, entity);
+        Map<Integer, Boolean> packages = CollectionUtils.isNotEmpty(packageV2Ids) ?
+                packageV2Ids.stream().collect(toMap(packageId -> packageId, packageId -> GEO_COOKIE_NOT_SUPPORTED)) :
+                null;
 
         if (checkInOldRepo) {
-            final Map<Integer, Boolean> oldStylePackageIds = IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId, entity);
+            final Map<Integer, Boolean> oldStylePackageIds =
+                    IXPackageMatcher.findMatchingPackageIds(sasParams, repositoryHelper, selectedSlotId, entity);
             final boolean oldStylePackageIdsMapIsNotNull = null != oldStylePackageIds;
             if (null != packages && oldStylePackageIdsMapIsNotNull) {
                 packages.putAll(oldStylePackageIds);
@@ -71,9 +74,7 @@ public class PackageMatcherDelegateV2 {
             Collections.shuffle(packagesList);
             packages = packagesList.stream().limit(PACKAGE_MAX_LIMIT).collect(toMap(Entry::getKey, Entry::getValue));
 
-            packages.keySet().forEach(
-                    id -> InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, PACKAGE_FORWARDED + id)
-            );
+            packages.keySet().forEach(id -> InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, PACKAGE_FORWARDED + id));
 
             if (log.isDebugEnabled()) {
                 log.debug("Overall packages shortlisted: {}", Arrays.toString(packages.keySet().toArray()));

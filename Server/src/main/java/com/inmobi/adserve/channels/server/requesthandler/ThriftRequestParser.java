@@ -7,6 +7,7 @@ import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestPar
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getMraidPath;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getSdkVersion;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.populateNappScore;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.updateCsiTags;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
@@ -101,6 +102,7 @@ public class ThriftRequestParser {
         if (tObject.isSetVastProtocols()) {
             params.setVastProtocols(ImmutableSet.copyOf(tObject.getVastProtocols()));
         }
+        params.setCoppaEnabled(tObject.isSetCoppaEnabled() ? tObject.isCoppaEnabled() : false);
         params.setRequestedAdType(tObject.getRequestedAdType());
         params.setRichMedia(tObject.isSetSupplyAllowedContents()
                 && tObject.supplyAllowedContents.contains(SupplyContentType.RICH_MEDIA));
@@ -137,8 +139,13 @@ public class ThriftRequestParser {
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
+            final UidType selectedUidType = tObject.getUidParams().getSelectedUidType();
+            String uId = null;
             if (tObject.getUidParams().isSetRawUidValues()) {
-                params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+                final Map<UidType, String> rawUidParams = tObject.getUidParams().getRawUidValues();
+                params.setTUidParams(getUserIdMap(rawUidParams));
+                uId = rawUidParams.get(selectedUidType);
+                params.setSelectedUserId(uId);
             }
         }
 
@@ -199,9 +206,11 @@ public class ThriftRequestParser {
                 final int age = currentYear - yob;
                 params.setAge((short) age);
             }
-            if (tObject.user.isSetUserProfile()) {
-                params.setCsiTags(tObject.user.userProfile.csiTags);
-            }
+
+            params.setCsiTags(tObject.user.isSetUserProfile() ?
+                    (tObject.user.getUserProfile().isSetCsiTags() ? tObject.user.userProfile.csiTags :
+                            new HashSet<>()) : new HashSet<>());
+            updateCsiTags(params.getCsiTags(), tObject.coreAttributes);
 
             if (tObject.user.gender != null) {
                 switch (tObject.user.gender) {

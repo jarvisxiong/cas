@@ -148,9 +148,9 @@ public class InspectorStrings {
     public static final String TOTAL_MOVIEBOARD_REQUESTS = "TotalMovieBoardRequests";
     public static final String TOTAL_MOVIEBOARD_TEMPLATES = "TotalMovieBoardTemplates";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
-    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
+    public static final String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
             "totalPureVastResponseInlineOrWrapperMissing";
-    public static final java.lang.String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING =
+    public static final String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING =
             "totalPureVastResponseTrackingEventsMissing";
     public static final String TOTAL_REWARDED_VAST_VIDEO_REQUESTS = "TotalRewardedVASTVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
@@ -290,4 +290,19 @@ public class InspectorStrings {
     public static final String TOTAL_REQUEST_WITHOUT_NAPP_SCORE = "TotalRequestWithoutNappScore";
     public static final String TOTAL_REQUEST_WITH_SCORE_GREATER_THAN_100 = "TotalRequestWithScoreGreaterThan100";
     public static final String TOTAL_REQUEST_WITHOUT_MAPP_RESPONSE = "TotalRequestWithoutMappResponse";
+
+    public static final String TOTAL_PHOTON_REQUEST = "TotalPhotonRequest";
+    public static final String TOTAL_PHOTON_REQUEST_THRIFT_PARSE_EXCEPTION = "TotalPhotonRequestThriftParseException";
+    public static final String TOTAL_PHOTON_IO_EXCEPTION = "TotalPhotonIOException";
+    public static final String TOTAL_PHOTON_RESPONSE_STATUS_CODE = "TotalPhotonResponseWithStatusCode_";
+    public static final String TOTAL_PHOTON_RESPONSE_THRIFT_PARSE_EXCEPTION = "TotalPhotonResponseThriftParseException";
+    public static final String TOTAL_PHOTON_EXCEPTION = "TotalPhotonExpection";
+    public static final String PHOTON_LATENCY = "PhotonLatency";
+    public static final String TOTAL_PHOTON_REQUEST_TIMEOUT = "TotalPhotonRequestTimeout";
+    public static final String TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE = "TotalInterruptedExceptionPhotonResponse";
+    public static final String TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE = "TotalExecutionExceptionPhotonResponse";
+    public static final String TOTAL_TIMEOUT_IN_PHOTON_RESPONSE = "TotalTimeoutPhotonResponse";
+    public static final String PHOTON = "photon";
+    public static final String TOTAL_PHOTON_ERROR_CALLBACK = "TotalErrorCallBack";
+    public static final String LATENCY_FOR_PHOTON_FUTURE_CALL = "PhotonFutureCallLatency";
 }
