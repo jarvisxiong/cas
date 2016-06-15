@@ -105,7 +105,6 @@ public class RequestFilters {
             return true;
         }
 
-
         final IntegrationDetails integrationDetails = sasParams.getIntegrationDetails();
         if (null != integrationDetails && SDK == integrationDetails.getIntegrationMethod()) {
             final IntegrationType integrationType = integrationDetails.getIntegrationType();

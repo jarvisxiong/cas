@@ -1,5 +1,8 @@
 package com.inmobi.adserve.channels.api;
 
+import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
+import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.concurrent.ThreadLocalRandom;
@@ -79,8 +82,16 @@ public class Formatter {
 
         if (isRequestFromSdk(sasParams)) {
             context.put(VelocityTemplateFieldConstants.SDK, true);
+            context.put(VelocityTemplateFieldConstants.IS_DEEPLINK_SUPPORTED, sasParams.isDeeplinkingSupported());
+
+            if (Android.getValue() == sasParams.getOsId()) {
+                context.put(VelocityTemplateFieldConstants.ANDROID, true);
+            } else if (iOS.getValue() == sasParams.getOsId()) {
+                context.put(VelocityTemplateFieldConstants.IOS, true);
+            }
             context.put(VelocityTemplateFieldConstants.SDK360_ONWARDS, isRequestFromSdkVersionOnwards(sasParams, 360));
             context.put(VelocityTemplateFieldConstants.SDK450_ONWARDS, isRequestFromSdkVersionOnwards(sasParams, 450));
+            context.put(VelocityTemplateFieldConstants.SDK500_ONWARDS, isRequestFromSdkVersionOnwards(sasParams, 500));
             if (StringUtils.isNotBlank(sasParams.getImaiBaseUrl())) {
                 context.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
             }

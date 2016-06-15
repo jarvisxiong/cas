@@ -92,6 +92,7 @@ import com.inmobi.adserve.contracts.rtb.request.Deal;
 import com.inmobi.adserve.contracts.rtb.request.Device;
 import com.inmobi.adserve.contracts.rtb.request.Geo;
 import com.inmobi.adserve.contracts.rtb.request.Impression;
+import com.inmobi.adserve.contracts.rtb.request.ImpressionExtension;
 import com.inmobi.adserve.contracts.rtb.request.PMP;
 import com.inmobi.adserve.contracts.rtb.request.Site;
 import com.inmobi.adserve.contracts.rtb.request.User;
@@ -371,7 +372,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             final Native nativeRtb = createNativeObject();
             impression.setNat(nativeRtb);
             if (nativeRtb != null) {
-                InspectorStats.incrementStatCount(getName(), InspectorStrings.TOTAL_NATIVE_REQUESTS);
+                InspectorStats.incrementStatCount(advertiserName, InspectorStrings.TOTAL_NATIVE_REQUESTS);
                 mandatoryAssetMap = new HashMap<>();
                 nonMandatoryAssetMap = new HashMap<>();
                 for (final Asset asset : nativeRtb.getRequestobj().getAssets()) {
@@ -384,6 +385,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             }
         } else {
             impression.setBanner(createBannerObject());
+            impression.setExt(new ImpressionExtension(sasParams.isDeeplinkingSupported()));
         }
         impression.setSecure(sasParams.isSecureRequest() ? 1 : 0);
         impression.setBidfloorcur(bidderCurrency);

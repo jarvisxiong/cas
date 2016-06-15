@@ -25,6 +25,10 @@ public class VelocityTemplateFieldConstants {
     public static final String SDK = "SDK";
     public static final String SDK360_ONWARDS = "SDK360Onwards";
     public static final String SDK450_ONWARDS = "SDK450Onwards";
+    public static final String SDK500_ONWARDS = "SDK500Onwards";
     public static final String IS_INTERSTITIAL = "isInterstitial";
+    public static final String IS_DEEPLINK_SUPPORTED = "IS_DEEPLINK_SUPPORTED";
+    public static final String ANDROID = "ANDROID";
+    public static final String IOS = "IOS";
     public static final String SPROUT = "Sprout";
 }

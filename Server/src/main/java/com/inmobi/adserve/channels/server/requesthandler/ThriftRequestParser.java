@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.api.SASParamsUtils.isSDK;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
@@ -41,7 +42,6 @@ import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.DemandType;
 import com.inmobi.adserve.adpool.Device;
 import com.inmobi.adserve.adpool.IntegrationDetails;
-import com.inmobi.adserve.adpool.IntegrationMethod;
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.NetworkType;
 import com.inmobi.adserve.adpool.ResponseFormat;
@@ -289,15 +289,15 @@ public class ThriftRequestParser {
             params.setRqIframe(details.iFrameId);
             params.setAdcode(getAdCode(details.integrationType));
 
-            final IntegrationMethod integrationMethod = details.getIntegrationMethod();
-            if (IntegrationMethod.SDK == integrationMethod) {
+            final boolean isSDK = isSDK(details);
+            params.setRequestFromSDK(isSDK);
+
+            if (isSDK) {
                 final Integer integrationVersion = details.isSetIntegrationVersion() ?
                         details.getIntegrationVersion() : null;
                 final String sdkVersion = getSdkVersion(details.integrationType, integrationVersion);
-                if (null != sdkVersion) {
-                    params.setSdkVersion(sdkVersion);
-                    params.setImaiBaseUrl(getMraidPath(sdkVersion));
-                }
+                params.setSdkVersion(sdkVersion);
+                params.setImaiBaseUrl(getMraidPath(sdkVersion));
             }
         }
     }
@@ -316,7 +316,7 @@ public class ThriftRequestParser {
             final SiteTemplateSettings sts = tSite.siteTemplateSettings;
             if (sts != null) {
                 // Set CAU
-                final Set<Long> cauMetaDataSet = new HashSet<Long>();
+                final Set<Long> cauMetaDataSet = new HashSet<>();
                 if (CollectionUtils.isNotEmpty(sts.getCustomAdUnitStableList())) {
                     cauMetaDataSet.addAll(sts.getCustomAdUnitStableList());
                 }
@@ -326,7 +326,7 @@ public class ThriftRequestParser {
                 params.setCauMetadataSet(cauMetaDataSet);
 
                 // Set CT
-                final Set<Long> customTemplateSet = new HashSet<Long>();
+                final Set<Long> customTemplateSet = new HashSet<>();
                 if (CollectionUtils.isNotEmpty(sts.getCustomTemplateStableList())) {
                     customTemplateSet.addAll(sts.getCustomTemplateStableList());
                 }
@@ -389,7 +389,7 @@ public class ThriftRequestParser {
         }
     }
 
-    protected String getPostalCode(final Set<Integer> postalCodes) {
+    private String getPostalCode(final Set<Integer> postalCodes) {
         final Integer zipId =
                 null != postalCodes && postalCodes.iterator().hasNext() ? postalCodes.iterator().next() : null;
         if (zipId != null) {
@@ -504,7 +504,7 @@ public class ThriftRequestParser {
         LOG.debug("CasInternalParams are {}", parameter);
     }
 
-    public String MD5(final String md5) {
+    private String MD5(final String md5) {
         try {
             final MessageDigest md = MessageDigest.getInstance(GlobalConstant.MD5);
             final byte[] array = md.digest(md5.getBytes(CharsetUtil.UTF_8));
@@ -519,14 +519,14 @@ public class ThriftRequestParser {
         return null;
     }
 
-    public String getAdCode(final IntegrationType integrationType) {
+    private String getAdCode(final IntegrationType integrationType) {
         if (integrationType == IntegrationType.JSAC || integrationType == IntegrationType.WINDOWS_JS_SDK) {
             return "JS";
         }
         return "NON-JS";
     }
 
-    public List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
+    private List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
         if (selectedSlots == null) {
             LOG.info("Emply selectedSlots received by CAS !!!");
             return Collections.emptyList();

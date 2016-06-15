@@ -23,4 +23,5 @@ public final class Impression {
     private double bidfloor = 0.0;
     private String bidfloorcur = "USD";
     private int secure = 0;
+    private ImpressionExtension ext;
 }

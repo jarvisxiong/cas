@@ -1,5 +1,7 @@
 package com.inmobi.adserve.channels.server.servlet;
 
+import static com.inmobi.adserve.channels.api.SASParamsUtils.isDeeplinkingSupported;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,6 +66,7 @@ public class ServletRtbd extends BaseServlet {
         LOG.debug("enrichDstSpecific RTBD");
         casInternal.setBlockedIabCategories(getBlockedIabCategories(sasParams.getSiteId()));
         casInternal.setBlockedAdvertisers(getBlockedAdvertisers(sasParams.getSiteId()));
+        sasParams.setDeeplinkingSupported(isDeeplinkingSupported(sasParams));
 
         final int bidFloorPercent = CasConfigUtil.getServerConfig().getInt("rtb.bidFloorPercent", 100);
         // SasParams SiteFloor has Math.max(tObject.site.ecpmFloor, tObject.site.cpmFloor)
@@ -100,6 +103,8 @@ public class ServletRtbd extends BaseServlet {
 
         LOG.debug("BlockedCategories are {}", casInternal.getBlockedIabCategories());
         LOG.debug("BlockedAdvertisers are {}", casInternal.getBlockedAdvertisers());
+        LOG.debug("Deeplinking supported: {}", sasParams.isDeeplinkingSupported());
+
         LOG.debug("rtb.bidFloorPercent is {}", bidFloorPercent);
         LOG.debug("rtb.demandDensity is {}", tempDemandDensity);
         LOG.debug("rtb.longTermRevenue is {}", tempLongTermRevenue);

@@ -44,7 +44,6 @@ public class SASRequestParameters {
     private String siteId;
     private Long placementId;
     private ContentType siteContentType;
-    private String sdkVersion;
     //Supply Capabilites supported by sdk/device
     private Set<Integer> supplyCapabilities;
 
@@ -131,6 +130,10 @@ public class SASRequestParameters {
     private String language;
     private boolean noJsTracking = false;
     private NappScore nappScore;
+
+    private boolean isRequestFromSDK;
+    private String sdkVersion;
+    private boolean deeplinkingSupported;
 
     /**
      * @return true if bundle ids are mismatched
