@@ -10,7 +10,7 @@
 
     <groupId>com.inmobi.channels</groupId>
     <artifactId>cas</artifactId>
-    <version>6.87-SNAPSHOT</version>
+    <version>6.87</version>
     <packaging>pom</packaging>
     <url>https://github.corp.inmobi.com/channel-adserve/cas</url>
 
@@ -18,7 +18,7 @@
         <connection>scm:git:git@github.corp.inmobi.com:channel-adserve/cas.git</connection>
         <url>scm:git:git@github.corp.inmobi.com:channel-adserve/cas.git</url>
         <developerConnection>scm:git:git@github.corp.inmobi.com:channel-adserve/cas.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>6.87</tag>
     </scm>
 
     <properties>
