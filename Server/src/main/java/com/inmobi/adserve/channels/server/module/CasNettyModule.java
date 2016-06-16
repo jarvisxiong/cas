@@ -88,6 +88,6 @@ public class CasNettyModule extends AbstractModule {
     @Singleton
     @Provides
     EnrichmentHelper provideEnrichmentHelper(final ServerConfig serverConfig) {
-        return new EnrichmentHelper(serverConfig.getNingTimeoutInMillisForPhoton() + 1);
+        return new EnrichmentHelper(serverConfig.getPhotonFutureTimeout() + 1);
     }
 }

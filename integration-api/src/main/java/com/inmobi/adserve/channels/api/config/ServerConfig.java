@@ -196,4 +196,17 @@ public class ServerConfig implements CasConfig {
             return 0;
         }
     }
+
+    public int getPhotonFutureTimeout() {
+        final int defaultTimeout = 5;
+        try {
+            final int photonFutureTimeout = serverConfiguration.getInt("photon.future_timeout", defaultTimeout);
+            log.debug("Photon Future timeout : {}", photonFutureTimeout);
+            return photonFutureTimeout;
+        } catch (final Exception e) {
+            log.error("Exception while parsing photon future timeout from config : {}", e.getMessage());
+            return defaultTimeout;
+        }
+
+    }
 }

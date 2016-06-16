@@ -19,6 +19,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.inmobi.adserve.channels.util.InspectorStrings.LATENCY_FOR_PHOTON_FUTURE_CALL;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON_LATENCY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NULL_CSIDS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_TIMEOUT_IN_PHOTON_RESPONSE;
+
 import static java.lang.Long.max;
 
 /**
@@ -50,23 +58,26 @@ public class EnrichmentHelper {
         try {
             final BrandAttributes brandAttr =
                     futureBrandAttributes.get(getWaitTime(startTime, curTime), TimeUnit.MILLISECONDS);
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.PHOTON_LATENCY, (System.currentTimeMillis()-startTime));
-            log.debug("CSIds before enrich : {}", sasCSITags);
+            InspectorStats.updateYammerTimerStats(PHOTON, PHOTON_LATENCY, (System.currentTimeMillis()-startTime));
+            if (log.isDebugEnabled()) {
+                log.debug("CSIds before enrich : {}", sasCSITags);
+            }
             if (null != brandAttr) {
                 mergeCSITags(sasCSITags, brandAttr.getBluekai_csids());
                 mergeCSITags(sasCSITags, brandAttr.getGeocookie_csids());
                 mergeCSITags(sasCSITags, brandAttr.getPds_csids());
+            } else {
+                InspectorStats.incrementStatCount(PHOTON, TOTAL_NULL_CSIDS);
             }
-            log.debug("CSIds after enrich : {}", sasCSITags);
+            if (log.isDebugEnabled()) {
+                log.debug("CSIds after enrich : {}", sasCSITags);
+            }
         } catch (InterruptedException e) {
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE);
-            //log.error("Interrupt Exception occur while fetching photon data from async call : {}", e.getMessage());
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE);
         } catch (ExecutionException e) {
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE);
-            //log.error("Execution Exception occur while fetching photon data from async call : {}", e.getMessage());
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE);
         } catch (TimeoutException e) {
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_TIMEOUT_IN_PHOTON_RESPONSE);
-            //log.error("Timeout Exception occur while fetching photon data from async call : {}", e.getMessage());
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_TIMEOUT_IN_PHOTON_RESPONSE);
         }
         return sasCSITags;
     }
@@ -83,8 +94,8 @@ public class EnrichmentHelper {
 
     public static long getWaitTime(final Long startTime, final long curTime) {
         final long spentTime = curTime - startTime;
-        InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.LATENCY_FOR_PHOTON_FUTURE_CALL, spentTime);
         final long remainingTime = photonTimeout - spentTime;
+        InspectorStats.updateYammerTimerStats(PHOTON, LATENCY_FOR_PHOTON_FUTURE_CALL, spentTime);
         return max(remainingTime, 0);
     }
 }
