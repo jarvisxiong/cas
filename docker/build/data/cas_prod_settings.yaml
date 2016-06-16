@@ -49,6 +49,7 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1010.user.uj1.inmobi.com 192.168.96.185:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1011.user.uj1.inmobi.com 192.168.96.186:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
@@ -101,10 +102,11 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     lhr1:
         cas:
             database:
@@ -153,6 +155,7 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1011.user.lhr1.inmobi.com 10.72.94.130:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1012.user.lhr1.inmobi.com 10.72.90.122:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
@@ -206,6 +209,7 @@ prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1010.user.hkg1.inmobi.com 10.56.62.127:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1011.user.hkg1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
@@ -260,6 +264,7 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1010.user.uj1.inmobi.com 192.168.96.185:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1011.user.uj1.inmobi.com 192.168.96.186:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
@@ -312,10 +317,11 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     lhr1:
         cas:
             database:
@@ -364,6 +370,7 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1011.user.lhr1.inmobi.com 10.72.94.130:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1012.user.lhr1.inmobi.com 10.72.90.122:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
@@ -416,6 +423,7 @@ pilot:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1010.user.hkg1.inmobi.com 10.56.62.127:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1011.user.hkg1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
@@ -469,10 +477,11 @@ non_prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     debug:
         cas:
             database:
@@ -521,10 +530,11 @@ non_prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     automation:
         cas:
             database:
@@ -572,10 +582,11 @@ non_prod:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'non_prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.56.62.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.56.66.13:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1013.user.uh1.inmobi.com 10.56.66.139:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
 skyhook:
     uj1:
         cas:
@@ -625,6 +636,7 @@ skyhook:
 
         graphite_host_prefix: 'cas-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1003.user.uj1.inmobi.com 192.168.96.144:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 300'
     hkg1:
@@ -675,5 +687,6 @@ skyhook:
 
         graphite_host_prefix: 'cn-metrics-relay'
         graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'internal-skyhook-photon.vip.hkg1.inmobi.com'
         photon_servers:
-          - 'internal-skyhook-photon.vip.hkg1.inmobi.com'
+          - 'usr1003.user.hkg1.inmobi.com 10.56.74.128:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'

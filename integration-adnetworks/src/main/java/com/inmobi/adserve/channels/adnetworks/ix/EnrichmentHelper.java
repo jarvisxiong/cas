@@ -59,9 +59,7 @@ public class EnrichmentHelper {
             final BrandAttributes brandAttr =
                     futureBrandAttributes.get(getWaitTime(startTime, curTime), TimeUnit.MILLISECONDS);
             InspectorStats.updateYammerTimerStats(PHOTON, PHOTON_LATENCY, (System.currentTimeMillis()-startTime));
-            if (log.isDebugEnabled()) {
-                log.debug("CSIds before enrich : {}", sasCSITags);
-            }
+            log.debug("CSIds before enrich : {}", sasCSITags);
             if (null != brandAttr) {
                 mergeCSITags(sasCSITags, brandAttr.getBluekai_csids());
                 mergeCSITags(sasCSITags, brandAttr.getGeocookie_csids());
@@ -69,9 +67,7 @@ public class EnrichmentHelper {
             } else {
                 InspectorStats.incrementStatCount(PHOTON, TOTAL_NULL_CSIDS);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("CSIds after enrich : {}", sasCSITags);
-            }
+            log.debug("CSIds after enrich : {}", sasCSITags);
         } catch (InterruptedException e) {
             InspectorStats.incrementStatCount(PHOTON, TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE);
         } catch (ExecutionException e) {

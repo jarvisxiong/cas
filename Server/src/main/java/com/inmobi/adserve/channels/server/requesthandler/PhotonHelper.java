@@ -26,7 +26,14 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.inmobi.adserve.channels.util.InspectorStrings.LATENCY_FOR_NING_PHOTON_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_ERROR_CALLBACK_FOR;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_EXCEPTION;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_IO_EXCEPTION;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_REQUEST;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_REQUEST_THRIFT_PARSE_EXCEPTION;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_REQUEST_TIMEOUT;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_RESPONSE_STATUS_CODE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_PHOTON_RESPONSE_THRIFT_PARSE_EXCEPTION;
 
 /**
@@ -68,13 +75,12 @@ public class PhotonHelper {
             final long startTime = System.currentTimeMillis();
             brandAttributesFuture =
                     asyncHttpClient.executeRequest(request, getAsyncCompletionHandler(photonThriftParser, startTime));
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_PHOTON_REQUEST);
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_REQUEST);
         } catch (IOException e) {
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_PHOTON_IO_EXCEPTION);
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_IO_EXCEPTION);
         } catch (Exception e) {
-            InspectorStats.incrementStatCount(InspectorStrings.PHOTON,
-                    InspectorStrings.TOTAL_PHOTON_REQUEST_THRIFT_PARSE_EXCEPTION);
-            log.error("Exception occur while building request : {}", e.getMessage());
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_REQUEST_THRIFT_PARSE_EXCEPTION);
+            log.debug("Exception occur while building request : {}", e);
         }
         return brandAttributesFuture;
     }
@@ -91,8 +97,9 @@ public class PhotonHelper {
             public BrandAttributes onCompleted(Response response) throws Exception {
                 final int statusCode = response.getStatusCode();
                 log.debug("Photon Response status : {}, response body : {}", statusCode, response.getResponseBody());
-                InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_PHOTON_RESPONSE_STATUS_CODE + statusCode);
-                InspectorStats.updateYammerTimerStats(InspectorStrings.PHOTON, LATENCY_FOR_NING_PHOTON_RESPONSE, (System.currentTimeMillis()-startTime));
+                InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_RESPONSE_STATUS_CODE + statusCode);
+                InspectorStats.updateYammerTimerStats(PHOTON, LATENCY_FOR_NING_PHOTON_RESPONSE,
+                        (System.currentTimeMillis()-startTime));
                 BrandAttributes brandAttr = null;
                 switch (statusCode) {
                     case HttpStatus.SC_OK:
@@ -101,17 +108,17 @@ public class PhotonHelper {
                             final Attributes attributes = photonThriftParser.receive(protocol);
                             brandAttr = (null != attributes) ? attributes.getBrand() : null;
                         } catch (final PhotonException e) {
-                            log.error("Excepton sent from photon server : {}", e.getMessage());
-                            InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_PHOTON_EXCEPTION);
+                            log.debug("Excepton sent from photon server : {}", e);
+                            InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_EXCEPTION);
                         } catch (final Exception e) {
-                            log.error("Excepton occur while parsing response to Thrift : {}", e.getMessage());
-                            InspectorStats.incrementStatCount(InspectorStrings.PHOTON,
-                                    TOTAL_PHOTON_RESPONSE_THRIFT_PARSE_EXCEPTION + e.getClass().getName());
+                            log.debug("Excepton occur while parsing response to Thrift", e);
+                            InspectorStats.incrementStatCount(PHOTON,
+                                TOTAL_PHOTON_RESPONSE_THRIFT_PARSE_EXCEPTION + e.getClass().getName());
                         }
                         break;
                     case HttpStatus.SC_GATEWAY_TIMEOUT:
                     case HttpStatus.SC_REQUEST_TIMEOUT:
-                        InspectorStats.incrementStatCount(InspectorStrings.PHOTON, InspectorStrings.TOTAL_PHOTON_REQUEST_TIMEOUT);
+                        InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_REQUEST_TIMEOUT);
                         break;
                 }
                 return brandAttr;
@@ -119,7 +126,7 @@ public class PhotonHelper {
 
             @Override
             public void onThrowable(final Throwable t) {
-                InspectorStats.incrementStatCount(InspectorStrings.PHOTON, TOTAL_PHOTON_ERROR_CALLBACK_FOR + t.getClass().getName());
+                InspectorStats.incrementStatCount(PHOTON, TOTAL_PHOTON_ERROR_CALLBACK_FOR + t.getClass().getName());
             }
         };
     }
