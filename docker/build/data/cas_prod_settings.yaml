@@ -104,9 +104,10 @@ prod:
         graphite_prefix_base: 'prod'
         photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1014.user.uh1.inmobi.com 10.24.198.125:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1015.user.uh1.inmobi.com 10.24.178.111:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+
     lhr1:
         cas:
             database:
@@ -319,9 +320,9 @@ pilot:
         graphite_prefix_base: 'prod'
         photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1014.user.uh1.inmobi.com 10.24.198.125:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1015.user.uh1.inmobi.com 10.24.178.111:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     lhr1:
         cas:
             database:
@@ -479,9 +480,9 @@ non_prod:
         graphite_prefix_base: 'non_prod'
         photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1014.user.uh1.inmobi.com 10.24.198.125:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1015.user.uh1.inmobi.com 10.24.178.111:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     debug:
         cas:
             database:
@@ -532,9 +533,9 @@ non_prod:
         graphite_prefix_base: 'non_prod'
         photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1014.user.uh1.inmobi.com 10.24.198.125:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1015.user.uh1.inmobi.com 10.24.178.111:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
     automation:
         cas:
             database:
@@ -584,9 +585,9 @@ non_prod:
         graphite_prefix_base: 'non_prod'
         photon_lb_endpoint: 'localhost:8083'
         photon_servers:
-          - 'usr1011.user.uh1.inmobi.com 10.24.170.101:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
-          - 'usr1012.user.uh1.inmobi.com 10.24.178.115:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
           - 'usr1013.user.uh1.inmobi.com 10.24.194.118:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1014.user.uh1.inmobi.com 10.24.198.125:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
+          - 'usr1015.user.uh1.inmobi.com 10.24.178.111:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 100'
 skyhook:
     uj1:
         cas:
