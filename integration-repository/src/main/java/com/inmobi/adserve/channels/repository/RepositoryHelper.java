@@ -497,6 +497,7 @@ public class RepositoryHelper {
         return ixPackageRepository.getIndexedPackages().retrieve(query);
     }
 
+    @SuppressWarnings("unchecked")
     public ResultSet<TargetingSegmentEntity> queryForMatchingTargetingSegments(
             final DemandSourceType dst,
             final String advertiserId,

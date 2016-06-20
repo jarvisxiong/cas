@@ -287,22 +287,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (LOG.isDebugEnabled()) {
             LOG.debug(templateEntity.toString());
         }
-        /*final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-        if (nativeContentObject == null) { */
         setDimensionForCustomTemplates();
-        /*} else {
-            for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
-                final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
-                final NativeAdContentAsset adContentAsset = attributes.getAdContentAsset();
-                final Dimension dimensions = imageAsset.getDimension();
-                thumbnailHeight = dimensions.getHeight();
-                thumbnailWidth = dimensions.getWidth();
-                if (adContentAsset == NativeAdContentAsset.SCREENSHOT) {
-                    isScreenshotResponse = true;
-                    break;
-                }
-            }
-        }*/
         return true;
     }
 

@@ -1,10 +1,16 @@
 package com.inmobi.adserve.channels.repository;
 
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.MOVIEBOARD_REQUIRED_JPATH_KEYS;
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.VAST_KEY;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.MOVIEBOARD;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.VAST;
-import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.VAST_KEY;
+import static com.inmobi.adserve.channels.repository.NativeConstraints.LAYOUT_FEED;
+import static com.inmobi.adserve.channels.repository.NativeConstraints.LAYOUT_ICON;
+import static com.inmobi.adserve.channels.repository.NativeConstraints.LAYOUT_STREAM;
+import static com.inmobi.adserve.channels.util.InspectorStrings.REPO_STAT_KEY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_MOVIEBOARD_TEMPLATES;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NATIVE_VIDEO_TEMPLATES;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -14,15 +20,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TDeserializer;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.query.NativeAdTemplateQuery;
 import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.adtemplate.platform.AdTemplate;
 import com.inmobi.adtemplate.platform.AdTemplateDemandConstraints;
 import com.inmobi.adtemplate.platform.CardDetail;
@@ -42,7 +44,6 @@ public class NativeAdTemplateRepository
         extends AbstractStatsMaintainingDBRepository<NativeAdTemplateEntity, NativeAdTemplateQuery>
         implements
             RepositoryManager {
-    private final static Gson GSON = new Gson();
 
     @Override
     public DBEntity<NativeAdTemplateEntity, NativeAdTemplateQuery> buildObjectFromRow(final ResultSetRow resultSetRow)
@@ -55,7 +56,7 @@ public class NativeAdTemplateRepository
         try {
             final Long templateId = row.getLong("native_template_id");
             final Integer uiLayoutId = (Integer) row.getObject("ui_layout_id");
-            final String contentJson = row.getString("content_json");
+            // final String contentJson = row.getString("content_json");
             final String binaryTemplate = row.getString("binary_template");
             if (StringUtils.isEmpty(binaryTemplate)) {
                 throw new RepositoryException("No binary template found.");
@@ -66,34 +67,19 @@ public class NativeAdTemplateRepository
             builder.modifiedOn(modifiedOn);
             builder.templateId(templateId);
 
-            if (null != uiLayoutId) {
-                try {
-                    builder.nativeUILayout(NativeAdContentUILayoutType.findByValue(uiLayoutId));
-                } catch (final IllegalArgumentException ignored) {
-                    // Ignored
-                }
-            }
-            if (null != contentJson) {
-                try {
-                    builder.contentJson(GSON.fromJson(contentJson, NativeContentJsonObject.class));
-                } catch (final JsonParseException jpe) {
-                    // Ignored
-                }
-            }
-
             // Deserialize ad Template Binary
             final TDeserializer deserializer = new TDeserializer();
             final AdTemplate adTemplate = new com.inmobi.adtemplate.platform.AdTemplate();
             deserializer.deserialize(adTemplate, Base64.decodeBase64(binaryTemplate));
+
             // Get fields from ad Template Binary
             List<String> demandJpath = null;
             if (adTemplate.isMultiCardTemplate() && checkIfMovieBoardTemplate(adTemplate.getMultiCardConstraints())) {
                 templateClass = MOVIEBOARD;
-                InspectorStats.incrementStatCount(InspectorStrings.TOTAL_MOVIEBOARD_TEMPLATES);
+                InspectorStats.incrementStatCount(REPO_STAT_KEY, TOTAL_MOVIEBOARD_TEMPLATES);
             } else {
                 final AdTemplateDemandConstraints adTemplateDemandConstraints = adTemplate.getDemandConstraints();
-                demandJpath = (null != adTemplateDemandConstraints ?
-                        adTemplateDemandConstraints.getJsonPath() : null);
+                demandJpath = null != adTemplateDemandConstraints ? adTemplateDemandConstraints.getJsonPath() : null;
             }
 
             if (demandJpath == null && templateClass != MOVIEBOARD) {
@@ -111,6 +97,7 @@ public class NativeAdTemplateRepository
                         mandatoryKey = key;
                     } else if (VAST_KEY.equalsIgnoreCase(key)) {
                         templateClass = VAST;
+                        InspectorStats.incrementStatCount(REPO_STAT_KEY, TOTAL_NATIVE_VIDEO_TEMPLATES);
                     }
                 }
             }
@@ -121,6 +108,12 @@ public class NativeAdTemplateRepository
                     errorMsg = "No mandatory/image Key for STATIC templateClass. JPath is " + demandJpath.toString();
                     throw new RepositoryException(errorMsg);
                 }
+                final NativeAdContentUILayoutType type = getnativeUILayout(uiLayoutId, mandatoryKey);
+                if (type == null) {
+                    throw new RepositoryException(String.format(
+                            "Native UI Layout is null for uiLayoutId=%s, mandatoryKey=%s", uiLayoutId, mandatoryKey));
+                }
+                builder.nativeUILayout(type);
             }
             builder.templateClass(templateClass);
             // Add template Content
@@ -131,7 +124,7 @@ public class NativeAdTemplateRepository
             }
             builder.template(templateContent);
             // Add Template to VM Cache
-            TemplateManager templateMgr = TemplateManager.getInstance();
+            final TemplateManager templateMgr = TemplateManager.getInstance();
             templateMgr.addToTemplateCache(templateId, templateContent);
             logger.debug(String.format("Adding templateId %d to NativeAdTemplateRepository", templateId));
             // Fetching the template from cache to check its validity
@@ -141,10 +134,49 @@ public class NativeAdTemplateRepository
             return new DBEntity<>(templateEntity, modifiedOn);
         } catch (final Exception e) {
             logger.error("Error in resultset row", e);
-            return new DBEntity<>(new EntityError<>(new NativeAdTemplateQuery(placementId, templateClass), errorMsg), modifiedOn);
+            return new DBEntity<>(new EntityError<>(new NativeAdTemplateQuery(placementId, templateClass), errorMsg),
+                    modifiedOn);
         }
     }
 
+    /**
+     *
+     * @param uiLayoutId
+     * @param mandatoryKey
+     * @return
+     */
+    private NativeAdContentUILayoutType getnativeUILayout(final Integer uiLayoutId, final String mandatoryKey) {
+        NativeAdContentUILayoutType toReturn = null;
+        if (null != uiLayoutId) {
+            try {
+                // builder.nativeUILayout(NativeAdContentUILayoutType.findByValue(uiLayoutId));
+                toReturn = NativeAdContentUILayoutType.findByValue(uiLayoutId);
+            } catch (final IllegalArgumentException ignored) {
+                // Ignored
+            }
+        }
+        if (null == toReturn) {
+            switch (mandatoryKey) {
+                case LAYOUT_ICON:
+                    toReturn = NativeAdContentUILayoutType.NEWS_FEED;
+                    break;
+                case LAYOUT_FEED:
+                    toReturn = NativeAdContentUILayoutType.NEWS_FEED;
+                    break;
+                case LAYOUT_STREAM:
+                    toReturn = NativeAdContentUILayoutType.CONTENT_STREAM;
+                    break;
+                // default is already taken care.
+            }
+        }
+        return toReturn;
+    }
+
+    /**
+     *
+     * @param multiCardConstraintsMap
+     * @return
+     */
     private boolean checkIfMovieBoardTemplate(final Map<Integer, MultiCardConstraints> multiCardConstraintsMap) {
         if (null == multiCardConstraintsMap) {
             return false;

@@ -392,9 +392,12 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         // Set interstitial or not
         impression.setInstl(RequestedAdType.INTERSTITIAL == sasParams.getRequestedAdType() ? 1 : 0);
 
-        shortlistedTargetingSegmentIds = getMatchingTargetingSegmentIds(sasParams, repositoryHelper, processedSlotId, entity);
+        shortlistedTargetingSegmentIds =
+                getMatchingTargetingSegmentIds(sasParams, repositoryHelper, processedSlotId, entity);
 
-        final Map<Integer, Boolean> packageToGeoCookieServed = PackageMatcherDelegateV2.getMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity, shortlistedTargetingSegmentIds, getName(), DO_NOT_QUERY_IN_OLD_REPO);
+        final Map<Integer, Boolean> packageToGeoCookieServed =
+                PackageMatcherDelegateV2.getMatchingPackageIds(sasParams, repositoryHelper, processedSlotId, entity,
+                        shortlistedTargetingSegmentIds, getName(), DO_NOT_QUERY_IN_OLD_REPO);
 
         if (null != packageToGeoCookieServed && !packageToGeoCookieServed.isEmpty()) {
             forwardedPackageIds = packageToGeoCookieServed.keySet();
@@ -409,9 +412,11 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             for (final DealEntity dealEntity : deals) {
                 final String id = dealEntity.getId();
                 forwardedDealIds.add(id);
-                final Deal deal = new Deal(id, max(dealEntity.getFloor(), casInternalRequestParameters.getAuctionBidFloor()), dealEntity.getCurrency(), dealEntity.getAuctionType().getValue());
+                final Deal deal =
+                        new Deal(id, max(dealEntity.getFloor(), casInternalRequestParameters.getAuctionBidFloor()),
+                                dealEntity.getCurrency(), dealEntity.getAuctionType().getValue());
                 dealsList.add(deal);
-                InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, DEAL_FORWARDED  + id);
+                InspectorStats.incrementStatCount(OVERALL_PMP_REQUEST_STATS, DEAL_FORWARDED + id);
             }
             final PMP pmp = new PMP();
             pmp.setDeals(dealsList);
@@ -510,15 +515,9 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             site.setCat(IABCategoriesMap.getIABCategories(sasParams.getCategories()));
         }
 
-
         final Map<String, String> siteExtensions = new HashMap<>();
-        String siteRating;
-        if (ContentType.FAMILY_SAFE == sasParams.getSiteContentType()) {
-            // Family safe
-            siteRating = FAMILY_SAFE_RATING;
-        } else {
-            siteRating = PERFORMANCE_RATING;
-        }
+        final String siteRating =
+                ContentType.FAMILY_SAFE == sasParams.getSiteContentType() ? FAMILY_SAFE_RATING : PERFORMANCE_RATING;
         siteExtensions.put(RATING_KEY, siteRating);
         site.setExt(siteExtensions);
 
@@ -802,15 +801,13 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         url = url.replaceAll(AUCTION_CURRENCY_INSENSITIVE, bidderCurrency);
 
         if (null != bidResponse.getSeatbid().get(0).getBid().get(0).getAdid()) {
-            url = url.replaceAll(AUCTION_AD_ID_INSENSITIVE,
-                    bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
+            url = url.replaceAll(AUCTION_AD_ID_INSENSITIVE, bidResponse.getSeatbid().get(0).getBid().get(0).getAdid());
         }
         if (null != bidResponse.getBidid()) {
             url = url.replaceAll(AUCTION_BID_ID_INSENSITIVE, bidResponse.getBidid());
         }
         if (null != bidResponse.getSeatbid().get(0).getSeat()) {
-            url = url.replaceAll(AUCTION_SEAT_ID_INSENSITIVE,
-                    bidResponse.getSeatbid().get(0).getSeat());
+            url = url.replaceAll(AUCTION_SEAT_ID_INSENSITIVE, bidResponse.getSeatbid().get(0).getSeat());
         }
         if (null == bidRequest) {
             LOG.info(traceMarker, "bidrequest is null");
@@ -980,19 +977,15 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
 
                 deal = dealEntityOptional.get();
                 final Integer packageId = deal.getPackageId();
-
+                auctionType = deal.getAuctionType();
                 if (CollectionUtils.isEmpty(forwardedPackageIds) || !forwardedPackageIds.contains(packageId)) {
                     InspectorStats.incrementStatCount(advertiserName,
                             RESPONSE_DROPPED_AS_NON_FORWARDED_DEAL_WAS_RECEIVED + dealId);
                     return false;
                 }
-
-                auctionType = deal.getAuctionType();
-
                 if (StringUtils.isNotBlank(deal.getCurrency())) {
                     bidderCurrency = deal.getCurrency();
                 }
-
                 dealAttributionMetadata =
                         generateDealAttributionMetadata(shortlistedTargetingSegmentIds, deal.getPackageId(), sasParams
                                 .getCsiTags(), repositoryHelper, GEO_COOKIE_NOT_SUPPORTED);

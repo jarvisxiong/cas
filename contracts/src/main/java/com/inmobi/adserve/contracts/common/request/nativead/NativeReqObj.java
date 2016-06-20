@@ -30,7 +30,7 @@ public class NativeReqObj {
     private List<Asset> assets;
     private CommonExtension ext;
 
-    public NativeReqObj(NativeLayoutId layout) {
+    public NativeReqObj(final NativeLayoutId layout) {
         this.layout = layout.getKey();
     }
 

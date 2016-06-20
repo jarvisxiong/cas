@@ -84,11 +84,8 @@ public class ServerModule extends AbstractModule {
     @Singleton
     @Provides
     Map<String, Servlet> provideServletMap(final Injector injector) {
-
         final Map<String, Servlet> pathToServletMap = Maps.newHashMap();
-
         final Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Path.class);
-
         for (final Class<?> class1 : classes) {
             pathToServletMap.put(class1.getAnnotation(Path.class).value(), (Servlet) injector.getInstance(class1));
         }

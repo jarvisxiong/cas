@@ -86,13 +86,14 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             jsAdTag = Boolean.parseBoolean(entity.getAdditionalParams().getString(JS_AD_TAG));
         } catch (final JSONException e) {
             jsAdTag = false;
-            LOG.debug("exception raised while retrieving JS_AD_TAG from additional Params {}", e);
+            LOG.debug(
+                    "exception raised while retrieving JS_AD_TAG from additional Params for the segment:{} {}, exception raised {}",
+                    entity.getExternalSiteKey(), getName(), e);
         }
 
-        isApp =
-                StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
-                        ? false
-                        : true;
+        isApp = StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
+                ? false
+                : true;
         constructURL();
         return true;
     }
@@ -151,8 +152,7 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
         }
 
         final String ifa = getUidIFA(false);
-        if (StringUtils.isNotEmpty(ifa)
-                && casInternalRequestParameters.isTrackingAllowed()) {
+        if (StringUtils.isNotEmpty(ifa) && casInternalRequestParameters.isTrackingAllowed()) {
             finalUrlBuilder.append("&d(id24)=").append(ifa);
         }
 
@@ -229,8 +229,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             buildInmobiAdTracker();
 
             try {
-                responseContent = Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams,
-                        getBeaconUrl());
+                responseContent =
+                        Formatter.getResponseFromTemplate(TemplateType.HTML, context, sasParams, getBeaconUrl());
             } catch (final Exception exception) {
                 adStatus = NO_AD;
                 LOG.info("Error parsing response {} from nexage: {}", response, exception);
@@ -254,9 +254,8 @@ public class DCPNexageAdNetwork extends AbstractDCPAdNetworkImpl {
             context.put(LAT_LONG, casInternalRequestParameters.getLatLong());
         }
         try {
-            responseContent =
-                    Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams,
-                            getBeaconUrl());
+            responseContent = Formatter.getResponseFromTemplate(TemplateType.NEXAGE_JS_AD_TAG, context, sasParams,
+                    getBeaconUrl());
             LOG.debug("response length is {}", responseContent.length());
             adStatus = AD_STRING;
         } catch (final Exception exception) {

@@ -92,8 +92,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_HANDSET_TARGETING_FILTER = "DroppedinHandsetTargetingFilter";
     public static final String DROPPED_IN_AUTOMATION_FRAMEWORK_FILTER = "DroppedinAutomationFrameworkFilter";
     public static final String DROPPED_IN_AD_TYPE_TARGETING_FILTER = "DroppedInAdTypeTargetingFilter";
-    public static final String DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE =
-            "DroppedInAdTypeTargetingFilter.UnknownAdTypeFormat";
+    public static final String DROPPED_AS_UNKNOWN_ADGROUP_AD_TYPE = "DroppedInAdTypeTargetingFilter.UnknownAdTypeFormat";
     public static final String DROPPED_IN_PRICING_ENGINE_FILTER = "DroppedinPricingEngineFilter";
     public static final String DROPPED_IN_TOD_FILTER = "DroppedInTODFilter";
     public static final String SITE_FEEDBACK_CACHE_HIT = "SiteFeedbackCacheHit";
@@ -123,8 +122,7 @@ public class InspectorStrings {
     public static final String DROPPED_IN_CREATIVE_VALIDATOR_FILTER = "DroppedInCreativeValidatorFilter";
     public static final String DROPPED_IN_AUCTION_IX_IMPRESSION_ID_FILTER = "DroppedInAuctionIxImpressionIdFilter";
     public static final String DROPPED_IN_ACCOUNT_SEGMENT_FILTER = "DroppedInAccountSegmentFilter";
-    public static final String DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER =
-            "DroppedInSupplyDemandClassificationFilter";
+    public static final String DROPPED_IN_SUPPLY_DEMAND_CLASSIFICATION_FILTER = "DroppedInSupplyDemandClassificationFilter";
     public static final String DROPPED_IN_RTB_CURRENCY_NOT_SUPPORTED_FILTER = "DroppedInRtbCurrencyNotSupportedFilter";
     public static final String DROPPED_IN_INVALID_DETAILS_FILTER = "DroppedInInvalidDetailsFilter";
     public static final String DROPPED_IN_PARTNER_COUNT_FILTER = "DroppedInPartnerCountFilter";
@@ -146,12 +144,9 @@ public class InspectorStrings {
     public static final String TOTAL_PURE_VAST_REQUESTS = "TotalPureVASTRequests";
     public static final String TOTAL_NATIVE_VAST_REQUESTS = "TotalNativeVASTRequests";
     public static final String TOTAL_MOVIEBOARD_REQUESTS = "TotalMovieBoardRequests";
-    public static final String TOTAL_MOVIEBOARD_TEMPLATES = "TotalMovieBoardTemplates";
     public static final String TOTAL_PURE_VAST_RESPONSE = "TotalPureVASTResponses";
-    public static final String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING =
-            "totalPureVastResponseInlineOrWrapperMissing";
-    public static final String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING =
-            "totalPureVastResponseTrackingEventsMissing";
+    public static final String TOTAL_PURE_VAST_RESPONSE_INLINE_OR_WRAPPER_MISSING = "totalPureVastResponseInlineOrWrapperMissing";
+    public static final String TOTAL_PURE_VAST_RESPONSE_TRACKING_EVENTS_MISSING = "totalPureVastResponseTrackingEventsMissing";
     public static final String TOTAL_REWARDED_VAST_VIDEO_REQUESTS = "TotalRewardedVASTVideoRequests";
     public static final String TOTAL_VIDEO_RESPONSES = "TotalVideoResponses";
     public static final String TOTAL_VAST_VIDEO_RESPONSES = "TotalVASTVideoResponses";
@@ -307,4 +302,9 @@ public class InspectorStrings {
     public static final String LATENCY_FOR_PHOTON_FUTURE_CALL = "FutureCallLatency";
     public static final String LATENCY_FOR_NING_PHOTON_RESPONSE = "NingResponseLatency";
     public static final String TOTAL_NULL_CSIDS = "NullCSIds";
+    
+    // Repo related stats
+    public static final String REPO_STAT_KEY = "repoData";
+    public static final String TOTAL_MOVIEBOARD_TEMPLATES = "TotalMovieBoardTemplates";
+    public static final String TOTAL_NATIVE_VIDEO_TEMPLATES = "TotalNativeVideoTemplates";
 }

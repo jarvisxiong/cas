@@ -1,5 +1,27 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.replay;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.apache.commons.configuration.Configuration;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 import com.inmobi.adserve.channels.adnetworks.taboola.DCPTaboolaAdnetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
@@ -13,37 +35,12 @@ import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
-import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
-import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.template.config.DefaultConfiguration;
 import com.inmobi.template.gson.GsonManager;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.support.membermodification.MemberMatcher;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.lang.reflect.Field;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.assertEquals;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.replay;
 
 /**
  * Created by thushara.v on 19/06/15.
@@ -69,8 +66,6 @@ public class DCPTaboolaAdnetworkTest {
     private static RepositoryHelper repositoryHelper;
     private static WapSiteUACEntity wapSiteUACEntity;
     private static NativeAdTemplateEntity templateEntity;
-    private static ImageAsset imageAsset;
-    private static CommonAssetAttributes commonAssetAttributes;
 
     public static void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -130,20 +125,7 @@ public class DCPTaboolaAdnetworkTest {
         expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15).anyTimes();
 
-        commonAssetAttributes = createMock(CommonAssetAttributes.class);
-        expect(commonAssetAttributes.getAdContentAsset()).andReturn(NativeAdContentAsset.SCREENSHOT);
-        replay(commonAssetAttributes);
-        imageAsset = createMock(ImageAsset.class);
-        final com.inmobi.adserve.contracts.misc.contentjson.Dimension dimension =
-                new com.inmobi.adserve.contracts.misc.contentjson.Dimension();
-        dimension.setHeight(200);
-        dimension.setWidth(200);
-        expect(imageAsset.getDimension()).andReturn(dimension);
 
-        expect(imageAsset.getCommonAttributes()).andReturn(commonAssetAttributes);
-        replay(imageAsset);
-        final List<ImageAsset> assets = new ArrayList<>();
-        assets.add(imageAsset);
         wapSiteUACEntity = createMock(WapSiteUACEntity.class);
         expect(wapSiteUACEntity.isTransparencyEnabled()).andReturn(true).anyTimes();
         expect(wapSiteUACEntity.getAppTitle()).andReturn("Taboola").anyTimes();
@@ -151,16 +133,12 @@ public class DCPTaboolaAdnetworkTest {
         expect(wapSiteUACEntity.getSiteUrl()).andReturn("http://abc.com").anyTimes();
         expect(wapSiteUACEntity.getBundleId()).andReturn("a.b.c").anyTimes();
         replay(wapSiteUACEntity);
-        final NativeContentJsonObject json = createMock(NativeContentJsonObject.class);
         templateEntity = createMock(NativeAdTemplateEntity.class);
-        expect(templateEntity.getContentJson()).andReturn(json);
         expect(templateEntity.getMandatoryKey()).andReturn("layoutConstraint.1");
-        expect(json.getImageAssets()).andReturn(assets);
         replay(templateEntity);
         expect(repositoryHelper.queryNativeAdTemplateRepository(1l, TemplateClass.STATIC)).andReturn(templateEntity)
                 .anyTimes();
         replay(repositoryHelper);
-        replay(json);
 
         dcptaboolaAdNetwork = new DCPTaboolaAdnetwork(mockConfig, clientBootstrap, base, serverChannel);
 

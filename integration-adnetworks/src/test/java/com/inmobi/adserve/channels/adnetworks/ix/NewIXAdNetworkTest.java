@@ -67,6 +67,7 @@ import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
+import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
@@ -233,6 +234,7 @@ public class NewIXAdNetworkTest {
 
         final NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
         builder.mandatoryKey("layoutConstraint.1");
+        builder.nativeUILayout(NativeAdContentUILayoutType.CHAT_LIST);
         final NativeAdTemplateEntity entity = builder.build();
 
         final JSONObject additionalParams = new JSONObject();
