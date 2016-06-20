@@ -64,7 +64,7 @@ public class LogStringConf {
                 break;
             }
             case MSG_RTBD_RESPONSE: {
-                logLine = "RTBD response json to RE is AdPoolResponse";
+                logLine = "RTBD response json to UMP";
                 System.out.println("****** Searching for \"" + logLine + "\" in the logs ! *****");
                 break;
             }
