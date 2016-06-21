@@ -1786,6 +1786,14 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
+    @Test(testName = "TEST_UID_PRESENT_IN_TUIDPARAMS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_UID_PRESENT_IN_TUIDPARAMS(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("UID=0002e17f-4df0-4067-8776-27ff6efac8de");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)
     // public void TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS(final String x, final ResponseBuilder responseBuilder)

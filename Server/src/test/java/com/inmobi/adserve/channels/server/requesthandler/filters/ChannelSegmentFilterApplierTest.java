@@ -222,7 +222,6 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(s2.getAdgroupId()).andReturn("").anyTimes();
         replay(s2);
         sasParams = new SASRequestParameters();
-        sasParams.setUidParams("xxx");
         sasParams.setPostalCode("110051");
         sasParams.setLatLong("11.35&12.56");
         sasParams.setRichMedia(true);
@@ -350,7 +349,6 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
 
         assertEquals(true, channelSegments.contains(channelSegment));
 
-        sasParams.setUidParams(null);
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
 
         assertEquals(false, channelSegments.contains(channelSegment));

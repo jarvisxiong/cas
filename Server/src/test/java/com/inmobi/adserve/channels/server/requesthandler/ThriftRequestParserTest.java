@@ -213,7 +213,6 @@ public class ThriftRequestParserTest extends TestCase {
         assertEquals(sasRequestParameters.getSiteFloor(), 3.2);
         assertEquals(sasRequestParameters.getAllowBannerAds(), Boolean.FALSE);
         assertEquals(sasRequestParameters.getSiteSegmentId(), new Integer(234));
-        assertEquals(sasRequestParameters.getUidParams(), null);
         assertEquals(sasRequestParameters.getTUidParams(), null);
         assertEquals(sasRequestParameters.getRqIframe(), "009");
         assertEquals(sasRequestParameters.getRFormat(), "xhtml");

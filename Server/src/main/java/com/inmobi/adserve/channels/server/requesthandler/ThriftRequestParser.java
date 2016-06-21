@@ -14,6 +14,7 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABS
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI_BEING_SENT_FOR;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.UID_KEY;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -140,11 +141,12 @@ public class ThriftRequestParser {
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
             final UidType selectedUidType = tObject.getUidParams().getSelectedUidType();
-            String uId = null;
             if (tObject.getUidParams().isSetRawUidValues()) {
-                final Map<UidType, String> rawUidParams = tObject.getUidParams().getRawUidValues();
-                params.setTUidParams(getUserIdMap(rawUidParams));
-                uId = rawUidParams.get(selectedUidType);
+                Map<UidType, String> rawUidParams = tObject.getUidParams().getRawUidValues();
+                Map<String, String> tUidParamMap = getUserIdMap(rawUidParams);
+                final String uId = rawUidParams.get(selectedUidType);
+                tUidParamMap.put(UID_KEY, uId);
+                params.setTUidParams(tUidParamMap);
                 params.setSelectedUserId(uId);
             }
         }

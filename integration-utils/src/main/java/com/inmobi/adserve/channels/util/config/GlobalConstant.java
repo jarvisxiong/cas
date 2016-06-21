@@ -32,4 +32,5 @@ public class GlobalConstant {
     public static final String PROD = "prod";
     public static final String NON_PROD = "non_prod";
     public static final String SDK_TIMESTAMP_SUFFIX = "&__t=$TS";
+    public static final String UID_KEY = "UID";
 }

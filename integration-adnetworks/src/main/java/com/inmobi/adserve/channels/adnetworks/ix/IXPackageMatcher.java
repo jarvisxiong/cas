@@ -321,7 +321,6 @@ class IXPackageMatcher {
     }
 
     private static boolean isUdIdPresent(final SASRequestParameters sasParams) {
-        return StringUtils.isNotEmpty(sasParams.getUidParams()) && !"{}".equals(sasParams.getUidParams())
-                || null != sasParams.getTUidParams() && !sasParams.getTUidParams().isEmpty();
+        return  !(null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty());
     }
 }
