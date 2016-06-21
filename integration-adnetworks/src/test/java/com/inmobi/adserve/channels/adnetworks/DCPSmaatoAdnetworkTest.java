@@ -155,10 +155,10 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
-                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                            "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
                 dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 11, repositoryHelper));
     }
@@ -175,9 +175,9 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, null,
-                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
                 dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
     }
@@ -221,10 +221,10 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "6378ef4a7db50d955c90f7dffb05ee20";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                    new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                        new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
 
@@ -278,10 +278,10 @@ public class DCPSmaatoAdnetworkTest {
 
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         AdapterTestHelper.setBeaconAndClickStubs();
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         final String response =
@@ -305,66 +305,66 @@ public class DCPSmaatoAdnetworkTest {
 
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         AdapterTestHelper.setBeaconAndClickStubs();
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         final String response =
                 "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>8480EA708D25F34A3FEBC14FF1E4F188.ip-10-0-32-9</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"RICHMEDIA\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><mediadata><![CDATA[\n" +
-                    "<div style=\"display:none; position:absolute;\" id=\"im_7056_clickTarget\"></div>\n" +
-                    "<script type=\"text/javascript\">\n" +
-                    "(function() {var e=encodeURIComponent,f=window,h=document,k='appendChild',l='createElement',p='setAttribute',q='',r='&',s='0',t='2',u='=',v='?m=',w='Events',x='_blank',y='a',z='click',A='clickCallback',B='clickTarget',C='error',D='event',E='function',F='height',G='href',H='iatSendClick',I='iframe',J='img',K='impressionCallback',L='onclick',M='openLandingPage',N='recordEvent',O='seamless',P='src',Q='target',R='width';f.inmobi=f.inmobi||{};var S=f.inmobi;S.c=S.c||[];\n" +
-                    "S.b=function(a,b){for(var c=S.c,d=0;d<c.length;d++)c[d].call(this,a,b)};S.recordEvent=S.b;function T(a){function b(a,b){c.b(a,b)}this.i=a.lp;this.j=a.lps;this.e=a.ct;this.f=a.tc;this.g=a.bcu;this.a=a.ns;this.k=a.ws;a=this.a;var c=this;f[a+M]=function(){var a=T.d(c.i),b=f.mraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=T.d(c.j),b=h[l](y),b[p](Q,x),b[p](G,a),h.body[k](b),T.h(b))};f[a+A]=function(a){U(c,a)};f[a+K]=function(){V(c)};S.c.push(b);f[a+N]=b}S.Bolt=T;\n" +
-                    "T.h=function(a){if(typeof a.click==E)a.click.call(a);else if(a.fireEvent)a.fireEvent(L);else if(a.dispatchEvent){var b=h.createEvent(w);b.initEvent(z,!1,!0);a.dispatchEvent(b)}};T.d=function(a){return a.replace(/\\$TS/g,q+(new Date).getTime())};function W(a,b){var c=h.getElementById(a.a+B),d=h[l](I);d[p](P,b);d[p](O,O);d[p](F,s);d[p](R,t);c[k](d)}\n" +
-                    "function U(a,b){var c=f[a.a+H];c&&c();for(var c=a.e.length,d=0;d<c;d++)W(a,T.d(a.e[d]));a.k&&(b=b||eval(D),'undefined'!==typeof b&&(c=void 0!=b.touches?b.touches[0]:b,f.external.notify(JSON.stringify({l:c.clientX,m:c.clientY}))))}function V(a){if(null!=a.f)try{var b=h.getElementById(a.a+B),c=a.f,d=h[l](I);d[p](O,O);d[p](F,s);d[p](R,t);b[k](d);var g=d.contentWindow;g&&g.document.write(c)}catch(n){}}\n" +
-                    "T.prototype.b=function(a,b){function c(a,b,g){if(!(0>=g)){var n=h.getElementById(d.a+B),m=h[l](J);m[p](P,a);m[p](F,s);m[p](R,t);void 0!=m.addEventListener&&m.addEventListener(C,function(){f.setTimeout(function(){3E5<b&&(b=3E5);c(a,2*b,g-1)},b*Math.random())},!1);n[k](m)}}var d=this,g=this.g,g=g+(v+a);if(b)for(var n in b)g+=r+e(n)+u+e(b[n]);c(g,1E3,5);18==a&&V(this);8==a&&U(this,null)};})();\n" +
-                    " new window.inmobi.Bolt({\"lp\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"lps\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"ct\":[\"http://c.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/1/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/778ec58e?at\\u003d1\\u0026am\\u003d0\"],\"bcu\":\"http://et.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/0/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/d06308c7\",\"ws\":false,\"ns\":\"im_7056_\"});\n" +
-                    "(function() {var a=window,c='handleClick',e='handleTouchEnd',f='handleTouchStart';a.inmobi=a.inmobi||{};function g(b,h){this.b=h;this.a=this.c=!1;var d=this;a[b+c]=function(){d.click()};a[b+f]=function(){d.start(a.event)};a[b+e]=function(){d.end()}}a.inmobi.OldTap=g;g.prototype.click=function(){this.c||this.b()};g.prototype.start=function(b){this.a=this.c=!0;b&&b.preventDefault()};g.prototype.end=function(){this.a&&(this.a=!1,this.b())};})();\n" +
-                    " new window.inmobi.OldTap(\"im_7056_\", function() {\n" +
-                    "  window['im_7056_openLandingPage']();\n" +
-                    "  window['im_7056_recordEvent'](8);\n" +
-                    "});\n" +
-                    "</script>\n" +
-                    "<div onclick=\"im_7056_mwClick()\">\n" +
-                    "<img border=\"0\" src=\"http://r.edge.inmobicdn.net/FileData/340e85973578468798d470bccea3c214.gif\" alt=\" \" height=\"50\" width=\"320\"/>\n" +
-                    "</div>\n" +
-                    "<script type=\"text/javascript\">\n" +
-                    "var im_7056_mwClick = function() {im_7056_recordEvent(8);im_7056_openLandingPage();};\n" +
-                    "</script>\n" +
-                    "  <script type=\"text/javascript\"> im_7056_recordEvent(18); </script>\n" +
-                    "<style>body{margin:0}</style>\n" +
-                    "\n" +
-                    "]]></mediadata><link></link><action target=\"\" type=\"\"/><beacons><beacon>http://54.86.57.126/oapi/getAd;jsessionid=8480EA708D25F34A3FEBC14FF1E4F188.ip-10-0-32-9</beacon></beacons></ad></ads></response>";
+                        "<div style=\"display:none; position:absolute;\" id=\"im_7056_clickTarget\"></div>\n" +
+                        "<script type=\"text/javascript\">\n" +
+                        "(function() {var e=encodeURIComponent,f=window,h=document,k='appendChild',l='createElement',p='setAttribute',q='',r='&',s='0',t='2',u='=',v='?m=',w='Events',x='_blank',y='a',z='click',A='clickCallback',B='clickTarget',C='error',D='event',E='function',F='height',G='href',H='iatSendClick',I='iframe',J='img',K='impressionCallback',L='onclick',M='openLandingPage',N='recordEvent',O='seamless',P='src',Q='target',R='width';f.inmobi=f.inmobi||{};var S=f.inmobi;S.c=S.c||[];\n" +
+                        "S.b=function(a,b){for(var c=S.c,d=0;d<c.length;d++)c[d].call(this,a,b)};S.recordEvent=S.b;function T(a){function b(a,b){c.b(a,b)}this.i=a.lp;this.j=a.lps;this.e=a.ct;this.f=a.tc;this.g=a.bcu;this.a=a.ns;this.k=a.ws;a=this.a;var c=this;f[a+M]=function(){var a=T.d(c.i),b=f.mraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=T.d(c.j),b=h[l](y),b[p](Q,x),b[p](G,a),h.body[k](b),T.h(b))};f[a+A]=function(a){U(c,a)};f[a+K]=function(){V(c)};S.c.push(b);f[a+N]=b}S.Bolt=T;\n" +
+                        "T.h=function(a){if(typeof a.click==E)a.click.call(a);else if(a.fireEvent)a.fireEvent(L);else if(a.dispatchEvent){var b=h.createEvent(w);b.initEvent(z,!1,!0);a.dispatchEvent(b)}};T.d=function(a){return a.replace(/\\$TS/g,q+(new Date).getTime())};function W(a,b){var c=h.getElementById(a.a+B),d=h[l](I);d[p](P,b);d[p](O,O);d[p](F,s);d[p](R,t);c[k](d)}\n" +
+                        "function U(a,b){var c=f[a.a+H];c&&c();for(var c=a.e.length,d=0;d<c;d++)W(a,T.d(a.e[d]));a.k&&(b=b||eval(D),'undefined'!==typeof b&&(c=void 0!=b.touches?b.touches[0]:b,f.external.notify(JSON.stringify({l:c.clientX,m:c.clientY}))))}function V(a){if(null!=a.f)try{var b=h.getElementById(a.a+B),c=a.f,d=h[l](I);d[p](O,O);d[p](F,s);d[p](R,t);b[k](d);var g=d.contentWindow;g&&g.document.write(c)}catch(n){}}\n" +
+                        "T.prototype.b=function(a,b){function c(a,b,g){if(!(0>=g)){var n=h.getElementById(d.a+B),m=h[l](J);m[p](P,a);m[p](F,s);m[p](R,t);void 0!=m.addEventListener&&m.addEventListener(C,function(){f.setTimeout(function(){3E5<b&&(b=3E5);c(a,2*b,g-1)},b*Math.random())},!1);n[k](m)}}var d=this,g=this.g,g=g+(v+a);if(b)for(var n in b)g+=r+e(n)+u+e(b[n]);c(g,1E3,5);18==a&&V(this);8==a&&U(this,null)};})();\n" +
+                        " new window.inmobi.Bolt({\"lp\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"lps\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"ct\":[\"http://c.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/1/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/778ec58e?at\\u003d1\\u0026am\\u003d0\"],\"bcu\":\"http://et.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/0/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/d06308c7\",\"ws\":false,\"ns\":\"im_7056_\"});\n" +
+                        "(function() {var a=window,c='handleClick',e='handleTouchEnd',f='handleTouchStart';a.inmobi=a.inmobi||{};function g(b,h){this.b=h;this.a=this.c=!1;var d=this;a[b+c]=function(){d.click()};a[b+f]=function(){d.start(a.event)};a[b+e]=function(){d.end()}}a.inmobi.OldTap=g;g.prototype.click=function(){this.c||this.b()};g.prototype.start=function(b){this.a=this.c=!0;b&&b.preventDefault()};g.prototype.end=function(){this.a&&(this.a=!1,this.b())};})();\n" +
+                        " new window.inmobi.OldTap(\"im_7056_\", function() {\n" +
+                        "  window['im_7056_openLandingPage']();\n" +
+                        "  window['im_7056_recordEvent'](8);\n" +
+                        "});\n" +
+                        "</script>\n" +
+                        "<div onclick=\"im_7056_mwClick()\">\n" +
+                        "<img border=\"0\" src=\"http://r.edge.inmobicdn.net/FileData/340e85973578468798d470bccea3c214.gif\" alt=\" \" height=\"50\" width=\"320\"/>\n" +
+                        "</div>\n" +
+                        "<script type=\"text/javascript\">\n" +
+                        "var im_7056_mwClick = function() {im_7056_recordEvent(8);im_7056_openLandingPage();};\n" +
+                        "</script>\n" +
+                        "  <script type=\"text/javascript\"> im_7056_recordEvent(18); </script>\n" +
+                        "<style>body{margin:0}</style>\n" +
+                        "\n" +
+                        "]]></mediadata><link></link><action target=\"\" type=\"\"/><beacons><beacon>http://54.86.57.126/oapi/getAd;jsessionid=8480EA708D25F34A3FEBC14FF1E4F188.ip-10-0-32-9</beacon></beacons></ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpSmaatoAdNetwork.getHttpResponseStatusCode());
         assertEquals(
                 "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body>\n" +
-                    "<div style=\"display:none; position:absolute;\" id=\"im_7056_clickTarget\"></div>\n" +
-                    "<script type=\"text/javascript\">\n" +
-                    "(function() {var e=encodeURIComponent,f=window,h=document,k='appendChild',l='createElement',p='setAttribute',q='',r='&',s='0',t='2',u='=',v='?m=',w='Events',x='_blank',y='a',z='click',A='clickCallback',B='clickTarget',C='error',D='event',E='function',F='height',G='href',H='iatSendClick',I='iframe',J='img',K='impressionCallback',L='onclick',M='openLandingPage',N='recordEvent',O='seamless',P='src',Q='target',R='width';f.inmobi=f.inmobi||{};var S=f.inmobi;S.c=S.c||[];\n" +
-                    "S.b=function(a,b){for(var c=S.c,d=0;d<c.length;d++)c[d].call(this,a,b)};S.recordEvent=S.b;function T(a){function b(a,b){c.b(a,b)}this.i=a.lp;this.j=a.lps;this.e=a.ct;this.f=a.tc;this.g=a.bcu;this.a=a.ns;this.k=a.ws;a=this.a;var c=this;f[a+M]=function(){var a=T.d(c.i),b=f.mraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=T.d(c.j),b=h[l](y),b[p](Q,x),b[p](G,a),h.body[k](b),T.h(b))};f[a+A]=function(a){U(c,a)};f[a+K]=function(){V(c)};S.c.push(b);f[a+N]=b}S.Bolt=T;\n" +
-                    "T.h=function(a){if(typeof a.click==E)a.click.call(a);else if(a.fireEvent)a.fireEvent(L);else if(a.dispatchEvent){var b=h.createEvent(w);b.initEvent(z,!1,!0);a.dispatchEvent(b)}};T.d=function(a){return a.replace(/\\$TS/g,q+(new Date).getTime())};function W(a,b){var c=h.getElementById(a.a+B),d=h[l](I);d[p](P,b);d[p](O,O);d[p](F,s);d[p](R,t);c[k](d)}\n" +
-                    "function U(a,b){var c=f[a.a+H];c&&c();for(var c=a.e.length,d=0;d<c;d++)W(a,T.d(a.e[d]));a.k&&(b=b||eval(D),'undefined'!==typeof b&&(c=void 0!=b.touches?b.touches[0]:b,f.external.notify(JSON.stringify({l:c.clientX,m:c.clientY}))))}function V(a){if(null!=a.f)try{var b=h.getElementById(a.a+B),c=a.f,d=h[l](I);d[p](O,O);d[p](F,s);d[p](R,t);b[k](d);var g=d.contentWindow;g&&g.document.write(c)}catch(n){}}\n" +
-                    "T.prototype.b=function(a,b){function c(a,b,g){if(!(0>=g)){var n=h.getElementById(d.a+B),m=h[l](J);m[p](P,a);m[p](F,s);m[p](R,t);void 0!=m.addEventListener&&m.addEventListener(C,function(){f.setTimeout(function(){3E5<b&&(b=3E5);c(a,2*b,g-1)},b*Math.random())},!1);n[k](m)}}var d=this,g=this.g,g=g+(v+a);if(b)for(var n in b)g+=r+e(n)+u+e(b[n]);c(g,1E3,5);18==a&&V(this);8==a&&U(this,null)};})();\n" +
-                    " new window.inmobi.Bolt({\"lp\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"lps\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"ct\":[\"http://c.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/1/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/778ec58e?at\\u003d1\\u0026am\\u003d0\"],\"bcu\":\"http://et.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/0/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/d06308c7\",\"ws\":false,\"ns\":\"im_7056_\"});\n" +
-                    "(function() {var a=window,c='handleClick',e='handleTouchEnd',f='handleTouchStart';a.inmobi=a.inmobi||{};function g(b,h){this.b=h;this.a=this.c=!1;var d=this;a[b+c]=function(){d.click()};a[b+f]=function(){d.start(a.event)};a[b+e]=function(){d.end()}}a.inmobi.OldTap=g;g.prototype.click=function(){this.c||this.b()};g.prototype.start=function(b){this.a=this.c=!0;b&&b.preventDefault()};g.prototype.end=function(){this.a&&(this.a=!1,this.b())};})();\n" +
-                    " new window.inmobi.OldTap(\"im_7056_\", function() {\n" +
-                    "  window['im_7056_openLandingPage']();\n" +
-                    "  window['im_7056_recordEvent'](8);\n" +
-                    "});\n" +
-                    "</script>\n" +
-                    "<div onclick=\"im_7056_mwClick()\">\n" +
-                    "<img border=\"0\" src=\"http://r.edge.inmobicdn.net/FileData/340e85973578468798d470bccea3c214.gif\" alt=\" \" height=\"50\" width=\"320\"/>\n" +
-                    "</div>\n" +
-                    "<script type=\"text/javascript\">\n" +
-                    "var im_7056_mwClick = function() {im_7056_recordEvent(8);im_7056_openLandingPage();};\n" +
-                    "</script>\n" +
-                    "  <script type=\"text/javascript\"> im_7056_recordEvent(18); </script>\n" +
-                    "<style>body{margin:0}</style>\n" +
-                    "\n" +
-                    "<img src='http://54.86.57.126/oapi/getAd;jsessionid=8480EA708D25F34A3FEBC14FF1E4F188.ip-10-0-32-9' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
+                        "<div style=\"display:none; position:absolute;\" id=\"im_7056_clickTarget\"></div>\n" +
+                        "<script type=\"text/javascript\">\n" +
+                        "(function() {var e=encodeURIComponent,f=window,h=document,k='appendChild',l='createElement',p='setAttribute',q='',r='&',s='0',t='2',u='=',v='?m=',w='Events',x='_blank',y='a',z='click',A='clickCallback',B='clickTarget',C='error',D='event',E='function',F='height',G='href',H='iatSendClick',I='iframe',J='img',K='impressionCallback',L='onclick',M='openLandingPage',N='recordEvent',O='seamless',P='src',Q='target',R='width';f.inmobi=f.inmobi||{};var S=f.inmobi;S.c=S.c||[];\n" +
+                        "S.b=function(a,b){for(var c=S.c,d=0;d<c.length;d++)c[d].call(this,a,b)};S.recordEvent=S.b;function T(a){function b(a,b){c.b(a,b)}this.i=a.lp;this.j=a.lps;this.e=a.ct;this.f=a.tc;this.g=a.bcu;this.a=a.ns;this.k=a.ws;a=this.a;var c=this;f[a+M]=function(){var a=T.d(c.i),b=f.mraid;'undefined'!==typeof b&&'undefined'!==typeof b.openExternal?b.openExternal(a):(a=T.d(c.j),b=h[l](y),b[p](Q,x),b[p](G,a),h.body[k](b),T.h(b))};f[a+A]=function(a){U(c,a)};f[a+K]=function(){V(c)};S.c.push(b);f[a+N]=b}S.Bolt=T;\n" +
+                        "T.h=function(a){if(typeof a.click==E)a.click.call(a);else if(a.fireEvent)a.fireEvent(L);else if(a.dispatchEvent){var b=h.createEvent(w);b.initEvent(z,!1,!0);a.dispatchEvent(b)}};T.d=function(a){return a.replace(/\\$TS/g,q+(new Date).getTime())};function W(a,b){var c=h.getElementById(a.a+B),d=h[l](I);d[p](P,b);d[p](O,O);d[p](F,s);d[p](R,t);c[k](d)}\n" +
+                        "function U(a,b){var c=f[a.a+H];c&&c();for(var c=a.e.length,d=0;d<c;d++)W(a,T.d(a.e[d]));a.k&&(b=b||eval(D),'undefined'!==typeof b&&(c=void 0!=b.touches?b.touches[0]:b,f.external.notify(JSON.stringify({l:c.clientX,m:c.clientY}))))}function V(a){if(null!=a.f)try{var b=h.getElementById(a.a+B),c=a.f,d=h[l](I);d[p](O,O);d[p](F,s);d[p](R,t);b[k](d);var g=d.contentWindow;g&&g.document.write(c)}catch(n){}}\n" +
+                        "T.prototype.b=function(a,b){function c(a,b,g){if(!(0>=g)){var n=h.getElementById(d.a+B),m=h[l](J);m[p](P,a);m[p](F,s);m[p](R,t);void 0!=m.addEventListener&&m.addEventListener(C,function(){f.setTimeout(function(){3E5<b&&(b=3E5);c(a,2*b,g-1)},b*Math.random())},!1);n[k](m)}}var d=this,g=this.g,g=g+(v+a);if(b)for(var n in b)g+=r+e(n)+u+e(b[n]);c(g,1E3,5);18==a&&V(this);8==a&&U(this,null)};})();\n" +
+                        " new window.inmobi.Bolt({\"lp\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"lps\":\"https://itunes.apple.com/app/pandora-radio/id284035177?mt\\u003d8\",\"ct\":[\"http://c.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/1/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/778ec58e?at\\u003d1\\u0026am\\u003d0\"],\"bcu\":\"http://et.w.inmobi.com/c.asm/C/t/e3ksbjnme7/zjc/k/2m/ba/u/0/0/0/x/d71aaf01-014d-1000-d51c-3fc3414400d5/0/2el4/15/0/0/x/9535867/NW/1/0/api/2.0.0/s_smaato/eA~~/FobWBBbAlrECFvrcqKuAmIsFRB4nAAAAAAAAAAAXAuUqTc2Yoz8UABIoBkJBTk5FUgA/-1/6/d06308c7\",\"ws\":false,\"ns\":\"im_7056_\"});\n" +
+                        "(function() {var a=window,c='handleClick',e='handleTouchEnd',f='handleTouchStart';a.inmobi=a.inmobi||{};function g(b,h){this.b=h;this.a=this.c=!1;var d=this;a[b+c]=function(){d.click()};a[b+f]=function(){d.start(a.event)};a[b+e]=function(){d.end()}}a.inmobi.OldTap=g;g.prototype.click=function(){this.c||this.b()};g.prototype.start=function(b){this.a=this.c=!0;b&&b.preventDefault()};g.prototype.end=function(){this.a&&(this.a=!1,this.b())};})();\n" +
+                        " new window.inmobi.OldTap(\"im_7056_\", function() {\n" +
+                        "  window['im_7056_openLandingPage']();\n" +
+                        "  window['im_7056_recordEvent'](8);\n" +
+                        "});\n" +
+                        "</script>\n" +
+                        "<div onclick=\"im_7056_mwClick()\">\n" +
+                        "<img border=\"0\" src=\"http://r.edge.inmobicdn.net/FileData/340e85973578468798d470bccea3c214.gif\" alt=\" \" height=\"50\" width=\"320\"/>\n" +
+                        "</div>\n" +
+                        "<script type=\"text/javascript\">\n" +
+                        "var im_7056_mwClick = function() {im_7056_recordEvent(8);im_7056_openLandingPage();};\n" +
+                        "</script>\n" +
+                        "  <script type=\"text/javascript\"> im_7056_recordEvent(18); </script>\n" +
+                        "<style>body{margin:0}</style>\n" +
+                        "\n" +
+                        "<img src='http://54.86.57.126/oapi/getAd;jsessionid=8480EA708D25F34A3FEBC14FF1E4F188.ip-10-0-32-9' height=1 width=1 border=0 style=\"display:none;\"/><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>",
             dcpSmaatoAdNetwork.getHttpResponseContent());
     }
 
@@ -379,10 +379,10 @@ public class DCPSmaatoAdnetworkTest {
 
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         final String response =
                 "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"TXT\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link></link><action target=\"http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106\" acc=\"server\"/><adtext>Please visit smaato.com! </adtext><beacons><beacon>http://ec2-54-209-110-73.compute-1.amazonaws.com/oapi/getBeacon.jsp;jsessionid=DF1C3BAB96CD1E2AC2C69B8E3C990E1A.ip-10-0-40-106</beacon><beacon>http://abc.com</beacon></beacons></ad></ads></response>";
@@ -427,10 +427,10 @@ public class DCPSmaatoAdnetworkTest {
         final String externalKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
-                    0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
-                    null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
-                        "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
-                    new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
+                        0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
+                                "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
+                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         assertEquals("4f8d98e2-4bbd-40bc-8795-22da170700f9", dcpSmaatoAdNetwork.getImpressionId());
     }
