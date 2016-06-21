@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.netty.util.internal.SystemPropertyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.Configuration;
 
@@ -36,6 +37,14 @@ public class ServerConfig implements CasConfig {
     @SuppressWarnings("rawtypes")
     private final List auctionIUrlFilterExcludedList;
     private static final Integer NEGATIVE_ONE = -1;
+    private static final int DEFAULT_EVENT_LOOP_THREADS;
+
+    // Default value of worker thread is 2 * Number of available processor
+    // source : io.netty.channel.MultithreadEventLoopGroup
+    static {
+        DEFAULT_EVENT_LOOP_THREADS = Math.max(1, SystemPropertyUtil.getInt(
+                "io.netty.eventLoopThreads", Runtime.getRuntime().availableProcessors() * 2));
+    }
 
     @Inject
     public ServerConfig(@ServerConfiguration final Configuration serverConfiguration,
@@ -188,12 +197,13 @@ public class ServerConfig implements CasConfig {
 
     public int getNumOfWorkerThread() {
         try {
-            final int numOfWorkerThread = serverConfiguration.getInt("worker.thread.count", 0);
+            final int numOfWorkerThread = DEFAULT_EVENT_LOOP_THREADS + serverConfiguration.getInt("photon.thread.count", 0);
             log.debug("Number of worker thread : {}", numOfWorkerThread);
             return numOfWorkerThread;
         } catch (final Exception e) {
-            log.error("Exception while parsing worker thread count from config : {}", e.getMessage());
-            return 0;
+            log.error("Exception while parsing worker thread count from config : {}, Default number of thread : {}",
+                e.getMessage(), DEFAULT_EVENT_LOOP_THREADS);
+            return DEFAULT_EVENT_LOOP_THREADS;
         }
     }
 

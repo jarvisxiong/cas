@@ -2,6 +2,8 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import java.io.ByteArrayOutputStream;
 
+import com.inmobi.adserve.contracts.ix.request.User;
+import com.inmobi.user.photon.datatypes.profile.UserProfileView;
 import com.inmobi.user.photon.service.UserProfileService;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TServiceClient;
@@ -14,7 +16,7 @@ import com.inmobi.user.photon.datatypes.commons.Tenant;
  * Created by avinash.kumar on 6/6/16.
  */
 public class PhotonThriftParser extends TServiceClient {
-    static final String fnName = "getAllAttributes";
+    static final String fnName = "getProfileView";
 
     public PhotonThriftParser(TProtocol prot) {
         super(prot, prot);
@@ -24,16 +26,16 @@ public class PhotonThriftParser extends TServiceClient {
         this.sendBase(fnName, new UserProfileService.getAllAttributes_args(userId, tenant));
     }
 
-    public Attributes receive(TProtocol protocol) throws Exception {
+    public UserProfileView receive(TProtocol protocol) throws Exception {
         this.iprot_ = protocol;
-        UserProfileService.getAllAttributes_result result = new UserProfileService.getAllAttributes_result();
+        final UserProfileService.getProfileView_result  result = new UserProfileService.getProfileView_result();
         this.receiveBase(result, fnName);
         if (result.isSetSuccess()) {
             return result.success;
         } else if (result.isSetPhotonException()) {
             throw result.getPhotonException();
         } else {
-            throw new TApplicationException(5, "getAllAttribute failed with unknown reason.");
+            throw new TApplicationException(5, fnName + " failed with unknown reason.");
         }
     }
 }

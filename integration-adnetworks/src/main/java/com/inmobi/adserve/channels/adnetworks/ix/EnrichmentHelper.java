@@ -52,22 +52,13 @@ public class EnrichmentHelper {
 
     public static Set<Integer> getCSIIds(Set<Integer> sasCSITags, final long startTime, final long curTime,
             final ListenableFuture<BrandAttributes> futureBrandAttributes) {
+        BrandAttributes brandAttr = null;
         if (null == sasCSITags) {
             sasCSITags = new HashSet<>();
         }
+        log.debug("CSIds before enrich : {}", sasCSITags);
         try {
-            final BrandAttributes brandAttr =
-                    futureBrandAttributes.get(getWaitTime(startTime, curTime), TimeUnit.MILLISECONDS);
-            InspectorStats.updateYammerTimerStats(PHOTON, PHOTON_LATENCY, (System.currentTimeMillis()-startTime));
-            log.debug("CSIds before enrich : {}", sasCSITags);
-            if (null != brandAttr) {
-                mergeCSITags(sasCSITags, brandAttr.getBluekai_csids());
-                mergeCSITags(sasCSITags, brandAttr.getGeocookie_csids());
-                mergeCSITags(sasCSITags, brandAttr.getPds_csids());
-            } else {
-                InspectorStats.incrementStatCount(PHOTON, TOTAL_NULL_CSIDS);
-            }
-            log.debug("CSIds after enrich : {}", sasCSITags);
+            brandAttr = futureBrandAttributes.get(getWaitTime(startTime, curTime), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             InspectorStats.incrementStatCount(PHOTON, TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE);
         } catch (ExecutionException e) {
@@ -75,6 +66,15 @@ public class EnrichmentHelper {
         } catch (TimeoutException e) {
             InspectorStats.incrementStatCount(PHOTON, TOTAL_TIMEOUT_IN_PHOTON_RESPONSE);
         }
+        InspectorStats.updateYammerTimerStats(PHOTON, PHOTON_LATENCY, (System.currentTimeMillis()-startTime));
+        if (null != brandAttr) {
+            mergeCSITags(sasCSITags, brandAttr.getBluekai_csids());
+            mergeCSITags(sasCSITags, brandAttr.getGeocookie_csids());
+            mergeCSITags(sasCSITags, brandAttr.getPds_csids());
+        } else {
+            InspectorStats.incrementStatCount(PHOTON, TOTAL_NULL_CSIDS);
+        }
+        log.debug("CSIds after enrich : {}", sasCSITags);
         return sasCSITags;
     }
 

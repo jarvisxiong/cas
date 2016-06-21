@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import com.inmobi.user.photon.datatypes.profile.UserProfileView;
 import com.inmobi.user.photon.service.PhotonException;
 import org.apache.http.HttpStatus;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -105,7 +106,8 @@ public class PhotonHelper {
                     case HttpStatus.SC_OK:
                         final TProtocol protocol = new TBinaryProtocol(new TIOStreamTransport(response.getResponseBodyAsStream()));
                         try {
-                            final Attributes attributes = photonThriftParser.receive(protocol);
+                            final UserProfileView userProfileView = photonThriftParser.receive(protocol);
+                            final Attributes attributes = (null != userProfileView) ? userProfileView.getAttributes() : null;
                             brandAttr = (null != attributes) ? attributes.getBrand() : null;
                         } catch (final PhotonException e) {
                             log.debug("Excepton sent from photon server : {}", e);
