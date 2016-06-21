@@ -88,22 +88,22 @@ public class DCPSmaatoAdnetworkTest {
         prepareMockConfig();
         Formatter.init();
         LifecycleInjector
-            .builder()
-            .withModules(Modules.combine(new AbstractModule() {
+                .builder()
+                .withModules(Modules.combine(new AbstractModule() {
 
-                @Override
-                public void configure() {
-                    bind(AsyncHttpClientProvider.class).toInstance(createMock(AsyncHttpClientProvider.class));
-                    bind(JaxbHelper.class).asEagerSingleton();
-                    bind(DocumentBuilderHelper.class).asEagerSingleton();
-                    install(new FactoryModuleBuilder()
-                        .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
-                        .build(Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
-                    requestStaticInjection(BaseAdNetworkImpl.class);
-                }
-            }), new TestScopeModule())
-            .usingBasePackages("com.inmobi.adserve.channels.server.netty",
-                "com.inmobi.adserve.channels.api.provider").build().createInjector();
+                    @Override
+                    public void configure() {
+                        bind(AsyncHttpClientProvider.class).toInstance(createMock(AsyncHttpClientProvider.class));
+                        bind(JaxbHelper.class).asEagerSingleton();
+                        bind(DocumentBuilderHelper.class).asEagerSingleton();
+                        install(new FactoryModuleBuilder()
+                            .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
+                            .build(Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
+                        requestStaticInjection(BaseAdNetworkImpl.class);
+                    }
+                }), new TestScopeModule())
+                .usingBasePackages("com.inmobi.adserve.channels.server.netty",
+                    "com.inmobi.adserve.channels.api.provider").build().createInjector();
         final SlotSizeMapEntity slotSizeMapEntityFor4 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
         replay(slotSizeMapEntityFor4);
