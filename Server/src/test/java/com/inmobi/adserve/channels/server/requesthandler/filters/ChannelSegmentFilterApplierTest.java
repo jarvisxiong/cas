@@ -6,8 +6,10 @@ import static org.easymock.EasyMock.replay;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -227,6 +229,10 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setRichMedia(true);
         sasParams.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         sasParams.setSiteId("siteid");
+        Map<String, String> tUidParam = new HashedMap();
+        tUidParam.put("O1", "O1_user_id");
+        sasParams.setTUidParams(tUidParam);
+
 
         injector = Guice.createInjector(Modules
                 .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
@@ -346,11 +352,14 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         final List<ChannelSegment> channelSegments = Lists.newArrayList(channelSegment);
 
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
-
         assertEquals(true, channelSegments.contains(channelSegment));
 
+        sasParams.setTUidParams(new HashMap<>());
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
+        assertEquals(false, channelSegments.contains(channelSegment));
 
+        sasParams.setTUidParams(null);
+        adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
         assertEquals(false, channelSegments.contains(channelSegment));
     }
 

@@ -66,7 +66,6 @@ public class SASRequestParameters {
     private String pubControlPreferencesJson;
 
     // Uid parameters
-    private String uidParams;
     private Map<String, String> tUidParams;
 
     private String rqIframe;
