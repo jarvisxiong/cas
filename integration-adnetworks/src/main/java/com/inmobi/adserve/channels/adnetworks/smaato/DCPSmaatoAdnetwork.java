@@ -43,7 +43,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String PUB = "pub";
     private static final String DEVICE = "device";
     private static final String MRAIDVER = "mraidver";
-    private static final String MRAIDVERION = "2";
+    private static final String MRAIDVERSION = "2";
     private static final String DEVIP = "devip";
     private static final String DIVID = "divid";
     private static final String ADSPACE = "adspace";
@@ -166,7 +166,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, DIVID, "smt-"+externalSiteId, false);
         }
         appendQueryParam(url, DEVICE, getURLEncode(sasParams.getUserAgent(), format), false);
-        appendQueryParam(url, MRAIDVER, MRAIDVERION, false);
+        appendQueryParam(url, MRAIDVER, MRAIDVERSION, false);
         appendQueryParam(url, FORMAT, RESPONSE_FORMAT, false);
         appendQueryParam(url, FORMAT_STRICT, FALSE, false);
         appendQueryParam(url, DIMENSION, dimension, false);
