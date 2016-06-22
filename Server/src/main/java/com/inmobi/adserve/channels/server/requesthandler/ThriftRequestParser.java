@@ -145,9 +145,11 @@ public class ThriftRequestParser {
                 Map<UidType, String> rawUidParams = tObject.getUidParams().getRawUidValues();
                 Map<String, String> tUidParamMap = getUserIdMap(rawUidParams);
                 final String uId = rawUidParams.get(selectedUidType);
-                tUidParamMap.put(UID_KEY, uId);
+                if (StringUtils.isNotBlank(uId)) {
+                    params.setSelectedUserId(uId);
+                    tUidParamMap.put(UID_KEY, uId);
+                }
                 params.setTUidParams(tUidParamMap);
-                params.setSelectedUserId(uId);
             }
         }
 
