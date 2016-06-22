@@ -224,7 +224,6 @@ public class DCPSmaatoAdnetworkTest {
         final List<Long> category = new ArrayList<Long>();
         category.add(3l);
         sasParams.setCategories(category);
-        casInternalRequestParameters.setUidIFA("IOSADID");
         sasParams.setGender("m");
         sasParams.setAge(Short.valueOf("32"));
         sasParams.setPostalCode("333310");
@@ -240,18 +239,29 @@ public class DCPSmaatoAdnetworkTest {
                         new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15,
             repositoryHelper)) {
-            final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
+            String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
 
-            final String expectedUrl =
+            String expectedUrl =
                     "http://f101.smaato.com/oapi/reqAd.jsp?apiver=501&adspace=6378ef4a7db50d955c90f7dffb05ee20"
                         + "&pub=923867039&devip=178.190.64.146&divid=smt-6378ef4a7db50d955c90f7dffb05ee20"
-                        + "&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+"
-                        + "AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400"
-                        + "&mraidver=2&format=all&formatstrict=false&dimension=mma&dimensionstrict=true"
-                        + "&iosadid=IOSADID&iosadtracking=true&googleadid=TEST_GPID&googlednt=false"
-                        + "&androidid=ANDROIDID&response=XML&coppa=0&height=50&width=320"
-                        + "&kws=Business&age=32&gender=m&gps=37.4429%2C-122.1514&zip=333310&devicemodel=Test"
-                        + "&devicemake=Test+manufacture";
+                        + "&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29"
+                        + "+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&mraidver=2"
+                        + "&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&googleadid=TEST_GPID"
+                        + "&googlednt=false&androidid=ANDROIDID&response=XML&coppa=0&height=50&width=320&kws=Business"
+                        + "&age=32&gender=m&gps=37.4429%2C-122.1514&zip=333310"
+                        + "&devicemodel=Test&devicemake=Test+manufacture";
+            assertEquals(expectedUrl, actualUrl);
+            casInternalRequestParameters.setUidIFA("IOSADID");
+            actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
+            expectedUrl =
+                "http://f101.smaato.com/oapi/reqAd.jsp?apiver=501&adspace=6378ef4a7db50d955c90f7dffb05ee20"
+                    + "&pub=923867039&devip=178.190.64.146&divid=smt-6378ef4a7db50d955c90f7dffb05ee20"
+                    + "&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29"
+                    + "+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&mraidver=2"
+                    + "&format=all&formatstrict=false&dimension=mma&dimensionstrict=true"
+                    + "&iosadid=IOSADID&iosadtracking=true&googleadid=TEST_GPID&googlednt=false"
+                    + "&androidid=ANDROIDID&response=XML&coppa=0&height=50&width=320&kws=Business&age=32&gender=m"
+                    + "&gps=37.4429%2C-122.1514&zip=333310&devicemodel=Test&devicemake=Test+manufacture";
             assertEquals(expectedUrl, actualUrl);
         }
     }
