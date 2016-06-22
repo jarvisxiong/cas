@@ -53,9 +53,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String IOSADTRACKING = "iosadtracking";
     private static final String GOOGLEADID = "googleadid";
     private static final String GOOGLEDNT = "googlednt";
-    private static final String OPENUDID = "openudid";
     private static final String ANDROIDID = "androidid";
-    private static final String ODIN1 = "odin";
     private static final String APIVER = "apiver";
     private static final String apiVersion = "501";
     private static final String RESPONSE = "response";
