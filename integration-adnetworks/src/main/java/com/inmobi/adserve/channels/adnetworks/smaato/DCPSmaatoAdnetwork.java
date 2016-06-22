@@ -218,15 +218,15 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, GPS, getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format),
                     false);
         }
-        if (null != sasParams.getPostalCode()) {
+        if (StringUtils.isNotBlank(sasParams.getPostalCode())) {
             appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
         }
 
-        if(sasParams.getDeviceModel()!=null){
+        if(StringUtils.isNotBlank(sasParams.getDeviceModel())){
             appendQueryParam(url, DEVICEMODEL, getURLEncode(sasParams.getDeviceModel(),"UTF-8"), false);
         }
 
-        if(sasParams.getDeviceMake()!=null){
+        if(StringUtils.isNotBlank(sasParams.getDeviceMake())){
             appendQueryParam(url, DEVICEMAKE, getURLEncode(sasParams.getDeviceMake(),"UTF-8"), false);
         }
         LOG.debug("Smaato url is {}", url);
@@ -254,7 +254,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("response is {}", response);
 
-        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+        if (StringUtils.isNotBlank(response) || status.code() != 200 || response.trim().isEmpty()) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
