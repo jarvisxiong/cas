@@ -142,7 +142,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
-
         isApp =
             StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
                 ? false
