@@ -100,7 +100,8 @@ public class DCPSmaatoAdnetworkTest {
                         bind(DocumentBuilderHelper.class).asEagerSingleton();
                         install(new FactoryModuleBuilder()
                                 .implement(InmobiAdTrackerBuilder.class, DefaultLazyInmobiAdTrackerBuilder.class)
-                                .build(Key.get(InmobiAdTrackerBuilderFactory.class, DefaultLazyInmobiAdTrackerBuilderFactory.class)));
+                                .build(Key.get(InmobiAdTrackerBuilderFactory.class,
+                                    DefaultLazyInmobiAdTrackerBuilderFactory.class)));
                         requestStaticInjection(BaseAdNetworkImpl.class);
                     }
                 }), new TestScopeModule())
@@ -203,7 +204,8 @@ public class DCPSmaatoAdnetworkTest {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
+                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+                    (short) 15, repositoryHelper));
     }
 
     @Test
@@ -213,7 +215,8 @@ public class DCPSmaatoAdnetworkTest {
         casInternalRequestParameters.setBlockedIabCategories(Arrays.asList(new String[]{"IAB10", "IAB21", "IAB12"}));
         sasParams.setRemoteHostIp("178.190.64.146");
         sasParams
-                .setUserAgent("Mozilla/5.0 (iPod; CPU iPhone OS 6_1_5 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Mobile/10B400");
+                .setUserAgent("Mozilla/5.0 (iPod; CPU iPhone OS 6_1_5 like Mac OS X) AppleWebKit/536.26 "
+                    + "(KHTML, like Gecko) Mobile/10B400");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setGpid("TEST_GPID");
         casInternalRequestParameters.setTrackingAllowed(true);
@@ -276,7 +279,8 @@ public class DCPSmaatoAdnetworkTest {
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
+        if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+            (short) 15, repositoryHelper)) {
             final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
             final String expectedUrl =
                     "http://f101.smaato.com/oapi/reqAd.jsp?apiver=501&adspace=01212121&pub=923867039"
@@ -305,13 +309,36 @@ public class DCPSmaatoAdnetworkTest {
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         AdapterTestHelper.setBeaconAndClickStubs();
-        dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
+        dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
+            (short) 15, repositoryHelper);
         final String response =
-                "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/smaatoapi_v2.xsd\"><sessionid>CFF4454048445012E09748993D22E78C.ip-10-0-37-13</sessionid><status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"IMG\"><log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/><link>http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/getAd.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13</link><action target=\"http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13\" acc=\"server\"/><beacons/></ad></ads></response>";
+                "<?xml version=\"1.0\"?><response xmlns=\"http://soma.smaato.com/oapi/\" "
+                    + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                    + "xsi:schemaLocation=\"http://soma.smaato.com/oapi/ http://www.smaato.com/definitions/xsd/"
+                    + "smaatoapi_v2.xsd\"><sessionid>CFF4454048445012E09748993D22E78C.ip-10-0-37-13</sessionid>"
+                    + "<status>success</status><user><id>900</id><ownid></ownid></user><ads><ad id=\"0\" type=\"IMG\">"
+                    + "<log-id></log-id><valid start=\"0\" end=\"0\" max=\"1\"/>"
+                    + "<link>http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/getAd.jsp;"
+                    + "jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13</link>"
+                    + "<action target=\"http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;"
+                    + "jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13\" acc=\"server\"/><beacons/>"
+                    + "</ad></ads></response>";
         dcpSmaatoAdNetwork.parseResponse(response, HttpResponseStatus.OK);
         assertEquals(200, dcpSmaatoAdNetwork.getHttpResponseStatusCode());
         assertEquals(
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><a href='http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13' onclick=\"document.getElementById('click').src='clickUrl';\" target=\"_blank\" style=\"text-decoration: none\"><img src='http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/getAd.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13'  /></a><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\" width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
+                "<html>"
+                    + "<head>"
+                    + "<title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, "
+                    + "maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style>"
+                    + "</head"
+                    + "><body>"
+                    + "<a href='http://ec2-54-209-70-178.compute-1.amazonaws.com/oapi/lp.jsp;"
+                    + "jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13' "
+                    + "onclick=\"document.getElementById('click').src='clickUrl';\" target=\"_blank\" "
+                    + "style=\"text-decoration: none\"><img src='http://ec2-54-209-70-178.compute-1.amazonaws.com/"
+                    + "oapi/getAd.jsp;jsessionid=CFF4454048445012E09748993D22E78C.ip-10-0-37-13'  /></a>"
+                    + "<img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/><img id=\"click\""
+                    + " width=\"1\" height=\"1\" style=\"display:none;\"/></body></html>",
                 dcpSmaatoAdNetwork.getHttpResponseContent());
     }
 
