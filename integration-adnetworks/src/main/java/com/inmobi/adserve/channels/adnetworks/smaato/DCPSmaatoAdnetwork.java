@@ -254,7 +254,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     public void parseResponse(final String response, final HttpResponseStatus status) {
         LOG.debug("Smaato Response is {}", response);
 
-        if (StringUtils.isBlank(response) || status.code() != 200 || response.trim().isEmpty()) {
+        if (StringUtils.isBlank(response) || status.code() != 200) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
