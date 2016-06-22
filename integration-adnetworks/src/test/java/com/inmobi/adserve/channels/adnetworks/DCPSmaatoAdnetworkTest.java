@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.adnetworks;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.find;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.replay;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -148,7 +150,8 @@ public class DCPSmaatoAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46"
+                    + "+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setUid("23e2ewq445545");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -160,7 +163,8 @@ public class DCPSmaatoAdnetworkTest {
                                 "{\"spot\":54235,\"pubId\":\"inmobi_1\"," + "\"site\":1234}"),
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(true,
-                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 11, repositoryHelper));
+                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters,
+                    entity, (short) 11, repositoryHelper));
     }
 
     @Test
@@ -169,7 +173,8 @@ public class DCPSmaatoAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sasParams.setRemoteHostIp(null);
         sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46"
+                    + "+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         sasParams.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalKey = "f6wqjq1r5v";
@@ -179,7 +184,8 @@ public class DCPSmaatoAdnetworkTest {
                         null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         assertEquals(false,
-                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper));
+                dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters,
+                    entity, (short) 15, repositoryHelper));
     }
 
     @Test
@@ -215,21 +221,34 @@ public class DCPSmaatoAdnetworkTest {
         final List<Long> category = new ArrayList<Long>();
         category.add(3l);
         sasParams.setCategories(category);
-        casInternalRequestParameters.setUid("202cb962ac59075b964b07152d234b70");
+        casInternalRequestParameters.setUidIFA("IOSADID");
         sasParams.setGender("m");
         sasParams.setAge(Short.valueOf("32"));
+        sasParams.setPostalCode("333310");
+        sasParams.setDeviceModel("Test");
+        sasParams.setDeviceMake("Test manufacture");
         final String externalKey = "6378ef4a7db50d955c90f7dffb05ee20";
+        casInternalRequestParameters.setUidMd5("ANDROIDID");
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(smaatoAdvId, null, null, null,
                         0, null, null, true, true, externalKey, null, null, null, new Long[] {0L}, true, null, null, 0,
                         null, false, false, false, false, false, false, false, false, false, false, new JSONObject(
                                 "{\"spot\":\"1_testkey\",\"pubId\":\"inmobi_1\",\"site\":0}"),
                         new ArrayList<>(), 0.0d, null, null, 0, new Integer[] {0}));
-        if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
+        if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15,
+            repositoryHelper)) {
             final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
 
             final String expectedUrl =
-                    "http://f101.smaato.com/oapi/reqAd.jsp?adspace=6378ef4a7db50d955c90f7dffb05ee20&pub=923867039&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400&devip=178.190.64.146&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&googleadid=TEST_GPID&googlednt=false&gps=37.4429%2C-122.1514&gender=m&kws=Business&width=320&height=50&age=32";
+                    "http://f101.smaato.com/oapi/reqAd.jsp?apiver=501&adspace=6378ef4a7db50d955c90f7dffb05ee20"
+                        + "&pub=923867039&devip=178.190.64.146&divid=smt-6378ef4a7db50d955c90f7dffb05ee20"
+                        + "&device=Mozilla%2F5.0+%28iPod%3B+CPU+iPhone+OS+6_1_5+like+Mac+OS+X%29+"
+                        + "AppleWebKit%2F536.26+%28KHTML%2C+like+Gecko%29+Mobile%2F10B400"
+                        + "&mraidver=2&format=all&formatstrict=false&dimension=mma&dimensionstrict=true"
+                        + "&iosadid=IOSADID&iosadtracking=true&googleadid=TEST_GPID&googlednt=false"
+                        + "&androidid=ANDROIDID&response=XML&coppa=0&height=50&width=320"
+                        + "&kws=Business&age=32&gender=m&gps=37.4429%2C-122.1514&zip=333310&devicemodel=Test"
+                        + "&devicemake=Test+manufacture";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -260,7 +279,10 @@ public class DCPSmaatoAdnetworkTest {
         if (dcpSmaatoAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 15, repositoryHelper)) {
             final String actualUrl = dcpSmaatoAdNetwork.getRequestUri().toString();
             final String expectedUrl =
-                    "http://f101.smaato.com/oapi/reqAd.jsp?adspace=01212121&pub=923867039&device=Mozilla&devip=206.29.182.240&format=all&formatstrict=false&dimension=mma&dimensionstrict=true&openudid=202cb962ac59075b964b07152d234b70&gps=38.5%2C-122.1514&kws=Business%2CBooks+%26+Reference&width=320&height=50";
+                    "http://f101.smaato.com/oapi/reqAd.jsp?apiver=501&adspace=01212121&pub=923867039"
+                        + "&devip=206.29.182.240&divid=smt-01212121&device=Mozilla&mraidver=2&format=all"
+                        + "&formatstrict=false&dimension=mma&dimensionstrict=true&response=XML&coppa=0"
+                        + "&height=50&width=320&kws=Business%2CBooks+%26+Reference&gps=38.5%2C-122.1514";
             assertEquals(expectedUrl, actualUrl);
 
         }
