@@ -143,6 +143,11 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             return false;
         }
 
+        isApp =
+            StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
+                ? false
+                : true;
+
         return true;
     }
 
@@ -158,10 +163,6 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         appendQueryParam(url, ADSPACE, externalSiteId, false);
         appendQueryParam(url, PUB, publisherId, false);
         appendQueryParam(url, DEVIP, sasParams.getRemoteHostIp(), false);
-        isApp =
-            StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
-                ? false
-                : true;
         if (!isApp) {
             appendQueryParam(url, DIVID, "smt-"+externalSiteId, false);
         }
