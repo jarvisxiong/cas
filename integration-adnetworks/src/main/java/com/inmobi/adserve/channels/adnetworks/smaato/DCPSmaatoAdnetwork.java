@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import gnu.crypto.sasl.srp.SRP;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -43,7 +42,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     private static final String PUB = "pub";
     private static final String DEVICE = "device";
-    private static final String mraidver = "mraidver";
+    private static final String MRAIDVER = "mraidver";
     private static final String DEVIP = "devip";
     private static final String DIVID = "divid";
     private static final String ADSPACE = "adspace";
@@ -168,7 +167,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             appendQueryParam(url, DIVID, "smt-"+externalSiteId, false);
         }
         appendQueryParam(url, DEVICE, getURLEncode(sasParams.getUserAgent(), format), false);
-        appendQueryParam(url, mraidver, "2", false);
+        appendQueryParam(url, MRAIDVER, "2", false);
         appendQueryParam(url, FORMAT, RESPONSE_FORMAT, false);
         appendQueryParam(url, FORMAT_STRICT, FALSE, false);
         appendQueryParam(url, DIMENSION, dimension, false);
@@ -176,7 +175,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         final String ifa = getUidIFA(false);
         if (StringUtils.isNotBlank(ifa)) {
             appendQueryParam(url, IOSADID, ifa, false);
-            appendQueryParam(url, IOSADTRACKING, casInternalRequestParameters.isTrackingAllowed() ? 1 : 0, false);
+            appendQueryParam(url, IOSADTRACKING, casInternalRequestParameters.isTrackingAllowed() ? TRUE : FALSE, false);
         }
 
         final String gpId = getGPID(false);
@@ -225,11 +224,11 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         }
 
         if(sasParams.getDeviceModel()!=null){
-            appendQueryParam(url, DEVICEMODEL, sasParams.getDeviceModel(), false);
+            appendQueryParam(url, DEVICEMODEL, getURLEncode(sasParams.getDeviceModel(),"UTF-8"), false);
         }
 
         if(sasParams.getDeviceMake()!=null){
-            appendQueryParam(url, DEVICEMAKE, sasParams.getDeviceMake(), false);
+            appendQueryParam(url, DEVICEMAKE, getURLEncode(sasParams.getDeviceMake(),"UTF-8"), false);
         }
         LOG.debug("Smaato url is {}", url);
         return new URI(url.toString());
