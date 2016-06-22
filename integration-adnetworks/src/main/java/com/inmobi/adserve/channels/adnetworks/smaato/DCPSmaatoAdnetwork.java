@@ -180,11 +180,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
         final String gpId = getGPID(false);
         if (StringUtils.isNotBlank(gpId)) {
             appendQueryParam(url, GOOGLEADID, gpId, false);
-            if (casInternalRequestParameters.isTrackingAllowed()) {
-                appendQueryParam(url, GOOGLEDNT, FALSE, false);
-            } else {
-                appendQueryParam(url, GOOGLEDNT, TRUE, false);
-            }
+            appendQueryParam(url, GOOGLEDNT, casInternalRequestParameters.isTrackingAllowed() ? FALSE : TRUE, false);
         }
 
         if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
