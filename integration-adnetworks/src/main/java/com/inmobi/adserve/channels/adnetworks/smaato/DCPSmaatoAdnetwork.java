@@ -34,25 +34,33 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
-    protected static final String LATLONG = "gps";
-    protected static final String KEYWORDS = "kws";
+    protected static final String GPS = "gps";
+    protected static final String KWS = "kws";
     protected static final String AGE = "age";
 
     private static final Logger LOG = LoggerFactory.getLogger(DCPSmaatoAdnetwork.class);
 
-    private static final String PUBID = "pub";
-    private static final String UA = "device";
-    private static final String CLIENT_IP = "devip";
-    private static final String ADSPACEID = "adspace";
+    private static final String PUB = "pub";
+    private static final String DEVICE = "device";
+    private static final String MRAIDVER = "mraidver";
+    private static final String MRAIDVERSION = "2";
+    private static final String DEVIP = "devip";
+    private static final String DIVID = "divid";
+    private static final String ADSPACE = "adspace";
+    private static final String DEVICEMODEL = "devicemodel";
+    private static final String DEVICEMAKE = "devicemake";
 
-    private static final String IFA = "iosadid";
-    private static final String IFA_TRACKING = "iosadtracking";
-    private static final String GPID = "googleadid";
-    private static final String GPID_TRACKING = "googlednt";
-    private static final String OPEN_UDID = "openudid";
-    private static final String ANDROID_ID = "androidid";
-    private static final String ODIN1 = "odin";
-    // private static final String VERSION = "apiver";
+    private static final String IOSADID = "iosadid";
+    private static final String IOSADTRACKING = "iosadtracking";
+    private static final String GOOGLEADID = "googleadid";
+    private static final String GOOGLEDNT = "googlednt";
+    private static final String ANDROIDID = "androidid";
+    private static final String APIVER = "apiver";
+    private static final String APIVERSION = "501";
+    private static final String RESPONSE = "response";
+    private static final String RESPONSE_TYPE = "XML";
+    private static final String COPPA = "coppa";
+    private static final short AGE_LIMIT_FOR_COPPA = 8;
 
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
@@ -78,6 +86,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private int width;
     private int height;
     private String dimension;
+    private boolean isApp;
 
     static {
         slotIdMap = new HashMap<Integer, String>();
@@ -133,6 +142,10 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
             LOG.info("Configure parameters inside Smaato returned false");
             return false;
         }
+        isApp =
+            StringUtils.isBlank(sasParams.getSource()) || WAP.equalsIgnoreCase(sasParams.getSource())
+                ? false
+                : true;
 
         return true;
     }
@@ -145,68 +158,73 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder url = new StringBuilder(host);
-        // appendQueryParam(url, VERSION, apiVersion, true);
-
-        appendQueryParam(url, ADSPACEID, externalSiteId, true);
-        appendQueryParam(url, PUBID, publisherId, false);
-        appendQueryParam(url, UA, getURLEncode(sasParams.getUserAgent(), format), false);
-        appendQueryParam(url, CLIENT_IP, sasParams.getRemoteHostIp(), false);
+        appendQueryParam(url, APIVER, APIVERSION, true);
+        appendQueryParam(url, ADSPACE, externalSiteId, false);
+        appendQueryParam(url, PUB, publisherId, false);
+        appendQueryParam(url, DEVIP, sasParams.getRemoteHostIp(), false);
+        if (!isApp) {
+            appendQueryParam(url, DIVID, "smt-"+externalSiteId, false);
+        }
+        appendQueryParam(url, DEVICE, getURLEncode(sasParams.getUserAgent(), format), false);
+        appendQueryParam(url, MRAIDVER, MRAIDVERSION, false);
         appendQueryParam(url, FORMAT, RESPONSE_FORMAT, false);
         appendQueryParam(url, FORMAT_STRICT, FALSE, false);
         appendQueryParam(url, DIMENSION, dimension, false);
         appendQueryParam(url, DIMENSION_STRICT, TRUE, false);
-
-        // TODO map the udids
         final String ifa = getUidIFA(false);
         if (StringUtils.isNotBlank(ifa)) {
-            appendQueryParam(url, IFA, ifa, false);
-            appendQueryParam(url, IFA_TRACKING, casInternalRequestParameters.isTrackingAllowed() ? 1 : 0, false);
-        }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
-            appendQueryParam(url, ANDROID_ID, casInternalRequestParameters.getUidMd5(), false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidIDUS1())) {
-            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.getUidIDUS1(), false);
-        }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUid())) {
-            appendQueryParam(url, OPEN_UDID, casInternalRequestParameters.getUid(), false);
-        }
-        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidSO1())) {
-            appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidSO1(), false);
-        } else if (StringUtils.isNotBlank(casInternalRequestParameters.getUidO1())) {
-            appendQueryParam(url, ODIN1, casInternalRequestParameters.getUidO1(), false);
+            appendQueryParam(url, IOSADID, ifa, false);
+            appendQueryParam(url, IOSADTRACKING, casInternalRequestParameters.isTrackingAllowed() ? TRUE : FALSE, false);
         }
 
         final String gpId = getGPID(false);
         if (StringUtils.isNotBlank(gpId)) {
-            appendQueryParam(url, GPID, gpId, false);
-            if (casInternalRequestParameters.isTrackingAllowed()) {
-                appendQueryParam(url, GPID_TRACKING, FALSE, false);
-            } else {
-                appendQueryParam(url, GPID_TRACKING, TRUE, false);
-            }
+            appendQueryParam(url, GOOGLEADID, gpId, false);
+            appendQueryParam(url, GOOGLEDNT, casInternalRequestParameters.isTrackingAllowed() ? FALSE : TRUE, false);
         }
 
-        if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
-            appendQueryParam(url, LATLONG, getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format),
-                    false);
+        if (StringUtils.isNotBlank(casInternalRequestParameters.getUidMd5())) {
+            appendQueryParam(url, ANDROIDID, casInternalRequestParameters.getUidMd5(), false);
         }
-        if (StringUtils.isNotBlank(sasParams.getGender())) {
-            appendQueryParam(url, GENDER, sasParams.getGender(), false);
-        }
-        if (null != sasParams.getPostalCode()) {
-            appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
-        }
-        appendQueryParam(url, KEYWORDS, getURLEncode(getCategories(',', true, false), format), false);
-        if (width != 0) {
-            appendQueryParam(url, WIDTH, width + "", false);
-        }
+
+        appendQueryParam(url, RESPONSE, RESPONSE_TYPE, false);
+
+        boolean isCoppaSet = isWapSiteUACEntity && wapSiteUACEntity.isCoppaEnabled() || sasParams.getAge() != null
+            && sasParams.getAge() <= AGE_LIMIT_FOR_COPPA;
+        int coppaValue = isCoppaSet?1:0;
+        appendQueryParam(url, COPPA, coppaValue, false);
+
         if (height != 0) {
             appendQueryParam(url, HEIGHT, height + "", false);
         }
+        if (width != 0) {
+            appendQueryParam(url, WIDTH, width + "", false);
+        }
+
+        appendQueryParam(url, KWS, getURLEncode(getCategories(',', true, false), format), false);
         if (null != sasParams.getAge()) {
             appendQueryParam(url, AGE, sasParams.getAge().toString(), false);
         }
 
+        if (StringUtils.isNotBlank(sasParams.getGender())) {
+            appendQueryParam(url, GENDER, sasParams.getGender(), false);
+        }
+
+        if (StringUtils.isNotBlank(latitude) && StringUtils.isNotBlank(longitude)) {
+            appendQueryParam(url, GPS, getURLEncode(String.format(LAT_LONG_FORMAT, latitude, longitude), format),
+                    false);
+        }
+        if (StringUtils.isNotBlank(sasParams.getPostalCode())) {
+            appendQueryParam(url, ZIP, sasParams.getPostalCode(), false);
+        }
+
+        if(StringUtils.isNotBlank(sasParams.getDeviceModel())){
+            appendQueryParam(url, DEVICEMODEL, getURLEncode(sasParams.getDeviceModel(),"UTF-8"), false);
+        }
+
+        if(StringUtils.isNotBlank(sasParams.getDeviceMake())){
+            appendQueryParam(url, DEVICEMAKE, getURLEncode(sasParams.getDeviceMake(),"UTF-8"), false);
+        }
         LOG.debug("Smaato url is {}", url);
         return new URI(url.toString());
     }
@@ -230,9 +248,9 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
 
     @Override
     public void parseResponse(final String response, final HttpResponseStatus status) {
-        LOG.debug("response is {}", response);
+        LOG.debug("Smaato Response is {}", response);
 
-        if (null == response || status.code() != 200 || response.trim().isEmpty()) {
+        if (StringUtils.isBlank(response) || status.code() != 200) {
             statusCode = status.code();
             if (200 == statusCode) {
                 statusCode = 500;
