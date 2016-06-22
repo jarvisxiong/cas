@@ -56,7 +56,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String GOOGLEDNT = "googlednt";
     private static final String ANDROIDID = "androidid";
     private static final String APIVER = "apiver";
-    private static final String apiVersion = "501";
+    private static final String APIVERSION = "501";
     private static final String RESPONSE = "response";
     private static final String RESPONSE_TYPE = "XML";
     private static final String COPPA = "coppa";
@@ -158,7 +158,7 @@ public class DCPSmaatoAdnetwork extends AbstractDCPAdNetworkImpl {
     @Override
     public URI getRequestUri() throws Exception {
         final StringBuilder url = new StringBuilder(host);
-        appendQueryParam(url, APIVER, apiVersion, true);
+        appendQueryParam(url, APIVER, APIVERSION, true);
         appendQueryParam(url, ADSPACE, externalSiteId, false);
         appendQueryParam(url, PUB, publisherId, false);
         appendQueryParam(url, DEVIP, sasParams.getRemoteHostIp(), false);
