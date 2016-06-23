@@ -118,10 +118,10 @@
                 })();
             </script>
             #if($IMBeaconUrl)
-                <img src='${IMBeaconUrl}?b=${WIN_BID}' height=1 width=1 border=0 />
+                <img src='${IMBeaconUrl}?b=${WIN_BID}' class='im_1011_beacon' />
             #end
             #if($PartnerBeaconUrl)
-                <img src='$PartnerBeaconUrl' height=1 width=1 border=0 />
+                <img src='$PartnerBeaconUrl' class='im_1011_beacon' />
             #end
             $PartnerHtmlCode
         </div>

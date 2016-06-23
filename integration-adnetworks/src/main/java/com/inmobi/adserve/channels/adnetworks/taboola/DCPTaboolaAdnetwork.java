@@ -50,6 +50,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String SOURCE_URL = "source.url";
     private static final String SOURCE_PLACEMENT = "source.placement";
     private static final String USER_ID = "user.id";
+    private static final String DEVICE_ID = "device.id";
     private static final String USER_REFERRER = "user.referrer";
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
@@ -140,6 +141,15 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (udid != null) {
             appendQueryParam(requestBuilder, USER_ID, udid, false);
         }
+        String deviceId;
+        if (StringUtils.isNotEmpty(deviceId = getUidIFA(true))) {
+            // Set to UIDIFA for IOS Device
+            appendQueryParam(requestBuilder,DEVICE_ID,deviceId,false);
+        } else if (StringUtils.isNotEmpty(deviceId = getGPID(true))) {
+            // Set to GPID for Android Device
+            appendQueryParam(requestBuilder,DEVICE_ID,deviceId,false);
+        }
+
         LOG.debug("Taboola AD request url {}", requestBuilder);
         return new URI(requestBuilder.toString());
     }
