@@ -230,7 +230,7 @@ public class DCPTaboolaAdnetworkTest {
                 repositoryHelper);
         final String actualUrl = dcptaboolaAdNetwork.getRequestUri().toString();
         final String expectedUrl =
-                "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.visible=false&source.type=text&user.session=init&rec.count=2&app.name=Taboola&source.id=a.b.c&source.placement=00000000-0000-0000-0000-0000006456fc&source.url=http://abc.com&user.realip=206.29.182.240&user.agent=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&rec.thumbnail.height=150&rec.thumbnail.width=150&user.id=202cb962ac59075b964b07152d234b70&device.id=idfaval";
+                "http://api.taboola.com/1.1/json/inmobi/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.visible=false&source.type=text&user.session=init&rec.count=2&app.name=Taboola&source.id=a.b.c&source.placement=00000000-0000-0000-0000-0000006456fc&source.url=http://abc.com&user.realip=206.29.182.240&user.agent=Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+7_0_5+like+Mac+OS+X%29+AppleWebKit%2F537.51.1+%28KHTML%2C+like+Gecko%29+Mobile%2F11B601&rec.thumbnail.height=150&rec.thumbnail.width=150&user.id=idfaval&device.id=idfaval";
         assertEquals(actualUrl, expectedUrl);
 
     }
