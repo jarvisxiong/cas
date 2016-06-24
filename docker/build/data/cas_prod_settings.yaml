@@ -649,11 +649,13 @@ skyhook:
                database: wap_prod_adserve_cas
                cas_user: cas_read
                cas_pass: sa$c87Te@z
-             aerospike:
-               aerospike_host: as-skyhook.ads.uh1.inmobi.com
-               aerospike_port: 3000
-             kafka:
-               kafka_host: kafka-zookeeper.grid.uh1.inmobi.com
+
+               aerospike:
+                   aerospike_host: as-skyhook.ads.uh1.inmobi.com
+                   aerospike_port: 3000
+               kafka:
+                   kafka_host: kafka-zookeeper.grid.uh1.inmobi.com
+
             timeout:
                 ning_timeout_dcp: 600
                 ning_timeout_rtbd: 500
@@ -673,19 +675,23 @@ skyhook:
             t_segmentno: '-1'
             automation_enabled: 'false'
             circuit_breaker_disabled: 'false'
-            scribe:
-                mondemand_address: 'krvm4102.grid.uh1.inmobi.com'
-                mondemand_port: '12000'
-                scribe_endpoint1: 'internal-skyhook-databus.vip.uh1.inmobi.com'
-            logging:
-                log_type: 'ERROR'
-                debug_log_type: 'ERROR'
-                flush_debug_log: 'false'
-            graphite_host_prefix: 'skyhook-metrics-relay'
-            graphite_prefix_base: 'prod'
-            photon_lb_endpoint: 'internal-skyhook-photon.vip.uh1.inmobi.com'
-            photon_servers:
-                - 'NA'
+            
+        scribe:
+            mondemand_address: 'krvm4102.grid.uh1.inmobi.com'
+            mondemand_port: '12000'
+            scribe_endpoint1: 'internal-skyhook-databus.vip.uh1.inmobi.com'
+            
+        logging:
+            log_type: 'ERROR'
+            debug_log_type: 'ERROR'
+            flush_debug_log: 'false'
+            
+        graphite_host_prefix: 'skyhook-metrics-relay'
+        graphite_prefix_base: 'prod'
+        photon_lb_endpoint: 'internal-skyhook-photon.vip.uh1.inmobi.com'
+        photon_servers:
+            - 'NA'
+            
     hkg1:
         cas:
             database:
