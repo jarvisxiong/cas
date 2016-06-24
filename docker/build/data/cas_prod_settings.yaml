@@ -640,6 +640,52 @@ skyhook:
         photon_lb_endpoint: 'localhost:8083'
         photon_servers:
           - 'usr1003.user.uj1.inmobi.com 192.168.96.144:8100 check port 8101 inter 5000 rise 2 fall 3 maxconn 300'
+          
+    uh1:
+        cas:
+            database:
+               db_host: internal-skyhook-db.vip.uh1.inmobi.com
+               db_port: 6543
+               database: wap_prod_adserve_cas
+               cas_user: cas_read
+               cas_pass: sa$c87Te@z
+             aerospike:
+               aerospike_host: as-skyhook.ads.uh1.inmobi.com
+               aerospike_port: 3000
+             kafka:
+               kafka_host: kafka-zookeeper.grid.uh1.inmobi.com
+            timeout:
+                ning_timeout_dcp: 600
+                ning_timeout_rtbd: 500
+                ning_timeout_photon: 10
+                cas_timer_handler_timeout_dcp: 600
+                cas_timer_handler_timeout_rtbd: 190
+            rtbd:
+                rtb_enabled: 'false'
+                rtbd_demand_density: '1'
+                rtbd_long_term_revenue: '1.3'
+                rtbd_publisher_yield: '12'
+            ix:
+                ix_advertiser_id: '1b1bdc749bd44a6c9037e513701ee815'
+                ix_default_url: 'NA'
+            beacon_url_prefix: 'et2.w.inmobi.com/c.asm'
+            click_url_prefix: 'c2.w.inmobi.com/c.asm'
+            t_segmentno: '-1'
+            automation_enabled: 'false'
+            circuit_breaker_disabled: 'false'
+            scribe:
+                mondemand_address: 'krvm4102.grid.uh1.inmobi.com'
+                mondemand_port: '12000'
+                scribe_endpoint1: 'internal-skyhook-databus.vip.uh1.inmobi.com'
+            logging:
+                log_type: 'ERROR'
+                debug_log_type: 'ERROR'
+                flush_debug_log: 'false'
+            graphite_host_prefix: 'skyhook-metrics-relay'
+            graphite_prefix_base: 'prod'
+            photon_lb_endpoint: 'internal-skyhook-photon.vip.uh1.inmobi.com'
+            photon_servers:
+                - 'NA'
     hkg1:
         cas:
             database:
