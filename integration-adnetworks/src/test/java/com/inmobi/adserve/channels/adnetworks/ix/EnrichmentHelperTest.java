@@ -1,33 +1,30 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
-import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
-import com.inmobi.user.photon.datatypes.commons.attribute.ValueProperties;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.listenable.AbstractListenableFuture;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.powermock.api.easymock.PowerMock.mockStaticNice;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.powermock.api.easymock.PowerMock.mockStaticNice;
-import static org.powermock.api.easymock.PowerMock.replayAll;
+import org.apache.commons.collections.CollectionUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
+import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
+import com.inmobi.user.photon.datatypes.commons.attribute.ValueProperties;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.listenable.AbstractListenableFuture;
 
 /**
  * Created by avinash.kumar on 6/9/16.
@@ -85,6 +82,7 @@ public class EnrichmentHelperTest {
         };
     }
 
+    @SuppressWarnings("unchecked")
     @Test(dataProvider = "Enrich CSIIds when Brand Attribute is Not Null ANd umpCSITags Cant be Null")
     public void testEnrichCSIIdsWhenBrandAttrIsNotNull(final String testName, Set<Integer> sasCsiTags, Set<Integer> bluekaiCSIIds,
              Set<Integer> geoCookiesCSIIds, Set<Integer> pdsCSIIds) {
@@ -94,7 +92,6 @@ public class EnrichmentHelperTest {
             setCSIIds(1, geoCookiesCSIIds, brandAttr);
             setCSIIds(2, pdsCSIIds, brandAttr);
 
-            final EnrichmentHelper enrichmentHelper = new EnrichmentHelper(timeout);
             final ListenableFuture<BrandAttributes> mockAttrFutureMock = createNiceMock(AbstractListenableFuture.class);
             expect(mockAttrFutureMock.get(EnrichmentHelper.getWaitTime(startTime, curTime), TimeUnit.MILLISECONDS)).andReturn(brandAttr).anyTimes();
             replay(mockAttrFutureMock);

@@ -7,7 +7,6 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -395,12 +394,6 @@ public class IXAdNetworkHelperTest {
         final String expectedOutput4a = getExpectedStr(trackerArr4a);
         final String[] trackerArr4b = {};
         final String expectedOutput4b = getExpectedStr(trackerArr4b);
-
-        ArrayList<String> trackerList = new ArrayList<String>(){{
-            add(VelocityTemplateFieldConstants.VIEWABILITY_TRACKER);
-            add(VelocityTemplateFieldConstants.AUDIENCE_VERIFICATION_TRACKER);
-            add(VelocityTemplateFieldConstants.THIRD_PARTY_IMPRESSION_TRACKER);
-            add(VelocityTemplateFieldConstants.THIRD_PARTY_CLICK_TRACKER);}};
 
         return new Object[][] {
             {"trackerMapWithOutEmptyValue", trackerMapWithOutEmptyValue, false, expectedOutput1a, expectedOutput1b},

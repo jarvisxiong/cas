@@ -2,7 +2,6 @@ package com.inmobi.adserve.channels.adnetworks;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.find;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.replay;
 
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import org.apache.commons.configuration.Configuration;
 import org.json.JSONException;
 import org.json.JSONObject;

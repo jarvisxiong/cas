@@ -24,7 +24,7 @@ import lombok.Setter;
 public abstract class BaseStats {
     private static final Logger LOG = LoggerFactory.getLogger(BaseStats.class);
     protected static final String STATS = "stat";
-    protected static String containerName = "localhost";
+    protected String containerName = "localhost";
 
     private final Map<String, ConcurrentHashMap<String, ConcurrentHashMap<String, Counter>>> yammerCounterStats =
             new ConcurrentHashMap<>();
@@ -58,9 +58,8 @@ public abstract class BaseStats {
         } else {
             this.containerName = containerName.substring(0, splitIndex);
         }
-
         LOG.error("graphiteServer:{}, graphitePort:{}, graphiteInterval:{}", graphiteServer, graphitePort,
-            graphiteInterval);
+                graphiteInterval);
         LOG.error("metricsPrefix:{}, containerName:{}", metricsPrefix, this.containerName);
         GraphiteReporter.enable(registry, graphiteInterval, TimeUnit.MINUTES, graphiteServer, graphitePort,
                 metricsPrefix);
@@ -124,8 +123,8 @@ public abstract class BaseStats {
             synchronized (parameter) {
                 if (yammerMeterStats.get(key).get(STATS).get(parameter) == null) {
                     final MetricName metricName = new MetricName(containerName, "meterRate." + key, parameter);
-                    yammerMeterStats.get(key).get(STATS)
-                            .put(parameter, REGISTRY.newMeter(metricName, parameter, TimeUnit.MINUTES));
+                    yammerMeterStats.get(key).get(STATS).put(parameter,
+                            REGISTRY.newMeter(metricName, parameter, TimeUnit.MINUTES));
                 }
             }
         }
@@ -158,8 +157,8 @@ public abstract class BaseStats {
             synchronized (parameter) {
                 if (yammerGaugeStats.get(key).get(STATS).get(parameter) == null) {
                     final MetricName metricName = new MetricName(containerName, key, parameter);
-                    yammerGaugeStats.get(key).get(STATS)
-                            .put(parameter, REGISTRY.newGauge(metricName, new MetricGauge(value)));
+                    yammerGaugeStats.get(key).get(STATS).put(parameter,
+                            REGISTRY.newGauge(metricName, new MetricGauge(value)));
                 }
             }
         }

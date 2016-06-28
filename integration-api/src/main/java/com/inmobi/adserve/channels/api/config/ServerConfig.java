@@ -162,7 +162,7 @@ public class ServerConfig implements CasConfig {
      */
     @SuppressWarnings("unchecked")
     public List<String> getUSWestStatesCodes() {
-        return serverConfiguration.getList("usa.stateCodes", Lists.newArrayList());
+        return serverConfiguration.getList("us.west.stateCodes", Lists.newArrayList());
     }
 
     public String getPhotonEndPoint() {
