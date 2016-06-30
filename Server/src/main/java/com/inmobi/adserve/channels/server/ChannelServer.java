@@ -14,6 +14,7 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHA
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATABASE;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_CITY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
@@ -63,6 +64,7 @@ import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
 import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.GeoCityRepository;
 import com.inmobi.adserve.channels.repository.GeoRegionFenceMapRepository;
 import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.IMEIAerospikeRepository;
@@ -134,6 +136,7 @@ public class ChannelServer {
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     private static GeoZipRepository geoZipRepository;
+    private static GeoCityRepository geoCityRepository;
     private static SlotSizeMapRepository slotSizeMapRepository;
     private static SdkMraidMapRepository sdkMraidMapRepository;
     private static GeoRegionFenceMapRepository geoRegionFenceMapRepository;
@@ -234,6 +237,7 @@ public class ChannelServer {
             ixPackageRepository = new IXPackageRepository();
             packageRepositoryV2 = new PackageRepositoryV2();
             geoZipRepository = new GeoZipRepository();
+            geoCityRepository = new GeoCityRepository();
             slotSizeMapRepository = new SlotSizeMapRepository();
             sdkMraidMapRepository = new SdkMraidMapRepository();
             geoRegionFenceMapRepository = new GeoRegionFenceMapRepository();
@@ -261,6 +265,8 @@ public class ChannelServer {
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
+            repoHelperBuilder.setGeoCityRepository(geoCityRepository);
+
             repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
             repoHelperBuilder.setSdkMraidMapRepository(sdkMraidMapRepository);
             repoHelperBuilder.setGeoRegionFenceMapRepository(geoRegionFenceMapRepository);
@@ -386,6 +392,7 @@ public class ChannelServer {
             loadRepos(siteFilterRepository, SITE_FILTER_REPOSITORY, config, logger);
             loadRepos(siteEcpmRepository, SITE_ECPM_REPOSITORY, config, logger);
             loadRepos(geoZipRepository, GEO_ZIP_REPOSITORY, config, logger);
+            loadRepos(geoCityRepository, GEO_CITY_REPOSITORY, config, logger);
             loadRepos(slotSizeMapRepository, SLOT_SIZE_MAP_REPOSITORY, config, logger);
             loadRepos(sdkMraidMapRepository, SDK_MRAID_MAP_REPOSITORY, config, logger);
             loadRepos(geoRegionFenceMapRepository, GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);

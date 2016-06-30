@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import com.inmobi.castest.casconfenums.def.CasConf.ChannelPartners;
 import com.inmobi.castest.casconfenums.impl.CasPartnerConf;

@@ -1841,6 +1841,9 @@ TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
 TEST_IEM:
 - adpool_iem: '123456789123456'
 
+TEST_CITY:
+- geo_cityids: '71146'
+
 TEST_IEM_WITH_O1:
 - adpool_iem: '123456789123456'
   uidparams_rawuidvalues_o1: '9e74e1b452e07afded40fd15b45aa9e6'

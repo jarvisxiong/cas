@@ -75,6 +75,7 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.entity.CreativeEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
+import com.inmobi.adserve.channels.entity.GeoCityEntity;
 import com.inmobi.adserve.channels.entity.GeoRegionFenceMapEntity;
 import com.inmobi.adserve.channels.entity.GeoZipEntity;
 import com.inmobi.adserve.channels.entity.IMEIEntity;
@@ -145,6 +146,7 @@ public class RepositoryHelper {
     private final CreativeRepository creativeRepository;
     private final NativeAdTemplateRepository nativeAdTemplateRepository;
     private final GeoZipRepository geoZipRepository;
+    private final GeoCityRepository geoCityRepository;
     private final SlotSizeMapRepository slotSizeMapRepository;
     private final SdkMraidMapRepository sdkMraidMapRepository;
     private final GeoRegionFenceMapRepository geoRegionFenceMapRepository;
@@ -172,6 +174,7 @@ public class RepositoryHelper {
         ixPackageRepository = builder.ixPackageRepository;
         packageRepositoryV2 = builder.PackageRepositoryV2;
         geoZipRepository = builder.geoZipRepository;
+        geoCityRepository = builder.geoCityRepository;
         slotSizeMapRepository = builder.slotSizeMapRepository;
         sdkMraidMapRepository = builder.sdkMraidMapRepository;
         geoRegionFenceMapRepository = builder.geoRegionFenceMapRepository;
@@ -190,7 +193,8 @@ public class RepositoryHelper {
                 .addRepositoryToStats(creativeRepository).addRepositoryToStats(geoZipRepository)
                 .addRepositoryToStats(slotSizeMapRepository).addRepositoryToStats(geoRegionFenceMapRepository)
                 .addRepositoryToStats(ccidMapRepository).addRepositoryToStats(ixBlocklistRepository)
-                .addRepositoryToStats(sdkMraidMapRepository).addRepositoryToStats(cauMetaDataRepository);
+                .addRepositoryToStats(sdkMraidMapRepository).addRepositoryToStats(cauMetaDataRepository)
+                .addRepositoryToStats(geoCityRepository);
     }
 
     public static Builder newBuilder() {
@@ -218,6 +222,7 @@ public class RepositoryHelper {
         private IXPackageRepository ixPackageRepository;
         private PackageRepositoryV2 PackageRepositoryV2;
         private GeoZipRepository geoZipRepository;
+        private GeoCityRepository geoCityRepository;
         private SlotSizeMapRepository slotSizeMapRepository;
         private SdkMraidMapRepository sdkMraidMapRepository;
         private GeoRegionFenceMapRepository geoRegionFenceMapRepository;
@@ -245,6 +250,7 @@ public class RepositoryHelper {
             Preconditions.checkNotNull(ixPackageRepository);
             Preconditions.checkNotNull(PackageRepositoryV2);
             Preconditions.checkNotNull(geoZipRepository);
+            Preconditions.checkNotNull(geoCityRepository);
             Preconditions.checkNotNull(slotSizeMapRepository);
             Preconditions.checkNotNull(geoRegionFenceMapRepository);
             Preconditions.checkNotNull(ccidMapRepository);
@@ -269,6 +275,15 @@ public class RepositoryHelper {
             return geoZipRepository.query(zipId);
         } catch (final RepositoryException ignored) {
             LOG.debug("Exception while querying Geo Zip Repository, {}", ignored);
+        }
+        return null;
+    }
+
+    public GeoCityEntity queryGeoCityRepository(final Integer id) {
+        try {
+            return geoCityRepository.query(id);
+        } catch (final RepositoryException ignored) {
+            LOG.debug("Exception while querying Geo City Repository, {}", ignored);
         }
         return null;
     }

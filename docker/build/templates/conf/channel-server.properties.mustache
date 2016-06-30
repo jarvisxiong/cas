@@ -324,6 +324,14 @@ Cache.GeoZipRepository.refreshTime = 3607
 Cache.GeoZipRepository.isUpdatable = true
 Cache.GeoZipRepository.dataSourceName = jdbc
 
+Cache.Name = GeoCityRepository
+Cache.GeoCityRepository.Manager = com.inmobi.adserve.channels.repository.GeoCityRepository
+Cache.GeoCityRepository.query = select id\, name\, modified_on from geo_city where modified_on >= ('${last_update}')
+Cache.GeoCityRepository.initialDelay = 300
+Cache.GeoCityRepository.refreshTime = 3607
+Cache.GeoCityRepository.isUpdatable = true
+Cache.GeoCityRepository.dataSourceName = jdbc
+
 Cache.Name = SlotSizeMapRepository
 Cache.SlotSizeMapRepository.Manager = com.inmobi.adserve.channels.repository.SlotSizeMapRepository
 Cache.SlotSizeMapRepository.query = select id\,height\,width\,modified_on from serving_unit where modified_on >=('${last_update}')
@@ -731,7 +739,7 @@ adapter.rtbTestAdapter1.advertiserId=rtbTestAdapter1
 adapter.rtbTestAdapter1.urlArg=query
 adapter.rtbTestAdapter1.rtbMethod=post
 adapter.rtbTestAdapter1.isWnRequired=true
-adapter.rtbTestAdapter1.host.default=http://10.14.118.66:8765/getBid
+adapter.rtbTestAdapter1.host.default=http://10.14.118.29:8091/getRTBBid
 adapter.rtbTestAdapter1.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.rtbTestAdapter1.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.rtbTestAdapter1.nativeSupported=true
@@ -744,7 +752,7 @@ adapter.rtbTestAdapter2.advertiserId=rtbTestAdapter2
 adapter.rtbTestAdapter2.urlArg=query
 adapter.rtbTestAdapter2.rtbMethod=post
 adapter.rtbTestAdapter2.isWnRequired=true
-adapter.rtbTestAdapter2.host.default=http://10.14.118.66:8765/getBid
+adapter.rtbTestAdapter2.host.default=http://10.14.118.29:8091/getRTBBid
 adapter.rtbTestAdapter2.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.rtbTestAdapter2.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.rtbTestAdapter2.nativeSupported=true
@@ -757,7 +765,7 @@ adapter.rtbTestAdapter3.advertiserId=rtbTestAdapter3
 adapter.rtbTestAdapter3.urlArg=query
 adapter.rtbTestAdapter3.rtbMethod=post
 adapter.rtbTestAdapter3.isWnRequired=true
-adapter.rtbTestAdapter3.host.default=http://10.14.118.66:8765/getBid
+adapter.rtbTestAdapter3.host.default=http://10.14.118.29:8091/getRTBBid
 adapter.rtbTestAdapter3.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.rtbTestAdapter3.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.rtbTestAdapter3.nativeSupported=true

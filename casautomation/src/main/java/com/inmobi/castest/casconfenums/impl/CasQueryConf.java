@@ -52,24 +52,24 @@ public class CasQueryConf {
                     if (adGroup.get("adpool_requestedadtype").equalsIgnoreCase("NATIVE")) {
                         queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                             + "$1',(select max(inc_id) from wap_channel_ad)+1,9,'" + adGroup.get("advertiser_id")
-                            + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                            + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
                             + adGroup.get("adgroup_id") + "',1,now(),8)";
                     } else if (adGroup.get("adpool_requestedadtype").equalsIgnoreCase("INTERSTITIAL")
                         && adGroup.get("slot_ids").contains("14")) {
                         queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                             + "$1',(select max(inc_id) from wap_channel_ad)+1,11,'" + adGroup.get("advertiser_id")
-                            + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                            + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
                             + adGroup.get("adgroup_id") + "',1,now(),8)";
                     } else {
                         queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                             + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
-                            + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                            + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
                             + adGroup.get("adgroup_id") + "',1,now(),8)";
                     }
                 } catch (Exception adpool_requestedadtype_notfound) {
                     queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                         + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
-                        + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                        + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
                         + adGroup.get("adgroup_id") + "',1,now(),8)";
                 }
                 System.out.println(queryString);

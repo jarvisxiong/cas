@@ -72,6 +72,7 @@ import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.CcidMapEntity;
+import com.inmobi.adserve.channels.entity.GeoCityEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.pmp.DealEntity;
@@ -478,6 +479,14 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
         if (null != sasParams.getCountryCode()) {
             geo.setCountry(IABCountriesMap.getIabCountry(sasParams.getCountryCode()));
         }
+
+        if (null != sasParams.getCity()) {
+            final GeoCityEntity cityEntity = repositoryHelper.queryGeoCityRepository(sasParams.getCity());
+            if (null != cityEntity) {
+                geo.setCity(cityEntity.getName());
+            }
+        }
+
         geo.setZip(casInternalRequestParameters.getZipCode());
         // Setting type of geo data
         if (LocationSource.DERIVED_LAT_LON == sasParams.getLocationSource()) {
