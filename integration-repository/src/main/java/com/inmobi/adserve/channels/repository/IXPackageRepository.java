@@ -356,6 +356,14 @@ public class IXPackageRepository extends AbstractCQEngineRepository {
                 entityBuilder.secondaryAdFormatConstraints(secondaryAdFormatConstraints);
                 entityBuilder.dataVendorCost(dataVendorCost);
 
+                if (null != geoFenceRegion) {
+                    entityBuilder.geoFenceRegion(geoFenceRegion);
+                }
+
+                if (null != geocookieId) {
+                    entityBuilder.geocookieId(geocookieId);
+                }
+
                 final IXPackageEntity entity = entityBuilder.build();
 
                 // Creating Deals
@@ -367,10 +375,6 @@ public class IXPackageRepository extends AbstractCQEngineRepository {
                 Double[] agencyRebatePercentages = null;
                 if (null != rs.getArray("rp_agency_ids")) {
                     rpAgencyIds = (Integer[]) rs.getArray("rp_agency_ids").getArray();
-
-                if (null != geocookieId) {
-                    entityBuilder.geocookieId(geocookieId);
-                }
                 }
                 if (null != rs.getArray("agency_rebate_percentages")) {
                     agencyRebatePercentages = (Double[]) rs.getArray("agency_rebate_percentages").getArray();
@@ -402,10 +406,6 @@ public class IXPackageRepository extends AbstractCQEngineRepository {
                     dealBuilder.dealType(DealType.getDealTypeByName(accessTypes[i]));
                     dealBuilder.thirdPartyTrackersMap(getThirdPartyTrackerMap(thirdPartyTrackerJsonList[i]));
                     newIXDealsSet.add(dealBuilder.build());
-                }
-
-                if (null != geoFenceRegion) {
-                    entityBuilder.geoFenceRegion(geoFenceRegion);
                 }
 
                 final boolean active = rs.getBoolean("is_active");
