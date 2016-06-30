@@ -186,7 +186,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     private double secondBidPriceInUsd = 0;
     private double secondBidPriceInLocal = 0;
     private String bidRequestJson = DEFAULT_EMPTY_STRING;
-    private String encryptedBid;
     private boolean siteBlinded;
     private String responseSeatId;
     private String responseImpressionId;
@@ -1115,11 +1114,6 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
     @Override
     public String getSeatId() {
         return responseSeatId;
-    }
-
-    @Override
-    public void setEncryptedBid(final String encryptedBid) {
-        this.encryptedBid = encryptedBid;
     }
 
     @Override

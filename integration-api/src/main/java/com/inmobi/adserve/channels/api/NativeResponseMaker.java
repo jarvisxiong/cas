@@ -3,7 +3,6 @@ package com.inmobi.adserve.channels.api;
 import static com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants.IMAI_BASE_URL;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,13 +92,20 @@ public class NativeResponseMaker {
 
     /**
      * Render and ClientFill are empty in case of IX
-    */
+     */
     protected Map<Integer, Map<String, List<String>>> getEventTracking(final App app,
             final Map<String, String> params) {
         // click Tracker
+        List<String> clickUrls = app.getClickUrls();
+        if (clickUrls == null) {
+            clickUrls = new ArrayList<>();
+        }
+        final String inmobiClickUrl = params.get(CLICK_URL_PARAM);
+        if (StringUtils.isNotBlank(inmobiClickUrl)) {
+            clickUrls.add(inmobiClickUrl);
+        }
         final Map<String, List<String>> clickMap = new HashMap<>();
-        final List<String> clickUrls = app.getClickUrls();
-        clickMap.put(URLS, CollectionUtils.isNotEmpty(clickUrls) ? clickUrls : Collections.emptyList());
+        clickMap.put(URLS, clickUrls);
 
         // View or Impression Tracker
         final Map<String, List<String>> renderMap = new HashMap<>();
@@ -149,7 +155,6 @@ public class NativeResponseMaker {
             if (nUrl != null) {
                 bcu.append(constructBeaconUrl(nUrl));
             }
-
         } catch (final Exception e) {
             log.debug("Exception while parsing response {}", e);
         }
