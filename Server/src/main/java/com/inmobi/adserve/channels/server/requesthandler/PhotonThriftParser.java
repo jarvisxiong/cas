@@ -1,16 +1,12 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import java.io.ByteArrayOutputStream;
-
-import com.inmobi.adserve.contracts.ix.request.User;
-import com.inmobi.user.photon.datatypes.profile.UserProfileView;
-import com.inmobi.user.photon.service.UserProfileService;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TProtocol;
 
-import com.inmobi.user.photon.datatypes.attribute.Attributes;
 import com.inmobi.user.photon.datatypes.commons.Tenant;
+import com.inmobi.user.photon.datatypes.profile.UserProfileView;
+import com.inmobi.user.photon.service.UserProfileService;
 
 /**
  * Created by avinash.kumar on 6/6/16.
@@ -18,18 +14,18 @@ import com.inmobi.user.photon.datatypes.commons.Tenant;
 public class PhotonThriftParser extends TServiceClient {
     static final String fnName = "getProfileView";
 
-    public PhotonThriftParser(TProtocol prot) {
+    public PhotonThriftParser(final TProtocol prot) {
         super(prot, prot);
     }
 
-    public void send(String userId, Tenant tenant) throws Exception {
-        this.sendBase(fnName, new UserProfileService.getAllAttributes_args(userId, tenant));
+    public void send(final String userId, final Tenant tenant) throws Exception {
+        sendBase(fnName, new UserProfileService.getAllAttributes_args(userId, tenant));
     }
 
-    public UserProfileView receive(TProtocol protocol) throws Exception {
-        this.iprot_ = protocol;
-        final UserProfileService.getProfileView_result  result = new UserProfileService.getProfileView_result();
-        this.receiveBase(result, fnName);
+    public UserProfileView receive(final TProtocol protocol) throws Exception {
+        iprot_ = protocol;
+        final UserProfileService.getProfileView_result result = new UserProfileService.getProfileView_result();
+        receiveBase(result, fnName);
         if (result.isSetSuccess()) {
             return result.success;
         } else if (result.isSetPhotonException()) {

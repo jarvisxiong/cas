@@ -840,26 +840,16 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         } else {
             setParamsForBlindApp(app, ext);
         }
+        app.setBlocklists(IXAdNetworkHelper.getBlocklists(sasParams, repositoryHelper, traceMarker));
+        app.setPublisher(createPublisher());
+        app.setAq(createAdQuality());
+        app.setTransparency(createTransparency());
         app.setCat(iabCategories);
-
-        final List<String> blockedList = IXAdNetworkHelper.getBlocklists(sasParams, repositoryHelper, traceMarker);
-        app.setBlocklists(blockedList);
-
-        final Publisher publisher = createPublisher();
-        app.setPublisher(publisher);
-
-        final AdQuality adQuality = createAdQuality();
-        app.setAq(adQuality);
-
-        final Transparency transparency = createTransparency();
-        app.setTransparency(transparency);
 
         final RubiconExtension rpForApp = new RubiconExtension();
         rpForApp.setSite_id(rubiconSiteId);
         ext.setRp(rpForApp);
-
         app.setExt(ext);
-
         return app;
     }
 
@@ -868,7 +858,7 @@ public class IXAdNetwork extends BaseAdNetworkImpl {
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteUrl())) {
             app.setStoreurl(wapSiteUACEntity.getSiteUrl());
         }
-        final String marketId = getAppBundleId();
+        final String marketId = getAppBundleId(false);
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
         }

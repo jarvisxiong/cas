@@ -42,7 +42,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupDailyImpressionCountFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPropertyViolationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
@@ -229,7 +228,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setRichMedia(true);
         sasParams.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         sasParams.setSiteId("siteid");
-        Map<String, String> tUidParam = new HashedMap();
+        Map<String, String> tUidParam = new HashMap<>();
         tUidParam.put("O1", "O1_user_id");
         sasParams.setTUidParams(tUidParam);
 

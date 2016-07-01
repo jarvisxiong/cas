@@ -636,7 +636,6 @@ public class LoggingTest {
         long latency = 789L;
         double bidPriceInUSD = 4.0;
         double originalBidPriceInUSD = 5.0;
-        double agencyRebatePercentage = 10.0;
         ADCreativeType adCreativeType = ADCreativeType.BANNER;
 
         mockStaticNice(InspectorStats.class);
@@ -1001,7 +1000,7 @@ public class LoggingTest {
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockIXAdNetwork).anyTimes();
         expect(mockIXAdNetwork.getForwardedBidFloor()).andReturn(auctionBidFloor).anyTimes();
         expect(mockIXAdNetwork.getForwardedBidGuidance()).andReturn(marketRate).anyTimes();
-        expect(mockIXAdNetwork.getAppBundleId()).andReturn(appBundleId).anyTimes();
+        expect(mockIXAdNetwork.getAppBundleId(false)).andReturn(appBundleId).anyTimes();
         expect(mockSASRequestParameters.getSiteId()).andReturn(siteId).anyTimes();
         expect(mockSASRequestParameters.getTid()).andReturn(taskId).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(dst).anyTimes();

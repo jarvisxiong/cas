@@ -363,8 +363,14 @@ public interface AdNetworkInterface {
      * Returns the list of deals that were forwarded in the bid request.
      */
     Set<String> getForwardedDealIds();
-
-    String getAppBundleId();
+    
+    /**
+     * Get App Bundle Id from UAC.
+     * 
+     * @param useAppBundleIdOfRequest - If UAC Bundle Id not available fall back to request bundle id
+     * @return
+     */
+    String getAppBundleId(boolean useAppBundleIdOfRequest);
 
     /**
      * Returns the host name

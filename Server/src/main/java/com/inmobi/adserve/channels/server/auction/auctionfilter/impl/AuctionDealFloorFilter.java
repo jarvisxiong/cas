@@ -16,9 +16,6 @@ import com.inmobi.adserve.channels.server.auction.auctionfilter.AbstractAuctionF
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Singleton
 public class AuctionDealFloorFilter extends AbstractAuctionFilter {
     private static final double ZERO = 0d;

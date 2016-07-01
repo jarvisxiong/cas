@@ -619,7 +619,7 @@ public class RtbAdNetwork extends BaseAdNetworkImpl {
             app.setName(wapSiteUACEntity.getSiteName());
         }
 
-        final String marketId = getAppBundleId();
+        final String marketId = getAppBundleId(true);
         if (StringUtils.isNotEmpty(marketId)) {
             app.setBundle(marketId);
         }

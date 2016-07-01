@@ -135,6 +135,7 @@ public class AdPoolResponseCreatorTest {
         Assert.assertEquals(getHighestBid(adn, highestBid), expected);
     }
 
+    @SuppressWarnings("unused")
     @DataProvider(name = "Deal and Attribution Data Provider")
     public Iterator<Object[]> dataProvider2() {
 

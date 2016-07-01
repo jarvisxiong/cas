@@ -3,14 +3,13 @@ package com.inmobi.adserve.channels.server.module;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.inmobi.adserve.channels.adnetworks.ix.EnrichmentHelper;
 import org.apache.commons.configuration.Configuration;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
-import com.inmobi.adserve.channels.adnetworks.ix.PackageMatcherDelegateV2;
+import com.inmobi.adserve.channels.adnetworks.ix.EnrichmentHelper;
 import com.inmobi.adserve.channels.api.IPRepository;
 import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;

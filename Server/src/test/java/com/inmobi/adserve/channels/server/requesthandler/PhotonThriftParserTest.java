@@ -1,11 +1,10 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
-import com.inmobi.user.photon.datatypes.attribute.Attributes;
-import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
-import com.inmobi.user.photon.datatypes.commons.Tenant;
-import com.inmobi.user.photon.datatypes.profile.UserProfileView;
-import com.ning.http.client.HttpContent;
-import com.ning.http.client.Response;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+
+import java.io.ByteArrayOutputStream;
+
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
@@ -16,12 +15,9 @@ import org.junit.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.Arrays;
-
-import static org.testng.Assert.*;
+import com.inmobi.user.photon.datatypes.attribute.Attributes;
+import com.inmobi.user.photon.datatypes.commons.Tenant;
+import com.inmobi.user.photon.datatypes.profile.UserProfileView;
 
 /**
  * Created by avinash.kumar on 6/9/16.
@@ -68,7 +64,7 @@ public class PhotonThriftParserTest {
         try {
             UserProfileView userProfileView = photonThriftParser.receive(proto);
             Attributes attributes = userProfileView.getAttributes();
-            BrandAttributes brandAttributes = attributes.getBrand();
+            attributes.getBrand();
             Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.assertFalse(true);

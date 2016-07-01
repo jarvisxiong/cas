@@ -262,8 +262,9 @@ public class Logging {
             }
 
             /**
-             * Logging PMP specific fields in ixAdInfo. Populating this only if, 1) we get an AD response  or, 2)
-             * forward any packages/deals
+             * Logging PMP specific fields in ixAdInfo. Populating this only if, <br>
+             * 1) we get an AD response or <br>
+             * 2) forward any packages/deals
              */
             if (GlobalConstant.AD_STRING.equals(adResponse.getAdStatus())
                     || CollectionUtils.isNotEmpty(adNetwork.getForwardedPackageIds())
@@ -555,7 +556,8 @@ public class Logging {
                 if (null != adNetworkInterface.getForwardedBidGuidance()) {
                     request.setBidGuidance(adNetworkInterface.getForwardedBidGuidance());
                 }
-                final String appBundleId = adNetworkInterface.getAppBundleId();
+                final String appBundleId =
+                        adNetworkInterface.getAppBundleId(DemandSourceType.IX.getValue() != sasParams.getDst());
                 if (StringUtils.isNotBlank(appBundleId)) {
                     request.setAppBundleId(appBundleId);
                     LOG.debug("AppBundleId is : {}", appBundleId);

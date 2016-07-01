@@ -1,16 +1,13 @@
 package com.inmobi.adserve.channels.adnetworks.ix;
 
-import com.google.inject.Inject;
-import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.util.InspectorStats;
-import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
-import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
-import com.inmobi.user.photon.datatypes.commons.attribute.ValueProperties;
-import com.ning.http.client.ListenableFuture;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import static com.inmobi.adserve.channels.util.InspectorStrings.LATENCY_FOR_PHOTON_FUTURE_CALL;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON;
+import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON_LATENCY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NULL_CSIDS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_TIMEOUT_IN_PHOTON_RESPONSE;
+import static java.lang.Long.max;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -19,15 +16,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.inmobi.adserve.channels.util.InspectorStrings.LATENCY_FOR_PHOTON_FUTURE_CALL;
-import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON;
-import static com.inmobi.adserve.channels.util.InspectorStrings.PHOTON_LATENCY;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_NULL_CSIDS;
-import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_TIMEOUT_IN_PHOTON_RESPONSE;
+import org.apache.commons.lang3.tuple.Pair;
 
-import static java.lang.Long.max;
+import com.google.inject.Inject;
+import com.inmobi.adserve.channels.api.SASRequestParameters;
+import com.inmobi.adserve.channels.util.InspectorStats;
+import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
+import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
+import com.inmobi.user.photon.datatypes.commons.attribute.ValueProperties;
+import com.ning.http.client.ListenableFuture;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by avinash.kumar on 6/9/16.
@@ -39,14 +38,15 @@ public class EnrichmentHelper {
 
     @Inject
     public EnrichmentHelper(final int photonTimeout) {
-        this.photonTimeout = photonTimeout;
+        EnrichmentHelper.photonTimeout = photonTimeout;
     }
 
     public static void enrichCSIIdsWrapper(final SASRequestParameters sasParams) {
         final Pair<Long, ListenableFuture<BrandAttributes>> brandAttrPair = sasParams.getBrandAttrFuturePair();
         if (null != brandAttrPair) {
             final ListenableFuture<BrandAttributes> brandAttrFuture = brandAttrPair.getRight();
-            sasParams.setCsiTags(getCSIIds(sasParams.getCsiTags(), brandAttrPair.getLeft(), System.currentTimeMillis(), brandAttrPair.getRight()));
+            sasParams.setCsiTags(getCSIIds(sasParams.getCsiTags(), brandAttrPair.getLeft(), System.currentTimeMillis(),
+                    brandAttrFuture));
         }
     }
 
@@ -59,14 +59,14 @@ public class EnrichmentHelper {
         log.debug("CSIds before enrich : {}", sasCSITags);
         try {
             brandAttr = futureBrandAttributes.get(getWaitTime(startTime, curTime), TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             InspectorStats.incrementStatCount(PHOTON, TOTAL_INTERRUPTED_EXCEPTION_IN_PHOTON_RESPONSE);
-        } catch (ExecutionException e) {
+        } catch (final ExecutionException e) {
             InspectorStats.incrementStatCount(PHOTON, TOTAL_EXECUTION_EXCEPTION_IN_PHOTON_RESPONSE);
-        } catch (TimeoutException e) {
+        } catch (final TimeoutException e) {
             InspectorStats.incrementStatCount(PHOTON, TOTAL_TIMEOUT_IN_PHOTON_RESPONSE);
         }
-        InspectorStats.updateYammerTimerStats(PHOTON, PHOTON_LATENCY, (System.currentTimeMillis()-startTime));
+        InspectorStats.updateYammerTimerStats(PHOTON, PHOTON_LATENCY, System.currentTimeMillis() - startTime);
         if (null != brandAttr) {
             mergeCSITags(sasCSITags, brandAttr.getBluekai_csids());
             mergeCSITags(sasCSITags, brandAttr.getGeocookie_csids());
@@ -82,8 +82,9 @@ public class EnrichmentHelper {
         if (null != intAttr) {
             final Map<String, Map<Integer, ValueProperties>> valueMap = intAttr.getValueMap();
             if (null != valueMap) {
-                for (Map.Entry<String, Map<Integer, ValueProperties>> entry : valueMap.entrySet())
+                for (final Map.Entry<String, Map<Integer, ValueProperties>> entry : valueMap.entrySet()) {
                     csiTags.addAll(entry.getValue().keySet());
+                }
             }
         }
     }

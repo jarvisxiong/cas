@@ -432,24 +432,24 @@ public class BaseAdNetworkImplTest {
         final BaseAdNetworkImpl baseAdNetwork = createPartialMock(BaseAdNetworkImpl.class, mockedMethods);
         MemberMatcher.field(BaseAdNetworkImpl.class, "sasParams").set(baseAdNetwork, sasParams);
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.FALSE);
-        assertEquals("com.default", baseAdNetwork.getAppBundleId());
+        assertEquals(null, baseAdNetwork.getAppBundleId(false));
 
         // preference over sasParam appBundleId test
         final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
         builder.marketId("uac.marketId");
         MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
-        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
+        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId(true));
 
         // wapSiteUACEntity have null market id
         builder.marketId(null);
         MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
-        assertEquals("com.default", baseAdNetwork.getAppBundleId());
+        assertEquals("com.default", baseAdNetwork.getAppBundleId(true));
 
         //both are null
         sasParams.setAppBundleId(null);
-        assertEquals(null, baseAdNetwork.getAppBundleId());
+        assertEquals(null, baseAdNetwork.getAppBundleId(true));
     }
 
     /**

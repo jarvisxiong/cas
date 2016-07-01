@@ -480,8 +480,6 @@ public class ThriftRequestParserTest extends TestCase {
         final Carrier carrier = new Carrier();
         final User user = new User();
         final Geo geo = new Geo();
-        final Set<Integer> stateIds = new HashSet<Integer>();
-        final IntegrationDetails integrationDetails = new IntegrationDetails();
         final AdPoolRequest adPoolRequest = new AdPoolRequest();
         adPoolRequest.setSite(site);
         adPoolRequest.setDevice(device);

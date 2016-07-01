@@ -10,7 +10,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -21,14 +23,13 @@ import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.fds.thrift.mapp.MappResponse;
 import com.inmobi.fds.thrift.mapp.Score;
 import com.inmobi.segment.impl.AdTypeEnum;
-
 import com.inmobi.user.photon.datatypes.attribute.core.CoreAttributes;
 import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 
 @Slf4j
-class ThriftRequestParserHelper {
+public class ThriftRequestParserHelper {
     private static final short CONFIDENT_GOOD_SCORE = 100;
     private static final short UNKNOWN_SCORE = 90;
     private static final short MAYBE_BAD_SCORE = 40;
@@ -44,7 +45,7 @@ class ThriftRequestParserHelper {
         if (null != mappResponse) {
             final Score effectiveScore = mappResponse.getEffectiveScore();
             if (null != effectiveScore) {
-                final short nappScore = (short) effectiveScore.getScore();
+                final short nappScore = effectiveScore.getScore();
                 if (nappScore <= CONFIDENT_BAD_SCORE) {
                     params.setNappScore(NappScore.CONFIDENT_BAD_SCORE);
                     InspectorStats.incrementStatCount(
@@ -113,7 +114,7 @@ class ThriftRequestParserHelper {
     }
 
     public static void setSandBoxTest(final SASRequestParameters params, final Map<String, String> requestHeaders) {
-        params.setSandBoxRequest((null != requestHeaders) ?
-                StringUtils.equals("true", requestHeaders.get(SANDBOX_HEADER)) : false);
+        params.setSandBoxRequest(
+                null != requestHeaders ? StringUtils.equals("true", requestHeaders.get(SANDBOX_HEADER)) : false);
     }
 }

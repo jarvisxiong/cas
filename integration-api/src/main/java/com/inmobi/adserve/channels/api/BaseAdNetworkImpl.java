@@ -623,13 +623,17 @@ public abstract class BaseAdNetworkImpl implements AdNetworkInterface {
     }
 
     /**
+     * Get App Bundle Id from UAC.
      * 
-     * @return app bundle Id
+     * @param useAppBundleIdOfRequest - If UAC Bundle Id not available fall back to request bundle id
+     * @return
      */
     @Override
-    public String getAppBundleId() {
-        return isWapSiteUACEntity && StringUtils.isNotBlank(wapSiteUACEntity.getMarketId())
-                ? wapSiteUACEntity.getMarketId() : sasParams.getAppBundleId();
+    public String getAppBundleId(final boolean useAppBundleIdOfRequest) {
+        if (isWapSiteUACEntity && StringUtils.isNotBlank(wapSiteUACEntity.getMarketId())) {
+            return wapSiteUACEntity.getMarketId();
+        }
+        return useAppBundleIdOfRequest ? sasParams.getAppBundleId() : null;
     }
 
     @Override
