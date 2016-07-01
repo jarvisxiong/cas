@@ -40,9 +40,9 @@ public class SegmentFactory {
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
         final String adapterName = adapterConfig.getAdapterName();
 
-        final String adapterHost = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx()
-                ? adapterConfig.getAdapterHost(sasParam.getState())
-                : adapterConfig.getAdapterHost();
+        final boolean isSmartRouting = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx();
+        final String adapterHost = adapterConfig.getAdapterHost(sasParam, isSmartRouting);
+        LOG.debug("adapter host : {}", adapterHost);
 
         if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterName))) {
             return null;

@@ -2037,3 +2037,6 @@ TEST_PHOTON_UID_PRESENT:
 TEST_UID_PRESENT_IN_TUIDPARAMS:
  - uidparams_rawuidvalues_o1: '0002e17f-4df0-4067-8776-27ff6efac8de'
    uidparam_selecteduidtypevalue: '2'
+
+TEST_INTEGRATION_REQUEST_POSITIVE:
+ - request_header: 'x-inmobi-sandbox-cas'

@@ -7,6 +7,7 @@ import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestPar
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getMraidPath;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getSdkVersion;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.populateNappScore;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.setSandBoxTest;
 import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.updateCsiTags;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
@@ -179,7 +180,7 @@ public class ThriftRequestParser {
 
         //setting the napp score for supply
         populateNappScore(params, tObject.getMappResponse());
-
+        setSandBoxTest(params, tObject.getRequestHeaders());
         LOG.debug("Successfully parsed tObject, SAS params are : {}", params);
     }
 

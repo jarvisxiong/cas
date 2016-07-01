@@ -9,7 +9,8 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.TOTAL_REQUEST_WI
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Set;;
 
 import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
@@ -24,7 +25,7 @@ import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.user.photon.datatypes.attribute.core.CoreAttributes;
 import com.inmobi.user.photon.datatypes.commons.attribute.IntAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 @Slf4j
 class ThriftRequestParserHelper {
@@ -32,6 +33,7 @@ class ThriftRequestParserHelper {
     private static final short UNKNOWN_SCORE = 90;
     private static final short MAYBE_BAD_SCORE = 40;
     private static final short CONFIDENT_BAD_SCORE = 10;
+    private static final String SANDBOX_HEADER = "x-inmobi-sandbox-cas";
 
     static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
             "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
@@ -104,9 +106,14 @@ class ThriftRequestParserHelper {
         if (null != core && core.isSetCsids()) {
             final IntAttribute intAttr = core.getCsids();
             if (intAttr.isSetValueMap()) {
-                intAttr.getValueMap().forEach((s,t) -> coreCSIIds.addAll(t.keySet()));
+                intAttr.getValueMap().forEach((s, t) -> coreCSIIds.addAll(t.keySet()));
             }
         }
         csiTags.addAll(coreCSIIds);
+    }
+
+    public static void setSandBoxTest(final SASRequestParameters params, final Map<String, String> requestHeaders) {
+        params.setSandBoxRequest((null != requestHeaders) ?
+                StringUtils.equals("true", requestHeaders.get(SANDBOX_HEADER)) : false);
     }
 }

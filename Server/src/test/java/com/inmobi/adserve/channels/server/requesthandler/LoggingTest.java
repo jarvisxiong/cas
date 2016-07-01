@@ -456,7 +456,8 @@ public class LoggingTest {
         ChannelSegment mockChannelSegment = createMock(ChannelSegment.class);
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         ThirdPartyAdResponse mockThirdPartyAdResponse = createMock(ThirdPartyAdResponse.class);
-
+        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        expect(mockSASRequestParameters.isSandBoxRequest()).andReturn(false).anyTimes();
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
         expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn(advertiserId).anyTimes();
@@ -497,9 +498,9 @@ public class LoggingTest {
 
         replayAll();
 
-        assertThat(Logging.createChannelsLog(null).size(), is(0));
+        assertThat(Logging.createChannelsLog(null, mockSASRequestParameters).size(), is(0));
 
-        Channel channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment)).get(0);
+        Channel channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment), mockSASRequestParameters).get(0);
         assertThat(channel.getAdStatus(), is(equalTo(Logging.getAdStatus(adStatus[0]))));
         assertThat(channel.getLatency(), is(equalTo(latency)));
         CasAdChain casAdChain = channel.getAdChain();
@@ -510,15 +511,15 @@ public class LoggingTest {
         assertThat(casAdChain.getDst(), is(equalTo(DemandSourceType.findByValue(dst))));
         assertThat(casAdChain.getCreativeId(), is(equalTo(creativeId)));
 
-        channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment)).get(0);
+        channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment), mockSASRequestParameters).get(0);
         casAdChain = channel.getAdChain();
         assertThat(channel.getAdStatus(), is(equalTo(Logging.getAdStatus(adStatus[1]))));
         assertThat(casAdChain.getCreativeId(), is(equalTo(null)));
 
-        channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment)).get(0);
+        channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment), mockSASRequestParameters).get(0);
         assertThat(channel.getAdStatus(), is(equalTo(Logging.getAdStatus(adStatus[2]))));
 
-        channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment)).get(0);
+        channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment), mockSASRequestParameters).get(0);
         assertThat(channel.getAdStatus(), is(equalTo(Logging.getAdStatus(adStatus[3]))));
     }
 
@@ -550,7 +551,8 @@ public class LoggingTest {
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         ChannelSegmentEntity mockChannelSegmentEntityForIncId = createMock(ChannelSegmentEntity.class);
         ThirdPartyAdResponse mockThirdPartyAdResponse = createMock(ThirdPartyAdResponse.class);
-
+        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        expect(mockSASRequestParameters.isSandBoxRequest()).andReturn(false).anyTimes();
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
         expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn(advertiserId).anyTimes();
@@ -589,9 +591,9 @@ public class LoggingTest {
 
         replayAll();
 
-        assertThat(Logging.createChannelsLog(null).size(), is(0));
+        assertThat(Logging.createChannelsLog(null, mockSASRequestParameters).size(), is(0));
 
-        Channel channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment)).get(0);
+        Channel channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment), mockSASRequestParameters).get(0);
         assertThat(channel.getAdStatus(), is(equalTo(Logging.getAdStatus(adStatus))));
         assertThat(channel.getLatency(), is(equalTo(latency)));
         CasAdChain casAdChain = channel.getAdChain();
@@ -644,7 +646,8 @@ public class LoggingTest {
         ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         ThirdPartyAdResponse mockThirdPartyAdResponse = createMock(ThirdPartyAdResponse.class);
         ChannelSegmentEntity mockChannelSegmentEntityForIncId = createMock(ChannelSegmentEntity.class);
-
+        SASRequestParameters mockSASRequestParameters = createMock(SASRequestParameters.class);
+        expect(mockSASRequestParameters.isSandBoxRequest()).andReturn(false).anyTimes();
         expect(mockChannelSegment.getAdNetworkInterface()).andReturn(mockAdNetworkInterface).anyTimes();
         expect(mockChannelSegment.getChannelSegmentEntity()).andReturn(mockChannelSegmentEntity).anyTimes();
         expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn(advertiserId).anyTimes();
@@ -682,9 +685,9 @@ public class LoggingTest {
 
         replayAll();
 
-        assertThat(Logging.createChannelsLog(null).size(), is(0));
+        assertThat(Logging.createChannelsLog(null, mockSASRequestParameters).size(), is(0));
 
-        Channel channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment)).get(0);
+        Channel channel = Logging.createChannelsLog(Arrays.asList(mockChannelSegment), mockSASRequestParameters).get(0);
         assertThat(channel.getAdStatus(), is(equalTo(Logging.getAdStatus(adStatus))));
         assertThat(channel.getLatency(), is(equalTo(latency)));
         CasAdChain casAdChain = channel.getAdChain();

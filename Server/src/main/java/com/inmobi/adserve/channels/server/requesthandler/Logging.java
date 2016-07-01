@@ -2,6 +2,7 @@ package com.inmobi.adserve.channels.server.requesthandler;
 
 import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapIntegrationDetailsToRequestSource;
 import static com.inmobi.adserve.channels.server.requesthandler.NOBLoggingHelper.mapRequestedAdTypeToAdFormat;
+import static com.inmobi.adserve.channels.util.InspectorStrings.SANDBOX_REQUEST_PREFIX;
 import static com.inmobi.adserve.channels.util.InspectorStrings.LATENCY;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NO_MATCH_SEGMENT_COUNT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NO_MATCH_SEGMENT_LATENCY;
@@ -217,7 +218,7 @@ public class Logging {
         }
     }
 
-    static List<Channel> createChannelsLog(final List<ChannelSegment> rankList) {
+    static List<Channel> createChannelsLog(final List<ChannelSegment> rankList, final SASRequestParameters sasParams) {
         if (null == rankList) {
             return new ArrayList<>();
         }
@@ -280,24 +281,26 @@ public class Logging {
             final String hostName = adNetwork.getHostName();
             final boolean isCrossColo =
                     StringUtils.equals(dataCentreName, UH1) && hostName.contains(RP_USA_WEST_HOST_END_POINT);
+            final boolean isSandBoxRequest = sasParams.isSandBoxRequest();
+
             // Incrementing inspectors
-            incrementStats(adNetwork.getName(), TOTAL_REQUESTS, isCrossColo, 1);
-            incrementStats(adNetwork.getName(), LATENCY, isCrossColo, adResponse.getLatency());
+            incrementStats(adNetwork.getName(), TOTAL_REQUESTS, isCrossColo, isSandBoxRequest, 1);
+            incrementStats(adNetwork.getName(), LATENCY, isCrossColo, isSandBoxRequest, adResponse.getLatency());
             switch (adResponse.getAdStatus()) {
                 case GlobalConstant.AD_STRING:
-                    incrementStats(adNetwork.getName(), TOTAL_FILLS, isCrossColo, 1);
+                    incrementStats(adNetwork.getName(), TOTAL_FILLS, isCrossColo, isSandBoxRequest,  1);
                     break;
                 case GlobalConstant.NO_AD:
-                    incrementStats(adNetwork.getName(), TOTAL_NO_FILLS, isCrossColo, 1);
+                    incrementStats(adNetwork.getName(), TOTAL_NO_FILLS, isCrossColo, isSandBoxRequest, 1);
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 case GlobalConstant.TIME_OUT:
-                    incrementStats(adNetwork.getName(), TOTAL_TIMEOUT, isCrossColo, 1);
+                    incrementStats(adNetwork.getName(), TOTAL_TIMEOUT, isCrossColo, isSandBoxRequest, 1);
                     InspectorStats.incrementStatCount(TOTAL_TIMEOUT);
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
                 default:
-                    incrementStats(adNetwork.getName(), TOTAL_TERMINATE, isCrossColo, 1);
+                    incrementStats(adNetwork.getName(), TOTAL_TERMINATE, isCrossColo, isSandBoxRequest, 1);
                     InspectorStats.incrementStatCount(TOTAL_TERMINATE);
                     AdvertiserFailureThrottler.incrementFailureCounter(adNetwork.getId(), adResponse.getStartTime());
                     break;
@@ -307,10 +310,12 @@ public class Logging {
     }
 
     private static void incrementStats(final String adNetworkName, final String statName, final boolean isCrossColo,
-            final long count) {
+            final boolean isSandBoxRequest, final long count) {
         InspectorStats.incrementStatCount(adNetworkName, statName, count);
         if (isCrossColo) {
             InspectorStats.incrementStatCount(adNetworkName, UH1_TO_RP_WEST_PREFIX + statName, count);
+        } else if (isSandBoxRequest) {
+            InspectorStats.incrementStatCount(adNetworkName, SANDBOX_REQUEST_PREFIX + statName, count);
         }
     }
 
@@ -452,7 +457,7 @@ public class Logging {
         final String timestamp = new Date().toString();
         final Request request =
                 getRequestObject(sasParams, casInternalRequestParameters, adsServed, requestSlot, slotServed, rankList);
-        final List<Channel> channels = createChannelsLog(rankList);
+        final List<Channel> channels = createChannelsLog(rankList, sasParams);
 
         // Container name must be equal to the hostname for now.
         final AdRR adRR;

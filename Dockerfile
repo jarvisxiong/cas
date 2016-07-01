@@ -10,8 +10,10 @@ EXPOSE 8800 8801
 EXPOSE 9004
 # Port for remote debugging
 EXPOSE 8998
-# Port for HAProxy Stats
+# Port for HAProxy stats
 EXPOSE 8082
+# Port for Dummy Bidder stats
+EXPOSE 8091
 
 # Using a newer version of supervisor for environment variable substitution support in configs
 RUN pip install supervisor==3.1.3
@@ -52,6 +54,9 @@ RUN chmod 755 /var/run/haproxy
 # See https://golang.org/pkg/path/filepath/#Match for filePath regex syntax. Current support is very basic and does not support wildcards for character ranges.
 COPY Server/target/server\\-*[0-9].jar Server/target/server\\-*[0-9]-SNAPSHOT.jar bin/cas.jar
 
+#Copy DummyRtbBidder jar files
+ADD https://artifactory-maven.corp.inmobi.com/content/repositories/releases/com/inmobi/channels/DummyBidder/1.7/DummyBidder-1.7-jar-with-dependencies.jar bin/dummyBidder.jar
+
 # Default execution point
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 
@@ -67,9 +72,9 @@ CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 
 # Useful Docker run Commands:
 # 1) Build: docker build -t cas_image .
-# 2) Run: docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 -p 8998:8998 -p 8082:8082 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=cas1234 --name=cas_container cas_image
-# 3) All in one: docker build -t cas_image .; docker rm cas_container; docker run -p 8800:8800 -p 8998:8998 -p 8082:8082 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=cas1234 --name=cas_container cas_image
+# 2) Run: docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 -p 8998:8998 -p 8082:8082 -p 8091:8091 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=cas1234 --name=cas_container cas_image
+# 3) All in one: docker build -t cas_image .; docker rm cas_container; docker run -p 8800:8800 -p 8998:8998 -p 8082:8082 -p 8091:8091 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=cas1234 --name=cas_container cas_image
 # 4) ssh into running container: docker exec -it cas_container /bin/bash
 # 5) To override the default supervisord setup add -it just before the image name and /bin/bash just after the image name
 
-# docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 -p 8998:8998 -p 8082:8082 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=test --name=cas dockerhub.corp.inmobi.com/channel_adserve/cas:1681a0affb94
+# docker run -p 8800:8800 -p 8801:8801 -p 9004:9004 -p 8998:8998 -p 8082:8082 -p 8091:8091 --ulimit nofile=98304:98304 -e IDP_ENVIRONMENT=non_prod -e IDP_CLUSTER=corp -e IDP_NODE=test --name=cas dockerhub.corp.inmobi.com/channel_adserve/cas:1681a0affb94

@@ -747,8 +747,8 @@ adapter.rtbTestAdapter1.advertiserId=rtbTestAdapter1
 adapter.rtbTestAdapter1.urlArg=query
 adapter.rtbTestAdapter1.rtbMethod=post
 adapter.rtbTestAdapter1.isWnRequired=true
-adapter.rtbTestAdapter1.host.default=http://10.14.118.29:8091/getRTBBid
-adapter.rtbTestAdapter1.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
+adapter.rtbTestAdapter1.host.default=http://localhost:8091/getRTBBid
+adapter.rtbTestAdapter1.wnUrlback=http://localhost:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.rtbTestAdapter1.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.rtbTestAdapter1.nativeSupported=true
 
@@ -760,8 +760,8 @@ adapter.rtbTestAdapter2.advertiserId=rtbTestAdapter2
 adapter.rtbTestAdapter2.urlArg=query
 adapter.rtbTestAdapter2.rtbMethod=post
 adapter.rtbTestAdapter2.isWnRequired=true
-adapter.rtbTestAdapter2.host.default=http://10.14.118.29:8091/getRTBBid
-adapter.rtbTestAdapter2.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
+adapter.rtbTestAdapter2.host.default=http://localhost:8091/getRTBBid
+adapter.rtbTestAdapter2.wnUrlback=http://localhost:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.rtbTestAdapter2.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.rtbTestAdapter2.nativeSupported=true
 
@@ -773,8 +773,8 @@ adapter.rtbTestAdapter3.advertiserId=rtbTestAdapter3
 adapter.rtbTestAdapter3.urlArg=query
 adapter.rtbTestAdapter3.rtbMethod=post
 adapter.rtbTestAdapter3.isWnRequired=true
-adapter.rtbTestAdapter3.host.default=http://10.14.118.29:8091/getRTBBid
-adapter.rtbTestAdapter3.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
+adapter.rtbTestAdapter3.host.default=http://localhost:8091/getRTBBid
+adapter.rtbTestAdapter3.wnUrlback=http://localhost:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
 adapter.rtbTestAdapter3.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 adapter.rtbTestAdapter3.nativeSupported=true
 {{/automation_enabled}}
@@ -1931,6 +1931,7 @@ adapter.ix.host.lhr1=http://exapi-eu.rubiconproject.com/a/api/exchange.json?tk_s
 adapter.ix.host.hkg1=http://exapi-apac.rubiconproject.com/a/api/exchange.json?tk_sdc=apac
 adapter.ix.host.uh1=http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east
 adapter.ix.host.default={{ix_default_url}}
+adapter.ix.host.sandbox=http://localhost:8091/getIXBid
 adapter.ix.partnerSegmentNo=1
 adapter.ix.class=com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork
 adapter.ix.userName=inmobi

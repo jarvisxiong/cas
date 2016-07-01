@@ -140,6 +140,7 @@ public class SASRequestParameters {
     private boolean isRequestFromSDK;
     private String sdkVersion;
     private boolean deeplinkingSupported;
+    private boolean isSandBoxRequest;
 
     /**
      * @return true if bundle ids are mismatched

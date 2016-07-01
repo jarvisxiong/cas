@@ -4,6 +4,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 
@@ -23,6 +24,7 @@ import lombok.EqualsAndHashCode;
 public class AdapterConfig implements CasConfig {
     private static final String UJ1 = DataCenter.UJ1.name().toLowerCase();
     private static final String UH1 = DataCenter.UH1.name().toLowerCase();
+    private static final java.lang.String SANDBOX_HOST = "host.sandbox";
     private final Configuration adapterConfig;
     private final String dcName;
     private final String adapterName;
@@ -99,8 +101,9 @@ public class AdapterConfig implements CasConfig {
     /**
      * @return the adapterHost based on Data Center and stateCode of USA
      */
-    public String getAdapterHost(final Integer stateCode) {
-        return getAdapterHost(getDcName(stateCode));
+    public String getAdapterHost(final SASRequestParameters sasParam, final boolean isSmartRouting) {
+        return sasParam.isSandBoxRequest() ? adapterConfig.getString(SANDBOX_HOST) : (isSmartRouting ?
+                getAdapterHost(getDcName(sasParam.getState())) : getAdapterHost());
     }
 
     public String getAdapterHost() {

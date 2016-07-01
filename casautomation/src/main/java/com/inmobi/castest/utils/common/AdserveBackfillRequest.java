@@ -711,6 +711,13 @@ public class AdserveBackfillRequest {
         mappResponse.setEffectiveScore(score);
         adPoolRequest.setMappResponse(mappResponse);
 
+        Map<String, String> requestHeader = new HashMap<>();
+        final String headerKey = requestObject.get("request_header");
+        if (StringUtils.isNotBlank(headerKey)) {
+            requestHeader.put(headerKey, "true");
+        }
+        adPoolRequest.setRequestHeaders(requestHeader);
+
         return adPoolRequest;
     }
 

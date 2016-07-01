@@ -267,6 +267,7 @@ public class InspectorStrings {
     public static final String TOTAL_SECURE_RESPONSE = "TotalSecureResponse";
 
     public static final String UH1_TO_RP_WEST_PREFIX = "UH1ToRPWest";
+    public static final String SANDBOX_REQUEST_PREFIX = "SandBoxRequest";
 
     // Native 1.0 Video errors
     public static final String NATIVE_VIDEO_REQUEST_DROPPED_AS_TEMPLATE_WAS_MISSING = "NativeVideoResponse.DroppedAsTemplateWasMissing";
