@@ -1,22 +1,29 @@
 package com.inmobi.adserve.channels.repository;
 
 
+import static com.inmobi.adserve.channels.repository.pmp.DealAttributes.DEAL_ID;
+import static com.inmobi.adserve.channels.repository.pmp.DeprecatedIXPackageAttributes.COUNTRY_ID;
+import static com.inmobi.adserve.channels.repository.pmp.DeprecatedIXPackageAttributes.OS_ID;
+import static com.inmobi.adserve.channels.repository.pmp.DeprecatedIXPackageAttributes.PACKAGE_ID;
+import static com.inmobi.adserve.channels.repository.pmp.DeprecatedIXPackageAttributes.SITE_ID;
+import static com.inmobi.adserve.channels.repository.pmp.DeprecatedIXPackageAttributes.SLOT_ID;
+import static com.inmobi.adserve.channels.repository.pmp.PackageHelperV2.extractDmpFilterExpression;
+import static com.inmobi.adserve.channels.repository.pmp.PackageHelperV2.extractManufModelTargeting;
+import static com.inmobi.adserve.channels.repository.pmp.PackageHelperV2.extractOsVersionTargeting;
+import static com.inmobi.adserve.channels.repository.pmp.PackageHelperV2.extractSdkVersionTargeting;
+import static com.inmobi.adserve.channels.repository.pmp.PackageHelperV2.getThirdPartyTrackerMap;
+import static com.inmobi.adserve.channels.util.demand.enums.AuctionType.FIRST_PRICE;
+import static com.inmobi.casthrift.DemandSourceType.IX;
+
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,34 +32,22 @@ import javax.sql.DataSource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Range;
-import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.googlecode.cqengine.CQEngine;
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.googlecode.cqengine.attribute.Attribute;
-import com.googlecode.cqengine.attribute.MultiValueAttribute;
-import com.googlecode.cqengine.attribute.MultiValueNullableAttribute;
 import com.googlecode.cqengine.index.hash.HashIndex;
+import com.googlecode.cqengine.index.unique.UniqueIndex;
 import com.inmobi.adserve.channels.entity.IXPackageEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
+import com.inmobi.adserve.channels.repository.pmp.AbstractCQEngineRepository;
+import com.inmobi.adserve.channels.util.demand.enums.DealType;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.data.repository.DBReaderDelegate;
-import com.inmobi.data.repository.ScheduledDbReader;
 import com.inmobi.segment.Segment;
 import com.inmobi.segment.impl.CarrierId;
 import com.inmobi.segment.impl.City;
@@ -71,139 +66,43 @@ import com.inmobi.segment.impl.SiteId;
 import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
 import com.inmobi.segment.impl.ZipCodePresent;
-import com.inmobi.segmentparameter.SegmentParameter;
 
 import lombok.Getter;
 
 
-public class IXPackageRepository {
-    private volatile Map<Integer, IXPackageEntity> packageSet = Collections.emptyMap();
+public class IXPackageRepository extends AbstractCQEngineRepository {
     @Getter
-    private IndexedCollection<IXPackageEntity> packageIndex;
-    private ScheduledDbReader reader;
-    private static final Integer[][] EMPTY_2D_INTEGER_ARRAY = new Integer[0][];
-    private static Logger logger;
-
-    public static final String ALL_SITE_ID = "A";
-    public static final Integer ALL_COUNTRY_ID = -1;
-    public static final Integer ALL_OS_ID = -1;
-    public static final Integer ALL_SLOT_ID = -1;
-
-    public static final Attribute<IXPackageEntity, String> DEAL_IDS =
-            new MultiValueNullableAttribute<IXPackageEntity, String>("deal_ids", false) {
-                @Override
-                public List<String> getNullableValues(final IXPackageEntity entity) {
-                    final List<String> dealIds = entity.getDealIds();
-                    return dealIds;
-                }
-            };
-
-    public static final Attribute<IXPackageEntity, String> SITE_ID = new MultiValueAttribute<IXPackageEntity, String>(
-            "site_id") {
-        @Override
-        @SuppressWarnings("unchecked")
-        public List<String> getValues(final IXPackageEntity entity) {
-            final Segment segment = entity.getSegment();
-
-            Collection<String> siteIds = null;
-            final SegmentParameter<?> siteIdParam = segment.getSegmentParameters().get(SiteId.class.getName());
-            if (siteIdParam != null) {
-                siteIds = (Collection<String>) siteIdParam.getValue();
-            }
-            if (siteIds == null || siteIds.isEmpty()) {
-                siteIds = Collections.singleton(ALL_SITE_ID);
-            }
-            return new ArrayList<>(siteIds);
-        }
-    };
-
-    public static final Attribute<IXPackageEntity, Integer> COUNTRY_ID =
-            new MultiValueAttribute<IXPackageEntity, Integer>("country_id") {
-                @Override
-                @SuppressWarnings("unchecked")
-                public List<Integer> getValues(final IXPackageEntity entity) {
-                    final Segment segment = entity.getSegment();
-                    Collection<Integer> countryIds = null;
-                    final SegmentParameter<?> countryIdParam =
-                            segment.getSegmentParameters().get(Country.class.getName());
-                    if (countryIdParam != null) {
-                        countryIds = (Collection<Integer>) countryIdParam.getValue();
-                    }
-                    if (countryIds == null || countryIds.isEmpty()) {
-                        countryIds = Collections.singleton(ALL_COUNTRY_ID);
-                    }
-                    return new ArrayList<>(countryIds);
-                }
-            };
-
-    public static final Attribute<IXPackageEntity, Integer> OS_ID = new MultiValueAttribute<IXPackageEntity, Integer>(
-            "os_id") {
-        @Override
-        @SuppressWarnings("unchecked")
-        public List<Integer> getValues(final IXPackageEntity entity) {
-            final Segment segment = entity.getSegment();
-
-            Collection<Integer> osIds = null;
-            final SegmentParameter<?> osIdParam = segment.getSegmentParameters().get(DeviceOs.class.getName());
-            if (osIdParam != null) {
-                osIds = (Collection<Integer>) osIdParam.getValue();
-            }
-            if (osIds == null || osIds.isEmpty()) {
-                osIds = Collections.singleton(ALL_OS_ID);
-            }
-            return new ArrayList<>(osIds);
-        }
-    };
-
-    public static final Attribute<IXPackageEntity, Integer> SLOT_ID =
-            new MultiValueAttribute<IXPackageEntity, Integer>("slot_id") {
-                @Override
-                @SuppressWarnings("unchecked")
-                public List<Integer> getValues(final IXPackageEntity entity) {
-                    final Segment segment = entity.getSegment();
-
-                    Collection<Integer> slotIds = null;
-                    final SegmentParameter<?> slotIdParam = segment.getSegmentParameters().get(SlotId.class.getName());
-                    if (slotIdParam != null) {
-                        slotIds = (Collection<Integer>) slotIdParam.getValue();
-                    }
-                    if (slotIds == null || slotIds.isEmpty()) {
-                        slotIds = Collections.singleton(ALL_SLOT_ID);
-                    }
-                    return new ArrayList<>(slotIds);
-                }
-            };
+    private IndexedCollection<IXPackageEntity> indexedPackages;
+    @Getter
+    private IndexedCollection<DealEntity> indexedDeals;
 
     public void init(final Logger logger, final DataSource dataSource, final Configuration config,
             final String instanceName) {
 
-        this.logger = logger;
-        final String query = config.getString("query");
-        final MetricRegistry metricsRegistry = new MetricRegistry();
+        super.init(logger, dataSource, config, instanceName, new IXPackageReaderDelegate());
 
-        reader =
-                new ScheduledDbReader(dataSource, query, null, new IXPackageReaderDelegate(), new MetricRegistry(),
-                        getRepositorySchedule(config), Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-                                .setNameFormat("repository-update-%d").build()), instanceName);
+        indexedPackages = new ConcurrentIndexedCollection<>();
+        indexedDeals = new ConcurrentIndexedCollection<>();
 
-        packageIndex = CQEngine.newInstance();
-        packageIndex.addIndex(HashIndex.onAttribute(SITE_ID));
-        packageIndex.addIndex(HashIndex.onAttribute(COUNTRY_ID));
-        packageIndex.addIndex(HashIndex.onAttribute(OS_ID));
-        packageIndex.addIndex(HashIndex.onAttribute(SLOT_ID));
-        packageIndex.addIndex(HashIndex.onAttribute(DEAL_IDS));
+        indexedPackages.addIndex(HashIndex.onAttribute(SITE_ID));
+        indexedPackages.addIndex(HashIndex.onAttribute(COUNTRY_ID));
+        indexedPackages.addIndex(HashIndex.onAttribute(OS_ID));
+        indexedPackages.addIndex(HashIndex.onAttribute(SLOT_ID));
+        indexedPackages.addIndex(UniqueIndex.onAttribute(PACKAGE_ID));
 
-        metricsRegistry.register(MetricRegistry.name(this.getClass(), "size"), (Gauge<Integer>) () -> packageSet.size());
+        indexedDeals.addIndex(UniqueIndex.onAttribute(DEAL_ID));
 
         start();
     }
 
-    public class IXPackageReaderDelegate implements DBReaderDelegate {
-        private Map<Integer, IXPackageEntity> newIXPackageSet;
+    private class IXPackageReaderDelegate implements DBReaderDelegate {
+        private Set<IXPackageEntity> newIXPackageSet;
+        private Set<DealEntity> newIXDealsSet;
 
         @Override
         public void beforeEachIteration() {
-            newIXPackageSet = new HashMap<>();
+            newIXPackageSet = new HashSet<>();
+            newIXDealsSet = new HashSet<>();
         }
 
         @Override
@@ -225,14 +124,12 @@ public class IXPackageRepository {
                 String[] geoSourceTypes = null;
                 final String geoFenceRegion = rs.getString("geo_fence_region");
                 final Array languageArray = rs.getArray("language_targeting_list");
-                final Set<String> languageTargetingSet = new HashSet<String>();
+                final Set<String> languageTargetingSet = new HashSet<>();
                 final Integer geocookieId = rs.getInt("geocookie_id");
                 if (null != languageArray) {
                     if (null != languageArray.getArray()) {
                         final String[] languageTargetingList = (String[]) languageArray.getArray();
-                        for (String language : languageTargetingList) {
-                            languageTargetingSet.add(language);
-                        }
+                        Collections.addAll(languageTargetingSet, languageTargetingList);
                     }
                 }
                 final boolean viewable = rs.getBoolean("viewable");
@@ -257,22 +154,6 @@ public class IXPackageRepository {
                 final int dataVendorId = rs.getInt("data_vendor_id");
                 final Double dataVendorCost = rs.getDouble("data_vendor_cost");
                 final int dmpId = rs.getInt("dmp_id");
-
-                final String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
-                final String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
-                final Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
-
-
-
-                Integer[] rpAgencyIds = null;
-                Double[] agencyRebatePercentages = null;
-                if (null != rs.getArray("rp_agency_ids")) {
-                    rpAgencyIds = (Integer[]) rs.getArray("rp_agency_ids").getArray();
-                }
-                if (null != rs.getArray("agency_rebate_percentages")) {
-                    agencyRebatePercentages = (Double[]) rs.getArray("agency_rebate_percentages").getArray();
-                }
-
                 Set<Set<Integer>> dmpFilterSegmentExpression;
                 try {
                     dmpFilterSegmentExpression = extractDmpFilterExpression(rs.getString("dmp_filter_expression"));
@@ -308,10 +189,6 @@ public class IXPackageRepository {
                     // Skip this record.
                     return rs.getTimestamp("last_modified");
                 }
-
-                final Object[] outputArray = (Object[]) rs.getArray("scheduled_tods").getArray();
-                final Integer[][] scheduleTimeOfDays =
-                        outputArray.length == 0 ? EMPTY_2D_INTEGER_ARRAY : (Integer[][]) outputArray;
 
                 final Integer[] slotIds = (Integer[]) rs.getArray("placement_slot_ids").getArray();
 
@@ -475,50 +352,70 @@ public class IXPackageRepository {
                 entityBuilder.osVersionTargeting(osVersionTargeting);
                 entityBuilder.manufModelTargeting(manufModelTargeting);
                 entityBuilder.sdkVersionTargeting(sdkVersionTargeting);
-                entityBuilder.scheduledTimeOfDays(scheduleTimeOfDays);
                 entityBuilder.languageTargetingSet(languageTargetingSet);
                 entityBuilder.secondaryAdFormatConstraints(secondaryAdFormatConstraints);
+                entityBuilder.dataVendorCost(dataVendorCost);
+
+                if (null != geoFenceRegion) {
+                    entityBuilder.geoFenceRegion(geoFenceRegion);
+                }
 
                 if (null != geocookieId) {
                     entityBuilder.geocookieId(geocookieId);
                 }
 
-                if (null != dealIds) {
-                    entityBuilder.dealIds(Arrays.asList(dealIds));
+                final IXPackageEntity entity = entityBuilder.build();
+
+                // Creating Deals
+                final String[] dealIds = (String[]) rs.getArray("deal_ids").getArray();
+                final String[] accessTypes = (String[]) rs.getArray("access_types").getArray();
+                final Double[] dealFloors = (Double[]) rs.getArray("deal_floors").getArray();
+
+                Integer[] rpAgencyIds = null;
+                Double[] agencyRebatePercentages = null;
+                if (null != rs.getArray("rp_agency_ids")) {
+                    rpAgencyIds = (Integer[]) rs.getArray("rp_agency_ids").getArray();
                 }
-                if (null != dealFloors) {
-                    entityBuilder.dealFloors(Arrays.asList(dealFloors));
-                }
-                if (null != rpAgencyIds) {
-                    entityBuilder.rpAgencyIds(Arrays.asList(rpAgencyIds));
-                }
-                if (null != agencyRebatePercentages) {
-                    entityBuilder.agencyRebatePercentages(Arrays.asList(agencyRebatePercentages));
-                }
-                if (null != accessTypes) {
-                    entityBuilder.accessTypes(Arrays.asList(accessTypes));
-                }
-                if (null != geoFenceRegion) {
-                    entityBuilder.geoFenceRegion(geoFenceRegion);
+                if (null != rs.getArray("agency_rebate_percentages")) {
+                    agencyRebatePercentages = (Double[]) rs.getArray("agency_rebate_percentages").getArray();
                 }
 
                 String[] thirdPartyTrackerJsonList = null;
                 if (null != rs.getArray("third_party_tracker_json_list")) {
                     thirdPartyTrackerJsonList = (String[]) rs.getArray("third_party_tracker_json_list").getArray();
                 }
-                entityBuilder.thirdPartyTrackerMapList(getThirdPartyTrackerMapList(thirdPartyTrackerJsonList));
 
-                entityBuilder.dataVendorCost(dataVendorCost);
+                for (int i = 0; i< dealIds.length; ++i) {
+                    final DealEntity.Builder dealBuilder = DealEntity.newBuilder();
+                    dealBuilder.id(dealIds[i]);
+                    dealBuilder.floor(dealFloors[i]);
+                    dealBuilder.auctionType(FIRST_PRICE);
+                    dealBuilder.dst(IX);
 
-                final IXPackageEntity entity = entityBuilder.build();
+                    if (null != rpAgencyIds) {
+                        dealBuilder.externalAgencyId(rpAgencyIds[i]);
+                    }
+
+                    if (null != agencyRebatePercentages) {
+                        dealBuilder.agencyRebatePercentage(agencyRebatePercentages[i]);
+                    }
+
+                    dealBuilder.toBeBilledOnViewability(viewable);
+                    dealBuilder.packageId(id);
+
+                    dealBuilder.dealType(DealType.getDealTypeByName(accessTypes[i]));
+                    dealBuilder.thirdPartyTrackersMap(getThirdPartyTrackerMap(thirdPartyTrackerJsonList[i]));
+                    newIXDealsSet.add(dealBuilder.build());
+                }
+
                 final boolean active = rs.getBoolean("is_active");
                 if (active) {
-                    newIXPackageSet.put(id, entity);
+                    newIXPackageSet.add(entity);
                     if (logger.isDebugEnabled()) {
                         logger.debug("Adding entity with id: " + id + " to IXPackageRepository.");
                     }
                 } else {
-                    newIXPackageSet.remove(id);
+                    newIXPackageSet.remove(entity);
                     if (logger.isDebugEnabled()) {
                         logger.debug("Removing entity with id: " + id + " from IXPackageRepository.");
                     }
@@ -533,206 +430,16 @@ public class IXPackageRepository {
 
         @Override
         public void afterEachIteration() {
-            packageSet = ImmutableMap.copyOf(newIXPackageSet);
-            packageIndex.clear();
-            packageIndex.addAll(packageSet.values());
+            final Set<IXPackageEntity> packagesSet = ImmutableSet.copyOf(newIXPackageSet);
+            final Set<DealEntity> dealsSet = ImmutableSet.copyOf(newIXDealsSet);
+            // TODO: Investigate whether this can cause any problems in the future
+            indexedPackages.clear();
+            indexedDeals.clear();
+
+            indexedDeals.addAll(dealsSet);
+            indexedPackages.addAll(packagesSet);
         }
     }
 
-    protected static List<Map<String, String>> getThirdPartyTrackerMapList(final String[] thirdPartyTrackerJsonList) {
-        final ImmutableList.Builder<Map<String, String>> thirdPartyTrackerMapListBuilder = new ImmutableList.Builder();
-        if (null != thirdPartyTrackerJsonList) {
-            for (final String thirdPartyTrackerJson : thirdPartyTrackerJsonList) {
-                final ImmutableMap.Builder<String, String> thirdPartyTrackerMapBuilder = new ImmutableMap.Builder<>();
-                if (StringUtils.isNotBlank(thirdPartyTrackerJson)) {
-                    try {
-                        final JSONObject jsonObj = new JSONObject(thirdPartyTrackerJson);
-                        final Iterator iterator = jsonObj.keys();
-                        while(iterator.hasNext()) {
-                            final String key = (String)iterator.next();
-                            thirdPartyTrackerMapBuilder.put(key, jsonObj.getString(key));
-                        }
-                    } catch (final JSONException jse) {
-                        logger.error("Invalid third party tracker json: \nException: {}" + thirdPartyTrackerJson, jse);
-                    }
-                }
-                thirdPartyTrackerMapListBuilder.add(thirdPartyTrackerMapBuilder.build());
-            }
-        }
-        return thirdPartyTrackerMapListBuilder.build();
-    }
 
-    private void start() {
-        logger.info("Starting asynchronous IXPackageRepository updates.");
-        reader.startAsync();
-        logger.info("Waiting for initial IXPackageRepository load");
-        reader.awaitRunning();
-        logger.info("Initial IXPackageRepository load complete");
-    }
-
-    public void stop() {
-        logger.info("Stop IXPackageRepository updates.");
-        reader.stopAsync();
-    }
-
-    public boolean isInitialized() {
-        return reader.isInitialized();
-    }
-
-    public Collection<IXPackageEntity> getIXPackageSet() {
-        if (packageSet != null) {
-            return packageSet.values();
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
-    private Scheduler getRepositorySchedule(final Configuration config) {
-        final int initialDelay = Preconditions.checkNotNull(config.getInt("initialDelay"));
-        final int refreshTime = Preconditions.checkNotNull(config.getInt("refreshTime"));
-
-        return Scheduler.newFixedRateSchedule(initialDelay, refreshTime, TimeUnit.SECONDS);
-    }
-
-    private static Set<Set<Integer>> extractDmpFilterExpression(final String dmpFilterExpressionJson)
-            throws JSONException {
-        final Set<Set<Integer>> dmpFilterSegmentExpression = new HashSet<>();
-
-        if (StringUtils.isNotEmpty(dmpFilterExpressionJson)) {
-            final JSONArray dmpSegmentsJsonArray = new JSONArray(dmpFilterExpressionJson);
-            for (int andSetIdx = 0; andSetIdx < dmpSegmentsJsonArray.length(); andSetIdx++) {
-                final JSONArray andJsonArr = (JSONArray) dmpSegmentsJsonArray.get(andSetIdx);
-                final Set<Integer> orSet = new HashSet<>();
-                for (int orSetIdx = 0; orSetIdx < andJsonArr.length(); orSetIdx++) {
-                    orSet.add((Integer) andJsonArr.get(orSetIdx));
-                }
-                dmpFilterSegmentExpression.add(orSet);
-            }
-        }
-
-        return dmpFilterSegmentExpression;
-    }
-
-    /**
-     * This function extracts the os version targeting meta data. Meta Data consists of a map that maps the os id to a
-     * Closed Range
-     *
-     * note: osId in the adPoolRequest is a long, osId in CAS is an int and osId in the ix_packages table is a short
-     * 
-     * @param osVersionTargetingJson
-     * @return
-     * @throws JSONException
-     */
-    protected static Map<Integer, Range<Double>> extractOsVersionTargeting(final String osVersionTargetingJson)
-            throws JSONException {
-        final ImmutableMap.Builder<Integer, Range<Double>> osVersionTargeting = new ImmutableMap.Builder<>();
-
-        if (StringUtils.isNotEmpty(osVersionTargetingJson)) {
-            final JSONArray jsonArray = new JSONArray(osVersionTargetingJson);
-
-            // Iterate over all os ids
-            for (int index = 0; index < jsonArray.length(); ++index) {
-                final JSONObject osEntry = (JSONObject) jsonArray.get(index);
-                final JSONArray osVersionRangeJsonArray = osEntry.getJSONArray("range");
-                Range<Double> osVersionRange;
-
-                // Sanity for malformed ranges
-                if (osVersionRangeJsonArray.length() != 2) {
-                    osVersionRange = Range.all();
-                } else {
-                    double minVer = osVersionRangeJsonArray.getDouble(0);
-                    double maxVer = osVersionRangeJsonArray.getDouble(1);
-                    // Sanity for range: minVer must always be <= maxVer
-                    if (minVer > maxVer) {
-                        final double temp = minVer;
-                        minVer = maxVer;
-                        maxVer = temp;
-                    }
-
-                    osVersionRange = Range.closed(minVer, maxVer);
-                }
-
-                osVersionTargeting.put(osEntry.getInt("osId"), osVersionRange);
-            }
-        }
-
-        return osVersionTargeting.build();
-    }
-
-    /**
-     * This function extracts the device manufacturer and device model targeting meta data. Meta Data consists of a map
-     * that maps the device manufacturer id (Long) to the inclusion boolean (Boolean) to the set of device model ids.
-     *
-     * @param manufModelTargetingJson
-     * @return Map as described above
-     * @throws JSONException
-     */
-    protected static Map<Long, Pair<Boolean, Set<Long>>> extractManufModelTargeting(final String manufModelTargetingJson)
-            throws JSONException {
-        final ImmutableMap.Builder<Long, Pair<Boolean, Set<Long>>> manufModelTargeting = new ImmutableMap.Builder<>();
-
-        if (StringUtils.isNotEmpty(manufModelTargetingJson)) {
-            final JSONArray jsonArray = new JSONArray(manufModelTargetingJson);
-
-            // Iterate over all device manufacturer ids
-            for (int manufIndex = 0; manufIndex < jsonArray.length(); ++manufIndex) {
-                final JSONObject manufEntry = (JSONObject) jsonArray.get(manufIndex);
-
-                final Builder<Long> modelIds = new Builder<>();
-                final JSONArray modelIdsJsonArray = manufEntry.getJSONArray("modelIds");
-
-                // Iterate over all the device model ids and add them to the modelIds Set
-                for (int modelIndex = 0; modelIndex < modelIdsJsonArray.length(); ++modelIndex) {
-                    modelIds.add(modelIdsJsonArray.getLong(modelIndex));
-                }
-
-                // Determine whether the modelIds Set is an inclusion or an exclusion Set
-                final Boolean incl = manufEntry.getBoolean("incl");
-
-                // Sanity: If modelIds Set is empty and incl is false, then skip manufacturer
-                if (0 == modelIdsJsonArray.length() && !incl) {
-                    continue;
-                }
-
-                manufModelTargeting.put(manufEntry.getLong("manufId"), ImmutablePair.of(incl, modelIds.build()));
-            }
-        }
-
-        return manufModelTargeting.build();
-    }
-
-    static Pair<Boolean, Set<Integer>> extractSdkVersionTargeting(final String sdkVersionTargetingJson)
-            throws JSONException {
-        final ImmutableSet.Builder<Integer> sdkVersionSet = new ImmutableSet.Builder<>();
-        boolean exclusion = true;
-
-        if (StringUtils.isNotBlank(sdkVersionTargetingJson)) {
-            try {
-                final JSONObject sdkVersionTargetingJsonObject = new JSONObject(sdkVersionTargetingJson);
-                JSONArray sdkVersionJsonArray = null;
-
-                // Inclusion has higher priority in case of faulty jsons
-                if (sdkVersionTargetingJsonObject.has("inclusion")) {
-                    exclusion = false;
-                    sdkVersionJsonArray = sdkVersionTargetingJsonObject.getJSONArray("inclusion");
-                } else if (sdkVersionTargetingJsonObject.has("exclusion")) {
-                    sdkVersionJsonArray = sdkVersionTargetingJsonObject.getJSONArray("exclusion");
-                }
-
-                if (null != sdkVersionJsonArray) {
-                    for (int index = 0; index < sdkVersionJsonArray.length(); ++index) {
-                        try {
-                            sdkVersionSet.add(sdkVersionJsonArray.getInt(index));
-                        } catch (final Exception e) {
-                            // Ignore entry
-                        }
-                    }
-                }
-            } catch (final JSONException je) {
-                // Ignore list
-            }
-        }
-
-        return ImmutablePair.of(exclusion, sdkVersionSet.build());
-    }
 }

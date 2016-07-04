@@ -5,9 +5,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.entity.ChannelEntity;
 import com.inmobi.adserve.channels.entity.ChannelFeedbackEntity;
@@ -16,16 +13,14 @@ import com.inmobi.adserve.channels.entity.ChannelSegmentFeedbackEntity;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.annotations.AdvertiserIdNameMap;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 public class ChannelSegment {
 
     public final static Comparator<ChannelSegment> CHANNEL_SEGMENT_REVERSE_COMPARATOR =
-            new Comparator<ChannelSegment>() {
-                @Override
-                public int compare(final ChannelSegment o1, final ChannelSegment o2) {
-                    return o1.getPrioritisedECPM() > o2.getPrioritisedECPM() ? -1 : 1;
-                }
-            };
+            (o1, o2) -> o1.getPrioritisedECPM() > o2.getPrioritisedECPM() ? -1 : 1;
 
     @AdvertiserIdNameMap
     @Inject

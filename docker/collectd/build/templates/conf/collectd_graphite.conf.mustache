@@ -3,7 +3,7 @@ Hostname "{{CONCISE_CONTAINER_NAME}}"
 LoadPlugin write_graphite
 <Plugin write_graphite>
     <Node graphite_prod>
-    Host "cas-metrics-relay.cas.{{IDP_CLUSTER}}.inmobi.com"
+    Host "{{graphite_host_prefix}}.cas.{{IDP_CLUSTER}}.inmobi.com"
     Port "2020"
     Protocol "tcp"
     LogSendErrors true

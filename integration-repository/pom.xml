@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.inmobi.channels</groupId>
         <artifactId>cas</artifactId>
-        <version>6.67-SNAPSHOT</version>
+        <version>6.97-SNAPSHOT</version>
     </parent>
 
     <artifactId>repository</artifactId>
@@ -109,7 +109,6 @@
         <dependency>
             <groupId>com.googlecode.cqengine</groupId>
             <artifactId>cqengine</artifactId>
-            <version>1.2.6</version>
         </dependency>
         <dependency>
             <groupId>com.inmobi</groupId>

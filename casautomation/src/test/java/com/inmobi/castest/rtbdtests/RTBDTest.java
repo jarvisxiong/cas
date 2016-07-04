@@ -24,8 +24,7 @@ public class RTBDTest {
     public void Test2_1_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -35,8 +34,7 @@ public class RTBDTest {
     public void Test2_2_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("taskId:,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("taskId:,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -46,8 +44,7 @@ public class RTBDTest {
     public void Test2_2_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("taskId: ,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("taskId: ,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -57,9 +54,7 @@ public class RTBDTest {
     public void Test2_2_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("taskId:justlikethat,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("taskId:justlikethat,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -69,8 +64,7 @@ public class RTBDTest {
     public void Test2_3_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING),
-                        "remoteHostIp:, ");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING), "remoteHostIp:, ");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -79,8 +73,7 @@ public class RTBDTest {
     public void Test2_3_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING),
-                        "remoteHostIp: ,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING), "remoteHostIp: ,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -89,8 +82,7 @@ public class RTBDTest {
     public void Test2_3_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "remoteHostIp:invalid,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "remoteHostIp:invalid,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -99,9 +91,7 @@ public class RTBDTest {
     public void Test2_4_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("site:Site(siteIncId:0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteIncId:0,");
+            LogParserHelper.logParser("site:Site(siteIncId:0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteIncId:0,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -110,9 +100,7 @@ public class RTBDTest {
     public void Test2_4_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("site:Site(siteIncId:10109910,", "siteIncId=10109910,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("site:Site(siteIncId:10109910,", "siteIncId=10109910,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -121,8 +109,7 @@ public class RTBDTest {
     public void Test2_5_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("siteUrl:,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteUrl:,");
+            LogParserHelper.logParser("siteUrl:,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteUrl:,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -131,8 +118,7 @@ public class RTBDTest {
     public void Test2_5_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("siteUrl: ,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteUrl: ,");
+            LogParserHelper.logParser("siteUrl: ,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteUrl: ,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -141,9 +127,7 @@ public class RTBDTest {
     public void Test2_5_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("siteUrl:justlikethat",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteUrl:justlikethat");
+            LogParserHelper.logParser("siteUrl:justlikethat", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteUrl:justlikethat");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -152,9 +136,7 @@ public class RTBDTest {
     public void Test2_6_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("cpcFloor:2.0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("cpcFloor:2.0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -163,9 +145,7 @@ public class RTBDTest {
     public void Test2_6_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("cpcFloor:2.02,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("cpcFloor:2.02,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -174,9 +154,7 @@ public class RTBDTest {
     public void Test2_7_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("ecpmFloor:2.0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("ecpmFloor:2.0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -185,9 +163,7 @@ public class RTBDTest {
     public void Test2_7_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("ecpmFloor:2.02,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("ecpmFloor:2.02,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -196,8 +172,7 @@ public class RTBDTest {
     public void Test2_8_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteId:,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteId:,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -206,8 +181,7 @@ public class RTBDTest {
     public void Test2_8_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("Terminating request as site id was missing",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("Terminating request as site id was missing", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -216,8 +190,7 @@ public class RTBDTest {
     public void Test2_8_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteId: ,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteId: ,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -226,8 +199,32 @@ public class RTBDTest {
     public void Test2_8_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteId:justlikethat,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "siteId:justlikethat,");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+        @Test(testName = "Test2_8_4", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+        public void TEST_RTBD_PMP_PACKAGES(final String x, final ResponseBuilder responseBuilder) throws Exception {
+            /* Deriving the parser output to assert for */
+            parserOutput =
+                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE));
+            Reporter.log(parserOutput, true);
+            Assert.assertTrue(parserOutput.equals("PASS"));
+        }
+    @Test(testName = "Test2_8_4", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_RTBD_PMP_PACKAGES1(final String x, final ResponseBuilder responseBuilder) throws Exception {
+            /* Deriving the parser output to assert for */
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE));
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+    @Test(testName = "Test2_8_4", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_RTBD_PMP_PACKAGES2(final String x, final ResponseBuilder responseBuilder) throws Exception {
+            /* Deriving the parser output to assert for */
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -236,8 +233,7 @@ public class RTBDTest {
     public void Test2_9_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "publisherId:,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "publisherId:,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -246,8 +242,7 @@ public class RTBDTest {
     public void Test2_9_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -256,8 +251,7 @@ public class RTBDTest {
     public void Test2_9_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "publisherId: ,");
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG), "publisherId: ,");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -274,9 +268,7 @@ public class RTBDTest {
     public void Test2_10_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("inventoryType:APP, ", "source=APP,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("inventoryType:APP, ", "source=APP,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -285,7 +277,7 @@ public class RTBDTest {
     public void Test2_10_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("source=WAP,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("source=WAP,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -294,7 +286,7 @@ public class RTBDTest {
     public void Test2_10_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("source=WAP,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("source=WAP,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -303,7 +295,7 @@ public class RTBDTest {
     public void Test2_10_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("source=WAP,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("source=WAP,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -313,9 +305,7 @@ public class RTBDTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser("contentRatingDeprecated:PERFORMANCE,", "siteContentType=PERFORMANCE,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("contentRatingDeprecated:PERFORMANCE,", "siteContentType=PERFORMANCE,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         // System.out.println("ParserOutput : " + parserOutput);
         Reporter.log(parserOutput, true);
@@ -327,9 +317,7 @@ public class RTBDTest {
     public void Test2_11_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("contentRatingDeprecated:FAMILY_SAFE,", "siteContentType=FAMILY_SAFE,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("contentRatingDeprecated:FAMILY_SAFE,", "siteContentType=FAMILY_SAFE,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -340,8 +328,7 @@ public class RTBDTest {
     public void Test2_11_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("contentRatingDeprecated:MATURE,", "siteContentType=MATURE,",
-                        "Terminating request as incompatible content type");
+            LogParserHelper.logParser("contentRatingDeprecated:MATURE,", "siteContentType=MATURE,", "Terminating request as incompatible content type");
 
         Reporter.log(parserOutput, true);
 
@@ -352,9 +339,7 @@ public class RTBDTest {
     public void Test2_11_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteContentType=FAMILY_SAFE,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteContentType=FAMILY_SAFE,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -365,9 +350,7 @@ public class RTBDTest {
     public void Test2_11_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteContentType=FAMILY_SAFE,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteContentType=FAMILY_SAFE,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -378,9 +361,7 @@ public class RTBDTest {
     public void Test2_11_6(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteContentType=FAMILY_SAFE,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteContentType=FAMILY_SAFE,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -391,9 +372,7 @@ public class RTBDTest {
     public void Test2_12_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTags:[70], ", "categories=[70],",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteTags:[70], ", "categories=[70],", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -404,9 +383,7 @@ public class RTBDTest {
     public void Test2_12_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTags:[70, 71],", "categories=[70, 71],",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteTags:[70, 71],", "categories=[70, 71],", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -417,9 +394,7 @@ public class RTBDTest {
     public void Test2_12_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTags:[0],",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteTags:[0],", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -430,9 +405,7 @@ public class RTBDTest {
     public void Test2_12_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTags:[10000],",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteTags:[10000],", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -443,9 +416,7 @@ public class RTBDTest {
     public void Test2_12_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTags:[],",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteTags:[],", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -456,9 +427,7 @@ public class RTBDTest {
     public void Test2_12_7(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTags:[],",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("siteTags:[],", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -469,8 +438,7 @@ public class RTBDTest {
     public void Test2_13_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTaxonomies:[190]",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("siteTaxonomies:[190]", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -481,8 +449,7 @@ public class RTBDTest {
     public void Test2_13_3(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTaxonomies:[0]",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("siteTaxonomies:[0]", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -493,8 +460,7 @@ public class RTBDTest {
     public void Test2_13_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTaxonomies:[10000]", "categories=[10000],",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("siteTaxonomies:[10000]", "categories=[10000],", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -505,8 +471,7 @@ public class RTBDTest {
     public void Test2_13_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTaxonomies:[]", "categories=[], ",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("siteTaxonomies:[]", "categories=[], ", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -517,8 +482,7 @@ public class RTBDTest {
     public void Test2_13_7(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("siteTaxonomies:[]", "categories=[], ",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("siteTaxonomies:[]", "categories=[], ", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -529,8 +493,7 @@ public class RTBDTest {
     public void Test2_14_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("userAgent:,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING));
+            LogParserHelper.logParser("userAgent:,", LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING));
 
         Reporter.log(parserOutput, true);
 
@@ -541,8 +504,7 @@ public class RTBDTest {
     public void Test2_14_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("userAgent:,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING));
+            LogParserHelper.logParser("userAgent:,", LogStringConf.getLogString(LogStringParams.MSG_RTB_MANDATE_PARAM_MISSING));
 
         Reporter.log(parserOutput, true);
 
@@ -553,9 +515,7 @@ public class RTBDTest {
     public void Test2_14_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("userAgent:justlikethat,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("userAgent:justlikethat,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -566,9 +526,7 @@ public class RTBDTest {
     public void Test2_15_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("modelId:0,", "modelId=0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("modelId:0,", "modelId=0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -579,9 +537,7 @@ public class RTBDTest {
     public void Test2_15_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("modelId:1199999,", " modelId=1199999,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("modelId:1199999,", " modelId=1199999,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -592,9 +548,7 @@ public class RTBDTest {
     public void Test2_16_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("manufacturerId:0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("manufacturerId:0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -605,9 +559,7 @@ public class RTBDTest {
     public void Test2_16_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("manufacturerId:1010199,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("manufacturerId:1010199,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -618,9 +570,7 @@ public class RTBDTest {
     public void Test2_17_1(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("osId:3,", "osId=3,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("osId:3,", "osId=3,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -631,8 +581,7 @@ public class RTBDTest {
     public void Test2_17_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("osId:5,", "osId=5,",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("osId:5,", "osId=5,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -643,8 +592,7 @@ public class RTBDTest {
     public void Test2_17_6(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("osId:101,", "osId=101,",
-                        LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
+            LogParserHelper.logParser("osId:101,", "osId=101,", LogStringConf.getLogString(LogStringParams.MSG_SENDING_NO_AD));
 
         Reporter.log(parserOutput, true);
 
@@ -655,9 +603,7 @@ public class RTBDTest {
     public void Test2_18_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("osMajorVersion:0.0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("osMajorVersion:0.0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -668,9 +614,7 @@ public class RTBDTest {
     public void Test2_18_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("osMajorVersion:10.0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("osMajorVersion:10.0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -681,9 +625,7 @@ public class RTBDTest {
     public void Test2_18_6(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("osMajorVersion:10.02",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("osMajorVersion:10.02", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -694,9 +636,7 @@ public class RTBDTest {
     public void Test2_19_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("browserId:0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("browserId:0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -707,9 +647,7 @@ public class RTBDTest {
     public void Test2_19_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("browserId:1010,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("browserId:1010,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -720,9 +658,7 @@ public class RTBDTest {
     public void Test2_20_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("browserMajorVersion:0.0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("browserMajorVersion:0.0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -733,9 +669,7 @@ public class RTBDTest {
     public void Test2_20_5(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("browserMajorVersion:10.0,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("browserMajorVersion:10.0,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -746,9 +680,7 @@ public class RTBDTest {
     public void Test2_20_6(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser("browserMajorVersion:10.02,",
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser("browserMajorVersion:10.02,", LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -762,9 +694,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={GID=somevalue},";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -780,9 +710,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={GID=},";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -798,9 +726,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={GID=  },";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -816,9 +742,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={},";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -834,9 +758,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={WC=somevalue},";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -852,9 +774,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={WC=},";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -870,9 +790,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={WC= },";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -888,9 +806,7 @@ public class RTBDTest {
         searchStringInLog2 = "tUidParams={},";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -929,9 +845,7 @@ public class RTBDTest {
         searchStringInLog = "udidFromRequest:somevalue,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -946,9 +860,7 @@ public class RTBDTest {
         searchStringInLog = "udidFromRequest:,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -963,9 +875,7 @@ public class RTBDTest {
         searchStringInLog = "udidFromRequest: ,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -978,8 +888,7 @@ public class RTBDTest {
     public void Test2_54_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -994,9 +903,7 @@ public class RTBDTest {
         searchStringInLog = "uuidFromUidCookie:somevalue,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1011,9 +918,7 @@ public class RTBDTest {
         searchStringInLog = "uuidFromUidCookie:,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1028,9 +933,7 @@ public class RTBDTest {
         searchStringInLog = "uuidFromUidCookie: ,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1043,8 +946,7 @@ public class RTBDTest {
     public void Test2_55_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1059,9 +961,7 @@ public class RTBDTest {
         searchStringInLog = "limitIOSAdTracking:true),";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1076,9 +976,7 @@ public class RTBDTest {
         searchStringInLog = "limitIOSAdTracking:false),";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1093,9 +991,7 @@ public class RTBDTest {
         searchStringInLog = "dataVendorId:10011010,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1110,9 +1006,7 @@ public class RTBDTest {
         searchStringInLog = "dataVendorId:1,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1127,9 +1021,7 @@ public class RTBDTest {
         searchStringInLog = "dataVendorName:somevendorname,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1144,9 +1036,7 @@ public class RTBDTest {
         searchStringInLog = "dataVendorName:,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1161,9 +1051,7 @@ public class RTBDTest {
         searchStringInLog = "dataVendorName: ,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1176,8 +1064,7 @@ public class RTBDTest {
     public void Test2_58_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1192,9 +1079,7 @@ public class RTBDTest {
         searchStringInLog = "yearOfBirth:1900,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1209,9 +1094,7 @@ public class RTBDTest {
         searchStringInLog = "yearOfBirth:0,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1226,9 +1109,7 @@ public class RTBDTest {
         searchStringInLog = "yearOfBirth:2015,";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1245,9 +1126,7 @@ public class RTBDTest {
         searchStringInLog3 = "gender:MALE),";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, searchStringInLog3,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, searchStringInLog3, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1264,9 +1143,7 @@ public class RTBDTest {
         searchStringInLog3 = "gender:FEMALE),";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, searchStringInLog3,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, searchStringInLog3, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1283,9 +1160,7 @@ public class RTBDTest {
         searchStringInLog3 = "gender:UNKNOWN),";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, searchStringInLog3,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog1, searchStringInLog2, searchStringInLog3, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1322,9 +1197,7 @@ public class RTBDTest {
         searchStringInLog = "interests:[],";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log("Searching for " + searchStringInLog + "in the logs for test case :" + x + "\n", true);
 
@@ -1339,9 +1212,7 @@ public class RTBDTest {
         searchStringInLog = "interests:[someinterestsvalue],";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -1354,9 +1225,7 @@ public class RTBDTest {
         searchStringInLog = "interests:[ ],";
 
         parserOutput =
-                LogParserHelper.logParser(searchStringInLog,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchStringInLog, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -1370,9 +1239,7 @@ public class RTBDTest {
         final String searchString2 = "tUidParams={UM5=somevalue},";
 
         parserOutput =
-                LogParserHelper.logParser(searchString1, searchString2,
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(searchString1, searchString2, LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -1382,8 +1249,7 @@ public class RTBDTest {
     public void Test2_63_4(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -1394,8 +1260,7 @@ public class RTBDTest {
     public void TEST2_RTBD_SIGNALS_NULLCHECK(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_RESPONSE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_AdRR_FLAG));
 
         Reporter.log(parserOutput, true);
 
@@ -1403,15 +1268,10 @@ public class RTBDTest {
     }
 
     @Test(testName = "TEST2_RTBD_SIGNALS_VALIDATIONS_POSITIVE", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST2_RTBD_SIGNALS_VALIDATIONS_POSITIVE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST2_RTBD_SIGNALS_VALIDATIONS_POSITIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MANUFNAME_NEGATIVE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MODELNAME_NEGATIVE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_MAKE_AND_MANUF_DATA_SIGNALS),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_EXT_OBJECT_DATA_SIGNALS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MANUFNAME_NEGATIVE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MODELNAME_NEGATIVE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_MAKE_AND_MANUF_DATA_SIGNALS), LogStringConf.getLogString(LogStringParams.MSG_RTBD_EXT_OBJECT_DATA_SIGNALS));
 
         Reporter.log(parserOutput, true);
 
@@ -1419,15 +1279,10 @@ public class RTBDTest {
     }
 
     @Test(testName = "TEST2_RTBD_SIGNALS_VALIDATIONS_NEGATIVE", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST2_RTBD_SIGNALS_VALIDATIONS_NEGATIVE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST2_RTBD_SIGNALS_VALIDATIONS_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput =
-                LogParserHelper.logParser(
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MANUFNAME_NEGATIVE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MODELNAME_NEGATIVE),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_MAKE_AND_MANUF_DATA_SIGNALS),
-                        LogStringConf.getLogString(LogStringParams.MSG_RTBD_EXT_OBJECT_DATA_SIGNALS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MANUFNAME_NEGATIVE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_SASPARAMS_MODELNAME_NEGATIVE), LogStringConf.getLogString(LogStringParams.MSG_RTBD_MAKE_AND_MANUF_DATA_SIGNALS), LogStringConf.getLogString(LogStringParams.MSG_RTBD_EXT_OBJECT_DATA_SIGNALS));
 
         Reporter.log(parserOutput, true);
 
@@ -1450,7 +1305,6 @@ public class RTBDTest {
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-
     @Test(testName = "TESTIOS9_2", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void TESTIOS9_2(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
@@ -1459,6 +1313,13 @@ public class RTBDTest {
     @Test(testName = "TEST_IEM", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IEM(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput = LogParserHelper.logParser("IEM=123456789123456");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_CITY", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_CITY(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput = LogParserHelper.logParser("\"city\":\"GUANGTONG\"");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1472,8 +1333,7 @@ public class RTBDTest {
 
 
     @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL(final String x, final ResponseBuilder responseBuilder)
-            throws IOException {
+    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_NOT_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
         final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":3,\"wmin\":480,\"hmin\":320}";
         final String logLine2 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
         final String logLine3 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
@@ -1485,15 +1345,14 @@ public class RTBDTest {
     }
 
     @Test(testName = "TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL", dataProvider = "fender_rtbd_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL(final String x, final ResponseBuilder responseBuilder)
-            throws IOException {
+    public void TEST_NATIVE_ON_RTB_WHEN_CONTENT_JSON_IS_NULL(final String x, final ResponseBuilder responseBuilder) throws IOException {
         final String logLine0 = "\"native\":{\"requestobj\":{\"layout\":6,\"adunit\":500,\"plcmtcnt\":1,\"seq\":0";
         final String logLine1 = "{\"id\":1,\"required\":1,\"img\":{\"type\":1,\"wmin\":300,\"hmin\":300}}";
         final String logLine2 = "{\"id\":2,\"required\":1,\"title\":{\"len\":100}}";
         final String logLine3 = "{\"id\":3,\"required\":1,\"data\":{\"type\":2}}";
         final String logLine4 = "{\"id\":4,\"required\":1,\"img\":{\"type\":3,\"wmin\":300,\"hmin\":250}}";
         parserOutput =
-                LogParserHelper.logParser("RTB request json is", logLine0, logLine1, logLine2, logLine3, logLine4);
+            LogParserHelper.logParser("RTB request json is", logLine0, logLine1, logLine2, logLine3, logLine4);
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }

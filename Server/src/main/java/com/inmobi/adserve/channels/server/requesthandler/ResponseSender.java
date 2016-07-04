@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.server.requesthandler.AdPoolResponseCreator.createAdPoolResponse;
 import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.AD_IMAI_START_TAG;
 import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.DCP_NATIVE_WRAPPING_AD_JSON;
 import static com.inmobi.adserve.channels.server.requesthandler.AdResponseTemplate.END_TAG;
@@ -19,12 +20,10 @@ import static com.inmobi.casthrift.DemandSourceType.RTBD;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 import javax.inject.Inject;
@@ -45,15 +44,9 @@ import org.slf4j.Marker;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.inject.Provider;
-import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
-import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
-import com.inmobi.adserve.adpool.AdInfo;
 import com.inmobi.adserve.adpool.AdPoolResponse;
-import com.inmobi.adserve.adpool.AuctionType;
-import com.inmobi.adserve.adpool.Creative;
 import com.inmobi.adserve.adpool.EncryptionKeys;
 import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.Formatter;
@@ -61,26 +54,21 @@ import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse;
 import com.inmobi.adserve.channels.api.ThirdPartyAdResponse.ResponseStatus;
-import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.auction.AuctionEngine;
+import com.inmobi.adserve.channels.server.kafkalogging.PhotonCasActivityWriter;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
-import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
 import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import com.inmobi.adserve.contracts.ump.NativeAd;
-import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.commons.security.api.InmobiSession;
 import com.inmobi.commons.security.impl.InmobiSecurityImpl;
 import com.inmobi.commons.security.util.exception.InmobiSecureException;
 import com.inmobi.commons.security.util.exception.InvalidMessageException;
-import com.inmobi.types.AdIdChain;
-import com.inmobi.types.GUID;
-import com.inmobi.types.PricingModel;
+import com.inmobi.user.photon.datatypes.activity.NestedActivityRecord;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -102,15 +90,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private static final int STORYBOARD_SDK_BASE_VERSION = 530;
     private static final Gson gson = new Gson();
 
-
-
-    /**
-     * At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if the bid is absent, then
-     * the bid is considered from the remaining DSP's.
-     */
-    protected static final String RIGHT_TO_FIRST_REFUSAL_DEAL = "RIGHT_TO_FIRST_REFUSAL_DEAL";
-
-
     @Setter
     @Getter
     private SASRequestParameters sasParams;
@@ -123,6 +102,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private int rankIndexToProcess;
     private int selectedAdIndex;
     private boolean requestCleaned;
+    @Getter
     private final AuctionEngine auctionEngine;
     private final Object lock = new Object();
     private String terminationReason;
@@ -132,6 +112,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     @Setter
     @Inject
     private static Provider<Marker> traceMarkerProvider;
+
+    private PhotonCasActivityWriter photonCasActivityWriter;
+
 
     public String getTerminationReason() {
         return terminationReason;
@@ -174,10 +157,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     public String getDST() {
-        if (sasParams.getDst() == 0) {
-            return StringUtils.EMPTY;
-        }
-        return DemandSourceType.findByValue(sasParams.getDst()).toString();
+        return sasParams.getDst() == 0
+                ? StringUtils.EMPTY
+                : DemandSourceType.findByValue(sasParams.getDst()).toString();
     }
 
     @Inject
@@ -195,25 +177,24 @@ public class ResponseSender extends HttpRequestHandlerBase {
         if (null != traceMarkerProvider) {
             traceMarker = traceMarkerProvider.get();
         }
+        photonCasActivityWriter = PhotonCasActivityWriter.getInstance();
     }
 
     @Override
     public void sendAdResponse(final AdNetworkInterface selectedAdNetwork, final Channel serverChannel) {
         adResponse = selectedAdNetwork.getResponseAd();
         selectedAdIndex = getRankIndex(selectedAdNetwork);
-
         sendAdResponse(adResponse, serverChannel, selectedAdNetwork.getSelectedSlotId(),
-            selectedAdNetwork.getRepositoryHelper());
+                selectedAdNetwork.getRepositoryHelper());
     }
 
     // send Ad Response
     private void sendAdResponse(final ThirdPartyAdResponse adResponse, final Channel serverChannel,
-        final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
+            final Short selectedSlotId, final RepositoryHelper repositoryHelper) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
             return;
         }
-
 
         LOG.debug("ad received so trying to send ad response");
         String finalResponse = adResponse.getResponse();
@@ -225,7 +206,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             final String startElement = String.format(START_TAG, (int) dim.getWidth(), (int) dim.getHeight());
             finalResponse = startElement + finalResponse + END_TAG;
         } else if ((rFormat == ResponseFormat.IMAI || rFormat == ResponseFormat.JSON)
-            && RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
+                && RequestedAdType.NATIVE != sasParams.getRequestedAdType()) {
             finalResponse = AD_IMAI_START_TAG + finalResponse;
         }
 
@@ -233,17 +214,18 @@ public class ResponseSender extends HttpRequestHandlerBase {
             sendResponse(HttpResponseStatus.OK, finalResponse, adResponse.getResponseHeaders(), serverChannel);
             incrementStatsForFills(sasParams.getDst());
         } else {
-            final String dstName = DemandSourceType.findByValue(sasParams.getDst()).toString();
-            final AdPoolResponse rtbdOrIxResponse = createThriftResponse(adResponse.getResponse(), repositoryHelper);
-            LOG.debug("{} response json to RE is {}", dstName, rtbdOrIxResponse);
-            if (null == rtbdOrIxResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
+            final AdPoolResponse adPoolResponse = createAdPoolResponse(auctionEngine.getAuctionResponse(),
+                    adResponse.getResponse(), auctionEngine.getHighestBid());
+
+            LOG.debug("{} response json to UMP: {}", sasParams.getDemandSourceType(), adPoolResponse);
+            if (null == adPoolResponse || !SUPPORTED_RESPONSE_FORMATS.contains(sasParams.getRFormat())) {
                 sendNoAdResponse(serverChannel);
             } else {
                 try {
                     final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
-                    final byte[] serializedResponse = serializer.serialize(rtbdOrIxResponse);
+                    final byte[] serializedResponse = serializer.serialize(adPoolResponse);
                     sendResponse(HttpResponseStatus.OK, serializedResponse, adResponse.getResponseHeaders(),
-                        serverChannel);
+                            serverChannel);
                     incrementStatsForFills(sasParams.getDst());
                 } catch (final TException e) {
                     LOG.error("Error in serializing the adPool response ", e);
@@ -254,11 +236,11 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     private void incrementStatsForFills(final int dst) {
-        if (dst == DemandSourceType.DCP.getValue()) {
+        if (dst == DCP.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.DCP_FILLS);
-        } else if (dst == DemandSourceType.RTBD.getValue()) {
+        } else if (dst == RTBD.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.RULE_ENGINE_FILLS);
-        } else if (dst == DemandSourceType.IX.getValue()) {
+        } else if (dst == IX.getValue()) {
             InspectorStats.incrementStatCount(InspectorStrings.IX_FILLS);
         }
 
@@ -280,117 +262,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
     }
 
-    protected AdPoolResponse createThriftResponse(final String finalResponse, final RepositoryHelper repositoryHelper) {
-        final AdPoolResponse adPoolResponse = new AdPoolResponse();
-        final AdIdChain adIdChain = new AdIdChain();
-        final ChannelSegmentEntity channelSegmentEntity = getRtbResponse().getChannelSegmentEntity();
-        final ADCreativeType responseCreativeType = getRtbResponse().getAdNetworkInterface().getCreativeType();
-
-        adIdChain.setAdgroup_guid(channelSegmentEntity.getAdgroupId());
-        adIdChain.setAd_guid(channelSegmentEntity.getAdId(responseCreativeType));
-        adIdChain.setCampaign_guid(channelSegmentEntity.getCampaignId());
-        adIdChain.setAd(channelSegmentEntity.getIncId(responseCreativeType));
-        adIdChain.setGroup(channelSegmentEntity.getAdgroupIncId());
-        adIdChain.setCampaign(channelSegmentEntity.getCampaignIncId());
-        adIdChain.setAdvertiser_guid(channelSegmentEntity.getAdvertiserId());
-
-        final AdInfo rtbdAd = new AdInfo();
-        rtbdAd.setPricingModel(PricingModel.CPM);
-
-        // TODO: Create method and write UT
-        switch (getRtbResponse().getAdNetworkInterface().getDst()) {
-            case IX: // If IX,
-                // Set IX specific parameters
-                if (getRtbResponse().getAdNetworkInterface() instanceof IXAdNetwork) {
-                    final IXAdNetwork ixAdNetwork = (IXAdNetwork) getRtbResponse().getAdNetworkInterface();
-                    final String dealId = ixAdNetwork.getDealId();
-                    final long highestBid = (long) (ixAdNetwork.getAdjustbid() * Math.pow(10, 6));
-                    IXPackageEntity pckgEntity = null;
-                    // Checking whether a dealId was provided in the bid response
-                    if (dealId != null) {
-                        try {
-                            pckgEntity = repositoryHelper.queryIxPackageByDeal(dealId);
-                        } catch (final NoSuchObjectException exception) {
-                            LOG.error("For the dealId, we dont have entry in our system {}", dealId);
-                            InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
-                        } catch (final NonUniqueObjectException exception) {
-                            LOG.error("For the dealId, we dont have entry in our system {}", dealId);
-                            InspectorStats.incrementStatCount(InspectorStrings.IX_DEAL_NON_EXISTING);
-                        }
-                    }
-                    if (null != pckgEntity) {
-                        if (ixAdNetwork.isExternalPersonaDeal() && CollectionUtils
-                            .isNotEmpty(ixAdNetwork.getUsedCsIds())) {
-                            rtbdAd.setMatched_csids(new ArrayList<>(ixAdNetwork.getUsedCsIds()));
-                        }
-                        final int indexOfDealId = pckgEntity.getDealIds().indexOf(dealId);
-                        final String dealType = pckgEntity.getAccessTypes().size() > indexOfDealId ?
-                            pckgEntity.getAccessTypes().get(indexOfDealId) :
-                            RIGHT_TO_FIRST_REFUSAL_DEAL;
-                        rtbdAd.setDealId(dealId);
-                        rtbdAd.setHighestBid(highestBid);
-                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
-                        if (RIGHT_TO_FIRST_REFUSAL_DEAL.contentEquals(dealType)) {
-                            // At IX-Rubicon, at first, bid will be taken by DSP's who have deal with the publisher, if
-                            // the bid is absent, then
-                            // get additional info like geo, bidLandScaping etc
-                            rtbdAd.setAuctionType(AuctionType.TRUMP);
-                        }
-                    } else {
-                        // otherwise auction type is set to FIRST_PRICE
-                        rtbdAd.setAuctionType(AuctionType.FIRST_PRICE);
-                    }
-                }
-                break;
-
-            case RTBD:
-                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-                break;
-            default: // For DCP, auction type is set to SECOND_PRICE
-                rtbdAd.setAuctionType(AuctionType.SECOND_PRICE);
-                break;
-        }
-
-        final List<AdIdChain> adIdChains = new ArrayList<>();
-        adIdChains.add(adIdChain);
-        rtbdAd.setDeprecatedAdIds(adIdChains);
-
-        final long bid = (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInUsd() * Math.pow(10, 6));
-        rtbdAd.setPrice(bid);
-        rtbdAd.setBid(bid);
-
-        final String impressionId = getRtbResponse().getAdNetworkInterface().getImpressionId();
-        final UUID uuid = UUID.fromString(impressionId);
-        rtbdAd.setDeprecatedImpressionId(new GUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()));
-
-        // Setting render unit id
-        final String renderUnitId = ImpressionIdGenerator.getInstance().resetWilburyIntKey(impressionId, 0L);
-        final UUID renderUnitUUID = UUID.fromString(renderUnitId);
-        rtbdAd.setRenderUnitId(
-            new GUID(renderUnitUUID.getMostSignificantBits(), renderUnitUUID.getLeastSignificantBits()));
-
-        rtbdAd.setSlotServed(getRtbResponse().getAdNetworkInterface().getSelectedSlotId());
-        final Creative rtbdCreative = new Creative();
-        rtbdCreative.setValue(finalResponse);
-        rtbdAd.setCreative(rtbdCreative);
-        adPoolResponse.setAds(Collections.singletonList(rtbdAd));
-        adPoolResponse.setMinChargedValue(
-            (long) (getRtbResponse().getAdNetworkInterface().getSecondBidPriceInUsd() * Math.pow(10, 6)));
-        if (!GlobalConstant.USD.equalsIgnoreCase(getRtbResponse().getAdNetworkInterface().getCurrency())) {
-            rtbdAd.setOriginalCurrencyName(getRtbResponse().getAdNetworkInterface().getCurrency());
-            rtbdAd.setBidInOriginalCurrency(
-                (long) (getRtbResponse().getAdNetworkInterface().getBidPriceInLocal() * Math.pow(10, 6)));
-        }
-        return adPoolResponse;
-    }
-
     // send response to the caller
     @SuppressWarnings("rawtypes")
-    private void sendResponse(final HttpResponseStatus status, String responseString, final Map responseHeaders,
-        final Channel serverChannel) {
-        final byte[] bytes = DCP.getValue() == sasParams.getDst() ?
-            processDCPResponse(responseString) :
-            responseString.getBytes(Charsets.UTF_8);
+    private void sendResponse(final HttpResponseStatus status, final String responseString, final Map responseHeaders,
+            final Channel serverChannel) {
+        final byte[] bytes = DCP.getValue() == sasParams.getDst()
+                ? processDCPResponse(responseString)
+                : responseString.getBytes(Charsets.UTF_8);
 
         if (bytes == null) {
             sendNoAdResponse(serverChannel);
@@ -400,45 +278,45 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
     private byte[] processDCPResponse(String responseString) {
         final boolean storyBoardSdkSupport =
-            Formatter.isRequestFromSdkVersionOnwards(sasParams, STORYBOARD_SDK_BASE_VERSION);
+                Formatter.isRequestFromSdkVersionOnwards(sasParams, STORYBOARD_SDK_BASE_VERSION);
         final boolean encryptedSdkBaseSupport =
-            Formatter.isRequestFromSdkVersionOnwards(sasParams, ENCRYPTED_SDK_BASE_VERSION);
+                Formatter.isRequestFromSdkVersionOnwards(sasParams, ENCRYPTED_SDK_BASE_VERSION);
 
         // for native we have already base64encoded response string so we are reverting in case of sdk greater than 530
         if (RequestedAdType.NATIVE == sasParams.getRequestedAdType()) {
             responseString = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                storyBoardSdkSupport ? getJSEscapeWithoutBase64(responseString) : responseString);
+                    storyBoardSdkSupport ? getJSEscapeWithoutBase64(responseString) : responseString);
             LOG.debug("Rewrapping native JSON for DCP traffic. Wrapped Response is: {}", responseString);
         } else if (Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
             responseString = String.format(SDK_500_DCP_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
-                storyBoardSdkSupport ?
-                    StringEscapeUtils.escapeJavaScript(responseString) :
-                    new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
+                    storyBoardSdkSupport
+                            ? StringEscapeUtils.escapeJavaScript(responseString)
+                            : new String(Base64.encodeBase64(responseString.getBytes(CharsetUtil.UTF_8))));
             LOG.debug("Wrapping in JSON for SDK > 500. Wrapped Response is: {}", responseString);
         }
         try {
             return encryptResponseIfRequired(responseString.getBytes(Charsets.UTF_8), encryptedSdkBaseSupport,
-                storyBoardSdkSupport);
-        } catch (RuntimeException  e) {
+                    storyBoardSdkSupport);
+        } catch (RuntimeException e) {
             return null;
         }
     }
 
     private byte[] encryptResponseIfRequired(byte[] responseBytes, final boolean encryptedSdkBaseSupport,
-        final boolean storyBoardSdkSupport) {
+            final boolean storyBoardSdkSupport) {
         if (sasParams.getEncryptionKey() != null && responseBytes.length > 0 && encryptedSdkBaseSupport) {
             LOG.debug("Encrypting the response as request is from SDK: {}", sasParams.getSdkVersion());
             final EncryptionKeys encryptionKey = sasParams.getEncryptionKey();
             final InmobiSession inmobiSession = new InmobiSecurityImpl(null).newSession(null);
             responseBytes = storyBoardSdkSupport ? compressResponseBytes(responseBytes) : responseBytes;
             try {
-                responseBytes = inmobiSession
-                    .write(responseBytes, encryptionKey.getAesKey(), encryptionKey.getInitializationVector());
+                responseBytes = inmobiSession.write(responseBytes, encryptionKey.getAesKey(),
+                        encryptionKey.getInitializationVector());
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Encyption Details:  EncryptionKey: {}  IVBytes: {}  Response: {}",
-                        new String(encryptionKey.getAesKey(), CharsetUtil.UTF_8),
-                        new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8),
-                        new String(responseBytes, CharsetUtil.UTF_8));
+                            new String(encryptionKey.getAesKey(), CharsetUtil.UTF_8),
+                            new String(encryptionKey.getInitializationVector(), CharsetUtil.UTF_8),
+                            new String(responseBytes, CharsetUtil.UTF_8));
                 }
             } catch (InmobiSecureException | InvalidMessageException e) {
                 LOG.info("Exception while encrypting response from {}", e);
@@ -455,7 +333,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
     public byte[] compressResponseBytes(final byte[] responseBytes) {
         byte[] compressedBytes;
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
+                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
             gzipOutputStream.write(responseBytes);
             gzipOutputStream.close();
             compressedBytes = outputStream.toByteArray();
@@ -470,20 +348,19 @@ public class ResponseSender extends HttpRequestHandlerBase {
     private String getJSEscapeWithoutBase64(final String nativeResponse) {
         final NativeAd nativeAd = gson.fromJson(nativeResponse, NativeAd.class);
         final String jsEscapePubContentWithoutBase64 =
-            StringEscapeUtils.escapeJavaScript(new String(Base64.decodeBase64(nativeAd.getPubContent())));
-        final NativeAd nativeAdWithoutbase64 =
-            new NativeAd(jsEscapePubContentWithoutBase64, nativeAd.getContextCode(), nativeAd.getNamespace(),
-                nativeAd.getLandingPage(), nativeAd.getEventTracking());
+                StringEscapeUtils.escapeJavaScript(new String(Base64.decodeBase64(nativeAd.getPubContent())));
+        final NativeAd nativeAdWithoutbase64 = new NativeAd(jsEscapePubContentWithoutBase64, nativeAd.getContextCode(),
+                nativeAd.getNamespace(), nativeAd.getLandingPage(), nativeAd.getEventTracking());
         return gson.toJson(nativeAdWithoutbase64);
     }
 
     // send response to the caller
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void sendResponse(final HttpResponseStatus status, byte[] responseBytes, final Map responseHeaders,
-        final Channel serverChannel) {
+            final Channel serverChannel) {
         LOG.debug("Inside send Response");
         final FullHttpResponse response =
-            new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
+                new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(responseBytes), false);
         if (null != responseHeaders) {
             for (final Map.Entry entry : (Set<Map.Entry>) responseHeaders.entrySet()) {
                 response.headers().add(entry.getKey().toString(), responseHeaders.get(entry.getValue()));
@@ -523,11 +400,6 @@ public class ResponseSender extends HttpRequestHandlerBase {
     }
 
     @Override
-    public AuctionEngine getAuctionEngine() {
-        return auctionEngine;
-    }
-
-    @Override
     public void sendNoAdResponse(final Channel serverChannel) {
         // Making sure response is sent only once
         if (checkResponseSent()) {
@@ -556,9 +428,9 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     httpResponseStatus = HttpResponseStatus.NO_CONTENT;
                     defaultContent = NO_AD_IMAI;
 
-                    if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
-                        defaultContent =
-                            String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), StringUtils.EMPTY);
+                    if (DCP.getValue() == sasParams.getDst()) {
+                        defaultContent = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                                StringUtils.EMPTY);
                         LOG.debug("Wrapping in JSON for DCP. Wrapped Response is: {}", defaultContent);
                     }
 
@@ -569,10 +441,10 @@ public class ResponseSender extends HttpRequestHandlerBase {
                     defaultContent = StringUtils.EMPTY;
 
                     // Native on dcp
-                    if (DemandSourceType.DCP.getValue() == sasParams.getDst() && Formatter
-                        .isRequestFromSdkVersionOnwards(sasParams, 500)) {
-                        defaultContent =
-                            String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(), StringUtils.EMPTY);
+                    if (DCP.getValue() == sasParams.getDst()
+                            && Formatter.isRequestFromSdkVersionOnwards(sasParams, 500)) {
+                        defaultContent = String.format(DCP_NATIVE_WRAPPING_AD_JSON, sasParams.getRequestGuid(),
+                                StringUtils.EMPTY);
                         LOG.debug("Wrapping in JSON for SDK > 500 & DCP. Wrapped Response is: {}", defaultContent);
                     }
                     break;
@@ -596,7 +468,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
         }
         sendResponse(getResponseStatus(sasParams.getDst(), httpResponseStatus),
-            getResponseBytes(sasParams.getDst(), defaultContent), new HashMap<String, String>(), serverChannel);
+                getResponseBytes(sasParams.getDst(), defaultContent), new HashMap<String, String>(), serverChannel);
     }
 
     private HttpResponseStatus getResponseStatus(final int dstType, final HttpResponseStatus httpResponseStatus) {
@@ -701,7 +573,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rankList.get(index).getAdNetworkInterface().cleanUp();
             } catch (final Exception exception) {
                 LOG.debug("Error in closing channel for index: {} Name: {} Exception: {}", index,
-                    rankList.get(index).getAdNetworkInterface(), exception);
+                        rankList.get(index).getAdNetworkInterface(), exception);
             }
         }
 
@@ -714,7 +586,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
                 rtbList.get(index).getAdNetworkInterface().cleanUp();
             } catch (final Exception exception) {
                 LOG.debug("Error in closing channel for index: {}  Name: {} Exception: {}", index,
-                    rtbList.get(index).getAdNetworkInterface(), exception);
+                        rtbList.get(index).getAdNetworkInterface(), exception);
             }
         }
 
@@ -737,16 +609,16 @@ public class ResponseSender extends HttpRequestHandlerBase {
 
         if (CollectionUtils.isNotEmpty(dcpList) && CollectionUtils.isNotEmpty(rtbList)) {
             LOG.debug("Both DCP and RTBD/IX channel segment lists cannot be populated at the same time. "
-                + "Aborting Logging");
+                    + "Aborting Logging");
             return;
         } else if (CollectionUtils.isNotEmpty(dcpList)) {
-            if (DemandSourceType.DCP.getValue() != sasParams.getDst()) {
+            if (DCP.getValue() != sasParams.getDst()) {
                 LOG.debug("DCP channel segment list cannot be populated when dst is not DCP. Aborting Logging");
                 return;
             }
             list.addAll(dcpList);
         } else if (CollectionUtils.isNotEmpty(rtbList)) {
-            if (DemandSourceType.DCP.getValue() == sasParams.getDst()) {
+            if (DCP.getValue() == sasParams.getDst()) {
                 LOG.debug("RTBD/IX channel segment list cannot be populated when dst is DCP. Aborting Logging");
                 return;
             }
@@ -754,9 +626,7 @@ public class ResponseSender extends HttpRequestHandlerBase {
         }
 
         long totalTime = getTotalTime();
-        if (totalTime > 2000) {
-            totalTime = 0;
-        }
+        totalTime = totalTime > 2000 ? 0 : totalTime;
         try {
             ChannelSegment adResponseChannelSegment = null;
             if (null != getRtbResponse()) {
@@ -766,10 +636,13 @@ public class ResponseSender extends HttpRequestHandlerBase {
             }
 
             Logging.rrLogging(traceMarker, adResponseChannelSegment, list, sasParams, casInternalRequestParameters,
-                terminationReason, totalTime);
+                    terminationReason, totalTime);
             Logging.advertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.sampledAdvertiserLogging(list, CasConfigUtil.getLoggerConfig());
             Logging.creativeLogging(list, sasParams);
+            final NestedActivityRecord nestedActivityRecord =
+                    photonCasActivityWriter.getNestedActivityRecord(adResponseChannelSegment, sasParams);
+            photonCasActivityWriter.publish(nestedActivityRecord);
         } catch (final JSONException exception) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Exception raised in ResponseSender {}", exception);

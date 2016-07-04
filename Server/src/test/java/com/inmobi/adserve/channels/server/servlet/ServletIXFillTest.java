@@ -138,12 +138,14 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
+        expect(mockConfig.getBoolean("photon.enable", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockSASRequestParameters.getSource()).andReturn(WAP).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
         expect(mockMatchSegments.matchSegments(mockSASRequestParameters)).andReturn(new ArrayList<>());
         expect(mockSASRequestParameters.getImaiBaseUrl()).andReturn(null).anyTimes();
+        expect(mockSASRequestParameters.isCoppaEnabled()).andReturn(true).anyTimes();
 
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();
@@ -209,6 +211,7 @@ public class ServletIXFillTest {
         expect(mockHttpRequest.headers()).andReturn(mockHttpHeaders).anyTimes();
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
+        expect(mockConfig.getBoolean("photon.enable", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
@@ -292,6 +295,7 @@ public class ServletIXFillTest {
         expect(mockHttpHeaders.get("x-mkhoj-tracer")).andReturn("true");
         expect(mockRequestFilters.isDroppedInRequestFilters(mockHttpRequestHandler)).andReturn(false).anyTimes();
         expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).times(1);
+        expect(mockConfig.getBoolean("photon.enable", false)).andReturn(false).anyTimes();
         expect(mockSASRequestParameters.getDst()).andReturn(DemandSourceType.IX.getValue()).anyTimes();
         expect(mockResponseSender.getResponseFormat()).andReturn(ResponseFormat.XHTML).anyTimes();
         expect(mockResponseSender.getSasParams()).andReturn(mockSASRequestParameters).anyTimes();
@@ -309,11 +313,13 @@ public class ServletIXFillTest {
             .andReturn(mockChannelSegmentList).anyTimes();
         expect(mockSASRequestParameters.getSiteFloor()).andReturn(0.5).anyTimes();
         expect(mockSASRequestParameters.getSiteIncId()).andReturn(5L).anyTimes();
+        expect(CasConfigUtil.getServerConfig()).andReturn(mockConfig).anyTimes();
         expect(CasConfigUtil.getRtbConfig()).andReturn(mockConfig).anyTimes();
         expect(CasConfigUtil.getAdapterConfig()).andReturn(mockConfig).anyTimes();
         expect(mockSASRequestParameters.getUAdapters()).andReturn(null).anyTimes();
         expect(mockSASRequestParameters.getSource()).andReturn(WAP).anyTimes();
         expect(mockCasInternalRequestParameters.getAuctionBidFloor()).andReturn(0.5).anyTimes();
+        expect(mockSASRequestParameters.isCoppaEnabled()).andReturn(true).anyTimes();
 
         mockSASRequestParameters.setImaiBaseUrl(null);
         expectLastCall().anyTimes();

@@ -6,9 +6,7 @@ import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import lombok.Data;
 import lombok.NonNull;
 
-/**
- * Created by avinash.kumar on 12/14/15.
- */
+
 @Data
 public final class Impression {
     @NonNull
@@ -17,6 +15,7 @@ public final class Impression {
     private Video video;
     @SerializedName("native")
     private Native nat;
+    private PMP pmp;
     private String displaymanager;
     private String displaymanagerver;
     private int instl = 0;
@@ -24,4 +23,5 @@ public final class Impression {
     private double bidfloor = 0.0;
     private String bidfloorcur = "USD";
     private int secure = 0;
+    private ImpressionExtension ext;
 }

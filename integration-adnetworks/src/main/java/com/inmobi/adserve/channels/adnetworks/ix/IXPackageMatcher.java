@@ -2,6 +2,8 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 
 import static com.inmobi.adserve.adpool.RequestedAdType.BANNER;
 import static com.inmobi.adserve.adpool.RequestedAdType.INTERSTITIAL;
+import static com.inmobi.adserve.channels.adnetworks.ix.TargetingSegmentFiltersV2.checkForAdTypeTargeting;
+import static com.inmobi.adserve.channels.adnetworks.ix.TargetingSegmentFiltersV2.checkForSDKVersionTargeting;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_AD_TYPE_TARGETING_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_DMP_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_GEO_REGION_FILTER;
@@ -10,14 +12,14 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKA
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_OS_VERSION_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_SDK_VERSION_FILTER;
 import static com.inmobi.adserve.channels.util.InspectorStrings.DROPPED_IN_PACKAGE_SEGMENT_SUBSET_FILTER;
-import static com.inmobi.adserve.channels.util.InspectorStrings.IX_PACKAGE_REQUEST_FOR_ID;
-import static com.inmobi.adserve.channels.util.InspectorStrings.IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT;
-import static com.inmobi.adserve.channels.util.InspectorStrings.PACKAGE_AND_DEAL_STATS;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IX_PACKAGE_MATCH_LATENCY;
 import static com.inmobi.adserve.channels.util.InspectorStrings.PACKAGE_FILTER_STATS;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.REWARDED_VAST_VIDEO;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.STATIC;
 import static com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints.VAST_VIDEO;
+import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,12 +28,8 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Range;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
@@ -59,34 +57,45 @@ import com.inmobi.segment.impl.SlotId;
 import com.inmobi.segment.impl.UidPresent;
 import com.inmobi.segment.impl.ZipCodePresent;
 
-public class IXPackageMatcher {
-    private static final Logger LOG = LoggerFactory.getLogger(IXPackageMatcher.class);
-    public static final int PACKAGE_MAX_LIMIT = 35;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Set<Integer> bannerAllowedSdksForViewability = ImmutableSortedSet.of(300, 364, 365, 370, 371,
-            381, 400, 402, 403, 404, 410, 411, 430, 440, 441, 442, 443, 451, 452, 453, 454, 455);
-    private static final Set<Integer> interstitialAllowedSdksForViewability =
+
+@Slf4j
+@NoArgsConstructor(access = PRIVATE)
+class IXPackageMatcher {
+
+    static final Set<Integer> BANNER_ALLOWED_SDKS_FOR_VIEWABILITY =
+            ImmutableSortedSet.of(300, 364, 365, 370, 371, 381, 400, 402, 403, 404, 410, 411, 430, 440, 441, 442, 443,
+                    451, 452, 453, 454, 455);
+    static final Set<Integer> INTERSTITIAL_ALLOWED_SDKS_FOR_VIEWABILITY =
             ImmutableSortedSet.of(442, 443, 452, 454, 456);
-    private static final Set<Integer> vastAllowedSdksForViewability =
+    static final Set<Integer> VAST_ALLOWED_SDKS_FOR_VIEWABILITY =
             ImmutableSortedSet.of(402, 403, 404, 410, 411, 430, 440, 441, 442, 443, 450, 451, 453, 456);
 
-    public static Map<Integer, Boolean> findMatchingPackageIds(final SASRequestParameters sasParams,
+    static Map<Integer, Boolean> findMatchingPackageIds(final SASRequestParameters sasParams,
             final RepositoryHelper repositoryHelper, final Short selectedSlotId,
             final ChannelSegmentEntity adGroupEntity) {
-        LOG.debug("Inside IX Package Matcher");
-        final HashMap<Integer, Boolean> matchedPackageToGeocookieServedMap = new HashMap<>();
+        log.debug("Finding matching packages (V1)");
+        final Map<Integer, Boolean> matchedPackages = new HashMap<>();
 
         // TODO: Do package matching on the intersection of ump selected slots and those present in the adgroup
         final Segment requestSegment = createRequestSegment(sasParams, selectedSlotId);
+
+        final long startTime = System.currentTimeMillis();
         final ResultSet<IXPackageEntity> resultSet = repositoryHelper.queryIXPackageRepository(sasParams.getOsId(),
                 sasParams.getSiteId(), sasParams.getCountryId().intValue(), selectedSlotId);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Number of packages selected after OS({}), Site({}), Country({}) and Slot({}) filtration: {}",
+        final long latency = System.currentTimeMillis() - startTime;
+        log.debug("Packages (V1) match latency: {}", latency);
+        InspectorStats.updateYammerTimerStats(sasParams.getDemandSourceType().name(), IX_PACKAGE_MATCH_LATENCY, latency);
+
+        if (log.isDebugEnabled() && null != resultSet) {
+            log.debug("Number of packages (V1) selected after OS({}), Site({}), Country({}) and Slot({}) filtration: {}",
                     sasParams.getOsId(), sasParams.getSiteId(), sasParams.getCountryId().intValue(), selectedSlotId,
                     resultSet.size());
         }
-        int matchedPackagesCount = 0;
+
         int droppedInPackageDMPFilter = 0;
         int droppedInPackageManufModelFilter = 0;
         int droppedInPackageOsVersionFilter = 0;
@@ -98,107 +107,97 @@ public class IXPackageMatcher {
 
 
         // TODO: Refactor into proper filters
-        for (final IXPackageEntity packageEntity : resultSet) {
-            boolean servedByGeocookie = false;
-            if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
-                final boolean failsAdTypeTargetingFilter =
-                        !checkForAdTypeTargeting(adGroupEntity.getSecondaryAdFormatConstraints(),
-                                packageEntity.getSecondaryAdFormatConstraints());
+        if (null != resultSet) {
+            for (final IXPackageEntity packageEntity : resultSet) {
+                if (requestSegment.isSubsetOf(packageEntity.getSegment())) {
+                    final boolean failsAdTypeTargetingFilter =
+                            !checkForAdTypeTargeting(adGroupEntity.getSecondaryAdFormatConstraints(), packageEntity.getSecondaryAdFormatConstraints());
 
-                if (failsAdTypeTargetingFilter) {
-                    LOG.debug("Package {} dropped in Ad Type Targeting Filter", packageEntity.getId());
-                    droppedInPackageAdTypeTargetingFilter += 1;
-                    continue;
-                }
-
-                final boolean failedInLanguageTargetingFilter =
-                        !checkForLanguageTargeting(sasParams.getLanguage(), packageEntity);
-                if (failedInLanguageTargetingFilter) {
-                    LOG.debug("Package {} dropped in Language Targeting Filter", packageEntity.getId());
-                    droppedInPackageLanguageTargetingFilter += 1;
-                    continue;
-                }
-
-                // Add to matchedPackageIds only if csId's match
-                if (CollectionUtils.isNotEmpty(packageEntity.getDmpFilterSegmentExpression())
-                        && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity.getDmpFilterSegmentExpression())) {
-                    LOG.debug("Package {} dropped in DMP Filter", packageEntity.getId());
-                    droppedInPackageDMPFilter += 1;
-                    continue;
-                }
-
-                // Manuf Model Targeting
-                if (!checkForManufModelTargeting(packageEntity.getManufModelTargeting(), sasParams.getManufacturerId(),
-                        sasParams.getModelId())) {
-                    LOG.debug("Package {} dropped in Manufacturer Model Filter", packageEntity.getId());
-                    droppedInPackageManufModelFilter += 1;
-                    continue;
-                }
-
-                // OS Version Targeting
-                if (!checkForOsVersionTargeting(packageEntity.getOsVersionTargeting(), sasParams.getOsId(),
-                        sasParams.getOsMajorVersion())) {
-                    LOG.debug("Package {} dropped in OS Version Filter", packageEntity.getId());
-                    droppedInPackageOsVersionFilter += 1;
-                    continue;
-                }
-
-                Set<Integer> viewabilityInclusionList = null;
-                final SecondaryAdFormatConstraints adgroupSecondaryAdFormat =
-                        adGroupEntity.getSecondaryAdFormatConstraints();
-                if (STATIC == adgroupSecondaryAdFormat) {
-                    if (BANNER == sasParams.getRequestedAdType()) {
-                        viewabilityInclusionList = bannerAllowedSdksForViewability;
-                    } else if (INTERSTITIAL == sasParams.getRequestedAdType()) {
-                        viewabilityInclusionList = interstitialAllowedSdksForViewability;
+                    if (failsAdTypeTargetingFilter) {
+                        log.debug("Package {} dropped in Ad Type Targeting Filter", packageEntity.getId());
+                        droppedInPackageAdTypeTargetingFilter += 1;
+                        continue;
                     }
-                } else if (VAST_VIDEO == adgroupSecondaryAdFormat || REWARDED_VAST_VIDEO == adgroupSecondaryAdFormat) {
-                    viewabilityInclusionList = vastAllowedSdksForViewability;
-                }
 
-                if (!checkForSDKVersionTargeting(sasParams.getSdkVersion(), packageEntity.getSdkVersionTargeting(),
-                        packageEntity.isViewable(), new ImmutablePair<>(false, viewabilityInclusionList))) {
-                    LOG.debug("Package {} dropped in SDK Version Filter", packageEntity.getId());
-                    droppedInSdkVersionFilter += 1;
-                    continue;
-                }
-                // Add to matchedPackageIds only if at least one fence from the set of request fence ids
-                // is present in the set of fence ids defined in the package.
-                // But if the package is selected because of its geoCookieTargeting do not drop it.
-                if (StringUtils.isNotEmpty(packageEntity.getGeoFenceRegion())) {
-                    final String geoRegionNameCountryCombo =
-                            packageEntity.getGeoFenceRegion() + "_" + sasParams.getCountryId();
-                    final GeoRegionFenceMapEntity geoRegionFenceMapEntity = repositoryHelper
-                            .queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(geoRegionNameCountryCombo);
+                    final boolean failedInLanguageTargetingFilter = !checkForLanguageTargeting(sasParams.getLanguage(), packageEntity);
+                    if (failedInLanguageTargetingFilter) {
+                        log.debug("Package {} dropped in Language Targeting Filter", packageEntity.getId());
+                        droppedInPackageLanguageTargetingFilter += 1;
+                        continue;
+                    }
 
-                    if (null == geoRegionFenceMapEntity
-                            || null != geoRegionFenceMapEntity.getFenceIdsList() && (null == sasParams.getGeoFenceIds()
-                                    || !CollectionUtils.containsAny(sasParams.getGeoFenceIds(),
-                                            geoRegionFenceMapEntity.getFenceIdsList()))) {
-                        LOG.debug("Package {} does not match geo Fences, check if it geocookieTargeted",
-                                packageEntity.getId());
-                        if (packageEntity.getGeocookieId() != null && sasParams.getCsiTags() != null
-                                && sasParams.getCsiTags().contains(packageEntity.getGeocookieId())) {
-                            servedByGeocookie = true;
-                        } else {
-                            LOG.debug("Package {} with geocookie {} dropped in Geo Fence Filter", packageEntity.getId(),
-                                    packageEntity.getGeocookieId());
-                            droppedInPackageGeoRegionFilter += 1;
-                            continue;
+                    // Add to matchedPackageIds only if csId's match
+                    if (CollectionUtils.isNotEmpty(packageEntity.getDmpFilterSegmentExpression()) && !checkForCsidMatch(sasParams.getCsiTags(), packageEntity
+                            .getDmpFilterSegmentExpression())) {
+                        log.debug("Package {} dropped in DMP Filter", packageEntity.getId());
+                        droppedInPackageDMPFilter += 1;
+                        continue;
+                    }
+
+                    // Manuf Model Targeting
+                    if (!TargetingSegmentFiltersV2.checkForManufModelTargeting(packageEntity.getManufModelTargeting(), sasParams
+                            .getManufacturerId(), sasParams.getModelId())) {
+                        log.debug("Package {} dropped in Manufacturer Model Filter", packageEntity.getId());
+                        droppedInPackageManufModelFilter += 1;
+                        continue;
+                    }
+
+                    // OS Version Targeting
+                    if (!TargetingSegmentFiltersV2.checkForOsVersionTargeting(packageEntity.getOsVersionTargeting(), sasParams
+                            .getOsId(), sasParams.getOsMajorVersion())) {
+                        log.debug("Package {} dropped in OS Version Filter", packageEntity.getId());
+                        droppedInPackageOsVersionFilter += 1;
+                        continue;
+                    }
+
+                    Set<Integer> viewabilityInclusionList = null;
+                    final SecondaryAdFormatConstraints adgroupSecondaryAdFormat = adGroupEntity.getSecondaryAdFormatConstraints();
+                    if (STATIC == adgroupSecondaryAdFormat) {
+                        if (BANNER == sasParams.getRequestedAdType()) {
+                            viewabilityInclusionList = BANNER_ALLOWED_SDKS_FOR_VIEWABILITY;
+                        } else if (INTERSTITIAL == sasParams.getRequestedAdType()) {
+                            viewabilityInclusionList = INTERSTITIAL_ALLOWED_SDKS_FOR_VIEWABILITY;
+                        }
+                    } else if (VAST_VIDEO == adgroupSecondaryAdFormat || REWARDED_VAST_VIDEO == adgroupSecondaryAdFormat) {
+                        viewabilityInclusionList = VAST_ALLOWED_SDKS_FOR_VIEWABILITY;
+                    }
+
+                    if (!checkForSDKVersionTargeting(sasParams.getSdkVersion(), packageEntity.getSdkVersionTargeting(), packageEntity
+                            .isViewable(), new ImmutablePair<>(false, viewabilityInclusionList))) {
+                        log.debug("Package {} dropped in SDK Version Filter", packageEntity.getId());
+                        droppedInSdkVersionFilter += 1;
+                        continue;
+                    }
+                    // Add to matchedPackageIds only if at least one fence from the set of request fence ids
+                    // is present in the set of fence ids defined in the package.
+                    // But if the package is selected because of its geoCookieTargeting do not drop it.
+                    boolean servedByGeoCookie = false;
+                    if (StringUtils.isNotEmpty(packageEntity.getGeoFenceRegion())) {
+                        final String geoRegionNameCountryCombo = packageEntity.getGeoFenceRegion() + '_' + sasParams.getCountryId();
+                        final GeoRegionFenceMapEntity geoRegionFenceMapEntity =
+                                repositoryHelper.queryGeoRegionFenceMapRepositoryByRegionNameCountryCombo(geoRegionNameCountryCombo);
+
+                        if (null == geoRegionFenceMapEntity || null != geoRegionFenceMapEntity.getFenceIdsList() && (
+                                null == sasParams.getGeoFenceIds() || !CollectionUtils
+                                        .containsAny(sasParams.getGeoFenceIds(), geoRegionFenceMapEntity.getFenceIdsList()))) {
+                            log.debug("Package {} does not match geo Fences, check if it geocookieTargeted", packageEntity
+                                    .getId());
+                            if (packageEntity.getGeocookieId() != null && sasParams.getCsiTags() != null && sasParams.getCsiTags().contains(packageEntity.getGeocookieId())) {
+                                servedByGeoCookie = true;
+                            } else {
+                                log.debug("Package {} with geocookie {} dropped in Geo Fence Filter", packageEntity
+                                        .getId(), packageEntity.getGeocookieId());
+                                droppedInPackageGeoRegionFilter += 1;
+                                continue;
+                            }
                         }
                     }
+
+                    matchedPackages.put(packageEntity.getId(), servedByGeoCookie);
+                } else {
+                    log.debug("Package {} dropped in Segment Subset Filter", packageEntity.getId());
+                    droppedInPackageSegmentSubsetFilter += 1;
                 }
-                matchedPackageToGeocookieServedMap.put(packageEntity.getId(), servedByGeocookie);
-                InspectorStats.incrementStatCount(PACKAGE_AND_DEAL_STATS,
-                        IX_PACKAGE_REQUEST_FOR_ID + packageEntity.getId());
-                // Break the loop if we reach the threshold.
-                if (++matchedPackagesCount == PACKAGE_MAX_LIMIT) {
-                    InspectorStats.incrementStatCount(PACKAGE_FILTER_STATS, IX_PACKAGE_THRESHOLD_EXCEEDED_COUNT);
-                    break;
-                }
-            } else {
-                LOG.debug("Package {} dropped in Segment Subset Filter", packageEntity.getId());
-                droppedInPackageSegmentSubsetFilter += 1;
             }
         }
 
@@ -212,12 +211,10 @@ public class IXPackageMatcher {
                 droppedInPackageLanguageTargetingFilter);
         incrementPackageFilterStat(DROPPED_IN_PACKAGE_SDK_VERSION_FILTER, droppedInSdkVersionFilter);
 
-        String matchedPackageIdStr = "";
-        for (final Integer i : matchedPackageToGeocookieServedMap.keySet()) {
-            matchedPackageIdStr += " " + i;
+        if (log.isDebugEnabled()) {
+            log.debug("Packages selected: {}", Arrays.toString(matchedPackages.keySet().toArray()));
         }
-        LOG.debug("Packages selected: {}", matchedPackageIdStr);
-        return matchedPackageToGeocookieServedMap;
+        return matchedPackages;
     }
 
     private static void incrementPackageFilterStat(final String dropInFilterStat, final int increment) {
@@ -231,8 +228,7 @@ public class IXPackageMatcher {
                 : languageTargetingSet.isEmpty() ? true : languageTargetingSet.contains(reqLanguage);
     }
 
-    private static boolean checkForCsidMatch(final Set<Integer> csiReqTags,
-            final Set<Set<Integer>> dmpFilterExpression) {
+    public static boolean checkForCsidMatch(final Set<Integer> csiReqTags, final Set<Set<Integer>> dmpFilterExpression) {
         if (CollectionUtils.isEmpty(csiReqTags)) {
             return false;
         } else {
@@ -243,149 +239,6 @@ public class IXPackageMatcher {
             }
         }
         return true;
-    }
-
-    protected static boolean checkForAdTypeTargeting(
-            final SecondaryAdFormatConstraints adgroupSecondaryAdFormatConstraints,
-            final Set<SecondaryAdFormatConstraints> packageSecondaryAdFormatConstraintsSet) {
-
-        return packageSecondaryAdFormatConstraintsSet.contains(SecondaryAdFormatConstraints.ALL)
-                || packageSecondaryAdFormatConstraintsSet.contains(adgroupSecondaryAdFormatConstraints);
-    }
-
-    /**
-     * Checks whether Os Version Targeting is satisfied.
-     *
-     * If OS Version Targeting map is null or empty then no targeting takes place and true is returned.
-     *
-     * Otherwise, check whether the os (major version) lies within the range.
-     *
-     * Assumption: osId will always have an entry in the osVersionTargeting map if the map is not empty
-     *
-     * @param osVersionTargeting
-     * @param osId
-     * @param osMajorVersionStr
-     * @return
-     */
-    protected static boolean checkForOsVersionTargeting(final Map<Integer, Range<Double>> osVersionTargeting,
-            final int osId, final String osMajorVersionStr) {
-        if (null == osVersionTargeting || osVersionTargeting.isEmpty()) {
-            return true;
-        }
-
-        Double osMajorVersion;
-        Boolean checkPassed = false;
-        try {
-            osMajorVersion = Double.parseDouble(osMajorVersionStr);
-            checkPassed = osVersionTargeting.get(osId).contains(osMajorVersion);
-        } catch (final NumberFormatException nfe) {
-            // Sanity: If the osMajorVersion is not a double, check whether any os version targeting was applied
-            if (osVersionTargeting.get(osId).encloses(Range.all())) {
-                checkPassed = true;
-            } else {
-                checkPassed = false;
-                LOG.info("osMajorVersion is not a double");
-            }
-        } catch (final NullPointerException npe) {
-            checkPassed = false;
-            LOG.info("osId not present in the osVersionTargeting Map");
-        }
-        return checkPassed;
-    }
-
-    /**
-     * Checks whether Manufacturer Model Targeting is satisfied.
-     *
-     * If Manufacturer Model Targeting map is null or empty; or if the corresponding Model Id Set is empty for the
-     * manufacturerId, then no targeting takes place and true is returned.
-     *
-     * If the Manufacturer Id is not found in the Manufacturer Model Targeting map, then false is returned. Otherwise,
-     * If inclusion is true, then true is returned only if the modelId is present in the Set of Model Ids. Else if
-     * inclusion is false, then true is returned only if the modelId is not present in the Set of Model Ids.
-     *
-     * @param manufModelTargeting
-     * @param manufacturerId
-     * @param modelId
-     * @return
-     */
-    protected static boolean checkForManufModelTargeting(final Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting,
-            final long manufacturerId, final long modelId) {
-        if (null == manufModelTargeting || manufModelTargeting.isEmpty()) {
-            return true;
-        }
-
-        final Pair<Boolean, Set<Long>> inclusionModelIdSetPair = manufModelTargeting.get(manufacturerId);
-        if (null == inclusionModelIdSetPair) {
-            return false;
-        }
-
-        final boolean incl = inclusionModelIdSetPair.getLeft();
-        final Set<Long> modelIdsSet = inclusionModelIdSetPair.getRight();
-
-        boolean checkPassed = false;
-        if (modelIdsSet.isEmpty()) {
-            checkPassed = true;
-        } else if (incl) {
-            checkPassed = modelIdsSet.contains(modelId);
-        } else {
-            checkPassed = !modelIdsSet.contains(modelId);
-        }
-        return checkPassed;
-    }
-
-    protected static boolean checkForSDKVersionTargeting(final String sdkVersionStr,
-            final Pair<Boolean, Set<Integer>> sdkVersionTargeting, final boolean checkForViewability,
-            final Pair<Boolean, Set<Integer>> sdkViewabilityEligibility) {
-        boolean returnValue = true;
-        Integer sdkVersion;
-        try {
-            sdkVersion = StringUtils.isBlank(sdkVersionStr) ? null : Integer.parseInt(sdkVersionStr.substring(1));
-        } catch (final NumberFormatException nfe) {
-            return false;
-        }
-
-        if (null == sdkVersion) {
-            // API case
-            if (checkForViewability) {
-                // Drop if viewability is on
-                returnValue = false;
-            }
-            // else allowed (if a package reaches this point then it would have already passed the APP & WAP check
-            // enforced by Segments Lib, WAP is dropped if viewability is on)
-        } else {
-            // SDK case
-            if (null != sdkVersionTargeting) {
-                final Set<Integer> sdkVersionSet = sdkVersionTargeting.getRight();
-                if (sdkVersionTargeting.getLeft()) {
-                    // If exclusion sdk version list
-                    returnValue = !sdkVersionSet.contains(sdkVersion);
-                } else {
-                    // If inclusion sdk version list
-                    returnValue = sdkVersionSet.contains(sdkVersion);
-                }
-            }
-
-            if (checkForViewability) {
-                if (null != sdkViewabilityEligibility) {
-                    final Set<Integer> sdkViewabilityVersionSet = sdkViewabilityEligibility.getRight();
-                    if (null != sdkViewabilityVersionSet) {
-                        if (sdkViewabilityEligibility.getLeft()) {
-                            // If exclusion sdk version list
-                            returnValue = returnValue && !sdkViewabilityVersionSet.contains(sdkVersion);
-                        } else {
-                            // If inclusion sdk version list
-                            returnValue = returnValue && sdkViewabilityVersionSet.contains(sdkVersion);
-                        }
-                    } else {
-                        LOG.debug("Unsupported ad type for viewability");
-                        returnValue = false;
-                    }
-                } else {
-                    returnValue = false;
-                }
-            }
-        }
-        return returnValue;
     }
 
     private static Segment createRequestSegment(final SASRequestParameters sasParams, final Short selectedSlotId) {
@@ -468,7 +321,6 @@ public class IXPackageMatcher {
     }
 
     private static boolean isUdIdPresent(final SASRequestParameters sasParams) {
-        return StringUtils.isNotEmpty(sasParams.getUidParams()) && !"{}".equals(sasParams.getUidParams())
-                || null != sasParams.getTUidParams() && !sasParams.getTUidParams().isEmpty();
+        return  !(null == sasParams.getTUidParams() || sasParams.getTUidParams().isEmpty());
     }
 }

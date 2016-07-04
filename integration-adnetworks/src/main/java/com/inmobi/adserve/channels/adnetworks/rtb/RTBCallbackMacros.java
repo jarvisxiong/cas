@@ -18,15 +18,6 @@ public class RTBCallbackMacros {
     public static final String AUCTION_AD_ID_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_AD_ID);
     public static final String AUCTION_PRICE_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_PRICE);
     public static final String AUCTION_CURRENCY_INSENSITIVE = "(?i)" + Pattern.quote(AUCTION_CURRENCY);
-
-    public static final Pattern AUCTION_ID_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_ID_INSENSITIVE);
-    public static final Pattern AUCTION_BID_ID_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_BID_ID_INSENSITIVE);
-    public static final Pattern AUCTION_IMP_ID_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_IMP_ID_INSENSITIVE);
-    public static final Pattern AUCTION_SEAT_ID_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_SEAT_ID_INSENSITIVE);
-    public static final Pattern AUCTION_AD_ID_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_AD_ID_INSENSITIVE);
-    public static final Pattern AUCTION_PRICE_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_PRICE_INSENSITIVE);
-    public static final Pattern AUCTION_CURRENCY_INSENSITIVE_PATTERN = Pattern.compile(AUCTION_CURRENCY_INSENSITIVE);
-
     // InMobi specific macros
     public static final String WIN_BID_GET_PARAM = "?b=${WIN_BID}";
     public static final String AUCTION_PRICE_ENCRYPTED_INSENSITIVE = "(?i)" + Pattern.quote("${WIN_BID}");

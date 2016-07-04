@@ -46,12 +46,8 @@ import com.inmobi.adserve.channels.server.requesthandler.filters.advertiser.impl
  */
 public class ChannelSegmentFilterModule extends AbstractModule {
 
-    private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR = new Comparator<ChannelSegmentFilter>() {
-        @Override
-        public int compare(final ChannelSegmentFilter o1, final ChannelSegmentFilter o2) {
-            return o1.getOrder().getValue() - o2.getOrder().getValue();
-        }
-    };
+    private final static Comparator<ChannelSegmentFilter> FILTER_COMPARATOR =
+            (o1, o2) -> o1.getOrder().getValue() - o2.getOrder().getValue();
 
     private final Reflections reflections;
 

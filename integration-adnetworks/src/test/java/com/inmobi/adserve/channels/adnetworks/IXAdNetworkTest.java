@@ -1,5 +1,6 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static com.inmobi.casthrift.DemandSourceType.IX;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -17,7 +18,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.powermock.api.support.membermodification.MemberMatcher;
 
 import com.google.common.collect.Lists;
-import com.googlecode.cqengine.resultset.ResultSet;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -42,9 +41,9 @@ import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.api.provider.AsyncHttpClientProvider;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.CurrencyConversionEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.adserve.channels.entity.WapSiteUACEntity.Builder;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.types.IXBlocklistKeyType;
 import com.inmobi.adserve.channels.types.IXBlocklistType;
@@ -123,96 +122,57 @@ public class IXAdNetworkTest {
         sas.setSource("APP");
         sas.setCarrierId(0);
         sas.setDst(8);
+        sas.setDemandSourceType(IX);
         final String urlBase = "";
         final CurrencyConversionEntity currencyConversionEntity = EasyMock.createMock(CurrencyConversionEntity.class);
 
-        EasyMock.expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
+        expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
         EasyMock.replay(currencyConversionEntity);
-        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
-        EasyMock.expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
+        repositoryHelper = EasyMock.createNiceMock(RepositoryHelper.class);
+        expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
                 .andReturn(currencyConversionEntity).anyTimes();
         expect(repositoryHelper.queryIXBlocklistRepository(anyObject(String.class), anyObject(IXBlocklistKeyType.class),
                 anyObject(IXBlocklistType.class))).andReturn(null).anyTimes();
 
         final SlotSizeMapEntity slotSizeMapEntityFor1 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
+        expect(slotSizeMapEntityFor1.getDimension()).andReturn(new Dimension(120, 20)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor1);
         final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
+        expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor4);
         final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
+        expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor9);
         final SlotSizeMapEntity slotSizeMapEntityFor10 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
+        expect(slotSizeMapEntityFor10.getDimension()).andReturn(new Dimension(300, 250)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor10);
         final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
+        expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor11);
         final SlotSizeMapEntity slotSizeMapEntityFor12 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
+        expect(slotSizeMapEntityFor12.getDimension()).andReturn(new Dimension(468, 60)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor12);
         final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
+        expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor14);
         final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
-        EasyMock.expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
+        expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor15);
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4)
                 .anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9)
                 .anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11)
                 .anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 12)).andReturn(slotSizeMapEntityFor12)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 12)).andReturn(slotSizeMapEntityFor12)
                 .anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14)
                 .anyTimes();
-        EasyMock.expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15)
                 .anyTimes();
 
-        final ResultSet<IXPackageEntity> resultSet = new ResultSet<IXPackageEntity>() {
-            @Override
-            public Iterator<IXPackageEntity> iterator() {
-                return new Iterator<IXPackageEntity>() {
-                    @Override
-                    public boolean hasNext() {
-                        return false;
-                    }
-
-                    @Override
-                    public IXPackageEntity next() {
-                        return null;
-                    }
-
-                    @Override
-                    public void remove() {}
-                };
-            }
-
-            @Override
-            public boolean contains(final IXPackageEntity object) {
-                return false;
-            }
-
-            @Override
-            public int getRetrievalCost() {
-                return 0;
-            }
-
-            @Override
-            public int getMergeCost() {
-                return 0;
-            }
-
-            @Override
-            public int size() {
-                return 0;
-            }
-        };
-
-        EasyMock.expect(repositoryHelper.queryIXPackageRepository(OS_ID, SITE_ID, (int) COUNTRY_ID, SLOT_ID))
-                .andReturn(resultSet).anyTimes();
+        expect(repositoryHelper.queryIXPackageRepository(OS_ID, SITE_ID, (int) COUNTRY_ID, SLOT_ID))
+                .andReturn(null).anyTimes();
         EasyMock.replay(repositoryHelper);
 
         ixAdNetwork = new IXAdNetwork(mockConfig, null, base, serverChannel, urlBase, "ix");
@@ -224,6 +184,8 @@ public class IXAdNetworkTest {
         expect(serverConfig.getNingTimeoutInMillisForRTB()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxDcpOutGoingConnections()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxRtbOutGoingConnections()).andReturn(200).anyTimes();
+        expect(serverConfig.getNingTimeoutInMillisForPhoton()).andReturn(200).anyTimes();
+        expect(serverConfig.getMaxPhotonOutGoingConnections()).andReturn(200).anyTimes();
         replay(serverConfig);
         final AsyncHttpClientProvider asyncHttpClientProvider = new AsyncHttpClientProvider(serverConfig);
         asyncHttpClientProvider.setup();
@@ -301,7 +263,7 @@ public class IXAdNetworkTest {
             sas.setRemoteHostIp("206.29.182.240");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
-            final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+            final Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
             sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
@@ -339,7 +301,7 @@ public class IXAdNetworkTest {
             sas.setRemoteHostIp("206.29.182.240");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
-            final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+            final Builder builder = WapSiteUACEntity.newBuilder();
             // builder.setAppType("Games");
             sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
@@ -379,13 +341,14 @@ public class IXAdNetworkTest {
             sas.setRemoteHostIp("206.29.182.240");
             sas.setSiteId(SITE_ID);
             sas.setSource("wap");
-            final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+            final Builder builder = WapSiteUACEntity.newBuilder();
             builder.isTransparencyEnabled(false);
             builder.bundleId("com.play.google.testApp.bundleId");
             builder.marketId("com.play.google.testApp.marketId");
             builder.siteUrl("http://www.testSite.com");
             sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas.setDemandSourceType(IX);
             sas.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -493,9 +456,10 @@ public class IXAdNetworkTest {
             sas.setRemoteHostIp("206.29.182.240");
             sas.setSiteId(SITE_ID);
 
-            final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
+            final Builder builder = WapSiteUACEntity.newBuilder();
             sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas.setDemandSourceType(IX);
             sas.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
@@ -545,7 +509,7 @@ public class IXAdNetworkTest {
     public void testShouldSetSiteOrAppNotBoth() {
         boolean adapterCreated = false;
         final String externalSiteKey = "f6wqjq1r5v";
-        WapSiteUACEntity.Builder builder;
+        Builder builder;
 
         try {
             final ChannelSegmentEntity entity =
@@ -568,6 +532,7 @@ public class IXAdNetworkTest {
             builder.isTransparencyEnabled(true);
             sas.setWapSiteUACEntity(builder.build());
             sas.setCategories(Lists.newArrayList(3L, 15L, 12L, 11L));
+            sas.setDemandSourceType(IX);
             sas.setUserAgent(
                     "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
             casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");

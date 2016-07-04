@@ -72,7 +72,21 @@ public class CasPartnerConf {
             }
             case RTBD2: {
                 wapChannelAdGroup.put("name", "rtb2");
-                wapChannelAdGroup.put("advertiser_id", "9ab79acef8764348a36a07b05fc3ee64");
+                wapChannelAdGroup.put("advertiser_id", "rtbTestAdapter2");
+                wapChannelAdGroup.put("dst", "6");
+                wapChannelAdGroup.put("account_segment", "6");
+                break;
+            }
+            case RTBD1: {
+                wapChannelAdGroup.put("name", "rtb1");
+                wapChannelAdGroup.put("advertiser_id", "rtbTestAdapter1");
+                wapChannelAdGroup.put("dst", "6");
+                wapChannelAdGroup.put("account_segment", "6");
+                break;
+            }
+            case RTBD3: {
+                wapChannelAdGroup.put("name", "rtb3");
+                wapChannelAdGroup.put("advertiser_id", "rtbTestAdapter3");
                 wapChannelAdGroup.put("dst", "6");
                 wapChannelAdGroup.put("account_segment", "6");
                 break;

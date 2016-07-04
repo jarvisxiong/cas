@@ -13,6 +13,7 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHA
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHANNEL_SEGMENT_FEEDBACK_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_CITY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IMEI_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IP_REPOSITORY;
@@ -146,6 +147,8 @@ public class ServletGetSegment implements Servlet {
                             repositoryHelper.queryNativeAdTemplateRepository(placementId, MOVIEBOARD));
                 } else if (repoName.equalsIgnoreCase(GEO_ZIP_REPOSITORY)) {
                     entity = repositoryHelper.queryGeoZipRepository(Integer.parseInt(id));
+                } else if (repoName.equalsIgnoreCase(GEO_CITY_REPOSITORY)) {
+                    entity = repositoryHelper.queryGeoCityRepository(Integer.parseInt(id));
                 } else if (repoName.equalsIgnoreCase(CAU_METADATA_REPOSITORY)) {
                     entity = repositoryHelper.queryCauMetaDataRepository(Long.parseLong(id));
                 } else if (repoName.equalsIgnoreCase(SLOT_SIZE_MAP_REPOSITORY)) {

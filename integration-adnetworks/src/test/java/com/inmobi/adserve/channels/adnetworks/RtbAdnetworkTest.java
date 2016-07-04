@@ -1,8 +1,18 @@
 package com.inmobi.adserve.channels.adnetworks;
 
+import static com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType.APP_WALL;
+import static com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType.CAROUSEL;
+import static com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType.CHAT_LIST;
+import static com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType.CONTENT_STREAM;
+import static com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType.CONTENT_WALL;
+import static com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType.NEWS_FEED;
+import static com.inmobi.casthrift.DemandSourceType.RTBD;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.powermock.api.easymock.PowerMock.createMock;
@@ -18,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.thrift.TException;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +40,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.adnetworks.rtb.ImpressionCallbackHelper;
 import com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -50,27 +58,21 @@ import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
 import com.inmobi.adserve.channels.util.IABCategoriesMap;
-import com.inmobi.adserve.channels.util.Utils.TestUtils;
-import com.inmobi.adserve.contracts.common.request.nativead.Data;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
 import com.inmobi.adserve.contracts.common.request.nativead.Native;
 import com.inmobi.adserve.contracts.iab.NativeLayoutId;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
-import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
-import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
-import com.inmobi.adserve.contracts.misc.contentjson.OtherAsset;
-import com.inmobi.adserve.contracts.misc.contentjson.TextAsset;
 import com.inmobi.adserve.contracts.rtb.response.Bid;
 import com.inmobi.adserve.contracts.rtb.response.BidResponse;
 import com.inmobi.adserve.contracts.rtb.response.SeatBid;
+import com.inmobi.template.config.DefaultConfiguration;
+import com.inmobi.template.gson.GsonManager;
 import com.inmobi.types.LocationSource;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 
 @RunWith(PowerMockRunner.class)
@@ -82,9 +84,27 @@ public class RtbAdnetworkTest {
     private final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
     private final String rtbAdvId = "id";
     private Configuration mockConfig = null;
-    private RtbAdNetwork rtbAdNetwork;
+    private RTBAdNetworkForTest rtbAdNetwork;
     private BidResponse bidResponse;
     private RepositoryHelper repositoryHelper;
+
+    private static class RTBAdNetworkForTest extends RtbAdNetwork {
+
+        static {
+            templateConfiguration = new DefaultConfiguration() {
+                @Override
+                public GsonManager getGsonManager() {
+                    return new GsonManager();
+                }
+            };
+        }
+
+        RTBAdNetworkForTest(final Configuration config, final Bootstrap clientBootstrap,
+                final HttpRequestHandlerBase baseRequestHandler, final Channel serverChannel, final String host,
+                final String advertiserName) {
+            super(config, clientBootstrap, baseRequestHandler, serverChannel, host, advertiserName);
+        }
+    }
 
     public void prepareMockConfig() {
         mockConfig = createMock(Configuration.class);
@@ -104,9 +124,8 @@ public class RtbAdnetworkTest {
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", false)).andReturn(false).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".nativeSupported", true)).andReturn(true).anyTimes();
         expect(mockConfig.getBoolean(advertiserName + ".bannerVideoSupported", false)).andReturn(true).once();
-        expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(
-                new String[] {"king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com",
-                        "supercell.com"}).anyTimes();
+        expect(mockConfig.getStringArray("rtb.blockedAdvertisers")).andReturn(new String[] {"king.com", "supercell.net",
+                "paps.com", "fhs.com", "china.supercell.com", "supercell.com"}).anyTimes();
         expect(mockConfig.getString("key.1.value")).andReturn("clickmaker.key.1.value").anyTimes();
         expect(mockConfig.getString("key.2.value")).andReturn("clickmaker.key.2.value").anyTimes();
         expect(mockConfig.getString("beaconURLPrefix")).andReturn("clickmaker.beaconURLPrefix").anyTimes();
@@ -127,13 +146,15 @@ public class RtbAdnetworkTest {
         prepareMockConfig();
         Formatter.init();
         sas.setSource("APP");
-        sas.setDst(2);
+        sas.setDst(6);
+        sas.setDemandSourceType(RTBD);
+        sas.setCountryId(94L);
 
         final String urlBase = "";
         final CurrencyConversionEntity currencyConversionEntity = createMock(CurrencyConversionEntity.class);
         expect(currencyConversionEntity.getConversionRate()).andReturn(10.0).anyTimes();
         replay(currencyConversionEntity);
-        repositoryHelper = createMock(RepositoryHelper.class);
+        repositoryHelper = createNiceMock(RepositoryHelper.class);
         expect(repositoryHelper.queryCurrencyConversionRepository(EasyMock.isA(String.class)))
                 .andReturn(currencyConversionEntity).anyTimes();
         final SlotSizeMapEntity slotSizeMapEntityFor1 = createMock(SlotSizeMapEntity.class);
@@ -154,23 +175,19 @@ public class RtbAdnetworkTest {
         final SlotSizeMapEntity slotSizeMapEntityFor15 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
         replay(slotSizeMapEntityFor15);
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 1)).andReturn(slotSizeMapEntityFor1)
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 1)).andReturn(slotSizeMapEntityFor1).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14).anyTimes();
+        expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15).anyTimes();
+        expect(repositoryHelper.queryCcidMapRepository(null)).andReturn(null).anyTimes();
+        expect(repositoryHelper.queryDealById(anyObject(String.class), eq(false))).andReturn(Optional.empty())
                 .anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4)
-                .anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9)
-                .anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 11)).andReturn(slotSizeMapEntityFor11)
-                .anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 14)).andReturn(slotSizeMapEntityFor14)
-                .anyTimes();
-        expect(repositoryHelper.querySlotSizeMapRepository((short) 15)).andReturn(slotSizeMapEntityFor15)
-                .anyTimes();
-        expect(repositoryHelper.queryCcidMapRepository(null)).andReturn(null)
-                .anyTimes();
+
         replay(repositoryHelper);
 
-        rtbAdNetwork = new RtbAdNetwork(mockConfig, null, base, serverChannel, urlBase, "rtb");
+        rtbAdNetwork = new RTBAdNetworkForTest(mockConfig, null, base, serverChannel, urlBase, "rtb");
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
         ipRepositoryField.setAccessible(true);
@@ -188,6 +205,8 @@ public class RtbAdnetworkTest {
         expect(serverConfig.getNingTimeoutInMillisForRTB()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxDcpOutGoingConnections()).andReturn(200).anyTimes();
         expect(serverConfig.getMaxRtbOutGoingConnections()).andReturn(200).anyTimes();
+        expect(serverConfig.getNingTimeoutInMillisForPhoton()).andReturn(200).anyTimes();
+        expect(serverConfig.getMaxPhotonOutGoingConnections()).andReturn(200).anyTimes();
         replay(serverConfig);
         final AsyncHttpClientProvider asyncHttpClientProvider = new AsyncHttpClientProvider(serverConfig);
         asyncHttpClientProvider.setup();
@@ -199,7 +218,8 @@ public class RtbAdnetworkTest {
         bid2.setPrice(0.2);
         bid2.setCid("cid");
         bid2.setCrid("crid");
-        bid2.setAdm("<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
+        bid2.setAdm(
+                "<style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
         bid2.setImpid("impressionId");
         final List<Bid> bidList = new ArrayList<Bid>();
         bidList.add(bid2);
@@ -221,15 +241,13 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         RtbAdNetwork.impressionCallbackHelper = createMock(ImpressionCallbackHelper.class);
-        expect(
-                RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(URI.class), isA(Request.class),
-                        isA(AsyncHttpClient.class))).andReturn(true).anyTimes();
+        expect(RtbAdNetwork.impressionCallbackHelper.writeResponse(isA(URI.class), isA(Request.class),
+                isA(AsyncHttpClient.class))).andReturn(true).anyTimes();
         replay(RtbAdNetwork.impressionCallbackHelper);
         rtbAdNetwork.setBidResponse(bidResponse);
         rtbAdNetwork.impressionCallback();
@@ -248,17 +266,19 @@ public class RtbAdnetworkTest {
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSource("wap");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        casInternalRequestParameters.setAuctionId("auctionId");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity,
-                (short) 15, repositoryHelper), false);
+        assertEquals(rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
+                repositoryHelper), false);
     }
 
     @Test
@@ -266,21 +286,22 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSiteId("some_site_id");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.setAuctionId("auctionId");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
         sas.setWapSiteUACEntity(null);
         sas.setCategories(Lists.newArrayList(15L, 12L, 11L));
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 15 mean board games. Refer to CategoryList
         assertEquals("Board", rtbAdNetwork.getBidRequest().getApp().getName());
 
@@ -288,8 +309,7 @@ public class RtbAdnetworkTest {
         sas.setSource("wap");
         sas.setWapSiteUACEntity(null);
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
 
@@ -298,8 +318,7 @@ public class RtbAdnetworkTest {
         sas.setWapSiteUACEntity(null);
         final ArrayList<Long> list = new ArrayList<Long>();
         sas.setCategories(list);
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
 
         assertEquals("miscellenous", rtbAdNetwork.getBidRequest().getSite().getName());
 
@@ -307,16 +326,14 @@ public class RtbAdnetworkTest {
         WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
         builder.appType("Games");
         sas.setWapSiteUACEntity(builder.build());
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
 
         // First UAC Entity Category should be present as Site Name.
         assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
 
         // For App, First UAC Entity Category should be present as App Name.
         sas.setSource("app");
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
 
 
@@ -325,8 +342,7 @@ public class RtbAdnetworkTest {
         builder = WapSiteUACEntity.newBuilder();
         builder.appType("Social");
         sas.setWapSiteUACEntity(builder.build());
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // Setting primary category name from uac.
         assertEquals("Social", rtbAdNetwork.getBidRequest().getApp().getName());
 
@@ -339,21 +355,21 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
+        casInternalRequestParameters.setAuctionId("auctionId");
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSource("wap");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
 
         // Expected Blocked Advertisers
-        final ArrayList<String> expectedBlockedAdvertisers =
-                Lists.newArrayList("king.com", "supercell.net", "paps.com", "fhs.com", "china.supercell.com",
-                        "supercell.com");
+        final ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("king.com", "supercell.net", "paps.com",
+                "fhs.com", "china.supercell.com", "supercell.com");
         assertNull(casInternalRequestParameters.getBlockedAdvertisers());
         assertEquals(6, rtbAdNetwork.getBidRequest().getBadv().size());
         assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
@@ -364,22 +380,23 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         casInternalRequestParameters.setBlockedAdvertisers(Lists.newArrayList("abcd.com"));
+        casInternalRequestParameters.setAuctionId("auctionId");
+
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSource("wap");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
 
         // Expected Blocked Advertisers
-        final ArrayList<String> expectedBlockedAdvertisers =
-                Lists.newArrayList("abcd.com", "king.com", "supercell.net", "paps.com", "fhs.com",
-                        "china.supercell.com", "supercell.com");
+        final ArrayList<String> expectedBlockedAdvertisers = Lists.newArrayList("abcd.com", "king.com", "supercell.net",
+                "paps.com", "fhs.com", "china.supercell.com", "supercell.com");
         assertEquals(1, casInternalRequestParameters.getBlockedAdvertisers().size());
         assertEquals(7, rtbAdNetwork.getBidRequest().getBadv().size());
         assertTrue(rtbAdNetwork.getBidRequest().getBadv().containsAll(expectedBlockedAdvertisers));
@@ -390,17 +407,19 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSource("wap");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setBlockedIabCategories(Lists.newArrayList("IAB-1", "IAB-2", "IAB-3"));
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        casInternalRequestParameters.setAuctionId("auctionId");
+
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
 
         // Expected Blocked Categories
         final List<String> expectedBlockedCategories = Lists.newArrayList("IAB-1", "IAB-2", "IAB-3");
@@ -427,22 +446,26 @@ public class RtbAdnetworkTest {
         sasParams.setCategories(Arrays.asList(catLong));
         sasParams.setLocationSource(LocationSource.WIFI);
         sasParams.setGender("Male");
+        sasParams.setCountryId(94L);
+        sasParams.setDemandSourceType(RTBD);
         casInternalRequestParameters.setUid("1234");
         sasParams.setAge((short) 26);
         sasParams.setRemoteHostIp("206.29.182.240");
-        sasParams
-                .setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sasParams.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setLatLong("37.4429,-122.1514");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
         casInternalRequestParameters.setAuctionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
+        casInternalRequestParameters.setAuctionId("auctionId");
+
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        assertEquals(rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity,
-                (short) 1, repositoryHelper), true);
+        assertEquals(rtbAdNetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 1,
+                repositoryHelper), true);
     }
 
     @Test
@@ -455,129 +478,14 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         rtbAdNetwork.setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}");
         rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl()));
         assertEquals("http://rtb:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3",
                 rtbAdNetwork.getCallbackUrl());
-    }
-
-    @Test
-    public void testReplaceMacrosAllPosibilities() {
-        final String externalSiteKey = "f6wqjq1r5v";
-        sas.setSource("app");
-        sas.setRemoteHostIp("206.29.182.240");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
-        casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-        final ChannelSegmentEntity entity =
-                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
-        rtbAdNetwork
-                .setCallbackUrl("http://rtb:8970/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_IMP_ID}/${AUCTION_SEAT_ID}/${AUCTION_AD_ID}/${AUCTION_PRICE}/${AUCTION_CURRENCY}");
-        rtbAdNetwork.setEncryptedBid("abc");
-        rtbAdNetwork.setCallbackUrl(rtbAdNetwork.replaceRTBMacros(rtbAdNetwork.getCallbackUrl()));
-        assertEquals(
-                "http://rtb:8970/SGu1Jpq1IO/ac1a2c944cff0a176643079625b0cad4a1bbe4a3/4f8d98e2-4bbd-40bc-8795-22da170700f9/TO-BE-DETERMINED/1335571993285/0.0/USD",
-                rtbAdNetwork.getCallbackUrl());
-    }
-
-    @Test
-    public void testParseResponse() throws TException {
-        final StringBuilder str = new StringBuilder();
-        // Temporarily using ixResponseJSON instead of rtbdResponseJSON
-        str.append(TestUtils.SampleStrings.ixResponseJson);
-        final StringBuilder responseAdm = new StringBuilder();
-        responseAdm.append("<html><head><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/></head><body style=\"margin:0;padding:0;\">");
-        responseAdm
-                .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
-        responseAdm.append("<img src=\'beaconUrl?b=${WIN_BID}\' height=1 width=1 border=0 />");
-        responseAdm.append("</body></html>");
-        final String externalSiteKey = "f6wqjq1r5v";
-        final ChannelSegmentEntity entity =
-                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        AdapterTestHelper.setBeaconAndClickStubs();
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
-        final Gson gson = new Gson();
-        rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
-        rtbAdNetwork.setEncryptedBid("0.23");
-        rtbAdNetwork.setSecondBidPrice(0.23);
-        final String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
-        rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
-        assertEquals("", rtbAdNetwork.getResponseContent());
-    }
-
-    @Test
-    public void testParseResponseSDK450Interstitial() throws TException {
-        final StringBuilder str = new StringBuilder();
-        // Temporarily using ixResponseJSON instead of rtbdResponseJSON
-        str.append(TestUtils.SampleStrings.ixResponseJson);
-        final StringBuilder responseAdm = new StringBuilder();
-        responseAdm
-                .append("<html><head><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/></head><body style=\"margin:0;padding:0;\"><script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='http://www.inmobi.com/' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p><script type=\"text/javascript\">var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler);</script><img src='beaconUrl?b=${WIN_BID}' height=1 width=1 border=0 /></body></html>");
-        sas.setSdkVersion("a450");
-        sas.setRequestedAdType(RequestedAdType.INTERSTITIAL);
-        final String externalSiteKey = "f6wqjq1r5v";
-        final ChannelSegmentEntity entity =
-                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        AdapterTestHelper.setBeaconAndClickStubs();
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
-        final Gson gson = new Gson();
-        rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
-        rtbAdNetwork.setEncryptedBid("0.23");
-        rtbAdNetwork.setSecondBidPrice(0.23);
-        final String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
-        rtbAdNetwork.parseResponse(str.toString(), HttpResponseStatus.NOT_FOUND);
-        assertEquals("", rtbAdNetwork.getResponseContent());
-    }
-
-    @Test
-    public void testParseResponseWithRMD() throws TException {
-        bidResponse.setCur("RMD");
-        bidResponse.getSeatbid().get(0).getBid().get(0).setNurl("${AUCTION_PRICE}${AUCTION_CURRENCY}");
-        final StringBuilder responseAdm = new StringBuilder();
-        responseAdm.append("<html><head><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/></head><body style=\"margin:0;padding:0;\">");
-        responseAdm
-                .append("<script src=\"mraid.js\" ></script><style type=\'text/css\'>body { margin:0;padding:0 }  </style> <p align='center'><a href=\'http://www.inmobi.com/\' target='_blank'><img src='http://www.digitalmarket.asia/wp-content/uploads/2012/04/7a4cb5ba9e52331ae91aeee709cd3fe3.jpg' border='0'/></a></p>");
-        responseAdm
-                .append("<img src=\'beaconUrl?b=${WIN_BID}\' height=1 width=1 border=0 /><img src=\'${AUCTION_PRICE}${AUCTION_CURRENCY}\' height=1 width=1 border=0 />");
-        responseAdm.append("</body></html>");
-        final String externalSiteKey = "f6wqjq1r5v";
-        final ChannelSegmentEntity entity =
-                new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
-                        new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
-        sas.setDst(2);
-        AdapterTestHelper.setBeaconAndClickStubs();
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
-        final Gson gson = new Gson();
-        rtbAdNetwork.parseResponse(gson.toJson(bidResponse), HttpResponseStatus.OK);
-        assertEquals(responseAdm.toString(), rtbAdNetwork.getResponseContent());
-        rtbAdNetwork.setEncryptedBid("0.23");
-        rtbAdNetwork.setSecondBidPrice(0.23);
-        final String afterMacros = rtbAdNetwork.replaceRTBMacros(responseAdm.toString());
-        assertEquals(afterMacros, rtbAdNetwork.getResponseContent());
     }
 
     @Test
@@ -586,15 +494,16 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSiteId("some_site_id");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-
+        casInternalRequestParameters.setAuctionId("auctionId");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
@@ -605,8 +514,7 @@ public class RtbAdnetworkTest {
         sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals(null, rtbAdNetwork.getBidRequest().getSite().getName());
         assertEquals("www.inmobi.com", rtbAdNetwork.getBidRequest().getSite().getDomain());
@@ -620,15 +528,16 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSiteId("some_site_id");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-
+        casInternalRequestParameters.setAuctionId("auctionId");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
@@ -637,12 +546,11 @@ public class RtbAdnetworkTest {
         sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
-        assertEquals("http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite()
-                .getDomain());
+        assertEquals("http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474",
+                rtbAdNetwork.getBidRequest().getSite().getDomain());
         assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite().getId());
     }
 
@@ -651,27 +559,27 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSiteId("some_site_id");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-
+        casInternalRequestParameters.setAuctionId("auctionId");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("wap");
         sas.setWapSiteUACEntity(null);
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getSite().getName());
-        assertEquals("http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite()
-                .getDomain());
+        assertEquals("http://www.ix.com/7dea362b-3fac-3e00-956a-4952a3d4f474",
+                rtbAdNetwork.getBidRequest().getSite().getDomain());
         assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getSite().getId());
     }
 
@@ -681,15 +589,16 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSiteId("some_site_id");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-
+        casInternalRequestParameters.setAuctionId("auctionId");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
@@ -702,8 +611,7 @@ public class RtbAdnetworkTest {
         sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
         assertEquals("com.android.app.marketId", rtbAdNetwork.getBidRequest().getApp().getBundle());
@@ -717,15 +625,16 @@ public class RtbAdnetworkTest {
         final String externalSiteKey = "f6wqjq1r5v";
         final ChannelSegmentEntity entity =
                 new ChannelSegmentEntity(AdNetworksTest.getChannelSegmentEntityBuilder(rtbAdvId, null, null, null, 0,
-                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null,
-                        0, null, false, false, false, false, false, false, false, false, false, false, null,
+                        null, null, true, true, externalSiteKey, null, null, null, new Long[] {0L}, true, null, null, 0,
+                        null, false, false, false, false, false, false, false, false, false, false, null,
                         new ArrayList<>(), 0.0d, null, null, 32, new Integer[] {0}));
         final CasInternalRequestParameters casInternalRequestParameters = new CasInternalRequestParameters();
         sas.setRemoteHostIp("206.29.182.240");
         sas.setSiteId("some_site_id");
-        sas.setUserAgent("Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
+        sas.setUserAgent(
+                "Mozilla%2F5.0+%28iPhone%3B+CPU+iPhone+OS+5_0+like+Mac+OS+X%29+AppleWebKit%2F534.46+%28KHTML%2C+like+Gecko%29+Mobile%2F9A334");
         casInternalRequestParameters.setImpressionId("4f8d98e2-4bbd-40bc-8795-22da170700f9");
-
+        casInternalRequestParameters.setAuctionId("auctionId");
 
         // If WapSiteUACEntity is null, then it should fallback to InMobi categories.
         sas.setSource("app");
@@ -734,382 +643,81 @@ public class RtbAdnetworkTest {
         sas.setWapSiteUACEntity(builder.build());
         sas.setCategories(Lists.newArrayList(11L, 12L, 15L));
         rtbAdNetwork.setSiteBlinded(false);
-        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15,
-                repositoryHelper);
+        rtbAdNetwork.configureParameters(sas, casInternalRequestParameters, entity, (short) 15, repositoryHelper);
         // 11 mean Games. Refer to CategoryList
         assertEquals("Games", rtbAdNetwork.getBidRequest().getApp().getName());
         assertEquals("com.ix.7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getBundle());
         assertEquals("7dea362b-3fac-3e00-956a-4952a3d4f474", rtbAdNetwork.getBidRequest().getApp().getId());
     }
 
-    @DataProvider(name = "DataProviderForRtbNative")
-    public Object[][] paramDataProviderForRtbNative() {
-        return new Object[][] {
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.ICON, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.TITLE, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 69,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.STAR_RATING, false, NativeAdContentUILayoutType.NEWS_FEED},
-            {75, 75, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.APP_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CAROUSEL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CHAT_LIST},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_STREAM},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.CONTENT_WALL},
-            {480, 320, NativeAdContentAsset.SCREENSHOT, false, NativeAdContentAsset.DESCRIPTION, false, 0,
-                NativeAdContentAsset.CTA, false, NativeAdContentUILayoutType.NEWS_FEED},
-
-        };
-    }
-
-    @org.testng.annotations.Test(dataProvider = "DataProviderForRtbNative")
-    public void verifyNativeOnRtb(final Integer w, final Integer h,
-                                  final NativeAdContentAsset imageContentAsset, final boolean isImageOptional,
-                                  final NativeAdContentAsset textContentAsset, final boolean isTitleOptional,
-                                  Integer titleMaxLen, final NativeAdContentAsset otherContentAsset,
-                                  final boolean isOtherOptional, final NativeAdContentUILayoutType layoutType) throws Exception {
-
-        NativeContentJsonObject nativeContentJsonObject = new NativeContentJsonObject();
-        com.inmobi.adserve.contracts.misc.contentjson.Dimension dimension =
-            new com.inmobi.adserve.contracts.misc.contentjson.Dimension();
-        dimension.setHeight(h);
-        dimension.setWidth(w);
-        ImageAsset imageAsset = new ImageAsset();
-        CommonAssetAttributes commonAssetAttributes = new CommonAssetAttributes();
-        commonAssetAttributes.setAdContentAsset(imageContentAsset);
-        commonAssetAttributes.setOptional(isImageOptional);
-        imageAsset.setCommonAttributes(commonAssetAttributes);
-        imageAsset.setDimension(dimension);
-        nativeContentJsonObject.setImageAssets(Arrays.asList(imageAsset));
-
-        CommonAssetAttributes commonAssetAttributesText = new CommonAssetAttributes();
-        commonAssetAttributesText.setAdContentAsset(textContentAsset);
-        commonAssetAttributesText.setOptional(isTitleOptional);
-        TextAsset textAsset = new TextAsset();
-        textAsset.setCommonAttributes(commonAssetAttributesText);
-        textAsset.setMaxChars(titleMaxLen);
-        nativeContentJsonObject.setTextAssets(Arrays.asList(textAsset));
-
-        CommonAssetAttributes commonAssetAttributesOther = new CommonAssetAttributes();
-        commonAssetAttributesOther.setAdContentAsset(otherContentAsset);
-        commonAssetAttributesOther.setOptional(isOtherOptional);
-        OtherAsset otherAsset = new OtherAsset();
-        otherAsset.setCommonAttributes(commonAssetAttributesOther);
-        nativeContentJsonObject.setOtherAssets(Arrays.asList(otherAsset));
-
-        final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
-            .templateId(4408950071453012585l)
-            .contentJson(nativeContentJsonObject)
-            .imageKey("imageKey")
-            .mandatoryKey("mandatoryKey")
-            .modifiedOn(new Timestamp(new Date().getTime()))
-            .placementId(1431975538797857l)
-            .template("template")
-            .nativeUILayout(layoutType)
-            .build();
-        CommonNativeBuilderImpl ixNativeBuilder = new CommonNativeBuilderImpl(nativeAdTemplateEntity);
-        Native natObj = ixNativeBuilder.buildNative();
-
-        Integer imageType;
-        if (imageContentAsset == NativeAdContentAsset.SCREENSHOT) {
-            imageType = Image.ImageAssetType.MAIN.getId();
-        } else if (imageContentAsset == NativeAdContentAsset.ICON){
-            imageType = Image.ImageAssetType.ICON.getId();
-        } else {
-            imageType = null;
-        }
-        assertEquals(w, natObj.getRequestobj().getAssets().get(0).getImg().getWmin());
-        assertEquals(h, natObj.getRequestobj().getAssets().get(0).getImg().getHmin());
-        assertEquals(imageType, natObj.getRequestobj().getAssets().get(0).getImg().getType());
-        assertEquals((Integer) (!isImageOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(0).getRequired());
-
-        titleMaxLen = titleMaxLen == 0 ? 100 : titleMaxLen;
-        if(textContentAsset == NativeAdContentAsset.TITLE) {
-            assertEquals(titleMaxLen, natObj.getRequestobj().getAssets().get(1).getTitle().getLen());
-        } else if (textContentAsset == NativeAdContentAsset.DESCRIPTION) {
-            assertEquals(titleMaxLen, natObj.getRequestobj().getAssets().get(1).getData().getLen());
-        }
-        assertEquals((Integer) (!isTitleOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(1).getRequired());
-        Integer type;
-        if(otherContentAsset == NativeAdContentAsset.CTA){
-            type = (Integer)Data.DataAssetType.CTA_TEXT.getId();
-        } else if (otherContentAsset == NativeAdContentAsset.STAR_RATING){
-            type = (Integer)Data.DataAssetType.RATING.getId();
-        }else{
-            type = null;
-        }
-        assertEquals(type, natObj.getRequestobj().getAssets().get(2).getData().getType());
-        assertEquals((Integer) (!isOtherOptional ? 1 : 0), natObj.getRequestobj().getAssets().get(2).getRequired());
-    }
-
     @DataProvider(name = "DataProviderForRtbNativeWhenEntityNull")
     public Object[][] paramDataProviderForRtbNativeWhenEntityNull() {
-        return new Object[][] {
-            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.1", null},
-            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.2", null},
-            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.3", "inmTag.a083"},
-            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.3", "inmTag.a067"},
-            {NativeAdContentUILayoutType.NEWS_FEED, "layoutConstraint.3", "inmTag.a64"},
-            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.1", null},
-            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.2", null},
-            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.3", "inmTag.a083"},
-            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.3", "inmTag.a067"},
-            {NativeAdContentUILayoutType.CONTENT_WALL, "layoutConstraint.3", "inmTag.a64"},
-            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.1", null},
-            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.2", null},
-            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.3", "inmTag.a083"},
-            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.3", "inmTag.a067"},
-            {NativeAdContentUILayoutType.CONTENT_STREAM, "layoutConstraint.3", "inmTag.a64"},
-            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.1", null},
-            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.2", null},
-            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.3", "inmTag.a083"},
-            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.3", "inmTag.a067"},
-            {NativeAdContentUILayoutType.CAROUSEL, "layoutConstraint.3", "inmTag.a64"},
-            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.1", null},
-            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.2", null},
-            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.3", "inmTag.a083"},
-            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.3", "inmTag.a067"},
-            {NativeAdContentUILayoutType.CHAT_LIST, "layoutConstraint.3", "inmTag.a64"},
-            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.1", null},
-            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.2", null},
-            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.3", "inmTag.a083"},
-            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.3", "inmTag.a067"},
-            {NativeAdContentUILayoutType.APP_WALL, "layoutConstraint.3", "inmTag.a64"},
-        };
+        return new Object[][] {{NEWS_FEED, "layoutConstraint.1", null}, {NEWS_FEED, "layoutConstraint.2", null},
+                {NEWS_FEED, "layoutConstraint.3", "inmTag.a083"}, {NEWS_FEED, "layoutConstraint.3", "inmTag.a067"},
+                {NEWS_FEED, "layoutConstraint.3", "inmTag.a64"}, {CONTENT_WALL, "layoutConstraint.1", null},
+                {CONTENT_WALL, "layoutConstraint.2", null}, {CONTENT_WALL, "layoutConstraint.3", "inmTag.a083"},
+                {CONTENT_WALL, "layoutConstraint.3", "inmTag.a067"}, {CONTENT_WALL, "layoutConstraint.3", "inmTag.a64"},
+                {CONTENT_STREAM, "layoutConstraint.1", null}, {CONTENT_STREAM, "layoutConstraint.2", null},
+                {CONTENT_STREAM, "layoutConstraint.3", "inmTag.a083"},
+                {CONTENT_STREAM, "layoutConstraint.3", "inmTag.a067"},
+                {CONTENT_STREAM, "layoutConstraint.3", "inmTag.a64"}, {CAROUSEL, "layoutConstraint.1", null},
+                {CAROUSEL, "layoutConstraint.2", null}, {CAROUSEL, "layoutConstraint.3", "inmTag.a083"},
+                {CAROUSEL, "layoutConstraint.3", "inmTag.a067"}, {CAROUSEL, "layoutConstraint.3", "inmTag.a64"},
+                {CHAT_LIST, "layoutConstraint.1", null}, {CHAT_LIST, "layoutConstraint.2", null},
+                {CHAT_LIST, "layoutConstraint.3", "inmTag.a083"}, {CHAT_LIST, "layoutConstraint.3", "inmTag.a067"},
+                {CHAT_LIST, "layoutConstraint.3", "inmTag.a64"}, {APP_WALL, "layoutConstraint.1", null},
+                {APP_WALL, "layoutConstraint.2", null}, {APP_WALL, "layoutConstraint.3", "inmTag.a083"},
+                {APP_WALL, "layoutConstraint.3", "inmTag.a067"}, {APP_WALL, "layoutConstraint.3", "inmTag.a64"},};
     }
 
 
     @org.testng.annotations.Test(dataProvider = "DataProviderForRtbNativeWhenEntityNull")
     public void verifyNativeOnRtbWhenEntityNull(final NativeAdContentUILayoutType layoutType, final String mandatoryKey,
-                                                final String imageKey) throws Exception {
-        final NativeAdTemplateEntity nativeAdTemplateEntity = NativeAdTemplateEntity.newBuilder()
-            .templateId(4408950071453012585l)
-            .contentJson(null)
-            .imageKey(imageKey)
-            .mandatoryKey(mandatoryKey)
-            .modifiedOn(new Timestamp(new Date().getTime()))
-            .placementId(1431975538797857l)
-            .template("template")
-            .nativeUILayout(layoutType)
-            .build();
+            final String imageKey) throws Exception {
+        final NativeAdTemplateEntity nativeAdTemplateEntity =
+                NativeAdTemplateEntity.newBuilder().templateId(4408950071453012585l).imageKey(imageKey)
+                        .mandatoryKey(mandatoryKey).modifiedOn(new Timestamp(new Date().getTime()))
+                        .placementId(1431975538797857l).template("template").nativeUILayout(layoutType).build();
         CommonNativeBuilderImpl ixNativeBuilder = new CommonNativeBuilderImpl(nativeAdTemplateEntity);
         Native natObj = ixNativeBuilder.buildNative();
 
-        assertEquals((Integer)Image.ImageAssetType.ICON.getId(), natObj.getRequestobj().getAssets().get(0).getImg().getType());
-        assertEquals((Integer)300, natObj.getRequestobj().getAssets().get(0).getImg().getWmin());
-        assertEquals((Integer)300, natObj.getRequestobj().getAssets().get(0).getImg().getHmin());
+        assertEquals((Integer) Image.ImageAssetType.ICON.getId(),
+                natObj.getRequestobj().getAssets().get(0).getImg().getType());
+        assertEquals((Integer) 300, natObj.getRequestobj().getAssets().get(0).getImg().getWmin());
+        assertEquals((Integer) 300, natObj.getRequestobj().getAssets().get(0).getImg().getHmin());
         assertEquals((Integer) 1, natObj.getRequestobj().getAssets().get(0).getRequired());
-        assertEquals(NativeLayoutId.findByInmobiNativeUILayoutType(layoutType).getKey(), natObj.getRequestobj().getLayout().intValue());
+        assertEquals(NativeLayoutId.findByInmobiNativeUILayoutType(layoutType).getKey(),
+                natObj.getRequestobj().getLayout().intValue());
 
-        assertEquals((Integer)100, natObj.getRequestobj().getAssets().get(1).getTitle().getLen());
-        assertEquals((Integer)1, natObj.getRequestobj().getAssets().get(1).getRequired());
+        assertEquals((Integer) 100, natObj.getRequestobj().getAssets().get(1).getTitle().getLen());
+        assertEquals((Integer) 1, natObj.getRequestobj().getAssets().get(1).getRequired());
 
 
-        assertEquals((Integer)2, natObj.getRequestobj().getAssets().get(2).getData().getType());
-        assertEquals((Integer)1, natObj.getRequestobj().getAssets().get(2).getRequired());
+        assertEquals((Integer) 2, natObj.getRequestobj().getAssets().get(2).getData().getType());
+        assertEquals((Integer) 1, natObj.getRequestobj().getAssets().get(2).getRequired());
 
         int index = 3;
-        if(null != imageKey){
-            Integer wMin=0, hMin=0;
-            if(imageKey.equals("inmTag.a083")){
-                wMin = 250; hMin = 300;
-            } else if(imageKey.equals("inmTag.a067")){
-                wMin = 320 ; hMin = 480;
-            } else if(imageKey.equals("inmTag.a64")){
-                wMin = 320; hMin = 50;
+        if (null != imageKey) {
+            Integer wMin = 0, hMin = 0;
+            if (imageKey.equals("inmTag.a083")) {
+                wMin = 250;
+                hMin = 300;
+            } else if (imageKey.equals("inmTag.a067")) {
+                wMin = 320;
+                hMin = 480;
+            } else if (imageKey.equals("inmTag.a64")) {
+                wMin = 320;
+                hMin = 50;
             }
             index += 1;
-            assertEquals((Integer) Image.ImageAssetType.MAIN.getId(), natObj.getRequestobj().getAssets().get(3).getImg().getType());
+            assertEquals((Integer) Image.ImageAssetType.MAIN.getId(),
+                    natObj.getRequestobj().getAssets().get(3).getImg().getType());
             assertEquals(wMin, natObj.getRequestobj().getAssets().get(3).getImg().getWmin());
             assertEquals(hMin, natObj.getRequestobj().getAssets().get(3).getImg().getHmin());
         }
 
-        assertEquals((Integer)12, natObj.getRequestobj().getAssets().get(index).getData().getType());
-        assertEquals((Integer)5, natObj.getRequestobj().getAssets().get(index+1).getData().getType());
-        assertEquals((Integer)3, natObj.getRequestobj().getAssets().get(index+2).getData().getType());
+        assertEquals((Integer) 12, natObj.getRequestobj().getAssets().get(index).getData().getType());
+        assertEquals((Integer) 5, natObj.getRequestobj().getAssets().get(index + 1).getData().getType());
+        assertEquals((Integer) 3, natObj.getRequestobj().getAssets().get(index + 2).getData().getType());
     }
 }

@@ -24,9 +24,12 @@ public class CasConfigUtil {
     public static final String CHINA_MOBILE_TARGETING = "NONCHINAMOBILE";
     public static final String NO_SUPPORTED_SLOTS = "NOSUPPORTEDSLOTS";
     public static final String NO_SAS_PARAMS = "NOSASPARAMS";
+    public static final String MISSING_MRAID_PATH = "NOMRAIDPATH";
+    public static final String UNKNOWN_SDK_VERSION = "NOSDKVERSION";
     public static final String CLOSED_CHANNEL_EXCEPTION = "java.nio.channels.ClosedChannelException";
     public static final String CONNECTION_RESET_PEER = "java.io.IOException: Connection reset by peer";
     public static final Random RANDOM = new Random();
+    public static final String NAPP_SCORE_LESS_THAN_40 = "NappScoreLessThan40";
 
     public static RepositoryHelper repositoryHelper;
     public static List<String> allowedSiteTypes;

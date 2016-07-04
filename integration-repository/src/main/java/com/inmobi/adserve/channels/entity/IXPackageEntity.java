@@ -1,6 +1,5 @@
 package com.inmobi.adserve.channels.entity;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,18 +21,11 @@ public class IXPackageEntity {
     private int dmpVendorId;
     private boolean viewable;
     private Set<Set<Integer>> dmpFilterSegmentExpression;
-    private Integer[][] scheduledTimeOfDays;
-    private List<String> dealIds;
-    private List<String> accessTypes;
-    private List<Double> dealFloors;
-    private List<Integer> rpAgencyIds;
-    private List<Double> agencyRebatePercentages;
-    private List<Map<String, String>> thirdPartyTrackerMapList;
     private Map<Integer, Range<Double>> osVersionTargeting;
     private Map<Long, Pair<Boolean, Set<Long>>> manufModelTargeting;
     private Pair<Boolean, Set<Integer>> sdkVersionTargeting;
     private Double dataVendorCost;
-    private String geoFenceRegion;
+    private String geoFenceRegion; // TODO Expose geo region id
     private Set<SecondaryAdFormatConstraints> secondaryAdFormatConstraints;
     private final Set<String> languageTargetingSet;
     private final Integer geocookieId;

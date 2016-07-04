@@ -1,0 +1,23 @@
+{{#logging}}
+    <?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <appender name="debugAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>{{CAS_BASE_DIRECTORY}}/logs/dummyBidder/debug/debug.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>{{CAS_BASE_DIRECTORY}}/dummyBidder/debug/debug.log.%d{yyyy-MM-dd-HH}
+            </FileNamePattern>
+            <maxHistory>12</maxHistory> <!--Keep logs for 12 hours-->
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>%d %-5p %c{36}: %m\n%ex{6}</Pattern>
+            <immediateFlush>{{flush_debug_log}}</immediateFlush>
+        </encoder>
+    </appender>
+
+    <root level={{debug_log_type}}>
+        <appender-ref ref="debugAppender"/>
+    </root>
+</configuration>
+{{/logging}}

@@ -23,8 +23,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -85,8 +84,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -99,8 +97,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -113,8 +110,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -127,8 +123,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -141,8 +136,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -155,8 +149,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_FORMREQ),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_FORMREQ), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -169,8 +162,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -183,8 +175,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -209,8 +200,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -223,8 +213,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -237,8 +226,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_FORMREQ),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_FORMREQ), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -251,8 +239,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -265,8 +252,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -279,8 +265,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_MULTSLOTICL),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_MULTSLOTICL), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -293,8 +278,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_SLOTFILTER), LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRNOADS));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -308,8 +292,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -322,8 +305,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -336,8 +318,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -350,8 +331,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_DST));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -369,8 +349,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -383,8 +362,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_APPOBJ),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_APPOBJ), LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -397,8 +375,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ANDRD),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_AVRSN));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ANDRD), LogStringConf.getLogString(LogStringParams.MSG_IX_AVRSN));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -411,8 +388,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -425,8 +401,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -439,8 +414,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID), LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -455,8 +429,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW1));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW1));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -469,8 +442,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH1));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH1));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -483,8 +455,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME1));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME1));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -497,10 +468,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -513,10 +481,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -529,10 +494,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPP2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPP2), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -562,8 +524,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -576,8 +537,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_WAPOBJ),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_WAPOBJ), LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -590,8 +550,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ANDRD),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_AVRSN));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ANDRD), LogStringConf.getLogString(LogStringParams.MSG_IX_AVRSN));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -604,8 +563,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -618,8 +576,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -632,8 +589,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID), LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -646,8 +602,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW1));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW1));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -660,8 +615,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH1));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH1));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -674,8 +628,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME1));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME1));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -688,10 +641,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -704,10 +654,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -720,10 +667,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSWAP2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSWAP2), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -753,8 +697,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -767,8 +710,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_APPOBJ),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_APPOBJ), LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -781,8 +723,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_IOS),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_IVRSN));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_IOS), LogStringConf.getLogString(LogStringParams.MSG_IX_IVRSN));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -795,8 +736,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -809,8 +749,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -823,8 +762,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID), LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -837,8 +775,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -851,8 +788,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -865,8 +801,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -879,10 +814,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -895,10 +827,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -911,10 +840,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPP2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSAPP2), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDAPPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -949,8 +875,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADRRFLAG2), LogStringConf.getLogString(LogStringParams.MSG_IX_EXCHANGEREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -963,8 +888,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_WAPOBJ),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_WAPOBJ), LogStringConf.getLogString(LogStringParams.MSG_IX_TMAX));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -977,8 +901,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_IOS),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_IVRSN));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_IOS), LogStringConf.getLogString(LogStringParams.MSG_IX_IVRSN));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -991,8 +914,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_LATLONG), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1005,8 +927,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_UA), LogStringConf.getLogString(LogStringParams.MSG_IX_SENDREQ));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1019,8 +940,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_RPACNTID), LogStringConf.getLogString(LogStringParams.MSG_IX_RPSIZEID));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1033,8 +953,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDLOW), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDLOW));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1047,8 +966,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDHGH), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDHGH));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1061,8 +979,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADPGBIDSME), LogStringConf.getLogString(LogStringParams.MSG_IX_GBIDSME));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1075,10 +992,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1091,10 +1005,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAP), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1107,10 +1018,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSWAP2),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_BLIND), LogStringConf.getLogString(LogStringParams.MSG_IX_TRANSWAP2), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPBUNDLE), LogStringConf.getLogString(LogStringParams.MSG_IX_BLINDWAPEXTBUNDLE));
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1186,8 +1094,7 @@ public class IXTest {
         searchStringInLog = "\"native\":{\"requestobj\":{\"layout\":3";
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),
-                        searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1200,8 +1107,7 @@ public class IXTest {
         searchStringInLog = "\"native\":{\"requestobj\":{\"layout\":1";
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),
-                        searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1215,8 +1121,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),
-                        searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1242,8 +1147,7 @@ public class IXTest {
 
         /* Deriving the parser output to assert for */
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),
-                        searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1258,8 +1162,7 @@ public class IXTest {
         /* Deriving the parser output to assert for */
 
         parserOutput =
-                LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE),
-                        searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         // System.out.println("ParserOutput : " + parserOutput);
@@ -1272,9 +1175,7 @@ public class IXTest {
 
         searchStringInLog = "This placement id 123456 doesn't have native template";
         parserOutput =
-                LogParserHelper.logParser(
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL), LogStringConf.getLogString(LogStringParams.MSG_IX_CREATIVE_NATIVE), searchStringInLog);
 
         Reporter.log(parserOutput, true);
 
@@ -1299,8 +1200,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES1", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_HAPPY_ALTERNATE_SIZES1(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES1(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1317,8 +1217,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES2", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_HAPPY_ALTERNATE_SIZES2(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES2(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1335,8 +1234,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_HAPPY_ALTERNATE_SIZES3", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_HAPPY_ALTERNATE_SIZES3(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_HAPPY_ALTERNATE_SIZES3(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1387,8 +1285,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_PUBCONTROLS_BANNER_450", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_PUBCONTROLS_BANNER_450(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_PUBCONTROLS_BANNER_450(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
         final String responseString1 = "<VASTAdTagURI>";
         final String responseString2 = "<\\/VASTAdTagURI>";
@@ -1417,8 +1314,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_IX_API_ANDROID_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_IX_API_ANDROID_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_IX_API_ANDROID_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
 
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
@@ -1430,8 +1326,7 @@ public class IXTest {
 
 
     @Test(testName = "TEST_IX_API_IOS_INTEGRATION_TYPE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_IX_API_IOS_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_IX_API_IOS_INTEGRATION_TYPE(final String x, final ResponseBuilder responseBuilder) throws Exception {
         /* Deriving the parser output to assert for */
 
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_AD_SERVED));
@@ -1474,19 +1369,94 @@ public class IXTest {
 
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
-    @Test(testName = "TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_WITHOUT_VIEWABILITY));
+    @Test(testName = "TEST IX PACKAGES DROPPED IN SDK VERSION FOR BANNER", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_PACKAGES_SDK_VERSION_BANNER(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("Package 10011 dropped in SDK Version Filter");
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
-    @Test(testName = "TEST_IX_TRACKERDEAL_WITH_VIEWABILITY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_IX_TRACKERDEAL_WITH_VIEWABILITY(final String x, final ResponseBuilder responseBuilder) throws Exception {
+    @Test(testName = "TEST IX PACKAGES DROPPED IN SDK VERSION FOR NATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_PACKAGES_SDK_VERSION_NATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_WITH_VIEWABILITY));
+        parserOutput = LogParserHelper.logParser("Package 10011 dropped in SDK Version Filter");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST IX PACKAGES DROPPED IN SDK VERSION FOR VAST", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_PACKAGES_SDK_VERSION_VAST(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("Package 10011 dropped in SDK Version Filter");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST IX NEW PACKAGES DROPPED IN SDK VERSION FOR BANNER", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_NEW_PACKAGES_SDK_VERSION_BANNER(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("10014 dropped in SDK Version Filter");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST IX NEW PACKAGES DROPPED IN SDK VERSION FOR NATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_NEW_PACKAGES_SDK_VERSION_NATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("10014 dropped in SDK Version Filter");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST IX NEW PACKAGES DROPPED IN SDK VERSION FOR VAST", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_NEW_PACKAGES_SDK_VERSION_VAST(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("10014 dropped in SDK Version Filter");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_NEW_PACKAGE_COUNTRY_EXCLUSION", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_NEW_PACKAGE_COUNTRY_EXCLUSION(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("Targeting Segment 100004 dropped in Country City Filter");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+
+    @Test(testName = "TEST_RTBD_PMP_OLD& NEW_PACKAGES", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_RTBD_PMP_NEW_PACKAGES(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("\"target\":{\"packages\":[\"10001\",\"10013\"]}");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_RTBD_PMP_VIEWABILITY_NEW_PACKAGES", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_RTBD_PMP_VIEWABILITY_NEW_PACKAGES(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("https://ViewabilityTracker_thirdpartyjson.com");
+        Reporter.log(parserOutput, true);
+
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_WITHOUT_VIEWABILITY));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -1495,53 +1465,66 @@ public class IXTest {
     @Test(testName = "TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON));
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_INSTEAD_JSON));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
+
     @Test(testName = "TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON));
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_VIEWABILITY_TRACKER_FROM_JSON));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
+
     @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO));
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
+
     @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO));
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
+
     @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO));
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO));
         Reporter.log(parserOutput, true);
 
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
+
     @Test(testName = "TEST_IX_TRACKERDEAL_AUDIENCE_WITH_MULTIPLE_MACRO", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_IX_TRACKERDEAL_AUDIENCE_WITH_MULTIPLE_MACRO(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
-        parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO));
+        parserOutput =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_LIMIT_AD_TRACKING_MACRO));
         Reporter.log(parserOutput, true);
-        parserOutput1 = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO));
+        parserOutput1 =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_USER_ID_SHA256_HASHED_MACRO));
         Reporter.log(parserOutput, true);
-        parserOutput2 = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO));
+        parserOutput2 =
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_TRACKERDEAL_AUDIENCE_IMP_CB_MACRO));
         Reporter.log(parserOutput, true);
-        Assert.assertTrue(parserOutput.equals("FAIL")&& parserOutput1.equals("FAIL") && parserOutput2.equals("FAIL"));
+        Assert.assertTrue(parserOutput.equals("FAIL") && parserOutput1.equals("FAIL") && parserOutput2.equals("FAIL"));
     }
 
     @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
@@ -1557,8 +1540,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
 
         parserOutput = LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_PACKAGE_CSID));
         response = new String(responseBuilder.getResponseData());
@@ -1567,20 +1549,40 @@ public class IXTest {
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
 
+    @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_NEW_PACKAGES_CSIDDEAL(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("\"target\":{\"packages\":[\"10016\",\"10015\"]}");
+        Reporter.log(parserOutput, true);
+        parserOutput2 = LogParserHelper.logParser("\"target\":{\"packages\":[\"10015\",\"10016\"]}");
+        Reporter.log(parserOutput2, true);
+        Assert.assertTrue(parserOutput.equals("PASS") || parserOutput2.equals("PASS"));
+
+    }
+
+    @Test(testName = "TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_IX_NEW_PACKAGES_CSIDDEAL_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
+
+        parserOutput = LogParserHelper.logParser("\"target\":{\"packages\":[\"10016\",\"10015\"]}");
+        Reporter.log(parserOutput, true);
+        parserOutput2 = LogParserHelper.logParser("\"target\":{\"packages\":[\"10015\",\"10016\"]}");
+        Reporter.log(parserOutput2, true);
+        Assert.assertTrue(parserOutput.equals("FAIL") && parserOutput2.equals("FAIL"));
+
+    }
+
     @Test(testName = "TEST_DEVICE_LANGUAGE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_DEVICE_LANGUAGE(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput =
-                LogParserHelper.logParser("locale:en", "language=en",
-                        "Package 10007 dropped in Language Targeting Filter", "Packages selected:" + "  10006");
+            LogParserHelper.logParser("locale:en", "language=en", "Package 10007 dropped in Language Targeting Filter", "Packages selected: [10006]");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_DEVICE_LANGUAGE_NULL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_DEVICE_LANGUAGE_NULL(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
-                        + "Targeting Filter");
+        parserOutput = LogParserHelper.logParser("language=null", "IX request json",
+            "10006 dropped in Language " + "Targeting Filter");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1588,17 +1590,16 @@ public class IXTest {
     @Test(testName = "TEST_DEVICE_LANGUAGE_API", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_DEVICE_LANGUAGE_API(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput =
-                LogParserHelper.logParser("locale:en", "language=en",
-                        "Package 10007 dropped in Language Targeting Filter", "Packages selected:" + "  10006");
+            LogParserHelper.logParser("locale:en", "language=en", "Package 10007 dropped in Language Targeting Filter",
+                "Packages selected:" + " [10006]");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_DEVICE_LANGUAGE_NULL_API", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_DEVICE_LANGUAGE_NULL_API(final String x, final ResponseBuilder responseBuilder) throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("language=null", "IX request json", "10006 dropped in Language "
-                        + "Targeting Filter");
+        parserOutput = LogParserHelper.logParser("language=null", "IX request json",
+            "10006 dropped in Language " + "Targeting Filter");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1636,9 +1637,7 @@ public class IXTest {
         searchStringInLog = "zone id not present, will say false";
 
         parserOutput =
-                LogParserHelper.logParser(
-                        LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL),
-                        searchStringInLog);
+            LogParserHelper.logParser(LogStringConf.getLogString(LogStringParams.MSG_IX_ADAPTER_CONFIG_FAIL_IMP_OBJ_NULL), searchStringInLog);
 
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -1661,7 +1660,7 @@ public class IXTest {
 
         if (response.contains("<html>")) {
             responseToEncrypt =
-                    response.substring(response.indexOf(grepFrom), response.indexOf(grepUpto) + grepUpto.length());
+                response.substring(response.indexOf(grepFrom), response.indexOf(grepUpto) + grepUpto.length());
         }
         System.out.println("\n\n***********************\n\n");
         // System.out.println("RESPONSE IS : " + response);
@@ -1685,32 +1684,27 @@ public class IXTest {
     @Test(testName = "TEST_RP_ALT_SLOT_IDS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
     public void TEST_RP_ALT_SLOT_IDS(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput =
-                LogParserHelper.logParser("SAS params are", "selectedSlots:[9, 4]", "IX request json is",
-                        "\"size_id\":43", "\"alt_size_ids\":[44]");
+            LogParserHelper.logParser("SAS params are", "selectedSlots:[9, 4]", "IX request json is", "\"size_id\":43", "\"alt_size_ids\":[44]");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
-        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456789", "AppBundleId is : TEST_MARKET_ID_IOS");
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_IOS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456789", "appBundleId:TEST_MARKET_ID_IOS");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
-        parserOutput =
-                LogParserHelper.logParser("AdGroupIncId 123456790", "AppBundleId is : TEST_APP_BUNDLE_ID_NOT_IOS");
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_BUNDLE_ID_NOT_IOS(final String x, final ResponseBuilder responseBuilder) throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroupIncId 123456790", "appBundleId:TEST_MARKET_ID_NOT_IOS");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
 
     @Test(testName = "TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_ADGROUP_AD_INC_ID_AND_APP_NO_BUNDLE_ID(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput = LogParserHelper.logParser("AdGroupIncId 123456791", "appBundleId=null");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
@@ -1727,8 +1721,7 @@ public class IXTest {
         final String complete = "Tracking added in VAST xml key is : event and value is : complete";
 
         parserOutput =
-                LogParserHelper.logParser(impression, error, clickTracking, start, firstQuartile, midPoint,
-                        thirdQuartile, complete);
+            LogParserHelper.logParser(impression, error, clickTracking, start, firstQuartile, midPoint, thirdQuartile, complete);
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1739,8 +1732,7 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_REQUEST_API_WAP_SDK_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
         VastPassAssert();
     }
 
@@ -1755,17 +1747,14 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_REQUEST_SDK_APP_NO_INTG_VERSION_PASS(final String x, final ResponseBuilder responseBuilder) throws Exception {
         VastPassAssert();
     }
 
     @Test(testName = "TEST_VAST_AD_TYPE_TARGETING_FAIL", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_VAST_AD_TYPE_TARGETING_FAIL(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_VAST_AD_TYPE_TARGETING_FAIL(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput =
-                LogParserHelper
-                        .logParser("Failed in filter AdGroupAdTypeTargetingFilter  , adgroup TEST_VAST_AD_TYPE_TARGETING_FAIL");
+            LogParserHelper.logParser("Failed in filter: AdGroupAdTypeTargetingFilter, adgroup: TEST_VAST_AD_TYPE_TARGETING_FAIL");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("PASS"));
     }
@@ -1783,13 +1772,35 @@ public class IXTest {
     }
 
     @Test(testName = "TEST_SECURE_SEGMENT_FLAG_NEGATIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
-    public void TEST_SECURE_SEGMENT_FLAG_NEGATIVE(final String x, final ResponseBuilder responseBuilder)
-            throws Exception {
+    public void TEST_SECURE_SEGMENT_FLAG_NEGATIVE(final String x, final ResponseBuilder responseBuilder) throws Exception {
         parserOutput = LogParserHelper.logParser("AdGroup : TEST_SECURE_SEGMENT_FLAG_NEGATIVE");
         Reporter.log(parserOutput, true);
         Assert.assertTrue(parserOutput.equals("FAIL"));
     }
 
+    @Test(testName = "TEST_PHOTON_UID_PRESENT", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_PHOTON_UID_PRESENT(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("AdGroup : TEST_PHOTON_UID_PRESENT");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_UID_PRESENT_IN_TUIDPARAMS", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_UID_PRESENT_IN_TUIDPARAMS(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("UID=0002e17f-4df0-4067-8776-27ff6efac8de");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
+
+    @Test(testName = "TEST_INTEGRATION_REQUEST_POSITIVE", dataProvider = "fender_ix_dp", dataProviderClass = FenderDataProvider.class)
+    public void TEST_INTEGRATION_REQUEST_POSITIVE(final String x, final ResponseBuilder responseBuilder)
+            throws Exception {
+        parserOutput = LogParserHelper.logParser("adapter host : http://localhost:8091/getIXBid");
+        Reporter.log(parserOutput, true);
+        Assert.assertTrue(parserOutput.equals("PASS"));
+    }
 
     // @Test(testName = "TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS", dataProvider = "fender_ix_dp", dataProviderClass =
     // FenderDataProvider.class)

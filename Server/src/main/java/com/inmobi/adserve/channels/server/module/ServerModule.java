@@ -6,11 +6,11 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
@@ -84,11 +84,8 @@ public class ServerModule extends AbstractModule {
     @Singleton
     @Provides
     Map<String, Servlet> provideServletMap(final Injector injector) {
-
         final Map<String, Servlet> pathToServletMap = Maps.newHashMap();
-
         final Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Path.class);
-
         for (final Class<?> class1 : classes) {
             pathToServletMap.put(class1.getAnnotation(Path.class).value(), (Servlet) injector.getInstance(class1));
         }

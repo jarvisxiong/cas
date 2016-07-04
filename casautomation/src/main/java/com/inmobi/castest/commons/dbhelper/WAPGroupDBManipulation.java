@@ -13,9 +13,16 @@ import com.inmobi.castest.casconfenums.impl.CasQueryConf;
 
 public class WAPGroupDBManipulation {
 
+    public static void DeleteMultiWapChannelAdgroupInDB(final Map<String, String> wapChannelAdgroupObject)
+            throws ClassNotFoundException, SQLException {
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_MULTI_WAPCHANNEL_ADGROUP_SEGMENT,
+                wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf
+                .setQuery(Query.DELETE_MULTI_WAPCHANNEL_AD, wapChannelAdgroupObject));
+    }
+
     public static void UpdateWapChannelAdgroupInDB(final Map<String, String> wapChannelAdgroupObject,
             final String advertiser_id_list) throws ClassNotFoundException, SQLException {
-
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAPCHANNEL_ADGROUP_SEGMENT,
                 wapChannelAdgroupObject));
 
@@ -39,6 +46,19 @@ public class WAPGroupDBManipulation {
                     .executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_WAP_CHANNEL_AD, wapChannelAdgroupObject));
         }
 
+        try {
+            if (wapChannelAdgroupObject.get("adpool_requestedadtype").equals("INTERSTITIAL")
+                    || wapChannelAdgroupObject.get("adpool_requestedadtype").equals("NATIVE")) {
+                wapChannelAdgroupObject.put("adpool_requestedadtype", "");
+                if (resultSetOfWapChannelAd.size() == 0) {
+                    QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_CHANNEL_AD,
+                            wapChannelAdgroupObject));
+                } else {
+                    QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_WAP_CHANNEL_AD,
+                            wapChannelAdgroupObject));
+                }
+            }
+        } catch (Exception e) {}
         // update wap_channel table
 
         final ArrayList<Map> resultSetOfWapChannel =
@@ -51,7 +71,8 @@ public class WAPGroupDBManipulation {
 
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_CHANNEL, wapChannelAdgroupObject));
         } else {
-            wapChannelAdgroupObject.putAll(resultSetOfWapChannel.get(0));
+
+            // wapChannelAdgroupObject.putAll(resultSetOfWapChannel.get(0));
             System.out.println("******ACC SEGMENT****** : " + wapChannelAdgroupObject.get("account_segment"));
 
             QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.UPDATE_WAP_CHANNEL, wapChannelAdgroupObject));
@@ -60,18 +81,18 @@ public class WAPGroupDBManipulation {
 
         // update realtime_dcp_feedback table
 
-//        final ArrayList<Map> resultSetOfRealTimeDcpFeedback =
-//                QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectRealTimeDcpFeedback,
-//                        wapChannelAdgroupObject, advertiser_id_list));
-//        System.out.println("***RESULT SET 3 SIZE***  : " + resultSetOfRealTimeDcpFeedback.size());
-//
-//        if (resultSetOfRealTimeDcpFeedback.size() == 0) {
-//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertRealtimeDcpFeedbackQuery,
-//                    wapChannelAdgroupObject));
-//        } else {
-//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateRealtimeDCPFeedbackQuery,
-//                    wapChannelAdgroupObject));
-//        }
+        // final ArrayList<Map> resultSetOfRealTimeDcpFeedback =
+        // QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectRealTimeDcpFeedback,
+        // wapChannelAdgroupObject, advertiser_id_list));
+        // System.out.println("***RESULT SET 3 SIZE***  : " + resultSetOfRealTimeDcpFeedback.size());
+        //
+        // if (resultSetOfRealTimeDcpFeedback.size() == 0) {
+        // QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertRealtimeDcpFeedbackQuery,
+        // wapChannelAdgroupObject));
+        // } else {
+        // QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updateRealtimeDCPFeedbackQuery,
+        // wapChannelAdgroupObject));
+        // }
 
         // update dcp_advertiser_burn table
         final ArrayList<Map> resultSetOfDcpAdvertiserBurnQuery =
@@ -88,18 +109,18 @@ public class WAPGroupDBManipulation {
         }
 
         // update earnings_dcp_feedback table
-////        final ArrayList<Map> resultSetOfEarningsFeedbackQuery =
-////                QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectEarningsFeedBackQuery,
-////                        wapChannelAdgroupObject));
-////        System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfEarningsFeedbackQuery.size());
-//
-//        if (resultSetOfEarningsFeedbackQuery.size() == 0) {
-//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertEarningsDcpFeedbackQuery,
-//                    wapChannelAdgroupObject));
-//        } else {
-//            QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updatEarningsDcpFeedBackQuery,
-//                    wapChannelAdgroupObject));
-//        }
+        // // final ArrayList<Map> resultSetOfEarningsFeedbackQuery =
+        // // QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.selectEarningsFeedBackQuery,
+        // // wapChannelAdgroupObject));
+        // // System.out.println("***RESULT SET 5 SIZE***  : " + resultSetOfEarningsFeedbackQuery.size());
+        //
+        // if (resultSetOfEarningsFeedbackQuery.size() == 0) {
+        // QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertEarningsDcpFeedbackQuery,
+        // wapChannelAdgroupObject));
+        // } else {
+        // QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.updatEarningsDcpFeedBackQuery,
+        // wapChannelAdgroupObject));
+        // }
 
         final ArrayList<Map> resultSetOfDcpChnSiteIncExc =
                 QueryManager.executeAndGetColumnsOutput(CasQueryConf.setQuery(Query.SELECT_DCP_CHN_SITE_INC_EXC,
@@ -111,23 +132,17 @@ public class WAPGroupDBManipulation {
                     wapChannelAdgroupObject));
         }
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_SITE_UAC,
-            wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_SITE_UAC, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_SITE_UAC,
-            wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_SITE_UAC, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_SITE,
-            wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_SITE, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_SITE,
-            wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_SITE, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_PUBLISHER_IX,
-            wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAP_PUBLISHER_IX, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_PUBLISHER_IX,
-            wapChannelAdgroupObject));
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_WAP_PUBLISHER_IX, wapChannelAdgroupObject));
 
     }
 
@@ -139,12 +154,16 @@ public class WAPGroupDBManipulation {
 
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertSiteEcpm, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deletePricingEngine, wapChannelAdgroupObject));
+        // QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.deletePricingEngine, wapChannelAdgroupObject));
 
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertPricingEngine, wapChannelAdgroupObject));
+        // QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.insertPricingEngine, wapChannelAdgroupObject));
+
     }
-    public static void DeleteWapchannelAdgroupLikeTest(final Map<String, String> wapChannelAdgroupObject) throws SQLException, ClassNotFoundException {
-        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAPCHANNEL_ADGROUP_LIKE_TEST, wapChannelAdgroupObject));
+
+    public static void DeleteWapchannelAdgroupLikeTest(final Map<String, String> wapChannelAdgroupObject)
+            throws SQLException, ClassNotFoundException {
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_WAPCHANNEL_ADGROUP_LIKE_TEST,
+                wapChannelAdgroupObject));
     }
 
     public static void DeleteIXPackageData(final Map<String, String> wapChannelAdgroupObject,
@@ -162,6 +181,22 @@ public class WAPGroupDBManipulation {
         QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_IX_PACKAGE_DEALS, wapChannelAdgroupObject));
         final int pack_int = 1 + Integer.parseInt(wapChannelAdgroupObject.get("package_id"));
         wapChannelAdgroupObject.put("package_id", Integer.toString(pack_int));
+
+    }
+
+    public static void DeleteTaretingSegmentData(final Map<String, String> wapChannelAdgroupObject,
+            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.DELETE_TARGETING_SEGMENT, wapChannelAdgroupObject));
+
+    }
+
+    public static void InsertTargetSegmentData(final Map<String, String> wapChannelAdgroupObject,
+            final String advertiser_id_list) throws ClassNotFoundException, SQLException {
+
+        QueryManager.executeUpdateQuery(CasQueryConf.setQuery(Query.INSERT_TARGETING_SEGMENT, wapChannelAdgroupObject));
+        final int pack_int = 1 + Integer.parseInt(wapChannelAdgroupObject.get("segment_id"));
+        wapChannelAdgroupObject.put("segment_id", Integer.toString(pack_int));
 
     }
 }

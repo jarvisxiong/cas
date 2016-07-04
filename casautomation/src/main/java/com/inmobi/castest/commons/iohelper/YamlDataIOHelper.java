@@ -62,6 +62,7 @@ public class YamlDataIOHelper {
             return map;
         } catch (Exception e) {
             System.out.println("Unable to load TestParams.yml file " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }

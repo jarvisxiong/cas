@@ -3,6 +3,7 @@ package com.inmobi.adserve.channels.adnetworks.ix;
 import static com.inmobi.adserve.channels.adnetworks.AdapterTestHelper.setInmobiAdTrackerBuilderFactoryForTest;
 import static com.inmobi.adserve.channels.util.config.GlobalConstant.CPM;
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,6 +13,7 @@ import static org.powermock.api.easymock.PowerMock.createNiceMock;
 import static org.powermock.api.easymock.PowerMock.createPartialMock;
 import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStaticNice;
+import static org.powermock.api.easymock.PowerMock.replay;
 import static org.powermock.api.easymock.PowerMock.replayAll;
 
 import java.awt.Dimension;
@@ -19,8 +21,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -37,9 +39,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.inmobi.adserve.adpool.ContentType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.BaseAdNetworkImpl;
@@ -53,7 +53,6 @@ import com.inmobi.adserve.channels.api.natives.NativeBuilderFactory;
 import com.inmobi.adserve.channels.api.trackers.DefaultLazyInmobiAdTrackerBuilder;
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
 import com.inmobi.adserve.channels.entity.IXAccountMapEntity;
-import com.inmobi.adserve.channels.entity.IXPackageEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity;
 import com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass;
 import com.inmobi.adserve.channels.entity.SlotSizeMapEntity;
@@ -68,7 +67,9 @@ import com.inmobi.adserve.channels.util.Utils.TestUtils;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.channels.util.demand.enums.SecondaryAdFormatConstraints;
 import com.inmobi.adserve.contracts.ix.request.BidRequest;
+import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
 import com.inmobi.casthrift.ADCreativeType;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.phoenix.batteries.util.WilburyUUID;
 import com.inmobi.template.config.DefaultConfiguration;
 import com.inmobi.template.gson.GsonManager;
@@ -81,7 +82,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 // TODO: Merge with IXAdNetworkTest.java
 // TODO: Remove dependency on beacon and click changes
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({IXAdNetwork.class, InspectorStats.class, IXPackageMatcher.class})
+@PrepareForTest({IXAdNetwork.class, InspectorStats.class, IXPackageMatcher.class, PackageMatcherDelegateV2.class})
 @PowerMockIgnore("javax.crypto.*")
 public class NewIXAdNetworkTest {
     private static final String advertiserName = "ix";
@@ -133,22 +134,22 @@ public class NewIXAdNetworkTest {
 
         prepareMockConfig();
         DefaultLazyInmobiAdTrackerBuilder.init(mockConfig);
-        final SlotSizeMapEntity slotSizeMapEntityFor4 = EasyMock.createMock(SlotSizeMapEntity.class);
+        final SlotSizeMapEntity slotSizeMapEntityFor4 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor4.getDimension()).andReturn(new Dimension(300, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor4);
-        final SlotSizeMapEntity slotSizeMapEntityFor9 = EasyMock.createMock(SlotSizeMapEntity.class);
+        final SlotSizeMapEntity slotSizeMapEntityFor9 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor9.getDimension()).andReturn(new Dimension(320, 48)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor9);
-        final SlotSizeMapEntity slotSizeMapEntityFor11 = EasyMock.createMock(SlotSizeMapEntity.class);
+        final SlotSizeMapEntity slotSizeMapEntityFor11 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor11.getDimension()).andReturn(new Dimension(728, 90)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor11);
-        final SlotSizeMapEntity slotSizeMapEntityFor14 = EasyMock.createMock(SlotSizeMapEntity.class);
+        final SlotSizeMapEntity slotSizeMapEntityFor14 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor14.getDimension()).andReturn(new Dimension(320, 480)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor14);
-        final SlotSizeMapEntity slotSizeMapEntityFor15 = EasyMock.createMock(SlotSizeMapEntity.class);
+        final SlotSizeMapEntity slotSizeMapEntityFor15 = createMock(SlotSizeMapEntity.class);
         expect(slotSizeMapEntityFor15.getDimension()).andReturn(new Dimension(320, 50)).anyTimes();
         EasyMock.replay(slotSizeMapEntityFor15);
-        repositoryHelper = EasyMock.createMock(RepositoryHelper.class);
+        repositoryHelper = createMock(RepositoryHelper.class);
 
         expect(repositoryHelper.querySlotSizeMapRepository((short) 4)).andReturn(slotSizeMapEntityFor4).anyTimes();
         expect(repositoryHelper.querySlotSizeMapRepository((short) 9)).andReturn(slotSizeMapEntityFor9).anyTimes();
@@ -167,7 +168,7 @@ public class NewIXAdNetworkTest {
         mockStaticNice(InspectorStats.class);
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
         expect(mockStatus.code()).andReturn(404).times(4).andReturn(200).times(6);
-        replayAll();
+        replay(mockStatus);
 
         final String response1 = "";
         final String response2 = "Dummy";
@@ -220,183 +221,20 @@ public class NewIXAdNetworkTest {
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("TERM")));
     }
 
-    // @Test
-    public void testParseResponsePassedDeserializationBannerBuilding() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSource()).andReturn("wap").times(3);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("SdkVer").times(1);
-        expect(mockSasParams.getCarrierId()).andReturn(0).times(1);
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).times(1);
-        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
-
-        replayAll();
-
-        final String response = TestUtils.SampleStrings.ixResponseJson;
-
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
-        ipRepositoryField.setAccessible(true);
-        final IPRepository ipRepository = new IPRepository();
-        ipRepository.getUpdateTimer().cancel();
-        ipRepositoryField.set(null, ipRepository);
-
-        ixAdNetwork.setHost("http://localhost:8080/getIXBid");
-
-        expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
-        expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).anyTimes();
-        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
-        replayAll();
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
-        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
-        // TODO: This should not be checked here. Keeping these here till we have dedicated template unit tests.
-        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("<html>\n" + "    <head>\n"
-                + "                <style type=\"text/css\">\n" + "            #im_1011_ad{\n"
-                + "                display: table;\n                width:100%;\n" + "                height:100%;\n"
-                + "            }\n" + "            #im_1011_p{\n" + "                text-align: center;\n"
-                + "                position: absolute;\n" + "                display: inline-block;\n"
-                + "                top: 50%;\n" + "                left: 50%;\n"
-                + "                transform: translate(-50%, -50%);\n" + "            }\n"
-                + "                        .im_1011_beacon{\n" + "                display: none;\n" + "            }\n"
-                + "        </style>\n" + "    </head>\n" + "    <body style=\"margin:0;padding:0;\">\n"
-                + "                <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
-                + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
-                + "                <style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p>\n"
-                + "\n" + "                <script type='text/javascript'>\n" + "                    var events = {\n"
-                + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=1' ],\n"
-                + "                        renderBeacons : [\n"
-                + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/49c8c14b' ],\n"
-                + "                        viewabilityBeacon1Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=99&action=viewability_one_second' ],\n"
-                + "                        viewabilityBeacon2Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=99&action=viewability_two_second' ],\n"
-                + "                        viewabilityBeacon1SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=99&action=viewability_one_second_simple' ],\n"
-                + "                        viewabilityBeacon2SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3sPBwW_7-_69_SpNt9Fv_____f____dQAWAQAATAAA/1/179240ff?m=99&action=viewability_two_second_simple' ]\n"
-                + "                    },\n" + "                    state = {\n"
-                + "                        viewability1SecBeaconsFired: false,\n"
-                + "                        viewability2SecBeaconsFired: false\n" + "                    },\n"
-                + "                    eventHandler = {\n"
-                + "                        fireBeacon : function (beaconUrl) {\n"
-                + "                            if (undefined === beaconUrl) {\n"
-                + "                                return;\n" + "                            }\n"
-                + "                            var x = document.createElement(\"img\");\n"
-                + "                            x.setAttribute(\"src\", beaconUrl);\n"
-                + "                            x.className = \"im_1011_beacon\";\n"
-                + "                            document.body.appendChild(x);\n" + "                        },\n"
-                + "                        fireBeacons : function (beaconList) {\n"
-                + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
-                + "                                var element = beaconList[index];\n"
-                + "                                if (undefined !== element) {\n"
-                + "                                    this.fireBeacon(beaconList[index]);\n"
-                + "                                }\n" + "                            }\n"
-                + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                + "                            this.fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                + "                        fireRenderBeacons : function () {\n"
-                + "                            var self = this;\n"
-                + "                                                            self.fireBeacons(events.renderBeacons);\n"
-                + "                                                        window.setTimeout(\n"
-                + "                                function () {\n"
-                + "                                    if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                        state.viewability1SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon1SecSimple);\n"
-                + "                                },\n" + "                                1000\n"
-                + "                            );\n" + "                            window.setTimeout(\n"
-                + "                                function() {\n"
-                + "                                    if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                        state.viewability2SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon2SecSimple);\n"
-                + "                                },\n" + "                                2000\n"
-                + "                            );\n" + "                        },\n"
-                + "                        fireClickBeacons : function () {\n"
-                + "                            this.fireBeacons(events.clickBeacons);\n"
-                + "                            if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                state.viewability2SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                            }\n"
-                + "                            if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                state.viewability1SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                            }\n" + "                        }\n" + "                    };\n" + "\n"
-                + "\n" + "                    function fireAdReady () {\n"
-                + "                        var readyHandler=function() {\n"
-                + "                            _im_imai.fireAdReady();\n"
-                + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
-                + "                        };\n"
-                + "                        _im_imai.addEventListener('ready', readyHandler);\n"
-                + "                    }\n" + "\n" + "                    var count = 0,\n"
-                + "                        mraid = window.mraid;\n" + "\n"
-                + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
-                + "                        if (4 !== count) {\n"
-                + "                            if (\"undefined\" !== typeof mraid) {\n"
-                + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
-                + "                                    eventHandler.fireRenderBeacons();\n"
-                + "                                } else {\n"
-                + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
-                + "                                        if (viewable) {\n"
-                + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
-                + "                                            eventHandler.fireRenderBeacons();\n"
-                + "                                        }\n" + "                                    });\n"
-                + "                                }\n" + "                            }\n"
-                + "                        } else {\n" + "                            setTimeout(checkForMraid, 500);\n"
-                + "                        }\n" + "                    }\n" + "\n" + "\n"
-                + "                    function setupRender () {\n"
-                + "                                                    eventHandler.fireRenderBeacons();\n"
-                + "                                            }\n" + "\n" + "\n"
-                + "                    function setupClick() {\n"
-                + "                        function clickHandler() {\n"
-                + "                            document.removeEventListener('click', clickHandler);\n"
-                + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
-                + "                        document.addEventListener('click', clickHandler);\n"
-                + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                + "                    setupClick();\n" + "                                        setupRender();\n"
-                + "                </script>\n" + "                                            </div>\n"
-                + "        </div>\n" + "    </body>\n" + "</html>\n")));
-    }
-
     @Test
     public void testNativeAdBuilding() throws Exception {
         mockStaticNice(InspectorStats.class);
         mockStaticNice(IXPackageMatcher.class);
+        mockStaticNice(PackageMatcherDelegateV2.class);
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final RepositoryHelper mockRepositoryHelper = createNiceMock(RepositoryHelper.class);
         final NativeBuilderFactory mockNativeBuilderfactory = createMock(NativeBuilderFactory.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
 
         final NativeAdTemplateEntity.Builder builder = NativeAdTemplateEntity.newBuilder();
         builder.mandatoryKey("layoutConstraint.1");
+        builder.nativeUILayout(NativeAdContentUILayoutType.CHAT_LIST);
         final NativeAdTemplateEntity entity = builder.build();
 
         final JSONObject additionalParams = new JSONObject();
@@ -410,6 +248,7 @@ public class NewIXAdNetworkTest {
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
+        expect(mockChannelSegmentEntity.getAdvertiserId()).andReturn(null).anyTimes();
         expect(mockNativeBuilderfactory.create(entity)).andReturn(new CommonNativeBuilderImpl(entity));
         expect(mockRepositoryHelper.queryNativeAdTemplateRepository(99L, TemplateClass.STATIC)).andReturn(entity);
         expect(mockRepositoryHelper.queryIXBlocklistRepository(anyObject(String.class),
@@ -438,6 +277,7 @@ public class NewIXAdNetworkTest {
         sas.setWapSiteUACEntity(wapBuild.build());
         sas.setCountryId(1L);
         sas.setDst(8);
+        sas.setDemandSourceType(DemandSourceType.IX);
         sas.setSiteContentType(ContentType.PERFORMANCE);
 
         final CasInternalRequestParameters casInt = new CasInternalRequestParameters();
@@ -451,372 +291,21 @@ public class NewIXAdNetworkTest {
         assertThat(bidReq.getImp().get(0).getNat().getRequestobj().getAssets().size(), is(5));
     }
 
-    // @Test
-    public void testParseResponsePassedDeserializationRichMediaBuildingCoppaDisabled() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createMock(CasInternalRequestParameters.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
-                .anyTimes();
-        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
-        expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
-        expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
-        expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
-        expect(mockCasInternalRequestParameters.getUidIFA()).andReturn("userId").anyTimes();
-
-        final String response = TestUtils.SampleStrings.ixResponseJson;
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
-        ipRepositoryField.setAccessible(true);
-        final IPRepository ipRepository = new IPRepository();
-        ipRepository.getUpdateTimer().cancel();
-        ipRepositoryField.set(null, ipRepository);
-
-        ixAdNetwork.isSproutSupported = true;
-        ixAdNetwork.setHost("http://localhost:8080/getIXBid");
-
-        expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
-        expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixStudioResponseAdTag).anyTimes();
-        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
-        replayAll();
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParameters, mockChannelSegmentEntity,
-                (short) 15, mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
-        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
-        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("    <!DOCTYPE html>\n" + "<html>\n" + "    <head>\n"
-                + "                    <meta name=\"viewport\" content=\"width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/>\n"
-                + "            <base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base>\n"
-                + "                <style type=\"text/css\">\n" + "            #im_1011_ad{\n"
-                + "                display: table;\n" + "                width:100%;\n"
-                + "                height:100%;\n" + "            }\n" + "            #im_1011_p{\n"
-                + "                text-align: center;\n" + "                position: absolute;\n"
-                + "                display: inline-block;\n" + "                top: 50%;\n"
-                + "                left: 50%;\n" + "                transform: translate(-50%, -50%);\n"
-                + "            }\n" + "                            body{\n" + "                    overflow:hidden;\n"
-                + "                }\n" + "                        .im_1011_beacon{\n"
-                + "                display: none;\n" + "            }\n" + "        </style>\n" + "    </head>\n"
-                + "    <body style=\"margin:0;padding:0;\">\n"
-                + "        <script type=\"text/javascript\" src=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></script>        <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
-                + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
-                + "                <script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/f72421f7?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/81965087\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"123.45\",geo_lng:\"678.9\",geo_cc:\"55\",geo_zip:\"560103\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script>\n"
-                + "\n" + "                <script type='text/javascript'>\n" + "                    var events = {\n"
-                + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=1' ],\n"
-                + "                        renderBeacons : [\n"
-                + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81965087' ],\n"
-                + "                        viewabilityBeacon1Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_one_second' ],\n"
-                + "                        viewabilityBeacon2Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_two_second' ],\n"
-                + "                        viewabilityBeacon1SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_one_second_simple' ],\n"
-                + "                        viewabilityBeacon2SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_two_second_simple' ]\n"
-                + "                    },\n" + "                    state = {\n"
-                + "                        viewability1SecBeaconsFired: false,\n"
-                + "                        viewability2SecBeaconsFired: false\n" + "                    },\n"
-                + "                    eventHandler = {\n"
-                + "                        fireBeacon : function (beaconUrl) {\n"
-                + "                            if (undefined === beaconUrl) {\n"
-                + "                                return;\n" + "                            }\n"
-                + "                            var x = document.createElement(\"img\");\n"
-                + "                            x.setAttribute(\"src\", beaconUrl);\n"
-                + "                            x.className = \"im_1011_beacon\";\n"
-                + "                            document.body.appendChild(x);\n" + "                        },\n"
-                + "                        fireBeacons : function (beaconList) {\n"
-                + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
-                + "                                var element = beaconList[index];\n"
-                + "                                if (undefined !== element) {\n"
-                + "                                    this.fireBeacon(beaconList[index]);\n"
-                + "                                }\n" + "                            }\n"
-                + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                + "                            this.fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                + "                        fireRenderBeacons : function () {\n"
-                + "                            var self = this;\n"
-                + "                                                            self.fireBeacons(events.renderBeacons);\n"
-                + "                                                        window.setTimeout(\n"
-                + "                                function () {\n"
-                + "                                    if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                        state.viewability1SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon1SecSimple);\n"
-                + "                                },\n" + "                                1000\n"
-                + "                            );\n" + "                            window.setTimeout(\n"
-                + "                                function() {\n"
-                + "                                    if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                        state.viewability2SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon2SecSimple);\n"
-                + "                                },\n" + "                                2000\n"
-                + "                            );\n" + "                        },\n"
-                + "                        fireClickBeacons : function () {\n"
-                + "                            this.fireBeacons(events.clickBeacons);\n"
-                + "                            if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                state.viewability2SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                            }\n"
-                + "                            if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                state.viewability1SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                            }\n" + "                        }\n" + "                    };\n" + "\n"
-                + "\n" + "                    function fireAdReady () {\n"
-                + "                        var readyHandler=function() {\n"
-                + "                            _im_imai.fireAdReady();\n"
-                + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
-                + "                        };\n"
-                + "                        _im_imai.addEventListener('ready', readyHandler);\n"
-                + "                    }\n" + "\n" + "                    var count = 0,\n"
-                + "                        mraid = window.mraid;\n" + "\n"
-                + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
-                + "                        if (4 !== count) {\n"
-                + "                            if (\"undefined\" !== typeof mraid) {\n"
-                + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
-                + "                                    eventHandler.fireRenderBeacons();\n"
-                + "                                } else {\n"
-                + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
-                + "                                        if (viewable) {\n"
-                + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
-                + "                                            eventHandler.fireRenderBeacons();\n"
-                + "                                        }\n" + "                                    });\n"
-                + "                                }\n" + "                            }\n"
-                + "                        } else {\n" + "                            setTimeout(checkForMraid, 500);\n"
-                + "                        }\n" + "                    }\n" + "\n" + "\n"
-                + "                    function setupRender () {\n"
-                + "                                                    eventHandler.fireRenderBeacons();\n"
-                + "                                            }\n" + "\n" + "\n"
-                + "                    function setupClick() {\n"
-                + "                        function clickHandler() {\n"
-                + "                            document.removeEventListener('click', clickHandler);\n"
-                + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
-                + "                        document.addEventListener('click', clickHandler);\n"
-                + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                + "                    setupClick();\n" + "                                        setupRender();\n"
-                + "                </script>\n" + "                                            </div>\n"
-                + "        </div>\n" + "    </body>\n" + "</html>\n")));
-    }
-
-    // @Test
-    public void testParseResponsePassedDeserializationRichMediaBuildingCoppaSet() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final CasInternalRequestParameters mockCasInternalRequestParameters =
-                createMock(CasInternalRequestParameters.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getCountryCode()).andReturn("55").times(1);
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
-                .anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
-        expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
-        expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
-        expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
-        expect(mockCasInternalRequestParameters.getUidIFA()).andReturn("userId").anyTimes();
-
-        final String response = TestUtils.SampleStrings.ixResponseJson;
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
-        ipRepositoryField.setAccessible(true);
-        final IPRepository ipRepository = new IPRepository();
-        ipRepository.getUpdateTimer().cancel();
-        ipRepositoryField.set(null, ipRepository);
-
-        ixAdNetwork.isSproutSupported = true;
-        ixAdNetwork.setHost("http://localhost:8080/getIXBid");
-        ixAdNetwork.isCoppaSet = true;
-
-        expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
-        expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixStudioResponseAdTag).anyTimes();
-        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
-        replayAll();
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, mockCasInternalRequestParameters, mockChannelSegmentEntity,
-                (short) 15, mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
-        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
-        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("    <!DOCTYPE html>\n" + "<html>\n" + "    <head>\n"
-                + "                    <meta name=\"viewport\" content=\"width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/>\n"
-                + "            <base href=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></base>\n"
-                + "                <style type=\"text/css\">\n" + "            #im_1011_ad{\n"
-                + "                display: table;\n" + "                width:100%;\n"
-                + "                height:100%;\n" + "            }\n" + "            #im_1011_p{\n"
-                + "                text-align: center;\n" + "                position: absolute;\n"
-                + "                display: inline-block;\n" + "                top: 50%;\n"
-                + "                left: 50%;\n" + "                transform: translate(-50%, -50%);\n"
-                + "            }\n" + "                            body{\n" + "                    overflow:hidden;\n"
-                + "                }\n" + "                        .im_1011_beacon{\n"
-                + "                display: none;\n" + "            }\n" + "        </style>\n" + "    </head>\n"
-                + "    <body style=\"margin:0;padding:0;\">\n"
-                + "        <script type=\"text/javascript\" src=\"http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js\"></script>        <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
-                + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
-                + "                <script src=\"mraid.js\"></script><div id=\"Sprout_ShCMGj4G1A4GIIsw_div\" data-creativeId=\"ShCMGj4G1A4GIIsw\"></div><script type=\"text/javascript\">var _Sprout = _Sprout || {};/* 3rd Party Impression Tracker: a tracking pixel URL for tracking 3rd party impressions */_Sprout.impressionTracker = \"PUT_IMPRESSION_TRACKER_HERE\";/* 3rd Party Click Tracker: A URL or Macro like %c for third party exit tracking */_Sprout.clickTracker = \"PUT_CLICK_TRACKER_HERE\";/* Publisher Label: What you want to call this line-item in Studio reports */_Sprout.publisherLabel = \"PUT_PUBLISHER_LABEL_HERE\";_Sprout._inMobiAdTagTracking={st:new Date().getTime(),rr:0};Sprout[\"ShCMGj4G1A4GIIsw\"]={querystring:{im_curl:\"BeaconPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/0\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/f72421f7?b=${WIN_BID}${DEAL_GET_PARAM}\",im_sdk:\"a450\",click:\"ClickPrefix\\/C\\/b\\/0\\/0\\/0\\/0\\/0\\/u\\/0\\/0\\/0\\/x\\/c124b6b5-0148-1000-c54a-00012e330000\\/-1\\/0\\/-1\\/1\\/0\\/x\\/0\\/nw\\/101\\/7\\/-1\\/-1\\/-1\\/eA~~\\/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA\\/1\\/81965087\",adFormat:\"interstitial\",im_recordEventFun:\"\",geo_lat:\"\",geo_lng:\"\",geo_cc:\"\",geo_zip:\"\",js_esc_geo_city:\"\",openLandingPage:\"\"}};var _sproutReadyEvt=document.createEvent(\"Event\");_sproutReadyEvt.initEvent(\"sproutReady\",true,true);window.dispatchEvent(_sproutReadyEvt);var sr, sp=\"/load/ShCMGj4G1A4GIIsw.inmobi.html.review.js?_t=\"(Date.now())\"\", _Sprout_load=function(){var e=document.getElementsByTagName(\"script\"),e=e[e.length-1],t=document.createElement(\"script\");t.async=!0;t.type=\"text/javascript\";(https:==document.location.protocol?sr=\"http://farm.sproutbuilder.com\":sr=\"http://farm.sproutbuilder.com\");t.src=sr+sp;e.parentNode.insertBefore(t,e.nextSibling)};\"0\"===window[\"_Sprout\"][\"ShCMGj4G1A4GIIsw\"][\"querystring\"][\"__im_sdk\"]||\"complete\"===document.readyState?_Sprout_load():window.addEventListener(\"load\",_Sprout_load,!1)</script>\n"
-                + "\n" + "                <script type='text/javascript'>\n" + "                    var events = {\n"
-                + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=1' ],\n"
-                + "                        renderBeacons : [\n"
-                + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81965087' ],\n"
-                + "                        viewabilityBeacon1Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_one_second' ],\n"
-                + "                        viewabilityBeacon2Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_two_second' ],\n"
-                + "                        viewabilityBeacon1SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_one_second_simple' ],\n"
-                + "                        viewabilityBeacon2SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YBkJBTk5FUhw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/f72421f7?m=99&action=viewability_two_second_simple' ]\n"
-                + "                    },\n" + "                    state = {\n"
-                + "                        viewability1SecBeaconsFired: false,\n"
-                + "                        viewability2SecBeaconsFired: false\n" + "                    },\n"
-                + "                    eventHandler = {\n"
-                + "                        fireBeacon : function (beaconUrl) {\n"
-                + "                            if (undefined === beaconUrl) {\n"
-                + "                                return;\n" + "                            }\n"
-                + "                            var x = document.createElement(\"img\");\n"
-                + "                            x.setAttribute(\"src\", beaconUrl);\n"
-                + "                            x.className = \"im_1011_beacon\";\n"
-                + "                            document.body.appendChild(x);\n" + "                        },\n"
-                + "                        fireBeacons : function (beaconList) {\n"
-                + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
-                + "                                var element = beaconList[index];\n"
-                + "                                if (undefined !== element) {\n"
-                + "                                    this.fireBeacon(beaconList[index]);\n"
-                + "                                }\n" + "                            }\n"
-                + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                + "                            this.fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                + "                        fireRenderBeacons : function () {\n"
-                + "                            var self = this;\n"
-                + "                                                            self.fireBeacons(events.renderBeacons);\n"
-                + "                                                        window.setTimeout(\n"
-                + "                                function () {\n"
-                + "                                    if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                        state.viewability1SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon1SecSimple);\n"
-                + "                                },\n" + "                                1000\n"
-                + "                            );\n" + "                            window.setTimeout(\n"
-                + "                                function() {\n"
-                + "                                    if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                        state.viewability2SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon2SecSimple);\n"
-                + "                                },\n" + "                                2000\n"
-                + "                            );\n" + "                        },\n"
-                + "                        fireClickBeacons : function () {\n"
-                + "                            this.fireBeacons(events.clickBeacons);\n"
-                + "                            if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                state.viewability2SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                            }\n"
-                + "                            if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                state.viewability1SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                            }\n" + "                        }\n" + "                    };\n" + "\n"
-                + "\n" + "                    function fireAdReady () {\n"
-                + "                        var readyHandler=function() {\n"
-                + "                            _im_imai.fireAdReady();\n"
-                + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
-                + "                        };\n"
-                + "                        _im_imai.addEventListener('ready', readyHandler);\n"
-                + "                    }\n" + "\n" + "                    var count = 0,\n"
-                + "                        mraid = window.mraid;\n" + "\n"
-                + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
-                + "                        if (4 !== count) {\n"
-                + "                            if (\"undefined\" !== typeof mraid) {\n"
-                + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
-                + "                                    eventHandler.fireRenderBeacons();\n"
-                + "                                } else {\n"
-                + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
-                + "                                        if (viewable) {\n"
-                + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
-                + "                                            eventHandler.fireRenderBeacons();\n"
-                + "                                        }\n" + "                                    });\n"
-                + "                                }\n" + "                            }\n"
-                + "                        } else {\n" + "                            setTimeout(checkForMraid, 500);\n"
-                + "                        }\n" + "                    }\n" + "\n" + "\n"
-                + "                    function setupRender () {\n"
-                + "                                                    eventHandler.fireRenderBeacons();\n"
-                + "                                            }\n" + "\n" + "\n"
-                + "                    function setupClick() {\n"
-                + "                        function clickHandler() {\n"
-                + "                            document.removeEventListener('click', clickHandler);\n"
-                + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
-                + "                        document.addEventListener('click', clickHandler);\n"
-                + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                + "                    setupClick();\n" + "                                        setupRender();\n"
-                + "                </script>\n" + "                                            </div>\n"
-                + "        </div>\n" + "    </body>\n" + "</html>\n")));
-    }
-
     @Test
     public void testParseResponseFailedDeserializationRichMediaBuildingSdkLowerThan370() throws Exception {
         mockStaticNice(InspectorStats.class);
+        mockStaticNice(PackageMatcherDelegateV2.class);
+
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final RepositoryHelper mockRepositoryHelper = createNiceMock(RepositoryHelper.class);
         final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
                 createMock(CasInternalRequestParameters.class);
 
-        expect(mockStatus.code()).andReturn(200).times(2);
+        expect(mockStatus.code()).andReturn(200).anyTimes();
         expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).times(1);
@@ -827,16 +316,16 @@ public class NewIXAdNetworkTest {
                 .anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
         expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
+        expect(mockRepositoryHelper.queryDealById(anyObject(String.class), eq(true))).andReturn(Optional.empty()).anyTimes();
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
@@ -866,7 +355,7 @@ public class NewIXAdNetworkTest {
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
+        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
     }
@@ -874,10 +363,12 @@ public class NewIXAdNetworkTest {
     @Test
     public void testParseResponseFailedDeserializationRichMediaBuildingWAP() throws Exception {
         mockStaticNice(InspectorStats.class);
+        mockStaticNice(PackageMatcherDelegateV2.class);
+
         final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
         final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
         final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
+        final RepositoryHelper mockRepositoryHelper = createNiceMock(RepositoryHelper.class);
         final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
         final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
         final CasInternalRequestParameters mockCasInternalRequestParameters =
@@ -900,10 +391,10 @@ public class NewIXAdNetworkTest {
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockCasInternalRequestParameters.getLatLong()).andReturn("123.45,678.90").anyTimes();
         expect(mockCasInternalRequestParameters.getZipCode()).andReturn("560103").anyTimes();
+        expect(mockRepositoryHelper.queryDealById(anyObject(String.class), eq(true))).andReturn(Optional.empty()).anyTimes();
 
         final String response = TestUtils.SampleStrings.ixResponseJson;
         final Object[] constructerArgs =
@@ -932,175 +423,9 @@ public class NewIXAdNetworkTest {
         Formatter.init();
 
         ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
+        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(500)));
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("NO_AD")));
         assertThat(ixAdNetwork.getResponseContent(), is(equalTo("")));
-    }
-
-
-    // @Test
-    public void testParseResponsePassedDeserializationInterstitialBuildingForSDK450() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockSasParams.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
-
-        final String response = TestUtils.SampleStrings.ixResponseJson;
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"getAdMarkUp", "isNativeRequest", "updateRPAccountInfo"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
-        ipRepositoryField.setAccessible(true);
-        final IPRepository ipRepository = new IPRepository();
-        ipRepository.getUpdateTimer().cancel();
-        ipRepositoryField.set(null, ipRepository);
-
-        ixAdNetwork.setHost("http://localhost:8080/getIXBid");
-
-        expect(ixAdNetwork.isNativeRequest()).andReturn(false).times(1);
-        expect(ixAdNetwork.getAdMarkUp()).andReturn(TestUtils.SampleStrings.ixResponseADM).anyTimes();
-        expect(ixAdNetwork.updateRPAccountInfo("2770")).andReturn(true).times(1);
-        replayAll();
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.parseResponse(response, mockStatus);
-        assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
-        assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
-        assertThat(ixAdNetwork.getResponseContent(), is(equalTo("<html>\n" + "    <head>\n"
-                + "                    <meta name=\"viewport\" content=\"width=device-width, height=device-height, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/>\n"
-                + "            <base href=\"imaiBaseUrl\"></base>\n" + "                <style type=\"text/css\">\n"
-                + "            #im_1011_ad{\n" + "                display: table;\n" + "                width:100%;\n"
-                + "                height:100%;\n" + "            }\n" + "            #im_1011_p{\n"
-                + "                text-align: center;\n" + "                position: absolute;\n"
-                + "                display: inline-block;\n" + "                top: 50%;\n"
-                + "                left: 50%;\n" + "                transform: translate(-50%, -50%);\n"
-                + "            }\n" + "                        .im_1011_beacon{\n" + "                display: none;\n"
-                + "            }\n" + "        </style>\n" + "    </head>\n"
-                + "    <body style=\"margin:0;padding:0;\">\n"
-                + "        <script type=\"text/javascript\" src=\"imaiBaseUrl\"></script>        <div id=\"im_1011_ad\" style=\"width:100%;height:100%\">\n"
-                + "            <div id=\"im_1011_p\" style=\"width:100%;height:100%\">\n"
-                + "                <script src=\"mraid.js\" ></script><style type='text/css'>body { margin:0;padding:0 }  </style> <p align='center'><a href='https://play.google.com/store/apps/details?id=com.sweetnspicy.recipes&hl=en' target='_blank'><img src='http://redge-a.akamaihd.net/FileData/50758558-c167-463d-873e-f989f75da95215.png' border='0'/></a></p>\n"
-                + "\n" + "                <script type='text/javascript'>\n" + "                    var events = {\n"
-                + "                        loadBeacons : [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=1' ],\n"
-                + "                        renderBeacons : [\n"
-                + "                             'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=18&b=${WIN_BID}${DEAL_GET_PARAM}'                             , 'http://partner-wn.dummy-bidder.com/callback/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}'                         ],\n"
-                + "                        clickBeacons : [ 'ClickPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/1/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/b156f9ea' ],\n"
-                + "                        viewabilityBeacon1Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=99&action=viewability_one_second' ],\n"
-                + "                        viewabilityBeacon2Sec: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=99&action=viewability_two_second' ],\n"
-                + "                        viewabilityBeacon1SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=99&action=viewability_one_second_simple' ],\n"
-                + "                        viewabilityBeacon2SecSimple: [ 'BeaconPrefix/C/b/0/0/0/0/0/u/0/0/0/x/c124b6b5-0148-1000-c54a-00012e330000/-1/0/-1/0/0/x/0/nw/101/7/-1/-1/-1/eA~~/FtDE6Q3YDElOVEVSU1RJVElBTBw8HBb_v7_r39Kk230W_____9____91ABYBAABMAAA/1/81bf731c?m=99&action=viewability_two_second_simple' ]\n"
-                + "                    },\n" + "                    state = {\n"
-                + "                        viewability1SecBeaconsFired: false,\n"
-                + "                        viewability2SecBeaconsFired: false\n" + "                    },\n"
-                + "                    eventHandler = {\n"
-                + "                        fireBeacon : function (beaconUrl) {\n"
-                + "                            if (undefined === beaconUrl) {\n"
-                + "                                return;\n" + "                            }\n"
-                + "                            var x = document.createElement(\"img\");\n"
-                + "                            x.setAttribute(\"src\", beaconUrl);\n"
-                + "                            x.className = \"im_1011_beacon\";\n"
-                + "                            document.body.appendChild(x);\n" + "                        },\n"
-                + "                        fireBeacons : function (beaconList) {\n"
-                + "                            for (var index = 0; index < beaconList.length; ++index) {\n"
-                + "                                var element = beaconList[index];\n"
-                + "                                if (undefined !== element) {\n"
-                + "                                    this.fireBeacon(beaconList[index]);\n"
-                + "                                }\n" + "                            }\n"
-                + "                        },\n" + "                        fireLoadBeacons : function () {\n"
-                + "                            this.fireBeacons(events.loadBeacons);\n" + "                        },\n"
-                + "                        fireRenderBeacons : function () {\n"
-                + "                            var self = this;\n"
-                + "                                                            self.fireBeacons(events.renderBeacons);\n"
-                + "                                                        window.setTimeout(\n"
-                + "                                function () {\n"
-                + "                                    if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                        state.viewability1SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon1SecSimple);\n"
-                + "                                },\n" + "                                1000\n"
-                + "                            );\n" + "                            window.setTimeout(\n"
-                + "                                function() {\n"
-                + "                                    if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                        state.viewability2SecBeaconsFired = true;\n"
-                + "                                        self.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                                    }\n"
-                + "                                    self.fireBeacons(events.viewabilityBeacon2SecSimple);\n"
-                + "                                },\n" + "                                2000\n"
-                + "                            );\n" + "                        },\n"
-                + "                        fireClickBeacons : function () {\n"
-                + "                            this.fireBeacons(events.clickBeacons);\n"
-                + "                            if (!state.viewability2SecBeaconsFired) {\n"
-                + "                                state.viewability2SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon2Sec);\n"
-                + "                            }\n"
-                + "                            if (!state.viewability1SecBeaconsFired) {\n"
-                + "                                state.viewability1SecBeaconsFired = true;\n"
-                + "                                this.fireBeacons(events.viewabilityBeacon1Sec);\n"
-                + "                            }\n" + "                        }\n" + "                    };\n" + "\n"
-                + "\n" + "                    function fireAdReady () {\n"
-                + "                        var readyHandler=function() {\n"
-                + "                            _im_imai.fireAdReady();\n"
-                + "                            _im_imai.removeEventListener('ready', readyHandler);\n"
-                + "                        };\n"
-                + "                        _im_imai.addEventListener('ready', readyHandler);\n"
-                + "                    }\n" + "\n" + "                    var count = 0,\n"
-                + "                        mraid = window.mraid;\n" + "\n"
-                + "                    function checkForMraid() {\n" + "                        count++;\n" + "\n"
-                + "                        if (4 !== count) {\n"
-                + "                            if (\"undefined\" !== typeof mraid) {\n"
-                + "                                if (typeof mraid.isViewable === \"function\" && mraid.isViewable()) {\n"
-                + "                                    eventHandler.fireRenderBeacons();\n"
-                + "                                } else {\n"
-                + "                                    mraid.addEventListener(\"viewableChange\", function(viewable) {\n"
-                + "                                        if (viewable) {\n"
-                + "                                            mraid.removeEventListener(\"viewableChange\", arguments.callee);\n"
-                + "                                            eventHandler.fireRenderBeacons();\n"
-                + "                                        }\n" + "                                    });\n"
-                + "                                }\n" + "                            }\n"
-                + "                        } else {\n" + "                            setTimeout(checkForMraid, 500);\n"
-                + "                        }\n" + "                    }\n" + "\n" + "\n"
-                + "                    function setupRender () {\n"
-                + "                                                                                    checkForMraid();\n"
-                + "                                                                        }\n" + "\n" + "\n"
-                + "                    function setupClick() {\n"
-                + "                        function clickHandler() {\n"
-                + "                            document.removeEventListener('click', clickHandler);\n"
-                + "                            eventHandler.fireClickBeacons();\n" + "                        }\n"
-                + "                        document.addEventListener('click', clickHandler);\n"
-                + "                    }\n" + "\n" + "                    eventHandler.fireLoadBeacons();\n"
-                + "                    setupClick();\n" + "                                            fireAdReady();\n"
-                + "                                        setupRender();\n" + "                </script>\n"
-                + "                                            </div>\n" + "        </div>\n" + "    </body>\n"
-                + "</html>\n")));
     }
 
     @Test
@@ -1126,7 +451,7 @@ public class NewIXAdNetworkTest {
                 .andReturn(mockChannelAdGroupRepo).anyTimes();
 
         expect(mockChannelAdGroupRepo.getEntities(dummyAccountId)).andReturn(null).times(1)
-                .andReturn(new ArrayList<ChannelSegmentEntity>()).times(1)
+                .andReturn(new ArrayList<>()).times(1)
                 .andReturn(Arrays.asList(mockChannelSegmentEntity)).anyTimes();
 
         expect(mockChannelSegmentEntity.getIncId(ADCreativeType.BANNER)).andReturn(dummyIncId).anyTimes();
@@ -1146,6 +471,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
         expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParams.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
@@ -1225,6 +551,7 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.isRichMedia()).andReturn(false).anyTimes();
         expect(mockSasParams.getImpressionId()).andReturn(TestUtils.SampleStrings.impressionId).anyTimes();
         expect(mockSasParams.getSiteIncId()).andReturn(1234L).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
 
         final Object[] constructerArgs =
                 {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
@@ -1532,8 +859,8 @@ public class NewIXAdNetworkTest {
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
         expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
         expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
+        expect(mockRepositoryHelper.queryDealById(anyObject(String.class), eq(true))).andReturn(Optional.empty()).anyTimes();
 
         final String response = TestUtils.SampleStrings.ixNativeResponseJson;
         final Object[] constructerArgs =
@@ -1564,295 +891,6 @@ public class NewIXAdNetworkTest {
         ixAdNetwork.parseResponse(response, mockStatus);
         assertThat(ixAdNetwork.getHttpResponseStatusCode(), is(equalTo(200)));
         assertThat(ixAdNetwork.getAdStatus(), is(equalTo("AD")));
-    }
-
-    @Test
-    public void testSetDealRelatedMetadataAgencyRebateFailsLowerBound() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final IXPackageEntity mockIXPackageEntity = createMock(IXPackageEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
-        expect(mockIXPackageEntity.getId()).andReturn(1).anyTimes();
-
-        final List<String> stringListWithNull = new ArrayList<>();
-        stringListWithNull.add(null);
-        expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
-        expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
-        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
-        expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
-        expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(0.0)).anyTimes();
-        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
-        replayAll();
-
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.setDealRelatedMetadata();
-        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(null)));
-    }
-
-    @Test
-    public void testSetDealRelatedMetadataAgencyRebateFailsUpperBound() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final IXPackageEntity mockIXPackageEntity = createMock(IXPackageEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
-        expect(mockIXPackageEntity.getId()).andReturn(1).anyTimes();
-
-        final List<String> stringListWithNull = new ArrayList<>();
-        stringListWithNull.add(null);
-        /*final List<Double> doubleListWithNull = new ArrayList<>();
-        doubleListWithNull.add(null);*/
-        expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
-        expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
-        expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
-        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
-        expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(101.0)).anyTimes();
-        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
-        replayAll();
-
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.setDealRelatedMetadata();
-        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(null)));
-    }
-
-    @Test
-    public void testSetDealRelatedMetadataAgencyRebateResponseSeatIdMissingAndDealMetaDataAgencyMissing()
-            throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final IXPackageEntity mockIXPackageEntity = createMock(IXPackageEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
-        expect(mockIXPackageEntity.getId()).andReturn(1).anyTimes();
-
-        final List<String> stringListWithNull = new ArrayList<>();
-        stringListWithNull.add(null);
-        final List<Integer> integerListWithNull = new ArrayList<>();
-        integerListWithNull.add(null);
-        expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
-        expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
-        expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
-        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
-        expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
-        expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(integerListWithNull).anyTimes();
-        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
-        replayAll();
-
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.setDealRelatedMetadata();
-        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(null)));
-    }
-
-    @Test
-    public void testSetDealRelatedMetadataAgencyRebateResponseSeatIdAndDealMetaDataAgencyMismatch() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final IXPackageEntity mockIXPackageEntity = createMock(IXPackageEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
-        expect(mockIXPackageEntity.getId()).andReturn(1).anyTimes();
-
-        final List<String> stringListWithNull = new ArrayList<>();
-        stringListWithNull.add(null);
-        /*final List<Integer> integerListWithNull = new ArrayList<>();
-        integerListWithNull.add(null);*/
-        expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
-        expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
-        expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
-        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
-        expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
-        expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
-        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
-        replayAll();
-
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        MemberMatcher.field(IXAdNetwork.class, "seatId").set(ixAdNetwork, "2");
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.setDealRelatedMetadata();
-        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(55.0)));
-    }
-
-    @Test
-    public void testSetDealRelatedMetadataAgencyRebatePositive() throws Exception {
-        mockStaticNice(InspectorStats.class);
-        final HttpResponseStatus mockStatus = createMock(HttpResponseStatus.class);
-        final HttpRequestHandlerBase mockHttpRequestHandlerBase = createMock(HttpRequestHandlerBase.class);
-        final Channel mockChannel = createMock(Channel.class);
-        final RepositoryHelper mockRepositoryHelper = createMock(RepositoryHelper.class);
-        final SASRequestParameters mockSasParams = createNiceMock(SASRequestParameters.class);
-        final ChannelSegmentEntity mockChannelSegmentEntity = createMock(ChannelSegmentEntity.class);
-        final IXPackageEntity mockIXPackageEntity = createMock(IXPackageEntity.class);
-
-        expect(mockStatus.code()).andReturn(200).times(2);
-        expect(mockSasParams.getSiteIncId()).andReturn(1234L).times(1);
-        expect(mockSasParams.getImpressionId()).andReturn("ImpressionId").times(1);
-        expect(mockSasParams.getSdkVersion()).andReturn("a450").anyTimes();
-        expect(mockSasParams.getImaiBaseUrl()).andReturn("imaiBaseUrl").anyTimes();
-        expect(mockSasParams.getSource()).andReturn("APP").anyTimes();
-        expect(mockSasParams.getRequestedAdType()).andReturn(RequestedAdType.INTERSTITIAL).anyTimes();
-        expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
-        expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
-        expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
-        expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
-        expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
-                .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockSasParams.getCarrierId()).andReturn(0).anyTimes();
-        expect(mockSasParams.getIpFileVersion()).andReturn(0).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal(null)).andReturn(mockIXPackageEntity).anyTimes();
-        expect(mockIXPackageEntity.getId()).andReturn(1).anyTimes();
-
-        final List<String> stringListWithNull = new ArrayList<>();
-        stringListWithNull.add(null);
-        expect(mockIXPackageEntity.getDealIds()).andReturn(stringListWithNull).anyTimes();
-        expect(mockIXPackageEntity.getDealFloors()).andReturn(ImmutableList.of(5.0)).anyTimes();
-        expect(mockIXPackageEntity.getDataVendorCost()).andReturn(0.0).anyTimes();
-        expect(mockIXPackageEntity.getAccessTypes()).andReturn(ImmutableList.of("PREFERRED_DEAL")).anyTimes();
-        expect(mockIXPackageEntity.getAgencyRebatePercentages()).andReturn(ImmutableList.of(55.0)).anyTimes();
-        expect(mockIXPackageEntity.getRpAgencyIds()).andReturn(ImmutableList.of(1)).anyTimes();
-        expect(mockIXPackageEntity.isViewable()).andReturn(false).anyTimes();
-        expect(mockIXPackageEntity.getThirdPartyTrackerMapList()).andReturn(new ArrayList<>());
-        replayAll();
-
-        final Object[] constructerArgs =
-                {mockConfig, new Bootstrap(), mockHttpRequestHandlerBase, mockChannel, "", advertiserName};
-        final String[] methodsToBeMocked = {"isNativeRequest", "updateDSPAccountInfo", "nativeAdBuilding"};
-        final IXAdNetwork ixAdNetwork = createPartialMock(IXAdNetwork.class, methodsToBeMocked, constructerArgs);
-
-        MemberModifier.suppress(IXAdNetwork.class.getDeclaredMethod("configureParameters"));
-        setInmobiAdTrackerBuilderFactoryForTest(ixAdNetwork);
-        ixAdNetwork.configureParameters(mockSasParams, null, mockChannelSegmentEntity, (short) 15,
-                mockRepositoryHelper);
-        Formatter.init();
-
-        ixAdNetwork.setDealRelatedMetadata();
-        assertThat(ixAdNetwork.getAgencyRebatePercentage(), is(equalTo(55.0)));
-        assertThat(ixAdNetwork.isAgencyRebateDeal(), is(equalTo(true)));
     }
 
     @DataProvider(name = "Valid Third Party Tracker Json List")
@@ -1939,14 +977,13 @@ public class NewIXAdNetworkTest {
         expect(mockSasParams.getImaiBaseUrl()).andReturn("http://inmobisdk-a.akamaihd.net/sdk/android/mraid.js")
                 .anyTimes();
         expect(mockSasParams.getDst()).andReturn(8).anyTimes();
+        expect(mockSasParams.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockChannelSegmentEntity.getExternalSiteKey()).andReturn("ExtSiteKey").times(1);
         expect(mockChannelSegmentEntity.getAdgroupIncId()).andReturn(123L).times(1);
         expect(mockChannelSegmentEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockChannelSegmentEntity.getDst()).andReturn(8).anyTimes();
         expect(mockChannelSegmentEntity.getSecondaryAdFormatConstraints())
                 .andReturn(SecondaryAdFormatConstraints.STATIC).anyTimes();
-        expect(mockRepositoryHelper.queryIxPackageByDeal("DealWaleBabaJi")).andThrow(new NoSuchObjectException())
-                .anyTimes();
         expect(mockCasInternalRequestParameters.getAuctionId()).andReturn("AuctionId").anyTimes();
         replayAll();
 
@@ -1959,7 +996,6 @@ public class NewIXAdNetworkTest {
         casInt.setAuctionId("auctionId");
         final IXAdNetwork ixAdNetwork = new IXAdNetwork(mockConfig, null, null, null, null, advertiserName);
         ixAdNetwork.configureParameters(sasParam, casInt, mockChannelSegmentEntity, (short) 15, mockRepositoryHelper);
-        ixAdNetwork.setViewablityTrackers(trackerMap);
         final MacroData macroData = new MacroData(casInt, sasParam);
         ixAdNetwork.setAudienceVerificationTrackers(trackerMap, macroData);
         ixAdNetwork.setThirdPartyImpressionTracker(trackerMap, macroData);

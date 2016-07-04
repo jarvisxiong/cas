@@ -6,8 +6,10 @@ import static org.easymock.EasyMock.replay;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -40,7 +42,6 @@ import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupDailyImpressionCountFilter;
-import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupMaxSegmentPerRequestFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupPropertyViolationFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSiteExclusionFilter;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.impl.AdGroupSupplyDemandClassificationFilter;
@@ -51,6 +52,7 @@ import com.inmobi.adserve.channels.util.ConfigurationLoader;
 
 import junit.framework.TestCase;
 
+// TODO: This test case is messed up (order of the tests matters, tests extends junit 3 but uses testng)
 public class ChannelSegmentFilterApplierTest extends TestCase {
     private ChannelEntity cE1;
     private ChannelEntity cE2;
@@ -96,8 +98,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     public void setUp() throws Exception {
         configurationLoder = ConfigurationLoader.getInstance("channel-server.properties");
         CasConfigUtil.init(configurationLoder, null);
-        emptySet = new HashSet<String>();
-        emptySet2 = new HashSet<String>();
+        emptySet = new HashSet<>();
+        emptySet2 = new HashSet<>();
 
         advertiserId1 = "4028cb1e38411ed20138515af2b6025a";
         advertiserId2 = "4028cbe0373b25ce0137c0eb0c091e83";
@@ -134,95 +136,61 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         cE3 = cE3Builder.build();
 
         cFE1 =
-                new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId1, 100.0, 50.0, 50.0, 100, 95,
-                        120, 1, 4.0));
+                new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId1, 100.0, 50.0, 50.0, 100, 95, 120, 1, 4.0));
         cFE2 =
-                new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId2, 100.0, 95.0, 5.0, 100, 55,
-                        120, 2, 0.6));
+                new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId2, 100.0, 95.0, 5.0, 100, 55, 120, 2, 0.6));
         cFE3 =
-                new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId2, 100.0, 50.0, 50.0, 100, 55, 0,
-                        1, 4.0));
+                new ChannelFeedbackEntity(getChannelFeedbackEntityBuilder(advertiserId2, 100.0, 50.0, 50.0, 100, 55, 0, 1, 4.0));
         cSFE1 =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId1", 0.29,
-                        0.1, 0, 0, 0, 0, 200));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId1", 0.29, 0.1, 0, 0, 0, 0, 200));
         cSFE2 =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId2", 0.9,
-                        0.1, 0, 0, 0, 0, 0));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId2", 0.9, 0.1, 0, 0, 0, 0, 0));
         cSFE3 =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId3", 0.4,
-                        0.1, 0, 0, 0, 0, 0));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId1, "adgroupId3", 0.4, 0.1, 0, 0, 0, 0, 0));
         cSFE4 =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId2, "adgroupId4", 0.2,
-                        0.1, 0, 0, 0, 0, 50));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId2, "adgroupId4", 0.2, 0.1, 0, 0, 0, 0, 50));
         cSFE5 =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId2, "adgroupId5", 0.5,
-                        0.1, 0, 0, 0, 0, 0));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId2, "adgroupId5", 0.5, 0.1, 0, 0, 0, 0, 0));
         cSFE6 =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId3, "adgroupId6", 0.7,
-                        0.1, 0, 0, 0, 0, 0));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(advertiserId3, "adgroupId6", 0.7, 0.1, 0, 0, 0, 0, 0));
         final Long[] rcList = null;
         final Long[] tags = null;
         final Timestamp modified_on = null;
         final Long[] slotIds = null;
         final Integer[] siteRatings = null;
         channelSegmentEntity1 =
-                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId1", "adId",
-                        "channelId1", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
-                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, true, emptySet,
-                        100));
+                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId1", "adId", "channelId1", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, true, emptySet, 100));
         channelSegmentEntity2 =
-                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId2", "adId",
-                        "channelId1", 0, rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId",
-                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet,
-                        0));
+                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId2", "adId", "channelId1", 0, rcList, tags, false, true, "externalSiteKey", modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet, 0));
         channelSegmentEntity3 =
-                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId3", "adId",
-                        "channelId1", 1, rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId",
-                        slotIds, 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet,
-                        0));
+                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId1, "adgroupId3", "adId", "channelId1", 1, rcList, tags, false, false, "externalSiteKey", modified_on, "campaignId", slotIds, 0, false, "pricingModel", siteRatings, 0, null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet, 0));
         channelSegmentEntity4 =
-                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId2, "adgroupId4", "adId",
-                        "channelId2", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
-                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet,
-                        100));
+                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId2, "adgroupId4", "adId", "channelId2", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet, 100));
         channelSegmentEntity5 =
-                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId2, "adgroupId5", "adId",
-                        "channelId2", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
-                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet,
-                        0));
+                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId2, "adgroupId5", "adId", "channelId2", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet, 0));
         channelSegmentEntity6 =
-                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId3, "adgroupId5", "adId",
-                        "channelId3", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId",
-                        slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false,
-                        false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet,
-                        0));
+                new ChannelSegmentEntity(getChannelSegmentEntityBuilder(advertiserId3, "adgroupId5", "adId", "channelId3", 1, rcList, tags, true, true, "externalSiteKey", modified_on, "campaignId", slotIds, 1, true, "pricingModel", siteRatings, 1, null, false, false, false, false, false, false, false, false, false, false, null, new ArrayList<>(), 0.0d, null, null, false, emptySet, 0));
 
         final ChannelSegmentFeedbackEntity channelSegmentFeedbackEntity =
-                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(null, null, 2.1, 60, 12, 123, 12, 11,
-                        0));
+                new ChannelSegmentFeedbackEntity(getChannelSegmentFeedbackBuilder(null, null, 2.1, 60, 12, 123, 12, 11, 0));
         channelSegment1 =
-                new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, channelSegmentFeedbackEntity, null,
-                        cSFE1.getECPM());
+                new ChannelSegment(channelSegmentEntity1, cE1, cFE1, cSFE1, channelSegmentFeedbackEntity, null, cSFE1
+                        .getECPM());
         channelSegment2 =
-                new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, channelSegmentFeedbackEntity, null,
-                        cSFE2.getECPM());
+                new ChannelSegment(channelSegmentEntity2, cE1, cFE1, cSFE2, channelSegmentFeedbackEntity, null, cSFE2
+                        .getECPM());
         channelSegment3 =
-                new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, channelSegmentFeedbackEntity, null,
-                        cSFE3.getECPM());
+                new ChannelSegment(channelSegmentEntity3, cE1, cFE1, cSFE3, channelSegmentFeedbackEntity, null, cSFE3
+                        .getECPM());
         channelSegment4 =
-                new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, channelSegmentFeedbackEntity, null,
-                        cSFE4.getECPM());
+                new ChannelSegment(channelSegmentEntity4, cE2, cFE2, cSFE4, channelSegmentFeedbackEntity, null, cSFE4
+                        .getECPM());
         channelSegment5 =
-                new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, channelSegmentFeedbackEntity, null,
-                        cSFE5.getECPM());
+                new ChannelSegment(channelSegmentEntity5, cE2, cFE2, cSFE5, channelSegmentFeedbackEntity, null, cSFE5
+                        .getECPM());
         channelSegment6 =
-                new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, channelSegmentFeedbackEntity, null,
-                        cSFE6.getECPM());
+                new ChannelSegment(channelSegmentEntity6, cE3, cFE3, cSFE6, channelSegmentFeedbackEntity, null, cSFE6
+                        .getECPM());
 
         sMDE = createMock(SiteMetaDataEntity.class);
         expect(sMDE.getAdvertisersIncludedBySite()).andReturn(emptySet).anyTimes();
@@ -241,6 +209,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(s1.isRestrictedToRichMediaOnly()).andReturn(false).anyTimes();
         expect(s1.isInterstitialOnly()).andReturn(false).anyTimes();
         expect(s1.isNonInterstitialOnly()).andReturn(false).anyTimes();
+        expect(s1.getAdgroupId()).andReturn("").anyTimes();
+        expect(s1.getAdvertiserId()).andReturn("").anyTimes();
         replay(s1);
         s2 = createMock(ChannelSegmentEntity.class);
         expect(s2.isUdIdRequired()).andReturn(true).anyTimes();
@@ -250,29 +220,35 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(s2.isInterstitialOnly()).andReturn(true).anyTimes();
         expect(s2.isNonInterstitialOnly()).andReturn(false).anyTimes();
         expect(s2.getAdvertiserId()).andReturn(advertiserId1).anyTimes();
+        expect(s2.getAdgroupId()).andReturn("").anyTimes();
         replay(s2);
         sasParams = new SASRequestParameters();
-        sasParams.setUidParams("xxx");
         sasParams.setPostalCode("110051");
         sasParams.setLatLong("11.35&12.56");
         sasParams.setRichMedia(true);
         sasParams.setRequestedAdType(RequestedAdType.INTERSTITIAL);
         sasParams.setSiteId("siteid");
+        Map<String, String> tUidParam = new HashMap<>();
+        tUidParam.put("O1", "O1_user_id");
+        sasParams.setTUidParams(tUidParam);
 
-        injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
-                        new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
+
+        injector = Guice.createInjector(Modules
+                .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
+                        .getServerConfiguration())).with(new TestScopeModule()));
 
         channelSegmentFilterApplier = injector.getInstance(ChannelSegmentFilterApplier.class);
 
         final TypeLiteral<List<AdvertiserLevelFilter>> advertiserLevelTypeLiteral =
-                new TypeLiteral<List<AdvertiserLevelFilter>>() {};
+                new TypeLiteral<List<AdvertiserLevelFilter>>() {
+                };
         final Key<List<AdvertiserLevelFilter>> dcpAndRtbdAdvertiserLevelFiltersKey =
                 Key.get(advertiserLevelTypeLiteral, DcpAndRtbdAdvertiserLevelFilters.class);
         dcpAndRtbdAdvertiserLevelFilters = injector.getInstance(dcpAndRtbdAdvertiserLevelFiltersKey);
 
         final TypeLiteral<List<AdGroupLevelFilter>> adGroupLevelTypeLiteral =
-                new TypeLiteral<List<AdGroupLevelFilter>>() {};
+                new TypeLiteral<List<AdGroupLevelFilter>>() {
+                };
         final Key<List<AdGroupLevelFilter>> dcpAndRtbAdGroupLevelFiltersKey =
                 Key.get(adGroupLevelTypeLiteral, DcpAndRtbAdGroupLevelFilters.class);
         dcpAndRtbAdGroupLevelFilters = injector.getInstance(dcpAndRtbAdGroupLevelFiltersKey);
@@ -282,12 +258,11 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     @Test
     public void testIsBurnLimitExceeded() {
         final List<AdvertiserMatchedSegmentDetail> advertiserMatchedSegmentDetails = Lists.newArrayList();
-        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment1,
-                channelSegment4, channelSegment6)));
+        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists
+                .newArrayList(channelSegment1, channelSegment4, channelSegment6)));
 
-        final List<ChannelSegment> channelSegments =
-                channelSegmentFilterApplier.getChannelSegments(advertiserMatchedSegmentDetails, sasParams,
-                        new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
+        final List<ChannelSegment> channelSegments = channelSegmentFilterApplier
+                .getChannelSegments(advertiserMatchedSegmentDetails, sasParams, new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
 
         assertEquals(true, channelSegments.contains(channelSegment1));
         assertEquals(true, channelSegments.contains(channelSegment4));
@@ -297,12 +272,11 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     @Test
     public void testIsDailyImpressionCeilingExceeded() {
         final List<AdvertiserMatchedSegmentDetail> advertiserMatchedSegmentDetails = Lists.newArrayList();
-        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment1,
-                channelSegment4, channelSegment6)));
+        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists
+                .newArrayList(channelSegment1, channelSegment4, channelSegment6)));
 
-        final List<ChannelSegment> channelSegments =
-                channelSegmentFilterApplier.getChannelSegments(advertiserMatchedSegmentDetails, sasParams,
-                        new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
+        final List<ChannelSegment> channelSegments = channelSegmentFilterApplier
+                .getChannelSegments(advertiserMatchedSegmentDetails, sasParams, new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
 
         assertEquals(true, channelSegments.contains(channelSegment1));
         assertEquals(true, channelSegments.contains(channelSegment4));
@@ -312,12 +286,11 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     @Test
     public void testIsDailyRequestCapExceeded() {
         final List<AdvertiserMatchedSegmentDetail> advertiserMatchedSegmentDetails = Lists.newArrayList();
-        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment1,
-                channelSegment4, channelSegment6)));
+        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists
+                .newArrayList(channelSegment1, channelSegment4, channelSegment6)));
 
-        final List<ChannelSegment> channelSegments =
-                channelSegmentFilterApplier.getChannelSegments(advertiserMatchedSegmentDetails, sasParams,
-                        new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
+        final List<ChannelSegment> channelSegments = channelSegmentFilterApplier
+                .getChannelSegments(advertiserMatchedSegmentDetails, sasParams, new CasContext(), dcpAndRtbdAdvertiserLevelFilters, dcpAndRtbAdGroupLevelFilters);
         assertEquals(true, channelSegments.contains(channelSegment1));
         assertEquals(true, channelSegments.contains(channelSegment4));
         assertEquals(true, channelSegments.contains(channelSegment6));
@@ -326,10 +299,10 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     @Test
     public void testAdvertiserLevelFilter() {
         final List<AdvertiserMatchedSegmentDetail> advertiserMatchedSegmentDetails = Lists.newArrayList();
-        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment1,
-                channelSegment2, channelSegment3)));
-        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment4,
-                channelSegment5)));
+        advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists
+                .newArrayList(channelSegment1, channelSegment2, channelSegment3)));
+        advertiserMatchedSegmentDetails
+                .add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment4, channelSegment5)));
         advertiserMatchedSegmentDetails.add(new AdvertiserMatchedSegmentDetail(Lists.newArrayList(channelSegment6)));
 
         final SASRequestParameters sasParams = new SASRequestParameters();
@@ -342,16 +315,10 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         final List<ChannelSegment> channelSegmentList = getChannelSegments(advertiserMatchedSegmentDetails);
 
         assertEquals(6, channelSegmentList.size());
-        assertEquals(
-                false,
-                channelSegmentList.get(0).getChannelEntity().getAccountId()
-                        .equals(channelSegmentEntity6.getAdvertiserId()));
+        assertEquals(false, channelSegmentList.get(0).getChannelEntity().getAccountId()
+                .equals(channelSegmentEntity6.getAdvertiserId()));
     }
 
-    /**
-     * @param advertiserMatchedSegmentDetails
-     * @return
-     */
     private List<ChannelSegment> getChannelSegments(
             final List<AdvertiserMatchedSegmentDetail> advertiserMatchedSegmentDetails) {
         final List<ChannelSegment> channelSegmentList = Lists.newArrayList();
@@ -384,12 +351,14 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         final List<ChannelSegment> channelSegments = Lists.newArrayList(channelSegment);
 
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
-
         assertEquals(true, channelSegments.contains(channelSegment));
 
-        sasParams.setUidParams(null);
+        sasParams.setTUidParams(new HashMap<>());
         adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
+        assertEquals(false, channelSegments.contains(channelSegment));
 
+        sasParams.setTUidParams(null);
+        adGroupPropertyViolationFilter.filter(channelSegments, sasParams, new CasContext());
         assertEquals(false, channelSegments.contains(channelSegment));
     }
 
@@ -468,6 +437,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(s2.isInterstitialOnly()).andReturn(false).anyTimes();
         expect(s2.isNonInterstitialOnly()).andReturn(true).anyTimes();
         expect(s2.getAdvertiserId()).andReturn(advertiserId1).anyTimes();
+        expect(s2.getAdgroupId()).andReturn("").anyTimes();
         replay(s2);
 
         final AdGroupPropertyViolationFilter adGroupPropertyViolationFilter =
@@ -489,8 +459,7 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     public void testAdGroupLevelFiltering() {
 
         final List<ChannelSegment> channelSegments =
-                Lists.newArrayList(channelSegment1, channelSegment2, channelSegment3, channelSegment4, channelSegment5,
-                        channelSegment6);
+                Lists.newArrayList(channelSegment1, channelSegment2, channelSegment3, channelSegment4, channelSegment5, channelSegment6);
 
         final SASRequestParameters sasParams = new SASRequestParameters();
         sasParams.setSiteFloor(0.3);
@@ -533,18 +502,17 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         assertEquals(true, channelSegments.contains(channelSegment4));
     }
 
-    @Test
+    /*@Test
     public void testSelectTopAdgroupsForRequest() {
         final List<ChannelSegment> channelSegments =
-                Lists.newArrayList(channelSegment1, channelSegment2, channelSegment3, channelSegment4, channelSegment5,
-                        channelSegment6);
+                Lists.newArrayList(channelSegment1, channelSegment2, channelSegment3, channelSegment4, channelSegment5, channelSegment6);
 
         final AdGroupMaxSegmentPerRequestFilter adGroupTotalCountFilter =
                 injector.getInstance(AdGroupMaxSegmentPerRequestFilter.class);
         adGroupTotalCountFilter.filter(channelSegments, sasParams, new CasContext());
 
         assertEquals(5, channelSegments.size());
-    }
+    }*/
 
     @Test
     public void testIsAdvertiserExcludedWhenSiteInclusionListEmptyPublisherInclusionListEmpty() {
@@ -816,9 +784,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
-                        new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
+        final Injector injector = Guice.createInjector(Modules
+                .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
+                        .getServerConfiguration())).with(new TestScopeModule()));
 
         final AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter =
                 injector.getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -842,9 +810,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
-                        new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
+        final Injector injector = Guice.createInjector(Modules
+                .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
+                        .getServerConfiguration())).with(new TestScopeModule()));
 
         final AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter =
                 injector.getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -877,9 +845,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
-                        new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
+        final Injector injector = Guice.createInjector(Modules
+                .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
+                        .getServerConfiguration())).with(new TestScopeModule()));
 
         final AdGroupSupplyDemandClassificationFilter adGroupSupplyDemandClassificationFilter =
                 injector.getInstance(AdGroupSupplyDemandClassificationFilter.class);
@@ -918,9 +886,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         expect(repositoryHelper.querySiteEcpmRepository("siteid", 1, 2)).andReturn(null).anyTimes();
         replay(repositoryHelper);
 
-        final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
-                        new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
+        final Injector injector = Guice.createInjector(Modules
+                .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
+                        .getServerConfiguration())).with(new TestScopeModule()));
 
         sasParams.setSiteId("siteid");
         sasParams.setCountryId((long) 1);
@@ -965,9 +933,9 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
         sasParams.setCountryId((long) 1);
         sasParams.setOsId(2);
 
-        final Injector injector =
-                Guice.createInjector(Modules.override(new ServerModule(configurationLoder, repositoryHelper, "containerName"),
-                        new CasNettyModule(configurationLoder.getServerConfiguration())).with(new TestScopeModule()));
+        final Injector injector = Guice.createInjector(Modules
+                .override(new ServerModule(configurationLoder, repositoryHelper, "containerName"), new CasNettyModule(configurationLoder
+                        .getServerConfiguration())).with(new TestScopeModule()));
 
         final CasContext casContext = new CasContext();
         casContext.setPricingEngineEntity(injector.getInstance(CasUtils.class).fetchPricingEngineEntity(sasParams));
@@ -1053,8 +1021,8 @@ public class ChannelSegmentFilterApplierTest extends TestCase {
     }
 
     private ChannelSegmentFeedbackEntity.Builder getChannelSegmentFeedbackBuilder(final String advertiserId,
-            final String adGroupId, final double eCPM, final double fillRatio, final double latency,
-            final int requests, final int beacons, final int clicks, final int todaysImpressions) {
+            final String adGroupId, final double eCPM, final double fillRatio, final double latency, final int requests,
+            final int beacons, final int clicks, final int todaysImpressions) {
         final ChannelSegmentFeedbackEntity.Builder builder = ChannelSegmentFeedbackEntity.newBuilder();
         builder.setAdvertiserId(advertiserId);
         builder.setAdGroupId(adGroupId);

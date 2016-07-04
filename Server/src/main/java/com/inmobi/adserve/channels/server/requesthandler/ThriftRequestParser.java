@@ -1,22 +1,26 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.channels.api.SASParamsUtils.isSDK;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getMraidPath;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.getSdkVersion;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.populateNappScore;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.setSandBoxTest;
+import static com.inmobi.adserve.channels.server.requesthandler.ThriftRequestParserHelper.updateCsiTags;
 import static com.inmobi.adserve.channels.util.InspectorStrings.AUCTION_STATS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_FLOOR_TOO_LOW;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_ABSENT;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BID_GUIDANCE_LESS_OR_EQUAL_TO_FLOOR;
-import static com.inmobi.adserve.channels.util.InspectorStrings.CSIDS_MIGRATION_NOT_SANE;
-import static com.inmobi.adserve.channels.util.InspectorStrings.CSIDS_MIGRATION_SANE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI;
 import static com.inmobi.adserve.channels.util.InspectorStrings.IMEI_BEING_SENT_FOR;
-import static com.inmobi.adserve.channels.util.InspectorStrings.ONLY_NEW_CSIDS_SET;
-import static com.inmobi.adserve.channels.util.InspectorStrings.ONLY_OLD_CSIDS_SET;
+import static com.inmobi.adserve.channels.util.config.GlobalConstant.UID_KEY;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,16 +75,13 @@ import io.netty.util.CharsetUtil;
 public class ThriftRequestParser {
     private static final Logger LOG = LoggerFactory.getLogger(ThriftRequestParser.class);
 
-    private static final String DEFAULT_PUB_CONTROL_MEDIA_PREFERENCES =
-            "{\"incentiveJSON\": \"{}\",\"video\" :{\"preBuffer\": \"WIFI\",\"skippable\": true,\"soundOn\": false}}";
-    private static final List<AdTypeEnum> DEFAULT_PUB_CONTROL_SUPPORTED_AD_TYPES =
-            Arrays.asList(AdTypeEnum.BANNER, AdTypeEnum.VIDEO);
-
     public void parseRequestParameters(final AdPoolRequest tObject, final SASRequestParameters params,
             final CasInternalRequestParameters casInternal, final int dst) {
         LOG.debug("Inside parameter parser : ThriftParser");
-        params.setAllParametersJson(tObject.toString());
+        LOG.debug("AdPoolRequest: {}", tObject);
+
         params.setDst(dst);
+        params.setDemandSourceType(DemandSourceType.findByValue(dst));
         // Fill params from AdPoolRequest Object
         params.setRemoteHostIp(tObject.remoteHostIp);
         params.setRqMkSlot(tObject.selectedSlots);
@@ -103,6 +104,7 @@ public class ThriftRequestParser {
         if (tObject.isSetVastProtocols()) {
             params.setVastProtocols(ImmutableSet.copyOf(tObject.getVastProtocols()));
         }
+        params.setCoppaEnabled(tObject.isSetCoppaEnabled() ? tObject.isCoppaEnabled() : false);
         params.setRequestedAdType(tObject.getRequestedAdType());
         params.setRichMedia(tObject.isSetSupplyAllowedContents()
                 && tObject.supplyAllowedContents.contains(SupplyContentType.RICH_MEDIA));
@@ -139,8 +141,16 @@ public class ThriftRequestParser {
         // Fill params from UIDParams Object
         if (tObject.isSetUidParams()) {
             setUserIdParams(casInternal, tObject.getUidParams());
+            final UidType selectedUidType = tObject.getUidParams().getSelectedUidType();
             if (tObject.getUidParams().isSetRawUidValues()) {
-                params.setTUidParams(getUserIdMap(tObject.getUidParams().getRawUidValues()));
+                Map<UidType, String> rawUidParams = tObject.getUidParams().getRawUidValues();
+                Map<String, String> tUidParamMap = getUserIdMap(rawUidParams);
+                final String uId = rawUidParams.get(selectedUidType);
+                if (StringUtils.isNotBlank(uId)) {
+                    params.setSelectedUserId(uId);
+                    tUidParamMap.put(UID_KEY, uId);
+                }
+                params.setTUidParams(tUidParamMap);
             }
         }
 
@@ -168,7 +178,10 @@ public class ThriftRequestParser {
             params.setSecureRequest(tObject.rqSslEnabled);
         }
 
-        LOG.debug("Successfully parsed tObject, SAS params are : {}", params.toString());
+        //setting the napp score for supply
+        populateNappScore(params, tObject.getMappResponse());
+        setSandBoxTest(params, tObject.getRequestHeaders());
+        LOG.debug("Successfully parsed tObject, SAS params are : {}", params);
     }
 
     private void setCarrier(final AdPoolRequest tObject, final SASRequestParameters params) {
@@ -198,35 +211,11 @@ public class ThriftRequestParser {
                 final int age = currentYear - yob;
                 params.setAge((short) age);
             }
-            if (tObject.user.isSetUserProfile()) {
-                final Set<Integer> csiTagsOld = tObject.user.userProfile.csiTags;
-                params.setCsiTags(csiTagsOld);
 
-                Set<Integer> csiTagsNew = null;
-                if (tObject.user.userProfile.isSetTUserProfile()) {
-                    if (tObject.user.userProfile.tUserProfile.isSetCsiIds()) {
-                        csiTagsNew = ImmutableSet.copyOf(tObject.user.userProfile.getTUserProfile().getCsiIds());
-                    }
-                }
-
-                final boolean csiTagsOldSet = CollectionUtils.isNotEmpty(csiTagsOld);
-                final boolean csiTagsNewSet = CollectionUtils.isNotEmpty(csiTagsNew);
-
-                if (csiTagsOldSet && !csiTagsNewSet) {
-                    InspectorStats.incrementStatCount(ONLY_OLD_CSIDS_SET);
-                } else if (!csiTagsOldSet && csiTagsNewSet) {
-                    InspectorStats.incrementStatCount(ONLY_NEW_CSIDS_SET);
-                } else if (csiTagsOldSet && csiTagsNewSet) {
-                    if (csiTagsNew.containsAll(csiTagsOld)) {
-                        InspectorStats.incrementStatCount(CSIDS_MIGRATION_SANE);
-                    } else {
-                        InspectorStats.incrementStatCount(CSIDS_MIGRATION_NOT_SANE);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Mismatch in CSIDs. Old: {}, New: {} ", csiTagsOldSet, csiTagsNewSet);
-                        }
-                    }
-                }
-            }
+            params.setCsiTags(tObject.user.isSetUserProfile() ?
+                    (tObject.user.getUserProfile().isSetCsiTags() ? tObject.user.userProfile.csiTags :
+                            new HashSet<>()) : new HashSet<>());
+            updateCsiTags(params.getCsiTags(), tObject.coreAttributes);
 
             if (tObject.user.gender != null) {
                 switch (tObject.user.gender) {
@@ -261,6 +250,7 @@ public class ThriftRequestParser {
             final Set<Integer> cities = tObject.geo.getCityIds();
             params.setCity(
                     null != cities && cities.iterator().hasNext() ? tObject.geo.getCityIds().iterator().next() : null);
+            params.setCities(cities);
             params.setPostalCode(getPostalCode(tObject.geo.getZipIds()));
             final Set<Integer> states = tObject.geo.getStateIds();
             params.setState(
@@ -305,13 +295,24 @@ public class ThriftRequestParser {
 
     private void setIntegrationDetails(final AdPoolRequest tObject, final SASRequestParameters params) {
         if (tObject.isSetIntegrationDetails()) {
-            final IntegrationDetails tIntDetails = tObject.integrationDetails;
-            params.setRqIframe(tIntDetails.iFrameId);
-            if (tIntDetails.isSetAdCodeType()) {
-                params.setAdcode(tIntDetails.adCodeType.toString());
+            final IntegrationDetails details = tObject.getIntegrationDetails();
+
+            if (details.isSetAdCodeType()) {
+                params.setAdcode(details.adCodeType.toString());
             }
-            params.setSdkVersion(getSdkVersion(tIntDetails.integrationType, tIntDetails.integrationVersion));
-            params.setAdcode(getAdCode(tIntDetails.integrationType));
+            params.setRqIframe(details.iFrameId);
+            params.setAdcode(getAdCode(details.integrationType));
+
+            final boolean isSDK = isSDK(details);
+            params.setRequestFromSDK(isSDK);
+
+            if (isSDK) {
+                final Integer integrationVersion = details.isSetIntegrationVersion() ?
+                        details.getIntegrationVersion() : null;
+                final String sdkVersion = getSdkVersion(details.integrationType, integrationVersion);
+                params.setSdkVersion(sdkVersion);
+                params.setImaiBaseUrl(getMraidPath(sdkVersion));
+            }
         }
     }
 
@@ -322,12 +323,14 @@ public class ThriftRequestParser {
             params.setSiteIncId(tSite.siteIncId);
             params.setAppUrl(tSite.siteUrl);
             params.setPubId(tSite.publisherId);
-            final boolean isApp = tSite.isSetInventoryType() && tSite.inventoryType == InventoryType.APP;
-            params.setSource(isApp ? GlobalConstant.APP : GlobalConstant.WAP);
+            if (tSite.isSetInventoryType()) {
+                params.setSource(tSite.inventoryType == InventoryType.APP ? GlobalConstant.APP : GlobalConstant.WAP);
+                params.setInventoryType(tSite.inventoryType);
+            }
             final SiteTemplateSettings sts = tSite.siteTemplateSettings;
             if (sts != null) {
                 // Set CAU
-                final Set<Long> cauMetaDataSet = new HashSet<Long>();
+                final Set<Long> cauMetaDataSet = new HashSet<>();
                 if (CollectionUtils.isNotEmpty(sts.getCustomAdUnitStableList())) {
                     cauMetaDataSet.addAll(sts.getCustomAdUnitStableList());
                 }
@@ -337,7 +340,7 @@ public class ThriftRequestParser {
                 params.setCauMetadataSet(cauMetaDataSet);
 
                 // Set CT
-                final Set<Long> customTemplateSet = new HashSet<Long>();
+                final Set<Long> customTemplateSet = new HashSet<>();
                 if (CollectionUtils.isNotEmpty(sts.getCustomTemplateStableList())) {
                     customTemplateSet.addAll(sts.getCustomTemplateStableList());
                 }
@@ -400,7 +403,7 @@ public class ThriftRequestParser {
         }
     }
 
-    protected String getPostalCode(final Set<Integer> postalCodes) {
+    private String getPostalCode(final Set<Integer> postalCodes) {
         final Integer zipId =
                 null != postalCodes && postalCodes.iterator().hasNext() ? postalCodes.iterator().next() : null;
         if (zipId != null) {
@@ -515,7 +518,7 @@ public class ThriftRequestParser {
         LOG.debug("CasInternalParams are {}", parameter);
     }
 
-    public String MD5(final String md5) {
+    private String MD5(final String md5) {
         try {
             final MessageDigest md = MessageDigest.getInstance(GlobalConstant.MD5);
             final byte[] array = md.digest(md5.getBytes(CharsetUtil.UTF_8));
@@ -530,23 +533,14 @@ public class ThriftRequestParser {
         return null;
     }
 
-    public String getAdCode(final IntegrationType integrationType) {
+    private String getAdCode(final IntegrationType integrationType) {
         if (integrationType == IntegrationType.JSAC || integrationType == IntegrationType.WINDOWS_JS_SDK) {
             return "JS";
         }
         return "NON-JS";
     }
 
-    public String getSdkVersion(final IntegrationType integrationType, final int version) {
-        if (integrationType == IntegrationType.ANDROID_SDK) {
-            return "a" + version;
-        } else if (integrationType == IntegrationType.IOS_SDK) {
-            return "i" + version;
-        }
-        return null;
-    }
-
-    public List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
+    private List<Short> getValidSlotList(final List<Short> selectedSlots, final boolean isIX) {
         if (selectedSlots == null) {
             LOG.info("Emply selectedSlots received by CAS !!!");
             return Collections.emptyList();

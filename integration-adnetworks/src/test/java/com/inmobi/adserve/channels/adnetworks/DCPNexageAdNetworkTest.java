@@ -292,7 +292,7 @@ public class DCPNexageAdNetworkTest {
         if (dcpNexageAdnetwork.configureParameters(sasParams, casInternalRequestParameters, entity, (short) 9, repositoryHelper)) {
             final String actualUrl = dcpNexageAdnetwork.getRequestUri().toString();
             final String expectedUrl =
-                    "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB10-2&p(blind_id)=00000000-0000-0000-0000-000000000000";
+                    "http://bos.ads.nexage.com/adServe?pos=header&p(size)=320x48&mode=test&dcn=8a809449013c3c643cad82cb412b5857&ip=206.29.182.240&ua=Mozilla%2F5.0+%28Linux%3B+U%3B+Android+4.1.1%3B+en-us%3B+Galaxy+Nexus+Build%2FJRO03O%29+AppleWebKit%2F534.30+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Mobile+Safari%2F534.30&p(site)=fs&u(id)=202cb962ac59075b964b07152d234b70&req(loc)=37.4429%2C-122.1514&cn=IAB9-30&p(blind_id)=00000000-0000-0000-0000-000000000000";
             assertEquals(expectedUrl, actualUrl);
         }
     }
@@ -988,7 +988,7 @@ public class DCPNexageAdNetworkTest {
         dcpNexageAdnetwork.generateJsAdResponse();
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script> var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB20-1\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script> var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB9-30\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpNexageAdnetwork.getHttpResponseContent());
     }
 
@@ -1019,7 +1019,7 @@ public class DCPNexageAdNetworkTest {
         dcpNexageAdnetwork.generateJsAdResponse();
         assertEquals(dcpNexageAdnetwork.getHttpResponseStatusCode(), 200);
         final String expectedResponse =
-                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler); var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB20-1\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
+                "<html><head><title></title><meta name=\"viewport\" content=\"user-scalable=0, minimum-scale=1.0, maximum-scale=1.0\"/><style type=\"text/css\">body {margin: 0px; overflow: hidden;} </style></head><body><script type=\"text/javascript\" src=\"http://cdn.inmobi.com/android/mraid.js\"></script><script src=\"http://sjc.ads.nexage.com/js/admax/admax_api.js\"></script><script>var readyHandler=function(){_im_imai.fireAdReady();_im_imai.removeEventListener('ready',readyHandler);};_im_imai.addEventListener('ready',readyHandler); var suid = getSuid(); var admax_vars = { dcn: \"19100\",pos: \"header\",\"p(blind_id)\": \"00000000-0000-0000-0000-000000000000\",cn: \"IAB9-30\"};if (suid) admax_vars[\"u(id)\"]=suid;admaxAd(admax_vars);</script><img src='beaconUrl' height=1 width=1 border=0 style=\"display:none;\"/></body></html>";
         assertEquals(expectedResponse, dcpNexageAdnetwork.getHttpResponseContent());
     }
 

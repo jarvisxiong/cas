@@ -6,8 +6,9 @@ import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.get
 import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.getIdBase36;
 import static com.inmobi.adserve.channels.api.trackers.InmobiAdTrackerHelper.getIntegrationVersionStr;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
@@ -102,7 +103,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
     private final Double agencyRebatePercentage;
     private final Long chargedBid;
     private final Double enrichmentCost;
-    private final List<Integer> matchedCsids;
+    private final Set<Integer> matchedCsids;
     private final Long nativeTemplateId;
 
     // State
@@ -284,7 +285,7 @@ public class DefaultLazyInmobiAdTracker implements InmobiAdTracker {
         }
         if (null != enrichmentCost && CollectionUtils.isNotEmpty(matchedCsids)) {
             impInfo.setEnrichment_cost(enrichmentCost);
-            impInfo.setMatched_csids(matchedCsids);
+            impInfo.setMatched_csids(new ArrayList<>(matchedCsids));
         }
 
         // IX Specific Info

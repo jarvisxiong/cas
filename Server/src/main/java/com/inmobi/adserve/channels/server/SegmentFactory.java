@@ -24,7 +24,7 @@ import io.netty.channel.Channel;
 public class SegmentFactory {
     private final static Logger LOG = LoggerFactory.getLogger(SegmentFactory.class);
     private final Map<String, AdapterConfig> advertiserIdConfigMap;
-    private final static Long USA_COUNTRY_ID = 94l;
+    private final static Long USA_COUNTRY_ID = 94L;
 
     @Inject
     public SegmentFactory(final Map<String, AdapterConfig> advertiserIdConfigMap) {
@@ -33,15 +33,6 @@ public class SegmentFactory {
 
     /**
      * Call the Specific Adapter of the Ad Networks
-     *
-     * @param advertiserId
-     * @param config
-     * @param dcpClientBootstrap
-     * @param rtbClientBootstrap
-     * @param base
-     * @param channel
-     * @param advertiserSet
-     * @return
      */
     public AdNetworkInterface getChannel(final String advertiserId, final Configuration config,
             final Bootstrap dcpClientBootstrap, final Bootstrap rtbClientBootstrap, final HttpRequestHandlerBase base,
@@ -49,9 +40,9 @@ public class SegmentFactory {
         final AdapterConfig adapterConfig = advertiserIdConfigMap.get(advertiserId);
         final String adapterName = adapterConfig.getAdapterName();
 
-        final String adapterHost = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx()
-                ? adapterConfig.getAdapterHost(sasParam.getState())
-                : adapterConfig.getAdapterHost();
+        final boolean isSmartRouting = USA_COUNTRY_ID == sasParam.getCountryId() && adapterConfig.isIx();
+        final String adapterHost = adapterConfig.getAdapterHost(sasParam, isSmartRouting);
+        LOG.debug("adapter host : {}", adapterHost);
 
         if (!(CollectionUtils.isEmpty(advertiserSet) || advertiserSet.contains(adapterName))) {
             return null;

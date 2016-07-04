@@ -7,6 +7,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import com.google.inject.Singleton;
+import com.inmobi.adserve.channels.api.config.ServerConfig;
 import com.inmobi.adserve.channels.server.ChannelServerPipelineFactory;
 import com.inmobi.adserve.channels.server.ChannelStatServerPipelineFactory;
 
@@ -34,10 +35,10 @@ public class CasNettyServer {
 
     @Inject
     public CasNettyServer(final ChannelServerPipelineFactory serverChannelInitializer,
-            final ChannelStatServerPipelineFactory statServerChannelInitializer) {
+            final ChannelStatServerPipelineFactory statServerChannelInitializer, final ServerConfig serverConfig) {
 
         bossGroup = new NioEventLoopGroup(2, new DefaultThreadFactory("inbound-netty-boss"));
-        workerGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("inbound-netty-worker"));
+        workerGroup = new NioEventLoopGroup(serverConfig.getNumOfWorkerThread(), new DefaultThreadFactory("inbound-netty-worker"));
         serverBootstrap = new ServerBootstrap();
         statServerBootstrap = new ServerBootstrap();
         this.serverChannelInitializer = serverChannelInitializer;

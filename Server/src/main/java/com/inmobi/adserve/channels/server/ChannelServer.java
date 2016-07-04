@@ -14,12 +14,14 @@ import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CHA
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CREATIVE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.CURRENCY_CONVERSION_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.DATABASE;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_CITY_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_REGION_FENCE_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.GEO_ZIP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_ACCOUNT_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_BLOCKLIST_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.IX_PACKAGE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.NATIVE_AD_TEMPLATE_REPOSITORY;
+import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PACKAGE_REPOSITORY_V2;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.PRICING_ENGINE_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SDK_MRAID_MAP_REPOSITORY;
 import static com.inmobi.adserve.channels.server.ChannelServerStringLiterals.SITE_ECPM_REPOSITORY;
@@ -62,6 +64,7 @@ import com.inmobi.adserve.channels.repository.ChannelSegmentFeedbackRepository;
 import com.inmobi.adserve.channels.repository.ChannelSegmentMatchingCache;
 import com.inmobi.adserve.channels.repository.CreativeRepository;
 import com.inmobi.adserve.channels.repository.CurrencyConversionRepository;
+import com.inmobi.adserve.channels.repository.GeoCityRepository;
 import com.inmobi.adserve.channels.repository.GeoRegionFenceMapRepository;
 import com.inmobi.adserve.channels.repository.GeoZipRepository;
 import com.inmobi.adserve.channels.repository.IMEIAerospikeRepository;
@@ -78,7 +81,9 @@ import com.inmobi.adserve.channels.repository.SiteMetaDataRepository;
 import com.inmobi.adserve.channels.repository.SiteTaxonomyRepository;
 import com.inmobi.adserve.channels.repository.SlotSizeMapRepository;
 import com.inmobi.adserve.channels.repository.WapSiteUACRepository;
+import com.inmobi.adserve.channels.repository.pmp.PackageRepositoryV2;
 import com.inmobi.adserve.channels.repository.stats.RepositoryStats;
+import com.inmobi.adserve.channels.server.kafkalogging.PhotonCasActivityWriter;
 import com.inmobi.adserve.channels.server.module.CasNettyModule;
 import com.inmobi.adserve.channels.server.module.ServerModule;
 import com.inmobi.adserve.channels.server.requesthandler.Logging;
@@ -127,9 +132,11 @@ public class ChannelServer {
     private static WapSiteUACRepository wapSiteUACRepository;
     private static IXAccountMapRepository ixAccountMapRepository;
     private static IXPackageRepository ixPackageRepository;
+    private static PackageRepositoryV2 packageRepositoryV2;
     private static CreativeRepository creativeRepository;
     private static NativeAdTemplateRepository nativeAdTemplateRepository;
     private static GeoZipRepository geoZipRepository;
+    private static GeoCityRepository geoCityRepository;
     private static SlotSizeMapRepository slotSizeMapRepository;
     private static SdkMraidMapRepository sdkMraidMapRepository;
     private static GeoRegionFenceMapRepository geoRegionFenceMapRepository;
@@ -207,7 +214,7 @@ public class ChannelServer {
             final String umpAdsLogKey = configurationLoader.getServerConfiguration().getString("umpAdsLogKey");
             Logging.init(dataBusPublisher, rrLogKey, advertisementLogKey, umpAdsLogKey,
                     configurationLoader.getServerConfiguration(), containerName, dataCentreName);
-
+            PhotonCasActivityWriter.init(configurationLoader.getServerConfiguration(), channelServerHelper.isProdEnvironment());
             // Initializing graphite stats
             RepositoryStats.init(configurationLoader.getMetricsConfiguration(), containerName);
             InspectorStats.init(configurationLoader.getMetricsConfiguration(), containerName);
@@ -228,7 +235,9 @@ public class ChannelServer {
             nativeAdTemplateRepository = new NativeAdTemplateRepository();
             ixAccountMapRepository = new IXAccountMapRepository();
             ixPackageRepository = new IXPackageRepository();
+            packageRepositoryV2 = new PackageRepositoryV2();
             geoZipRepository = new GeoZipRepository();
+            geoCityRepository = new GeoCityRepository();
             slotSizeMapRepository = new SlotSizeMapRepository();
             sdkMraidMapRepository = new SdkMraidMapRepository();
             geoRegionFenceMapRepository = new GeoRegionFenceMapRepository();
@@ -252,9 +261,12 @@ public class ChannelServer {
             repoHelperBuilder.setWapSiteUACRepository(wapSiteUACRepository);
             repoHelperBuilder.setIxAccountMapRepository(ixAccountMapRepository);
             repoHelperBuilder.setIxPackageRepository(ixPackageRepository);
+            repoHelperBuilder.setPackageRepositoryV2(packageRepositoryV2);
             repoHelperBuilder.setCreativeRepository(creativeRepository);
             repoHelperBuilder.setNativeAdTemplateRepository(nativeAdTemplateRepository);
             repoHelperBuilder.setGeoZipRepository(geoZipRepository);
+            repoHelperBuilder.setGeoCityRepository(geoCityRepository);
+
             repoHelperBuilder.setSlotSizeMapRepository(slotSizeMapRepository);
             repoHelperBuilder.setSdkMraidMapRepository(sdkMraidMapRepository);
             repoHelperBuilder.setGeoRegionFenceMapRepository(geoRegionFenceMapRepository);
@@ -300,10 +312,6 @@ public class ChannelServer {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public static String getConfigFile() {
         if (configFile != null) {
             return configFile;
@@ -340,7 +348,7 @@ public class ChannelServer {
             final boolean testOnBorrow = databaseConfig.getBoolean("testOnBorrow", true);
 
             final String connectUri =
-                    "jdbc:postgresql://" + databaseConfig.getString("host") + ":" + databaseConfig.getInt("port") + "/"
+                    "jdbc:postgresql://" + databaseConfig.getString("host") + ':' + databaseConfig.getInt("port") + '/'
                             + databaseConfig.getString(DATABASE) + "?socketTimeout="
                             + databaseConfig.getString("socketTimeout") + "&ApplicationName=cas";
             final ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectUri, props);
@@ -384,14 +392,15 @@ public class ChannelServer {
             loadRepos(siteFilterRepository, SITE_FILTER_REPOSITORY, config, logger);
             loadRepos(siteEcpmRepository, SITE_ECPM_REPOSITORY, config, logger);
             loadRepos(geoZipRepository, GEO_ZIP_REPOSITORY, config, logger);
+            loadRepos(geoCityRepository, GEO_CITY_REPOSITORY, config, logger);
             loadRepos(slotSizeMapRepository, SLOT_SIZE_MAP_REPOSITORY, config, logger);
             loadRepos(sdkMraidMapRepository, SDK_MRAID_MAP_REPOSITORY, config, logger);
             loadRepos(geoRegionFenceMapRepository, GEO_REGION_FENCE_MAP_REPOSITORY, config, logger);
             loadRepos(ccidMapRepository, CCID_MAP_REPOSITORY, config, logger);
             loadRepos(ixBlocklistRepository, IX_BLOCKLIST_REPOSITORY, config, logger);
             loadRepos(cauMetaDataRepository, CAU_METADATA_REPOSITORY, config, logger);
-            ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY),
-                    IX_PACKAGE_REPOSITORY);
+            ixPackageRepository.init(logger, ds, config.getCacheConfiguration().subset(IX_PACKAGE_REPOSITORY), IX_PACKAGE_REPOSITORY);
+            packageRepositoryV2.init(logger, ds, config.getCacheConfiguration().subset(PACKAGE_REPOSITORY_V2), PACKAGE_REPOSITORY_V2);
             final DataCenter dc = getDataCentre(dataCentreName);
             siteAerospikeFeedbackRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
             imeiAerospikeRepository.init(config.getServerConfiguration().subset(AEROSPIKE_FEEDBACK), dc);
@@ -435,7 +444,6 @@ public class ChannelServer {
         }
         final long endTime = System.currentTimeMillis();
         logger.error(String.format("*************** Loaded repo %s, in %s ms", repoName, endTime - startTime));
-        return;
     }
 
     private static DataCenter getDataCentre(final String dataCentreName) {

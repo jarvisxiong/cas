@@ -53,7 +53,7 @@ server.defaultDemandClass=0
 server.supplyClassFloors=2.916,2.041,1.429,1.0,0.7,0.49,0.343,0.24,0.168
 server.servletChangeLogLevel.timerDelay=15000
 server.repoLoadRetryCount=3
-server.enableAutomationTests={{automation_tests_enabled}}
+server.enableAutomationTests={{automation_enabled}}
 
 server.adtype.vast.minimumSupportedSdkVersion=450
 server.adtype.vast.minimumSupportedIOSVersion=8
@@ -63,7 +63,7 @@ server.adtype.inlineBanner.minimumSupportedAndroidVersion=4
 
 server.clickmaker.ipFileVersion = 1
 server.clickmaker.clickURLPrefix = http://{{{click_url_prefix}}}
-server.clickmaker.clickSecureURLPrefix=https:{{{click_url_prefix}}}
+server.clickmaker.clickSecureURLPrefix=https://{{{click_url_prefix}}}
 server.clickmaker.clickURLHashingSecretKeyVersion = 1
 server.clickmaker.beaconURLPrefix=http://{{{beacon_url_prefix}}}
 server.clickmaker.beaconSecureURLPrefix=https://{{{beacon_url_prefix}}}
@@ -86,11 +86,8 @@ server.circuitbreaker.class=com.inmobi.adserve.channels.server.circuitbreaker.Ci
 
 server.isIPRepositoryDisabled=false
 
-server.auction.exclude.AuctionAdvertiserDomainFilter = 42d047b0efe046c5be965260fe50a075, 50235b3b4d2a41ffb4130b0987d2ee39, b7010bce3e964616ab2775288e2f8eca, bbdad206402443e99ae37e2c95a45c2e, c2ab586eb0d446ccad0634eacbec47a4, 1dc7bc3327d047f6a9dba3732c769bc4, 351d8374d8a44c71bcf2e19675a59425, fa9a7988fcd3471fbc7f5dccaea4bc0a, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, a3d59e47436d47cab83847b29404e246, 0c5b79a8ad1447b198ad592513683495, 0c4f8ddcb5bd4b5a93c374f9f03b18c1, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, a6f21fc7eab34171973326aec9f77fd8, 22bf326a5caf4dd2b3de42309ff93a91, 762e9098f2184f28ba744da17636dd77, e58b07358148433c99f7392ffe2e205f, 7a97096d81a2428ab95006f134d6b13d, 107bef2f2d5c4e12a678c75425ea2202, e513e32147c94e69b44035f679f4ed13, e7b63e58f5a242a187570bb2f4b5a086, fad2f318acef40059d936c8f0027089c, da976f5ba3764d8faf5755a132d620b9, 1588c61fe51b4c7c87426604e9c0ef00, 8c2b31b2fdaa41b9a18bb84cdd602854, 5fcfcfa708ef4743bcb4cef209bda91a, 00c4041269f244f2946d5f1e6262610c, a46da64258ea447483e3c8e80cb84267, 315297cac52b4fc39634301f5299228e, 094c438f2ce24f8588552afe9ba6a89d, 4f0b93a0735a4690a596365a803ec2cf, b36a6caeac5c483d9b6f57d4c6a6925a, 8adb9a3da01a4a5c93acb7d7f131880b, 5c18a08659cf4aef8235a9d6b447de3f, a40b50983bd34c0e8b3f4be98cf0da7b, c9cfbaf73e61446587036a2293d14e43, 9db590e96fc3445e8f4a20b16f1ac84d, 2ebed517d2be4a05b329c8489c1aad52, 2e628a9993014c2c829747cb7342d61b, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c,a5a42efdf5684fa184f8c6051437c266,82771c11ed31497bb542e6ad44c75dc3,90cc6670d7a541b69a47cd906fcf5503,dd6e3a39adb4483892601d69f180f66e,774f560ccc9c40839ea6360feaaaf0f0,6435edf6c25244e18d2f5f709972fae6,e0e4a367dd2b477491c246505f532390,b03cee175dca452bb3b02033d1dacbe6,0b5e28b49b654f4a9e658405fa48a74e,f3ac392a56674543a83d46c99ccb98f6,a95447eafff74c3c8613e341522700cd,570e0454c6314889b18486fb71186ca8,75f70122644b4d9499801b3936b03dfb,d8dc94dac84e42ceb75de5e8565a9df6,fc56e2b620874561960767c39427298c,768b588e30b44843a06168221f772c4b,fffdba729a194ab2a8cdcb37572df33e,96ff268b1d654cefabbf28aba4db6334,9a151336f867432199a9a329791686a0,aa1bb7f2ca634a9fabb38aebd25352fd,ec6cf772fa234e2584805291e141ad7f,8c473223f7e8444bb3be7d5f3e0feeef,50c1c9114a6a4c3c8e492a24ddac0de6,e84b681ba4e64a04b9986dbbd4c93deb,a646b9b3830343f7a7d0df6939e0ab8b,4e877132525d49ad95375cb141d7e336, cd276cc9484f4f42aba5e17a8965d22f, e427282ec6814c4f9a6ba69d3651154f, e9373d36236a4fa5af7ff55619a759cf, bf77af5a8fae43008e783e6a8993b517, 04100a81e61b47d0b28569f84000623b
-server.auction.exclude.AuctionCreativeAttributeFilter = 42d047b0efe046c5be965260fe50a075, 50235b3b4d2a41ffb4130b0987d2ee39, b7010bce3e964616ab2775288e2f8eca, bbdad206402443e99ae37e2c95a45c2e, c2ab586eb0d446ccad0634eacbec47a4, 1dc7bc3327d047f6a9dba3732c769bc4, 351d8374d8a44c71bcf2e19675a59425, fa9a7988fcd3471fbc7f5dccaea4bc0a, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, a3d59e47436d47cab83847b29404e246, 0c5b79a8ad1447b198ad592513683495, 0c4f8ddcb5bd4b5a93c374f9f03b18c1, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, a6f21fc7eab34171973326aec9f77fd8, 22bf326a5caf4dd2b3de42309ff93a91, 762e9098f2184f28ba744da17636dd77, e58b07358148433c99f7392ffe2e205f, 7a97096d81a2428ab95006f134d6b13d, 107bef2f2d5c4e12a678c75425ea2202, e513e32147c94e69b44035f679f4ed13, e7b63e58f5a242a187570bb2f4b5a086, fad2f318acef40059d936c8f0027089c, da976f5ba3764d8faf5755a132d620b9, 1588c61fe51b4c7c87426604e9c0ef00, 8c2b31b2fdaa41b9a18bb84cdd602854, 5fcfcfa708ef4743bcb4cef209bda91a, 00c4041269f244f2946d5f1e6262610c, a46da64258ea447483e3c8e80cb84267, 315297cac52b4fc39634301f5299228e, 094c438f2ce24f8588552afe9ba6a89d, 4f0b93a0735a4690a596365a803ec2cf, b36a6caeac5c483d9b6f57d4c6a6925a, 8adb9a3da01a4a5c93acb7d7f131880b, 5c18a08659cf4aef8235a9d6b447de3f, a40b50983bd34c0e8b3f4be98cf0da7b, c9cfbaf73e61446587036a2293d14e43, 9db590e96fc3445e8f4a20b16f1ac84d, 2ebed517d2be4a05b329c8489c1aad52, 2e628a9993014c2c829747cb7342d61b, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c,a5a42efdf5684fa184f8c6051437c266,82771c11ed31497bb542e6ad44c75dc3,90cc6670d7a541b69a47cd906fcf5503,dd6e3a39adb4483892601d69f180f66e,774f560ccc9c40839ea6360feaaaf0f0,6435edf6c25244e18d2f5f709972fae6,e0e4a367dd2b477491c246505f532390,b03cee175dca452bb3b02033d1dacbe6,0b5e28b49b654f4a9e658405fa48a74e,f3ac392a56674543a83d46c99ccb98f6,a95447eafff74c3c8613e341522700cd,570e0454c6314889b18486fb71186ca8,75f70122644b4d9499801b3936b03dfb,d8dc94dac84e42ceb75de5e8565a9df6,fc56e2b620874561960767c39427298c,768b588e30b44843a06168221f772c4b,fffdba729a194ab2a8cdcb37572df33e,96ff268b1d654cefabbf28aba4db6334,9a151336f867432199a9a329791686a0,aa1bb7f2ca634a9fabb38aebd25352fd,ec6cf772fa234e2584805291e141ad7f,8c473223f7e8444bb3be7d5f3e0feeef,50c1c9114a6a4c3c8e492a24ddac0de6,e84b681ba4e64a04b9986dbbd4c93deb,bbc4d78d22da484db35de5fb6f839dc5,a646b9b3830343f7a7d0df6939e0ab8b,4e877132525d49ad95375cb141d7e336, cd276cc9484f4f42aba5e17a8965d22f, e427282ec6814c4f9a6ba69d3651154f, e9373d36236a4fa5af7ff55619a759cf, bf77af5a8fae43008e783e6a8993b517, 04100a81e61b47d0b28569f84000623b
 server.auction.exclude.AuctionCreativeIdFilter = b7010bce3e964616ab2775288e2f8eca, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, 0c5b79a8ad1447b198ad592513683495, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, 22bf326a5caf4dd2b3de42309ff93a91, fad2f318acef40059d936c8f0027089c, 4f0b93a0735a4690a596365a803ec2cf, a40b50983bd34c0e8b3f4be98cf0da7b, 9db590e96fc3445e8f4a20b16f1ac84d, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c, a5a42efdf5684fa184f8c6051437c266, 82771c11ed31497bb542e6ad44c75dc3,bbc4d78d22da484db35de5fb6f839dc5
 server.auction.exclude.AuctionCreativeValidatorFilter = b7010bce3e964616ab2775288e2f8eca, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, 0c5b79a8ad1447b198ad592513683495, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, 22bf326a5caf4dd2b3de42309ff93a91, fad2f318acef40059d936c8f0027089c, 4f0b93a0735a4690a596365a803ec2cf, a40b50983bd34c0e8b3f4be98cf0da7b, 9db590e96fc3445e8f4a20b16f1ac84d, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c, a5a42efdf5684fa184f8c6051437c266, 82771c11ed31497bb542e6ad44c75dc3
-server.auction.exclude.AuctionIUrlFilter = 42d047b0efe046c5be965260fe50a075, 50235b3b4d2a41ffb4130b0987d2ee39, b7010bce3e964616ab2775288e2f8eca, bbdad206402443e99ae37e2c95a45c2e, c2ab586eb0d446ccad0634eacbec47a4, 351d8374d8a44c71bcf2e19675a59425, fa9a7988fcd3471fbc7f5dccaea4bc0a, b7c5e7b5522f41b1afaa2ad234ce943e, 897fe76008604c529ac43be1e89fda0c, 0c5b79a8ad1447b198ad592513683495, a3d59e47436d47cab83847b29404e246,0c4f8ddcb5bd4b5a93c374f9f03b18c1, 4d6668b337db4efb9b60239d80834669, f55c9d46d7704f8789015a64153a7015, 22bf326a5caf4dd2b3de42309ff93a91, 762e9098f2184f28ba744da17636dd77, e58b07358148433c99f7392ffe2e205f, 7a97096d81a2428ab95006f134d6b13d, 107bef2f2d5c4e12a678c75425ea2202, e513e32147c94e69b44035f679f4ed13, e7b63e58f5a242a187570bb2f4b5a086, fad2f318acef40059d936c8f0027089c, da976f5ba3764d8faf5755a132d620b9, 1588c61fe51b4c7c87426604e9c0ef00, 8c2b31b2fdaa41b9a18bb84cdd602854, 5fcfcfa708ef4743bcb4cef209bda91a, 00c4041269f244f2946d5f1e6262610c, a46da64258ea447483e3c8e80cb84267, 315297cac52b4fc39634301f5299228e, 094c438f2ce24f8588552afe9ba6a89d, 4f0b93a0735a4690a596365a803ec2cf, b36a6caeac5c483d9b6f57d4c6a6925a, 8adb9a3da01a4a5c93acb7d7f131880b, 5c18a08659cf4aef8235a9d6b447de3f, a40b50983bd34c0e8b3f4be98cf0da7b, c9cfbaf73e61446587036a2293d14e43, 9db590e96fc3445e8f4a20b16f1ac84d, 2ebed517d2be4a05b329c8489c1aad52, 2e628a9993014c2c829747cb7342d61b, ad8704ce190d4b30ab79ecc29ed530c0, 542f875d06fb416aaaceb5a06919976c,a5a42efdf5684fa184f8c6051437c266,82771c11ed31497bb542e6ad44c75dc3,90cc6670d7a541b69a47cd906fcf5503,dd6e3a39adb4483892601d69f180f66e,774f560ccc9c40839ea6360feaaaf0f0,6435edf6c25244e18d2f5f709972fae6,e0e4a367dd2b477491c246505f532390,b03cee175dca452bb3b02033d1dacbe6,0b5e28b49b654f4a9e658405fa48a74e,f3ac392a56674543a83d46c99ccb98f6,a95447eafff74c3c8613e341522700cd,570e0454c6314889b18486fb71186ca8,75f70122644b4d9499801b3936b03dfb,d8dc94dac84e42ceb75de5e8565a9df6,fc56e2b620874561960767c39427298c,768b588e30b44843a06168221f772c4b,fffdba729a194ab2a8cdcb37572df33e,96ff268b1d654cefabbf28aba4db6334,9a151336f867432199a9a329791686a0,aa1bb7f2ca634a9fabb38aebd25352fd,ec6cf772fa234e2584805291e141ad7f,8c473223f7e8444bb3be7d5f3e0feeef,50c1c9114a6a4c3c8e492a24ddac0de6,e84b681ba4e64a04b9986dbbd4c93deb,bbc4d78d22da484db35de5fb6f839dc5,a646b9b3830343f7a7d0df6939e0ab8b,4e877132525d49ad95375cb141d7e336, cd276cc9484f4f42aba5e17a8965d22f, e427282ec6814c4f9a6ba69d3651154f, e9373d36236a4fa5af7ff55619a759cf, bf77af5a8fae43008e783e6a8993b517, 04100a81e61b47d0b28569f84000623b
 
 server.adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter = ab8677d5210241a091da3e0f94a1b425,f797f299338e4bb8b645351528a9b401,86490ae2c95a4fae9f6036317da740d3
 
@@ -98,8 +95,18 @@ server.adGroupFilter.exclude.AdGroupSupplyDemandClassificationFilter = ab8677d52
 server.scribePublisherConf={{CAS_BASE_DIRECTORY}}/conf/messaging-publisher-conf.properties
 
 #UH1 to Uj1 Routing routingFromUH1ToUJ1Percentage = -1 will stop the traffic to RP West
-server.routingFromUH1ToUJ1Percentage=40
-server.usa.stateCodes=10993,12131,12539,28962,13365,17188,28963,18469,19855,20598,22140,23451,28994,11326,12869,28970,14690,15118,16121,28965,17799,29000,20372,21892,22839,28978
+server.routingFromUH1ToUJ1Percentage=60
+server.us.west.stateCodes=10993,12131,12539,28962,13365,17188,28963,18469,19855,20598,22140,23451,28994,11326,12869,28970,14690,15118,16121,28965,17799,29000,20372,21892,22839,28978
+
+#photon
+server.photon.enable=true
+server.photon.haproxy_endpoint=http://{{photon_lb_endpoint}}/profile
+server.photon.ning_timeout=20
+server.photon.future_timeout=5
+server.photon.outGoingMaxConnections=200
+server.photon.headerKey=photon-cid
+server.photon.headerValue=direct-brand
+server.photon.thread.count=35
 
 graphite.host={{graphite_host_prefix}}.cas.{{IDP_CLUSTER}}.inmobi.com
 graphite.port=2020
@@ -133,7 +140,11 @@ server.aerospike.boostTimeFrame=3
 server.aerospike.imeiNamespae=device_imei
 server.aerospike.imeiSet=imei
 {{/aerospike}}
-    
+
+{{#kafka}}
+server.kafka.host_list={{kafka_host}}
+server.cas_photon_activity=casPhotonActivity    
+{{/kafka}}
 {{/database}}
 
 #refreshTime is set as different prime numbers to avoid refresh of all repos at their LCM.
@@ -220,7 +231,7 @@ Cache.WapSiteUACRepository.override.site.e4bd17df91e641b1afe1b8a46101d852.siteUr
 
 Cache.Name = ChannelAdGroupRepository
 Cache.ChannelAdGroupRepository.Manager = com.inmobi.adserve.channels.repository.ChannelAdGroupRepository
-Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_28082015('${last_update}')
+Cache.ChannelAdGroupRepository.query = select * from wap_channel_adgroup_fun_04042016('${last_update}')
 Cache.ChannelAdGroupRepository.initialDelay = 300
 Cache.ChannelAdGroupRepository.refreshTime = 1483
 Cache.ChannelAdGroupRepository.isUpdatable = true
@@ -269,10 +280,17 @@ Cache.SiteFilterRepository.dataSourceName = jdbc
 
 Cache.Name = IXPackageRepository
 Cache.IXPackageRepository.Manager = com.inmobi.adserve.channels.repository.IXPackageRepository
-Cache.IXPackageRepository.query = select * from ix_package_fun_21042016()
+Cache.IXPackageRepository.query = select * from ix_package_fun_03052016()
 Cache.IXPackageRepository.initialDelay = 0
 Cache.IXPackageRepository.refreshTime = 1867
 Cache.IXPackageRepository.dataSourceName = jdbc
+
+Cache.Name = PackageRepositoryV2
+Cache.PackageRepositoryV2.Manager = com.inmobi.adserve.channels.repository.pmp.PackageRepositoryV2
+Cache.PackageRepositoryV2.query = select * from packages_func_V2()
+Cache.PackageRepositoryV2.initialDelay = 0
+Cache.PackageRepositoryV2.refreshTime = 1933
+Cache.PackageRepositoryV2.dataSourceName = jdbc
 
 Cache.Name = SiteEcpmRepository
 Cache.SiteEcpmRepository.Manager = com.inmobi.adserve.channels.repository.SiteEcpmRepository
@@ -305,6 +323,14 @@ Cache.GeoZipRepository.initialDelay = 300
 Cache.GeoZipRepository.refreshTime = 3607
 Cache.GeoZipRepository.isUpdatable = true
 Cache.GeoZipRepository.dataSourceName = jdbc
+
+Cache.Name = GeoCityRepository
+Cache.GeoCityRepository.Manager = com.inmobi.adserve.channels.repository.GeoCityRepository
+Cache.GeoCityRepository.query = select id\, name\, modified_on from geo_city where modified_on >= ('${last_update}')
+Cache.GeoCityRepository.initialDelay = 300
+Cache.GeoCityRepository.refreshTime = 3607
+Cache.GeoCityRepository.isUpdatable = true
+Cache.GeoCityRepository.dataSourceName = jdbc
 
 Cache.Name = SlotSizeMapRepository
 Cache.SlotSizeMapRepository.Manager = com.inmobi.adserve.channels.repository.SlotSizeMapRepository
@@ -520,7 +546,7 @@ adapter.crimzo.partnerSegmentNo=1
 adapter.crimzo.class=com.inmobi.adserve.channels.adnetworks.ajillion.DCPAjillionAdnetwork
 
 adapter.marimedia.advertiserId=1d457bd580c743eba224be18834d3c7a
-adapter.marimedia.status=on
+adapter.marimedia.status=off
 adapter.marimedia.host=http://ad.taptica.com/aff_ad?rt=0
 adapter.marimedia.host.uj1=
 adapter.marimedia.partnerSegmentNo=1
@@ -631,10 +657,10 @@ adapter.taboola.status=on
 adapter.taboola.secureSupported=true
 {{! Please use triple curly braces for urls and html content }}
 adapter.taboola.host=https://api.taboola.com:443/1.1/json/%s/recommendations.get?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&rec.visible=false&source.type=text&user.session=init
-adapter.taboola.notification=https://api.taboola.com/json/%s/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s
+adapter.taboola.notification=https://api.taboola.com:443/1.1/json/%s/recommendations.notify-visible?app.type=mobile&app.apikey=fc1200c7a7aa52109d762a9f005b149abef01479&response.id=%s&response.session=%s
 adapter.taboola.partnerSegmentNo=1
 adapter.taboola.icon=https://i.l.inmobicdn.net/banners/programmatic/taboola.png
-adapter.taboola.oemSites=5a5b2dcb31804111b3830a686bbe8db6,af168c289f7146cba9ff1693bd0b4b51
+adapter.taboola.oemSites=5a5b2dcb31804111b3830a686bbe8db6,af168c289f7146cba9ff1693bd0b4b51,8ff70ace7e044229b4564bc2a1407d11,091876e5a11c4e1dbc290fc034c81be0,5cca85944d534b7b822f860e2c10d6f4
 adapter.taboola.class=com.inmobi.adserve.channels.adnetworks.taboola.DCPTaboolaAdnetwork
 
 adapter.googleadx.advertiserId=ab8677d5210241a091da3e0f94a1b425
@@ -688,6 +714,22 @@ adapter.tencento2.advertiserId=674cb34c74804a5f90fca49aac985be3
 adapter.tencento2.partnerSegmentNo=1
 adapter.tencento2.class=com.inmobi.adserve.channels.adnetworks.tencentdcp.TencentAdnetwork
 
+adapter.tappx.advertiserId=13767fa2e84741348ed453a67a1a1524
+adapter.tappx.status=on
+adapter.tappx.host=http://ssp.api.tappx.com/req_v1
+adapter.tappx.key=/120940746/Pub-10023-Android-0217
+adapter.tappx.istest=0
+adapter.tappx.partnerSegmentNo=1
+adapter.tappx.class=com.inmobi.adserve.channels.adnetworks.tappx.DCPTappxAdnetwork
+
+adapter.onedigitalad.status=on
+adapter.onedigitalad.advertiserId=6e0e1f777e9e4a718956668e758b5b1f
+adapter.onedigitalad.host.uj1=NA
+adapter.onedigitalad.host.uh1=NA
+adapter.onedigitalad.host.hkg1=NA
+adapter.onedigitalad.host=http://imsgrtb.onedigitalad.com/is2s
+adapter.onedigitalad.partnerSegmentNo=1
+adapter.onedigitalad.class=com.inmobi.adserve.channels.adnetworks.onedigitalad.DCPOneDigitalAdNetwork
 
 {{#rtbd}}
 server.isRtbEnabled={{rtb_enabled}}
@@ -696,39 +738,46 @@ server.rtb.demandDensity={{rtbd_demand_density}}
 server.rtb.longTermRevenue={{rtbd_long_term_revenue}}
 server.rtb.publisherYield={{rtbd_publisher_yield}}
 
-adapter.inmobiRtb1.isRtb=true
-adapter.inmobiRtb1.status=off
-adapter.inmobiRtb1.siteBlinded=true
-adapter.inmobiRtb1.rtbVer=2.0
-adapter.inmobiRtb1.advertiserId=3bde051aaeef442a822b19507ee349df
-adapter.inmobiRtb1.urlArg=query
-adapter.inmobiRtb1.rtbMethod=post
-adapter.inmobiRtb1.isWnRequired=true
-adapter.inmobiRtb1.host.uj1=
-adapter.inmobiRtb1.host.lhr1=NA
-adapter.inmobiRtb1.host.hkg1=NA
-adapter.inmobiRtb1.host.uh1=
-adapter.inmobiRtb1.host.default=http://ec2-23-23-18-252.compute-1.amazonaws.com/getBid
-adapter.inmobiRtb1.wnUrlback=http://ec2-23-23-18-252.compute-1.amazonaws.com/callback/${AUCTION_PRICE}
-adapter.inmobiRtb1.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+{{#automation_enabled}}
+adapter.rtbTestAdapter1.isRtb=true
+adapter.rtbTestAdapter1.status=on
+adapter.rtbTestAdapter1.siteBlinded=true
+adapter.rtbTestAdapter1.rtbVer=2.0
+adapter.rtbTestAdapter1.advertiserId=rtbTestAdapter1
+adapter.rtbTestAdapter1.urlArg=query
+adapter.rtbTestAdapter1.rtbMethod=post
+adapter.rtbTestAdapter1.isWnRequired=true
+adapter.rtbTestAdapter1.host.default=http://localhost:8091/getRTBBid
+adapter.rtbTestAdapter1.wnUrlback=http://localhost:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
+adapter.rtbTestAdapter1.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+adapter.rtbTestAdapter1.nativeSupported=true
 
+adapter.rtbTestAdapter2.isRtb=true
+adapter.rtbTestAdapter2.status=on
+adapter.rtbTestAdapter2.siteBlinded=true
+adapter.rtbTestAdapter2.rtbVer=2.0
+adapter.rtbTestAdapter2.advertiserId=rtbTestAdapter2
+adapter.rtbTestAdapter2.urlArg=query
+adapter.rtbTestAdapter2.rtbMethod=post
+adapter.rtbTestAdapter2.isWnRequired=true
+adapter.rtbTestAdapter2.host.default=http://localhost:8091/getRTBBid
+adapter.rtbTestAdapter2.wnUrlback=http://localhost:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
+adapter.rtbTestAdapter2.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+adapter.rtbTestAdapter2.nativeSupported=true
 
-adapter.inmobiRtb2.isRtb=true
-adapter.inmobiRtb2.status={{rtb2_status}}
-adapter.inmobiRtb2.siteBlinded=true
-adapter.inmobiRtb2.rtbVer=2.0
-adapter.inmobiRtb2.advertiserId=9ab79acef8764348a36a07b05fc3ee64
-adapter.inmobiRtb2.urlArg=query
-adapter.inmobiRtb2.rtbMethod=post
-adapter.inmobiRtb2.isWnRequired=true
-adapter.inmobiRtb2.host.uj1=
-adapter.inmobiRtb2.host.lhr1=NA
-adapter.inmobiRtb2.host.hkg1=NA
-adapter.inmobiRtb2.host.uh1=
-adapter.inmobiRtb2.host.default=http://10.14.118.66:8765/getBid
-adapter.inmobiRtb2.wnUrlback=http://10.14.118.66:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
-adapter.inmobiRtb2.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
-
+adapter.rtbTestAdapter3.isRtb=true
+adapter.rtbTestAdapter3.status=on
+adapter.rtbTestAdapter3.siteBlinded=true
+adapter.rtbTestAdapter3.rtbVer=2.0
+adapter.rtbTestAdapter3.advertiserId=rtbTestAdapter3
+adapter.rtbTestAdapter3.urlArg=query
+adapter.rtbTestAdapter3.rtbMethod=post
+adapter.rtbTestAdapter3.isWnRequired=true
+adapter.rtbTestAdapter3.host.default=http://localhost:8091/getRTBBid
+adapter.rtbTestAdapter3.wnUrlback=http://localhost:8091/callback/${AUCTION_ID}/${AUCTION_ID}/${AUCTION_BID_ID}/${AUCTION_PRICE}
+adapter.rtbTestAdapter3.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+adapter.rtbTestAdapter3.nativeSupported=true
+{{/automation_enabled}}
 
 adapter.drawbridgeRTB.isRtb=true
 adapter.drawbridgeRTB.status=off
@@ -1330,7 +1379,7 @@ adapter.lomarkRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 adapter.domobRTB.isRtb=true
 adapter.domobRTB.status=on
-adapter.domobRTB.siteBlinded=true
+adapter.domobRTB.siteBlinded=false
 adapter.domobRTB.rtbVer=2.0
 adapter.domobRTB.nativeSupported=true
 adapter.domobRTB.advertiserId=dd6e3a39adb4483892601d69f180f66e
@@ -1495,7 +1544,7 @@ adapter.beheRTB.host.default=NA
 adapter.beheRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
 adapter.shunfeiRTB.isRtb=true
-adapter.shunfeiRTB.status=off
+adapter.shunfeiRTB.status=on
 adapter.shunfeiRTB.siteBlinded=true
 adapter.shunfeiRTB.rtbVer=2.0
 adapter.shunfeiRTB.advertiserId=570e0454c6314889b18486fb71186ca8
@@ -1518,6 +1567,7 @@ adapter.tencentRTB.urlArg=query
 adapter.tencentRTB.rtbMethod=post
 adapter.tencentRTB.isWnRequired=true
 adapter.tencentRTB.currency=CNY
+adapter.tencentRTB.nativeSupported=true
 adapter.tencentRTB.host.uj1=NA
 adapter.tencentRTB.host.lhr1=NA
 adapter.tencentRTB.host.hkg1=http://i.e.qq.com/inmobi_rtb_view.fcg
@@ -1821,6 +1871,7 @@ adapter.jinqiaoRTB.urlArg=query
 adapter.jinqiaoRTB.rtbMethod=post
 adapter.jinqiaoRTB.isWnRequired=true
 adapter.jinqiaoRTB.currency=CNY
+adapter.jinqiaoRTB.nativeSupported=true
 adapter.jinqiaoRTB.host.uj1=NA
 adapter.jinqiaoRTB.host.lhr1=NA
 adapter.jinqiaoRTB.host.hkg1=http://rtbhk.cctvgb.com.cn/inmobi/auctions
@@ -1844,6 +1895,23 @@ adapter.onnuriRTB.host.uh1=NA
 adapter.onnuriRTB.host.default=NA
 adapter.onnuriRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
 
+adapter.zamplusRTB.isRtb=true
+adapter.zamplusRTB.status=on
+adapter.zamplusRTB.siteBlinded=false
+adapter.zamplusRTB.rtbVer=2.0
+adapter.zamplusRTB.advertiserId=b9a2620b23ad47bb99aa7c48dfa2851a
+adapter.zamplusRTB.urlArg=query
+adapter.zamplusRTB.rtbMethod=post
+adapter.zamplusRTB.isWnRequired=true
+adapter.zamplusRTB.currency=CNY
+adapter.zamplusRTB.nativeSupported=true
+adapter.zamplusRTB.host.uj1=NA
+adapter.zamplusRTB.host.lhr1=NA
+adapter.zamplusRTB.host.hkg1=http://inmobi.zampdsp.com/rtb/?vendor=VENDOR_INMOBI
+adapter.zamplusRTB.host.uh1=NA
+adapter.zamplusRTB.host.default=NA
+adapter.zamplusRTB.class=com.inmobi.adserve.channels.adnetworks.rtb.RtbAdNetwork
+
 {{/rtbd}}
 
 {{#ix}}
@@ -1863,6 +1931,7 @@ adapter.ix.host.lhr1=http://exapi-eu.rubiconproject.com/a/api/exchange.json?tk_s
 adapter.ix.host.hkg1=http://exapi-apac.rubiconproject.com/a/api/exchange.json?tk_sdc=apac
 adapter.ix.host.uh1=http://exapi-us-east.rubiconproject.com/a/api/exchange.json?tk_sdc=us-east
 adapter.ix.host.default={{ix_default_url}}
+adapter.ix.host.sandbox=http://localhost:8091/getIXBid
 adapter.ix.partnerSegmentNo=1
 adapter.ix.class=com.inmobi.adserve.channels.adnetworks.ix.IXAdNetwork
 adapter.ix.userName=inmobi

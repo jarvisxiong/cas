@@ -6,9 +6,7 @@ import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * Created by ishanbhatnagar on 30/4/15.
- */
+
 @Data
 @Builder(builderClassName = "Builder", builderMethodName = "newBuilder")
 public class CcidMapEntity implements IdentifiableEntity<Integer> {

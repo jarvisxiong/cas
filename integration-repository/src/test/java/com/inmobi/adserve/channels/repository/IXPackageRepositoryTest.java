@@ -1,3 +1,4 @@
+/*
 package com.inmobi.adserve.channels.repository;
 
 import static com.inmobi.adserve.channels.repository.IXPackageRepository.extractManufModelTargeting;
@@ -431,3 +432,4 @@ public class IXPackageRepositoryTest {
 
     }
 }
+*/

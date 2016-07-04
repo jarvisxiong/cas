@@ -6,12 +6,8 @@ import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
  * Created by ishanbhatnagar on 7/5/15.
  */
 public enum NativeLayoutId {
-    CONTENT_WALL((short)1),
-    APP_WALL((short)2),
-    NEWS_FEED((short)3),
-    CHAT_LIST((short)4),
-    CAROUSEL((short)5),
-    CONTENT_STREAM((short)6);
+    CONTENT_WALL((short) 1), APP_WALL((short) 2), NEWS_FEED((short) 3), CHAT_LIST((short) 4), CAROUSEL(
+            (short) 5), CONTENT_STREAM((short) 6);
 
     private final short key;
 
@@ -24,8 +20,7 @@ public enum NativeLayoutId {
     }
 
     public static NativeLayoutId findByValue(short value) {
-        switch (value)
-        {
+        switch (value) {
             case 1:
                 return CONTENT_WALL;
             case 2:

@@ -82,9 +82,7 @@ public class DCPxAdAdNetwork extends AbstractDCPAdNetworkImpl {
 
         if (null != casInternalRequestParameters.getLatLong()
                 && StringUtils.countMatches(casInternalRequestParameters.getLatLong(), ",") > 0) {
-            if (LocationSource.DERIVED_LAT_LON == sasParams.getLocationSource()) {
-                // isLocSourceDerived = true;
-            } else {
+            if (LocationSource.DERIVED_LAT_LON != sasParams.getLocationSource()) {
                 final String[] latlong = casInternalRequestParameters.getLatLong().split(",");
                 latitude = latlong[0];
                 longitude = latlong[1];

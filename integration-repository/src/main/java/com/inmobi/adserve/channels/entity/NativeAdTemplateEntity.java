@@ -7,7 +7,6 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.query.NativeAdTemplateQuery;
 import com.inmobi.adserve.contracts.misc.NativeAdContentUILayoutType;
-import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.phoenix.batteries.data.IdentifiableEntity;
 
 import lombok.Builder;
@@ -28,7 +27,6 @@ public final class NativeAdTemplateEntity implements IdentifiableEntity<NativeAd
     private final String mandatoryKey;
     private final String imageKey;
     private NativeAdContentUILayoutType nativeUILayout;
-    private NativeContentJsonObject contentJson;
     private final String template;
     private final Timestamp modifiedOn;
 

@@ -1,0 +1,21 @@
+{{#dummy_bidder}}
+#DummyRtbBidder Config
+server.port=8091
+numOfResponsePerQuota={{response_quota}}
+delayResponseInMillisecond={{delay_response_in_ms}}
+
+#Counter Config
+numOfBucket=24
+numOfMillisecondInOneBucket=36000000
+
+#Log Config
+loggerConf={{CAS_BASE_DIRECTORY}}/conf/dummy_bidder_logger.xml
+
+#IX Config
+ix.packageDeal=1001:NormalDeal,1002:CSIDDeal,1003:TEST_10003,1004:TEST_10004,1005:null,1006:AR_Positive,1007:AR_Missing,1008:AR_Mismatch,DealWaleBabaJi
+{{/dummy_bidder}}
+
+#graphite config
+graphite.host={{graphite_host_prefix}}.cas.{{IDP_CLUSTER}}.inmobi.com
+graphite.port=2020
+graphite.intervalInMinutes=1

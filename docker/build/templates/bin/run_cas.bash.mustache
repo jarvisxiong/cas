@@ -53,11 +53,18 @@ fi;
 JAVA_JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9004 -Dcom.sun.management.jmxremote.rmi.port=9004 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=$IDP_NODE"
 
 JAVA_EXTRA_OPTS=""
-# Enable Jacoco instrumentation for automation
-if [ "$IDP_ENVIRONMENT" == "non_prod" ] && [ "$IDP_CLUSTER" == "automation" ];
+if [ "$IDP_ENVIRONMENT" == "non_prod" ];
 then
-    mkdir -p ${CAS_BASE_DIRECTORY}/reports
-    JAVA_EXTRA_OPTS="-javaagent:${CAS_BASE_DIRECTORY}/bin/jacocoagent.jar=destfile=${CAS_BASE_DIRECTORY}/reports/jacoco.exec,includes=com/inmobi/*,append=false"
+    if [ "$IDP_CLUSTER" == "automation" ];
+    then
+        # Enable Jacoco instrumentation for automation
+        mkdir -p ${CAS_BASE_DIRECTORY}/reports
+        JAVA_EXTRA_OPTS="-javaagent:${CAS_BASE_DIRECTORY}/bin/jacocoagent.jar=destfile=${CAS_BASE_DIRECTORY}/reports/jacoco.exec,includes=com/inmobi/*,append=false"
+    elif [ "$IDP_CLUSTER" == "debug" ];
+    then
+        # Enabling remote debugging
+        JAVA_EXTRA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8998,server=y"
+    fi
 fi
 
 JAVA_PERF_OPTS="-Dio.netty.noResourceLeakDetection -server -Xms${MEMORY_LIMIT_IN_MB}M -Xmx${MEMORY_LIMIT_IN_MB}M -XX:CMSInitiatingOccupancyFraction=65 -XX:-OmitStackTraceInFastThrow -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseConcMarkSweepGC -XX:NewRatio=4 -XX:SurvivorRatio=6"
@@ -76,6 +83,15 @@ SCRIBE_PID=$!
 ${CAS_BASE_DIRECTORY}/bin/scribe-emitter/cas-emit-scribe-agent-stats "$@" &
 SCRIBE_STATS_PID=$!
 
+# Starting DummyRtbBidder
+$JAVA_EXEC -jar ${CAS_BASE_DIRECTORY}/bin/dummyBidder.jar ${CAS_BASE_DIRECTORY}/conf/dummy_bidder.properties "$@" &
+DUMMY_BIDDER_PID=$!
+
+# Starting HAProxy
+exec /usr/sbin/haproxy -f ${CAS_BASE_DIRECTORY}/conf/haproxy.cfg &
+HAPROXY_PID=$!
+echo "Haproxy pid is: $HAPROXY_PID"
+
 # Graceful shutdown for only prod environments
 if ! [ "$IDP_ENVIRONMENT" == "non_prod" ];
 then
@@ -91,7 +107,8 @@ then
         kill $SCRIBE_PID;\
         echo Waiting 5 more seconds for SCRIBE_STATS to finish;\
         sleep 5;\
-        kill $SCRIBE_STATS_PID;" SIGTERM SIGINT
+        kill $SCRIBE_STATS_PID $DUMMY_BIDDER_PID $HAPROXY_PID;" SIGTERM SIGINT
+
 else
     echo Graceful Shutdown disabled;
     trap "echo Killing cas and scribe indiscriminantly;\

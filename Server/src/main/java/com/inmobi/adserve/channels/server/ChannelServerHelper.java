@@ -93,6 +93,18 @@ final class ChannelServerHelper {
         LOG.error("Detected ContainerName: {}", containerName);
         return containerName;
     }
+    
+    /**
+     * Return true if it is production environment else it returns false
+     * @return
+     */
+    final boolean isProdEnvironment() {
+        final String containerName = getContainerName();
+        if (containerName == NON_PROD_CONTAINER_NAME) {
+            return false;
+        }
+        return true;
+    }
 
 
     /**

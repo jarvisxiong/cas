@@ -29,7 +29,7 @@ public class CasQueryConf {
                 break;
             }
             case SELECT_WAP_CHANNEL_AD: {
-                queryString = "select * from wap_channel_ad where id = '" + adGroup.get("ad_id") + "'";
+                queryString = "select * from wap_channel_ad where ad_group_id = '" + adGroup.get("ad_id") + "'";
                 System.out.println(queryString);
                 break;
             }
@@ -47,40 +47,55 @@ public class CasQueryConf {
             }
 
             case INSERT_WAP_CHANNEL_AD: {
+                try {
 
-                if (adGroup.get("adpool_responseformat").equalsIgnoreCase("NATIVE")) {
-                    queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
-                        + "',(select max(inc_id) from wap_channel_ad)+1,9,'" + adGroup.get("advertiser_id")
-                        + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                        + adGroup.get("adgroup_id") + "',1,now(),8)";
-                } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
-                    && adGroup.get("slot_ids").contains("14")) {
-                    queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
-                        + "',(select max(inc_id) from wap_channel_ad)+1,11,'" + adGroup.get("advertiser_id")
-                        + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
-                        + adGroup.get("adgroup_id") + "',1,now(),8)";
-                } else {
+                    if (adGroup.get("adpool_requestedadtype").equalsIgnoreCase("NATIVE")) {
+                        queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
+                            + "$1',(select max(inc_id) from wap_channel_ad)+1,9,'" + adGroup.get("advertiser_id")
+                            + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                            + adGroup.get("adgroup_id") + "',1,now(),8)";
+                    } else if (adGroup.get("adpool_requestedadtype").equalsIgnoreCase("INTERSTITIAL")
+                        && adGroup.get("slot_ids").contains("14")) {
+                        queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
+                            + "$1',(select max(inc_id) from wap_channel_ad)+1,11,'" + adGroup.get("advertiser_id")
+                            + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                            + adGroup.get("adgroup_id") + "',1,now(),8)";
+                    } else {
+                        queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
+                            + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
+                            + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                            + adGroup.get("adgroup_id") + "',1,now(),8)";
+                    }
+                } catch (Exception adpool_requestedadtype_notfound) {
                     queryString = "insert into wap_channel_ad values ('" + adGroup.get("ad_id")
                         + "',(select max(inc_id) from wap_channel_ad)+1,0,'" + adGroup.get("advertiser_id")
-                        + "',null,'cpc','archived',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
+                        + "',null,'cpc','activated',null,1,'f378e4884d384f8ea28c780c8cafcd02','"
                         + adGroup.get("adgroup_id") + "',1,now(),8)";
                 }
-
                 System.out.println(queryString);
                 break;
             }
             case UPDATE_WAP_CHANNEL_AD: {
 
-                if (adGroup.get("adpool_responseformat").equalsIgnoreCase("NATIVE")) {
+                try {
+                    if (adGroup.get("adpool_requestedadtype").equalsIgnoreCase("NATIVE")) {
+                        queryString = "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
+                            + "',is_banner_ad=9, advertiser_id='" + adGroup.get("advertiser_id") + "' where id = '"
+                            + adGroup.get("ad_id") + "$1'";
+                    } else if (adGroup.get("adpool_requestedadtype").equalsIgnoreCase("INTERSTITIAL")
+                        && adGroup.get("slot_ids").contains("14")) {
+                        queryString = "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
+                            + " ',is_banner_ad=11, advertiser_id='" + adGroup.get("advertiser_id") + "' where id = '"
+                            + adGroup.get("ad_id") + "$1'";
+                    } else {
+                        queryString = "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
+                            + "',is_banner_ad=0, advertiser_id='" + adGroup.get("advertiser_id") + "' where id = '"
+                            + adGroup.get("ad_id") + "'";
+                    }
+                } catch (Exception e) {
                     queryString = "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
-                        + "',is_banner_ad=9 where id = '" + adGroup.get("ad_id") + "'";
-                } else if (adGroup.get("adpool_responseformat").equalsIgnoreCase("IMAI")
-                    && adGroup.get("slot_ids").contains("14")) {
-                    queryString = "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
-                        + "',is_banner_ad=11 where id = '" + adGroup.get("ad_id") + "'";
-                } else {
-                    queryString = "update wap_channel_ad set ad_group_id = '" + adGroup.get("adgroup_id")
-                        + "',is_banner_ad=0 where id = '" + adGroup.get("ad_id") + "'";
+                        + "',is_banner_ad=0, advertiser_id='" + adGroup.get("advertiser_id") + "' where id = '"
+                        + adGroup.get("ad_id") + "'";
                 }
                 System.out.println(queryString);
                 break;
@@ -154,7 +169,12 @@ public class CasQueryConf {
             }
 
             case UPDATE_WAP_CHANNEL: {
-
+                try {
+                    if (!adGroup.get("account_segment").equals(null)) {
+                    }
+                } catch (Exception e) {
+                    adGroup.put("account_segment", "11");
+                }
                 queryString = "update wap_channel set account_id='" + adGroup.get("advertiser_id")
                     + "' , impression_ceil=1000000, account_segment='" + adGroup.get("account_segment")
                     + "',priority=2,modified_on=now() where id='" + adGroup.get("channel_id") + "'";
@@ -184,6 +204,20 @@ public class CasQueryConf {
                 System.out.println(queryString);
                 break;
             }
+            case DELETE_MULTI_WAPCHANNEL_ADGROUP_SEGMENT: {
+
+                queryString =
+                    "delete from wap_channel_adgroup where adgroup_id like '%" + adGroup.get("adgroup_id") + "$%'";
+                System.out.println(queryString);
+                break;
+            }
+            case DELETE_MULTI_WAPCHANNEL_AD: {
+
+                queryString =
+                    "delete from wap_channel_ad where ad_group_id like '%" + adGroup.get("adgroup_id") + "$%'";
+                System.out.println(queryString);
+                break;
+            }
             case DELETE_WAPCHANNEL_ADGROUP_LIKE_TEST: {
 
                 queryString = "delete from wap_channel_adgroup where adgroup_id like '%TEST%'";
@@ -199,6 +233,12 @@ public class CasQueryConf {
             case DELETE_IX_PACKAGE_DEALS: {
 
                 queryString = "delete from ix_package_deals where created_by ='Fender'";
+                System.out.println(queryString);
+                break;
+            }
+            case DELETE_TARGETING_SEGMENT: {
+
+                queryString = "delete from targeting_segments where id>=100001";
                 System.out.println(queryString);
                 break;
             }
@@ -253,6 +293,10 @@ public class CasQueryConf {
                     CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getManufModelParamName() != null ?
                         CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getManufModelParamName() :
                         "[]";
+                final String targetingSegment =
+                    CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getTargetingSegment() != null ?
+                        CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getTargetingSegment() :
+                        "{}";
 
                 String language_targeting_list = "{}";
                 String placement_slot_ids = "{}";
@@ -272,37 +316,58 @@ public class CasQueryConf {
                             language_targeting_list = "{ch}";
                         }
                     }
-                    placement_slot_ids = "{9}";
-                    site_ids = "{newsiteid}";
+                    placement_slot_ids = "{}";
+                    site_ids = "{}";
                 }
                 queryString = "insert into ix_packages(id, name, description,rp_data_segment_id,pmp_class,country_ids, "
                     + "inventory_types, os_ids, carrier_ids,site_categories,connection_types,"
-                    + "app_store_categories,site_ids, zip_codes, cs_ids, scheduled_tods, "
-                    + "placement_slot_ids,is_active,data_vendor_cost,city_ids, "
+                    + "app_store_categories,site_ids,dmp_filter_expression, zip_codes, cs_ids, scheduled_tods, "
+                    + "placement_slot_ids,is_active,start_date,end_date,data_vendor_cost,city_ids, "
                     + "geo_source_types,os_version_targeting , manuf_model_targeting,"
-                    + " language_targeting_list,viewable,sdk_version_targeting,sdk_versions) values ("
+                    + " language_targeting_list,viewable,sdk_version_targeting,sdk_versions,targeting_segment_ids) values ("
                     + adGroup.get("package_id") + ",'Fender_Deal'," + "'Fender_Driven','"
                     + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName()
                     + "','RIGHT_TO_FIRST_REFUSAL','{" + CasConf.PackageDeals.valueOf(
                     "TEST_" + adGroup.get("package_id")).getCountryId() + "}',"
-                    + "'{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','" + site_ids + "',"
-                    + "'{}','{}','{}','" + placement_slot_ids + "','t',1,'{}','{}', '[{\"osId\":3, "
-                    + "\"range\":[]},{\"osId\":5, " + "\"range\":[]}]' , '" + manufParam + "', '"
-                    + language_targeting_list + "'," + CasConf.PackageDeals.valueOf(
-                    "TEST_" + adGroup.get("package_id")).getViewability() + ",'{exclusion:[]}','{}')";
+                    + "'{APP,BROWSER}','{5,3}','{}','{FAMILY_SAFE,PERFORMANCE}','{}','{}','" + site_ids + "'," + "'"
+                    + csidParam + "','{}','{}','{}','" + placement_slot_ids
+                    + "','t',now()-100,now()+100,1,'{}','{}', '[{\"osId\":3, " + "\"range\":[]},{\"osId\":5, "
+                    + "\"range\":[]}]' , '" + manufParam + "', '" + language_targeting_list + "',"
+                    + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getViewability()
+                    + ",'{exclusion:[]}','{}','" + targetingSegment + "')";
 
 
                 System.out.println(queryString);
                 break;
             }
+            case INSERT_TARGETING_SEGMENT: {
+                queryString = "Insert into targeting_segments VALUES (" + adGroup.get("segment_id") + ",'fender_test"
+                    + adGroup.get("segment_id")
+                    + "','dummy targetting segment',false,null,false,null,false,null,false,null,true,null,null,'"
+                    + CasConf.Targetingsegment.valueOf("TEST_" + adGroup.get("segment_id")).getOs_version_json() + "','"
+                    + CasConf.Targetingsegment.valueOf("TEST_" + adGroup.get("segment_id")).getCountry_version_json()
+                    + "',null,false,null,false,null,false,null,false,null,false,null,false,null,false,null,null,1345,3456,5,now(),'ANK',now(),'ank')";
+                System.out.println(queryString);
+                break;
+            }
             case INSERT_IX_PACKAGE_DEALS: {
+                final String viewability_tracker =
+                    CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getviewability_tracker() != null ?
+                        CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getviewability_tracker() :
+                        "";
+                final String Third_party_tracker_json =
+                    CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getThird_party_tracker_json()
+                        != null ?
+                        CasConf.PackageDeals.valueOf(
+                            "TEST_" + adGroup.get("package_id")).getThird_party_tracker_json() :
+                        "";
+
+
                 queryString =
-                    "Insert into ix_package_deals (rp_deal_id, package_id, created_by,access_type, deal_floor, modified_on,viewability_tracker,third_party_tracker_json) values ('"
+                    "Insert into ix_package_deals (rp_deal_id, package_id, created_by,access_type, deal_floor, modified_on,viewability_tracker,third_party_tracker_json,dst) values ('"
                         + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getDealName() + "',"
                         + adGroup.get("package_id") + ",'Fender','RIGHT_TO_FIRST_REFUSAL_DEAL',1, now(),'"
-                        + CasConf.PackageDeals.valueOf("TEST_" + adGroup.get("package_id")).getviewability_tracker()
-                        + "','" + CasConf.PackageDeals.valueOf(
-                        "TEST_" + adGroup.get("package_id")).getThird_party_tracker_json() + "')";
+                        + viewability_tracker + "','" + Third_party_tracker_json + "',8)";
                 System.out.println(queryString);
                 break;
             }
@@ -369,4 +434,6 @@ public class CasQueryConf {
         }
         return queryString;
     }
+
+
 }

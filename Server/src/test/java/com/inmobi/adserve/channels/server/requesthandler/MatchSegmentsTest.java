@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 
 public class MatchSegmentsTest extends TestCase {
-    private static final String CHANNEL_SERVER_CONFIG_FILE = "/opt/mkhoj/conf/cas/channel-server.properties";
+    private static final String CHANNEL_SERVER_CONFIG_FILE = "channel-server.properties";
     private ConfigurationLoader configurationLoder;
     private MatchSegments matchSegments;
 

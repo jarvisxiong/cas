@@ -20,6 +20,7 @@ public class AsyncHttpClientProvider {
     private final ServerConfig serverConfig;
     private AsyncHttpClient dcpAsyncHttpClient;
     private AsyncHttpClient rtbAsyncHttpClient;
+    private AsyncHttpClient photonAsyncHttpClient;
 
     @Inject
     public AsyncHttpClientProvider(final ServerConfig serverConfig) {
@@ -58,7 +59,20 @@ public class AsyncHttpClientProvider {
                                         "outbound-dcpbackfill-client-%d").build()));
         dcpAsyncHttpClient = new AsyncHttpClient(cfDcp.build());
 
-
+        final AsyncHttpClientConfig.Builder cfPhoton =
+                new AsyncHttpClientConfig.Builder()
+                        .setRequestTimeoutInMs(serverConfig.getNingTimeoutInMillisForPhoton())
+                        .setConnectionTimeoutInMs(serverConfig.getNingTimeoutInMillisForPhoton())
+                        .setMaximumConnectionsTotal(
+                                serverConfig.getMaxPhotonOutGoingConnections()
+                                        * Runtime.getRuntime().availableProcessors())
+                        .setFollowRedirects(false)
+                        .setMaxRequestRetry(0)
+                        .setAllowPoolingConnection(true)
+                        .setExecutorService(
+                                Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat(
+                                        "outbound-photon-client-%d").build()));
+        photonAsyncHttpClient = new AsyncHttpClient(cfPhoton.build());
     }
 
     /**
@@ -73,6 +87,13 @@ public class AsyncHttpClientProvider {
      */
     public AsyncHttpClient getRtbAsyncHttpClient() {
         return rtbAsyncHttpClient;
+    }
+
+    /**
+     * @return the photonAsyncHttpClient
+     */
+    public AsyncHttpClient getPhotonAsyncHttpClient() {
+        return photonAsyncHttpClient;
     }
 
     @PreDestroy

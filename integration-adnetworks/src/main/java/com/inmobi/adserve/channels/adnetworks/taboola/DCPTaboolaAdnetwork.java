@@ -1,5 +1,20 @@
 package com.inmobi.adserve.channels.adnetworks.taboola;
 
+import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.inmobi.adserve.channels.api.AbstractDCPAdNetworkImpl;
 import com.inmobi.adserve.channels.api.HttpRequestHandlerBase;
@@ -14,31 +29,14 @@ import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
 import com.inmobi.adserve.contracts.common.request.nativead.Image;
-// import com.inmobi.adserve.contracts.misc.contentjson.CommonAssetAttributes;
-// import com.inmobi.adserve.contracts.misc.contentjson.Dimension;
-// import com.inmobi.adserve.contracts.misc.contentjson.ImageAsset;
-// import com.inmobi.adserve.contracts.misc.contentjson.NativeAdContentAsset;
-// import com.inmobi.adserve.contracts.misc.contentjson.NativeContentJsonObject;
 import com.inmobi.template.context.App;
 import com.inmobi.template.context.Icon;
 import com.inmobi.template.context.Screenshot;
 import com.inmobi.template.interfaces.TemplateConfiguration;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.inmobi.adserve.channels.entity.NativeAdTemplateEntity.TemplateClass.STATIC;
 
 /**
  * Created by thushara.v on 25/05/15.
@@ -52,6 +50,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private static final String SOURCE_URL = "source.url";
     private static final String SOURCE_PLACEMENT = "source.placement";
     private static final String USER_ID = "user.id";
+    private static final String DEVICE_ID = "device.id";
     private static final String USER_REFERRER = "user.referrer";
     private static final String USER_AGENT = "user.agent";
     private static final String USER_IP = "user.realip";
@@ -67,6 +66,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     private boolean isScreenshotResponse = false;
     private NativeAdTemplateEntity templateEntity;
     private final List<String> oemSiteIds;
+    private boolean isOemSite;
 
     protected final Gson gson;
     @Inject
@@ -94,9 +94,9 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         host = String.format(config.getString("taboola.host"), externalSiteId);
         iconUrl = config.getString("taboola.icon");
         notificationUrl = config.getString("taboola.notification");
-
+        isOemSite = oemSiteIds.contains(sasParams.getSiteId());
         if (sasParams.getWapSiteUACEntity() != null
-                && sasParams.getWapSiteUACEntity().isTransparencyEnabled() == true) {
+                && (sasParams.getWapSiteUACEntity().isTransparencyEnabled() || isOemSite)) {
             wapSiteUACEntity = sasParams.getWapSiteUACEntity();
         } else {
             LOG.info("Uac is not initialized for site {} in Taboola", sasParams.getSiteId());
@@ -114,7 +114,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
     public URI getRequestUri() throws Exception {
         final StringBuilder requestBuilder = new StringBuilder(host);
         appendQueryParam(requestBuilder, AD_COUNT,
-                oemSiteIds.contains(sasParams.getSiteId()) ? sasParams.getRqMkAdcount() : 1, false);
+                isOemSite ? sasParams.getRqMkAdcount() : 1, false);
         if (StringUtils.isNotEmpty(wapSiteUACEntity.getAppTitle())) {
             appendQueryParam(requestBuilder, APP_NAME, getURLEncode(wapSiteUACEntity.getAppTitle(), format), false);
         } else if (StringUtils.isNotEmpty(wapSiteUACEntity.getSiteName())) {
@@ -141,6 +141,15 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (udid != null) {
             appendQueryParam(requestBuilder, USER_ID, udid, false);
         }
+        String deviceId;
+        if (StringUtils.isNotEmpty(deviceId = getUidIFA(true))) {
+            // Set to UIDIFA for IOS Device
+            appendQueryParam(requestBuilder,DEVICE_ID,deviceId,false);
+        } else if (StringUtils.isNotEmpty(deviceId = getGPID(true))) {
+            // Set to GPID for Android Device
+            appendQueryParam(requestBuilder,DEVICE_ID,deviceId,false);
+        }
+
         LOG.debug("Taboola AD request url {}", requestBuilder);
         return new URI(requestBuilder.toString());
     }
@@ -172,7 +181,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
             final TaboolaResponse taboolaResponse = gson.fromJson(response, TaboolaResponse.class);
             if (taboolaResponse.getList().length > 0) {
                 StringBuilder responseBuilder = new StringBuilder();
-                final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId());
+                final String nurl = String.format(notificationUrl, externalSiteId, taboolaResponse.getId(),taboolaResponse.getSession());
                 for (NativeJson taboolaNative : taboolaResponse.getList()) {
                     final App.Builder appBuilder = App.newBuilder();
                     updateNativeParams(params, nurl, beacon);
@@ -271,6 +280,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         params.put(NativeResponseMaker.TEMPLATE_ID_PARAM, String.valueOf(templateEntity.getTemplateId()));
         params.put(NativeResponseMaker.NURL_URL_PARAM, nurl);
         params.put(VelocityTemplateFieldConstants.IMAI_BASE_URL, sasParams.getImaiBaseUrl());
+        params.put(NativeResponseMaker.CLICK_URL_PARAM, getClickUrl());
     }
 
     @Override
@@ -287,22 +297,7 @@ public class DCPTaboolaAdnetwork extends AbstractDCPAdNetworkImpl {
         if (LOG.isDebugEnabled()) {
             LOG.debug(templateEntity.toString());
         }
-        /*final NativeContentJsonObject nativeContentObject = templateEntity.getContentJson();
-        if (nativeContentObject == null) { */
         setDimensionForCustomTemplates();
-        /*} else {
-            for (final ImageAsset imageAsset : nativeContentObject.getImageAssets()) {
-                final CommonAssetAttributes attributes = imageAsset.getCommonAttributes();
-                final NativeAdContentAsset adContentAsset = attributes.getAdContentAsset();
-                final Dimension dimensions = imageAsset.getDimension();
-                thumbnailHeight = dimensions.getHeight();
-                thumbnailWidth = dimensions.getWidth();
-                if (adContentAsset == NativeAdContentAsset.SCREENSHOT) {
-                    isScreenshotResponse = true;
-                    break;
-                }
-            }
-        }*/
         return true;
     }
 

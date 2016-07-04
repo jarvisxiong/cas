@@ -3,14 +3,14 @@ package com.inmobi.adserve.channels.server.utils;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.Android;
 import static com.inmobi.adserve.channels.api.SASRequestParameters.HandSetOS.iOS;
 
-import com.inmobi.adserve.supply.AdType;
-import com.inmobi.segment.impl.AdTypeEnum;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.inmobi.segment.impl.AdTypeEnum;
 
 public class ParameterisedCasUtilsTests {
 

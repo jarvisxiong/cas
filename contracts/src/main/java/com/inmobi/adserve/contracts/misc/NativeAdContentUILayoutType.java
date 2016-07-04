@@ -11,18 +11,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 // https://github.corp.inmobi.com/ci/publisher-core/blob/master/src/main/java/com/inmobi/publisher/core/constant/enums/NativeAdContentUILayoutType.java
 public enum NativeAdContentUILayoutType {
-    NEWS_FEED(1),
-    CONTENT_WALL(2),
-    CONTENT_STREAM(3),
-    CAROUSEL(4),
-    CHAT_LIST(5),
-    APP_WALL(6);
+    NEWS_FEED(1), CONTENT_WALL(2), CONTENT_STREAM(3), CAROUSEL(4), CHAT_LIST(5), APP_WALL(6);
 
     private final int id;
 
     public static NativeAdContentUILayoutType findByValue(int value) throws IllegalArgumentException {
-        switch (value)
-        {
+        switch (value) {
             case 1:
                 return NEWS_FEED;
             case 2:

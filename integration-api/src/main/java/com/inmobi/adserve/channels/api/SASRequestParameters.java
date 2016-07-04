@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.google.common.collect.ImmutableSet;
 import com.inmobi.adserve.adpool.ConnectionType;
 import com.inmobi.adserve.adpool.ContentType;
@@ -12,9 +15,13 @@ import com.inmobi.adserve.adpool.IntegrationDetails;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.entity.SiteEcpmEntity;
 import com.inmobi.adserve.channels.entity.WapSiteUACEntity;
+import com.inmobi.casthrift.DemandSourceType;
 import com.inmobi.segment.impl.AdTypeEnum;
 import com.inmobi.types.DeviceType;
+import com.inmobi.types.InventoryType;
 import com.inmobi.types.LocationSource;
+import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
+import com.ning.http.client.ListenableFuture;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +30,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class SASRequestParameters {
     private boolean secureRequest = false;
-    private String allParametersJson;
     private String remoteHostIp;
     private String userAgent;
 
@@ -38,11 +44,9 @@ public class SASRequestParameters {
     private LocationSource locationSource;
     private Set<Long> geoFenceIds;
     private String impressionId;
-    private String clurl;
     private String siteId;
     private Long placementId;
     private ContentType siteContentType;
-    private String sdkVersion;
     //Supply Capabilites supported by sdk/device
     private Set<Integer> supplyCapabilities;
 
@@ -61,7 +65,6 @@ public class SASRequestParameters {
     private String pubControlPreferencesJson;
 
     // Uid parameters
-    private String uidParams;
     private Map<String, String> tUidParams;
 
     private String rqIframe;
@@ -80,6 +83,7 @@ public class SASRequestParameters {
     private String handsetName;
     private Integer carrierId;
     private Integer city;
+    private Set<Integer> cities;
     private Integer state;
     private List<Short> rqMkSlot;
     private List<Short> processedMkSlot;
@@ -92,9 +96,11 @@ public class SASRequestParameters {
     private Set<String> uAdapters;
 
     private int dst; // This will describe the type of request dcp, rtbd or ix
+    private DemandSourceType demandSourceType;
     private Set<Integer> accountSegment;
     private int sst; // 0 for Network
     private String pubId;
+    private InventoryType inventoryType;
     private ConnectionType connectionType;
     private double marketRate;
     private Map<String, String> adPoolParamsMap;
@@ -125,6 +131,23 @@ public class SASRequestParameters {
     private String requestGuid;
     private String language;
     private boolean noJsTracking = false;
+    private NappScore nappScore;
+
+    private String selectedUserId;
+    private Pair<Long, ListenableFuture<BrandAttributes>> brandAttrFuturePair;
+    private boolean coppaEnabled;
+    private boolean isRequestFromSDK;
+    private String sdkVersion;
+    private boolean deeplinkingSupported;
+    private boolean isSandBoxRequest;
+
+    /**
+     * @return true if bundle ids are mismatched
+     */
+    public boolean isBundleIdMismatched() {
+        return (null != wapSiteUACEntity) ? !StringUtils.equalsIgnoreCase(wapSiteUACEntity.getBundleId(), appBundleId) :
+                false;
+    }
 
     public enum HandSetOS {
         OTHERS(1), Linux_Smartphone_OS(2), Android(3), Nokia_OS(4), iOS(5), RIM_OS(6), MTK_Nucleus_OS(7), Symbian_OS(8), Windows_Mobile_OS(
@@ -142,4 +165,15 @@ public class SASRequestParameters {
         }
     }
 
+    public enum NappScore {
+        CONFIDENT_BAD_SCORE(10), MAYBE_BAD_SCORE(40), UNKNOWN_SCORE(90), CONFIDENT_GOOD_SCORE(100);
+        private final int id;
+
+        NappScore (final int id) {
+            this.id = id;
+        }
+        public int getValue() {
+            return id;
+        }
+    }
 }

@@ -108,7 +108,7 @@ public class ImpressionIdGenerator {
      * @param uuid
      * @return
      */
-    private static Date extractDateFromImpId(final String uuid) {
+    public static Date extractDateFromImpId(final String uuid) {
         final UUID u = UUID.fromString(uuid);
         long lsig = u.getLeastSignificantBits();
         final long msig = u.getMostSignificantBits();

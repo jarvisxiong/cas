@@ -1,12 +1,19 @@
 package com.inmobi.adserve.channels.server.requesthandler;
 
+import static com.inmobi.adserve.adpool.IntegrationMethod.SDK;
+import static com.inmobi.adserve.adpool.IntegrationType.ANDROID_SDK;
+import static com.inmobi.adserve.adpool.IntegrationType.IOS_SDK;
+import static com.inmobi.adserve.channels.api.SASRequestParameters.NappScore.MAYBE_BAD_SCORE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.BANNER_NOT_ALLOWED;
 import static com.inmobi.adserve.channels.util.InspectorStrings.CHINA_MOBILE_TARGETING;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INCOMPATIBLE_SITE_TYPE;
 import static com.inmobi.adserve.channels.util.InspectorStrings.INVALID_SLOT_REQUEST;
+import static com.inmobi.adserve.channels.util.InspectorStrings.IX_REQUEST_DROPPED_FOR_NAPP_SCORE_40;
 import static com.inmobi.adserve.channels.util.InspectorStrings.JSON_PARSING_ERROR;
 import static com.inmobi.adserve.channels.util.InspectorStrings.LOW_SDK_VERSION;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_CATEGORY;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_MRAID_PATH;
+import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_SDK_VERSION;
 import static com.inmobi.adserve.channels.util.InspectorStrings.MISSING_SITE_ID;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NO_SAS_PARAMS;
 import static com.inmobi.adserve.channels.util.InspectorStrings.NO_SUPPORTED_SLOTS;
@@ -16,10 +23,14 @@ import static com.inmobi.adserve.channels.util.InspectorStrings.THRIFT_PARSING_E
 import java.util.ArrayList;
 import java.util.List;
 
+import com.inmobi.adserve.channels.api.SASRequestParameters.NappScore;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.inmobi.adserve.adpool.IntegrationDetails;
+import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
 import com.inmobi.adserve.channels.server.HttpRequestHandler;
@@ -29,8 +40,9 @@ import com.inmobi.casthrift.DemandSourceType;
 
 public class RequestFilters {
     private static final Logger LOG = LoggerFactory.getLogger(RequestFilters.class);
-    protected static final Long CHINA = 164l;
+    protected static final Long CHINA = 164L;
     protected static final Integer CHINA_MOBILE = 787;
+    public static final int MINIMUM_SUPPORTED_SDK_VERSION = 300;
 
 
     public boolean isDroppedInRequestFilters(final HttpRequestHandler hrh) {
@@ -55,9 +67,17 @@ public class RequestFilters {
         final DemandSourceType dst = DemandSourceType.findByValue(sasParams.getDst());
         final String dstName = dst != null ? "-" + dst.name() : "-UNKNOWN_DST";
 
+        final NappScore nappScore = sasParams.getNappScore();
+        if (MAYBE_BAD_SCORE == nappScore && dst == DemandSourceType.IX) {
+            LOG.debug("Terminating IX request as NappScore : {}", nappScore.name());
+            hrh.setTerminationReason(CasConfigUtil.NAPP_SCORE_LESS_THAN_40);
+            InspectorStats.incrementStatCount(TERMINATED_REQUESTS, IX_REQUEST_DROPPED_FOR_NAPP_SCORE_40);
+            return true;
+        }
+
         if (CollectionUtils.isEmpty(sasParams.getCategories())) {
             LOG.info("Category field is not present in the request so sending noad");
-            sasParams.setCategories(new ArrayList<Long>());
+            sasParams.setCategories(new ArrayList<>());
             hrh.setTerminationReason(CasConfigUtil.MISSING_CATEGORY);
             InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_CATEGORY + dstName);
             return true;
@@ -85,20 +105,29 @@ public class RequestFilters {
             return true;
         }
 
-        final String tempSdkVersion = sasParams.getSdkVersion();
-        LOG.debug("sdk-version : {}", tempSdkVersion);
-        if (null != tempSdkVersion) {
-            try {
-                final String ia = tempSdkVersion.substring(0, 1);
-                if (("i".equalsIgnoreCase(ia) || "a".equalsIgnoreCase(ia))
-                        && Integer.parseInt(tempSdkVersion.substring(1, 2)) < 3) {
-                    LOG.info("Terminating request as sdkVersion is less than 3");
-                    hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
-                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, LOW_SDK_VERSION + dstName);
+        final IntegrationDetails integrationDetails = sasParams.getIntegrationDetails();
+        if (null != integrationDetails && SDK == integrationDetails.getIntegrationMethod()) {
+            final IntegrationType integrationType = integrationDetails.getIntegrationType();
+            if (IOS_SDK == integrationType || ANDROID_SDK == integrationType) {
+                if (integrationDetails.isSetIntegrationVersion()) {
+                    final int sdkVersion = integrationDetails.getIntegrationVersion();
+                    if (sdkVersion < MINIMUM_SUPPORTED_SDK_VERSION) {
+                        LOG.info("Terminating request as sdkVersion was less than 300");
+                        hrh.setTerminationReason(CasConfigUtil.LOW_SDK_VERSION);
+                        InspectorStats.incrementStatCount(TERMINATED_REQUESTS, LOW_SDK_VERSION + dstName);
+                        return true;
+                    } else if (StringUtils.isBlank(sasParams.getImaiBaseUrl())) {
+                        LOG.info("Terminating request as mraid path could not be determined");
+                        hrh.setTerminationReason(CasConfigUtil.MISSING_MRAID_PATH);
+                        InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_MRAID_PATH + sdkVersion);
+                        return true;
+                    }
+                } else {
+                    LOG.info("Terminating request as the sdk version could not be determined");
+                    hrh.setTerminationReason(CasConfigUtil.UNKNOWN_SDK_VERSION);
+                    InspectorStats.incrementStatCount(TERMINATED_REQUESTS, MISSING_SDK_VERSION + dstName);
                     return true;
                 }
-            } catch (final Exception exception) {
-                LOG.info("Invalid sdk-version, Exception raised {}", exception);
             }
         }
 

@@ -18,9 +18,11 @@ public final class ChannelServerStringLiterals {
     public static final String WAP_SITE_UAC_REPOSITORY = "WapSiteUACRepository";
     public static final String IX_ACCOUNT_MAP_REPOSITORY = "IXAccountMapRepository";
     public static final String IX_PACKAGE_REPOSITORY = "IXPackageRepository";
+    public static final String PACKAGE_REPOSITORY_V2 = "PackageRepositoryV2";
     public static final String CREATIVE_REPOSITORY = "CreativeRepository";
     public static final String NATIVE_AD_TEMPLATE_REPOSITORY = "NativeAdTemplateRepository";
     public static final String GEO_ZIP_REPOSITORY = "GeoZipRepository";
+    public static final String GEO_CITY_REPOSITORY = "GeoCityRepository";
     public static final String CAU_METADATA_REPOSITORY = "CAUMetaDataRepository";
     public static final String SLOT_SIZE_MAP_REPOSITORY = "SlotSizeMapRepository";
     public static final String SDK_MRAID_MAP_REPOSITORY = "SdkMraidMapRepository";

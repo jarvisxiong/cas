@@ -32,11 +32,10 @@ public class CcidMapRepository extends AbstractStatsMaintainingDBRepository<Ccid
             builder.carrier(carrier);
 
             final CcidMapEntity entity = builder.build();
-            return new DBEntity<CcidMapEntity, Integer>(entity, null);
+            return new DBEntity<>(entity, null);
         } catch (final Exception exp) {
             logger.error("Error in resultset row", exp);
-            return new DBEntity<CcidMapEntity, Integer>(new EntityError<Integer>(countryCarrierId,
-                    "ERROR_IN_EXTRACTING_CCID_MAP"), null);
+            return new DBEntity<>(new EntityError<>(countryCarrierId, "ERROR_IN_EXTRACTING_CCID_MAP"), null);
         }
     }
 

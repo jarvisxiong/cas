@@ -22,21 +22,18 @@ import com.inmobi.adserve.adpool.IntegrationType;
 import com.inmobi.adserve.adpool.RequestedAdType;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
-import com.inmobi.adserve.channels.util.Utils.TestUtils;
+import com.inmobi.adserve.channels.util.Utils.TestUtils.SampleStrings;
 import com.inmobi.types.eventserver.ImpressionInfo;
 
-/**
- * Created by ishan.bhatnagar on 25/09/15.
- */
+
 public class ParameterizedDefaultLazyInmobiAdTrackerTest {
-    public static SASRequestParameters baseSasParams;
-    public static Configuration mockConfiguration;
+    private static SASRequestParameters baseSasParams;
     private static final Integer DEFAULT_SEGMENT_ID = 0;
 
     @BeforeClass
     public void setUp() {
         baseSasParams = new SASRequestParameters();
-        mockConfiguration = createNiceMock(Configuration.class);
+        final Configuration mockConfiguration = createNiceMock(Configuration.class);
 
         baseSasParams.setAge((short) 20);
         baseSasParams.setCarrierId(2);
@@ -70,7 +67,7 @@ public class ParameterizedDefaultLazyInmobiAdTrackerTest {
         ImpressionIdGenerator.init(hostIdCode, dataCenterIdCode);
     }
 
-    private static final SASRequestParameters copyHelper() {
+    private static SASRequestParameters copyHelper() {
         try {
             return (SASRequestParameters) BeanUtils.cloneBean(baseSasParams);
         } catch (Exception ignored) {
@@ -93,14 +90,14 @@ public class ParameterizedDefaultLazyInmobiAdTrackerTest {
     public void verifyBillingRelatedPlacementContract(final String testCaseName, final Long placementId,
             final Integer placementSegmentId, final Integer siteSegmentId, final String expectedSegmentId) throws Exception {
 
-        SASRequestParameters sasParams = copyHelper();
+        final SASRequestParameters sasParams = copyHelper();
         sasParams.setPlacementId(placementId);
         sasParams.setPlacementSegmentId(placementSegmentId);
         sasParams.setSiteSegmentId(siteSegmentId);
 
-        DefaultLazyInmobiAdTrackerBuilder builder =
-                new DefaultLazyInmobiAdTrackerBuilder(sasParams, TestUtils.SampleStrings.impressionId, true);
-        DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
+        final DefaultLazyInmobiAdTrackerBuilder builder =
+                new DefaultLazyInmobiAdTrackerBuilder(sasParams, SampleStrings.impressionId, true);
+        final DefaultLazyInmobiAdTracker inmobiAdTracker = builder.buildInmobiAdTracker();
 
         final String actualBeaconUrl = inmobiAdTracker.getBeaconUrl();
         final ImpressionInfo extractedImpressionInfo = DefaultLazyInmobiAdTrackerUtils.extractImpressionInfo(actualBeaconUrl);

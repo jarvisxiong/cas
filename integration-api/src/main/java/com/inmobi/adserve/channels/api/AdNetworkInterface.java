@@ -3,9 +3,13 @@ package com.inmobi.adserve.channels.api;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.inmobi.adserve.channels.entity.ChannelSegmentEntity;
+import com.inmobi.adserve.channels.entity.pmp.DealAttributionMetadata;
+import com.inmobi.adserve.channels.entity.pmp.DealEntity;
 import com.inmobi.adserve.channels.repository.RepositoryHelper;
+import com.inmobi.adserve.channels.util.demand.enums.AuctionType;
 import com.inmobi.casthrift.ADCreativeType;
 import com.inmobi.casthrift.DemandSourceType;
 
@@ -90,7 +94,7 @@ public interface AdNetworkInterface {
     double getBidPriceInUsd();
 
     /**
-     * Returns teh bid price for rtbd in local currency in which partner has bid
+     * Returns the bid price for rtbd in local currency in which partner has bid
      *
      * @return
      */
@@ -206,21 +210,9 @@ public interface AdNetworkInterface {
     URI getRequestUri() throws Exception;
 
     /**
-     * Returns true if the adapter is an internal partner.
-     *
-     * @return
-     */
-    boolean isInternal();
-
-    /**
      * Called after the adapter is selected for impression.
      */
     void impressionCallback();
-
-    /**
-     * Called after the adapter is not selected for impression.
-     */
-    void noImpressionCallBack();
 
     /**
      * get click url
@@ -343,13 +335,45 @@ public interface AdNetworkInterface {
     Double getForwardedBidGuidance();
 
     /**
-     * 
-     * @return
+     * Returns the auction type of the bid
      */
-    String getAppBundleId();
+    AuctionType getAuctionType();
 
     /**
-     * Return the host
+     * Returns the winning deal entity
+     */
+    DealEntity getDeal();
+
+    /**
+     * Returns the deal attribution metadata object
+     */
+    DealAttributionMetadata getDealAttributionMetadata();
+
+    /**
+     * Returns the list of packages that were forwarded in the bid request.
+     */
+    Set<Integer> getForwardedPackageIds();
+
+    /**
+     * Returns the list of all targeting segments that were shorlisted
+     */
+    Set<Long> getShortlistedTargetingSegmentIds();
+
+    /**
+     * Returns the list of deals that were forwarded in the bid request.
+     */
+    Set<String> getForwardedDealIds();
+    
+    /**
+     * Get App Bundle Id from UAC.
+     * 
+     * @param useAppBundleIdOfRequest - If UAC Bundle Id not available fall back to request bundle id
+     * @return
+     */
+    String getAppBundleId(boolean useAppBundleIdOfRequest);
+
+    /**
+     * Returns the host name
      */
     String getHostName();
 }

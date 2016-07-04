@@ -151,7 +151,6 @@ public class DCPWebmoblinkAdnetworkTest {
         sasParams.setRemoteHostIp("206.29.182.240");
         sasParams.setUserAgent(" ");
         sasParams.setSiteIncId(123456);
-        sasParams.setAllParametersJson("{\"carrier\": [365,0,\"us\",10224,10225]}");
         Long[] cats = {10l, 13l, 30l};
         sasParams.setCategories(Arrays.asList(cats));
         String externalSiteKey = "10023";

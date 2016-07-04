@@ -817,6 +817,7 @@ TEST3_1_3:
    new_category  :  '70,71'
    maxCasRequestCounter   : '1'
    adpool_selectedslots  :  '15'
+   multi_ad : '5'
 TEST3_1_4:
  - adpool_taskid  : 'anotherreqid'
    u_id_params  : '{\"O1\":\"9e74e1b452e07afded40fd15b45aa9e6\",\"u-id-s\":\"O1\"}'
@@ -1419,6 +1420,7 @@ TEST3_NATIVE_LAYOUT_1 :
   site_siteid : 'e445cd9750454deabe9174808d19aaa2'
   site_publisherid : 'e097d9f6569c423290118d087e03b2c4'
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype : 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1432,6 +1434,7 @@ TEST3_NATIVE_LAYOUT_2 :
   site_siteid : 'ad1b334e3bdf4d2ba02b43596011d2bb' #blind
   site_publisherid : '49260e6dff8747f992266858d65d9668' #trans
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype : 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1445,6 +1448,7 @@ TEST3_NATIVE_LAYOUT_3 :
   site_siteid : '9eb350a1706643c6a44bc18fca31ae0f' #blind
   site_publisherid : '4028cb9734cad8a301350f22338414fd' #trans
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype : 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1458,6 +1462,7 @@ TEST3_NATIVE_LAYOUT_4 :
   site_siteid : '' #blind
   site_publisherid : '' #trans
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype : 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1471,6 +1476,7 @@ TEST3_NATIVE_LAYOUT_5 :
   site_siteid : '4028cba6328f45a1013291790c62002a'
   site_publisherid : '4028cb8b2ee24759012ee2deee2d0013'
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype : 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1484,6 +1490,7 @@ TEST3_NATIVE_LAYOUT_6 :
   site_siteid : '56dfefa31b964fc0bef524e1c396616c'
   site_publisherid : '4028cb1e35513d9b0135a9d3b4b21d77'
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype : 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1635,6 +1642,90 @@ TEST_STUDIO_NEGATIVE :
 
 TEST_IX_PACKAGES_NORMALDEAL :
 - geo_countryid : '150'
+  integration_type: ANDROID_SDK
+  integration_version: '451'
+
+TEST_IX_PACKAGES_SDK_VERSION_BANNER :
+- geo_countryid : '151'
+  integration_type: ANDROID_SDK
+  integration_version: '451'
+
+TEST_IX_PACKAGES_SDK_VERSION_VAST :
+- geo_countryid : '151'
+  integration_type: 'ANDROID_SDK'
+  adpool_requestedadtype: 'VAST'
+  site_inventorytype : 'APP' #forreq
+  adpool_responseformat : 'VAST'
+  adpool_selectedslots : '14'
+  ad_type_targeting : '3'
+  integration_version: '500'
+
+TEST_IX_PACKAGES_SDK_VERSION_NATIVE :
+- geo_countryid : '151'
+  integration_type: ANDROID_SDK
+  integration_version: '451'
+  adpool_requestedadtype: 'NATIVE'
+  adpool_placementId : '1431976048482536'
+
+TEST_IX_NEW_PACKAGES_SDK_VERSION_BANNER :
+- geo_countryid : '154'
+  integration_type: ANDROID_SDK
+  integration_version: '451'
+
+TEST_IX_NEW_PACKAGE_COUNTRY_EXCLUSION :
+- geo_countryid : '94'
+  integration_type: ANDROID_SDK
+  integration_version: '451'
+  geo_cityids : '53241'
+
+TEST_IX_NEW_PACKAGES_SDK_VERSION_VAST :
+- geo_countryid : '154'
+  integration_type: 'ANDROID_SDK'
+  adpool_requestedadtype: 'VAST'
+  site_inventorytype : 'APP' #forreq
+  adpool_responseformat : 'VAST'
+  adpool_selectedslots : '14'
+  ad_type_targeting : '3'
+  integration_version: '500'
+
+TEST_IX_NEW_PACKAGES_SDK_VERSION_NATIVE :
+- geo_countryid : '154'
+  integration_type: ANDROID_SDK
+  integration_version: '451'
+  adpool_requestedadtype: 'NATIVE'
+  adpool_placementId : '1431976048482536'
+
+TEST_RTBD_PMP_PACKAGES :
+- geo_countryid : '150'
+  integration_type: ANDROID_SDK
+  integration_version: '452'
+  multi_ad : '3'
+
+TEST_RTBD_PMP_PACKAGES1 :
+- geo_countryid : '150'
+  integration_type: ANDROID_SDK
+  integration_version: '452'
+  multi_ad : '3'
+
+TEST_RTBD_PMP_PACKAGES2 :
+- geo_countryid : '150'
+  integration_type: ANDROID_SDK
+  integration_version: '452'
+  multi_ad : '3'
+
+TEST_RTBD_PMP_NEW_PACKAGES :
+- geo_countryid : '150'
+  integration_type: ANDROID_SDK
+  integration_version: '452'
+  multi_ad : '3'
+  adpool_requestedadtype: 'BANNER'
+
+TEST_RTBD_PMP_VIEWABILITY_NEW_PACKAGES :
+- geo_countryid : '154'
+  integration_type: ANDROID_SDK
+  integration_version: '442'
+  multi_ad : '3'
+  adpool_requestedadtype: 'BANNER'
 
 TEST_IX_TRACKERDEAL_WITHOUT_VIEWABILITY :
 - geo_countryid : '152'
@@ -1692,6 +1783,14 @@ TEST_IX_PACKAGES_CSIDDEAL_NEGATIVE :
 - geo_countryid : '200'
   userprofile_csitags : '4'
 
+TEST_IX_NEW_PACKAGES_CSIDDEAL :
+- geo_countryid : '201'
+  userprofile_csitags : '1,4'
+
+TEST_IX_NEW_PACKAGES_CSIDDEAL_NEGATIVE :
+- geo_countryid : '201'
+  userprofile_csitags : '4'
+
 TEST_IX_PACKAGES_MANUFDEAL :
 - geo_countryid : '250'
   device_modelid : '7'
@@ -1719,6 +1818,7 @@ TEST_NATIVE_NON_NATIVE_SITE :
   site_siteid : 'NonNativeSiteID'
   site_publisherid : '4028cb1e35513d9b0135a9d3b4b21d77'
   adpool_responseformat : 'NATIVE'
+  adpool_requestedadtype: 'NATIVE'
   enable_change_conf : 'true'
   change_config_key : 'adapter.ix.nativeSupported'
   change_config_val : 'true'
@@ -1740,6 +1840,9 @@ TEST_RENDER_UNIT_ID_FOR_NATIVE_STRANDS:
 
 TEST_IEM:
 - adpool_iem: '123456789123456'
+
+TEST_CITY:
+- geo_cityids: '71146'
 
 TEST_IEM_WITH_O1:
 - adpool_iem: '123456789123456'
@@ -1910,6 +2013,9 @@ TEST_SECURE_SEGMENT_FLAG:
    ad_type_targeting : '3'
    segment_flags : '{11}'
    adpool_rqSslEnabled : 'true'
+   uidparams_rawuidvalues_o1: '0002e17f-4df0-4067-8776-27ff6efac8de'
+   uidparam_selecteduidtypevalue: '2'
+   adpool_requestedadtype: 'VAST'
 
 TEST_SECURE_SEGMENT_FLAG_NEGATIVE:
 -  adpool_selectedslots : '9'
@@ -1923,3 +2029,14 @@ TEST1_SDK530_NON_NATIVE_DCP_WITHOUT_ENCRYPTION:
    integration_type: ANDROID_SDK
    integration_version: '530'
    requestguid: 'test'
+
+TEST_PHOTON_UID_PRESENT:
+ - uidparams_rawuidvalues_o1: '0002e17f-4df0-4067-8776-27ff6efac8de'
+   uidparam_selecteduidtypevalue: '2'
+
+TEST_UID_PRESENT_IN_TUIDPARAMS:
+ - uidparams_rawuidvalues_o1: '0002e17f-4df0-4067-8776-27ff6efac8de'
+   uidparam_selecteduidtypevalue: '2'
+
+TEST_INTEGRATION_REQUEST_POSITIVE:
+ - request_header: 'x-inmobi-sandbox-cas'

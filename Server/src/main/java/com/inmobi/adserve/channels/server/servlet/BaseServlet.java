@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -14,7 +16,6 @@ import com.inmobi.adserve.channels.api.AdNetworkInterface;
 import com.inmobi.adserve.channels.api.CasInternalRequestParameters;
 import com.inmobi.adserve.channels.api.SASParamsUtils;
 import com.inmobi.adserve.channels.api.SASRequestParameters;
-import com.inmobi.adserve.channels.entity.SdkMraidMapEntity;
 import com.inmobi.adserve.channels.entity.SiteFilterEntity;
 import com.inmobi.adserve.channels.entity.SiteMetaDataEntity;
 import com.inmobi.adserve.channels.server.CasConfigUtil;
@@ -25,8 +26,8 @@ import com.inmobi.adserve.channels.server.beans.CasContext;
 import com.inmobi.adserve.channels.server.requesthandler.AsyncRequestMaker;
 import com.inmobi.adserve.channels.server.requesthandler.ChannelSegment;
 import com.inmobi.adserve.channels.server.requesthandler.MatchSegments;
+import com.inmobi.adserve.channels.server.requesthandler.PhotonHelper;
 import com.inmobi.adserve.channels.server.requesthandler.RequestFilters;
-import com.inmobi.adserve.channels.server.requesthandler.ResponseFormat;
 import com.inmobi.adserve.channels.server.requesthandler.beans.AdvertiserMatchedSegmentDetail;
 import com.inmobi.adserve.channels.server.requesthandler.filters.ChannelSegmentFilterApplier;
 import com.inmobi.adserve.channels.server.requesthandler.filters.adgroup.AdGroupLevelFilter;
@@ -36,12 +37,15 @@ import com.inmobi.adserve.channels.types.AccountType;
 import com.inmobi.adserve.channels.util.InspectorStats;
 import com.inmobi.adserve.channels.util.InspectorStrings;
 import com.inmobi.adserve.channels.util.Utils.ImpressionIdGenerator;
+import com.inmobi.casthrift.DemandSourceType;
+import com.inmobi.user.photon.datatypes.attribute.brand.BrandAttributes;
+import com.ning.http.client.ListenableFuture;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
 
-public abstract class BaseServlet implements Servlet {
+abstract class BaseServlet implements Servlet {
     private static final Logger LOG = LoggerFactory.getLogger(BaseServlet.class);
     protected final Provider<Marker> traceMarkerProvider;
 
@@ -51,20 +55,9 @@ public abstract class BaseServlet implements Servlet {
     private final AsyncRequestMaker asyncRequestMaker;
     private final List<AdvertiserLevelFilter> advertiserLevelFilters;
     private final List<AdGroupLevelFilter> adGroupLevelFilters;
-    protected final CasUtils casUtils;
+    private final CasUtils casUtils;
 
-    /**
-     *
-     * @param matchSegments
-     * @param traceMarkerProvider
-     * @param channelSegmentFilterApplier
-     * @param casUtils
-     * @param requestFilters
-     * @param asyncRequestMaker
-     * @param advertiserLevelFilters
-     * @param adGroupLevelFilters
-     */
-    protected BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
+    BaseServlet(final MatchSegments matchSegments, final Provider<Marker> traceMarkerProvider,
             final ChannelSegmentFilterApplier channelSegmentFilterApplier, final CasUtils casUtils,
             final RequestFilters requestFilters, final AsyncRequestMaker asyncRequestMaker,
             final List<AdvertiserLevelFilter> advertiserLevelFilters,
@@ -79,10 +72,6 @@ public abstract class BaseServlet implements Servlet {
         this.adGroupLevelFilters = adGroupLevelFilters;
     }
 
-    /**
-     *
-     * @return
-     */
     protected abstract boolean isEnabled();
 
     @Override
@@ -136,15 +125,24 @@ public abstract class BaseServlet implements Servlet {
             return;
         }
 
+        final boolean isPhotonEnable = CasConfigUtil.getServerConfig().getBoolean("photon.enable", false);
+        if (!sasParams.isCoppaEnabled() && isPhotonEnable && (sasParams.getDemandSourceType() == DemandSourceType.IX
+                || sasParams.getDemandSourceType() == DemandSourceType.RTBD)) {
+            final String userId = sasParams.getSelectedUserId();
+            if (StringUtils.isNotBlank(userId)) {
+                ListenableFuture<BrandAttributes> brandAttributesFuture = PhotonHelper.getBrandAttribute(userId);
+                sasParams.setBrandAttrFuturePair(Pair.of(System.currentTimeMillis(), brandAttributesFuture));
+            }
+        } else {
+            //LOG.debug("Photon Criteria doesn't match due to PhotonEnable is {} and Demand Source Type is {}", isPhotonEnable, sasParams.getDst());
+        }
+
         // Incrementing Adapter Specific Total Selected Segments Stats
         incrementTotalSelectedSegmentStats(filteredSegments);
 
-        if (!commonEnrichment(hrh, sasParams, casInternal)) {
-            hrh.responseSender.sendNoAdResponse(serverChannel);
-            return;
-        }
+        commonEnrichment(hrh, sasParams, casInternal);
         specificEnrichment(casContext, sasParams, casInternal);
-        auctionEngine.casInternalRequestParameters = casInternal;
+        auctionEngine.casParams = casInternal;
         auctionEngine.sasParams = sasParams;
 
         LOG.debug("Total channels available for sending requests {}", filteredSegments.size());
@@ -194,31 +192,10 @@ public abstract class BaseServlet implements Servlet {
 
     /**
      * Enrichment common for all ad pools
-     *
-     * @param hrh
-     * @param sasParams
-     * @param sasParams
-     * @param casInternal
      */
-    protected final boolean commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
+    private void commonEnrichment(final HttpRequestHandler hrh, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal) {
         casInternal.setTraceEnabled(Boolean.valueOf(hrh.getHttpRequest().headers().get("x-mkhoj-tracer")));
-        // Set imai content if r-format is imai
-        String imaiBaseUrl = null;
-        if (hrh.responseSender.getResponseFormat() == ResponseFormat.IMAI
-                || hrh.responseSender.getResponseFormat() == ResponseFormat.JSON) {
-            final String sdkVersion = sasParams.getSdkVersion();
-            final SdkMraidMapEntity sdkMraidMapEntity =
-                    CasConfigUtil.repositoryHelper.querySdkMraidMapRepository(sdkVersion);
-            if (null == sdkMraidMapEntity) {
-                LOG.error(traceMarkerProvider.get(), "Mraid Path not found for Sdk version: {}", sdkVersion);
-                InspectorStats.incrementStatCount(InspectorStrings.DROPPED_AS_MRAID_PATH_NOT_FOUND + sdkVersion);
-                return false;
-            }
-            imaiBaseUrl = sdkMraidMapEntity.getMraidPath();
-        }
-        sasParams.setImaiBaseUrl(imaiBaseUrl);
-        LOG.debug("imai base url is {}", imaiBaseUrl);
 
         final SiteMetaDataEntity siteMetaDataEntity =
                 matchSegments.getRepositoryHelper().querySiteMetaDetaRepository(sasParams.getSiteId());
@@ -229,20 +206,15 @@ public abstract class BaseServlet implements Servlet {
         casInternal.setSiteAccountType(AccountType.SELF_SERVE);
         casInternal.setAuctionId(ImpressionIdGenerator.getInstance().getImpressionId(sasParams.getSiteIncId()));
         LOG.debug("Auction id generated is {}", casInternal.getAuctionId());
-        return true;
     }
 
     /**
      * Specific Enrichment for all ad pools
-     *
-     * @param casContext
-     * @param sasParams
-     * @param casInternal
      */
     protected abstract void specificEnrichment(final CasContext casContext, final SASRequestParameters sasParams,
             final CasInternalRequestParameters casInternal);
 
-    protected static List<String> getBlockedIabCategories(final String siteId) {
+    static List<String> getBlockedIabCategories(final String siteId) {
         List<String> blockedCategories = null;
         if (null != siteId) {
             final SiteFilterEntity siteFilterEntity =

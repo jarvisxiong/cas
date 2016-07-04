@@ -273,6 +273,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getDst()).andReturn(2).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockCasInternal.isTraceEnabled()).andReturn(true);
         expect(mockChannel.isOpen()).andReturn(true).times(1);
         replayAll();
@@ -319,6 +320,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getImpressionId()).andReturn("AAAAAAAAAABBBBBBBBBCCCCCCCCCCCC");
         expect(mockSasParam.getCarrierId()).andReturn(0);
         expect(mockSasParam.getIpFileVersion()).andReturn(0);
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
 
         replayAll();
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -371,6 +373,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
         expect(mockEntity.getPricingModel()).andReturn(CPM).anyTimes();
         expect(mockEntity.getAdgroupIncId()).andReturn(5L);
         expect(mockEntity.getExternalSiteKey()).andReturn("test-external-site-key");
@@ -429,24 +432,24 @@ public class BaseAdNetworkImplTest {
         final BaseAdNetworkImpl baseAdNetwork = createPartialMock(BaseAdNetworkImpl.class, mockedMethods);
         MemberMatcher.field(BaseAdNetworkImpl.class, "sasParams").set(baseAdNetwork, sasParams);
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.FALSE);
-        assertEquals("com.default", baseAdNetwork.getAppBundleId());
+        assertEquals(null, baseAdNetwork.getAppBundleId(false));
 
         // preference over sasParam appBundleId test
         final WapSiteUACEntity.Builder builder = WapSiteUACEntity.newBuilder();
         builder.marketId("uac.marketId");
         MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
-        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId());
+        assertEquals("uac.marketId", baseAdNetwork.getAppBundleId(true));
 
         // wapSiteUACEntity have null market id
         builder.marketId(null);
         MemberMatcher.field(BaseAdNetworkImpl.class, "wapSiteUACEntity").set(baseAdNetwork, builder.build());
         MemberMatcher.field(BaseAdNetworkImpl.class, "isWapSiteUACEntity").set(baseAdNetwork, Boolean.TRUE);
-        assertEquals("com.default", baseAdNetwork.getAppBundleId());
+        assertEquals("com.default", baseAdNetwork.getAppBundleId(true));
 
         //both are null
         sasParams.setAppBundleId(null);
-        assertEquals(null, baseAdNetwork.getAppBundleId());
+        assertEquals(null, baseAdNetwork.getAppBundleId(true));
     }
 
     /**
@@ -470,6 +473,8 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
+
         replayAll();
 
         final Field ipRepositoryField = BaseAdNetworkImpl.class.getDeclaredField("ipRepository");
@@ -544,6 +549,7 @@ public class BaseAdNetworkImplTest {
         expect(mockSasParam.getRequestedAdType()).andReturn(RequestedAdType.BANNER).anyTimes();
         expect(mockSasParam.getWapSiteUACEntity()).andReturn(null).anyTimes();
         expect(mockSasParam.isMovieBoardRequest()).andReturn(false).anyTimes();
+        expect(mockSasParam.isCoppaEnabled()).andReturn(true).anyTimes();
 
         expect(mockCasInternalRequestParameters.isTrackingAllowed()).andReturn(true).anyTimes();
         expect(mockCasInternalRequestParameters.getUidIFA()).andReturn(null).times(6)
