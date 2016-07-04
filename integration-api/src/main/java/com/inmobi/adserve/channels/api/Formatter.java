@@ -100,7 +100,7 @@ public class Formatter {
         velocityTemplateMicrosoftForTwoClick320x50 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick320x50.vm");
         velocityTemplateMicrosoftForOneClick728x90 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick728x90.vm");
         velocityTemplateMicrosoftForTwoClick728x90 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick728x90.vm");
-//        velocityTemplateMicrosoftForOneClick300x250 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick300x250.vm");
+        velocityTemplateMicrosoftForOneClick300x250 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick300x250.vm");
         velocityTemplateMicrosoftForTwoClick300x250 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick300x250.vm");
         velocityTemplateMicrosoftForOneClick320x480 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick320x480.vm");
         velocityTemplateMicrosoftForOneClick480x320 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick480x320.vm");
