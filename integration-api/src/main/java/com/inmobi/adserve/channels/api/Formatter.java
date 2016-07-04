@@ -1,9 +1,8 @@
 package com.inmobi.adserve.channels.api;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.inmobi.adserve.adpool.RequestedAdType;
+import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
+import com.inmobi.adserve.channels.util.config.GlobalConstant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -15,9 +14,9 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.inmobi.adserve.adpool.RequestedAdType;
-import com.inmobi.adserve.channels.util.VelocityTemplateFieldConstants;
-import com.inmobi.adserve.channels.util.config.GlobalConstant;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Formatter {
@@ -35,7 +34,18 @@ public class Formatter {
         WAP_HTML_JS_AD_TAG,
         IX_HTML,
         ADBAY_HTML,
-        CAU
+        CAU,
+        MICROSOFT_RICH_TEXT_ONE_CLICK_320x50,
+        MICROSOFT_RICH_TEXT_TWO_CLICK_320x50,
+        MICROSOFT_RICH_TEXT_480x80,
+        MICROSOFT_RICH_TEXT_ONE_CLICK_728x90,
+        MICROSOFT_RICH_TEXT_TWO_CLICK_728x90,
+        MICROSOFT_RICH_TEXT_ONE_CLICK_300x250,
+        MICROSOFT_RICH_TEXT_TWO_CLICK_300x250,
+        MICROSOFT_RICH_TEXT_ONE_CLICK_320x480,
+        MICROSOFT_RICH_TEXT_ONE_CLICK_480x320,
+        MICROSOFT_RICH_TEXT_TWO_CLICK_320x480,
+        MICROSOFT_RICH_TEXT_TWO_CLICK_480x320
     }
 
     private static VelocityEngine velocityEngine;
@@ -51,6 +61,16 @@ public class Formatter {
     private static Template velocityTemplateWapHtmlJsAdTag;
     private static Template velocityTemplateAdbay;
     private static Template velocityTemplateCAU;
+    private static Template velocityTemplateMicrosoftForOneClick320x50;
+    private static Template velocityTemplateMicrosoftForTwoClick320x50;
+    private static Template velocityTemplateMicrosoftForOneClick728x90;
+    private static Template velocityTemplateMicrosoftForTwoClick728x90;
+    private static Template velocityTemplateMicrosoftForOneClick300x250;
+    private static Template velocityTemplateMicrosoftForTwoClick300x250;
+    private static Template velocityTemplateMicrosoftForOneClick320x480;
+    private static Template velocityTemplateMicrosoftForOneClick480x320;
+    private static Template velocityTemplateMicrosoftForTwoClick320x480;
+    private static Template velocityTemplateMicrosoftForTwoClick480x320;
 
 
     public static void init() throws Exception {
@@ -69,6 +89,16 @@ public class Formatter {
         velocityTemplateWapHtmlJsAdTag = velocityEngine.getTemplate("wapHtmlAdFormat.vm");
         velocityTemplateAdbay = velocityEngine.getTemplate("adbayHtmlTag.vm");
         velocityTemplateCAU = velocityEngine.getTemplate("cau.vm");
+        velocityTemplateMicrosoftForOneClick320x50 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick320x50.vm");
+        velocityTemplateMicrosoftForTwoClick320x50 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick320x50.vm");
+        velocityTemplateMicrosoftForOneClick728x90 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick728x90.vm");
+        velocityTemplateMicrosoftForTwoClick728x90 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick728x90.vm");
+//        velocityTemplateMicrosoftForOneClick300x250 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick300x250.vm");
+        velocityTemplateMicrosoftForTwoClick300x250 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick300x250.vm");
+        velocityTemplateMicrosoftForOneClick320x480 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick320x480.vm");
+        velocityTemplateMicrosoftForOneClick480x320 = velocityEngine.getTemplate("microsoftCustomRichTextOneClick480x320.vm");
+        velocityTemplateMicrosoftForTwoClick320x480 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick320x480.vm");
+        velocityTemplateMicrosoftForTwoClick480x320 = velocityEngine.getTemplate("microsoftCustomRichTextTwoClick480x320.vm");
     }
 
     static void updateVelocityContext(final VelocityContext context, final SASRequestParameters sasParams,
@@ -178,6 +208,35 @@ public class Formatter {
             case CAU:
                 velocityTemplateCAU.merge(context, writer);
                 break;
+            case MICROSOFT_RICH_TEXT_ONE_CLICK_320x50:
+                velocityTemplateMicrosoftForOneClick320x50.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_TWO_CLICK_320x50:
+                velocityTemplateMicrosoftForTwoClick320x50.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_ONE_CLICK_728x90:
+                velocityTemplateMicrosoftForOneClick728x90.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_TWO_CLICK_728x90:
+                velocityTemplateMicrosoftForTwoClick728x90.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_ONE_CLICK_300x250:
+                velocityTemplateMicrosoftForOneClick300x250.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_TWO_CLICK_300x250:
+                velocityTemplateMicrosoftForTwoClick300x250.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_ONE_CLICK_320x480:
+                velocityTemplateMicrosoftForOneClick320x480.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_ONE_CLICK_480x320:
+                velocityTemplateMicrosoftForOneClick480x320.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_TWO_CLICK_320x480:
+                velocityTemplateMicrosoftForTwoClick320x480.merge(context, writer);
+                break;
+            case MICROSOFT_RICH_TEXT_TWO_CLICK_480x320:
+                velocityTemplateMicrosoftForTwoClick480x320.merge(context, writer);
             default:
                 break;
         }
@@ -203,6 +262,9 @@ public class Formatter {
         if ("9".equals(slot) || "9.0".equals(slot)) {
             return "template_320_48";
         }
+        if ("10".equals(slot) || "10.0".equals(slot)) {
+            return "template_300_250";
+        }
         if ("11".equals(slot) || "11.0".equals(slot)) {
             return "template_728_90";
         }
@@ -211,6 +273,12 @@ public class Formatter {
         }
         if ("15".equals(slot) || "15.0".equals(slot)) {
             return "template_320_50";
+        }
+        if ("14".equals(slot) || "14.0".equals(slot)) {
+            return "template_320_480";
+        }
+        if ("32".equals(slot) || "32.0".equals(slot)) {
+            return "template_480_320";
         }
         return null;
     }

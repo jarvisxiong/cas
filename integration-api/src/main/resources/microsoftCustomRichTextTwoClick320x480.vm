@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name='viewport' content='initial-scale=1,width=device-width,user-scalable=no'>
+    <style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+    <script type="text/javascript">
+        window.onerror = function(e,url,l,c) {
+            alert("error: "+e + ", l:" + l + ",  c:" + c)
+        }
+    </script>
+    #if($SDK) <script type="text/javascript" src=#if($IMAIBaseUrl) "$IMAIBaseUrl"#else "mraid.js"#end></script>#end
+    <script type="text/javascript">
+        window['im_2670_fireAdReady'] = function() {
+            _im_imai.fireAdReady();
+        };
+        window['im_2670_fireAdFailed'] = function() {
+            _im_imai.fireAdFailed();
+        };
+        window['im_2670_fireAutoAdReady'] = true;
+        window['im_2670_disableAutoFireAdReady'] = function() {
+            window['im_2670_fireAutoAdReady'] = false;
+        };
+        var readyHandler = function(val) {
+            if (window['im_2670_fireAutoAdReady']) {
+                window['im_2670_fireAdReady']();
+            }
+        };
+        mraid.addEventListener('ready', readyHandler);
+        window['im_2670_replaceTimeStamp'] = function(url) {
+            return url.replace(/\$TS/g, new Date().getTime());
+        };
+        window['im_2670_openLandingPage'] = function() {
+            var landingUrl = '$PartnerAdClickUrl';
+            var url = window['im_2670_replaceTimeStamp'](landingUrl);
+            imraid.openExternal(url);
+        };
+        window['im_2670_recordEvent'] = function(id, params) {
+            var firePixel = function(source, retryTime, times) {
+                if (times <= 0) {
+                    return;
+                }
+                var clickTarget = document.getElementById('im_2670_clickTarget');
+                var img = document.createElement('img');
+                img.setAttribute('src', source);
+                img.setAttribute('height', '0');
+                img.setAttribute('width', '2');
+                if (img['addEventListener'] != undefined) {
+                    img.addEventListener('error', function() {
+                        window.setTimeout(function() {
+                            if (retryTime > 300000) {
+                                retryTime = 300000;
+                            }
+                            firePixel(source, retryTime * 2, times - 1);
+                        }, retryTime + Math.random());
+                    }, false);
+                }
+                clickTarget.appendChild(img);
+            };
+            var beacon = "http://placehold.it/1x1";
+            beacon += "?m=" + id;
+            beacon += "&t=" + new Date().getTime();
+            if (params) {
+                for (var key in params) {
+                    beacon += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+                }
+            }
+            firePixel(beacon, 1000, 5);
+        };
+    </script>
+</head>
+<body>
+<div style="display:none; position:absolute;" id="im_2670_clickTarget"></div>
+<style>.im_2670_bg{background:-webkit-linear-gradient(top,#333,#000);background:linear-gradient(top,#333,#000)}#im_2670_wrapperDiv{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);-webkit-transform:translate(-50%,-50%);width:320px;height:480px;background-color:rgba(0,0,0,.75)}#im_2670_firstCard{position:relative;top:30px;width:300px;height:205px;background-color:#fff;margin:0 auto}#im_2670_secondCard{position:relative;top:50px;width:300px;height:205px;background-color:#fff;margin:0 auto}#im_2670_firstOverlay,#im_2670_secondOverlay{position:absolute;float:left;width:300px;height:205px;z-index:5}.im_2670_sponsored{position:absolute;top:3px;left:10px;font-family:'Segoe UI',Frutiger,'Frutiger Linotype','Dejavu Sans','Helvetica Neue',Arial,sans-serif;font-size:14px;color:#9b9b9b}.im_2670_firstLine{display:-webkit-box;font-family:'Segoe UI',Frutiger,'Frutiger Linotype','Dejavu Sans','Helvetica Neue',Arial,sans-serif;font-size:20px;color:#4d4d4d;position:relative;top:28px;left:10px;width:280px;line-height:23px;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}#im_2670_closeButton{position:absolute;right:10px;top:5px;width:18px;height:18px}.im_2670_firstImage{display:inline-block;position:relative;top:23px;width:300px;height:145px}.fitted img:first-child{width:100%;height:100%}</style>
+<div id="im_2670_wrapperDiv">
+   <div id="im_2670_closeButton" class="fitted"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Media_Viewer_Icon_-_Close.svg/2000px-Media_Viewer_Icon_-_Close.svg.png"></div>
+   <div id="im_2670_firstCard">
+      <div id="im_2670_firstOverlay"></div>
+      <div class="im_2670_sponsored">Sponsored</div>
+      <div class="im_2670_firstImage fitted"><img src="$PartnerImgUrl"></div>
+      <div class="im_2670_firstLine">$AdText</div>
+   </div>
+   <div id="im_2670_secondCard">
+      <div id="im_2670_secondOverlay"></div>
+      <div class="im_2670_sponsored">Sponsored</div>
+      <div class="im_2670_firstImage fitted"><img src="$PartnerImgUrl1"></div>
+      <div class="im_2670_firstLine">$AdText1</div>
+   </div>
+</div>
+<script>!function(){function a(a){return h.getElementById(a)}function b(a,b,c){for(var d=j.length-1;d>=0;d--)c?a.addEventListener(j[d],b,!1):a.removeEventListener(j[d],b,!1)}function c(b){var c="object"==typeof b?b:a(b);_this=this,_this.element=c,_this.moved=!1,_this.startX=0,_this.startY=0,_this.hteo=!1,c.addEventListener(k[0],_this,!1),c.addEventListener(k[1],_this,!1)}function d(a){var b=new XMLHttpRequest;b.open("GET",a,!0),b.send(null)}function e(a){d("$IMClickUrl"),a.target.id==i+"firstOverlay"?(d("$IMClickUrl"),imraid&&imraid.openExternal&&"function"==typeof imraid.openExternal?imraid.openExternal("$PartnerAdClickUrl"):mraid&&mraid.openExternal&&"function"==typeof mraid.openExternal?mraid.openExternal("$PartnerAdClickUrl"):window.open("$PartnerAdClickUrl")):a.target.id==i+"secondOverlay"&&(d("$IMClickUrl"),imraid&&imraid.openExternal&&"function"==typeof imraid.openExternal?imraid.openExternal("$PartnerAdClickUrl1"):mraid&&mraid.openExternal&&"function"==typeof mraid.openExternal?mraid.openExternal("$PartnerAdClickUrl1"):window.open("$PartnerAdClickUrl1"))}function f(a){a.stopPropagation(),imraid&&imraid.openExternal&&"function"==typeof imraid.openExternal?imraid.close():mraid&&mraid.openExternal&&"function"==typeof mraid.openExternal&&mraid.close()}var g=window,h=document,i="im_2670_",j=(g[i+"recordEvent"],g[i+"openLandingPage"],["touchmove","touchend","touchcancel","mousemove","mouseup"]),k=["touchstart","mousedown"];c.prototype.start=function(a){var c=this.element;a.type===k[0]&&(this.hteo=!0),this.moved=!1,this.startX=a.type===k[0]?a.touches[0].clientX:a.clientX,this.startY=a.type===k[0]?a.touches[0].clientY:a.clientY,b(c,this,!0)},c.prototype.move=function(a){var b=a.type===j[0]?a.touches[0].clientX:a.clientX,c=a.type===j[0]?a.touches[0].clientY:a.clientY;(Math.abs(b-this.startX)>10||Math.abs(c-this.startY)>10)&&(this.moved=!0)},c.prototype.end=function(a){var c,d=this.element;if(this.hteo&&a.type===j[4])return a.preventDefault(),a.stopPropagation(),void(this.hteo=!1);if(!this.moved){var e=a.type===j[1]?a.changedTouches[0].clientX:a.clientX,f=a.type===j[1]?a.changedTouches[0].clientY:a.clientY;if("function"==typeof CustomEvent)c=new CustomEvent("tap",{bubbles:!0,cancelable:!0,detail:{x:e,y:f}});else try{c=h.createEvent("CustomEvent"),c.initCustomEvent("tap",!0,!0,{x:e,y:f})}catch(g){c=h.createEvent("Event"),c.initEvent("tap",!0,!0)}a.target.dispatchEvent(c)}b(d,this,!1)},c.prototype.cancel=function(a){var c=this.element;this.moved=!1,this.startX=0,this.startY=0,b(c,this,!1)},c.prototype.handleEvent=function(a){switch(_this=this,a.type){case k[0]:_this.start(a);break;case j[0]:_this.move(a);break;case j[1]:_this.end(a);break;case j[2]:_this.cancel(a);break;case k[1]:_this.start(a);break;case j[3]:_this.move(a);break;case j[4]:_this.end(a)}},h.addEventListener(j[0],function(a){a.preventDefault()}),clickElement=a(i+"wrapperDiv"),bannerContainer=a(i+"bannerContainer"),closeButton=a(i+"closeButton"),imraid&&imraid.useCustomClose&&"function"==typeof imraid.useCustomClose?imraid.useCustomClose(!0):mraid&&mraid.useCustomClose&&"function"==typeof mraid.useCustomClose&&mraid.useCustomClose(!0),closeButton&&(new c(closeButton),closeButton.addEventListener("tap",f,!1)),clickElement&&(new c(clickElement),clickElement.addEventListener("tap",e,!1),d("$IMBeaconUrl"))}();</script>   </body>
+
+
+</html>
